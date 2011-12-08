@@ -176,21 +176,54 @@ function showWait(message, contextRoot) {
  * Return value: none
  */
 function toggleSelectAll(formId) {
-  formobj = document.getElementById(formId);
-  checkboxes = formobj.getElementsByTagName('input');
-  var isAllSelected = (formobj.selectAll.value == "Select all")?false:true;
+	formobj = document.getElementById(formId);
+	checkboxes = formobj.getElementsByTagName('input');
+	var isAllSelected = (formobj.selectAll.value == "Select all") ? false : true;
 
-  if (isAllSelected == null || isAllSelected == false) {
-    for (i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i].type == 'checkbox')
-        checkboxes[i].checked = true ;
-    }
-    formobj.selectAll.value = "Deselect all";
-  }
-  else {
-    for (i = 0; i < checkboxes.length; i++)
-      if (checkboxes[i].type == 'checkbox')
-        checkboxes[i].checked = false ;
-    formobj.selectAll.value = "Select all";
-  }
+	if (isAllSelected == null || isAllSelected == false) {
+		for (i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].type == 'checkbox') {
+				checkboxes[i].checked = true ;
+			}
+		}
+		formobj.selectAll.value = "Deselect all";
+	} else {
+		for (i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].type == 'checkbox') {
+				checkboxes[i].checked = false ;
+			}
+		}
+		formobj.selectAll.value = "Select all";
+	}
+}
+
+/**
+ * Toggles the "select all" feature for given checkbox field.
+ *
+ * Input parameters:
+ *   formId - the id of the form object where these checkboxes are looked for
+ *   field - the name of the checkbox field
+ *
+ * Return value: none
+ */
+function toggleSelectAllForField(formId, fieldName) {
+	formobj = document.getElementById(formId);
+	checkboxes = formobj.getElementsByTagName('input');
+	var isAllSelected = (formobj.selectAll.value == "Select all") ? false : true;
+
+	if (isAllSelected == null || isAllSelected == false) {
+		for (i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].type == 'checkbox' && checkboxes[i].name == fieldName) {
+				checkboxes[i].checked = true ;
+			}
+		}
+		formobj.selectAll.value = "Deselect all";
+	} else {
+		for (i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].type == 'checkbox' && checkboxes[i].name == fieldName) {
+				checkboxes[i].checked = false ;
+			}
+		}
+		formobj.selectAll.value = "Select all";
+	}
 }

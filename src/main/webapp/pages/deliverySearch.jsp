@@ -53,7 +53,7 @@
 		        <c:if test="${not empty param.search}">
 		        	<c:choose>
 						<c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
-				        	<crfn:form action="/saveFiles.action" method="post">
+				        	<crfn:form action="/saveFiles.action" method="post" id="deliveriesForm">
 					        	<display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem"
 					        				htmlId="resourcesResultList" requestURI="/deliverySearch.action"
 					        				decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
@@ -65,8 +65,10 @@
 									<display:column property="periodValue" title="Period" sortable="true" sortProperty="period"/>
 									<display:column property="locality" title="Locality"/>
 									<display:column property="date" title="Date" sortable="true"/>
+									<display:column property="coverageNote" title="Coverage Note" sortable="true"/>
 								</display:table>
 								<stripes:submit name="getFiles" value="Save files into dataset"/>
+								<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('deliveriesForm');return false"/>
 							</crfn:form>
 						</c:when>
 						<c:otherwise>

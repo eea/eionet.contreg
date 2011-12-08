@@ -35,11 +35,11 @@
 		        <h1>Save files into dataset</h1>
 				<p class="documentDescription">
 					Select multiple files and store them into one compiled dataset under your home-folder.
-					The list will show only XML or RDF files.
+					The list will show only XML files.
 				</p>
 
 				<c:if test="${not empty actionBean.deliveryFiles}">
-					<stripes:form action="/saveFiles.action" method="post">
+					<stripes:form action="/saveFiles.action" method="post" id="deliveryFilesForm">
 			        	<table border="0" width="100%" class="datatable">
 				        	<c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
 				        		<tr>
@@ -55,7 +55,7 @@
 				        		<c:forEach items="${delivery.files}" var="file" varStatus="loop">
 				        			<tr class="${loop.index % 2 == 0 ? 'odd' : 'even'}">
 				        				<td width="20">
-				        					<stripes:checkbox name="selectedFiles" value="${file.uri}"/>
+				        					<stripes:checkbox name="selectedFiles" value="${file.uri}" id="selFiles"/>
 				        				</td>
 				        				<td>
 				        					<c:out value="${file.title}"/>
@@ -73,6 +73,11 @@
 				        			</tr>
 				        		</c:forEach>
 				        	</c:forEach>
+				        	<tr>
+				        		<td colspan="3" align="left">
+				        			<input type="button" name="selectAll" value="Select all" onclick="toggleSelectAllForField('deliveryFilesForm','selectedFiles');return false"/>
+				        		</td>
+				        	</tr>
 			        	</table>
 						<table border="0" width="550">
 							<tr>
@@ -83,7 +88,7 @@
 									<stripes:select name="dataset" style="width: 383px;" id="selDataset">
 										<stripes:option value="new_dataset" label="- new dataset -" />
 										<c:forEach items="${actionBean.existingDatasets}" var="ds" varStatus="loop">
-											<stripes:option value="${ds}" label="${crfn:removeHomeUri(ds)}" />
+											<stripes:option value="${ds.value}" label="${crfn:removeHomeUri(ds.value)} (${ds.name})" />
 										</c:forEach>
 									</stripes:select>
 								</td>
@@ -93,10 +98,18 @@
 							<table border="0" width="550">
 								<tr>
 									<td width="160">
-										<stripes:label for="fileName" class="required question">Dataset name</stripes:label>
+										<stripes:label for="datasetId" class="required question">Dataset ID</stripes:label>
 									</td>
 									<td>
-										<stripes:text name="fileName" id="fileName" size="58"/>
+										<stripes:text name="datasetId" id="datasetId" size="58"/>
+									</td>
+								</tr>
+								<tr>
+									<td width="160">
+										<stripes:label for="datasetTitle">Dataset title</stripes:label>
+									</td>
+									<td>
+										<stripes:text name="datasetTitle" id="datasetTitle" size="58"/>
 									</td>
 								</tr>
 								<tr>

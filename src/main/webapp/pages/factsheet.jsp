@@ -239,7 +239,7 @@
 	                                	<label for="compiledDataset" style="width: 200px; float: left;">Select compiled dataset:</label>
 		                                <stripes:select name="dataset" id="compiledDataset" style="width: 350px;">
 											<c:forEach items="${actionBean.userCompiledDatasets}" var="ds" varStatus="loop">
-												<stripes:option value="${ds}" label="${crfn:removeHomeUri(ds)}" />
+												<stripes:option value="${ds.value}" label="${crfn:removeHomeUri(ds.value)} (${ds.name})" />
 											</c:forEach>
 										</stripes:select>
 									</fieldset>
