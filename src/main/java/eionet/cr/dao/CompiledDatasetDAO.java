@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.List;
 
 import eionet.cr.dto.DeliveryFilesDTO;
+import eionet.cr.dto.PairDTO;
 import eionet.cr.dto.SubjectDTO;
 
 /**
@@ -44,10 +45,10 @@ public interface CompiledDatasetDAO extends DAO {
      *
      * @param homeFolder
      * @param excludeFileUri - if provided, then compiled datasets that include this file, are not returned
-     * @return List<String>
+     * @return List<PairDTO>
      * @throws DAOException
      */
-    List<String> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException;
+    List<PairDTO> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException;
 
     /**
      *

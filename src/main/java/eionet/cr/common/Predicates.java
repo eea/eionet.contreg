@@ -64,6 +64,7 @@ public interface Predicates {
     String ROD_PRODUCT_OF = "http://rod.eionet.europa.eu/schema.rdf#productOf";
     String ROD_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#period";
     String ROD_RELEASED = "http://rod.eionet.europa.eu/schema.rdf#released";
+    String ROD_COVERAGE_NOTE = "http://rod.eionet.europa.eu/schema.rdf#coverageNote";
 
     String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
     String CR_URL = "urn:eionet:contreg:url";

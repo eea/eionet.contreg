@@ -25,10 +25,8 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
     /**
      * converts Bindingset row to DeliveryDTO.
      *
-     * @param bindingSet
-     *            BindingSet
-     * @throws ResultSetReaderException
-     *             if error in reading
+     * @param bindingSet - BindingSet
+     * @throws ResultSetReaderException - if error in reading
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {
@@ -46,8 +44,11 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
                 String predicateUri = bindingSet.getValue("p") != null ? bindingSet.getValue("p").stringValue() : null;
                 String object = bindingSet.getValue("o") != null ? bindingSet.getValue("o").stringValue() : null;
 
-                if (predicateUri != null && predicateUri.equals(Predicates.RDFS_LABEL)) {
+                if (predicateUri != null && predicateUri.equals(Predicates.DC_TITLE)) {
                     delivery.setTitle(object);
+                }
+                if (predicateUri != null && predicateUri.equals(Predicates.ROD_COVERAGE_NOTE)) {
+                    delivery.setCoverageNote(object);
                 }
                 if (predicateUri != null && predicateUri.equals(Predicates.ROD_HAS_FILE)) {
                     fileCount++;

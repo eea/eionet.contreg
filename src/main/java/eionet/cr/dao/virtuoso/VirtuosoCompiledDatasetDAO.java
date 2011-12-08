@@ -16,8 +16,10 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.DeliveryFilesReader;
+import eionet.cr.dao.readers.PairReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.DeliveryFilesDTO;
+import eionet.cr.dto.PairDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
@@ -74,23 +76,24 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * {@inheritDoc}
      */
     @Override
-    public List<String> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException {
-        List<String> ret = new ArrayList<String>();
+    public List<PairDTO> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException {
+        List<PairDTO> ret = new ArrayList<PairDTO>();
         if (!StringUtils.isBlank(homeFolder)) {
             StringBuffer query = new StringBuffer();
-            query.append("select distinct(?s) where {");
+            query.append("select distinct ?value ?name where {");
             query.append("graph ?g { ");
-            query.append("?s ?p <").append(Predicates.CR_COMPILED_DATASET).append("> .");
-            query.append("filter (?g = <").append(homeFolder).append(">)");
+            query.append("?value ?p <").append(Predicates.CR_COMPILED_DATASET).append("> .");
+            query.append("filter (?g = <").append(homeFolder).append(">) .");
             if (!StringUtils.isBlank(excludeFileUri)) {
                 query.append("filter not exists {");
-                query.append("?s <").append(Predicates.CR_GENERATED_FROM).append("> ?o .");
+                query.append("?value <").append(Predicates.CR_GENERATED_FROM).append("> ?o .");
                 query.append("filter (?o = <").append(excludeFileUri).append(">)");
                 query.append("}");
             }
-            query.append("}} ORDER BY ?s");
+            query.append("?value <http://www.w3.org/2000/01/rdf-schema#label> ?name ");
+            query.append("}} ORDER BY ?value");
 
-            ret = executeSPARQL(query.toString(), new SingleObjectReader<String>());
+            ret = executeSPARQL(query.toString(), new PairReader());
         }
         return ret;
     }

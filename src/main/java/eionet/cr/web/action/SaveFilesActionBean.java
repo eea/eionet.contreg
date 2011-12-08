@@ -39,6 +39,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.DeliveryFilesDTO;
+import eionet.cr.dto.PairDTO;
 
 /**
  *
@@ -50,11 +51,12 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     private List<String> selectedDeliveries;
     private List<DeliveryFilesDTO> deliveryFiles;
-    private List<String> existingDatasets;
+    private List<PairDTO> existingDatasets;
     private List<String> folders;
 
     private List<String> selectedFiles;
-    private String fileName;
+    private String datasetId;
+    private String datasetTitle;
     private String folder;
     private boolean overwrite;
     private String dataset;
@@ -81,6 +83,11 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
         if (selectedFiles != null && selectedFiles.size() > 0) {
             try {
+                // If dataset title is empty, then set it to dataset ID
+                if (StringUtils.isBlank(datasetTitle) && dataset.equals("new_dataset")) {
+                    datasetTitle = datasetId;
+                }
+
                 //Set folder to null if existing dataset selected
                 if (!StringUtils.isBlank(dataset) && !dataset.equals("new_dataset")) {
                     folder = null;
@@ -88,11 +95,11 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
                 // Construct new dataset uri
                 if (!StringUtils.isBlank(dataset) && !StringUtils.isBlank(folder) && dataset.equals("new_dataset")) {
-                    dataset = folder + "/" + StringUtils.replace(fileName, " ", "%20");
+                    dataset = folder + "/" + StringUtils.replace(datasetId, " ", "%20");
                 }
 
                 CreateDataset cd = new CreateDataset(Predicates.CR_COMPILED_DATASET, getUser());
-                cd.create(fileName, dataset, folder, selectedFiles, overwrite);
+                cd.create(datasetTitle, dataset, folder, selectedFiles, overwrite);
 
             } catch (Exception e) {
                 throw new DAOException(e.getMessage(), e);
@@ -136,18 +143,24 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
             return;
         }
 
-        // Check if file name is not empty
-        if (dataset != null && dataset.equals("new_dataset") && StringUtils.isBlank(fileName)) {
-            addGlobalValidationError("File name is mandatory!");
+        // Check that dataset ID is not empty
+        if (dataset != null && dataset.equals("new_dataset") && StringUtils.isBlank(datasetId)) {
+            addGlobalValidationError("Dataset ID is mandatory!");
+            return;
+        }
+
+        // Check that dataset ID does not contain slashes
+        if (!StringUtils.isBlank(datasetId) && datasetId.contains("/")) {
+            addGlobalValidationError("Dataset ID may not contain \"/\" character!");
             return;
         }
 
         // Check if file already exists
-        if (!overwrite && dataset != null && dataset.equals("new_dataset") && !StringUtils.isBlank(fileName)) {
-            String datasetUri = folder + "/" + StringUtils.replace(fileName, " ", "%20");
+        if (!overwrite && dataset != null && dataset.equals("new_dataset") && !StringUtils.isBlank(datasetId)) {
+            String datasetUri = folder + "/" + StringUtils.replace(datasetId, " ", "%20");
             boolean exists = DAOFactory.get().getDao(CompiledDatasetDAO.class).datasetExists(datasetUri);
             if (exists) {
-                addGlobalValidationError("Dataset named \"" + fileName + "\" already exists!");
+                addGlobalValidationError("Dataset with ID \"" + datasetId + "\" already exists!");
             }
         }
 
@@ -192,14 +205,6 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         this.selectedFiles = selectedFiles;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     public boolean isOverwrite() {
         return overwrite;
     }
@@ -220,11 +225,11 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         return deliveryFiles;
     }
 
-    public List<String> getExistingDatasets() {
+    public List<PairDTO> getExistingDatasets() {
         return existingDatasets;
     }
 
-    public void setExistingDatasets(List<String> existingDatasets) {
+    public void setExistingDatasets(List<PairDTO> existingDatasets) {
         this.existingDatasets = existingDatasets;
     }
 
@@ -246,6 +251,22 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     public List<String> getFolders() {
         return folders;
+    }
+
+    public String getDatasetTitle() {
+        return datasetTitle;
+    }
+
+    public void setDatasetTitle(String datasetTitle) {
+        this.datasetTitle = datasetTitle;
+    }
+
+    public String getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
     }
 
 }

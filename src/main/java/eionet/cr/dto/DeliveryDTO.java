@@ -42,6 +42,7 @@ public class DeliveryDTO extends HarvestBaseDTO implements java.io.Serializable 
     private String endYear;
     private String locality;
     private String date;
+    private String coverageNote;
 
     /**
      *
@@ -116,5 +117,13 @@ public class DeliveryDTO extends HarvestBaseDTO implements java.io.Serializable 
 
     public void setEndYear(String endYear) {
         this.endYear = endYear;
+    }
+
+    public String getCoverageNote() {
+        return coverageNote;
+    }
+
+    public void setCoverageNote(String coverageNote) {
+        this.coverageNote = coverageNote;
     }
 }
