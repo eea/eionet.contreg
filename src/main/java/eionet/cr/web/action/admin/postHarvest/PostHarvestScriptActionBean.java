@@ -59,7 +59,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** */
     private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n"
-        + "    INSERT { ?s cr:tag `bif:lower(?o)` }\n"
+        + "    INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " { ?s cr:tag `bif:lower(?o)` }\n"
+        + "    FROM ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + "\n"
         + "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
 
     /** */
