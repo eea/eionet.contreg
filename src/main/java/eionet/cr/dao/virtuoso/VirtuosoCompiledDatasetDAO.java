@@ -231,54 +231,6 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
     }
 
     /**
-     * SPARQL for detecting if user owns the dataset
-     */
-    private static final String IS_USER_DATASET_QUERY = "ASK { ?userHome ?pred ?dataset }";
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isUsersDataset(String dataset, String userHome) throws DAOException {
-
-        boolean ret = false;
-
-        if (dataset == null) {
-            throw new IllegalArgumentException("Dataset URI must not be null");
-        }
-
-        if (userHome == null) {
-            throw new IllegalArgumentException("User home URI must not be null");
-        }
-
-        RepositoryConnection con = null;
-
-        try {
-            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
-
-            Bindings bindings = new Bindings();
-            bindings.setURI("userHome", userHome);
-            bindings.setURI("pred", Predicates.CR_HAS_FILE);
-            bindings.setURI("dataset", dataset);
-
-            BooleanQuery booleanQuery = con.prepareBooleanQuery(QueryLanguage.SPARQL, IS_USER_DATASET_QUERY);
-            bindings.applyTo(booleanQuery, con.getValueFactory());
-            Boolean result = booleanQuery.evaluate();
-            if (result != null) {
-                ret = result.booleanValue();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SesameUtil.close(con);
-        }
-
-        return ret;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

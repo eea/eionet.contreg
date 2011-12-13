@@ -99,16 +99,6 @@ public interface CompiledDatasetDAO extends DAO {
     boolean datasetExists(String uri) throws DAOException;
 
     /**
-     * Check if user owns the compiled dataset.
-     *
-     * @param dataset
-     * @param userHome
-     * @throws DAOException
-     * @return boolean
-     */
-    boolean isUsersDataset(String dataset, String userHome) throws DAOException;
-
-    /**
      * Returns true, if compiled datset's lastModified property is older than one of the selected files.
      *
      * @param datasetUri

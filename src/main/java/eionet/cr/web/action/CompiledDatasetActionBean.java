@@ -32,8 +32,10 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryException;
 import org.quartz.JobDetail;
@@ -64,6 +66,12 @@ import eionet.cr.web.util.tabs.TabElement;
 @UrlBinding("/compiledDataset.action")
 public class CompiledDatasetActionBean extends AbstractActionBean {
 
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(CompiledDatasetActionBean.class);
+
+    /**  */
+    private static final String COMPILED_DATASET_JSP = "/pages/compiledDataset.jsp";
+
     /** URI by which the factsheet has been requested. */
     private String uri;
 
@@ -73,9 +81,14 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     /** Compiled dataset sources. */
     private List<SubjectDTO> sources;
 
+    /** */
     private List<TabElement> tabs;
 
+    /** */
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    /** */
+    private Boolean isUserDataset = null;
 
     /**
      * Action event for displaying dataset sources.
@@ -97,7 +110,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.COMPILED_DATASET);
         }
 
-        return new ForwardResolution("/pages/compiledDataset.jsp");
+        return new ForwardResolution(COMPILED_DATASET_JSP);
     }
 
     /**
@@ -107,51 +120,45 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public Resolution reload() throws DAOException {
+
         boolean success = false;
-        if (getUser() != null) {
-            if (isUsersDataset()) {
-                if (!StringUtils.isBlank(uri)) {
-                    try {
-                        // Raise the flag that dataset is being reloaded
-                        CurrentLoadedDatasets.addLoadedDataset(uri, getUserName());
+        try {
+            // Raise the flag that dataset is being reloaded
+            CurrentLoadedDatasets.addLoadedDataset(uri, getUserName());
 
-                        // Start dataset reload job
-                        SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
-                        Scheduler sched = schedFact.getScheduler();
-                        sched.start();
+            // Start dataset reload job
+            SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+            Scheduler sched = schedFact.getScheduler();
+            sched.start();
 
-                        JobDetail jobDetail = new JobDetail("LoadTriplesJob", null, LoadTriplesJob.class);
-                        jobDetail.getJobDataMap().put("datasetUri", uri);
-                        jobDetail.getJobDataMap().put("overwrite", true);
-                        List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(uri);
-                        jobDetail.getJobDataMap().put("selectedFiles", datasetFiles);
+            JobDetail jobDetail = new JobDetail("LoadTriplesJob", null, LoadTriplesJob.class);
+            jobDetail.getJobDataMap().put("datasetUri", uri);
+            jobDetail.getJobDataMap().put("overwrite", true);
+            List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(uri);
+            jobDetail.getJobDataMap().put("selectedFiles", datasetFiles);
 
-                        LoadTriplesJobListener listener = new LoadTriplesJobListener();
-                        jobDetail.addJobListener(listener.getName());
-                        sched.addJobListener(listener);
+            LoadTriplesJobListener listener = new LoadTriplesJobListener();
+            jobDetail.addJobListener(listener.getName());
+            sched.addJobListener(listener);
 
-                        SimpleTrigger trigger = new SimpleTrigger(jobDetail.getName(), null, new Date(), null, 0, 0L);
-                        sched.scheduleJob(jobDetail, trigger);
+            SimpleTrigger trigger = new SimpleTrigger(jobDetail.getName(), null, new Date(), null, 0, 0L);
+            sched.scheduleJob(jobDetail, trigger);
 
-                        // Update source last modified date
-                        DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+            // Update source last modified date
+            DAOFactory
+            .get()
+            .getDao(HarvestSourceDAO.class)
+            .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                    ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
-                        success = true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        addCautionMessage("Error occured while executing compiled dataset reload process!");
+            success = true;
+        } catch (Exception e) {
 
-                        // Remove the flag that dataset is being reloaded
-                        CurrentLoadedDatasets.removeLoadedDataset(uri);
-                    }
-                }
-            } else {
-                addCautionMessage("User must be the owner of the compiled dataset!");
-            }
-        } else {
-            addCautionMessage("User must be logged in!");
+            LOGGER.error("Dataset reload failed with the following exception", e);
+            addCautionMessage("Error occured while executing compiled dataset reload process!");
+
+            // Remove the flag that dataset is being reloaded
+            CurrentLoadedDatasets.removeLoadedDataset(uri);
         }
 
         if (success) {
@@ -161,7 +168,29 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                 addSystemMessage("Reload started in the background.");
             }
         }
-        return view();
+
+        return new RedirectResolution(this.getClass()).addParameter("uri", uri);
+    }
+
+    /**
+     *
+     */
+    @ValidationMethod(on = {"reload"})
+    public void validateReload() {
+
+        if (getUser() == null) {
+            addGlobalValidationError("You are not authorized for this operation!");
+        } else {
+            if (StringUtils.isBlank(uri)) {
+                addGlobalValidationError("Dataset URI missing!");
+            } else if (getIsUserDataset() == false) {
+                addGlobalValidationError("You are not the owner of this dataset!");
+            }
+        }
+
+        if (!getContext().getValidationErrors().isEmpty()) {
+            getContext().setSourcePageResolution(new ForwardResolution(COMPILED_DATASET_JSP));
+        }
     }
 
     /**
@@ -192,7 +221,9 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         helperDao.deleteTriples(triples);
 
         // Update source last modified date
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
+        DAOFactory
+        .get()
+        .getDao(HarvestSourceDAO.class)
         .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
                 ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
 
@@ -208,20 +239,18 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     }
 
     /**
-     * True, if the dataset with given uri belongs to the currently logged in user.
+     * Returns true if there is an authenticated user, and the dataset URI is not blank and it starts with the authenticated user's
+     * home-URI.
      *
-     * @return
+     * @return See method description.
      */
-    public boolean isUsersDataset() {
-        boolean ret = false;
-        try {
-            if (getUser() != null) {
-                ret = factory.getDao(CompiledDatasetDAO.class).isUsersDataset(uri, getUser().getHomeUri());
-            }
-        } catch (DAOException e) {
-            e.printStackTrace();
+    public boolean getIsUserDataset() {
+
+        if (isUserDataset == null) {
+            isUserDataset = getUser() != null && !StringUtils.isBlank(uri) && uri.startsWith(getUser().getHomeUri());
         }
-        return ret;
+
+        return isUserDataset;
     }
 
     /**
@@ -256,8 +285,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -278,8 +306,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedFiles
-     *            the selectedFiles to set
+     * @param selectedFiles the selectedFiles to set
      */
     public void setSelectedFiles(List<String> selectedFiles) {
         this.selectedFiles = selectedFiles;

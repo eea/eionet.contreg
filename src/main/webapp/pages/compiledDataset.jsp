@@ -8,7 +8,7 @@
 
         <cr:tabMenu tabs="${actionBean.tabs}" />
 
-        <c:set var="operationsAvailable" value="${actionBean.usersDataset}" />
+        <c:set var="operationsAvailable" value="${actionBean.isUserDataset}" />
 
         <br style="clear:left" />
         <br />
