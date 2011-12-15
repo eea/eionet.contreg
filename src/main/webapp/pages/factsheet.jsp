@@ -145,13 +145,18 @@
                                             <li>
                                                 <stripes:link class="link-plain" href="/factsheet.action">Remove bookmark
                                                     <stripes:param name="removebookmark" value="" />
-                                                    <stripes:param name="uri" value="${ subjectUrl }" />
+                                                    <stripes:param name="uri" value="${subjectUrl}"/>
                                                 </stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${addReviewAllowed}">
                                             <li>
-                                                <stripes:link class="link-plain" href="/home/${actionBean.userName}/reviews?add=Add&addUrl=${ subjectUrl }">Add review</stripes:link>
+                                                <stripes:link class="link-plain" href="/reviews.action">
+                                                	Add review
+                                                	<stripes:param name="add" value="Add"/>
+                                                	<stripes:param name="uri" value="${actionBean.user.reviewsUri}"/>
+                                                	<stripes:param name="addUrl" value="${subjectUrl}"/>
+                                                </stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${addToCompiledDataset}">
