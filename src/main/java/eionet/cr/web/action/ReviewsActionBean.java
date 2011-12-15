@@ -612,7 +612,6 @@ public class ReviewsActionBean extends AbstractActionBean {
      */
     public boolean isUsersReview() {
         boolean ret = false;
-        getUser().getReviewsUri();
         if (!StringUtils.isBlank(uri) && getUser() != null) {
             ret = uri.startsWith(getUser().getHomeUri());
         }
