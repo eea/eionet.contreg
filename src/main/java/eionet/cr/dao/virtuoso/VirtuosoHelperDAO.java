@@ -58,12 +58,10 @@ import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.helpers.ResourceRenameHandler;
-import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PredicateDTO;
-import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
@@ -872,504 +870,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#generateNewReviewId(eionet.cr.web.security.CRUser )
-     */
-    @Override
-    public int generateNewReviewId(CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-        // int currentLastId = getLastReviewId(user);
-        // // Deleting from the database the old value and creating a new one.
-        //
-        // String deleteQuery = "DELETE FROM spo WHERE " + "PREDICATE=" +
-        // Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER)
-        // + " and " + "SUBJECT=" + Hashes.spoHash(user.getHomeUri()) + "";
-        // Connection conn = null;
-        // Statement stmt = null;
-        // try {
-        // conn = getSQLConnection();
-        // stmt = conn.createStatement();
-        // stmt.execute(deleteQuery);
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-        //
-        // // Generating new ID
-        // int newId = currentLastId + 1;
-        //
-        // SubjectDTO newValue = new SubjectDTO(user.getHomeUri(), false);
-        // ObjectDTO objectDTO = new ObjectDTO(String.valueOf(newId), true);
-        // objectDTO.setSourceUri(user.getHomeUri());
-        //
-        // newValue.addObject(Predicates.CR_USER_REVIEW_LAST_NUMBER, objectDTO);
-        //
-        // addTriples(newValue);
-        //
-        // addResource(Predicates.CR_USER_REVIEW_LAST_NUMBER, user.getHomeUri());
-        // addResource(user.getHomeUri(), user.getHomeUri());
-        //
-        // // since user's home URI was used above as triple source, add it to
-        // // HARVEST_SOURCE too
-        // // (but set interval minutes to 0, to avoid it being
-        // // background-harvested)
-        // DAOFactory.get().getDao(HarvestSourceDAO.class)
-        // .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getHomeUri(), true, 0, user.getUserName()));
-        //
-        // return newId;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getLastReviewId(eionet.cr.web.security.CRUser)
-     */
-    @Override
-    public int getLastReviewId(CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-        // String subjectUrl = user.getHomeUri();
-
-        // String dbQuery = "select OBJECT as lastid from SPO " + "where " + "PREDICATE="
-        // + Hashes.spoHash(Predicates.CR_USER_REVIEW_LAST_NUMBER) + " and " + "SUBJECT=" + Hashes.spoHash(subjectUrl) +
-        // "";
-
-        // int lastid = 0;
-        // Connection conn = null;
-        // Statement stmt = null;
-        // ResultSet rs = null;
-        // try {
-        // conn = getSQLConnection();
-        // stmt = conn.createStatement();
-        // rs = stmt.executeQuery(dbQuery);
-        // while (rs.next()) {
-        // lastid = Integer.parseInt(rs.getString("lastid"));
-        // }
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(rs);
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-
-        // return lastid;
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
-     */
-    @Override
-    public int addReview(ReviewDTO review, CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-        // int reviewId = generateNewReviewId(user);
-        // insertReviewToDB(review, user, reviewId);
-        // return reviewId;
-
-    }
-
-    /*
-     * private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException {
-     *
-     * String userReviewUri = user.getReviewUri(reviewId); SubjectDTO newReview = new SubjectDTO(userReviewUri, false);
-     *
-     * ObjectDTO typeObject = new ObjectDTO(Subjects.CR_FEEDBACK, false); typeObject.setSourceUri(userReviewUri); ObjectDTO
-     * titleObject = new ObjectDTO(review.getTitle(), true); titleObject.setSourceUri(userReviewUri); ObjectDTO feedbackForObject =
-     * new ObjectDTO(review.getObjectUrl(), false); feedbackForObject.setSourceUri(userReviewUri); ObjectDTO feedbackUserObject =
-     * new ObjectDTO(user.getHomeUri(), false); feedbackUserObject.setSourceUri(userReviewUri);
-     *
-     * newReview.addObject(Predicates.RDF_TYPE, typeObject); newReview.addObject(Predicates.DC_TITLE, titleObject);
-     * newReview.addObject(Predicates.RDFS_LABEL, titleObject); newReview.addObject(Predicates.CR_FEEDBACK_FOR, feedbackForObject);
-     * newReview.addObject(Predicates.CR_USER, feedbackUserObject);
-     *
-     * addTriples(newReview);
-     *
-     * addResource(Subjects.CR_FEEDBACK, userReviewUri); addResource(Predicates.DC_TITLE, userReviewUri);
-     * addResource(Predicates.CR_FEEDBACK_FOR, userReviewUri); addResource(Predicates.CR_USER, userReviewUri);
-     * addResource(userReviewUri, userReviewUri);
-     *
-     * // creating a cross link to show that specific object has a review. SubjectDTO crossLinkSubject = new
-     * SubjectDTO(review.getObjectUrl(), false); ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri, false);
-     * grossLinkObject.setSourceUri(userReviewUri); crossLinkSubject.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
-     *
-     * addTriples(crossLinkSubject);
-     *
-     * addResource(Predicates.CR_HAS_FEEDBACK, userReviewUri); addResource(review.getObjectUrl(), userReviewUri);
-     *
-     * // since the review URI was used above as triple source, add it to // HARVEST_SOURCE too // (but set interval minutes to 0,
-     * to avoid it being // background-harvested) DAOFactory.get().getDao(HarvestSourceDAO.class)
-     * .addSourceIgnoreDuplicate(HarvestSourceDTO.create(userReviewUri, true, 0, user.getUserName()));
-     *
-     * // Adding content review to DB too.
-     *
-     * if (review.getReviewContent() != null && review.getReviewContent().length() > 0) {
-     *
-     * String contentType = review.getReviewContentType(); if (contentType == null) { contentType = ""; }
-     *
-     * Connection conn = null; PreparedStatement stmt = null; ResultSet rs = null; ByteArrayInputStream byteArrayInputStream = null;
-     * try { conn = getSQLConnection(); stmt = conn.prepareStatement(insertReviewContentQuery); stmt.setLong(1,
-     * Hashes.spoHash(user.getReviewUri(reviewId)));
-     *
-     * byte[] bytes = review.getReviewContent().getBytes("UTF-8"); byteArrayInputStream = new ByteArrayInputStream(bytes);
-     * stmt.setBinaryStream(2, byteArrayInputStream, bytes.length); stmt.setString(3, contentType); stmt.executeUpdate(); } catch
-     * (SQLException e) {
-     *
-     * throw new DAOException(e.getMessage(), e); } catch (UnsupportedEncodingException e) {
-     *
-     * throw new DAOException(e.getMessage(), e); } finally { IOUtils.closeQuietly(byteArrayInputStream); SQLUtil.close(rs);
-     * SQLUtil.close(stmt); SQLUtil.close(conn); } }
-     *
-     * }
-     */
-    // private static String insertReviewContentQuery = "INSERT INTO spo_binary (SUBJECT, OBJECT, DATATYPE, MUST_EMBED)
-    // VALUES (?,?,?, TRUE);";
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
-     */
-    @Override
-    public void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-        // deleteReview(user, reviewId, false);
-        // insertReviewToDB(review, user, reviewId);
-
-    }
-
-    private static final String USER_REVIEWS_SPARQL = "select ?s ?p ?o where { ?s ?p ?o." + " { select distinct ?s where { ?s <"
-    + Predicates.RDF_TYPE + "> <" + Subjects.CR_FEEDBACK + ">" + ". ?s <" + Predicates.CR_USER
-    + "> ?userHomeUri }}} order by ?s ?p ?o";
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getReviewList(eionet.cr.web.security.CRUser)
-     */
-    @Override
-    public List<ReviewDTO> getReviewList(CRUser user) throws DAOException {
-
-        Bindings bindings = new Bindings();
-        bindings.setURI("userHomeUri", user.getHomeUri());
-
-        RepositoryConnection conn = null;
-        List<ReviewDTO> resultList = new ArrayList<ReviewDTO>();
-        TupleQueryResult queryResult = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, USER_REVIEWS_SPARQL);
-            bindings.applyTo(tupleQuery, conn.getValueFactory());
-            queryResult = tupleQuery.evaluate();
-
-            ReviewDTO reviewDTO = null;
-            while (queryResult.hasNext()) {
-
-                BindingSet bindingSet = queryResult.next();
-
-                String reviewUri = bindingSet.getValue("s").stringValue();
-                if (reviewDTO == null || !reviewUri.equals(reviewDTO.getReviewSubjectUri())) {
-                    reviewDTO = new ReviewDTO();
-                    reviewDTO.setReviewSubjectUri(reviewUri);
-                    resultList.add(reviewDTO);
-                }
-
-                String predicateUri = bindingSet.getValue("p").stringValue();
-                if (predicateUri.equals(Predicates.DC_TITLE)) {
-                    reviewDTO.setTitle(bindingSet.getValue("o").stringValue());
-                }
-
-                if (predicateUri.equals(Predicates.CR_FEEDBACK_FOR)) {
-                    reviewDTO.setObjectUrl(bindingSet.getValue("o").stringValue());
-                }
-            }
-        } catch (OpenRDFException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(queryResult);
-            SesameUtil.close(conn);
-        }
-
-        return resultList;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
-     */
-    @Override
-    public ReviewDTO getReview(CRUser user, int reviewId) throws DAOException {
-
-        throw new UnsupportedOperationException("Method not implemented");
-        // String reviewUri = user.getReviewUri(reviewId);
-        // ReviewDTO reviewDTO = getReviewDTO(reviewUri);
-        //
-        // if (reviewDTO != null) {
-        //
-        // }
-        //
-        // return reviewDTO;
-
-        // String userUri = user.getReviewUri(reviewId);
-        //
-        // String dbQuery = "SELECT "
-        // + "uri"
-        // + ", spoTitle.object AS title"
-        // + ", spoObject.object AS object"
-        // + ", spo_binary.object AS reviewcontent"
-        // + ", spo_binary.datatype AS datatype "
-        // + " FROM spo AS spo1, spo AS spo2,"
-        // +
-        // " spo AS spoTitle, resource, spo AS spoObject LEFT OUTER JOIN spo_binary ON (spoObject.subject=spo_binary.subject"
-        // + " AND spo_binary.must_embed = TRUE) "
-        // + "WHERE " + "(spo1.subject = "
-        // + Hashes.spoHash(userUri)
-        // + ") AND "
-        // +
-        // "(spo1.subject = spo2.subject) AND (spo1.subject = spoTitle.subject) AND (spo1.subject = spoObject.subject) AND "
-        // + "spoObject.Predicate="
-        // + Hashes.spoHash(Predicates.CR_FEEDBACK_FOR)
-        // + "AND "
-        // + "spoTitle.Predicate="
-        // + Hashes.spoHash(Predicates.DC_TITLE)
-        // + "AND "
-        // + "spo1.subject=resource.uri_hash AND "
-        // + "(spo1.predicate = "
-        // + Hashes.spoHash(Predicates.CR_USER)
-        // + ") AND "
-        // + "(spo1.object_hash = "
-        // + Hashes.spoHash(user.getHomeUri())
-        // + ") AND "
-        // + "(spo2.predicate = "
-        // + Hashes.spoHash(Predicates.RDF_TYPE)
-        // + ") AND "
-        // + "(spo2.object_hash = "
-        // + Hashes.spoHash(Subjects.CR_FEEDBACK) + ") AND " + "(spoObject.lit_obj = 'N') " + "ORDER BY uri ASC";
-        //
-        // ReviewDTO result = new ReviewDTO();
-        //
-        // Connection conn = null;
-        // Statement stmt = null;
-        // ResultSet rs = null;
-        // try {
-        // conn = getSQLConnection();
-        // stmt = conn.createStatement();
-        // rs = stmt.executeQuery(dbQuery);
-        // if (rs.next()) {
-        // result.setReviewSubjectUri(rs.getString("uri"));
-        // result.setTitle(rs.getString("title"));
-        // result.setObjectUrl(rs.getString("object"));
-        // result.setReviewContentType(rs.getString("datatype"));
-        //
-        // byte[] bytes = rs.getBytes("reviewcontent");
-        // if (bytes != null && bytes.length > 0) {
-        // result.setReviewContent(new String(bytes, "UTF-8"));
-        // }
-        // }
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } catch (UnsupportedEncodingException e) {
-        // throw new DAOException("Unsupported encoding when fetching review content", e);
-        // } finally {
-        // SQLUtil.close(rs);
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-        //
-        // return result;
-
-    }
-
-    private static final String REVIEW_SPARQL = "select ?p ?o where { ?reviewUri ?p ?o }";
-
-    /**
-     * Get title and feedbackFor reference for a review.
-     *
-     * @param reviewUri - URI of review.
-     * @return ReviewDTO
-     * @throws DAOException if query fails
-     */
-    private ReviewDTO getReviewDTO(String reviewUri) throws DAOException {
-        Bindings bindings = new Bindings();
-        bindings.setURI("reviewUri", reviewUri);
-
-        ReviewDTO reviewDTO = null;
-        RepositoryConnection conn = null;
-        TupleQueryResult queryResult = null;
-
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, REVIEW_SPARQL);
-            bindings.applyTo(tupleQuery, conn.getValueFactory());
-            queryResult = tupleQuery.evaluate();
-
-            while (queryResult.hasNext()) {
-
-                BindingSet bindingSet = queryResult.next();
-
-                if (reviewDTO == null) {
-                    reviewDTO = new ReviewDTO();
-                    reviewDTO.setReviewSubjectUri(reviewUri);
-                }
-
-                String predicateUri = bindingSet.getValue("p").stringValue();
-                if (predicateUri.equals(Predicates.DC_TITLE)) {
-                    reviewDTO.setTitle(bindingSet.getValue("o").stringValue());
-                }
-                if (predicateUri.equals(Predicates.CR_FEEDBACK_FOR)) {
-                    reviewDTO.setObjectUrl(bindingSet.getValue("o").stringValue());
-                }
-            }
-        } catch (OpenRDFException e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(queryResult);
-            SesameUtil.close(conn);
-        }
-
-        return reviewDTO;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security .CRUser, int)
-     */
-    @Override
-    public List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-        // String dbQuery = "SELECT object FROM spo WHERE " + "(subject = " + Hashes.spoHash(user.getReviewUri(reviewId)) "
-        // + ") AND "
-        // + "(predicate = " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) + ") ORDER BY object ASC";
-        //
-        // List<String> returnList = new ArrayList<String>();
-        //
-        // Connection conn = null;
-        // Statement stmt = null;
-        // ResultSet rs = null;
-        // try {
-        // conn = getSQLConnection();
-        // stmt = conn.createStatement();
-        // rs = stmt.executeQuery(dbQuery);
-        // while (rs.next()) {
-        // returnList.add(rs.getString("object"));
-        // }
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(rs);
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-        //
-        // return returnList;
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#deleteReview(eionet.cr.web.security.CRUser, int, boolean)
-     */
-    @Override
-    public void deleteReview(CRUser user, int reviewId, boolean deleteAttachments) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-        // String sqlDeleteReview = "DELETE FROM spo WHERE (subject=? OR object_hash=?"
-        // + "OR source=? OR obj_deriv_source=? OR obj_source_object=?)";
-        //
-        // if (!deleteAttachments) {
-        // sqlDeleteReview += " AND (predicate <> " + Hashes.spoHash(Predicates.CR_HAS_ATTACHMENT) + ")";
-        // }
-        //
-        // String reviewSubjectURI = user.getReviewUri(reviewId);
-        //
-        // Connection conn = null;
-        // Statement stmt = null;
-        // try {
-        // conn = getSQLConnection();
-        //
-        // if (deleteAttachments) {
-        // List<String> reviewAttachments = this.getReviewAttachmentList(user, reviewId);
-        // for (int i = 0; i < reviewAttachments.size(); i++) {
-        // SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = " + Hashes.spoHash(reviewAttachments.get(i)),
-        // conn);
-        // }
-        // }
-        //
-        // SQLUtil.executeUpdate(StringUtils.replace(sqlDeleteReview, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
-        // SQLUtil.executeUpdate(
-        // StringUtils.replace(sqlDeleteReviewContent, "?", String.valueOf(Hashes.spoHash(reviewSubjectURI))), conn);
-        //
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#deleteAttachment(eionet.cr.web.security.CRUser, int, java.lang.String)
-     */
-    @Override
-    public void deleteAttachment(CRUser user, int reviewId, String attachmentUri) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-        // Connection conn = null;
-        // Statement stmt = null;
-        // try {
-        // conn = getSQLConnection();
-        // SQLUtil.executeUpdate("DELETE FROM spo WHERE object_hash = " + Hashes.spoHash(attachmentUri), conn);
-        // SQLUtil.executeUpdate("DELETE FROM spo_binary WHERE subject = " + Hashes.spoHash(attachmentUri), conn);
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(stmt);
-        // SQLUtil.close(conn);
-        // }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HelperDAO#loadAttachment(java.lang.String)
-     */
-    @Override
-    public DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-        // DownloadFileDTO returnFileDTO = new DownloadFileDTO();
-        //
-        // Connection conn = null;
-        // try {
-        // conn = getSQLConnection();
-        // PreparedStatement ps = conn.prepareStatement("SELECT object, datatype FROM spo_binary WHERE subject = ?");
-        // ps.setLong(1, Hashes.spoHash(attachmentUri));
-        // ResultSet rs = ps.executeQuery();
-        // while (rs.next()) {
-        // returnFileDTO.setContentType(rs.getString("datatype"));
-        // returnFileDTO.setInputStream(rs.getBinaryStream("object"));
-        // }
-        // } catch (SQLException e) {
-        // throw new DAOException(e.toString(), e);
-        // } finally {
-        // SQLUtil.close(conn);
-        // }
-        // return returnFileDTO;
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HelperDAO#deleteTriples(java.util.Collection)
      */
     @Override
@@ -1377,36 +877,55 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         RepositoryConnection conn = null;
         try {
-
             conn = SesameUtil.getRepositoryConnection();
-
             for (TripleDTO triple : triples) {
-                URI sub = conn.getValueFactory().createURI(triple.getSubjectUri());
-                URI pred = triple.getPredicateUri() == null ? null : conn.getValueFactory().createURI(triple.getPredicateUri());
-                URI source = conn.getValueFactory().createURI(triple.getSourceUri());
-                String strObject = triple.getObject();
-
-                if (triple.isLiteralObject()) {
-                    Literal literalObject = null;
-                    if (strObject != null) {
-                        literalObject = conn.getValueFactory().createLiteral(strObject);
-                    }
-                    conn.remove(sub, pred, literalObject, source);
-                } else {
-                    URI object = null;
-                    if (strObject != null) {
-                        object = conn.getValueFactory().createURI(triple.getObject());
-                    }
-                    conn.remove(sub, pred, object, source);
-                }
-
+                deleteTriple(triple, conn);
             }
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
         } finally {
             SesameUtil.close(conn);
         }
+    }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HelperDAO#deleteTriple(eionet.cr.dto.TripleDTO)
+     */
+    @Override
+    public void deleteTriple(TripleDTO triple) throws DAOException {
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            deleteTriple(triple, conn);
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    private void deleteTriple(TripleDTO triple, RepositoryConnection conn) throws RepositoryException {
+
+        URI sub = conn.getValueFactory().createURI(triple.getSubjectUri());
+        URI pred = triple.getPredicateUri() == null ? null : conn.getValueFactory().createURI(triple.getPredicateUri());
+        URI source = conn.getValueFactory().createURI(triple.getSourceUri());
+        String strObject = triple.getObject();
+
+        if (triple.isLiteralObject()) {
+            Literal literalObject = null;
+            if (strObject != null) {
+                literalObject = conn.getValueFactory().createLiteral(strObject);
+            }
+            conn.remove(sub, pred, literalObject, source);
+        } else {
+            URI object = null;
+            if (strObject != null) {
+                object = conn.getValueFactory().createURI(triple.getObject());
+            }
+            conn.remove(sub, pred, object, source);
+        }
     }
 
     /*

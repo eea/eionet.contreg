@@ -51,9 +51,9 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO, long)
+     * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO)
      */
-    public void add(SpoBinaryDTO dto, long contentSize) throws DAOException {
+    public void add(SpoBinaryDTO dto) throws DAOException {
 
         if (dto == null) {
             throw new IllegalArgumentException("DTO object must not be null");
@@ -144,8 +144,8 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         try {
             conn = getSQLConnection();
             Object o =
-                    SQLUtil.executeSingleReturnValueQuery(sqlExists,
-                            Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+                SQLUtil.executeSingleReturnValueQuery(sqlExists,
+                        Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
             return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);

@@ -12,10 +12,8 @@ import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
-import eionet.cr.dto.DownloadFileDTO;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.PredicateDTO;
-import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
@@ -254,101 +252,16 @@ public interface HelperDAO extends DAO {
     List<TripleDTO> getSampleTriplesInSource(String sourceUrl, PagingRequest pagingRequest) throws DAOException;
 
     /**
-     * @param user
-     * @return int
-     * @throws DAOException
-     *             if query fails
-     */
-    int generateNewReviewId(CRUser user) throws DAOException;
-
-    /**
-     * @param user
-     * @return int
-     * @throws DAOException
-     *             if query fails
-     */
-    int getLastReviewId(CRUser user) throws DAOException;
-
-    /**
-     * @param review
-     * @param user
-     * @return int
-     * @throws DAOException
-     *             if query fails
-     */
-    int addReview(ReviewDTO review, CRUser user) throws DAOException;
-
-    /**
-     * @param reviewId
-     * @param review
-     * @param user
-     * @return
-     * @throws DAOException
-     *             if query fails
-     */
-    void saveReview(int reviewId, ReviewDTO review, CRUser user) throws DAOException;
-
-    /**
-     * @param user
-     * @return List<ReviewDTO
-     * @throws DAOException
-     *             if query fails
-     */
-    List<ReviewDTO> getReviewList(CRUser user) throws DAOException;
-
-    /**
-     * @param user
-     * @param reviewId
-     * @return List<ReviewDTO
-     * @throws DAOException
-     *             if query fails
-     */
-    ReviewDTO getReview(CRUser user, int reviewId) throws DAOException;
-
-    /**
-     * @param user
-     * @param reviewId
-     * @return List<String>
-     * @throws DAOException
-     *             if query fails
-     */
-    List<String> getReviewAttachmentList(CRUser user, int reviewId) throws DAOException;
-
-    /**
-     * @param user
-     * @param reviewId
-     * @param deleteAttachments
-     * @return
-     * @throws DAOException
-     *             if query fails
-     */
-    void deleteReview(CRUser user, int reviewId, boolean deleteAttachments) throws DAOException;
-
-    /**
-     * @param user
-     * @param reviewId
-     * @param attachmentUri
-     * @return
-     * @throws DAOException
-     *             if query fails
-     */
-    void deleteAttachment(CRUser user, int reviewId, String attachmentUri) throws DAOException;
-
-    /**
-     * @param attachmentUri
-     * @return InputStream
-     * @throws DAOException
-     *             if query fails
-     */
-    DownloadFileDTO loadAttachment(String attachmentUri) throws DAOException;
-
-    /**
      * @param triples
-     * @return
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException - if query fails
      */
     void deleteTriples(Collection<TripleDTO> triples) throws DAOException;
+
+    /**
+     * @param triple
+     * @throws DAOException - if query fails
+     */
+    void deleteTriple(TripleDTO triple) throws DAOException;
 
     /**
      * @param sourceHash

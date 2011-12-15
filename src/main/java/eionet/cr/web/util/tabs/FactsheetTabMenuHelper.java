@@ -49,6 +49,7 @@ public class FactsheetTabMenuHelper {
     private boolean bookmarksFileType;
     private boolean registrationsFileType;
     private boolean historyFileType;
+    private boolean reviewType;
 
     private String latitude;
     private String longitude;
@@ -78,6 +79,11 @@ public class FactsheetTabMenuHelper {
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            reviewType = Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue()) ||
+            Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
             bookmarksFileType = Subjects.CR_BOOKMARKS_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
@@ -91,8 +97,8 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             folderType =
-                    Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                            || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
     }
@@ -100,8 +106,7 @@ public class FactsheetTabMenuHelper {
     /**
      * Returns tabs.
      *
-     * @param selected
-     *            selected tab's title
+     * @param selected - selected tab's title
      * @return
      */
     public List<TabElement> getTabs(String selected) {
@@ -139,9 +144,8 @@ public class FactsheetTabMenuHelper {
     /**
      * Returns the list of tab objects with the selected tab.
      *
-     * @param selected
-     *            the title of the selected tab
-     * @return
+     * @param selected - the title of the selected tab
+     * @return List<TabElement>
      */
     public List<TabElement> getTypeSpecificTabs(String selected) {
 
@@ -164,6 +168,12 @@ public class FactsheetTabMenuHelper {
 
         if (compiledDatasetType) {
             TabElement t = new TabElement(TabTitle.COMPILED_DATASET, "/compiledDataset.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
+        }
+
+        if (reviewType) {
+            TabElement t = new TabElement(TabTitle.REVIEW_FOLDER, "/reviews.action", selected);
             t.addParam("uri", subject.getUri());
             result.add(t);
         }
@@ -212,6 +222,7 @@ public class FactsheetTabMenuHelper {
         public static final String SHOW_ON_MAP = "Show on map";
         public static final String BOOKMARKED_SPARQL = "Bookmarked SPARQL";
         public static final String COMPILED_DATASET = "Compiled dataset";
+        public static final String REVIEW_FOLDER = "Reviews";
         public static final String FOLDER = "Contents";
         public static final String BOOKMARKS = "Bookmarks";
         public static final String REGISTRATIONS = "Registrations";

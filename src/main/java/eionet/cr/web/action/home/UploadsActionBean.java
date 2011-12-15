@@ -320,7 +320,7 @@ public class UploadsActionBean extends AbstractHomeActionBean implements Runnabl
 
         InputStream contentStream = null;
         try {
-            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
+            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
             contentStream = uploadedFile.getInputStream();
             FileStore.getInstance(getUserName()).add(uploadedFile.getFileName(), replaceExisting, contentStream);
         } finally {

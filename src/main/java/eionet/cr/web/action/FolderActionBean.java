@@ -511,7 +511,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -551,7 +551,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         InputStream contentStream = null;
         try {
-            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto, uploadedFile.getSize());
+            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
             contentStream = uploadedFile.getInputStream();
             String filePath = URIUtil.extractPathInUserHome(uri);
             if (StringUtils.isNotEmpty(filePath)) {

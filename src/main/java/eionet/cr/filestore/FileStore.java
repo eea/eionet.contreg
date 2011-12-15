@@ -165,8 +165,27 @@ public class FileStore {
      * @return
      */
     public boolean deleteFolder(String folderPath) {
+        return deleteFolder(folderPath, false);
+    }
+
+    /**
+     * True, if folder is deleted.
+     *
+     * @param folderPath
+     * @param cleanFolderFirst - removes all files from folder before deleting it
+     * @return boolean
+     */
+    public boolean deleteFolder(String folderPath, boolean cleanFolderFirst) {
         File file = new File(userDir, folderPath);
         if (file.isDirectory()) {
+            if (cleanFolderFirst) {
+                try {
+                    FileUtils.cleanDirectory(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
             return file.delete();
         } else {
             return true;

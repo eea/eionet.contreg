@@ -35,10 +35,9 @@ public interface SpoBinaryDAO extends DAO {
     /**
      *
      * @param dto
-     * @param contentSize
      * @throws DAOException
      */
-    void add(SpoBinaryDTO dto, long contentSize) throws DAOException;
+    void add(SpoBinaryDTO dto) throws DAOException;
 
     /**
      *
