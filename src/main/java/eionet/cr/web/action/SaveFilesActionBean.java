@@ -40,6 +40,7 @@ import eionet.cr.dao.FolderDAO;
 import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.PairDTO;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
  *

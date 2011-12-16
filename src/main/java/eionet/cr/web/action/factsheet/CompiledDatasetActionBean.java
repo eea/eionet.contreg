@@ -19,7 +19,7 @@
  *        Juhan Voolaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -55,6 +55,7 @@ import eionet.cr.dataset.LoadTriplesJobListener;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -70,7 +71,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(CompiledDatasetActionBean.class);
 
     /**  */
-    private static final String COMPILED_DATASET_JSP = "/pages/compiledDataset.jsp";
+    private static final String COMPILED_DATASET_JSP = "/pages/factsheet/compiledDataset.jsp";
 
     /** URI by which the factsheet has been requested. */
     private String uri;

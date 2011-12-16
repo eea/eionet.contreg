@@ -1,4 +1,4 @@
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -33,6 +33,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -126,7 +127,7 @@ public class ReviewsActionBean extends AbstractActionBean {
             }
         }
 
-        return new ForwardResolution("/pages/reviews.jsp");
+        return new ForwardResolution("/pages/factsheet/reviews.jsp");
     }
 
     /**

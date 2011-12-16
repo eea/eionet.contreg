@@ -28,7 +28,7 @@ import org.displaytag.decorator.TableDecorator;
 
 import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.FactsheetActionBean;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
  *

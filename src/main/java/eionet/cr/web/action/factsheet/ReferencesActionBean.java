@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +45,7 @@ import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
@@ -123,7 +124,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_REFERENCES);
         }
 
-        return new ForwardResolution("/pages/references.jsp");
+        return new ForwardResolution("/pages/factsheet/references.jsp");
     }
 
     /*

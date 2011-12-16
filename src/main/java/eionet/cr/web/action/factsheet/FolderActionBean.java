@@ -19,7 +19,7 @@
  *        Juhan Voolaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +62,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;

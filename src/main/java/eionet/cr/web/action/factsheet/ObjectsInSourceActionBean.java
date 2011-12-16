@@ -1,4 +1,4 @@
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -51,7 +52,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
 
         FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.OBJECTS_IN_SOURCE);
-        return new ForwardResolution("/pages/objectsInSource.jsp");
+        return new ForwardResolution("/pages/factsheet/objectsInSource.jsp");
     }
 
     /*
@@ -79,7 +80,7 @@ public class ObjectsInSourceActionBean extends AbstractSearchActionBean<SubjectD
         FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.OBJECTS_IN_SOURCE);
 
-        return new ForwardResolution("/pages/objectsInSource.jsp");
+        return new ForwardResolution("/pages/factsheet/objectsInSource.jsp");
     }
 
     /*

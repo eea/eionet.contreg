@@ -57,6 +57,7 @@ import eionet.cr.util.export.ExportFormat;
 import eionet.cr.util.export.Exporter;
 import eionet.cr.util.export.XlsExporter;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;

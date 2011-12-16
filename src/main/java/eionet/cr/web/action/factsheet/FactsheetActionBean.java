@@ -18,7 +18,7 @@
  * Contributor(s):
  * Jaanus Heinlaid, Tieto Eesti
  */
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +68,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -164,7 +165,7 @@ public class FactsheetActionBean extends AbstractActionBean {
             uriIsHarvestSource = tabsHelper.isUriIsHarvestSource();
         }
 
-        return new ForwardResolution("/pages/factsheet.jsp");
+        return new ForwardResolution("/pages/factsheet/factsheet.jsp");
     }
 
     /**
@@ -620,7 +621,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.SHOW_ON_MAP);
-        return new ForwardResolution("/pages/map.jsp");
+        return new ForwardResolution("/pages/factsheet/map.jsp");
     }
 
     public boolean isUriIsHarvestSource() {

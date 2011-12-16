@@ -51,6 +51,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.util.URIUtil;
+import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**

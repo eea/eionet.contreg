@@ -49,6 +49,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.export.ExportFormat;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;

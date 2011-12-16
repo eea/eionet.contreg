@@ -19,7 +19,7 @@
  *        Juhan Voolaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.List;
 
@@ -37,6 +37,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.URIUtil;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -70,7 +71,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
 
         registrations = DAOFactory.get().getDao(HelperDAO.class).getSampleTriplesInSource(uri, null);
 
-        return new ForwardResolution("/pages/registrations.jsp");
+        return new ForwardResolution("/pages/factsheet/registrations.jsp");
     }
 
     /**

@@ -19,7 +19,7 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +36,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 

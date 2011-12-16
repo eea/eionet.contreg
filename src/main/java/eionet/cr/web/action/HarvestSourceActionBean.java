@@ -60,6 +60,7 @@ import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.util.RDFGenerator;
 
 /**

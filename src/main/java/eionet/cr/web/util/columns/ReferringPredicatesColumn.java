@@ -30,7 +30,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.ReferencesActionBean;
+import eionet.cr.web.action.factsheet.ReferencesActionBean;
 import eionet.cr.web.util.JstlFunctions;
 
 /**

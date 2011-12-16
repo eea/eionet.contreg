@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.dao.DAOException;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.util.URLUtil;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.util.RegisterUrl;
 
 /**

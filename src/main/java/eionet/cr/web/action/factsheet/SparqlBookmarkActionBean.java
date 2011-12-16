@@ -19,7 +19,7 @@
  *        Juhan Voolaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.List;
 
@@ -36,6 +36,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -66,7 +67,7 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
             FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.BOOKMARKED_SPARQL);
         }
-        return new ForwardResolution("/pages/sparqlBookmark.jsp");
+        return new ForwardResolution("/pages/factsheet/sparqlBookmark.jsp");
     }
 
     public String getSpqrqlQuery() {

@@ -19,7 +19,7 @@
  *        Juhan Voolaid
  */
 
-package eionet.cr.web.action;
+package eionet.cr.web.action.factsheet;
 
 import java.util.List;
 
@@ -38,6 +38,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.util.URIUtil;
+import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -73,7 +74,7 @@ public class BookmarksActionBean extends AbstractActionBean {
         initTabs();
         bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(uri);
 
-        return new ForwardResolution("/pages/bookmarks.jsp");
+        return new ForwardResolution("/pages/factsheet/bookmarks.jsp");
     }
 
     /**
