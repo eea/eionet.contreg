@@ -342,7 +342,7 @@
         </description>
         <name>predicateExpandLink</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
-        <function-signature>java.lang.String predicateExpandLink(eionet.cr.web.action.FactsheetActionBean, java.lang.String, int)</function-signature>
+        <function-signature>java.lang.String predicateExpandLink(eionet.cr.web.action.factsheet.FactsheetActionBean, java.lang.String, int)</function-signature>
         <example>
             ${predicateExpandLink(factsheetActionBean, predicateUri, pageNumber)}
         </example>
@@ -353,7 +353,7 @@
         </description>
         <name>predicateCollapseLink</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
-        <function-signature>java.lang.String predicateCollapseLink(eionet.cr.web.action.FactsheetActionBean, java.lang.String)</function-signature>
+        <function-signature>java.lang.String predicateCollapseLink(eionet.cr.web.action.factsheet.FactsheetActionBean, java.lang.String)</function-signature>
         <example>
             ${predicateCollapseLink(factsheetActionBean, predicateUri)}
         </example>
@@ -383,7 +383,7 @@
 
     <function>
         <description>
-        	Removes root home URI part from given URI
+            Removes root home URI part from given URI
         </description>
         <name>removeHomeUri</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
