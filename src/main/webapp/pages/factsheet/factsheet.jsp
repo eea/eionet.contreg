@@ -153,7 +153,7 @@
                                             <li>
                                                 <stripes:link class="link-plain" href="/reviews.action">
                                                 	Add review
-                                                	<stripes:param name="add" value="Add"/>
+                                                	<stripes:param name="addReview" value="Add"/>
                                                 	<stripes:param name="uri" value="${actionBean.user.reviewsUri}"/>
                                                 	<stripes:param name="addUrl" value="${subjectUrl}"/>
                                                 </stripes:link>

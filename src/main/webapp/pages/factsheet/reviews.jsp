@@ -42,7 +42,7 @@
                                     	<stripes:hidden name="reviewId" value="${actionBean.reviewId}"/>
                                     	<stripes:hidden name="uri" value="${actionBean.uri}"/>
                                         <stripes:submit name="cancel" value="Cancel"/>
-                                        <stripes:submit name="editSave" value="Save review"/>
+                                        <stripes:submit name="save" value="Save review"/>
                                     </td>
                                 </tr>
                             </table>
@@ -104,7 +104,8 @@
                                         </stripes:link>
                                     </li>
                                     <li>
-                                        <stripes:link class="link-plain" href="/reviews.action?deleteReview=${actionBean.reviewId}" onclick=" return confirm('Are you sure you want to delete this review?');">
+                                        <stripes:link class="link-plain" href="/reviews.action" event="deleteSingleReview" onclick=" return confirm('Are you sure you want to delete this review?');">
+                                        	<stripes:param name="reviewId" value="${actionBean.reviewId}" />
                                         	<stripes:param name="uri" value="${actionBean.uri}" />
                                         	Delete
                                         </stripes:link>
@@ -115,6 +116,9 @@
                         </c:if>
 
                         <h1>Review #${actionBean.reviewId}</h1>
+                        <c:if test="${actionBean.obsolete}">
+                            <div class="advice-msg">Review is potentially obsolete!</div>
+                        </c:if>
                         <table class="datatable">
                             <col style="width:50em"/>
                             <col style="width:300em"/>
@@ -166,7 +170,6 @@
 	                                    <div>
 	                                    	<stripes:hidden name="reviewId" value="${actionBean.reviewId}"/>
 	                                    	<stripes:hidden name="uri" value="${actionBean.uri}"/>
-	                                    	<stripes:hidden name="deleteAttachments" value="delete"/>
 	                                    	<stripes:submit name="deleteAttachments" value="Delete"
 	                                        title="Delete selected attachments"  onclick=" return confirm('Are you sure you want to delete selected attachments?');"/>
 	                                        <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('attachmentList');return false" /></div>
@@ -207,7 +210,7 @@
         </c:when>
         <c:otherwise>
             <c:choose>
-                <c:when test="${not empty param.add}">
+                <c:when test="${not empty param.addReview}">
                     <h1>Adding new review</h1>
                         <crfn:form action="/reviews.action" method="post">
                         <table>
@@ -228,7 +231,7 @@
                             <tr>
                                 <td colspan="2">
                                 	<stripes:hidden name="uri" value="${actionBean.user.reviewsUri}"/>
-                                    <stripes:submit name="addSave" value="Add review"/>
+                                    <stripes:submit name="add" value="Add review"/>
                                 </td>
                             </tr>
                         </table>
@@ -240,7 +243,7 @@
 	                    <div id="operations">
 	                        <ul>
 	                            <li>
-	                                <stripes:link href="/reviews.action?add=Add">
+	                                <stripes:link href="/reviews.action?addReview=Add">
 	                                	<stripes:param name="uri" value="${actionBean.user.reviewsUri}"/>
 	                                	Add new Review
 	                                </stripes:link>
@@ -279,8 +282,7 @@
                             <c:if test="${actionBean.usersReview}">
                                 <div>
                                 	<stripes:hidden name="uri" value="${actionBean.uri}"/>
-                                	<stripes:hidden name="delete" value="delete"/>
-                                	<stripes:submit name="delete" value="Delete Reviews"
+                                	<stripes:submit name="deleteReviews" value="Delete Reviews"
                                     title="Delete selected reviews"  onclick=" return confirm('Are you sure you want to delete selected reviews?');" />
                                     <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('reviewList');return false" />
                                 </div>
