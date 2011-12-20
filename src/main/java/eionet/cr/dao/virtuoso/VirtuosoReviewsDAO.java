@@ -431,40 +431,4 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         dto.setSourceUri(reviewSubjectURI);
         DAOFactory.get().getDao(HelperDAO.class).deleteTriple(dto);
     }
-
-    public void updateRedirectedSourceReview(String originalUrl, String redirectedUrl) throws DAOException {
-
-        if (!StringUtils.isBlank(originalUrl) && !StringUtils.isBlank(redirectedUrl)) {
-            originalUrl = StringUtils.replace(originalUrl, " ", "%20");
-            redirectedUrl = StringUtils.replace(redirectedUrl, " ", "%20");
-
-            String query = "select ?s where {?s ?pred ?source}";
-            Bindings bindings = new Bindings();
-            bindings.setURI("pred", Predicates.CR_FEEDBACK_FOR);
-            bindings.setURI("source", originalUrl);
-            List<String> reviewUris = executeSPARQL(query, bindings, new SingleObjectReader<String>());
-            if (reviewUris != null) {
-                RepositoryConnection conn = null;
-                try {
-                    conn = SesameUtil.getRepositoryConnection();
-                    for (String reviewUri : reviewUris) {
-                        URI context = conn.getValueFactory().createURI(reviewUri);
-                        URI sub = conn.getValueFactory().createURI(reviewUri);
-                        URI pred = conn.getValueFactory().createURI(Predicates.CR_FEEDBACK_FOR);
-
-                        URI object = conn.getValueFactory().createURI(originalUrl);
-                        conn.remove(sub, pred, object, context);
-
-                        object = conn.getValueFactory().createURI(redirectedUrl);
-                        conn.add(sub, pred, object, context);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new DAOException(e.getMessage(), e);
-                } finally {
-                    SesameUtil.close(conn);
-                }
-            }
-        }
-    }
 }
