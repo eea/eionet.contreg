@@ -21,15 +21,14 @@
 package eionet.cr.dto;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 
-import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
+import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
@@ -436,12 +435,7 @@ public class ObjectDTO implements Serializable {
      * @return
      */
     public Date getDateValue() {
-
-        try {
-            return BaseHarvest.DATE_FORMATTER.parse(getValue());
-        } catch (ParseException e) {
-            return null;
-        }
+        return Util.virtuosoStringToDate(getValue());
     }
 
     /**

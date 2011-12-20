@@ -2,8 +2,6 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +9,8 @@ import java.util.Map;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
+
+import eionet.cr.util.Util;
 
 /**
  *
@@ -59,15 +59,9 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
         // expecting the column "d" to contain the date
         Value dateValue = bindingSet.getValue("d");
         if (dateValue != null) {
-            try {
-                String dateStr = dateValue.stringValue();
-                if (dateStr != null && dateStr.length() > 0) {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    Date date = dateFormat.parse(dateStr);
-                    resultMap.put(subjectUri, date);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
+            String dateStr = dateValue.stringValue();
+            if (dateStr != null && dateStr.length() > 0) {
+                resultMap.put(subjectUri, Util.virtuosoStringToDate(dateStr));
             }
         }
 

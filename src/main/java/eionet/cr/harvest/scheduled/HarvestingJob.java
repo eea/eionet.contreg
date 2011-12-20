@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.SimpleTrigger;
 import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
@@ -78,9 +77,6 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     private static Integer intervalSeconds;
     private static Integer harvesterUpperLimit;
     private static Integer dailyActiveMinutes;
-
-    /** */
-    private static SimpleTrigger trigger = null;
 
     /*
      * (non-Javadoc)
@@ -208,9 +204,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         if (!sourcesToDelete.isEmpty()) {
 
             LOGGER.trace("Deleting " + sourcesToDelete.size() + " sources found above");
-            for (Iterator iter = sourcesToDelete.iterator(); iter.hasNext();) {
+            for (Iterator<String> iter = sourcesToDelete.iterator(); iter.hasNext();) {
 
-                String sourceUrl = iter.next().toString();
+                String sourceUrl = iter.next();
                 if (CurrentHarvests.contains(sourceUrl)) {
                     iter.remove();
                     LOGGER.trace("Skipping deletion of " + sourceUrl + " because it is currently being harvested");

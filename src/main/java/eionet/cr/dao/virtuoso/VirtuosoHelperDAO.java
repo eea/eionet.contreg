@@ -2,7 +2,6 @@ package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +66,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
@@ -543,7 +541,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             // add the URL into user's history
             SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
-            objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true);
+            objectDTO = new ObjectDTO(Util.virtuosoDateToString(new Date()), true);
             objectDTO.setSourceUri(user.getHistoryUri());
             userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
 
@@ -737,7 +735,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         // now add new save-time
         userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
-        objectDTO = new ObjectDTO(Util.dateToString(new Date(), "yyyy-MM-dd'T'HH:mm:ss"), true, XMLSchema.DATETIME);
+        objectDTO = new ObjectDTO(Util.virtuosoDateToString(new Date()), true, XMLSchema.DATETIME);
         objectDTO.setSourceUri(user.getHistoryUri());
         userHomeItemSubject.addObject(Predicates.CR_SAVETIME, objectDTO);
 
@@ -1290,13 +1288,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         if (list != null) {
             for (Map<String, String> map : list) {
 
-                Date date = null;
-                try {
-                    date = BaseHarvest.DATE_FORMATTER.parse(map.get("date"));
-                } catch (ParseException e) {
-                    date = null;
-                }
-
+                Date date = Util.virtuosoStringToDate(map.get("date"));
                 if (date != null) {
                     String resourceUri = map.get("s");
                     Date currentDate = result.get(resourceUri);

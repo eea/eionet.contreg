@@ -3,7 +3,6 @@
  */
 package eionet.cr.dataset;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -31,8 +31,6 @@ import eionet.cr.web.security.CRUser;
  *
  */
 public class CreateDataset {
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     private String type;
     private CRUser user;
@@ -135,7 +133,7 @@ public class CreateDataset {
         .get()
         .getDao(HarvestSourceDAO.class)
         .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
     }
 
 }

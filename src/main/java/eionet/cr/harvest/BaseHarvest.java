@@ -22,7 +22,6 @@
 package eionet.cr.harvest;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -69,9 +68,6 @@ import eionet.cr.web.security.CRUser;
  * @author Jaanus Heinlaid
  */
 public abstract class BaseHarvest implements Harvest {
-
-    /** */
-    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
@@ -434,7 +430,7 @@ public abstract class BaseHarvest implements Harvest {
      * @param date
      */
     protected String formatDate(Date date) {
-        return DATE_FORMATTER.format(date);
+        return Util.virtuosoDateToString(date);
     }
 
     /**
@@ -723,16 +719,5 @@ public abstract class BaseHarvest implements Harvest {
     public boolean isBeingHarvested(String url) {
 
         return url != null && StringUtils.equals(url, contextUrl);
-    }
-
-    /**
-     *
-     * @param str
-     * @param searchStr
-     * @return
-     */
-    private static int indexOfSurroundedByWhitespace(String str, String searchStr) {
-
-        return 0;
     }
 }

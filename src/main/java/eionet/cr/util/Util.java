@@ -55,6 +55,8 @@ import nl.bitwalker.useragentutils.BrowserType;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
@@ -67,6 +69,9 @@ import eionet.cr.util.export.XmlUtil;
  *
  */
 public class Util {
+
+    /** */
+    private static Log logger = LogFactory.getLog(Util.class);
 
     /**
      * Private constructor to prevent public initiation.
@@ -108,6 +113,42 @@ public class Util {
             buf.append(array[i].toString());
         }
         return buf.toString();
+    }
+
+    /**
+     *
+     * @param date
+     * @param datePattern
+     * @return
+     */
+    public static String virtuosoDateToString(java.util.Date date) {
+
+        if (date == null) {
+            return null;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        return dateFormat.format(date);
+    }
+
+    /**
+     *
+     * @param str
+     * @return java.util.Date
+     */
+    public static java.util.Date virtuosoStringToDate(String str) {
+
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            return dateFormat.parse(str);
+        } catch (ParseException e) {
+            logger.warn("Failed to convert the given string to java.util.Date: " + e.toString(), e);
+            return null;
+        }
     }
 
     /**
@@ -820,4 +861,5 @@ public class Util {
             return actionBeanClass.getAnnotation(UrlBinding.class).value();
         }
     }
+
 }

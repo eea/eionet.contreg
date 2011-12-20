@@ -1,6 +1,7 @@
 package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -9,6 +10,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
@@ -27,6 +29,8 @@ import eionet.cr.dto.ReviewDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.Bindings;
+import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
@@ -117,6 +121,8 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException {
 
+        String objectUrl = StringUtils.replace(review.getObjectUrl(), " ", "%20");
+
         String userReviewUri = user.getReviewUri(reviewId);
         SubjectDTO newReview = new SubjectDTO(userReviewUri, false);
 
@@ -126,22 +132,26 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         ObjectDTO titleObject = new ObjectDTO(review.getTitle(), true);
         titleObject.setSourceUri(userReviewUri);
 
-        ObjectDTO feedbackForObject = new ObjectDTO(review.getObjectUrl(), false);
+        ObjectDTO feedbackForObject = new ObjectDTO(objectUrl, false);
         feedbackForObject.setSourceUri(userReviewUri);
 
         ObjectDTO feedbackUserObject = new ObjectDTO(user.getHomeUri(), false);
         feedbackUserObject.setSourceUri(userReviewUri);
+
+        ObjectDTO contentLastModifiedObject = new ObjectDTO(Util.virtuosoDateToString(new Date()), true, XMLSchema.DATETIME);
+        contentLastModifiedObject.setSourceUri(userReviewUri);
 
         newReview.addObject(Predicates.RDF_TYPE, typeObject);
         newReview.addObject(Predicates.DC_TITLE, titleObject);
         newReview.addObject(Predicates.RDFS_LABEL, titleObject);
         newReview.addObject(Predicates.CR_FEEDBACK_FOR, feedbackForObject);
         newReview.addObject(Predicates.CR_USER, feedbackUserObject);
+        newReview.addObject(Predicates.CR_LAST_MODIFIED, contentLastModifiedObject);
 
         DAOFactory.get().getDao(HelperDAO.class).addTriples(newReview);
 
         // creating a cross link to show that specific object has a review.
-        SubjectDTO crossLinkSubject = new SubjectDTO(review.getObjectUrl(), false);
+        SubjectDTO crossLinkSubject = new SubjectDTO(objectUrl, false);
         ObjectDTO grossLinkObject = new ObjectDTO(userReviewUri, false);
         grossLinkObject.setSourceUri(userReviewUri);
         crossLinkSubject.addObject(Predicates.CR_HAS_FEEDBACK, grossLinkObject);
@@ -292,6 +302,49 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
     /*
      * (non-Javadoc)
      *
+     * @see eionet.cr.dao.ReviewsDAO#isReviewObsolete(java.util.String reviewUri, java.util.String objectUri)
+     */
+    @Override
+    public boolean isReviewObsolete(String reviewUri, String objectUri) throws DAOException {
+
+        boolean ret = true;
+        String query = "ASK where {" +
+        "?objectUri ?pred ?date1 ." +
+        "?reviewUri ?pred ?date2 ." +
+        "FILTER (?date2 >= ?date1) " +
+        "}";
+
+        RepositoryConnection con = null;
+        try {
+            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
+            Bindings bindings = new Bindings();
+            bindings.setURI("objectUri", objectUri);
+            bindings.setURI("reviewUri", reviewUri);
+            bindings.setURI("pred", Predicates.CR_LAST_MODIFIED);
+
+            BooleanQuery booleanQuery = con.prepareBooleanQuery(QueryLanguage.SPARQL, query);
+            bindings.applyTo(booleanQuery, con.getValueFactory());
+            Boolean result = booleanQuery.evaluate();
+            if (result != null) {
+                if (result.booleanValue()) {
+                    ret = false;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+
+        return ret;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security .CRUser, int)
      */
     @Override
@@ -339,6 +392,9 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
             pred = conn.getValueFactory().createURI(Predicates.CR_USER);
             conn.remove(sub, pred, null, context);
 
+            pred = conn.getValueFactory().createURI(Predicates.CR_LAST_MODIFIED);
+            conn.remove(sub, pred, null, context);
+
             // Remove cross-link
             String sparql = "select ?s where {?s <" + Predicates.CR_HAS_FEEDBACK + "> <"+reviewSubjectURI+">}";
             String reviewObject = executeUniqueResultSPARQL(sparql, new SingleObjectReader<String>());
@@ -374,5 +430,41 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         TripleDTO dto = new TripleDTO(reviewSubjectURI, Predicates.CR_HAS_ATTACHMENT, attachmentUri);
         dto.setSourceUri(reviewSubjectURI);
         DAOFactory.get().getDao(HelperDAO.class).deleteTriple(dto);
+    }
+
+    public void updateRedirectedSourceReview(String originalUrl, String redirectedUrl) throws DAOException {
+
+        if (!StringUtils.isBlank(originalUrl) && !StringUtils.isBlank(redirectedUrl)) {
+            originalUrl = StringUtils.replace(originalUrl, " ", "%20");
+            redirectedUrl = StringUtils.replace(redirectedUrl, " ", "%20");
+
+            String query = "select ?s where {?s ?pred ?source}";
+            Bindings bindings = new Bindings();
+            bindings.setURI("pred", Predicates.CR_FEEDBACK_FOR);
+            bindings.setURI("source", originalUrl);
+            List<String> reviewUris = executeSPARQL(query, bindings, new SingleObjectReader<String>());
+            if (reviewUris != null) {
+                RepositoryConnection conn = null;
+                try {
+                    conn = SesameUtil.getRepositoryConnection();
+                    for (String reviewUri : reviewUris) {
+                        URI context = conn.getValueFactory().createURI(reviewUri);
+                        URI sub = conn.getValueFactory().createURI(reviewUri);
+                        URI pred = conn.getValueFactory().createURI(Predicates.CR_FEEDBACK_FOR);
+
+                        URI object = conn.getValueFactory().createURI(originalUrl);
+                        conn.remove(sub, pred, object, context);
+
+                        object = conn.getValueFactory().createURI(redirectedUrl);
+                        conn.add(sub, pred, object, context);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new DAOException(e.getMessage(), e);
+                } finally {
+                    SesameUtil.close(conn);
+                }
+            }
+        }
     }
 }

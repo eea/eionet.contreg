@@ -22,7 +22,6 @@
 package eionet.cr.web.action.factsheet;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +54,7 @@ import eionet.cr.dataset.LoadTriplesJobListener;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -84,9 +84,6 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
     /** */
     private List<TabElement> tabs;
-
-    /** */
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** */
     private Boolean isUserDataset = null;
@@ -150,7 +147,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             .get()
             .getDao(HarvestSourceDAO.class)
             .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                    ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                    ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
             success = true;
         } catch (Exception e) {
@@ -226,7 +223,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         .get()
         .getDao(HarvestSourceDAO.class)
         .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
         // Update HARVESTED STATEMENTS
         DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(uri);

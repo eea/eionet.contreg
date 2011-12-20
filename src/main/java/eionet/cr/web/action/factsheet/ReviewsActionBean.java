@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -33,6 +33,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
+import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -55,7 +56,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     private List<String> raportsListing;
 
     private ReviewDTO review;
-    private boolean testvar;
+    private boolean obsolete;
 
     private List<ReviewDTO> reviews;
 
@@ -73,67 +74,60 @@ public class ReviewsActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
 
+        if (StringUtils.isBlank(uri) && isUserLoggedIn()) {
+            uri = getUser().getReviewsUri();
+        }
+
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
 
         FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
         tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.REVIEW_FOLDER);
 
-        if (getContext().getRequest().getParameter("addSave") != null) {
-            if (isUsersReview()) {
-                add();
-            } else {
-                addWarningMessage("Only the owner of this home space can add a review.");
-            }
-        }
-
-        if (getContext().getRequest().getParameter("editSave") != null) {
-            if (isUsersReview()) {
-                save();
-            } else {
-                addWarningMessage("Only the owner of this home space can edit review.");
-            }
-        }
-
-        if (getContext().getRequest().getParameter("delete") != null) {
-            if (isUsersReview()) {
-                deleteReviews();
-            } else {
-                addWarningMessage("Only the owner of this home space can delete reviews.");
-            }
-        }
-
-        if (getContext().getRequest().getParameter("deleteReview") != null) {
-            if (isUsersReview()) {
-                deleteSingleReview();
-            } else {
-                addWarningMessage("Only the owner of this home space can delete review.");
-            }
-        }
-
-        if (getContext().getRequest().getParameter("upload") != null) {
-            if (isUsersReview()) {
-                upload();
-            } else {
-                addWarningMessage("Only the owner of this home space can upload attachments.");
-            }
-        }
-
-        if (getContext().getRequest().getParameter("deleteAttachments") != null) {
-            if (isUsersReview()) {
-                deleteAttachments();
-            } else {
-                addWarningMessage("Only the owner of this home space can delete attachments.");
-            }
+        if (isReviewView()) {
+            initReview();
         }
 
         return new ForwardResolution("/pages/factsheet/reviews.jsp");
     }
 
+    private void initReview() throws DAOException {
+        try {
+            review = DAOFactory.get().getDao(ReviewsDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
+            if (review.getReviewID() == 0) {
+                addCautionMessage("Review with this ID is not found.");
+                review = null;
+            } else {
+                review.setReviewContentType("text/plain");
+
+                // Check if review is obsolete
+                obsolete = DAOFactory.get().getDao(ReviewsDAO.class).isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
+
+                // Load review content from file.
+                try {
+                    File f = FileStore.getInstance(getAttemptedUserName()).get("reviews/review" + reviewId);
+                    if (f != null) {
+                        String content = FileUtils.readFileToString(f, "UTF-8");
+                        review.setReviewContent(content);
+                    }
+                } catch (IOException e) {
+                    addWarningMessage("Error loading content from file.");
+                    e.printStackTrace();
+                }
+
+                // Load attachments list only when it is needed - viewing a review.
+                review.setAttachments(DAOFactory.get().getDao(ReviewsDAO.class).getReviewAttachmentList(
+                        new CRUser(getAttemptedUserName()), reviewId));
+            }
+        } catch (DAOException ex) {
+            logger.error("Error when getting review", ex);
+        }
+    }
+
     /**
      *
      */
-    public void add() {
+    public Resolution add() {
         if (isUsersReview()) {
             try {
                 reviewId = factory.getDao(ReviewsDAO.class).addReview(review, getUser());
@@ -154,6 +148,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         } else {
             addWarningMessage("Only the owner of this home space can add reviews.");
         }
+        return new RedirectResolution(this.getClass()).addParameter("uri", uri).addParameter("reviewId", reviewId);
     }
 
     // Save review content as file under userhome/reviews folder
@@ -173,7 +168,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     /**
      *
      */
-    public void save() {
+    public Resolution save() {
         if (isUsersReview()) {
             try {
                 factory.getDao(ReviewsDAO.class).saveReview(reviewId, review, getUser());
@@ -189,51 +184,50 @@ public class ReviewsActionBean extends AbstractActionBean {
         } else {
             addWarningMessage("Only the owner of this home space can save reviews.");
         }
+        return new RedirectResolution(this.getClass()).addParameter("uri", uri).addParameter("reviewId", reviewId);
     }
 
     /**
      * @throws DAOException
      */
-    public void deleteReviews() throws DAOException {
+    public Resolution deleteReviews() throws DAOException {
         if (isUsersReview()) {
-            if (this.getContext().getRequest().getParameter("delete") != null) {
-                if (reviewIds != null && !reviewIds.isEmpty()) {
-                    try {
-                        List<String> reviewUris = new ArrayList<String>();
-                        for (int i = 0; i < reviewIds.size(); i++) {
-                            DAOFactory.get().getDao(ReviewsDAO.class).deleteReview(getUser(), reviewIds.get(i), true);
-                            // Delete review folder and files
-                            FileStore.getInstance(getUserName()).delete("reviews/review" + reviewIds.get(i));
-                            FileStore.getInstance(getUserName()).deleteFolder("reviews/" + reviewIds.get(i));
+            if (reviewIds != null && !reviewIds.isEmpty()) {
+                try {
+                    List<String> reviewUris = new ArrayList<String>();
+                    for (int i = 0; i < reviewIds.size(); i++) {
+                        DAOFactory.get().getDao(ReviewsDAO.class).deleteReview(getUser(), reviewIds.get(i), true);
+                        // Delete review folder and files
+                        FileStore.getInstance(getUserName()).delete("reviews/review" + reviewIds.get(i));
+                        FileStore.getInstance(getUserName()).deleteFolder("reviews/" + reviewIds.get(i));
 
-                            reviewUris.add(getUser().getReviewUri(reviewIds.get(i)));
-                        }
-                        // Delete review harvest sources also
-                        if (reviewUris != null && reviewUris.size() > 0) {
-                            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(reviewUris);
-                        }
-                        addSystemMessage("Selected reviews were deleted.");
-                    } catch (DAOException ex) {
-                        logger.error(ex);
-                        addWarningMessage("System error occured during review deletion.");
+                        reviewUris.add(getUser().getReviewUri(reviewIds.get(i)));
                     }
-                } else {
-                    addCautionMessage("No reviews selected for deletion.");
+                    // Delete review harvest sources also
+                    if (reviewUris != null && reviewUris.size() > 0) {
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(reviewUris);
+                    }
+                    addSystemMessage("Selected reviews were deleted.");
+                } catch (DAOException ex) {
+                    logger.error(ex);
+                    addWarningMessage("System error occured during review deletion.");
                 }
+            } else {
+                addCautionMessage("No reviews selected for deletion.");
             }
         } else {
             addWarningMessage("Only the owner of this home space can delete reviews.");
         }
+        return new RedirectResolution(this.getClass());
     }
 
     /**
      * @throws DAOException
      */
-    public void deleteSingleReview() throws DAOException {
+    public Resolution deleteSingleReview() throws DAOException {
         if (isUsersReview()) {
-            if (getContext().getRequest().getParameter("deleteReview") != null) {
+            if (reviewId != 0) {
                 try {
-                    reviewId = Integer.parseInt(getContext().getRequest().getParameter("deleteReview"));
                     DAOFactory.get().getDao(ReviewsDAO.class).deleteReview(getUser(), reviewId, true);
 
                     // Delete review folder and files
@@ -251,68 +245,70 @@ public class ReviewsActionBean extends AbstractActionBean {
                     logger.error(ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
+            } else {
+                addWarningMessage("Review ID is missing!");
             }
         } else {
             addWarningMessage("Only the owner of this home space can delete reviews.");
         }
+        return new RedirectResolution(this.getClass());
     }
 
     /**
      */
-    public void upload() {
+    public Resolution upload() {
 
         if (isUsersReview()) {
             logger.debug("Storing uploaded review attachment, file bean = " + attachment);
 
-            if (attachment == null) {
-                return;
-            }
+            if (attachment != null) {
+                // construct attachment uri
+                String attachmentUri = getUser().getReviewAttachmentUri(reviewId, attachment.getFileName());
 
-            // construct attachment uri
-            String attachmentUri = getUser().getReviewAttachmentUri(reviewId, attachment.getFileName());
+                InputStream attachmentContentStream = null;
+                try {
+                    // save attachment into filesystem under user folder
+                    String filePath = "reviews/" + reviewId + "/" + attachment.getFileName();
+                    FileStore.getInstance(getUserName()).add(filePath, true, attachment.getInputStream());
 
-            InputStream attachmentContentStream = null;
-            try {
-                // save attachment into filesystem under user folder
-                String filePath = "reviews/" + reviewId + "/" + attachment.getFileName();
-                FileStore.getInstance(getUserName()).add(filePath, true, attachment.getInputStream());
+                    // construct review uri
+                    String reviewUri = getUser().getReviewUri(reviewId);
 
-                // construct review uri
-                String reviewUri = getUser().getReviewUri(reviewId);
+                    // construct review SubjectDTO
+                    SubjectDTO subjectDTO = new SubjectDTO(reviewUri, false);
 
-                // construct review SubjectDTO
-                SubjectDTO subjectDTO = new SubjectDTO(reviewUri, false);
+                    // add cr:hasAttachment triple to review SubjectDTO
+                    ObjectDTO objectDTO = new ObjectDTO(attachmentUri, false);
+                    objectDTO.setSourceUri(reviewUri);
+                    subjectDTO.addObject(Predicates.CR_HAS_ATTACHMENT, objectDTO);
 
-                // add cr:hasAttachment triple to review SubjectDTO
-                ObjectDTO objectDTO = new ObjectDTO(attachmentUri, false);
-                objectDTO.setSourceUri(reviewUri);
-                subjectDTO.addObject(Predicates.CR_HAS_ATTACHMENT, objectDTO);
+                    HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 
-                HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+                    // persist review SubjectDTO
+                    helperDAO.addTriples(subjectDTO);
 
-                // persist review SubjectDTO
-                helperDAO.addTriples(subjectDTO);
+                    // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
+                    // (but set interval minutes to 0, to avoid it being background-harvested)
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
-                // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
-                // (but set interval minutes to 0, to avoid it being background-harvested)
-                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+                    // finally, attempt to harvest the uploaded file's contents
+                    harvestUploadedFile(attachmentUri, attachment, null, getUserName());
 
-                // finally, attempt to harvest the uploaded file's contents
-                harvestUploadedFile(attachmentUri, attachment, null, getUserName());
-
-            } catch (DAOException daoe) {
-                logger.error("Error when storing attachment", daoe);
-                addSystemMessage("Error when storing attachment");
-            } catch (IOException ioe) {
-                logger.error("File could not be successfully uploaded", ioe);
-                addSystemMessage("File could not be successfully uploaded");
-            } finally {
-                IOUtils.closeQuietly(attachmentContentStream);
+                } catch (DAOException daoe) {
+                    logger.error("Error when storing attachment", daoe);
+                    addSystemMessage("Error when storing attachment");
+                } catch (IOException ioe) {
+                    logger.error("File could not be successfully uploaded", ioe);
+                    addSystemMessage("File could not be successfully uploaded");
+                } finally {
+                    IOUtils.closeQuietly(attachmentContentStream);
+                }
             }
         } else {
             addWarningMessage("Only the owner of this home space can add attachments.");
         }
+        return new RedirectResolution(this.getClass()).addParameter("uri", uri).addParameter("reviewId", reviewId);
     }
 
     /**
@@ -364,7 +360,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     /**
      *
      */
-    public void deleteAttachments() {
+    public Resolution deleteAttachments() {
         if (isUsersReview()) {
             try {
                 if (attachmentList != null && attachmentList.size() > 0) {
@@ -381,6 +377,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         } else {
             addWarningMessage("Only the owner of this review can delete attachments.");
         }
+        return new RedirectResolution(this.getClass()).addParameter("uri", uri).addParameter("reviewId", reviewId);
     }
 
     /**
@@ -402,58 +399,13 @@ public class ReviewsActionBean extends AbstractActionBean {
      * @return username
      */
     public String getAttemptedUserName() {
-        String ret = "";
-        if (!StringUtils.isBlank(uri)) {
-            StringTokenizer st = new StringTokenizer(uri,"/");
-            boolean userToken = false;
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                if (userToken) {
-                    ret = token.toLowerCase();
-                    break;
-                }
-                if (token.equalsIgnoreCase("home")) {
-                    userToken = true;
-                }
-            }
-        }
-        return ret;
+        return URIUtil.extractUserName(uri);
     }
 
     /**
      * @return
      */
     public ReviewDTO getReview() {
-
-        if (isReviewView()) {
-            try {
-                review = DAOFactory.get().getDao(ReviewsDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
-                if (review.getReviewID() == 0) {
-                    addCautionMessage("Review with this ID is not found.");
-                    review = null;
-                } else {
-                    review.setReviewContentType("text/plain");
-                    // Load review content from file.
-                    try {
-                        File f = FileStore.getInstance(getAttemptedUserName()).get("reviews/review" + reviewId);
-                        if (f != null) {
-                            String content = FileUtils.readFileToString(f, "UTF-8");
-                            review.setReviewContent(content);
-                        }
-                    } catch (IOException e) {
-                        addWarningMessage("Error loading content from file.");
-                        e.printStackTrace();
-                    }
-
-                    // Load attachments list only when it is needed - viewing a review.
-                    review.setAttachments(DAOFactory.get().getDao(ReviewsDAO.class).getReviewAttachmentList(
-                            new CRUser(getAttemptedUserName()), reviewId));
-                }
-            } catch (DAOException ex) {
-                logger.error("Error when getting review", ex);
-            }
-        }
-
         return review;
     }
 
@@ -487,20 +439,6 @@ public class ReviewsActionBean extends AbstractActionBean {
     public void setReview(ReviewDTO review) {
         review.setReviewContentType("text/plain");
         this.review = review;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isTestvar() {
-        return testvar;
-    }
-
-    /**
-     * @param testvar
-     */
-    public void setTestvar(boolean testvar) {
-        this.testvar = testvar;
     }
 
     /**
@@ -619,4 +557,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         return ret;
     }
 
+    public boolean isObsolete() {
+        return obsolete;
+    }
 }

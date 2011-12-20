@@ -21,7 +21,6 @@
 
 package eionet.cr.util.sesame;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -29,6 +28,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.openrdf.model.Literal;
 
 import eionet.cr.harvest.BaseHarvest;
+import eionet.cr.util.Util;
 
 /**
  * Utility functions for operating with objects of {@link Literal} class.
@@ -65,10 +65,6 @@ public class LiteralUtil {
             return xmlGregorianCalendar.toGregorianCalendar().getTime();
         }
 
-        try {
-            return BaseHarvest.DATE_FORMATTER.parse(literal.stringValue());
-        } catch (ParseException e) {
-            return null;
-        }
+        return Util.virtuosoStringToDate(literal.stringValue());
     }
 }

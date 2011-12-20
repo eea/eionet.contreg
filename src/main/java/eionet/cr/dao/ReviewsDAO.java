@@ -65,6 +65,15 @@ public interface ReviewsDAO extends DAO {
     ReviewDTO getReview(CRUser user, int reviewId) throws DAOException;
 
     /**
+     * Returns TRUE if last modified date for objectUri is later than last modified date for reviewUri
+     * @param reviewUri
+     * @param objectUri
+     * @return boolean
+     * @throws DAOException - if query fails
+     */
+    boolean isReviewObsolete(String reviewUri, String objectUri) throws DAOException;
+
+    /**
      * @param user
      * @param reviewId
      * @return List<String>

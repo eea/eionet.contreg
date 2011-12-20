@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -519,10 +518,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
                 .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(dateFormat.format(new Date()), XMLSchema.DATETIME));
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory.get().getDao(HarvestSourceDAO.class)

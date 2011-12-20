@@ -1,6 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,8 +20,8 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.DeliveryFilesDTO;
 import eionet.cr.dto.PairDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Bindings;
+import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
@@ -135,12 +134,8 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
                         String sourceUri = bindingSet.getValue("source").stringValue();
                         Value lastModifiedDate = bindingSet.getValue("lastModified");
                         Date lastModified = null;
-                        try {
-                            if (lastModifiedDate != null) {
-                                lastModified = BaseHarvest.DATE_FORMATTER.parse(lastModifiedDate.stringValue());
-                            }
-                        } catch (ParseException e) {
-                            logger.warn("Failed to parse date", e);
+                        if (lastModifiedDate != null) {
+                            lastModified = Util.virtuosoStringToDate(lastModifiedDate.stringValue());
                         }
 
                         SubjectDTO dto = new SubjectDTO(sourceUri, false);
