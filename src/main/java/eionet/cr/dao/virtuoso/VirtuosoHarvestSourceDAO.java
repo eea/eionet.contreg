@@ -40,13 +40,11 @@ import eionet.cr.dao.readers.NewSourcesReaderWriter;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.URIUtil;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
@@ -658,17 +656,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             return;
         }
 
-        // If source has any reviews, delete those also
-        List<String> reviewUris = new ArrayList<String>();
-        for (String sourceUrl : sourceUrls) {
-            String reviewsQuery = "select ?o where {<"+sourceUrl+"> <"+Predicates.CR_HAS_FEEDBACK+"> ?o}";
-            List<String> uris = executeSPARQL(reviewsQuery, new SingleObjectReader<String>());
-            if (uris != null) {
-                reviewUris.addAll(uris);
-            }
-        }
-        sourceUrls.addAll(reviewUris);
-
         // We need to do removals both in triple store and relational tables,
         // so prepare connections for both.
 
@@ -689,19 +676,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             // Commit removals.
             repoConn.commit();
             sqlConn.commit();
-
-            // Delete reviews folder and files
-            if (reviewUris != null) {
-                for (String reviewUri : reviewUris) {
-                    String path = URIUtil.extractPathInUserHome(reviewUri);
-                    path = StringUtils.replace(path, "reviews/", "");
-                    String reviewId = StringUtils.substringBefore(path, "/");
-                    String reviewUser = URIUtil.extractUserName(reviewUri);
-
-                    FileStore.getInstance(reviewUser).delete("reviews/review"+reviewId);
-                    FileStore.getInstance(reviewUser).deleteFolder("reviews/"+reviewId, true);
-                }
-            }
 
         } catch (RepositoryException e) {
             SesameUtil.rollback(repoConn);
