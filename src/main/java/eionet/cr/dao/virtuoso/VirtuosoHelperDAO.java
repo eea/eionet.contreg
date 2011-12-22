@@ -80,6 +80,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.WebConstants;
 
 /**
  * Virtuoso DAO helper methods.
@@ -1343,7 +1344,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             throw new IllegalArgumentException("Subject uri must not be blank!");
         }
 
-        String query = StringUtils.replace(GET_FACTSHEET_ROWS, "LEN", String.valueOf(FactsheetDTO.MAX_OBJECT_LENGTH));
+        String query = StringUtils.replace(GET_FACTSHEET_ROWS, "LEN", String.valueOf(WebConstants.MAX_OBJECT_LENGTH));
         query = StringUtils.replace(query, "<|>", FactsheetReader.OBJECT_DATA_SPLITTER);
         if (logger.isTraceEnabled()) {
             logger.trace("Executing factsheet query: " + query);

@@ -32,6 +32,7 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
+import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -128,7 +129,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         // characters that we got here.
         if (isLiteral) {
             String value = objectDTO.getValue();
-            if (objectLength > FactsheetDTO.MAX_OBJECT_LENGTH && !DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5)){
+            if (objectLength > WebConstants.MAX_OBJECT_LENGTH && !DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5)){
                 objectDTO.setObjectMD5(objectMD5);
                 LOGGER.trace("Object's database-calculated length is " + objectLength);
             }

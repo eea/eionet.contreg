@@ -31,14 +31,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.web.util.WebConstants;
+
 /**
  *
  * @author Jaanus Heinlaid
  */
 public class FactsheetDTO extends SubjectDTO {
-
-    /** */
-    public static final int MAX_OBJECT_LENGTH = 2000;
 
     /** */
     private HashMap<String, Integer> predicateObjectCounts = new HashMap<String, Integer>();
@@ -119,7 +118,7 @@ public class FactsheetDTO extends SubjectDTO {
      * @return
      */
     public int getMaxObjectLength(){
-        return MAX_OBJECT_LENGTH;
+        return WebConstants.MAX_OBJECT_LENGTH;
     }
 
     /**

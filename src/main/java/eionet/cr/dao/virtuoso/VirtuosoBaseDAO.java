@@ -25,6 +25,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -229,6 +230,9 @@ public abstract class VirtuosoBaseDAO {
     /**
      * Returns a SPARQL query that will retrieve the given subjects' given predicates. Predicates and graphs are optional.
      *
+     * For very long objects, only first 2000 characters will be returned, to prevent
+     * VirtuosoException: SR319: Max row length exceeded exception (temp col)
+     *
      * @param subjectUris - collection of subjects whose data is being queried
      * @param predicateUris - array of predicates that are queried (if null or empty, no predicate filter is applied)
      * @param bindings - SPARQL variable bindings to fill when building the returned query
@@ -241,7 +245,8 @@ public abstract class VirtuosoBaseDAO {
         }
 
         String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
-        String query = "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + commaSeparatedSubjects + ")) ";
+        String query = "select ?g ?s ?p bif:left(str(?obj)," + WebConstants.MAX_OBJECT_LENGTH
+        + ") as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
