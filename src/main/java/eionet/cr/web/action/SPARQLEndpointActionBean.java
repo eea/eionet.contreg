@@ -3,7 +3,6 @@ package eionet.cr.web.action;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -264,8 +263,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             // log and display message about successful operation
             logger.debug("Query bookmarked with URI: " + bookmarksUri);
-            addSystemMessage("Successfully bookmarked query: <a href=\"factsheet.action?uri=" + URLEncoder.encode(bookmarkUri)
-                    + "\">" + bookmarkUri + "</a>");
+            addSystemMessage("Successfully bookmarked query: " + bookmarkName);
         }
 
         return new ForwardResolution(FORM_PAGE);
