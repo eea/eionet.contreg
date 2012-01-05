@@ -369,4 +369,13 @@ public class UploadHarvest extends BaseHarvest {
 
         return HarvestConstants.TYPE_PUSH;
     }
+
+    /* (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
+     */
+    @Override
+    protected void afterFinish() {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -93,4 +93,13 @@ public class PushHarvest extends BaseHarvest {
         }
         return ret;
     }
+
+    /* (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
+     */
+    @Override
+    protected void afterFinish() {
+        // TODO Auto-generated method stub
+        
+    }
 }

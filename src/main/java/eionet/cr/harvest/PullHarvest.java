@@ -56,6 +56,8 @@ import eionet.cr.common.Predicates;
 import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -70,7 +72,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PullHarvest extends BaseHarvest {
@@ -103,7 +105,7 @@ public class PullHarvest extends BaseHarvest {
     private boolean isOnDemandHarvest;
 
     /** */
-    private List<String> redirectedFromUrls = new ArrayList<String>();
+    private List<String> redirectedUrls = new ArrayList<String>();
 
     /**
      * @param contextUrl
@@ -114,7 +116,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param contextSourceDTO
      * @throws DAOException
      */
@@ -167,7 +169,7 @@ public class PullHarvest extends BaseHarvest {
 
                     // get redirected-to-url, throw exception if it's missing
                     String redirectedToUrl = getRedirectUrl(urlConn);
-                    redirectedFromUrls.add(connectUrl);
+                    redirectedUrls.add(connectUrl);
                     if (StringUtils.isBlank(redirectedToUrl)) {
                         throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
                     }
@@ -224,7 +226,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param noOfTriples
      */
@@ -245,7 +247,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param noOfTriples
      */
@@ -324,13 +326,10 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Calculate last harvest date when there is a temporary error with the source.
-     * The LAST_HARVEST is not set to current time. Instead it is increased
-     * with 10% of the harvesting period but minimum two hours.
-     * If the source was never harvested before then the base date is
-     * current time minus the harvesting period (as if the source was successfully
-     * harvested one period ago).
-     *
+     * Calculate last harvest date when there is a temporary error with the source. The LAST_HARVEST is not set to current time.
+     * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
+     * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
+     * 
      * @param contextSourceDTO - object representing the source with the error.
      * @return the last harvest date + 10 %.
      */
@@ -338,7 +337,7 @@ public class PullHarvest extends BaseHarvest {
 
         Date lastHarvest = getContextSourceDTO().getLastHarvest();
         if (lastHarvest == null) {
-            //The last harvest date is now - intervalMinutes (e.g. today - 6 weeks)
+            // The last harvest date is now - intervalMinutes (e.g. today - 6 weeks)
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MINUTE, -getContextSourceDTO().getIntervalMinutes());
             lastHarvest = c.getTime();
@@ -351,7 +350,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param responseCode
      * @param exception
@@ -413,10 +412,9 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Download and process content. If response content type is one of RDF,
-     * then proceed straight to loading. Otherwise process the file to see if
-     * it's zipped, it's an XML with RDF conversion, or actually an RDF file.
-     *
+     * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
+     * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
+     * 
      * @param urlConn - connection to the remote source.
      * @return number of triples harvested.
      * @throws IOException
@@ -458,7 +456,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param redirectedToUrl
      * @throws DAOException
      */
@@ -510,7 +508,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param sourceDTO
      * @param redirectionSeen
      * @param redirectedToUrl
@@ -541,7 +539,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Load file into triple store.
-     *
+     * 
      * @param file
      * @param rdfFormat
      * @return number of triples harvested.
@@ -557,9 +555,9 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Download file from remote source to a temporary file locally.
-     * Sideeffect: Adds the file size to the metadata to save in the harvester context.
-     *
+     * Download file from remote source to a temporary file locally. Sideeffect: Adds the file size to the metadata to save in the
+     * harvester context.
+     * 
      * @param urlConn - connection to the remote source.
      * @return object representing the temporary file.
      * @throws IOException if the file is not downloadable.
@@ -640,7 +638,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param connection
      * @return
      * @throws MalformedURLException
@@ -667,7 +665,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param url
      * @return long
      * @throws DAOException
@@ -688,7 +686,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param harvestSourceUrl
      * @return
      * @throws DAOException
@@ -717,7 +715,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Returns RDF format from url connection.
-     *
+     * 
      * @param contentType
      * @return
      */
@@ -748,7 +746,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @return
      */
@@ -801,6 +799,28 @@ public class PullHarvest extends BaseHarvest {
     public boolean isBeingHarvested(String url) {
 
         boolean result = super.isBeingHarvested(url);
-        return result == true ? result : redirectedFromUrls.contains(url);
+        return result == true ? result : redirectedUrls.contains(url);
+    }
+
+    /**
+     * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
+     */
+    @Override
+    protected void afterFinish() {
+
+        // Execute a background thread that will attempt to clear the graph of all redirected sources.
+        (new Thread() {
+            public void run() {
+                for (String redirectedUrl : PullHarvest.this.redirectedUrls){
+
+                    try {
+                        PullHarvest.LOGGER.debug("Clearing the graph of redirected source " + redirectedUrl);
+                        DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(redirectedUrl);
+                    } catch (DAOException e) {
+                        PullHarvest.LOGGER.error("Failed to clear the graph of redirected source " + redirectedUrl, e);
+                    }
+                }
+            }
+        }).start();
     }
 }

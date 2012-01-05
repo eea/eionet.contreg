@@ -144,6 +144,7 @@ public abstract class BaseHarvest implements Harvest {
             throw e;
         } finally {
             finishHarvest(wasHarvestException);
+            afterFinish();
         }
     }
 
@@ -232,6 +233,12 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug("                                                                   ");
         }
     }
+
+    /**
+     * Called as the very last thing after {@link #finishHarvest(boolean)}.
+     * This is an abstract method that extending classes must implement.
+     */
+    protected abstract void afterFinish();
 
     /**
      * @throws MalformedQueryException
