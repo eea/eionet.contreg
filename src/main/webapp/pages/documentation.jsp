@@ -48,32 +48,32 @@
 		                        <td><stripes:label class="question" for="page_id">Page ID</stripes:label></td>
 		                        <td>
 		                            ${actionBean.pageId}
-		                            <stripes:hidden name="pid" value="${actionBean.pageId}"/>
+		                            <stripes:hidden name="pageObject.pid" value="${actionBean.pageId}"/>
 		                        </td>
 		                    </tr>
 		                    <tr>
 		                        <td><stripes:label class="question" for="page_title">Page title</stripes:label></td>
 		                        <td>
-		                            <stripes:text id="page_title" name="title" size="66"/>
+		                            <stripes:text id="page_title" name="pageObject.title" size="66"/>
 		                        </td>
 		                    </tr>
 		                    <tr>
 		                        <td><stripes:label class="question" for="content_type">Content type</stripes:label></td>
 		                        <td>
-		                            <stripes:text id="content_type" name="contentType" size="66"/>
+		                            <stripes:text id="content_type" name="pageObject.contentType" size="66"/>
 		                        </td>
 		                    </tr>
-		                    <c:if test='${actionBean.editableContent}'>
+		                    <c:if test='${actionBean.pageObject.editableContent}'>
 			                    <tr>
 			                        <td valign="top"><stripes:label class="question" for="page_content">Content</stripes:label></td>
 			                        <td>
-			                            <stripes:textarea id="page_content" name="content" cols="70" rows="20" style="width:100%"/>
+			                            <stripes:textarea id="page_content" name="pageObject.content" cols="70" rows="20" style="width:100%"/>
 			                        </td>
 			                    </tr>
 		                    </c:if>
 		                    <tr>
 		                        <td><stripes:label class="question" for="file">File</stripes:label></td>
-		                        <td><stripes:file name="file" id="file" size="54" /></td>
+		                        <td><stripes:file name="pageObject.file" id="file" size="54" /></td>
 		                    </tr>
 		                    <tr>
 		                        <td colspan="2" align="right">
@@ -89,29 +89,29 @@
 		                    <tr>
 		                        <td><stripes:label class="question" for="page_id">Page ID</stripes:label></td>
 		                        <td>
-		                            <stripes:text id="page_id" name="pid" size="66"/>
+		                            <stripes:text id="page_id" name="pageObject.pid" size="66"/>
 		                        </td>
 		                    </tr>
 		                    <tr>
 		                        <td><stripes:label class="question" for="page_title">Page title</stripes:label></td>
 		                        <td>
-		                            <stripes:text id="page_title" name="title" size="66"/>
+		                            <stripes:text id="page_title" name="pageObject.title" size="66"/>
 		                        </td>
 		                    </tr>
 		                    <tr>
 		                        <td><stripes:label class="question" for="content_type">Content type</stripes:label></td>
 		                        <td>
-		                            <stripes:text id="content_type" name="contentType" size="66"/>
+		                            <stripes:text id="content_type" name="pageObject.contentType" size="66"/>
 		                        </td>
 		                    </tr>
 		                    <tr>
 		                        <td><stripes:label class="question" for="file">File</stripes:label></td>
-		                        <td><stripes:file name="file" id="file" size="54" /></td>
+		                        <td><stripes:file name="pageObject.file" id="file" size="54" /></td>
 		                    </tr>
 		                    <tr>
 		                    	<td></td>
 		                        <td>
-		                            <stripes:checkbox name="overwrite" id="overwrite"/>
+		                            <stripes:checkbox name="pageObject.overwrite" id="overwrite"/>
 		                            <stripes:label for="overwrite">Overwrite if file with the same name already exists</stripes:label>
 		                        </td>
 		                    </tr>
@@ -136,10 +136,10 @@
 	                </div>
            			<stripes:form action="/documentation" method="post">
 	           			<table>
-							<c:forEach var="doc" items="${actionBean.docs}">
+							<c:forEach var="doc" items="${actionBean.pageObject.docs}">
 								<tr>
 									<td>
-										<stripes:checkbox name="docIds" value="${doc.pageId}"/>
+										<stripes:checkbox name="pageObject.docIds" value="${doc.pageId}"/>
 									</td>
 									<td>
 										<stripes:link href="/documentation/${doc.pageId}/edit">${doc.pageId} (${doc.title})</stripes:link>
@@ -155,13 +155,13 @@
    				<c:otherwise>
    					<c:choose>
 						<c:when test="${not empty actionBean.pageId}">
-							<h1>${actionBean.title}</h1>
-							${actionBean.content}
+							<h1>${actionBean.pageObject.title}</h1>
+							${actionBean.pageObject.content}
 						</c:when>
                         <c:otherwise>
                         	<h1>Documentation</h1>
 		   					<ul>
-			   					<c:forEach var="doc" items="${actionBean.docs}">
+			   					<c:forEach var="doc" items="${actionBean.pageObject.docs}">
 									<li>
 										<c:set var="doctitle" value="${doc.title}"/>
 										<c:if test="${empty doctitle}">

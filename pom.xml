@@ -302,6 +302,11 @@
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
+            <artifactId>documentation</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>eionet</groupId>
             <artifactId>qawcommons</artifactId>
             <version>1.0</version>
         </dependency>

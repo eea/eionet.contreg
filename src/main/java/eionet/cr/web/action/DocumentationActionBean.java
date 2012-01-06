@@ -20,33 +20,17 @@
  */
 package eionet.cr.web.action;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.DocumentationDAO;
-import eionet.cr.dto.DocumentationDTO;
-import eionet.cr.filestore.FileStore;
+import eionet.doc.DocumentationService;
+import eionet.doc.dto.DocPageDTO;
 
 /**
  *
@@ -59,27 +43,8 @@ public class DocumentationActionBean extends AbstractActionBean {
     /** */
     private String pageId;
     private String event;
-    private String content;
-    private List<DocumentationDTO> docs;
 
-    /** */
-    public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
-
-    /** */
-    public static final String APP_URL = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
-
-    /**
-     * Properties for documentation add page
-     */
-    private String pid;
-    private FileBean file;
-    private String contentType;
-    private String title;
-    private boolean overwrite;
-
-    private boolean editableContent;
-
-    private List<String> docIds = new ArrayList<String>();
+    private DocPageDTO pageObject;
 
     /**
      *
@@ -90,46 +55,11 @@ public class DocumentationActionBean extends AbstractActionBean {
     public Resolution view() throws Exception {
 
         String forward = "/pages/documentation.jsp";
-        DocumentationDAO docDAO = DAOFactory.get().getDao(DocumentationDAO.class);
-        if (StringUtils.isBlank(pageId) || (pageId != null && pageId.equals("contents"))) {
-            if (pageId != null && pageId.equals("contents")) {
-                docs = docDAO.getDocObjects(false);
-            } else {
-                docs = docDAO.getDocObjects(true);
-            }
-        } else {
-            DocumentationDTO doc = docDAO.getDocObject(pageId);
-            if (doc == null) {
-                addCautionMessage("Such page ID doesn't exist in database: " + pageId);
-            } else {
-                if (!StringUtils.isBlank(event) && event.equals("edit")) {
-                    contentType = doc.getContentType();
-                    title = doc.getTitle();
-                    if (doc.getContentType().startsWith("text/")) {
-                        File f = FileStore.getInstance("documentation").get(pageId);
-                        if (f != null) {
-                            content = FileUtils.readFileToString(f, "UTF-8");
-                            editableContent = true;
-                        } else {
-                            addCautionMessage("File does not exist: " + pageId);
-                        }
-                    }
-                } else {
-                    if (doc.getContentType().startsWith("text/")) {
-                        File f = FileStore.getInstance("documentation").get(pageId);
-                        if (f != null) {
-                            content = FileUtils.readFileToString(f, "UTF-8");
-                        } else {
-                            addCautionMessage("File does not exist: " + pageId);
-                        }
-                        title = doc.getTitle();
-                    } else {
-                        File f = FileStore.getInstance("documentation").get(pageId);
-                        return new StreamingResolution(doc.getContentType(), new FileInputStream(f));
-                    }
-                }
-            }
+        pageObject = DocumentationService.getInstance().view(pageId, event);
+        if (pageObject != null && pageObject.getFis() != null) {
+            return new StreamingResolution(pageObject.getContentType(), pageObject.getFis());
         }
+
         return new ForwardResolution(forward);
     }
 
@@ -140,12 +70,16 @@ public class DocumentationActionBean extends AbstractActionBean {
      * @throws Exception
      */
     public Resolution editContent() throws Exception {
-        if (title == null) {
-            title = "";
+
+        if (isUserLoggedIn()) {
+            if (isPostRequest()) {
+                DocumentationService.getInstance().editContent(pageObject, true);
+                addSystemMessage("Successfully saved!");
+            }
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
         }
-        insertContent();
-        addSystemMessage("Successfully saved!");
-        return new RedirectResolution("/documentation/" + pid + "/edit");
+        return new RedirectResolution("/documentation/" + pageObject.getPid() + "/edit");
     }
 
     /**
@@ -155,93 +89,27 @@ public class DocumentationActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public Resolution addContent() throws Exception {
-
-        // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
-        if (StringUtils.isBlank(title)) {
-            title = pid;
-        }
-        insertContent();
-
-        return new RedirectResolution("/documentation/" + pid + "/edit");
-    }
-
-    /**
-     * Insert content into database
-     *
-     * @throws Exception
-     */
-    private void insertContent() throws Exception {
-
         if (isUserLoggedIn()) {
             if (isPostRequest()) {
-                // Extract file name.
-                String fileName = extractFileName();
-
-                // If content type is not filled in, then it takes the content-type of the file.
-                // If that's not available, then it is application/octet-stream.
-                // If file is null the the content-type is "text/html"
-                if (StringUtils.isBlank(contentType)) {
-                    if (file != null) {
-                        contentType = file.getContentType();
-                        if (StringUtils.isBlank(contentType)) {
-                            contentType = "application/octet-stream";
-                        }
-                    } else {
-                        contentType = "text/html";
-                    }
-                }
-
-                InputStream is = null;
-                if (file != null) {
-                    is = file.getInputStream();
-                } else if (content != null) {
-                    is = new ByteArrayInputStream(content.getBytes("UTF-8"));
-                } else {
-                    is = new ByteArrayInputStream("".getBytes());
-                }
-                FileStore.getInstance("documentation").add(fileName, true, is);
-                DocumentationDAO dao = DAOFactory.get().getDao(DocumentationDAO.class);
-                dao.insertContent(pid, contentType, title);
+                DocumentationService.getInstance().addContent(pageObject, true);
             }
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
         }
-    }
-
-    /**
-     * Extract file name
-     *
-     * @return String
-     */
-    private String extractFileName() {
-        String fileName = pid;
-        if (file != null && file.getFileName() != null) {
-            if (StringUtils.isBlank(pid)) {
-                fileName = file.getFileName();
-                pid = fileName;
-                // If title is still empty, then set it to file name
-                if (StringUtils.isBlank(title)) {
-                    title = fileName;
-                }
-            }
-        }
-        return fileName;
+        return new RedirectResolution("/documentation/" + pageObject.getPid() + "/edit");
     }
 
     @ValidationMethod(on = {"addContent"})
     public void validatePageId(ValidationErrors errors) throws Exception {
-        // If overwrite = false, then check if page id already exists
-        if (!StringUtils.isBlank(pid) && !overwrite) {
-            boolean exists = DAOFactory.get().getDao(DocumentationDAO.class).idExists(pid);
-            if (exists) {
-                errors.add("pid", new SimpleError("Such Page ID already exists!"));
-                getContext().setValidationErrors(errors);
-            }
-        }
-        if (file == null && StringUtils.isBlank(pid)) {
-            errors.add("pid", new SimpleError("If no file is chosen, then Page ID is mandatory!"));
+        // Expects that first parameter is named "pageObject" in this actionBean class
+        // Does two validations:
+        // - If pageObject.overwrite = false, then checks if page ID already exists
+        // - If no file is chosen, then Page ID is mandatory
+        errors = DocumentationService.getInstance().getStripesValidationErrors(pageObject, errors);
+        if (errors != null && errors.size() > 0) {
             getContext().setValidationErrors(errors);
         }
+        event = "add";
     }
 
     /**
@@ -254,14 +122,8 @@ public class DocumentationActionBean extends AbstractActionBean {
 
         if (isUserLoggedIn()) {
             // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
-            if (docIds != null || docIds.size() > 0) {
-                for (String id : docIds) {
-                    // Delete data from database
-                    DAOFactory.get().getDao(DocumentationDAO.class).deleteContent(id);
-
-                    // Delete file
-                    FileStore.getInstance("documentation").delete(id);
-                }
+            if (pageObject != null && pageObject.getDocIds() != null &&  pageObject.getDocIds().size() > 0) {
+                DocumentationService.getInstance().delete(pageObject);
             } else {
                 addWarningMessage("No objects selected!");
             }
@@ -280,46 +142,6 @@ public class DocumentationActionBean extends AbstractActionBean {
         this.pageId = pageId;
     }
 
-    public String getPid() {
-        return pid;
-    }
-
-    public void setPid(String pid) {
-        this.pid = pid;
-    }
-
-    public FileBean getFile() {
-        return file;
-    }
-
-    public void setFile(FileBean file) {
-        this.file = file;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public boolean isOverwrite() {
-        return overwrite;
-    }
-
-    public void setOverwrite(boolean overwrite) {
-        this.overwrite = overwrite;
-    }
-
     public String getEvent() {
         return event;
     }
@@ -328,36 +150,12 @@ public class DocumentationActionBean extends AbstractActionBean {
         this.event = event;
     }
 
-    public boolean isEditableContent() {
-        return editableContent;
+    public DocPageDTO getPageObject() {
+        return pageObject;
     }
 
-    public void setEditableContent(boolean editableContent) {
-        this.editableContent = editableContent;
-    }
-
-    public List<DocumentationDTO> getDocs() {
-        return docs;
-    }
-
-    public void setDocs(List<DocumentationDTO> docs) {
-        this.docs = docs;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public List<String> getDocIds() {
-        return docIds;
-    }
-
-    public void setDocIds(List<String> docIds) {
-        this.docIds = docIds;
+    public void setPageObject(DocPageDTO pageObject) {
+        this.pageObject = pageObject;
     }
 
 }

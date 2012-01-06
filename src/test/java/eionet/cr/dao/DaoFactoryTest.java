@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eionet.cr.dao.virtuoso.VirtuosoDocumentationDAO;
 import eionet.cr.dao.virtuoso.VirtuosoHarvestDAO;
 import eionet.cr.dao.virtuoso.VirtuosoHarvestMessageDAO;
 import eionet.cr.dao.virtuoso.VirtuosoHarvestSourceDAO;
@@ -49,7 +48,6 @@ public class DaoFactoryTest extends TestCase {
         assertTrue(factory.getDao(HarvestMessageDAO.class) instanceof VirtuosoHarvestMessageDAO);
         assertTrue(factory.getDao(TagsDAO.class) instanceof VirtuosoTagsDAO);
         assertTrue(factory.getDao(UserHomeDAO.class) instanceof VirtuosoUserHomeDAO);
-        assertTrue(factory.getDao(DocumentationDAO.class) instanceof VirtuosoDocumentationDAO);
         assertTrue(factory.getDao(UrgentHarvestQueueDAO.class) instanceof VirtuosoUrgentHarvestQueueDAO);
         assertTrue(factory.getDao(SpoBinaryDAO.class) instanceof VirtuosoSpoBinaryDAO);
 
