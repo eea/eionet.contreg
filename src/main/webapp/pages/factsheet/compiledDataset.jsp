@@ -20,7 +20,7 @@
                         <li>
                             <stripes:link class="link-plain" href="/compiledDataset.action" event="reload">
                                 <stripes:param name="uri" value="${actionBean.uri}" />
-                                Reload
+                                Recompile
                             </stripes:link>
                         </li>
                     </c:if>
@@ -55,15 +55,15 @@
                 </stripes:link>
             </display:column>
             <display:column title="Last modified" sortable="true">
-            	<c:if test="${not empty item.lastModifiedDate}">
-                	<fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
+                <c:if test="${not empty item.lastModifiedDate}">
+                    <fmt:formatDate value="${item.lastModifiedDate}" pattern="yyyy-MM-dd"/>T<fmt:formatDate value="${item.lastModifiedDate}" pattern="HH:mm:ss"/>
                 </c:if>
             </display:column>
         </display:table>
         <c:if test="${operationsAvailable && !actionBean.sourcesEmpty}">
             <br />
             <div>
-                <stripes:submit name="removeFiles" value="Delete" title="Remove files from dataset"/>
+                <stripes:submit name="removeFiles" value="Remove" title="Remove files from dataset"/>
             </div>
         </c:if>
         </crfn:form>
