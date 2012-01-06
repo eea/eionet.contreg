@@ -32,13 +32,17 @@
     <stripes:layout-component name="contents">
     	<c:choose>
 			<c:when test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/mergedeliveries", "v")}'>
-		        <h1>Save files into dataset</h1>
-				<p class="documentDescription">
-					Select multiple files and store them into one compiled dataset under your home-folder.
-					The list will show only XML files.
-				</p>
+		        <h1>Merge deliveries</h1>
 
 				<c:if test="${not empty actionBean.deliveryFiles}">
+				
+				    <p class="documentDescription">
+                        Below is the list of XML files in your selected deliveries.
+						Select the ones you wish to merge and proceed to the merging.
+						This will compile the selected files into a dataset within
+						your home folder.
+                    </p>
+				    
 					<stripes:form action="/saveFiles.action" method="post" id="deliveryFilesForm">
 			        	<table border="0" width="100%" class="datatable">
 				        	<c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
@@ -142,6 +146,12 @@
 							</tr>
 						</table>
 		        	</stripes:form>
+		        </c:if>
+		        <c:if test="${empty actionBean.deliveryFiles}">
+		            <p class="important-msg">
+                        Found no XML files files in your selected deliveries!
+                        Only XML files are currently supported for this operation.
+                    </p>
 		        </c:if>
         	</c:when>
 			<c:otherwise>
