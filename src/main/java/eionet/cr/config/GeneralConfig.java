@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -101,7 +102,11 @@ public class GeneralConfig {
      */
     public static final String SPARQLENDPOINT_MAX_ROWS_COUNT = "sparql.max.rows";
 
+    /** */
     public static final String APPLICATION_DISPLAY_NAME = "application.displayName";
+
+    /** */
+    public static final String USE_CENTRAL_AUTHENTICATION_SERVICE = "useCentralAuthenticationService";
 
     /** */
     public static final int SEVERITY_INFO = 1;
@@ -223,5 +228,15 @@ public class GeneralConfig {
 
         String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
         return virtuosoDbUrl != null && virtuosoDbUrl.trim().length() > 0;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public static synchronized boolean isUseCentralAuthenticationService() {
+
+        String useCentralAuthenticationService = getProperty(USE_CENTRAL_AUTHENTICATION_SERVICE);
+        return StringUtils.isBlank(useCentralAuthenticationService) || !useCentralAuthenticationService.equals("false");
     }
 }

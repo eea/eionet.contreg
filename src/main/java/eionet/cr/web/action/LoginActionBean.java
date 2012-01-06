@@ -37,6 +37,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.log4j.Logger;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -47,9 +48,9 @@ import eionet.cr.web.security.CRUser;
  * Action bean that deals with user login/logout.
  * <p>
  * In CAS context Action bean simply delegates user login/logout to CAS.
- *
+ * 
  * @author gerasvad, altnyris
- *
+ * 
  */
 @UrlBinding(LOGIN_ACTION)
 public class LoginActionBean extends AbstractActionBean {
@@ -57,21 +58,29 @@ public class LoginActionBean extends AbstractActionBean {
     /** */
     private static final Logger LOGGER = Logger.getLogger(LoginActionBean.class);
 
+
+
     /**
      * Action method deals with user logging in.
-     *
+     * 
      * @return {@link RedirectResolution} to CAS login URL.
      */
     @DefaultHandler
     @HandlesEvent(LOGIN_EVENT)
     @DontSaveLastActionEvent
     public Resolution login() {
-        return new RedirectResolution(getContext().getCASLoginURL(), false);
+
+        if (GeneralConfig.isUseCentralAuthenticationService()) {
+            return new RedirectResolution(getContext().getCASLoginURL(), false);
+        }
+        else{
+            return new RedirectResolution("/pages/index.jsp");
+        }
     }
 
     /**
      * Method redirects to last event occurred before logging in.
-     *
+     * 
      * @return redirect resolution to last event occurred before logging in.
      * @throws DAOException
      */
@@ -80,7 +89,7 @@ public class LoginActionBean extends AbstractActionBean {
     public Resolution afterLogin() throws DAOException {
 
         CRUser user = getContext().getCRUser();
-        if (user!=null){
+        if (user != null) {
             // Creating reserved files and folders for into user home
             FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
             dao.createUserHomeFolder(user.getUserName());
@@ -93,7 +102,7 @@ public class LoginActionBean extends AbstractActionBean {
 
     /**
      * Action method deals with user logging out.
-     *
+     * 
      * @return {@link RedirectResolution} to CAS logout URL.
      */
     @HandlesEvent(LOGOUT_EVENT)

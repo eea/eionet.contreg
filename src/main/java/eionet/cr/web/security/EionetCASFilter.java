@@ -60,8 +60,8 @@ public class EionetCASFilter extends CASFilter {
 
         CrCasFilterConfig filterConfig = CrCasFilterConfig.getInstance(config);
 
-        casLoginUrl = filterConfig.getInitParameter(LOGIN_INIT_PARAM);
-        serverName = filterConfig.getInitParameter(SERVERNAME_INIT_PARAM);
+        casLoginUrl = filterConfig.getInitParameter(CASFilter.LOGIN_INIT_PARAM);
+        serverName = filterConfig.getInitParameter(CASFilter.SERVERNAME_INIT_PARAM);
 
         super.init(filterConfig);
     }
@@ -143,7 +143,7 @@ public class EionetCASFilter extends CASFilter {
      */
     public static String getCASLogoutURL(HttpServletRequest request) {
         return casLoginUrl.replaceFirst("/login", "/logout") + "?url=" + request.getScheme() + "://" + serverName
-                + request.getContextPath();
+        + request.getContextPath();
     }
 
     /**
