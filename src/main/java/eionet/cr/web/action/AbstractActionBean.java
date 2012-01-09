@@ -99,10 +99,9 @@ public abstract class AbstractActionBean implements ActionBean {
     @Override
     public void setContext(final ActionBeanContext context) {
 
-        if (context instanceof CRActionBeanContext){
+        if (context instanceof CRActionBeanContext) {
             this.context = (CRActionBeanContext) context;
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("Context must be that of " + CRActionBeanContext.class.getSimpleName());
         }
     }
@@ -133,8 +132,8 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * Adds system message.
-     * The message will be shown in a simple rectangle and is to provide information on <i>successful</i> actions.
+     * Adds system message. The message will be shown in a simple rectangle and is to provide information on <i>successful</i>
+     * actions.
      *
      * @param message
      *            Message text in HTML format.
@@ -157,8 +156,7 @@ public abstract class AbstractActionBean implements ActionBean {
      * Adds caution message. The message will be shown wrapped in the &lt;div class="caution-msg"&lt; element. A caution is less
      * severe than a warning. It can e.g. be used when the application has to say to the user that it has ignored some input.
      *
-     * @param message
-     *            Message text in HTML format.
+     * @param message Message text in HTML format.
      */
     public void addCautionMessage(final String message) {
         getContext().getMessages(CAUTION_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
@@ -167,10 +165,9 @@ public abstract class AbstractActionBean implements ActionBean {
     /**
      * Adds warning message. The message will be shown wrapped in the &lt;div class="warning-msg"&lt; element.
      *
-     * @param message
-     *            Message text in HTML format.
+     * @param message Message text in HTML format.
      */
-    public void addWarningMessage(final String message) {
+    public void addWarningMessage(String message) {
         getContext().getMessages(WARNING_MESSAGES).add(new SimpleMessage(StringEscapeUtils.escapeXml(message)));
     }
 
@@ -310,11 +307,20 @@ public abstract class AbstractActionBean implements ActionBean {
         this.isHomeContext = isHomeContext;
     }
 
+    /**
+     *
+     * @param context
+     * @return
+     */
     public String getBaseUrl(CRActionBeanContext context) {
         String url = context.getRequest().getRequestURL().toString();
         return url.substring(0, url.lastIndexOf("/pages/"));
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEeaTemplate() {
         boolean ret = false;
         String use = getContext().getInitParameter("useEeaTemplate");

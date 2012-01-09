@@ -32,30 +32,7 @@
             <script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/prototype.js"/>"></script>
             <script type="text/javascript" src="<c:url value="/scripts/map.js"/>"></script>
-            
-            <c:set var="useCentralAuthenticationService" value="${empty initParam.useCentralAuthenticationService || initParam.useCentralAuthenticationService!='false'}"/>
-            
-            <c:if test="${!useCentralAuthenticationService}">
-	            <script type="text/javascript">
-	                // <![CDATA[
-	                    ( function($) {
-	                        $(document).ready(
-	
-	                            function(){
-	
-	                                $('#login_div').hide();
-	
-	                                $("#loginlink").click(function() {
-	                                    $('#login_div').show();
-	                                    $('#loginlink').hide();
-	                                    return false;
-	                                });
-	
-	                            });
-	                    } ) ( jQuery );
-	                // ]]>
-	            </script>
-            </c:if>
+
             <stripes:layout-component name="head"/>
         </head>
         <body ${bodyAttribute}>
@@ -68,15 +45,6 @@
                     <div id="righttools">
                         <c:choose>
                             <c:when test="${empty crUser}">
-                                <c:if test="${!useCentralAuthenticationService}">
-	                                <div id="login_div" style="display:inline">
-	                                    <form name="loginForm" action="/login.action" method="post">
-	                                        <input type="text" name="username"/>
-	                                        <input type="password" name="password"/>
-	                                        <input type="submit" name="doLogin" value="Login" style="font-size:90%"/>
-	                                    </form>
-	                                </div>
-                                </c:if>
                                 <stripes:link id="loginlink" title="Login" href="/login.action" event="login">Login</stripes:link>
                             </c:when>
                             <c:otherwise>
