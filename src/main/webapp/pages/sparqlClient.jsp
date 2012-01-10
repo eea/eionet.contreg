@@ -158,6 +158,7 @@
                     <div class="expandingArea">
                     <pre><span></span><br /></pre>
                     <textarea name="query" id="queryText" rows="8" cols="80" style="clear:right; display: block; width: 100%" onchange="format_select()" onkeyup="format_select()"><c:if test="${empty actionBean.query}">
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
 
 SELECT * WHERE {
