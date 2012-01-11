@@ -15,15 +15,15 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.DeliveryFilesReader;
-import eionet.cr.dao.readers.PairReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.dto.DatasetDTO;
 import eionet.cr.dto.DeliveryFilesDTO;
-import eionet.cr.dto.PairDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -75,11 +75,11 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
      * {@inheritDoc}
      */
     @Override
-    public List<PairDTO> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException {
-        List<PairDTO> ret = new ArrayList<PairDTO>();
+    public List<DatasetDTO> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException {
+        List<DatasetDTO> ret = new ArrayList<DatasetDTO>();
         if (!StringUtils.isBlank(homeFolder)) {
             StringBuffer query = new StringBuffer();
-            query.append("select distinct ?value ?name where {");
+            query.append("select distinct ?value ?name ?modified where {");
             query.append("graph ?g { ");
             query.append("?value ?p <").append(Predicates.CR_COMPILED_DATASET).append("> .");
             query.append("filter (?g = <").append(homeFolder).append(">) .");
@@ -89,10 +89,37 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
                 query.append("filter (?o = <").append(excludeFileUri).append(">)");
                 query.append("}");
             }
-            query.append("?value <http://www.w3.org/2000/01/rdf-schema#label> ?name ");
-            query.append("}} ORDER BY ?value");
+            query.append("?value <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
+            query.append("?value <").append(Predicates.CR_LAST_MODIFIED).append("> ?modified");
+            query.append("} ORDER BY ?value");
 
-            ret = executeSPARQL(query.toString(), new PairReader());
+            System.out.println("Query: " + query.toString());
+            ret = executeSPARQL(query.toString(), new SPARQLResultSetReader<DatasetDTO>() {
+                List<DatasetDTO> result = new ArrayList<DatasetDTO>();
+
+                @Override
+                public List<DatasetDTO> getResultList() {
+                    return result;
+                }
+
+                @Override
+                public void endResultSet() {
+                }
+
+                @Override
+                public void startResultSet(List<String> bindingNames) {
+                }
+
+                @Override
+                public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+                    DatasetDTO item = new DatasetDTO();
+                    item.setUri(bindingSet.getValue("value").stringValue());
+                    item.setLabel(bindingSet.getValue("name").stringValue());
+                    item.setModified(Util.virtuosoStringToDate(bindingSet.getValue("modified").stringValue()));
+                    result.add(item);
+                }
+
+            });
         }
         return ret;
     }

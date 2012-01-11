@@ -21,6 +21,8 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -38,8 +40,8 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dataset.CreateDataset;
+import eionet.cr.dto.DatasetDTO;
 import eionet.cr.dto.DeliveryFilesDTO;
-import eionet.cr.dto.PairDTO;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
@@ -52,7 +54,8 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     private List<String> selectedDeliveries;
     private List<DeliveryFilesDTO> deliveryFiles;
-    private List<PairDTO> existingDatasets;
+    private List<DatasetDTO> existingDatasets;
+    private List<DatasetDTO> newestExistingDatasets;
     private List<String> folders;
 
     private List<String> selectedFiles;
@@ -78,6 +81,43 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         deliveryFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDeliveryFiles(selectedDeliveries);
         existingDatasets = DAOFactory.get().getDao(CompiledDatasetDAO.class).getCompiledDatasets(getUser().getHomeUri(), null);
         folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+
+        // Sort by modified
+        Collections.sort(existingDatasets, new Comparator<DatasetDTO>() {
+            @Override
+            public int compare(DatasetDTO o1, DatasetDTO o2) {
+                if (o1.getModified().equals(o2.getModified())) {
+                    return 0;
+                }
+                if (o1.getModified().before(o2.getModified())) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+
+        // Add the top N datasets to newsestExistingDatasets
+        newestExistingDatasets = new ArrayList<DatasetDTO>();
+        for (int i = 0; i < 3; i++) {
+            if (existingDatasets.size() <= i) {
+                break;
+            }
+            newestExistingDatasets.add(existingDatasets.get(i));
+        }
+
+        // Remove the added datsets
+        for (DatasetDTO d : newestExistingDatasets) {
+            existingDatasets.remove(d);
+        }
+
+        // Sort back alphabetically
+        Collections.sort(existingDatasets, new Comparator<DatasetDTO>() {
+            @Override
+            public int compare(DatasetDTO o1, DatasetDTO o2) {
+                return o1.getUri().compareTo(o2.getUri());
+            }
+        });
     }
 
     public Resolution save() throws DAOException {
@@ -89,7 +129,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
                     datasetTitle = datasetId;
                 }
 
-                //Set folder to null if existing dataset selected
+                // Set folder to null if existing dataset selected
                 if (!StringUtils.isBlank(dataset) && !dataset.equals("new_dataset")) {
                     folder = null;
                 }
@@ -226,11 +266,11 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         return deliveryFiles;
     }
 
-    public List<PairDTO> getExistingDatasets() {
+    public List<DatasetDTO> getExistingDatasets() {
         return existingDatasets;
     }
 
-    public void setExistingDatasets(List<PairDTO> existingDatasets) {
+    public void setExistingDatasets(List<DatasetDTO> existingDatasets) {
         this.existingDatasets = existingDatasets;
     }
 
@@ -268,6 +308,14 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     public void setDatasetId(String datasetId) {
         this.datasetId = datasetId;
+    }
+
+    public List<DatasetDTO> getNewestExistingDatasets() {
+        return newestExistingDatasets;
+    }
+
+    public void setNewestExistingDatasets(List<DatasetDTO> newestExistingDatasets) {
+        this.newestExistingDatasets = newestExistingDatasets;
     }
 
 }

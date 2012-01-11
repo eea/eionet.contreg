@@ -56,9 +56,9 @@ import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dataset.CurrentLoadedDatasets;
+import eionet.cr.dto.DatasetDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PairDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.harvest.CurrentHarvests;
@@ -139,7 +139,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     private String graphUri;
 
     /** */
-    private List<PairDTO> userCompiledDatasets;
+    private List<DatasetDTO> userCompiledDatasets;
 
     /**
      *
@@ -765,7 +765,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         this.graphUri = graphUri;
     }
 
-    public List<PairDTO> getUserCompiledDatasets() {
+    public List<DatasetDTO> getUserCompiledDatasets() {
         if (userCompiledDatasets == null && !StringUtils.isBlank(uri)) {
             try {
                 CompiledDatasetDAO dao = DAOFactory.get().getDao(CompiledDatasetDAO.class);
@@ -777,7 +777,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         return userCompiledDatasets;
     }
 
-    public void setUserCompiledDatasets(List<PairDTO> userCompiledDatasets) {
+    public void setUserCompiledDatasets(List<DatasetDTO> userCompiledDatasets) {
         this.userCompiledDatasets = userCompiledDatasets;
     }
 

@@ -28,7 +28,7 @@
                             return true;
                         });
 
-                     	// onClick handler for add-to_dataset link (open add_dataset dialog)
+                         // onClick handler for add-to_dataset link (open add_dataset dialog)
                         $("#add_to_dataset").click(function() {
                             $('#dataset_dialog').dialog('open');
                             return false;
@@ -152,17 +152,17 @@
                                         <c:if test="${addReviewAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/reviews.action">
-                                                	Add review
-                                                	<stripes:param name="addReview" value="Add"/>
-                                                	<stripes:param name="uri" value="${actionBean.user.reviewsUri}"/>
-                                                	<stripes:param name="addUrl" value="${subjectUrl}"/>
+                                                    Add review
+                                                    <stripes:param name="addReview" value="Add"/>
+                                                    <stripes:param name="uri" value="${actionBean.user.reviewsUri}"/>
+                                                    <stripes:param name="addUrl" value="${subjectUrl}"/>
                                                 </stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${addToCompiledDataset}">
-                                        	<li>
-                                        		<a href="#" id="add_to_dataset">Add to compiled dataset</a>
-                                        	</li>
+                                            <li>
+                                                <a href="#" id="add_to_dataset">Add to compiled dataset</a>
+                                            </li>
                                         </c:if>
                                     </ul>
                                 </li>
@@ -227,30 +227,30 @@
                             </crfn:form>
                         </div>
                         <c:if test="${actionBean.userLoggedIn}">
-	                        <div id="bookmark_dialog" title="Add bookmark">
-	                            <crfn:form action="/factsheet.action" method="post">
-	                                <stripes:hidden name="uri" value="${subjectUrl}"/>
-	                                <fieldset style="border: 0px;">
-	                                    <label for="label" style="width: 200px; float: left;">Label</label>
-	                                    <stripes:text name="bookmarkLabel" id="label" size="40"/>
-	                                </fieldset>
-	                                <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
-	                            </crfn:form>
-	                        </div>
-	                        <div id="dataset_dialog" title="Add to compiled dataset">
-	                            <crfn:form action="/saveFiles.action" method="post">
-	                                <stripes:hidden name="selectedFiles" value="${subjectUri}"/>
-	                                <fieldset style="border: 0px;">
-	                                	<label for="compiledDataset" style="width: 200px; float: left;">Select compiled dataset:</label>
-		                                <stripes:select name="dataset" id="compiledDataset" style="width: 350px;">
-											<c:forEach items="${actionBean.userCompiledDatasets}" var="ds" varStatus="loop">
-												<stripes:option value="${ds.value}" label="${crfn:removeHomeUri(ds.value)} (${ds.name})" />
-											</c:forEach>
-										</stripes:select>
-									</fieldset>
-	                                <stripes:submit name="save" value="Add" id="dataset_form_submit" style="float: right;"/>
-	                            </crfn:form>
-	                        </div>
+                            <div id="bookmark_dialog" title="Add bookmark">
+                                <crfn:form action="/factsheet.action" method="post">
+                                    <stripes:hidden name="uri" value="${subjectUrl}"/>
+                                    <fieldset style="border: 0px;">
+                                        <label for="label" style="width: 200px; float: left;">Label</label>
+                                        <stripes:text name="bookmarkLabel" id="label" size="40"/>
+                                    </fieldset>
+                                    <stripes:submit name="addbookmark" value="Add bookmark" id="bookmark_form_submit" style="float: right;"/>
+                                </crfn:form>
+                            </div>
+                            <div id="dataset_dialog" title="Add to compiled dataset">
+                                <crfn:form action="/saveFiles.action" method="post">
+                                    <stripes:hidden name="selectedFiles" value="${subjectUri}"/>
+                                    <fieldset style="border: 0px;">
+                                        <label for="compiledDataset" style="width: 200px; float: left;">Select compiled dataset:</label>
+                                        <stripes:select name="dataset" id="compiledDataset" style="width: 350px;">
+                                            <c:forEach items="${actionBean.userCompiledDatasets}" var="ds" varStatus="loop">
+                                                <stripes:option value="${ds.uri}" label="${crfn:removeHomeUri(ds.uri)} (${ds.label})" />
+                                            </c:forEach>
+                                        </stripes:select>
+                                    </fieldset>
+                                    <stripes:submit name="save" value="Add" id="dataset_form_submit" style="float: right;"/>
+                                </crfn:form>
+                            </div>
                         </c:if>
                         <div id="predObjValueDialog" title="Property value"></div>
                     </c:when>
