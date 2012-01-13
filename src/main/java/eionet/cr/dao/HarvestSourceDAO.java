@@ -23,10 +23,12 @@ package eionet.cr.dao;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 
 import org.openrdf.OpenRDFException;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -127,11 +129,28 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      *
+     * @param conn
+     * @param source
+     * @return
+     * @throws DAOException
+     */
+    Integer addSource(Connection conn, HarvestSourceDTO source) throws DAOException;
+
+    /**
+     *
      * @param source
      * @throws DAOException
      *             if relational database is unavailable.
      */
     void addSourceIgnoreDuplicate(HarvestSourceDTO source) throws DAOException;
+
+    /**
+     *
+     * @param conn
+     * @param source
+     * @throws DAOException
+     */
+    void addSourceIgnoreDuplicate(Connection conn, HarvestSourceDTO source) throws DAOException;
 
     /**
      * @param source
@@ -278,6 +297,20 @@ public interface HarvestSourceDAO extends DAO {
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException,
             IOException;
+
+    /**
+     * Inserts given metadata into /harvester context.
+     *
+     * @param conn
+     * @param subject
+     * @param predicate
+     * @param object
+     * @throws DAOException
+     * @throws RepositoryException
+     * @throws IOException
+     */
+    void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO object)
+            throws DAOException, RepositoryException, IOException;
 
     /**
      *

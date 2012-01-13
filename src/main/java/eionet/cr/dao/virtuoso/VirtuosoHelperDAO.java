@@ -221,32 +221,38 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             conn = SesameUtil.getRepositoryConnection();
 
-            URI sub = conn.getValueFactory().createURI(subjectDTO.getUri());
+            addTriples(conn, subjectDTO);
 
-            for (String predicateUri : subjectDTO.getPredicateUris()) {
-                URI pred = conn.getValueFactory().createURI(predicateUri);
-
-                Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
-                if (objects != null && !objects.isEmpty()) {
-                    for (ObjectDTO object : objects) {
-
-                        String sourceUri = object.getSourceUri();
-                        URI source = conn.getValueFactory().createURI(sourceUri);
-
-                        if (object.isLiteral()) {
-                            Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
-                            conn.add(sub, pred, literalObject, source);
-                        } else {
-                            URI resourceObject = conn.getValueFactory().createURI(object.toString());
-                            conn.add(sub, pred, resourceObject, source);
-                        }
-                    }
-                }
-            }
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
         } finally {
             SesameUtil.close(conn);
+        }
+    }
+
+    @Override
+    public void addTriples(RepositoryConnection conn, SubjectDTO subjectDTO) throws DAOException, RepositoryException {
+        URI sub = conn.getValueFactory().createURI(subjectDTO.getUri());
+
+        for (String predicateUri : subjectDTO.getPredicateUris()) {
+            URI pred = conn.getValueFactory().createURI(predicateUri);
+
+            Collection<ObjectDTO> objects = subjectDTO.getObjects(predicateUri);
+            if (objects != null && !objects.isEmpty()) {
+                for (ObjectDTO object : objects) {
+
+                    String sourceUri = object.getSourceUri();
+                    URI source = conn.getValueFactory().createURI(sourceUri);
+
+                    if (object.isLiteral()) {
+                        Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
+                        conn.add(sub, pred, literalObject, source);
+                    } else {
+                        URI resourceObject = conn.getValueFactory().createURI(object.toString());
+                        conn.add(sub, pred, resourceObject, source);
+                    }
+                }
+            }
         }
     }
 

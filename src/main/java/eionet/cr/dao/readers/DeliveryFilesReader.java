@@ -37,12 +37,14 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
         if (bindingSet != null && bindingSet.size() > 0) {
             Value deliveryValue = bindingSet.getValue("s");
             String deliveryUri = deliveryValue.stringValue();
+            String deliveryTitle = bindingSet.getValue("title").stringValue();
 
             if (!StringUtils.isBlank(deliveryUri)) {
                 DeliveryFilesDTO del = deliveries.get(deliveryUri);
                 if (del == null) {
                     del = new DeliveryFilesDTO(deliveryUri);
                 }
+                del.setTitle(deliveryTitle);
 
                 String fileUri = bindingSet.getValue("o") != null ? bindingSet.getValue("o").stringValue() : null;
                 if (!StringUtils.isBlank(fileUri)) {

@@ -37,7 +37,7 @@
         <h1>Compiled dataset sources</h1>
 
         <c:if test="${actionBean.currentlyReloaded}">
-            <div class="advice-msg">Compiled dataset is currently being reloaded!</div>
+            <div class="advice-msg">The dataset is being compiled!</div>
         </c:if>
 
         <crfn:form action="/compiledDataset.action" method="post">

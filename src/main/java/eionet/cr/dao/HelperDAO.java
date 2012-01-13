@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+
 import eionet.cr.dao.readers.RDFExporter;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
@@ -80,11 +83,22 @@ public interface HelperDAO extends DAO {
     Collection<ObjectLabelPair> getPicklistForPredicate(String predicateUri, boolean extractLabels) throws DAOException;
 
     /**
+     * Adds triples to triplestore.
+     *
      * @param subjectDTO
      * @throws DAOException
      *             if query fails
      */
     void addTriples(SubjectDTO subjectDTO) throws DAOException;
+
+    /**
+     * Adds triples to triplestore.
+     *
+     * @param conn
+     * @param subjectDTO
+     * @throws DAOException
+     */
+    void addTriples(RepositoryConnection conn, SubjectDTO subjectDTO) throws DAOException, RepositoryException;
 
     /**
      * Store CONSTRUCT query result into given context
@@ -93,12 +107,14 @@ public interface HelperDAO extends DAO {
      * @param context
      * @param defaultGraphUris
      * @param namedGraphUris
-     * @param limit - max number of triples inserted
+     * @param limit
+     *            - max number of triples inserted
      * @return int - number of triples inserted
-     * @throws DAOException - if query fails
+     * @throws DAOException
+     *             - if query fails
      */
     int addTriples(String constructQuery, String context, String[] defaultGraphUris, String[] namedGraphUris, int limit)
-    throws DAOException;
+            throws DAOException;
 
     /**
      * @param uri
@@ -253,13 +269,15 @@ public interface HelperDAO extends DAO {
 
     /**
      * @param triples
-     * @throws DAOException - if query fails
+     * @throws DAOException
+     *             - if query fails
      */
     void deleteTriples(Collection<TripleDTO> triples) throws DAOException;
 
     /**
      * @param triple
-     * @throws DAOException - if query fails
+     * @throws DAOException
+     *             - if query fails
      */
     void deleteTriple(TripleDTO triple) throws DAOException;
 
@@ -348,7 +366,7 @@ public interface HelperDAO extends DAO {
      *             if query fails
      */
     void deleteSubjectPredicates(Collection<String> subjectUris, Collection<String> predicateUris, Collection<String> sourceUris)
-    throws DAOException;
+            throws DAOException;
 
     /**
      * @param user
@@ -416,7 +434,7 @@ public interface HelperDAO extends DAO {
      * @throws DAOException
      */
     FactsheetDTO getFactsheet(String subjectUri, List<String> acceptedLanguages, Map<String, Integer> predicatePages)
-    throws DAOException;
+            throws DAOException;
 
     /**
      * Returns number of harvested triples from the harvest source.

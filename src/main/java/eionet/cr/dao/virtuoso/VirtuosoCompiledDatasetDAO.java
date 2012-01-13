@@ -44,12 +44,15 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         if (deliveryUris != null && deliveryUris.size() > 0) {
 
             StringBuffer query = new StringBuffer();
-            query.append("select distinct ?s ?o ?triplesCnt where {");
+            query.append("select distinct ?s ?o ?triplesCnt ?title where {");
             query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
             query.append("?o <").append(Predicates.CR_MEDIA_TYPE).append("> \"text/xml\" . ");
             query.append("filter(?s IN (").append(SPARQLQueryUtil.urisToCSV(deliveryUris)).append("))");
             query.append("OPTIONAL {?o <").append(Predicates.CR_HARVESTED_STATEMENTS).append("> ?triplesCnt } ");
+            query.append("OPTIONAL {?s <").append(Predicates.DC_TITLE).append("> ?title } ");
             query.append("} ORDER BY ?s");
+
+            System.out.println(query.toString());
 
             /*StringBuffer query = new StringBuffer();
             query.append("select ?s ?o ?title count(?s1) ?triplesCnt where {");

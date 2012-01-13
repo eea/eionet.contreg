@@ -48,7 +48,7 @@
                             <c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
                                 <tr>
                                     <td colspan="2">
-                                        <b><c:out value="${delivery.uri}"/></b>
+                                        <b><c:out value="${delivery.title}"/></b> (<c:out value="${delivery.uri}"/>)
                                     </td>
                                     <td>
                                         <c:if test="${cnt.index == 0}">
@@ -70,7 +70,7 @@
                                                     <c:out value="${file.triplesCnt}"/>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <c:out value="na"/>
+                                                    <span title="Number of statements is not available"><c:out value="N/A"/></span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>

@@ -42,7 +42,8 @@ import eionet.cr.dao.FolderDAO;
 import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.DatasetDTO;
 import eionet.cr.dto.DeliveryFilesDTO;
-import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.util.URIUtil;
+import eionet.cr.web.action.factsheet.CompiledDatasetActionBean;
 
 /**
  *
@@ -147,7 +148,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
             }
         }
 
-        return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
+        return new RedirectResolution(CompiledDatasetActionBean.class).addParameter("uri", dataset);
     }
 
     /**
@@ -191,8 +192,8 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         }
 
         // Check that dataset ID does not contain slashes
-        if (!StringUtils.isBlank(datasetId) && datasetId.contains("/")) {
-            addGlobalValidationError("Dataset ID may not contain \"/\" character!");
+        if (!StringUtils.isBlank(datasetId) && (!URIUtil.isURI("http://" + datasetId) || datasetId.contains("/"))) {
+            addGlobalValidationError("Dataset ID contains invalid characters!");
             return;
         }
 
