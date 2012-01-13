@@ -624,7 +624,7 @@ public class PullHarvest extends BaseHarvest {
                 boolean hasConversion = !StringUtils.isBlank(conversionStylesheetUrl);
                 boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
 
-                // "If-Modified-Since" should only be set, if there is no modified conversion for this URL.
+                // "If-Modified-Since" should only be set if there is no modified conversion for this URL.
                 // Because if there is a conversion stylesheet, and it has been modified since last harvest,
                 // we surely want to get the content again, regardless of when the content itself was last modified.
                 if (!hasModifiedConversion) {
