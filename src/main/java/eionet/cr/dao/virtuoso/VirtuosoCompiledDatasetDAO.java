@@ -52,8 +52,6 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("OPTIONAL {?s <").append(Predicates.DC_TITLE).append("> ?title } ");
             query.append("} ORDER BY ?s");
 
-            System.out.println(query.toString());
-
             /*StringBuffer query = new StringBuffer();
             query.append("select ?s ?o ?title count(?s1) ?triplesCnt where {");
             query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
@@ -96,7 +94,6 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("?value <").append(Predicates.CR_LAST_MODIFIED).append("> ?modified");
             query.append("} ORDER BY ?value");
 
-            System.out.println("Query: " + query.toString());
             ret = executeSPARQL(query.toString(), new SPARQLResultSetReader<DatasetDTO>() {
                 List<DatasetDTO> result = new ArrayList<DatasetDTO>();
 
