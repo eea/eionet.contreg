@@ -46,33 +46,28 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
 
                 if (predicateUri != null && predicateUri.equals(Predicates.DC_TITLE)) {
                     delivery.setTitle(object);
-                }
-                if (predicateUri != null && predicateUri.equals(Predicates.ROD_COVERAGE_NOTE)) {
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_COVERAGE_NOTE)) {
                     delivery.setCoverageNote(object);
-                }
-                if (predicateUri != null && predicateUri.equals(Predicates.ROD_HAS_FILE)) {
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_HAS_FILE)) {
                     fileCount++;
                     delivery.setFileCnt(fileCount);
-                }
-                if (predicateUri != null && predicateUri.equals(Predicates.ROD_PERIOD)) {
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_PERIOD)) {
                     delivery.setPeriod(object);
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_START_OF_PERIOD)) {
                     if (object != null && object.length() > 4) {
                         delivery.setStartYear(object.substring(0, 4));
                     }
-                    Value eyear = bindingSet.getValue("end_year");
-                    if (eyear != null) {
-                        String eyearValue = eyear.stringValue();
-                        delivery.setEndYear(eyearValue);
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_END_OF_PERIOD)) {
+                    if (object != null && object.length() > 4) {
+                        delivery.setEndYear(object.substring(0, 4));
                     }
-                }
-                if (predicateUri != null && predicateUri.equals(Predicates.ROD_LOCALITY_PROPERTY)) {
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_LOCALITY_PROPERTY)) {
                     Value cname = bindingSet.getValue("cname");
                     if (cname != null) {
                         String cnameValue = cname.stringValue();
                         delivery.setLocality(cnameValue);
                     }
-                }
-                if (predicateUri != null && predicateUri.equals(Predicates.ROD_RELEASED)) {
+                } else if (predicateUri != null && predicateUri.equals(Predicates.ROD_RELEASED)) {
                     delivery.setDate(object);
                 }
                 deliveries.put(subjectUri, delivery);

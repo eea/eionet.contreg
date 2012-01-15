@@ -63,6 +63,8 @@ public interface Predicates {
     String ROD_HAS_FILE = "http://rod.eionet.europa.eu/schema.rdf#hasFile";
     String ROD_PRODUCT_OF = "http://rod.eionet.europa.eu/schema.rdf#productOf";
     String ROD_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#period";
+    String ROD_START_OF_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#startOfPeriod";
+    String ROD_END_OF_PERIOD = "http://rod.eionet.europa.eu/schema.rdf#endOfPeriod";
     String ROD_RELEASED = "http://rod.eionet.europa.eu/schema.rdf#released";
     String ROD_COVERAGE_NOTE = "http://rod.eionet.europa.eu/schema.rdf#coverageNote";
 
