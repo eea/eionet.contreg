@@ -78,6 +78,15 @@ public interface CompiledDatasetDAO extends DAO {
     void saveDataset(List<String> selectedFiles, String datasetUri, boolean overwrite) throws DAOException;
 
     /**
+     * Removes all dataset triples.
+     *
+     * @param datasetUri
+     * @param contextUri
+     * @throws DAOException
+     */
+    void clearDataset(String datasetUri, String contextUri) throws DAOException;
+
+    /**
      * Removes triples from compiled dataset that also exists in the selectedFiles.
      *
      * @param datasetUri

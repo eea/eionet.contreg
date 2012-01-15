@@ -17,6 +17,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -46,7 +47,7 @@ public class CreateDataset {
     }
 
     public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite)
-            throws Exception {
+    throws Exception {
 
         Connection sqlConn = null;
         RepositoryConnection repoConn = null;
@@ -57,6 +58,10 @@ public class CreateDataset {
 
             repoConn = SesameUtil.getRepositoryConnection();
             repoConn.setAutoCommit(false);
+
+            if (overwrite) {
+                DAOFactory.get().getDao(CompiledDatasetDAO.class).clearDataset(dataset, user.getHomeUri());
+            }
 
             // Store file as new source, but don't harvest it
             addSource(repoConn, sqlConn, dataset);
@@ -99,7 +104,7 @@ public class CreateDataset {
     }
 
     private void addMetadata(RepositoryConnection conn, String label, String dataset, String folder, List<String> selectedFiles)
-            throws DAOException, RepositoryException {
+    throws DAOException, RepositoryException {
 
         if (!StringUtils.isBlank(folder)) {
             // prepare cr:hasFile predicate
@@ -144,13 +149,13 @@ public class CreateDataset {
     private void addSource(RepositoryConnection repConn, Connection conn, String dataset) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(conn, HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
+        .addSourceIgnoreDuplicate(conn, HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
 
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(repConn, dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(repConn, dataset, Predicates.CR_LAST_MODIFIED,
+                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.BooleanQuery;
@@ -187,10 +188,6 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
         try {
             con = SesameConnectionProvider.getRepositoryConnection();
 
-            if (overwrite) {
-                clearGraph(datasetUri);
-            }
-
             StringBuffer query = new StringBuffer();
             query.append("INSERT INTO GRAPH ?graphUri { ?s ?p ?o } ");
             query.append("WHERE {graph ?g { ?s ?p ?o . ");
@@ -200,6 +197,30 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             Bindings bindings = new Bindings();
             bindings.setURI("graphUri", datasetUri);
             executeSPARUL(query.toString(), bindings, con);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearDataset(String datasetUri, String contextUri) throws DAOException {
+
+        RepositoryConnection con = null;
+        try {
+            con = SesameConnectionProvider.getRepositoryConnection();
+
+            con.clear(con.getValueFactory().createURI(datasetUri));
+
+            URI context = con.getValueFactory().createURI(contextUri);
+            URI sub = con.getValueFactory().createURI(datasetUri);
+            con.remove(sub, null, null, context);
 
         } catch (Exception e) {
             e.printStackTrace();
