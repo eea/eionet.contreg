@@ -9,6 +9,19 @@
 // <![CDATA[
             ( function($) {
                 $(document).ready(function(){
+
+                    $("#saveButton").click(function() {
+                        var checkedVals = [];
+                        $("#filesList :checked").each(function() {
+                            checkedVals.push($(this).val());
+                        });
+                        if (checkedVals.length == 0) {
+                            alert("No files are selected for merging");
+                            return false;
+                        }
+                        return true;
+                    });
+
                     var ds_val = $('select#selDataset').val();
                     //Hide div w/id extra
                     if(ds_val != "new_dataset") {
@@ -44,6 +57,7 @@
                     </p>
 
                     <stripes:form action="/saveFiles.action" method="post" id="deliveryFilesForm">
+                        <div id="filesList">
                         <table border="0" width="100%" class="datatable">
                             <c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
                                 <tr>
@@ -83,6 +97,7 @@
                                 </td>
                             </tr>
                         </table>
+                        </div>
                         <table border="0" width="550">
                             <tr>
                                 <td width="155">
@@ -148,7 +163,7 @@
                             <tr>
                                 <td align="right">
                                     <stripes:hidden name="selectedDeliveries" value="${actionBean.selectedDeliveries}"/>
-                                    <stripes:submit name="save" value="Save dataset"/>
+                                    <stripes:submit id="saveButton" name="save" value="Save dataset"/>
                                 </td>
                             </tr>
                         </table>
