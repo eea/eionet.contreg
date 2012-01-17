@@ -126,7 +126,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         String sourceUriBinding = (isValidIRI ? "?sourceUri" : "IRI(?sourceUri)");
         String sparql =
                 "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-                        + Predicates.RDF_TYPE + "> || (isURI(?o) && ?o=" + sourceUriBinding + "))}} ORDER BY ?s";
+                        + Predicates.RDF_TYPE + "> || <" + Predicates.RDFS_LABEL + "> || (isURI(?o) && ?o=" + sourceUriBinding + "))}} ORDER BY ?s";
 
         return sparql;
     }

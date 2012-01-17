@@ -561,7 +561,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         String query = helper.getQuery(null);
 
         long startTime = System.currentTimeMillis();
-        logger.trace("Search references, executing subject finder query: " + query);
+        logger.debug("Search references, executing subject finder query: " + query);
 
         // execute the query
         SingleObjectReader<String> reader = new SingleObjectReader<String>();
@@ -575,19 +575,20 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // if result list not null and not empty, then get the subjects data and total rowcount
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
-            logger.trace("Search references, getting the data of the found subjects");
+            logger.debug("Search references, getting the data of the found subjects");
 
             // get the data of all found subjects
             String predicateQuery = helper.getSubjectsDataQuery(subjectUris, subjectUri);
             SubjectDataReader sdReader = new SubjectDataReader(subjectUris);
             sdReader.setBlankNodeUriPrefix(BNODE_URI_PREFIX);
+            logger.debug("Predicate query: " + predicateQuery);
             // separate bindings for subject data
             resultList = executeSPARQL(predicateQuery, helper.getSubjectDataBindings(), sdReader);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest != null) {
 
-                logger.trace("Search references, executing rowcount query: " + query);
+                logger.debug("Search references, executing rowcount query: " + query);
                 totalMatchCount = new Integer(getExactRowCount(helper));
                 // totalMatchCount = resultList.size();
             }
