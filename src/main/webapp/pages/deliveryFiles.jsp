@@ -62,7 +62,13 @@
                             <c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">
                                 <tr>
                                     <td colspan="2">
-                                        <b><c:out value="${delivery.title}"/></b> (<c:out value="${delivery.uri}"/>)
+                                        <b>
+                                            <stripes:link href="/factsheet.action">
+                                                <stripes:param name="uri" value="${delivery.uri}" />
+                                                <c:out value="${delivery.title}"/>
+                                            </stripes:link>
+                                        </b>
+                                        (<c:out value="${delivery.uri}"/>)
                                     </td>
                                     <td>
                                         <c:if test="${cnt.index == 0}">
@@ -106,7 +112,7 @@
                                 <td>
                                     <stripes:select name="dataset" style="width: 383px;" id="selDataset">
                                         <stripes:option value="new_dataset" label="- new dataset -" />
-                                        <optgroup label="Most recent datasets">
+                                        <optgroup label="Recently compiled datasets">
                                             <c:forEach items="${actionBean.newestExistingDatasets}" var="ds" varStatus="loop">
                                                 <stripes:option value="${ds.uri}" label="${crfn:removeHomeUri(ds.uri)} (${ds.label})" />
                                             </c:forEach>
@@ -124,10 +130,10 @@
                             <table border="0" width="550">
                                 <tr>
                                     <td width="160">
-                                        <stripes:label for="datasetId" class="required question" title="Valid URI characters">Dataset ID</stripes:label>
+                                        <stripes:label for="datasetId" class="required question">Dataset ID</stripes:label>
                                     </td>
                                     <td>
-                                        <stripes:text name="datasetId" id="datasetId" size="58"/>
+                                        <stripes:text name="datasetId" id="datasetId" size="58" title="Valid URI characters"/>
                                     </td>
                                 </tr>
                                 <tr>

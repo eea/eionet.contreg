@@ -193,7 +193,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
         // Check that dataset ID does not contain slashes
         if (!StringUtils.isBlank(datasetId) && (!URIUtil.isURI("http://" + datasetId) || datasetId.contains("/"))) {
-            addGlobalValidationError("Dataset ID contains invalid characters!");
+            addGlobalValidationError("Dataset ID contains invalid characters (':', '/', '?', '#', '[', ']', '@').");
             return;
         }
 

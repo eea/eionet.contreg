@@ -6,6 +6,30 @@
 
     <stripes:useActionBean beanclass="eionet.cr.web.action.DeliverySearchActionBean" id="deliverySearchActionBean"/>
 
+    <stripes:layout-component name="head">
+        <script type="text/javascript">
+        // <![CDATA[
+            ( function($) {
+                $(document).ready(function(){
+
+                    $("#mergeButton").click(function() {
+                        var checkedVals = [];
+                        $("#deliveryList :checked").each(function() {
+                            checkedVals.push($(this).val());
+                        });
+                        if (checkedVals.length == 0) {
+                            alert("No deliveries selected for merging");
+                            return false;
+                        }
+                        return true;
+                    });
+                });
+
+             } ) ( jQuery );
+             // ]]>
+         </script>
+     </stripes:layout-component>
+
     <stripes:layout-component name="contents">
 
         <c:choose>
@@ -54,13 +78,16 @@
                     <c:choose>
                         <c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                             <crfn:form action="/saveFiles.action" method="post" id="deliveriesForm">
+                                <div id="deliveryList">
                                 <display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem"
                                             htmlId="resourcesResultList" requestURI="/deliverySearch.action"
                                             decorator="eionet.cr.web.util.DeliverySearchTableDecorator">
                                     <display:setProperty name="paging.banner.all_items_found" value="{0} deliveries found." />
                                     <display:setProperty name="paging.banner.one_item_found" value="One delivery found." />
+                                    <display:setProperty name="basic.msg.empty_list" value="No deliveries found." />
+
                                     <display:column title="">
-                                        <stripes:checkbox name="selectedDeliveries" value="${listItem.subjectUri}"/>
+                                        <stripes:checkbox id="selectDevilery" name="selectedDeliveries" value="${listItem.subjectUri}"/>
                                     </display:column>
                                     <display:column property="title" title="Title" sortable="true"/>
                                     <display:column property="fileCnt" title="Files"/>
@@ -69,8 +96,11 @@
                                     <display:column property="date" title="Date" sortable="true"/>
                                     <display:column property="coverageNote" title="Coverage Note" sortable="true"/>
                                 </display:table>
-                                <stripes:submit name="getFiles" value="Merge" title="Merge selected deliveries"/>
-                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('deliveriesForm');return false"/>
+                                <c:if test="${not empty actionBean.deliveries.list}">
+                                    <stripes:submit name="getFiles" value="Merge" title="Merge selected deliveries" id="mergeButton"/>
+                                    <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('deliveriesForm');return false"/>
+                                </c:if>
+                                </div>
                             </crfn:form>
                         </c:when>
                         <c:otherwise>
