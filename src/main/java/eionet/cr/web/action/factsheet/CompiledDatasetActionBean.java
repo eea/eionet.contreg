@@ -82,7 +82,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     /** Compiled dataset sources. */
     private List<SubjectDTO> sources;
 
-    /** */
+    /** Tabs. */
     private List<TabElement> tabs;
 
     /** */

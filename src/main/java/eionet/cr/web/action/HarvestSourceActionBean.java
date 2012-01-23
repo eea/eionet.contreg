@@ -46,9 +46,7 @@ import org.quartz.SchedulerException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
 import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -59,11 +57,13 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.RDFGenerator;
 
 /**
+ * Controller for adding new harvest source and for exporting source triples.
+ *
  * @author altnyris
  */
 @UrlBinding("/source.action")
@@ -147,61 +147,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     @DefaultHandler
     @HandlesEvent("view")
     public Resolution view() throws DAOException {
-
-        selectedTab = "view";
-        if (harvestSource != null) {
-            schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
-            prepareDTO();
-        }
-
-        return new ForwardResolution("/pages/viewsource.jsp");
-    }
-
-    /**
-     * @return Resolution
-     * @throws DAOException
-     */
-    @HandlesEvent("history")
-    public Resolution history() throws DAOException {
-
-        selectedTab = "history";
-        if (harvestSource != null) {
-            prepareDTO();
-            // populate history of harvests
-            harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
-        }
-
-        return new ForwardResolution("/pages/viewsource.jsp");
-    }
-
-    /**
-     * @return Resolution
-     * @throws DAOException
-     */
-    @HandlesEvent("sampleTriples")
-    public Resolution sampleTriples() throws DAOException {
-        selectedTab = "sampleTriples";
-        if (harvestSource != null) {
-            prepareDTO();
-            // populate sample triples
-            sampleTriples =
-                    DAOFactory.get().getDao(HelperDAO.class)
-                            .getSampleTriplesInSource(harvestSource.getUrl(), PagingRequest.create(1, 10));
-        }
-
-        return new ForwardResolution("/pages/viewsource.jsp");
-    }
-
-    private void prepareDTO() throws DAOException {
-
-        Integer sourceId = harvestSource.getSourceId();
-        String url = harvestSource.getUrl();
-
-        if (sourceId != null) {
-            harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(sourceId);
-        } else if (url != null && url.trim().length() > 0) {
-            harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
-        }
+        return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
     }
 
     /**
@@ -260,43 +206,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     /**
      *
-     * @return Resolution
-     * @throws DAOException
-     * @throws SchedulerException
-     */
-    public Resolution edit() throws DAOException, SchedulerException {
-
-        Resolution resolution = new ForwardResolution("/pages/editsource.jsp");
-        if (isUserLoggedIn()) {
-            if (isPostRequest()) {
-
-                if (validateAddEdit()) {
-                    HarvestSourceDTO source = getHarvestSource();
-                    if (source != null) {
-                        source.setOwner(getUserName());
-                        // All Schema sources are also Priority sources.
-                        if (schemaSource) {
-                            source.setPrioritySource(true);
-                        }
-                        // Add/remove source into/from inferencing ruleset.
-                        manageRuleset(source.getUrl());
-                    }
-                    factory.getDao(HarvestSourceDAO.class).editSource(source);
-                    addSystemMessage(getBundle().getString("update.success"));
-                }
-            } else {
-                harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
-                schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(harvestSource.getUrl());
-            }
-        } else {
-            addWarningMessage(getBundle().getString("not.logged.in"));
-        }
-
-        return resolution;
-    }
-
-    /**
-     *
      * @param url
      * @throws DAOException
      */
@@ -309,28 +218,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
         }
 
-    }
-
-    /**
-     *
-     * @return Resolution
-     * @throws DAOException
-     * @throws HarvestException
-     */
-    public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException {
-
-        // we need to re-fetch this.harvestSource, because the requested post
-        // has nulled it
-        harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceById(harvestSource.getSourceId());
-
-        // schedule the harvest
-        UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
-
-        // retrieve list of harvests (for display)
-        harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
-
-        addSystemMessage("Successfully scheduled for urgent harvest!");
-        return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     /**
@@ -432,17 +319,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             Resolution resolution = new ForwardResolution("/pages/export.jsp");
             getContext().setSourcePageResolution(resolution);
         }
-    }
-
-    /**
-     *
-     * @return Resolution
-     */
-    public Resolution goToEdit() {
-        if (harvestSource != null)
-            return new RedirectResolution(getUrlBinding() + "?edit=&harvestSource.sourceId=" + harvestSource.getSourceId());
-        else
-            return new ForwardResolution("/pages/viewsource.jsp");
     }
 
     /**

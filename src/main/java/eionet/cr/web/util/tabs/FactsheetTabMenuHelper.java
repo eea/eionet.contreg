@@ -213,7 +213,7 @@ public class FactsheetTabMenuHelper {
     }
 
     /**
-     *
+     * Tab titles.
      */
     public static class TabTitle {
         public static final String RESOURCE_PROPERTIES = "Resource properties";
