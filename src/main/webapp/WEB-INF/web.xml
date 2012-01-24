@@ -25,12 +25,17 @@
         <param-name>templateCacheFolder</param-name>
         <param-value>${application.eea.template.folder}</param-value>
     </context-param>
-    
+
     <context-param>
         <param-name>useCentralAuthenticationService</param-name>
         <param-value>${useCentralAuthenticationService}</param-value>
     </context-param>
-    
+
+    <context-param>
+        <param-name>enableEEAFunctionality</param-name>
+        <param-value>${enableEEAFunctionality}</param-value>
+    </context-param>
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!--              filters                   -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

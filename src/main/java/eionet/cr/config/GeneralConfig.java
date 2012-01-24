@@ -109,6 +109,9 @@ public class GeneralConfig {
     public static final String USE_CENTRAL_AUTHENTICATION_SERVICE = "useCentralAuthenticationService";
 
     /** */
+    public static final String ENABLE_EEA_FUNCTIONALITY = "enableEEAFunctionality";
+
+    /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
     public static final int SEVERITY_WARNING = 3;
@@ -231,7 +234,7 @@ public class GeneralConfig {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static synchronized boolean isUseCentralAuthenticationService() {
