@@ -8,12 +8,27 @@ from various Semantic Web / Linked Data nodes on the Internet,
 and stored as RDF triples in a triple store.
 
 The following sections describe how to install and run CR.
-A detailed set of installation instructions can also be found at
+Installation instructions can also be found at
 https://svn.eionet.europa.eu/projects/Reportnet/wiki/CR3Design/InstallationGuide
 
+****************************************************************************
+1. Download and install Java, Tomcat and Maven.
+****************************************************************************
+
+CR runs on Java platform, and has been tested and run on Tomcat Java Servlet Container.
+CR source code is built with Maven.
+
+Please download all of these software and install them according to the instructions
+found at their websites.
+
+The necessary versions are as follows:
+
+Java 1.5 or higher
+Maven 2.0.4 or higher
+Tomcat 5.5 or higher
 
 ****************************************************************************
-1. Download and install Virtuoso
+2. Download and install Virtuoso
 ****************************************************************************
 
 CR uses OpenLink Virtuoso as its backend for relational database and triple
@@ -36,88 +51,19 @@ NB!!! For security reasons, be sure to change your Virtuoso administrator passwo
 something other than the default!
 
 ****************************************************************************
-2. Download CR source code and database creation scripts
+3. Download and build CR source code
 ****************************************************************************
 
 CR source code is kept in a Subversion (SVN) repository located at
 https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk
 
-Install an SVN client of your preference, and checkout CR source code
-into a directory that we shal call CR_SOURCE_HOME in the below instructions.
+Install an SVN client of your preference, and checkout CR source code into a directory
+that is denoted by CR_SOURCE_HOME in the below instructions.
 
-****************************************************************************
-3. Import CR database creation scripts
-****************************************************************************
-
-The following commands shall import scripts that create necessary
-users, table structures, indexes and other CR setup information into
-Virtuoso.
-
-All of these commands use Virtuoso's Interactive SQL (ISQL) utility
-to import the scripts. They assume Virtuoso is running on localhost,
-and listens to its default port which is 1111. Please change these
-on the command line accordingly if this is not the case.
-
-Options -U and -P indicate user and password under which the command
-is run. All the below commands shall be executed as 'dba' user.
-
-It is assumed that the commands will be executed while being in
-CR_SOURCE_HOME/sql/virtuoso/install directory.
-It is also assumed that ISQL executable is on the command path.
-It is located in VIRTUOSO_HOME/bin directory.
-
-    3.1. Create necessary Virtuoso users
-
-        shell> isql localhost:1111 -U dba -P password < 1_create_users.sql
-
-    3.2. Set up the triple store's full text indexing
-
-        shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
-
-    3.3. Create the CR database schema
-
-        shell> isql localhost:1111 -U dba -P password < 3_create_schema.sql
-
-    3.4. Enforce EIONET-specific inference rules
-
-        Inference is something that is part of Semantic Web and helps CR to self-derive
-        conclusions and new information from certain structred data statements, based on
-        a certain rule-set.
-
-        This step imports a ruleset that is specific to EIONET. If you are not installing
-        CR for EIONET purposes, then this step is optional for you.
-
-        The EIONET-specific ruleset is located at CR_SOURCE_HOME/src/main/webapp/ontologies/contreg.rdf,
-        and the command expects to find it there, given it is executed in CR_SOURCE_HOME/sql/virtuoso/install.
-
-        shell> isql localhost:1111 -U dba -P password < 4_enforce_eionet_inferene_rules.sql
-
-****************************************************************************
-4. Install Java, Tomcat and Maven.
-****************************************************************************
-
-CR runs on Java platform, and has been tested and run on Tomcat Java Servlet Container.
-CR source code is built with Maven.
-
-Please download all of these software and install them according to the instructions
-found at their websites.
-
-The necessary versions are as follows:
-
-Java 1.5 or higher
-Maven 2.0.4 or higher
-Tomcat 5.5 or higher
-
-****************************************************************************
-4. Build CR source code
-****************************************************************************
-
-    4.1. Configure environment-specific build properties
-
-    Before building CR source code, you need to set your environment specific
-    properties. For that, make a copy of unittest.propertiesin in CR_SOURCE_HOME,
-    and rename it to local.properties. In the resulting file, ensure the following
-    properties match your environment (see further comments inside the properties file).
+Before you can build CR source code, you need to set your environment specific properties.
+For that, make a copy of unittest.properties in CR_SOURCE_HOME, and rename it to local.properties.
+In the resulting file, ensure that the following properties match your environment
+(see further comments inside the properties file):
 
     virtuoso.db.url
     virtuoso.db.usr
@@ -142,41 +88,69 @@ Tomcat 5.5 or higher
 
     edu.yale.its.tp.cas.client.filter.serverName
 
-    4.2. Build the code
-
-    CR source code is built with Maven. The following command assumes that
-    Maven's executable (mvn) is on the command path, and that it is run
-    while being in CR_SOURCE_HOME directory:
+Now you are ready to build your CR code. It is built with Maven.
+The following command assumes that Maven's executable (mvn) is on the command path,
+and that it is run while being in CR_SOURCE_HOME directory:
 
     shell> mvn -Dmaven.test.skip=true clean install
 
-****************************************************************************
-5. Deploy CR onto Tomcat
-****************************************************************************
-
-If the build went well, you shall have cr.war file in CR_SOURCE_HOME/target
-directory. Now all you have to do is to simply copy that file into Tomcat's
-webapps directory.
-
-Optionally, you can also deploy the WAR file via Tomcat's web console, but
-be sure to have made the next step, before running Tomcat.
 
 ****************************************************************************
-6. Change Tomcat's URI encoding
+4. Import CR database creation scripts
 ****************************************************************************
+
+The following commands shall import scripts that create necessary users,
+table structures, indexes and other CR setup information into Virtuoso.
+
+All of these commands use Virtuoso's Interactive SQL (ISQL) utility to import the scripts.
+They assume Virtuoso is running on localhost, and listens to its default port which is 1111.
+Please change these on the command line accordingly if this is not the case.
+
+Options -U and -P indicate user and password under which the command is run.
+All the below commands shall be executed as 'dba' user.
+
+The scripts are located in CR_SOURCE_HOME/sql/virtuoso/install directory,
+and the following commands should be executed while being in that directory.
+The commands also assume that ISQL executable is on the command path
+(it is located in VIRTUOSO_HOME/bin directory). 
+
+    Create necessary Virtuoso users for CR:
+
+        shell> isql localhost:1111 -U dba -P password < 1_create_users.sql
+
+    Set up the triple store's full text indexing
+
+        shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
+
+    Create the CR database schema:
+
+        shell> isql localhost:1111 -U dba -P password < 3_create_schema.sql
+
+    Enforce CR's default inference rules:
+
+        shell> isql localhost:1111 -U dba -P password < 4_enforce_inferene_rules.sql
+
+    Note that inference is something that is part of Semantic Web and helps CR to self-derive
+    conclusions and new information from certain structured data statements, based on a certain
+    ruleset. The above command imports CR's default ruleset. It downloads the ruleset from
+    http://svn.eionet.europa.eu/projects/Reportnet/browser/cr3/trunk/src/main/webapp/ontologies/contreg.rdf?format=txt. 
+
+
+****************************************************************************
+5. Deploy CR web application and run Tomcat
+****************************************************************************
+
+If the build went well, you shall have cr.war file in CR_SOURCE_HOME/target directory.
+Now all you have to do is to simply copy that file into Tomcat's webapps directory.
+Optionally, you can also deploy the WAR file via Tomcat's web console, but be sure to
+have made the following Tomcat configuration trick, before running Tomcat.
 
 Before you run Tomcat, you need to change the way Tomcat handles URI encoding.
-By default, it uses ISO-8859-1 for that. But CR needs UTF-8. Therefore make
-sure that the <Connector> tag in Tomcat's server.xml has the following attributes:
+By default, it uses ISO-8859-1 for that. But CR needs UTF-8. Therefore make sure
+that the <Connector> tag in Tomcat's server.xml has the following attributes:
 
 URIEncoding="UTF-8"
 useBodyEncodingForURI="true"
 
-****************************************************************************
-7. Run Tomcat and open CR in the browser
-****************************************************************************
-
-Once Tomcat is running, open CR in the browser. It's application
-context path is /cr, unless you renamed cr.war to something else or
-if you have chosen to deploy CR into a virtual host.
-
+Once Tomcat is running, open CR in the browser. It's application context path is /cr,
+unless you renamed cr.war to something else or you chose to deploy CR into a virtual host. 
