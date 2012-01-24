@@ -36,7 +36,7 @@ NB!!! For security reasons, be sure to change your Virtuoso administrator passwo
 something other than the default!
 
 ****************************************************************************
-2. Download CR source code
+2. Download CR source code and database creation scripts
 ****************************************************************************
 
 CR source code is kept in a Subversion (SVN) repository located at
@@ -46,7 +46,7 @@ Install an SVN client of your preference, and checkout CR source code
 into a directory that we shal call CR_SOURCE_HOME in the below instructions.
 
 ****************************************************************************
-3. Import CR database scripts
+3. Import CR database creation scripts
 ****************************************************************************
 
 The following commands shall import scripts that create necessary
@@ -88,7 +88,7 @@ It is located in VIRTUOSO_HOME/bin directory.
         CR for EIONET purposes, then this step is optional for you.
 
         The EIONET-specific ruleset is located at CR_SOURCE_HOME/src/main/webapp/ontologies/contreg.rdf,
-        and the command exepcts to find it there, given it is executed in CR_SOURCE_HOME/sql/virtuoso/install.
+        and the command expects to find it there, given it is executed in CR_SOURCE_HOME/sql/virtuoso/install.
 
         shell> isql localhost:1111 -U dba -P password < 4_enforce_eionet_inferene_rules.sql
 
