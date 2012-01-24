@@ -73,3 +73,45 @@ create table CR.cr3user.remove_source_queue
 	url varchar(1024) NOT NULL,
 	PRIMARY KEY (url)
 );
+
+create table CR.cr3user.post_harvest_script
+(
+  post_harvest_script_id INTEGER IDENTITY,
+  target_source_url VARCHAR(1024),
+  target_type_url VARCHAR(1024),
+  title VARCHAR(255),
+  script LONG VARCHAR,
+  position_number INTEGER,
+  active VARCHAR(1),
+  PRIMARY KEY (post_harvest_script_id)
+);
+
+ALTER TABLE CR.cr3user.post_harvest_script
+  ADD CHECK ( target_source_url  IS NULL OR  target_type_url  IS NULL);
+
+create procedure CR.cr3user.period_end_year (in txt varchar) {
+        declare start_year integer;
+        declare end_year integer;
+        declare period integer;
+        declare pidx integer;
+        declare yidx integer;
+        declare ylength integer;
+
+        pidx := strcasestr(txt, '/P');
+        yidx := strcasestr(txt, 'Y');
+        if (pidx > 0 and yidx > 0) {
+                ylength := yidx - pidx - 2;
+                start_year := cast(substring(txt, 1 , 4) as integer);
+                period := cast(substring(txt, pidx + 3, ylength) as integer);
+                end_year := start_year + period;
+        }
+        return end_year;
+};
+
+ALTER TABLE CR.cr3user.harvest_message
+ADD CONSTRAINT hame_ha_fk FOREIGN KEY (harvest_id) REFERENCES CR.cr3user.harvest (harvest_id)
+    ON DELETE CASCADE;
+
+ALTER TABLE CR.cr3user.harvest
+ADD CONSTRAINT ha_haso_fk FOREIGN KEY (harvest_source_id) REFERENCES CR.cr3user.harvest_source (harvest_source_id)
+    ON DELETE CASCADE;
