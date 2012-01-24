@@ -32,10 +32,13 @@ import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -69,12 +72,36 @@ public class SourceTriplesActionBean extends AbstractActionBean {
             addCautionMessage("No request criteria specified!");
         } else {
             sampleTriples = DAOFactory.get().getDao(HelperDAO.class).getSampleTriplesInSource(uri, PagingRequest.create(1, 10));
+            HarvestSourceDTO harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
-            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri);
+            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner(harvestSource));
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.SAMPLE_TRIPLES);
         }
 
         return new ForwardResolution("/pages/source/sourceTriples.jsp");
+    }
+
+    /**
+     * Chekcs if user is owner of the harvest source.
+     *
+     * @param harvestSourceDTO
+     * @return
+     */
+    private boolean isUserOwner(HarvestSourceDTO harvestSourceDTO) {
+
+        boolean result = false;
+
+        if (harvestSourceDTO != null) {
+
+            String sourceOwner = harvestSourceDTO.getOwner();
+            CRUser user = getUser();
+
+            if (user != null && (user.isAdministrator() || user.getUserName().equals(sourceOwner))) {
+                result = true;
+            }
+        }
+
+        return result;
     }
 
     /**

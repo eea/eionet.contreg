@@ -34,13 +34,18 @@ public class SourceTabMenuHelper {
     /** Source uri. */
     private String uri;
 
+    /** Is source editable by user. */
+    private boolean editable;
+
     /**
      * Class constructor.
      *
      * @param uri
+     * @param editable
      */
-    public SourceTabMenuHelper(String uri) {
+    public SourceTabMenuHelper(String uri, boolean editable) {
         this.uri = uri;
+        this.editable = editable;
     }
 
     /**
@@ -57,9 +62,11 @@ public class SourceTabMenuHelper {
         te1.addParam("uri", uri);
         result.add(te1);
 
-        TabElement te2 = new TabElement(TabTitle.EDIT, "/sourceEdit.action", selected);
-        te2.addParam("uri", uri);
-        result.add(te2);
+        if (editable) {
+            TabElement te2 = new TabElement(TabTitle.EDIT, "/sourceEdit.action", selected);
+            te2.addParam("uri", uri);
+            result.add(te2);
+        }
 
         TabElement te3 = new TabElement(TabTitle.SAMPLE_TRIPLES, "/sourceTriples.action", selected);
         te3.addParam("uri", uri);

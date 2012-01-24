@@ -39,6 +39,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -81,7 +82,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
             harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
 
-            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri);
+            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner(harvestSource));
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.VIEW);
         }
 
@@ -146,6 +147,29 @@ public class ViewSourceActionBean extends AbstractActionBean {
         }
 
         return buf.toString();
+    }
+
+    /**
+     * Chekcs if user is owner of the harvest source.
+     *
+     * @param harvestSourceDTO
+     * @return
+     */
+    private boolean isUserOwner(HarvestSourceDTO harvestSourceDTO) {
+
+        boolean result = false;
+
+        if (harvestSourceDTO != null) {
+
+            String sourceOwner = harvestSourceDTO.getOwner();
+            CRUser user = getUser();
+
+            if (user != null && (user.isAdministrator() || user.getUserName().equals(sourceOwner))) {
+                result = true;
+            }
+        }
+
+        return result;
     }
 
     /**

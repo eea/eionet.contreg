@@ -98,8 +98,13 @@ public class EditSourceActionBean extends AbstractActionBean {
             schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
-            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri);
+            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner(harvestSource));
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.EDIT);
+
+            if (!isUserOwner(harvestSource)) {
+                addCautionMessage("Only owner can modify this source.");
+                return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
+            }
         }
 
         return new ForwardResolution("/pages/source/sourceEdit.jsp");
