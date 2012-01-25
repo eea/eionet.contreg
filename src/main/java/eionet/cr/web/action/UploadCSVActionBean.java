@@ -76,8 +76,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private boolean fileUploaded = false;
 
     /**
-     *
-     * @return ForwardResolution
+     * 
+     * @return
      */
     @DefaultHandler
     public Resolution init() {
@@ -85,9 +85,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * Upload CSV/TSV file to /username/files folder.
-     *
-     * @return ForwardResolution
+     * 
+     * @return
      */
     public Resolution upload() {
 
@@ -126,9 +125,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * Insert content found from CSV/TSV file into Virtuoso triplestore.
-     *
-     * @return ForwardResolution
+     * 
+     * @return
      */
     public Resolution insert() {
 
@@ -239,6 +237,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
+     * 
      * @throws DAOException
      */
     @ValidationMethod(on = {"upload", "insert"})
@@ -281,6 +280,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * 
+     * @param subjectUri
+     */
     private void addMetadata(String subjectUri) {
 
         // prepare cr:hasFile predicate
@@ -305,6 +308,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * 
+     * @param subjectUri
+     * @param fileName
+     * @throws Exception
+     */
     private void addSource(String subjectUri, String fileName) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
@@ -333,74 +342,128 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     }
 
+    /**
+     * @return
+     */
     public FileBean getFile() {
         return file;
     }
 
+    /**
+     * @param file
+     */
     public void setFile(FileBean file) {
         this.file = file;
     }
 
+    /**
+     * @return
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * @param type
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * @return
+     */
     public String getObjectType() {
         return objectType;
     }
 
+    /**
+     * @param objectType
+     */
     public void setObjectType(String objectType) {
         this.objectType = objectType;
     }
 
+    /**
+     * @return
+     */
     public String[] getColumns() {
         return columns;
     }
 
+    /**
+     * @param columns
+     */
     public void setColumns(String[] columns) {
         this.columns = columns;
     }
 
+    /**
+     * @return
+     */
     public int getLabelColumn() {
         return labelColumn;
     }
 
+    /**
+     * @param labelColumn
+     */
     public void setLabelColumn(int labelColumn) {
         this.labelColumn = labelColumn;
     }
 
+    /**
+     * @return
+     */
     public List<Integer> getUniqueColumns() {
         return uniqueColumns;
     }
 
+    /**
+     * @param uniqueColumns
+     */
     public void setUniqueColumns(List<Integer> uniqueColumns) {
         this.uniqueColumns = uniqueColumns;
     }
 
+    /**
+     * @return
+     */
     public String getFilePath() {
         return filePath;
     }
 
+    /**
+     * @param filePath
+     */
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * @return
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * @param fileName
+     */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * @return
+     */
     public boolean isFileUploaded() {
         return fileUploaded;
     }
 
+    /**
+     * @param fileUploaded
+     */
     public void setFileUploaded(boolean fileUploaded) {
         this.fileUploaded = fileUploaded;
     }
@@ -419,5 +482,4 @@ public class UploadCSVActionBean extends AbstractActionBean {
     public void setUri(String uri) {
         this.uri = uri;
     }
-
 }
