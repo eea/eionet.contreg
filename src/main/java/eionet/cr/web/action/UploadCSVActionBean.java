@@ -61,6 +61,9 @@ import eionet.cr.web.util.CharsetToolkit;
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
 
+    /**  */
+    private static final String UPLOAD_CSV_JSP = "/pages/home/uploadCSV.jsp";
+
     /** URI of the folder where the file will be uploaded. */
     private String uri;
 
@@ -81,7 +84,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution init() {
-        return new ForwardResolution("/pages/home/uploadCSV.jsp");
+        return new ForwardResolution(UPLOAD_CSV_JSP);
     }
 
     /**
@@ -121,16 +124,16 @@ public class UploadCSVActionBean extends AbstractActionBean {
             addWarningMessage(e.getMessage());
         }
 
-        return new ForwardResolution("/pages/home/uploadCSV.jsp");
+        return new ForwardResolution(UPLOAD_CSV_JSP);
     }
 
     /**
      * 
      * @return
      */
-    public Resolution insert() {
+    public Resolution save() {
 
-        Resolution resolution = new ForwardResolution("/pages/home/uploadCSV.jsp");
+        Resolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
 
         try {
             char delimeter = ',';
@@ -275,7 +278,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // if any validation errors were set above, make sure the right resolution is returned
         if (hasValidationErrors()) {
-            Resolution resolution = new ForwardResolution("/pages/home/uploadCSV.jsp");
+            Resolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
             getContext().setSourcePageResolution(resolution);
         }
     }
