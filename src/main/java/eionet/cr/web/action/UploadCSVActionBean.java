@@ -54,21 +54,24 @@ import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
 
-    /**  */
+    /** */
     private static final String UPLOAD_CSV_JSP = "/pages/home/uploadCSV.jsp";
+
+    /** */
+    public enum Type {CSV, TSV;}
 
     /** URI of the folder where the file will be uploaded. */
     private String uri;
 
     private FileBean file;
-    private String type;
+    private Type type;
     private String[] columns;
     private String filePath;
     private String fileName;
@@ -93,38 +96,38 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public Resolution upload() {
 
+        ForwardResolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
+        if (file == null) {
+            addWarningMessage("No file found!");
+            return resolution;
+        }
+
         try {
-            if (file != null) {
-                char delimeter = ',';
-                if (type != null && type.equals("tsv")) {
-                    delimeter = '\t';
-                }
-                CSVReader reader = new CSVReader(file.getReader(), delimeter);
-                columns = reader.readNext();
+            CSVReader reader = new CSVReader(file.getReader(), getDelimiter());
+            columns = reader.readNext();
 
-                // Save file under home folder path
-                fileName = file.getFileName();
-                String fileHomePath = URIUtil.extractPathInUserHome(uri + "/" + fileName);
-                File storedFile = FileStore.getInstance(getUserName()).add(fileHomePath, true, file.getInputStream());
-                filePath = storedFile.getAbsolutePath();
+            // Save file under home folder path
+            fileName = file.getFileName();
+            String fileHomePath = URIUtil.extractPathInUserHome(uri + "/" + fileName);
+            File storedFile = FileStore.getInstance(getUserName()).add(fileHomePath, true, file.getInputStream());
+            filePath = storedFile.getAbsolutePath();
 
-                String subjectUri = uri + "/" + StringUtils.replace(fileName, " ", "%20");
+            String subjectUri = uri + "/" + StringUtils.replace(fileName, " ", "%20");
 
-                // Store file as new source, but don't harvest it
-                addSource(subjectUri, fileName);
+            // Store file as new source, but don't harvest it
+            addSource(subjectUri, fileName);
 
-                // Add metadata about user folder update
-                addMetadata(subjectUri);
+            // Add metadata about user folder update
+            addMetadata(subjectUri);
 
-                fileUploaded = true;
-            }
+            fileUploaded = true;
 
         } catch (Exception e) {
-            System.out.println("Exception while reading csv file: " + e);
+            System.out.println("Exception while reading the file: " + e);
             addWarningMessage(e.getMessage());
         }
 
-        return new ForwardResolution(UPLOAD_CSV_JSP);
+        return resolution;
     }
 
     /**
@@ -136,18 +139,13 @@ public class UploadCSVActionBean extends AbstractActionBean {
         Resolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
 
         try {
-            char delimeter = ',';
-            if (type != null && type.equals("tsv")) {
-                delimeter = '\t';
-            }
-
             File file = new File(filePath);
             Charset guessedCharset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
 
             String graphName = uri + "/" + StringUtils.replace(fileName, " ", "%20");
             String type = graphName + "/" + objectType;
 
-            CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file), guessedCharset), delimeter);
+            CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file), guessedCharset), getDelimiter());
             // First line contains column names
             String[] nextLine = reader.readNext();
             while ((nextLine = reader.readNext()) != null) {
@@ -229,7 +227,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             }
 
         } catch (Exception e) {
-            System.out.println("Exception while reading csv file: " + e);
+            System.out.println("Exception while reading uploaded file: " + e);
             addWarningMessage(e.toString());
             return resolution;
         }
@@ -322,11 +320,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
         DAOFactory.get().getDao(HarvestSourceDAO.class)
         .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
 
-        DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.RDFS_LABEL,
-                new ObjectDTO(fileName, true));
+        DAOFactory.get().getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(subjectUri, Predicates.RDFS_LABEL, new ObjectDTO(fileName, true));
 
         DAOFactory
         .get()
@@ -335,7 +330,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 new ObjectDTO(String.valueOf(file.getSize()), true));
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(String.valueOf(type), true));
+        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(type.toString(), true));
 
         DAOFactory
         .get()
@@ -362,14 +357,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /**
      * @return
      */
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
     /**
      * @param type
      */
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
@@ -479,10 +474,17 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public char getDelimiter(){
+        return type != null && type.equals(Type.TSV) ? '\t' : ',';
     }
 }

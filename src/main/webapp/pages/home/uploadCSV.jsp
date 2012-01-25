@@ -55,8 +55,8 @@
                                     <td><label class="question" for="type">File type</label></td>
                                     <td>
                                         <stripes:select name="type" style="width: 280px;">
-                                            <stripes:option value="csv" label="CSV - Comma separated values" />
-                                            <stripes:option value="tsv" label="TSV - Tab separated values" />
+                                            <stripes:option value="CSV" label="CSV - Comma separated values" />
+                                            <stripes:option value="TSV" label="TSV - Tab separated values" />
                                         </stripes:select>
                                     </td>
                                 </tr>
