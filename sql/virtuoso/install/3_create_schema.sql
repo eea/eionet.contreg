@@ -1,9 +1,9 @@
 create table CR.cr3user.documentation
 (
-	page_id varchar(255) NOT NULL,
-	content_type varchar(100) NOT NULL default 'text/html',
-	title varchar(512) default '',
-	PRIMARY KEY (page_id)
+    page_id varchar(255) NOT NULL,
+    content_type varchar(100) NOT NULL default 'text/html',
+    title varchar(512) default '',
+    PRIMARY KEY (page_id)
 );
 
 create table CR.cr3user.harvest_message
@@ -54,24 +54,24 @@ create table CR.cr3user.harvest_source (
 
 create table CR.cr3user.urgent_harvest_queue
 (
-	url varchar(1024) NOT NULL,
-	"timestamp" datetime NOT NULL,
-	pushed_content long varchar
+    url varchar(1024) NOT NULL,
+    "timestamp" datetime NOT NULL,
+    pushed_content long varchar
 );
 
 create table CR.cr3user.spo_binary
 (
-	subject bigint NOT NULL,
-	obj_lang varchar(10) NOT NULL DEFAULT '',
-	datatype varchar(50) NOT NULL DEFAULT '',
-	must_embed character NOT NULL DEFAULT 'N',
-	PRIMARY KEY (subject)
+    subject bigint NOT NULL,
+    obj_lang varchar(10) NOT NULL DEFAULT '',
+    datatype varchar(50) NOT NULL DEFAULT '',
+    must_embed character NOT NULL DEFAULT 'N',
+    PRIMARY KEY (subject)
 );
 
 create table CR.cr3user.remove_source_queue
 (
-	url varchar(1024) NOT NULL,
-	PRIMARY KEY (url)
+    url varchar(1024) NOT NULL,
+    PRIMARY KEY (url)
 );
 
 create table CR.cr3user.post_harvest_script
@@ -88,6 +88,17 @@ create table CR.cr3user.post_harvest_script
 
 ALTER TABLE CR.cr3user.post_harvest_script
   ADD CHECK ( target_source_url  IS NULL OR  target_type_url  IS NULL);
+
+create table CR.cr3user.delivery_filter
+(
+    delivery_filter_id INTEGER IDENTITY,
+    obligation varchar(255),
+    obligation_label varchar(255),
+    locality varchar(255),
+    locality_label varchar(255),
+    year varchar(10),
+    username varchar(10) NOT NULL
+);
 
 create procedure CR.cr3user.period_end_year (in txt varchar) {
         declare start_year integer;

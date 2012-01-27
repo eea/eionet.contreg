@@ -23,6 +23,24 @@
                         }
                         return true;
                     });
+
+                    // Open dialog
+                    $("#filtersButton").click(function() {
+                        $('#filtersDialog').dialog('open');
+                        return false;
+                    });
+
+                    // Dialog setup
+                    $('#filtersDialog').dialog({
+                        autoOpen: false,
+                        width: 500
+                    });
+
+                    // Close dialog
+                    $("#closeFiltersDialog").click(function() {
+                        $('#filtersDialog').dialog("close");
+                        return false;
+                    });
                 });
 
              } ) ( jQuery );
@@ -70,11 +88,15 @@
                             <c:forEach var="y" items="${deliverySearchActionBean.years}">
                                 <stripes:option value="${y}" label="${y}"/>
                             </c:forEach>
-                        </stripes:select><stripes:submit name="search" value="Search" id="searchButton" style="display:inline;margin-left:60px"/>
+                        </stripes:select>
+                        <stripes:submit name="search" value="Search" id="searchButton" style="display:inline;margin-left:60px"/>
+                        <c:if test="${not empty deliverySearchActionBean.deliveryFilters}">
+                            <button id="filtersButton">Latest searches</button>
+                        </c:if>
                     </div>
                 </crfn:form>
                 <br/>
-                <c:if test="${not empty param.search}">
+                <c:if test="${(not empty param.search) || (not empty param.filterId)}">
                     <c:choose>
                         <c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                             <crfn:form action="/saveFiles.action" method="post" id="deliveriesForm">
@@ -116,6 +138,20 @@
                         </c:otherwise>
                     </c:choose>
                 </c:if>
+
+                <div id="filtersDialog" title="Latest search filters">
+                    <ul>
+                    <c:forEach var="filter" items="${deliverySearchActionBean.deliveryFilters}">
+                        <li>
+                            <stripes:link href="/deliverySearch.action" event="filterSearch">
+                                <stripes:param name="filterId" value="${filter.id}" />
+                                <c:out value="${filter.label}" />
+                            </stripes:link>
+                        </li>
+                    </c:forEach>
+                    </ul>
+                    <button id="closeFiltersDialog">Cancel</button>
+                </div>
             </c:when>
             <c:otherwise>
                 <div class="note-msg">You are not logged in or you do not have enough privileges!</div>

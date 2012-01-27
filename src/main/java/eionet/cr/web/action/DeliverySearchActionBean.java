@@ -31,12 +31,17 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.DeliveryFilterDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dto.DeliveryDTO;
+import eionet.cr.dto.DeliveryFilterDTO;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
@@ -60,6 +65,12 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     private String locality;
     private String year;
 
+    /** Store delivery filters. */
+    private List<DeliveryFilterDTO> deliveryFilters = new ArrayList<DeliveryFilterDTO>();
+
+    /** Selected filter id. */
+    private Long filterId;
+
     private CustomPaginatedList<DeliveryDTO> deliveries;
 
     private static final Map<String, String> columns = new HashMap<String, String>();
@@ -72,9 +83,13 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     /**
      *
      * @return
+     * @throws DAOException
      */
     @DefaultHandler
-    public Resolution init() {
+    public Resolution init() throws DAOException {
+        if (isUserLoggedIn()) {
+            deliveryFilters = DAOFactory.get().getDao(DeliveryFilterDAO.class).getDeliveryFilters(getUserName());
+        }
         return new ForwardResolution("/pages/deliverySearch.jsp");
     }
 
@@ -92,7 +107,67 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
                                 new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
 
-        return new ForwardResolution("/pages/deliverySearch.jsp");
+        // Store search filter
+        if (StringUtils.isNotEmpty(obligation) || StringUtils.isNotEmpty(locality) || StringUtils.isNotEmpty(year)) {
+            DeliveryFilterDTO deliveryFilter = new DeliveryFilterDTO();
+            deliveryFilter.setObligation(obligation);
+            deliveryFilter.setLocality(locality);
+            deliveryFilter.setYear(year);
+            deliveryFilter.setUsername(getUserName());
+
+            if (StringUtils.isNotEmpty(obligation)) {
+                String obligationLabel = null;
+
+                for (List<UriLabelPair> group : getInstrumentsObligations().values()) {
+                    for (UriLabelPair pair : group) {
+                        if (pair.getUri().equals(obligation)) {
+                            obligationLabel = pair.getLabel();
+                            break;
+                        }
+                    }
+                }
+                deliveryFilter.setObligationLabel(obligationLabel);
+            }
+
+            if (StringUtils.isNotEmpty(locality)) {
+                String localityLabel = null;
+
+                for (ObjectLabelPair pair : getLocalities()) {
+                    if (pair.getLeft().equals(locality)) {
+                        localityLabel = pair.getRight();
+                        break;
+                    }
+                }
+                deliveryFilter.setLocalityLabel(localityLabel);
+            }
+
+            DAOFactory.get().getDao(DeliveryFilterDAO.class).saveDeliveryFilter(deliveryFilter);
+        }
+
+        return init();
+    }
+
+    /**
+     * Action for searching deliveries using a stored filter.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution filterSearch() throws DAOException {
+        DeliveryFilterDTO filter = DAOFactory.get().getDao(DeliveryFilterDAO.class).getDeliveryFilte(filterId);
+
+        obligation = filter.getObligation();
+        locality = filter.getLocality();
+        year = filter.getYear();
+
+        deliveries =
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
+                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+
+        return init();
     }
 
     /**
@@ -173,4 +248,27 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     public CustomPaginatedList<DeliveryDTO> getDeliveries() {
         return deliveries;
     }
+
+    /**
+     * @return the deliveryFilters
+     */
+    public List<DeliveryFilterDTO> getDeliveryFilters() {
+        return deliveryFilters;
+    }
+
+    /**
+     * @return the filterId
+     */
+    public Long getFilterId() {
+        return filterId;
+    }
+
+    /**
+     * @param filterId
+     *            the filterId to set
+     */
+    public void setFilterId(Long filterId) {
+        this.filterId = filterId;
+    }
+
 }
