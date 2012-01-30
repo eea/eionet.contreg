@@ -468,6 +468,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             LOGGER.error(e.toString(), e);
         }
 
+        if (limit < 1) {
+            limit = 1;
+        }
+
         return limit;
     }
 
