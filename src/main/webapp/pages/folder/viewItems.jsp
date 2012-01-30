@@ -57,7 +57,7 @@
                         </li>
                         <li>
                             <stripes:link href="/uploadCSV.action">
-                                <stripes:param name="uri" value="${actionBean.uri}"/>
+                                <stripes:param name="folderUri" value="${actionBean.uri}"/>
                                 Upload CSV/TSV file
                             </stripes:link>
                         </li>

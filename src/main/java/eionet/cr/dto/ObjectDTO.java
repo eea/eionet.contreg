@@ -201,11 +201,13 @@ public class ObjectDTO implements Serializable {
      */
     public boolean equals(Object other) {
 
-        if (this == other)
+        if (this == other) {
             return true;
+        }
 
-        if (!(other instanceof ObjectDTO))
+        if (!(other instanceof ObjectDTO)) {
             return false;
+        }
 
         String otherValue = ((ObjectDTO) other).getValue();
         return getValue() == null ? otherValue == null : getValue().equals(otherValue);
@@ -264,12 +266,13 @@ public class ObjectDTO implements Serializable {
      */
     public String getSourceSmart() {
 
-        if (derivSourceUri != null && derivSourceUri.trim().length() > 0)
+        if (derivSourceUri != null && derivSourceUri.trim().length() > 0) {
             return derivSourceUri;
-        else if (sourceUri != null && sourceUri.trim().length() > 0)
+        } else if (sourceUri != null && sourceUri.trim().length() > 0) {
             return sourceUri;
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -408,8 +411,8 @@ public class ObjectDTO implements Serializable {
      * @param value
      * @return
      */
-    public static ObjectDTO createLiteral(String value) {
-        return new ObjectDTO(value, true);
+    public static ObjectDTO createLiteral(Object value) {
+        return new ObjectDTO(value.toString(), true);
     }
 
     /**
@@ -418,8 +421,8 @@ public class ObjectDTO implements Serializable {
      * @param datatype
      * @return
      */
-    public static ObjectDTO createLiteral(String value, URI datatype) {
-        return new ObjectDTO(value, true, datatype);
+    public static ObjectDTO createLiteral(Object value, URI datatype) {
+        return new ObjectDTO(value.toString(), true, datatype);
     }
 
     /**

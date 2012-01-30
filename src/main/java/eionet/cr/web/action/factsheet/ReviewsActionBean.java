@@ -105,7 +105,7 @@ public class ReviewsActionBean extends AbstractActionBean {
 
                 // Load review content from file.
                 try {
-                    File f = FileStore.getInstance(getAttemptedUserName()).get("reviews/review" + reviewId);
+                    File f = FileStore.getInstance(getAttemptedUserName()).getFile("reviews/review" + reviewId);
                     if (f != null) {
                         String content = FileUtils.readFileToString(f, "UTF-8");
                         review.setReviewContent(content);

@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import net.sourceforge.stripes.action.FileBean;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -80,6 +82,21 @@ public class FileStore {
 
     /**
      *
+     * @param filePath
+     * @param overwrite
+     * @param fileBean
+     * @return
+     * @throws IOException
+     */
+    public File addByMoving(String filePath, boolean overwrite, FileBean fileBean) throws IOException {
+
+        File path = prepareFileWrite(filePath, overwrite);
+        fileBean.save(path);
+        return path;
+    }
+
+    /**
+     *
      * @param fileName
      * @param overwrite
      * @param reader
@@ -103,8 +120,7 @@ public class FileStore {
     /**
      * Returns file object of the uploaded file in the file system.
      *
-     * @param filePath
-     *            file folder path with file name
+     * @param filePath file folder path with file name
      * @param overwrite
      * @throws FileAlreadyExistsException
      */
@@ -219,13 +235,24 @@ public class FileStore {
     }
 
     /**
+     * Gets file by the relative path given. Relative means
+     * relative to the user's file-store directory.
      *
-     * @param fileName
+     * If no such file found, return null. Otherwise returns
+     * {@link File} reference to the found file.
+     *
+     * If the given relative path is blank, return null.
+     *
+     * @param relativePath
      * @return File
      */
-    public File get(String fileName) {
+    public File getFile(String relativePath) {
 
-        File file = new File(userDir, fileName);
+        if (StringUtils.isBlank(relativePath)){
+            return null;
+        }
+
+        File file = new File(userDir, relativePath);
         if (!file.exists() || !file.isFile()) {
             return null;
         } else {
@@ -252,7 +279,7 @@ public class FileStore {
                     throw new CRRuntimeException(e);
                 }
 
-                return FileStore.getInstance(userName).get(fileName);
+                return FileStore.getInstance(userName).getFile(fileName);
             } else {
                 logger.info("Could not extract user name from this URI: " + uriString);
             }

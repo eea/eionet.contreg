@@ -22,10 +22,16 @@ package eionet.cr.web.action;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
@@ -36,7 +42,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
@@ -54,76 +62,99 @@ import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- * 
- * @author Risto Alt
- * 
+ *
+ * @author Jaanus Heinlaid
+ *
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
 
     /** */
-    private static final String UPLOAD_CSV_JSP = "/pages/home/uploadCSV.jsp";
+    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
 
     /** */
-    public enum Type {CSV, TSV;}
+    private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
+
+    /** */
+    private static final String UPLOAD_EVENT = "upload";
+    private static final String SAVE_EVENT = "save";
+
+    /** */
+    private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
+
+    /** Enum for uploaded files' types. */
+    public enum FileType {
+        CSV, TSV;
+    }
 
     /** URI of the folder where the file will be uploaded. */
-    private String uri;
+    private String folderUri;
 
-    private FileBean file;
-    private Type type;
-    private String[] columns;
-    private String filePath;
+    /** Uploaded file's bean object. */
+    private FileBean fileBean;
+
+    /** Uploaded file's type. */
+    private FileType fileType;
+
+    /** Uploaded file's name. */
     private String fileName;
 
-    private String objectType;
-    private int labelColumn;
-    private List<Integer> uniqueColumns;
-    private boolean fileUploaded = false;
+    /** Stored file's relative path in the user's file-store. */
+    private String relativeFilePath;
+
+    /** Columns detected in the uploaded file (it's the titles of the columns). */
+    private List<String> columns;
+
+    /** The type of objects contained in the file (user-given free text). */
+    private String objectsType;
+
+    /** The column (i.e. column title) representing the contained objects' labels. */
+    private String labelColumn;
+
+    /** The columns (i.e. column titles) forming the contained objects' unique identifiers. */
+    private List<String> uniqueColumns;
 
     /**
-     * 
      * @return
      */
     @DefaultHandler
     public Resolution init() {
-        return new ForwardResolution(UPLOAD_CSV_JSP);
+        return new ForwardResolution(JSP_PAGE);
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Resolution upload() {
 
-        ForwardResolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
-        if (file == null) {
-            addWarningMessage("No file found!");
-            return resolution;
-        }
+        // Prepare resolution.
+        ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
 
         try {
-            CSVReader reader = new CSVReader(file.getReader(), getDelimiter());
-            columns = reader.readNext();
+            // Save the file into user's file-store.
+            fileName = fileBean.getFileName();
+            relativeFilePath = URIUtil.extractPathInUserHome(folderUri + "/" + fileName);
+            FileStore fileStore = FileStore.getInstance(getUserName());
+            fileStore.addByMoving(relativeFilePath, true, fileBean);
 
-            // Save file under home folder path
-            fileName = file.getFileName();
-            String fileHomePath = URIUtil.extractPathInUserHome(uri + "/" + fileName);
-            File storedFile = FileStore.getInstance(getUserName()).add(fileHomePath, true, file.getInputStream());
-            filePath = storedFile.getAbsolutePath();
-
-            String subjectUri = uri + "/" + StringUtils.replace(fileName, " ", "%20");
+            // File URI will be folder URI + "/" + file name where spaces URL-encoded
+            String fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
 
             // Store file as new source, but don't harvest it
-            addSource(subjectUri, fileName);
+            createFileMetadataAndSource(fileUri, fileName);
 
             // Add metadata about user folder update
-            addMetadata(subjectUri);
+            linkFileToFolder(fileUri);
 
-            fileUploaded = true;
+            // Pre-load wizard input values if this has been uploaded already before (so a re-upload now)
+            preloadWizardInputs(fileUri);
+
+            // Tell the JSP page that it should display the wizard.
+            resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
 
         } catch (Exception e) {
-            System.out.println("Exception while reading the file: " + e);
+            LOGGER.error("Error while reading the file: ", e);
             addWarningMessage(e.getMessage());
         }
 
@@ -131,117 +162,35 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Resolution save() {
 
-        Resolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
-
+        CSVReader csvReader = null;
         try {
-            File file = new File(filePath);
-            Charset guessedCharset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
-
-            String graphName = uri + "/" + StringUtils.replace(fileName, " ", "%20");
-            String type = graphName + "/" + objectType;
-
-            CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file), guessedCharset), getDelimiter());
-            // First line contains column names
-            String[] nextLine = reader.readNext();
-            while ((nextLine = reader.readNext()) != null) {
-                String id = "";
-                // Resolve resource ID
-                if (uniqueColumns != null) {
-                    for (int colIndex : uniqueColumns) {
-                        if (id.length() > 0) {
-                            id = id + "_";
-                        }
-                        if (nextLine.length > colIndex) {
-                            id = id + nextLine[colIndex];
-                        }
-                    }
-                }
-
-                String subjectUri = graphName + "/" + id;
-
-                SubjectDTO subject = new SubjectDTO(subjectUri, false);
-
-                // Add rdf:type
-                ObjectDTO typeObject = new ObjectDTO(type, false);
-                typeObject.setSourceUri(graphName);
-                subject.addObject(Predicates.RDF_TYPE, typeObject);
-
-                // Add rdfs:label
-                if (labelColumn != -1) {
-                    String label = nextLine[labelColumn];
-                    ObjectDTO labelObject = new ObjectDTO(label, true);
-                    labelObject.setSourceUri(graphName);
-                    subject.addObject(Predicates.RDFS_LABEL, labelObject);
-                }
-
-                // Add all other values found from file
-                int idx = 0;
-                for (String col : columns) {
-                    col = col.replace(" ", "_");
-                    if (idx != labelColumn && nextLine.length > idx) {
-                        String value = nextLine[idx];
-                        ObjectDTO obj = null;
-                        if (col.equalsIgnoreCase("url") || col.equalsIgnoreCase("uri")) {
-                            obj = new ObjectDTO(value, false);
-                        } else {
-                            if (col.equalsIgnoreCase("date")) {
-                                obj = new ObjectDTO(value, true, XMLSchema.DATE);
-                            }
-                            if (col.equalsIgnoreCase("datetime")) {
-                                obj = new ObjectDTO(value, true, XMLSchema.DATETIME);
-                            } else if (col.equalsIgnoreCase("boolean")) {
-                                obj = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
-                            } else if (col.equalsIgnoreCase("number")) {
-                                try {
-                                    Integer.parseInt(value);
-                                    obj = new ObjectDTO(value, true, XMLSchema.INTEGER);
-                                } catch (NumberFormatException nfe1) {
-                                    try {
-                                        Long.parseLong(value);
-                                        obj = new ObjectDTO(value, true, XMLSchema.LONG);
-                                    } catch (NumberFormatException nfe2) {
-                                        try {
-                                            Double.parseDouble(value);
-                                            obj = new ObjectDTO(value, true, XMLSchema.DOUBLE);
-                                        } catch (NumberFormatException nfe3) {
-                                            // Don't do anything
-                                        }
-                                    }
-                                }
-                            } else {
-                                obj = new ObjectDTO(value, true);
-                            }
-                        }
-                        obj.setSourceUri(graphName);
-                        subject.addObject(graphName + "#" + col, obj);
-                    }
-                    idx++;
-                }
-                DAOFactory.get().getDao(HelperDAO.class).addTriples(subject);
-                DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(graphName);
-            }
+            String fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+            csvReader = createCSVReader(true);
+            extractObjects(csvReader, fileUri);
+            saveWizardInput(fileUri);
 
         } catch (Exception e) {
-            System.out.println("Exception while reading uploaded file: " + e);
+            LOGGER.error("Exception while reading uploaded file:", e);
             addWarningMessage(e.toString());
-            return resolution;
+            return new ForwardResolution(JSP_PAGE);
+        } finally {
+            close(csvReader);
         }
 
         // If everything went successfully then redirect to the folder items list
-        resolution = new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        return resolution;
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
-    @ValidationMethod(on = {"upload", "insert"})
+    @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
     public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method
@@ -251,191 +200,466 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // for all the above POST events, user must be authorized
         if (getUser() == null) {
-            addGlobalValidationError("User not logged in!");
+            addGlobalValidationError("You are not authorised for this operation!");
             return;
         }
 
         // if upload event, make sure the file bean is not null
         String eventName = getContext().getEventName();
-        if (eventName.equals("upload")) {
-            if (file == null) {
-                addGlobalValidationError("No file specified!");
-            }
+        if (eventName.equals(UPLOAD_EVENT) && fileBean == null) {
+            addGlobalValidationError("No file specified!");
         }
 
         // if insert event, make sure unique columns and object type are not null
-        if (eventName.equals("insert")) {
+        if (eventName.equals(SAVE_EVENT)) {
+
+            if (StringUtils.isBlank(relativeFilePath)) {
+                addGlobalValidationError("No file specified!");
+            }
+
+            if (StringUtils.isBlank(fileName)) {
+                addGlobalValidationError("No file name specified!");
+            }
+
+            File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+            if (file == null || !file.exists()) {
+                addGlobalValidationError("Could not find stored file!");
+            }
+
             if (uniqueColumns == null || uniqueColumns.size() == 0) {
                 addGlobalValidationError("No unique column selected!");
             }
-            if (StringUtils.isBlank(objectType)) {
+
+            if (StringUtils.isBlank(objectsType)) {
                 addGlobalValidationError("No object type specified!");
             }
-            fileUploaded = true;
         }
 
         // if any validation errors were set above, make sure the right resolution is returned
         if (hasValidationErrors()) {
-            Resolution resolution = new ForwardResolution(UPLOAD_CSV_JSP);
+            ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
+            if (eventName.equals(SAVE_EVENT)) {
+                resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
+            }
             getContext().setSourcePageResolution(resolution);
         }
     }
 
     /**
-     * 
-     * @param subjectUri
+     *
+     * @param csvReader
+     * @param fileUri
+     * @throws IOException
+     * @throws DAOException
      */
-    private void addMetadata(String subjectUri) {
+    public void extractObjects(CSVReader csvReader, String fileUri) throws IOException, DAOException {
 
-        // prepare cr:hasFile predicate
-        ObjectDTO objectDTO = new ObjectDTO(subjectUri, false);
-        objectDTO.setSourceUri(uri);
-        SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
-        homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+        // Prepare objects' type URI.
+        String objectsTypeUri = fileUri + "/" + objectsType;
 
-        logger.debug("Creating the cr:hasFile predicate");
-        try {
-            // persist the prepared cr:hasFile and dc:title predicates
-            DAOFactory.get().getDao(HelperDAO.class).addTriples(homeSubjectDTO);
+        // Set columns by reading the first line.
+        String[] columnsArray = csvReader.readNext();
+        if (columnsArray==null || columnsArray.length==0){
+            columns = new ArrayList<String>();
+        }
+        else{
+            // We do trimming, because CSV Reader doesn't do it
+            columns = Arrays.asList(trimAll(columnsArray));
+        }
 
-            // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
-            // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(uri, false, 0, getUserName()));
+        // Read the contained objects by reading the rest of lines.
+        String[] line = null;
+        while ((line = csvReader.readNext()) != null) {
 
-        } catch (DAOException e) {
-            e.printStackTrace();
-            return;
+            // Construct subject URI and DTO object.
+            String subjectUri = fileUri + "/" + extractObjectId(line);
+            SubjectDTO subject = new SubjectDTO(subjectUri, false);
+
+            // Detect subject label, add it to DTO.
+            String subjectLabel = extractObjectLabel(line);
+            if (subjectLabel!=null){
+                ObjectDTO labelObject = new ObjectDTO(subjectLabel, true);
+                labelObject.setSourceUri(fileUri);
+                subject.addObject(Predicates.RDFS_LABEL, labelObject);
+            }
+
+            // Add rdf:type to DTO.
+            ObjectDTO typeObject = new ObjectDTO(objectsTypeUri, false);
+            typeObject.setSourceUri(fileUri);
+            subject.addObject(Predicates.RDF_TYPE, typeObject);
+
+            // Add all other values.
+            for (int i=0; i<columns.size(); i++) {
+
+                // If current columns index out of bounds for some reason, then break.
+                if (i >= line.length){
+                    break;
+                }
+
+                // Get column title, skip this column if it's the label column.
+                String column = columns.get(i);
+                if (column.equals(labelColumn)){
+                    continue;
+                }
+                column = column.replace(" ", "_");
+
+                String value = line[i];
+                ObjectDTO obj = null;
+                if (column.equalsIgnoreCase("url") || column.equalsIgnoreCase("uri")) {
+                    obj = new ObjectDTO(value, false);
+                } else {
+                    if (column.equalsIgnoreCase("date")) {
+                        obj = new ObjectDTO(value, true, XMLSchema.DATE);
+                    }
+                    if (column.equalsIgnoreCase("datetime")) {
+                        obj = new ObjectDTO(value, true, XMLSchema.DATETIME);
+                    } else if (column.equalsIgnoreCase("boolean")) {
+                        obj = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
+                    } else if (column.equalsIgnoreCase("number")) {
+                        try {
+                            Integer.parseInt(value);
+                            obj = new ObjectDTO(value, true, XMLSchema.INTEGER);
+                        } catch (NumberFormatException nfe1) {
+                            try {
+                                Long.parseLong(value);
+                                obj = new ObjectDTO(value, true, XMLSchema.LONG);
+                            } catch (NumberFormatException nfe2) {
+                                try {
+                                    Double.parseDouble(value);
+                                    obj = new ObjectDTO(value, true, XMLSchema.DOUBLE);
+                                } catch (NumberFormatException nfe3) {
+                                    // Don't do anything
+                                }
+                            }
+                        }
+                    } else {
+                        obj = new ObjectDTO(value, true);
+                    }
+                }
+                obj.setSourceUri(fileUri);
+                subject.addObject(fileUri + "#" + column, obj);
+            }
+            DAOFactory.get().getDao(HelperDAO.class).addTriples(subject);
+            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(fileUri);
         }
     }
 
     /**
-     * 
-     * @param subjectUri
-     * @param fileName
-     * @throws Exception
+     *
+     * @param line
+     * @return
      */
-    private void addSource(String subjectUri, String fileName) throws Exception {
+    public String extractObjectId(String[] line) {
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(subjectUri, false, 0, getUserName()));
+        StringBuilder buf = new StringBuilder();
+        if (uniqueColumns != null && !uniqueColumns.isEmpty()) {
 
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.RDFS_LABEL, new ObjectDTO(fileName, true));
+            for (String uniqueCol : uniqueColumns) {
+                int colIndex = columns.indexOf(uniqueCol);
+                if (colIndex>=0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])){
+                    if (buf.length()>0){
+                        buf.append("_");
+                    }
+                    buf.append(line[colIndex]);
+                }
+            }
+        }
 
-        DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_BYTE_SIZE,
-                new ObjectDTO(String.valueOf(file.getSize()), true));
-
-        DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_MEDIA_TYPE, new ObjectDTO(type.toString(), true));
-
-        DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(subjectUri, Predicates.CR_LAST_MODIFIED,
-                new ObjectDTO(Util.virtuosoDateToString(new Date()), true));
-
+        return buf.length() == 0 ? UUID.randomUUID().toString() : buf.toString();
     }
 
     /**
+     *
+     * @param line
      * @return
      */
-    public FileBean getFile() {
-        return file;
+    public String extractObjectLabel(String[] line) {
+
+        String result = null;
+        if (!StringUtils.isBlank(labelColumn)){
+            int colIndex = columns.indexOf(labelColumn);
+            if (colIndex>=0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])){
+                result = line[colIndex];
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param fileUri
+     * @throws DAOException
+     */
+    private void preloadWizardInputs(String fileUri) throws DAOException {
+
+        // If, for some reason, all inputs already have a value, do nothing and return
+        if (!StringUtils.isBlank(labelColumn) && !StringUtils.isBlank(objectsType) && !uniqueColumns.isEmpty()) {
+            return;
+        }
+
+        SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
+        if (fileSubject != null) {
+
+            if (StringUtils.isBlank(labelColumn)) {
+                labelColumn = fileSubject.getObjectValue(Predicates.CR_OBJECTS_LABEL_COLUMN);
+            }
+
+            if (StringUtils.isBlank(objectsType)) {
+                objectsType = fileSubject.getObjectValue(Predicates.CR_OBJECTS_TYPE);
+            }
+
+            if (uniqueColumns == null || uniqueColumns.isEmpty()) {
+                Collection<String> coll = fileSubject.getObjectValues(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
+                if (coll != null && !coll.isEmpty()) {
+                    uniqueColumns = new ArrayList<String>();
+                    uniqueColumns.addAll(coll);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param fileUri
+     * @throws IOException
+     * @throws RepositoryException
+     * @throws DAOException
+     *
+     */
+    private void saveWizardInput(String fileUri) throws DAOException, RepositoryException, IOException {
+
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_TYPE, ObjectDTO.createLiteral(objectsType));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
+
+        ObjectDTO[] uniqueColTitles = new ObjectDTO[uniqueColumns.size()];
+        for (int i = 0; i < uniqueColumns.size(); i++) {
+            uniqueColTitles[i] = ObjectDTO.createLiteral(uniqueColumns.get(i));
+        }
+
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_UNIQUE_COLUMN, uniqueColTitles);
+    }
+
+    /**
+     *
+     * @param csvReader
+     */
+    private void close(CSVReader csvReader) {
+        if (csvReader != null) {
+            try {
+                csvReader.close();
+            } catch (Exception e) {
+                // deliberately ignoring
+            }
+        }
+    }
+
+    /**
+     *
+     * @param fileUri
+     * @throws DAOException
+     */
+    private void linkFileToFolder(String fileUri) throws DAOException {
+
+        // prepare "folder hasFile file" statement
+        ObjectDTO fileObject = ObjectDTO.createResource(fileUri);
+        fileObject.setSourceUri(folderUri);
+        SubjectDTO folderSubject = new SubjectDTO(folderUri, false);
+        folderSubject.addObject(Predicates.CR_HAS_FILE, fileObject);
+
+        logger.debug("Creating the cr:hasFile predicate");
+
+        // persist the prepared "folder hasFile file" statement
+        DAOFactory.get().getDao(HelperDAO.class).addTriples(folderSubject);
+
+        // since folder URI was used above as triple source, add it to HARVEST_SOURCE too
+        // (but set interval minutes to 0, to avoid it being background-harvested)
+        HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
+    }
+
+    /**
+     *
+     * @param fileUri
+     * @param fileName
+     * @throws Exception
+     */
+    private void createFileMetadataAndSource(String fileUri, String fileName) throws Exception {
+
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, getUserName()));
+
+        String fileSize = String.valueOf(fileBean.getSize());
+        String mediaType = fileType.toString();
+        String lastModified = Util.virtuosoDateToString(new Date());
+
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileName));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(fileSize));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
+    }
+
+    /**
+     * @param guessEncoding
+     * @return
+     * @throws IOException
+     */
+    private CSVReader createCSVReader(boolean guessEncoding) throws IOException {
+
+        CSVReader result = null;
+        File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+        if (file != null && file.exists()) {
+            if (guessEncoding) {
+                Charset charset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
+                result = new CSVReader(new InputStreamReader(new FileInputStream(file), charset), getDelimiter());
+            } else {
+                result = new CSVReader(new FileReader(file), getDelimiter());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param strings
+     */
+    private static String[] trimAll(String[] strings) {
+
+        if (strings != null) {
+            for (int i = 0; i < strings.length; i++) {
+                strings[i] = strings[i].trim();
+            }
+        }
+
+        return strings;
     }
 
     /**
      * @param file
      */
-    public void setFile(FileBean file) {
-        this.file = file;
+    public void setFileBean(FileBean file) {
+        this.fileBean = file;
     }
 
     /**
      * @return
      */
-    public Type getType() {
-        return type;
+    public FileType getFileType() {
+        return fileType;
     }
 
     /**
      * @param type
      */
-    public void setType(Type type) {
-        this.type = type;
+    public void setFileType(FileType type) {
+        this.fileType = type;
     }
 
     /**
      * @return
      */
-    public String getObjectType() {
-        return objectType;
+    public String getObjectsType() {
+        return objectsType;
     }
 
     /**
      * @param objectType
      */
-    public void setObjectType(String objectType) {
-        this.objectType = objectType;
+    public void setObjectsType(String objectType) {
+        this.objectsType = objectType;
     }
 
     /**
      * @return
+     * @throws IOException
      */
-    public String[] getColumns() {
+    public List<String> getColumns() throws IOException {
+
+        if (columns == null) {
+
+            CSVReader csvReader = null;
+            try {
+                csvReader = createCSVReader(false);
+                String[] columnsArray = csvReader.readNext();
+                if (columnsArray==null || columnsArray.length==0){
+                    columns = new ArrayList<String>();
+                }
+                else{
+                    columns = Arrays.asList(trimAll(columnsArray));
+                }
+            } finally {
+                close(csvReader);
+            }
+        }
+
         return columns;
     }
 
     /**
-     * @param columns
-     */
-    public void setColumns(String[] columns) {
-        this.columns = columns;
-    }
-
-    /**
      * @return
      */
-    public int getLabelColumn() {
+    public String getLabelColumn() {
         return labelColumn;
     }
 
     /**
      * @param labelColumn
      */
-    public void setLabelColumn(int labelColumn) {
+    public void setLabelColumn(String labelColumn) {
         this.labelColumn = labelColumn;
     }
 
     /**
      * @return
      */
-    public List<Integer> getUniqueColumns() {
+    public List<String> getUniqueColumns() {
         return uniqueColumns;
     }
 
     /**
      * @param uniqueColumns
      */
-    public void setUniqueColumns(List<Integer> uniqueColumns) {
+    public void setUniqueColumns(List<String> uniqueColumns) {
         this.uniqueColumns = uniqueColumns;
     }
 
     /**
      * @return
      */
-    public String getFilePath() {
-        return filePath;
+    public String getRelativeFilePath() {
+        return relativeFilePath;
     }
 
     /**
      * @param filePath
      */
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setRelativeFilePath(String filePath) {
+        this.relativeFilePath = filePath;
+    }
+
+    /**
+     * @return the uri
+     */
+    public String getFolderUri() {
+        return folderUri;
+    }
+
+    /**
+     * @param uri
+     *            the uri to set
+     */
+    public void setFolderUri(String uri) {
+        this.folderUri = uri;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public char getDelimiter() {
+        return fileType != null && fileType.equals(FileType.TSV) ? '\t' : ',';
     }
 
     /**
@@ -446,45 +670,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fileName
+     * @param fileName the fileName to set
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isFileUploaded() {
-        return fileUploaded;
-    }
-
-    /**
-     * @param fileUploaded
-     */
-    public void setFileUploaded(boolean fileUploaded) {
-        this.fileUploaded = fileUploaded;
-    }
-
-    /**
-     * @return the uri
-     */
-    public String getUri() {
-        return uri;
-    }
-
-    /**
-     * @param uri the uri to set
-     */
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public char getDelimiter(){
-        return type != null && type.equals(Type.TSV) ? '\t' : ',';
     }
 }

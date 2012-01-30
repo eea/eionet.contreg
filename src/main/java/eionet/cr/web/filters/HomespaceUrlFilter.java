@@ -139,7 +139,7 @@ public class HomespaceUrlFilter implements Filter {
         int i = requestPathInfo.indexOf('/', 1);
         String userName = requestPathInfo.substring(1, i);
         String filePath = requestPathInfo.substring(i + 1);
-        return FileStore.getInstance(userName).get(filePath) != null;
+        return FileStore.getInstance(userName).getFile(filePath) != null;
     }
 
     /**

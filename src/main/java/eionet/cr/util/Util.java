@@ -861,5 +861,4 @@ public class Util {
             return actionBeanClass.getAnnotation(UrlBinding.class).value();
         }
     }
-
 }

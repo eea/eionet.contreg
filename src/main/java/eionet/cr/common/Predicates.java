@@ -102,6 +102,10 @@ public interface Predicates {
     String CR_COMPILED_DATASET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#CompiledDataset";
     String CR_GENERATED_FROM = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#generatedFrom";
 
+    String CR_OBJECTS_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#objectsType";
+    String CR_OBJECTS_LABEL_COLUMN = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#objectsLabelColumn";
+    String CR_OBJECTS_UNIQUE_COLUMN = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#objectsUniqueColumn";
+
     String WGS_LAT = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
     String WGS_LONG = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
 

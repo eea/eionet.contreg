@@ -295,7 +295,7 @@ public interface HarvestSourceDAO extends DAO {
      *             if data repository is unavailable.
      * @throws IOException
      */
-    void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO object) throws DAOException, RepositoryException,
+    void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException, RepositoryException,
             IOException;
 
     /**
@@ -309,7 +309,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws RepositoryException
      * @throws IOException
      */
-    void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO object)
+    void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO... object)
             throws DAOException, RepositoryException, IOException;
 
     /**
