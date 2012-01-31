@@ -33,12 +33,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
@@ -62,9 +64,9 @@ import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
- *
+ * 
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -99,6 +101,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** Uploaded file's name. */
     private String fileName;
 
+    /** The URI that will be assigned to the resource representing the file. */
+    private String fileUri;
+
     /** Stored file's relative path in the user's file-store. */
     private String relativeFilePath;
 
@@ -123,7 +128,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution upload() {
@@ -134,21 +139,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
         try {
             // Save the file into user's file-store.
             fileName = fileBean.getFileName();
+            long fileSize = fileBean.getSize();
             relativeFilePath = URIUtil.extractPathInUserHome(folderUri + "/" + fileName);
             FileStore fileStore = FileStore.getInstance(getUserName());
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
-            // File URI will be folder URI + "/" + file name where spaces URL-encoded
-            String fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
-
             // Store file as new source, but don't harvest it
-            createFileMetadataAndSource(fileUri, fileName);
+            createFileMetadataAndSource(fileSize);
 
             // Add metadata about user folder update
-            linkFileToFolder(fileUri);
+            linkFileToFolder();
 
             // Pre-load wizard input values if this has been uploaded already before (so a re-upload now)
-            preloadWizardInputs(fileUri);
+            preloadWizardInputs();
 
             // Tell the JSP page that it should display the wizard.
             resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
@@ -162,17 +165,16 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution save() {
 
         CSVReader csvReader = null;
         try {
-            String fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
             csvReader = createCSVReader(true);
-            extractObjects(csvReader, fileUri);
-            saveWizardInput(fileUri);
+            extractObjects(csvReader);
+            saveWizardInputs();
 
         } catch (Exception e) {
             LOGGER.error("Exception while reading uploaded file:", e);
@@ -187,7 +189,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * Actions to be performed before starting any event handling.
+     */
+    @Before(stages = LifecycleStage.EventHandling)
+    public void beforeEventHandling() {
+
+        if (fileName==null && fileBean!=null){
+            fileName = fileBean.getFileName();
+        }
+        fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+    }
+
+    /**
+     * 
      * @throws DAOException
      */
     @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
@@ -246,106 +260,130 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param csvReader
-     * @param fileUri
      * @throws IOException
      * @throws DAOException
      */
-    public void extractObjects(CSVReader csvReader, String fileUri) throws IOException, DAOException {
-
-        // Prepare objects' type URI.
-        String objectsTypeUri = fileUri + "/" + objectsType;
+    public void extractObjects(CSVReader csvReader) throws IOException, DAOException {
 
         // Set columns by reading the first line.
         String[] columnsArray = csvReader.readNext();
-        if (columnsArray==null || columnsArray.length==0){
+        if (columnsArray == null || columnsArray.length == 0) {
             columns = new ArrayList<String>();
-        }
-        else{
+        } else {
             // We do trimming, because CSV Reader doesn't do it
             columns = Arrays.asList(trimAll(columnsArray));
         }
 
         // Read the contained objects by reading the rest of lines.
         String[] line = null;
+        String objectsTypeUri = fileUri + "/" + objectsType;
+        HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
         while ((line = csvReader.readNext()) != null) {
 
-            // Construct subject URI and DTO object.
-            String subjectUri = fileUri + "/" + extractObjectId(line);
-            SubjectDTO subject = new SubjectDTO(subjectUri, false);
-
-            // Detect subject label, add it to DTO.
-            String subjectLabel = extractObjectLabel(line);
-            if (subjectLabel!=null){
-                ObjectDTO labelObject = new ObjectDTO(subjectLabel, true);
-                labelObject.setSourceUri(fileUri);
-                subject.addObject(Predicates.RDFS_LABEL, labelObject);
-            }
-
-            // Add rdf:type to DTO.
-            ObjectDTO typeObject = new ObjectDTO(objectsTypeUri, false);
-            typeObject.setSourceUri(fileUri);
-            subject.addObject(Predicates.RDF_TYPE, typeObject);
-
-            // Add all other values.
-            for (int i=0; i<columns.size(); i++) {
-
-                // If current columns index out of bounds for some reason, then break.
-                if (i >= line.length){
-                    break;
-                }
-
-                // Get column title, skip this column if it's the label column.
-                String column = columns.get(i);
-                if (column.equals(labelColumn)){
-                    continue;
-                }
-                column = column.replace(" ", "_");
-
-                String value = line[i];
-                ObjectDTO obj = null;
-                if (column.equalsIgnoreCase("url") || column.equalsIgnoreCase("uri")) {
-                    obj = new ObjectDTO(value, false);
-                } else {
-                    if (column.equalsIgnoreCase("date")) {
-                        obj = new ObjectDTO(value, true, XMLSchema.DATE);
-                    }
-                    if (column.equalsIgnoreCase("datetime")) {
-                        obj = new ObjectDTO(value, true, XMLSchema.DATETIME);
-                    } else if (column.equalsIgnoreCase("boolean")) {
-                        obj = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
-                    } else if (column.equalsIgnoreCase("number")) {
-                        try {
-                            Integer.parseInt(value);
-                            obj = new ObjectDTO(value, true, XMLSchema.INTEGER);
-                        } catch (NumberFormatException nfe1) {
-                            try {
-                                Long.parseLong(value);
-                                obj = new ObjectDTO(value, true, XMLSchema.LONG);
-                            } catch (NumberFormatException nfe2) {
-                                try {
-                                    Double.parseDouble(value);
-                                    obj = new ObjectDTO(value, true, XMLSchema.DOUBLE);
-                                } catch (NumberFormatException nfe3) {
-                                    // Don't do anything
-                                }
-                            }
-                        }
-                    } else {
-                        obj = new ObjectDTO(value, true);
-                    }
-                }
-                obj.setSourceUri(fileUri);
-                subject.addObject(fileUri + "#" + column, obj);
-            }
-            DAOFactory.get().getDao(HelperDAO.class).addTriples(subject);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(fileUri);
+            SubjectDTO subject = extractObject(line, objectsTypeUri);
+            helperDao.addTriples(subject);
         }
+
+        // Finally, make sure that the file has the correct number of harvested statements in its predicates.
+        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
     }
 
     /**
-     *
+     * @param line
+     * @param objectsTypeUri
+     * @return
+     */
+    private SubjectDTO extractObject(String[] line, String objectsTypeUri) {
+
+        // Construct subject URI and DTO object.
+        String subjectUri = fileUri + "/" + extractObjectId(line);
+        SubjectDTO subject = new SubjectDTO(subjectUri, false);
+
+        // Detect subject label, add it to DTO.
+        String subjectLabel = extractObjectLabel(line);
+        if (subjectLabel != null) {
+            ObjectDTO labelObject = new ObjectDTO(subjectLabel, true);
+            labelObject.setSourceUri(fileUri);
+            subject.addObject(Predicates.RDFS_LABEL, labelObject);
+        }
+
+        // Add rdf:type to DTO.
+        ObjectDTO typeObject = new ObjectDTO(objectsTypeUri, false);
+        typeObject.setSourceUri(fileUri);
+        subject.addObject(Predicates.RDF_TYPE, typeObject);
+
+        // Add all other values.
+        for (int i = 0; i < columns.size(); i++) {
+
+            // If current columns index out of bounds for some reason, then break.
+            if (i >= line.length) {
+                break;
+            }
+
+            // Get column title, skip this column if it's the label column, otherwise replace spaces.
+            String column = columns.get(i);
+            if (column.equals(labelColumn)) {
+                continue;
+            } else {
+                column = column.replace(" ", "_");
+            }
+
+            // Create ObjectDTO representing the given column's value on this line
+            ObjectDTO objectDTO = createValueObject(column, line[i]);
+            objectDTO.setSourceUri(fileUri);
+
+            // Add ObjectDTO to the subject.
+            String predicateUri = fileUri + "#" + column;
+            subject.addObject(predicateUri, objectDTO);
+        }
+
+        return subject;
+    }
+
+    /**
+     * @param column
+     * @param value
+     * @return
+     */
+    private ObjectDTO createValueObject(String column, String value) {
+
+        ObjectDTO objectDTO = null;
+
+        if (column.equalsIgnoreCase("url") || column.equalsIgnoreCase("uri")) {
+            objectDTO = new ObjectDTO(value, false);
+        } else if (column.equalsIgnoreCase("date")) {
+            objectDTO = new ObjectDTO(value, true, XMLSchema.DATE);
+        } else if (column.equalsIgnoreCase("datetime")) {
+            objectDTO = new ObjectDTO(value, true, XMLSchema.DATETIME);
+        } else if (column.equalsIgnoreCase("boolean")) {
+            objectDTO = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
+        } else if (column.equalsIgnoreCase("number")) {
+
+            try {
+                Integer.parseInt(value);
+                objectDTO = new ObjectDTO(value, true, XMLSchema.INTEGER);
+            } catch (NumberFormatException nfe1) {
+                try {
+                    Long.parseLong(value);
+                    objectDTO = new ObjectDTO(value, true, XMLSchema.LONG);
+                } catch (NumberFormatException nfe2) {
+                    try {
+                        Double.parseDouble(value);
+                        objectDTO = new ObjectDTO(value, true, XMLSchema.DOUBLE);
+                    } catch (NumberFormatException nfe3) {
+                        // ignore deliberately
+                    }
+                }
+            }
+        }
+
+        return objectDTO==null ? new ObjectDTO(value, true) : objectDTO;
+    }
+
+    /**
+     * 
      * @param line
      * @return
      */
@@ -356,8 +394,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             for (String uniqueCol : uniqueColumns) {
                 int colIndex = columns.indexOf(uniqueCol);
-                if (colIndex>=0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])){
-                    if (buf.length()>0){
+                if (colIndex >= 0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])) {
+                    if (buf.length() > 0) {
                         buf.append("_");
                     }
                     buf.append(line[colIndex]);
@@ -369,16 +407,16 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param line
      * @return
      */
     public String extractObjectLabel(String[] line) {
 
         String result = null;
-        if (!StringUtils.isBlank(labelColumn)){
+        if (!StringUtils.isBlank(labelColumn)) {
             int colIndex = columns.indexOf(labelColumn);
-            if (colIndex>=0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])){
+            if (colIndex >= 0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])) {
                 result = line[colIndex];
             }
         }
@@ -387,11 +425,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @param fileUri
+     * 
      * @throws DAOException
      */
-    private void preloadWizardInputs(String fileUri) throws DAOException {
+    private void preloadWizardInputs() throws DAOException {
 
         // If, for some reason, all inputs already have a value, do nothing and return
         if (!StringUtils.isBlank(labelColumn) && !StringUtils.isBlank(objectsType) && !uniqueColumns.isEmpty()) {
@@ -420,13 +457,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fileUri
      * @throws IOException
      * @throws RepositoryException
      * @throws DAOException
-     *
+     * 
      */
-    private void saveWizardInput(String fileUri) throws DAOException, RepositoryException, IOException {
+    private void saveWizardInputs() throws DAOException, RepositoryException, IOException {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
@@ -442,7 +478,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param csvReader
      */
     private void close(CSVReader csvReader) {
@@ -456,11 +492,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @param fileUri
+     * 
      * @throws DAOException
      */
-    private void linkFileToFolder(String fileUri) throws DAOException {
+    private void linkFileToFolder() throws DAOException {
 
         // prepare "folder hasFile file" statement
         ObjectDTO fileObject = ObjectDTO.createResource(fileUri);
@@ -480,17 +515,15 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @param fileUri
-     * @param fileName
+     * 
+     * @param fileSize
      * @throws Exception
      */
-    private void createFileMetadataAndSource(String fileUri, String fileName) throws Exception {
+    private void createFileMetadataAndSource(long fileSize) throws Exception {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, getUserName()));
 
-        String fileSize = String.valueOf(fileBean.getSize());
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
@@ -522,7 +555,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param strings
      */
     private static String[] trimAll(String[] strings) {
@@ -583,10 +616,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
             try {
                 csvReader = createCSVReader(false);
                 String[] columnsArray = csvReader.readNext();
-                if (columnsArray==null || columnsArray.length==0){
+                if (columnsArray == null || columnsArray.length == 0) {
                     columns = new ArrayList<String>();
-                }
-                else{
+                } else {
                     columns = Arrays.asList(trimAll(columnsArray));
                 }
             } finally {
@@ -647,15 +679,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setFolderUri(String uri) {
         this.folderUri = uri;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public char getDelimiter() {

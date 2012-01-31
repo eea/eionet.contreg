@@ -50,7 +50,7 @@ public class LoadTriplesJob implements Job {
                 harvestUnharvestedFiles(selectedFiles);
 
                 DAOFactory.get().getDao(CompiledDatasetDAO.class).saveDataset(selectedFiles, datasetUri, overwrite);
-                DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(datasetUri);
+                DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(datasetUri);
             }
         } catch (Exception e) {
             logger.info("Error occured while loading triples: " + datasetUri);

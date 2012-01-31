@@ -1200,7 +1200,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * {@inheritDoc}
      */
     @Override
-    public void updateHarvestedStatements(String sourceUri) throws DAOException {
+    public void updateHarvestedStatementsTriple(String sourceUri) throws DAOException {
         String sourceCountQuery = "SELECT COUNT(*) FROM ?sourceUri WHERE {?s ?p ?o}";
         Bindings bindings = new Bindings();
         bindings.setURI("sourceUri", sourceUri);

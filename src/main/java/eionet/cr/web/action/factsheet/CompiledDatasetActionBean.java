@@ -226,7 +226,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
                 ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
         // Update HARVESTED STATEMENTS
-        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatements(uri);
+        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(uri);
 
         addSystemMessage("Selected files are removed from the dataset.");
         if (compiledDatasetDao.hasCompiledDatasetExpiredData(uri, selectedFiles)) {

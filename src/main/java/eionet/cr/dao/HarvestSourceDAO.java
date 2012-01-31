@@ -422,5 +422,5 @@ public interface HarvestSourceDAO extends DAO {
      * @param sourceUri
      * @throws DAOException
      */
-    void updateHarvestedStatements(String sourceUri) throws DAOException;
+    void updateHarvestedStatementsTriple(String sourceUri) throws DAOException;
 }
