@@ -81,13 +81,13 @@ public interface FolderDAO extends DAO {
     boolean fileOrFolderExists(String folderUri) throws DAOException;
 
     /**
-     * Returns all user folders.
+     * Returns all sub folders + parent folder.
      *
-     * @param homeUri - User home folder URI.
+     * @param uri - Parent folder uri.
      * @return List<String>.
      * @throws DAOException
      */
-    List<String> getUserFolders(String homeUri) throws DAOException;
+    List<String> getSubFolders(String uri) throws DAOException;
 
     /**
      * True, if folder is not empty and has files or folders.

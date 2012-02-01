@@ -27,7 +27,7 @@ import java.util.List;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
-import eionet.cr.util.URIUtil;
+import eionet.cr.util.FolderUtil;
 
 /**
  *
@@ -68,7 +68,7 @@ public class UserFolderReader extends ResultSetMixedReader<String> {
 
             if (folder != null) {
                 String folderUri = folder.stringValue();
-                if (!URIUtil.isUserReservedUri(folderUri)) {
+                if (!FolderUtil.isUserReservedUri(folderUri)) {
                     resultList.add(folderUri);
                 }
             }

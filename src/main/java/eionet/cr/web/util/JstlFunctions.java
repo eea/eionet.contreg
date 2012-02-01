@@ -516,6 +516,20 @@ public class JstlFunctions {
     }
 
     /**
+     * Extract folder
+     *
+     * @param uri
+     * @return String
+     */
+    public static String extractFolder(String uri) {
+        if (uri == null) {
+            return "";
+        }
+        String appHome = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
+        return StringUtils.substringAfter(uri, appHome);
+    }
+
+    /**
      *
      * @param s
      * @return

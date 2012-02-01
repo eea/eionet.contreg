@@ -79,7 +79,7 @@
 	                	<label for="folder" style="width: 200px; float: left;">Folder</label><br/>
 	                	<stripes:select name="folder" id="folder" style="width: 200px; float: left;">
 							<c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
-								<stripes:option value="${f}" label="${crfn:removeHomeUri(f)}" />
+								<stripes:option value="${f}" label="${crfn:extractFolder(f)}" />
 							</c:forEach>
 						</stripes:select>
 						<br/><br/>

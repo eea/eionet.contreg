@@ -395,6 +395,18 @@
 
     <function>
         <description>
+            Extracts folder from uri.
+        </description>
+        <name>extractFolder</name>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
+        <function-signature>java.lang.String extractFolder(java.lang.String)</function-signature>
+        <example>
+            ${extractFolder(folderUri)}
+        </example>
+    </function>
+
+    <function>
+        <description>
             Returns the result of org.apache.commons.lang.StringEscapeUtils.escapeHtml(String).
         </description>
         <name>escapeHtml</name>

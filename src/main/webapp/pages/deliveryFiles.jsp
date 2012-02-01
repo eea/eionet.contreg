@@ -151,7 +151,7 @@
                                     <td>
                                         <stripes:select name="folder" id="folder">
                                             <c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
-                                                <stripes:option value="${f}" label="${crfn:removeHomeUri(f)}" />
+                                                <stripes:option value="${f}" label="${crfn:extractFolder(f)}" />
                                             </c:forEach>
                                         </stripes:select>
                                     </td>

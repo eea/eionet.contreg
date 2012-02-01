@@ -42,6 +42,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.export.ExportFormat;
@@ -804,7 +805,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         List<String> ret = new ArrayList<String>();
         if (getUser() != null) {
             try {
-                ret = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+                ret = FolderUtil.getUserAccessibleFolders(getUser());
             } catch (DAOException e) {
                 e.printStackTrace();
             }

@@ -36,7 +36,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
-import eionet.cr.util.URIUtil;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -102,7 +102,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
     }
 
     public String getOwnerName() {
-        return URIUtil.extractUserName(uri);
+        return FolderUtil.extractUserName(uri);
     }
 
     /**

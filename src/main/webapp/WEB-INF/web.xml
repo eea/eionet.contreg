@@ -189,19 +189,15 @@
         <url-pattern>/sitemap.xml</url-pattern>
     </servlet-mapping>
 
-    <!--  XmlRpcServlet (for XML-RPC 3) -->
     <servlet>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>eionet.cr.api.xmlrpc.CRXmlRpcServlet</servlet-class>
-        <init-param>
-          <param-name>enabledForExtensions</param-name>
-          <param-value>true</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <url-pattern>/xmlrpc</url-pattern>
-    </servlet-mapping>
+		<servlet-name>rpcrouter</servlet-name>
+		<servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>rpcrouter</servlet-name>
+		<url-pattern>/rpcrouter</url-pattern>
+	</servlet-mapping>
 
     <!--  AMP feed servlet -->
 

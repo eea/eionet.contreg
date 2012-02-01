@@ -50,6 +50,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.UserFolderReader;
 import eionet.cr.dto.FolderItemDTO;
 import eionet.cr.util.Bindings;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
@@ -134,7 +135,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
         // If the new folder URI is reserved, exit silently.
         String newFolderUri = parentFolderUri + "/" + URLUtil.escapeIRI(folderName);
-        if (URIUtil.isUserReservedUri(newFolderUri)) {
+        if (FolderUtil.isUserReservedUri(newFolderUri)) {
             LOGGER.debug("Cannot create reserved folder, exiting silently!");
             return;
         }
@@ -295,14 +296,14 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
                     item.setLastModified(bindingSet.getValue("lastModified").stringValue());
                 }
                 if (Predicates.CR_HAS_FOLDER.equals(bindingSet.getValue("type").stringValue())) {
-                    if (URIUtil.isUserReservedUri(item.getUri())) {
+                    if (FolderUtil.isUserReservedUri(item.getUri())) {
                         item.setType(FolderItemDTO.Type.RESERVED_FOLDER);
                     } else {
                         item.setType(FolderItemDTO.Type.FOLDER);
                     }
                 }
                 if (Predicates.CR_HAS_FILE.equals(bindingSet.getValue("type").stringValue())) {
-                    if (URIUtil.isUserReservedUri(item.getUri())) {
+                    if (FolderUtil.isUserReservedUri(item.getUri())) {
                         item.setType(FolderItemDTO.Type.RESERVED_FILE);
                     } else {
                         item.setType(FolderItemDTO.Type.FILE);
@@ -322,20 +323,20 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getUserFolders(String homeUri) throws DAOException {
+    public List<String> getSubFolders(String uri) throws DAOException {
 
         List<String> ret = new ArrayList<String>();
-        ret.add(homeUri);
+        ret.add(uri);
 
         Bindings bindings = new Bindings();
-        bindings.setURI("homeUri", homeUri);
+        bindings.setURI("uri", uri);
         bindings.setURI("hasFolder", Predicates.CR_HAS_FOLDER);
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ?o WHERE { ");
         sb.append("graph ?g {");
         sb.append("?s ?p ?o . ");
-        sb.append("FILTER (?g = ?homeUri) .");
+        sb.append("FILTER (?g = ?uri) .");
         sb.append("FILTER (?p = ?hasFolder) .");
         sb.append("}} ORDER BY ?o");
         List<String> folders = executeSPARQL(sb.toString(), bindings, new UserFolderReader());
@@ -427,6 +428,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     private List<Statement> getHomeFolderCreationStatements(CRUser user, ValueFactory vf) {
 
         URI rootHomeUri = vf.createURI(CRUser.rootHomeUri());
+        URI rootProjectUri = vf.createURI(CRUser.rootProjectUri());
         URI userHomeUri = vf.createURI(user.getHomeUri());
         URI reviewsUri = vf.createURI(user.getReviewsUri());
         URI bookmarksUri = vf.createURI(user.getBookmarksUri());
@@ -457,6 +459,9 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
         // statements about all user homes root (e.g. http://cr.eionet.europa.eu/home)
         result.add(new ContextStatementImpl(rootHomeUri, hasFolder, userHomeUri, rootHomeUri));
+
+        // statements about project root (e.g. http://cr.eionet.europa.eu/project)
+        result.add(new ContextStatementImpl(rootProjectUri, rdfType, folder, rootProjectUri));
 
         // statements about user home URI
         result.add(new ContextStatementImpl(userHomeUri, rdfType, userFolder, userHomeUri));

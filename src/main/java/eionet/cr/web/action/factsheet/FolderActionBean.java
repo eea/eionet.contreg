@@ -40,8 +40,12 @@ import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.tee.uit.security.AccessController;
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -59,6 +63,7 @@ import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
@@ -100,10 +105,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /** Label of newly uploaded file. */
     private String label;
 
+    /** ACL path. */
+    private String aclPath;
+
     /** Uploaded file. */
     private FileBean uploadedFile;
 
-    /** True, if newly uploaded file shoul replace the existing one. */
+    /** True, if newly uploaded file should replace the existing one. */
     private boolean replaceExisting;
 
     /** Exception that is thrown in file upload/harvest thread. */
@@ -123,12 +131,15 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
+
         initTabs();
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         Pair<FolderItemDTO, List<FolderItemDTO>> result = folderDAO.getFolderContents(uri);
         folder = result.getLeft();
         folderItems = result.getRight();
+
+        aclPath = FolderUtil.extractProjectAclPath(uri);
 
         return new ForwardResolution("/pages/folder/viewItems.jsp");
     }
@@ -197,7 +208,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         for (RenameFolderItemDTO item : renameItems) {
-            if (URIUtil.isUserReservedUri(item.getUri())) {
+            if (FolderUtil.isUserReservedUri(item.getUri())) {
                 addSystemMessage("Cannot rename items. File or folder is reserved: " + item.getName());
                 return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
             }
@@ -230,7 +241,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                     String oldFileName = StringUtils.replace(URIUtil.extractURILabel(item.getUri()), "%20", " ");
                     String newFileName = item.getNewName();
 
-                    String folderPath = URIUtil.extractPathInUserHome(uri);
+                    String folderPath = FolderUtil.extractPathInUserHome(uri);
                     if (StringUtils.isNotEmpty(folderPath)) {
                         oldFileName = folderPath + "/" + oldFileName;
                         newFileName = folderPath + "/" + newFileName;
@@ -290,7 +301,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
 
-                boolean folderDeleted = fileStore.deleteFolder(URIUtil.extractPathInUserHome(item.getUri()));
+                boolean folderDeleted = fileStore.deleteFolder(FolderUtil.extractPathInFolder(item.getUri()));
                 if (!folderDeleted) {
                     logger.warn("Failed to delete folder from filestore for uri: " + item.getUri());
                 }
@@ -304,7 +315,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // Delete files
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
-                String filePath = URIUtil.extractPathInUserHome(item.getUri());
+                String filePath = FolderUtil.extractPathInUserHome(item.getUri());
                 fileStore.delete(StringUtils.replace(filePath, "%20", " "));
             }
         }
@@ -340,7 +351,33 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             addCautionMessage("File or folder with the same name already exists.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
-        folderDAO.createFolder(uri, title, label, getUser().getHomeUri());
+
+        String context = getUser().getHomeUri();
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (uri.startsWith(appHome + "/project")) {
+            context = appHome + "/project";
+        }
+
+        folderDAO.createFolder(uri, title, label, context);
+
+        try {
+            if (uri.startsWith(appHome + "/project")) {
+                String path = FolderUtil.extractPathInProjectFolder(uri + "/" + title);
+                if (!StringUtils.isBlank(path)) {
+                    String[] tokens = path.split("/");
+                    if (tokens != null && tokens.length == 1) {
+                        String aclPath = "/project/" + tokens[0];
+                        HashMap acls = AccessController.getAcls();
+                        if (!acls.containsKey(aclPath)) {
+                            AccessController.addAcl(aclPath, getUserName(), "");
+                        }
+                    }
+                }
+            }
+        } catch (SignOnException e) {
+            e.printStackTrace();
+        }
+
         addSystemMessage("Folder created successfully.");
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }
@@ -554,7 +591,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         try {
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
             contentStream = uploadedFile.getInputStream();
-            String filePath = URIUtil.extractPathInUserHome(uri);
+            String filePath = FolderUtil.extractPathInUserHome(uri);
             if (StringUtils.isNotEmpty(filePath)) {
                 filePath += "/" + uploadedFile.getFileName();
             } else {
@@ -663,7 +700,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     private String selectedItemsReserved() throws DAOException {
         for (RenameFolderItemDTO item : selectedItems) {
-            if (item.isSelected() && URIUtil.isUserReservedUri(uri)) {
+            if (item.isSelected() && FolderUtil.isUserReservedUri(uri)) {
                 return item.getName();
             }
         }
@@ -709,7 +746,21 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @return
      */
     public boolean isHomeFolder() {
-        if (StringUtils.isEmpty(URIUtil.extractPathInUserHome(uri))) {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (!isProjectFolder() && uri.startsWith(appHome + "/home") && StringUtils.isEmpty(FolderUtil.extractPathInUserHome(uri))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * True, if the folder uri is project root folder.
+     *
+     * @return
+     */
+    public boolean isProjectFolder() {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (uri.equals(appHome + "/project")) {
             return true;
         }
         return false;
@@ -859,6 +910,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getAclPath() {
+        return aclPath;
     }
 
 }

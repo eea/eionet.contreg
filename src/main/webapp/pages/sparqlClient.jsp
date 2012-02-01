@@ -312,7 +312,7 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
 									<td>
 										<stripes:select name="folder" id="folder" style="width: 355px;">
 											<c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
-												<stripes:option value="${f}" label="${crfn:removeHomeUri(f)}" />
+												<stripes:option value="${f}" label="${crfn:extractFolder(f)}" />
 											</c:forEach>
 										</stripes:select>
 									</td>

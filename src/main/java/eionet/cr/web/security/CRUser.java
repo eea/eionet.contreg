@@ -129,6 +129,11 @@ public class CRUser {
         // get user object from session
         CRUser crUser = (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
 
+        // Return false if user is not logged in
+        if (crUser == null) {
+            return false;
+        }
+
         // get user name from user object, or set to null if user object null
         String userName = crUser == null ? null : crUser.getUserName();
 
@@ -203,6 +208,15 @@ public class CRUser {
     }
 
     /**
+     * Returns projects root URL.
+     *
+     * @return String
+     */
+    public String getProjectUri() {
+        return CRUser.rootProjectUri();
+    }
+
+    /**
      * Returns review URL of the user.
      *
      * @param reviewId
@@ -268,13 +282,23 @@ public class CRUser {
     }
 
     /**
-     * ROOT Home URI for all user fodlers.
+     * ROOT Home URI for all user folders.
      *
      * @return String
      */
     public static String rootHomeUri() {
 
         return new StringBuilder(appHomeURL()).append("/home").toString();
+    }
+
+    /**
+     * ROOT Project URI for all project folders.
+     *
+     * @return String
+     */
+    public static String rootProjectUri() {
+
+        return new StringBuilder(appHomeURL()).append("/project").toString();
     }
 
     /**

@@ -38,10 +38,10 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
 import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.DatasetDTO;
 import eionet.cr.dto.DeliveryFilesDTO;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.factsheet.CompiledDatasetActionBean;
 
@@ -81,7 +81,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     private void init() throws DAOException {
         deliveryFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDeliveryFiles(selectedDeliveries);
         existingDatasets = DAOFactory.get().getDao(CompiledDatasetDAO.class).getCompiledDatasets(getUser().getHomeUri(), null);
-        folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+        folders = FolderUtil.getUserAccessibleFolders(getUser());
 
         // Sort by modified
         Collections.sort(existingDatasets, new Comparator<DatasetDTO>() {

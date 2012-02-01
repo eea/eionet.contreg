@@ -58,15 +58,15 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
-import eionet.cr.util.URIUtil;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
- * 
+ *
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -128,7 +128,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Resolution upload() {
@@ -140,7 +140,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Save the file into user's file-store.
             fileName = fileBean.getFileName();
             long fileSize = fileBean.getSize();
-            relativeFilePath = URIUtil.extractPathInUserHome(folderUri + "/" + fileName);
+            relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
             FileStore fileStore = FileStore.getInstance(getUserName());
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
@@ -165,7 +165,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Resolution save() {
@@ -201,7 +201,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
@@ -260,7 +260,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param csvReader
      * @throws IOException
      * @throws DAOException
@@ -383,7 +383,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param line
      * @return
      */
@@ -407,7 +407,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param line
      * @return
      */
@@ -425,7 +425,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     private void preloadWizardInputs() throws DAOException {
@@ -460,7 +460,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @throws IOException
      * @throws RepositoryException
      * @throws DAOException
-     * 
+     *
      */
     private void saveWizardInputs() throws DAOException, RepositoryException, IOException {
 
@@ -478,7 +478,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param csvReader
      */
     private void close(CSVReader csvReader) {
@@ -492,7 +492,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     private void linkFileToFolder() throws DAOException {
@@ -515,7 +515,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param fileSize
      * @throws Exception
      */
@@ -555,7 +555,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param strings
      */
     private static String[] trimAll(String[] strings) {
@@ -686,7 +686,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public char getDelimiter() {

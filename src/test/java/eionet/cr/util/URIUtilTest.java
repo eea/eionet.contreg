@@ -21,7 +21,6 @@
 package eionet.cr.util;
 
 import junit.framework.TestCase;
-import eionet.cr.config.GeneralConfig;
 
 /**
  *
@@ -52,78 +51,5 @@ public class URIUtilTest extends TestCase {
      */
     public void testFixRelativeUrl() {
         assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
-    }
-
-    /**
-     *
-     */
-    public void testIsUserHomeUri() {
-
-        String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja"));
-        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja/"));
-        assertTrue(URIUtil.startsWithUserHome(appHomeUrl + "/home/heinlja/folder"));
-        assertFalse(URIUtil.startsWithUserHome(appHomeUrl + "/home/"));
-        assertFalse(URIUtil.startsWithUserHome(appHomeUrl + "/home"));
-        assertFalse(URIUtil.startsWithUserHome(appHomeUrl));
-        assertFalse(URIUtil.startsWithUserHome(""));
-        assertFalse(URIUtil.startsWithUserHome(" "));
-        try{
-            assertFalse(URIUtil.startsWithUserHome(null));
-        }
-        catch (NullPointerException e){
-            fail("Wasn't expecting this exception: " + e.toString());
-        }
-    }
-
-    /**
-     *
-     */
-    public void testExtarctUserName(){
-
-        try{
-            assertEquals(null, URIUtil.extractUserName(null));
-        }
-        catch (NullPointerException e){
-            fail("Wasn't expecting this exception: " + e.toString());
-        }
-
-        assertEquals(null, URIUtil.extractUserName(""));
-        assertEquals(null, URIUtil.extractUserName(" "));
-
-        String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        assertEquals(null, URIUtil.extractUserName(appHomeUrl));
-        assertEquals(null, URIUtil.extractUserName(appHomeUrl + "/home"));
-        assertEquals(null, URIUtil.extractUserName(appHomeUrl + "/home/"));
-        assertEquals(null, URIUtil.extractUserName(appHomeUrl + "/heinlja"));
-        assertEquals(null, URIUtil.extractUserName(appHomeUrl + "/heinlja/"));
-        assertEquals("heinlja", URIUtil.extractUserName(appHomeUrl + "/home/heinlja"));
-        assertEquals("heinlja", URIUtil.extractUserName(appHomeUrl + "/home/heinlja/"));
-        assertEquals("heinlja", URIUtil.extractUserName(appHomeUrl + "/home/heinlja/aaa"));
-    }
-
-    /**
-     *
-     */
-    public void testIsUserReservedUri(){
-
-        try{
-            assertFalse(URIUtil.isUserReservedUri(null));
-            assertFalse(URIUtil.isUserReservedUri(""));
-            assertFalse(URIUtil.isUserReservedUri(" "));
-
-            String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-            assertTrue(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/reviews"));
-            assertTrue(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/bookmarks"));
-            assertTrue(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/history"));
-            assertTrue(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/registrations"));
-            assertFalse(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/some"));
-            assertFalse(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/"));
-            assertFalse(URIUtil.isUserReservedUri(appHomeUrl + "/home/heinlja"));
-            assertFalse(URIUtil.isUserReservedUri(appHomeUrl + "/home/"));
-        }
-        catch (NullPointerException e){
-            fail("Wasn't expecting this exception: " + e.toString());
-        }
     }
 }

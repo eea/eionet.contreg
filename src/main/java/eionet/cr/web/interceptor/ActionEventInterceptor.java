@@ -43,7 +43,7 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 
 import org.apache.log4j.Logger;
 
-import eionet.cr.util.URIUtil;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.home.AbstractHomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
@@ -81,7 +81,7 @@ public class ActionEventInterceptor implements Interceptor {
             String actionEventURL = null;
 
             if (actionBean instanceof AbstractHomeActionBean) {
-                String userName = URIUtil.extractUserName(request.getRequestURI());
+                String userName = FolderUtil.extractUserName(request.getRequestURI());
                 actionEventURL = "/home/" + userName;
             } else {
                 actionEventURL =

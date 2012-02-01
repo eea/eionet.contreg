@@ -35,5 +35,8 @@
             <%-- don't have permissions in "/registrations" ACL.                     --%>
             <li><a href="view.action?uri=${fn:escapeXml(sessionScope.crUser.homeUri)}">My home</a></li>
         </c:if>
+        <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/project", "v")}'>
+            <li><a href="view.action?uri=${fn:escapeXml(sessionScope.crUser.projectUri)}">Projects</a></li>
+        </c:if>
     </ul>
 </div>

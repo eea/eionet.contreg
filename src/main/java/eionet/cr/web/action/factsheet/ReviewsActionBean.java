@@ -33,7 +33,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.UploadHarvest;
-import eionet.cr.util.URIUtil;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -399,7 +399,7 @@ public class ReviewsActionBean extends AbstractActionBean {
      * @return username
      */
     public String getAttemptedUserName() {
-        return URIUtil.extractUserName(uri);
+        return FolderUtil.extractUserName(uri);
     }
 
     /**

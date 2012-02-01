@@ -55,6 +55,7 @@ import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.RDFMediaTypes;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
@@ -270,7 +271,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 }
             }
         } else if (getUser() != null) {
-            folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+            folders = FolderUtil.getUserAccessibleFolders(getUser());
         }
 
         return resolution;
@@ -312,7 +313,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             }
         }
 
-        folders = factory.getDao(FolderDAO.class).getUserFolders(getUser().getHomeUri());
+        folders = FolderUtil.getUserAccessibleFolders(getUser());
 
         // if any validation errors were set above, make sure the right resolution is returned
         if (hasValidationErrors()) {
