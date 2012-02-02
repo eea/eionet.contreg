@@ -258,7 +258,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             helperDAO.renameUserUploads(uriRenamings);
         }
         if (fileRenamings.size() > 0) {
-            FileStore.getInstance(getUserName()).rename(fileRenamings);
+
+            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName())).rename(fileRenamings);
             addSystemMessage("Files renamed successfully!");
         }
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -295,7 +296,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         List<String> fileOrFolderUris = new ArrayList<String>();
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
-        FileStore fileStore = FileStore.getInstance(getUserName());
+
+        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName()));
 
         // Delete folders
         for (RenameFolderItemDTO item : selectedItems) {
@@ -315,7 +317,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // Delete files
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
-                String filePath = FolderUtil.extractPathInUserHome(item.getUri());
+                String filePath = FolderUtil.extractPathInFolder(item.getUri());
                 fileStore.delete(StringUtils.replace(filePath, "%20", " "));
             }
         }
@@ -361,7 +363,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         folderDAO.createFolder(uri, title, label, context);
 
         try {
-            if (uri.startsWith(appHome + "/project")) {
+            if (FolderUtil.isProjectFolder(uri)) {
                 String path = FolderUtil.extractPathInProjectFolder(uri + "/" + title);
                 if (!StringUtils.isBlank(path)) {
                     String[] tokens = path.split("/");
@@ -591,13 +593,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         try {
             DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
             contentStream = uploadedFile.getInputStream();
-            String filePath = FolderUtil.extractPathInUserHome(uri);
+            String filePath = FolderUtil.extractPathInFolder(uri);
             if (StringUtils.isNotEmpty(filePath)) {
                 filePath += "/" + uploadedFile.getFileName();
             } else {
                 filePath = uploadedFile.getFileName();
             }
-            FileStore.getInstance(getUserName()).add(filePath, replaceExisting, contentStream);
+            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName())).add(filePath, replaceExisting, contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
@@ -746,11 +748,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @return
      */
     public boolean isHomeFolder() {
-        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        if (!isProjectFolder() && uri.startsWith(appHome + "/home") && StringUtils.isEmpty(FolderUtil.extractPathInUserHome(uri))) {
-            return true;
-        }
-        return false;
+        return FolderUtil.isHomeFolder(uri);
     }
 
     /**
@@ -759,11 +757,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @return
      */
     public boolean isProjectFolder() {
-        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        if (uri.equals(appHome + "/project")) {
-            return true;
-        }
-        return false;
+        return FolderUtil.isProjectRootFolder(uri);
     }
 
     /**

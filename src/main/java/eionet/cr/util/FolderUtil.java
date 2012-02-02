@@ -200,4 +200,59 @@ public class FolderUtil {
         }
         return folders;
     }
+
+    /**
+     * True, if the folder uri is user's home folder.
+     *
+     * @return
+     */
+    public static boolean isHomeFolder(String uri) {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (!isProjectFolder(uri) && uri.startsWith(appHome + "/home") && StringUtils.isEmpty(FolderUtil.extractPathInUserHome(uri))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * True, if the folder uri is project root folder.
+     *
+     * @return
+     */
+    public static boolean isProjectFolder(String uri) {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (uri.startsWith(appHome + "/project")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * True, if the folder uri is project root folder.
+     *
+     * @return
+     */
+    public static boolean isProjectRootFolder(String uri) {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (uri.equals(appHome + "/project")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns FileStore userDir where the files will be stored
+     *
+     * @param uri
+     * @param userName
+     * @return String
+     */
+    public static String getUserDir(String uri, String userName) {
+        String folder = userName;
+        if (FolderUtil.isProjectFolder(uri)) {
+            folder = "project";
+        }
+        return folder;
+    }
+
 }

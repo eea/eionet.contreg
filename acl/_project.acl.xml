@@ -12,6 +12,7 @@
 			<principal id="cr_admin" type="localgroup"/>
 			<permissions>
 				<permission id="v"/>
+				<permission id="d"/>
 				<permission id="i"/>
 			</permissions>
 		</entry>
