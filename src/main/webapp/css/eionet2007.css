@@ -1,3 +1,8 @@
+/* SPARQL endpoint. */
+span.shaddowHover:hover {
+    background-color: #FFFFFF;
+}
+
 /* Folder items icons. */
 td.file {
     background: url('../images/file.gif') no-repeat left top;

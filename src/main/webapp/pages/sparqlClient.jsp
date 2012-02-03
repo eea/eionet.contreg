@@ -9,7 +9,7 @@
         // <![CDATA[
             var last_format = 1;
             function format_select() {
-            	var query_obg = document.getElementById('queryText');
+                var query_obg = document.getElementById('queryText');
                 var query = query_obg.value;
                 var format = query_obg.form.format;
 
@@ -56,71 +56,182 @@
                             return true;
                         });
 
+                        // Open prefixes dialog
+                        $("#prefixesLink").click(function() {
+                            $('#prefixesDialog').dialog('open');
+                            return false;
+                        });
+
+                        // Prefixes dialog setup
+                        $('#prefixesDialog').dialog({
+                            autoOpen: false,
+                            width: 600
+                        });
+
+                        // Close prefixes dialog
+                        $("#closePrefixesDialog").click(function() {
+                            $('#prefixesDialog').dialog("close");
+                            return true;
+                        });
+
+                        // Add query prefix #1
+                        $("#prefix1").click(function() {
+                            return handlePrefixClick("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>");
+                        });
+                        // Add query prefix #2
+                        $("#prefix2").click(function() {
+                            return handlePrefixClick("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>");
+                        });
+                        // Add query prefix #3
+                        $("#prefix3").click(function() {
+                            return handlePrefixClick("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>");
+                        });
+                        // Add query prefix #4
+                        $("#prefix4").click(function() {
+                            return handlePrefixClick("PREFIX owl: <http://www.w3.org/2002/07/owl#>");
+                        });
+                        // Add query prefix #5
+                        $("#prefix5").click(function() {
+                            return handlePrefixClick("PREFIX dc: <http://purl.org/dc/elements/1.1/>");
+                        });
+                        // Add query prefix #6
+                        $("#prefix6").click(function() {
+                            return handlePrefixClick("PREFIX dcterms: <http://purl.org/dc/terms/>");
+                        });
+                        // Add query prefix #7
+                        $("#prefix7").click(function() {
+                            return handlePrefixClick("PREFIX foaf: <http://xmlns.com/foaf/0.1/>");
+                        });
+                        // Add query prefix #8
+                        $("#prefix8").click(function() {
+                            return handlePrefixClick("PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>");
+                        });
+                        // Add query prefix #9
+                        $("#prefix9").click(function() {
+                            return handlePrefixClick("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>");
+                        });
+                        // Add query prefix #10
+                        $("#prefix10").click(function() {
+                            return handlePrefixClick("PREFIX rod: <http://rod.eionet.europa.eu/schema.rdf#>");
+                        });
+
                     });
             } ) ( jQuery );
+
+            function handlePrefixClick(prefix) {
+                var query = document.getElementById('queryText').value;
+                document.getElementById('queryText').value = addOrRemove(query, prefix);
+
+                var areas = document.querySelectorAll('.expandingArea');
+                var l = areas.length;
+                while (l--) {
+                    makeExpandingArea(areas[l]);
+                }
+
+                return false;
+            }
+
+            function addOrRemove(original, prefix) {
+                if (stringExists(original, prefix)) {
+                    return removeString(original, prefix);
+                } else {
+                    return addString(original, prefix);
+                }
+            }
+
+            function stringExists(string, subString) {
+                if (string.length < 1) {
+                    return false;
+                }
+                if (subString.length < 1) {
+                    return false;
+                }
+                if (string.indexOf(subString) == -1) {
+                    return false;
+                }
+                return true;
+            }
+
+            function addString(string, addable) {
+                return addable + "\n" + string;
+            }
+
+            function removeString(string, removable) {
+                if (stringExists(string, removable + "\n")) {
+                    return string.replace(removable + "\n", "");
+                } else {
+                    return string.replace(removable, "");
+                }
+            }
             // ]]>
         </script>
-		<c:if test="${actionBean.userLoggedIn}">
-			<script type="text/javascript">
-				// <![CDATA[
-			    ( function($) {
-				$(document).ready(
-				    function(){
-						$("#executeButton").click(function() {
-							var query = document.getElementById('queryText').value;
-							var format = document.getElementById('format').value;
+        <c:if test="${actionBean.userLoggedIn}">
+            <script type="text/javascript">
+                // <![CDATA[
+                ( function($) {
+                $(document).ready(
+                    function(){
+                        $("#executeButton").click(function() {
+                            var query = document.getElementById('queryText').value;
+                            var format = document.getElementById('format').value;
 
-							if (format == 'application/rdf+xml' && query.match(/\bconstruct\b/i)) {
-							    $('#constructDialog').dialog('open');
-							    document.getElementById('constructQuery').value = query;
-							    document.getElementById('constructFormat').value = format;
-							    return false;
-							} else {
-								return true;
-							}
-						});
+                            if (format == 'application/rdf+xml' && query.match(/\bconstruct\b/i)) {
+                                $('#constructDialog').dialog('open');
+                                document.getElementById('constructQuery').value = query;
+                                document.getElementById('constructFormat').value = format;
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
 
-						// Construct queriy dialog setup
-						$('#constructDialog').dialog({
-						    autoOpen: false,
-						    width: 500
-						});
+                        // Construct queriy dialog setup
+                        $('#constructDialog').dialog({
+                            autoOpen: false,
+                            width: 500
+                        });
 
-						//Hide div w/id extra
-						if ($("input[name=exportType]:checked").val() != "HOMESPACE") {
-							$("#homespace_data").css("display","none");
-						}
+                        //Hide div w/id extra
+                        if ($("input[name=exportType]:checked").val() != "HOMESPACE") {
+                            $("#homespace_data").css("display","none");
+                        }
 
-						// Add onclick handler to checkbox w/id checkme
-						$('input[name=exportType]').click(function(){
-							$("#homespace_data").toggle();
-						});
+                        // Add onclick handler to checkbox w/id checkme
+                        $('input[name=exportType]').click(function(){
+                            $("#homespace_data").toggle();
+                        });
 
-						// Close dialog
-						$("#executeConstruct").click(function() {
-							$('#constructDialog').dialog("close");
-							return true;
-						});
-				    });
-			    } ) ( jQuery );
-			    // ]]>
-			</script>
-		</c:if>
+                        // Close dialog
+                        $("#executeConstruct").click(function() {
+                            $('#constructDialog').dialog("close");
+                            return true;
+                        });
+
+
+                    });
+                } ) ( jQuery );
+
+                // ]]>
+            </script>
+        </c:if>
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
 
-        <c:if test="${actionBean.user != null}">
         <ul id="dropdown-operations">
             <li><a href="#">Operations</a>
                 <ul>
+                    <c:if test="${actionBean.user != null}">
                     <li>
                         <a href="#" id="bookmarksLink">Bookmarked queries</a>
+                    </li>
+                    </c:if>
+                    <li>
+                        <a href="#" id="prefixesLink">Useful namespaces</a>
                     </li>
                 </ul>
             </li>
         </ul>
-        </c:if>
 
         <h1>SPARQL endpoint</h1>
 
@@ -264,16 +375,16 @@ while (l--) {
                         <div>
                             <h2>Useful namespaces</h2>
                             <pre>
-PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
-PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
-PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
-PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
-PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;
-PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
-PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
-PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
-PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
-PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
+<span id="prefix1" class="shaddowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
+<span id="prefix2" class="shaddowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span>
+<span id="prefix3" class="shaddowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span>
+<span id="prefix4" class="shaddowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span>
+<span id="prefix5" class="shaddowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span>
+<span id="prefix6" class="shaddowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span>
+<span id="prefix7" class="shaddowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
+<span id="prefix8" class="shaddowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span>
+<span id="prefix9" class="shaddowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span>
+<span id="prefix10" class="shaddowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span>
                             </pre>
                         </div>
                     </c:if>
@@ -281,61 +392,61 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
             </crfn:form>
 
             <c:if test="${actionBean.userLoggedIn}">
-	            <div id="constructDialog" title="Save result to ">
-	            	<crfn:form name="constructForm" action="/sparql" method="get">
-	            		<stripes:hidden name="query" id="constructQuery"/>
-	                	<stripes:hidden name="format" id="constructFormat"/>
-		            	<table class="formtable">
-			                <tr>
-								<td width="120"><stripes:label for="toFile">To file</stripes:label></td>
-			                    <td>
-			                        <stripes:radio name="exportType" value="FILE" checked="FILE" title="To file" id="toFile"/>
-			                    </td>
-			                </tr>
-							<tr>
-								<td><stripes:label for="toHomespace">To homespace</stripes:label></td>
-								<td>
-									<stripes:radio name="exportType" value="HOMESPACE" id="toHomespace"/>
-								</td>
-							</tr>
-						</table>
-						<div id="homespace_data">
-							<table class="formtable">
-								<tr>
-									<td width="120"><label for="datasetName">Dataset name</label></td>
-									<td>
-										<stripes:text name="datasetName" id="datasetName" style="width: 350px;"/>
-									</td>
-								</tr>
-								<tr>
-									<td><label for="folder">Folder</label></td>
-									<td>
-										<stripes:select name="folder" id="folder" style="width: 355px;">
-											<c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
-												<stripes:option value="${f}" label="${crfn:extractFolder(f)}" />
-											</c:forEach>
-										</stripes:select>
-									</td>
-								</tr>
-								<tr>
-									<td></td>
-									<td>
-										<stripes:checkbox name="overwriteDataset" id="overwriteDataset"/>
-										<stripes:label for="overwriteDataset">Overwrite if file/dataset already exists</stripes:label>
-									</td>
-								</tr>
-							</table>
-						</div>
-						<table class="formtable">
-							<tr>
-			                    <td align="right">
-			                        <stripes:submit name="execute" value="Execute" id="executeConstruct"/>
-			                    </td>
-			                </tr>
-		            	</table>
-		            </crfn:form>
-	        	</div>
-        	</c:if>
+                <div id="constructDialog" title="Save result to ">
+                    <crfn:form name="constructForm" action="/sparql" method="get">
+                        <stripes:hidden name="query" id="constructQuery"/>
+                        <stripes:hidden name="format" id="constructFormat"/>
+                        <table class="formtable">
+                            <tr>
+                                <td width="120"><stripes:label for="toFile">To file</stripes:label></td>
+                                <td>
+                                    <stripes:radio name="exportType" value="FILE" checked="FILE" title="To file" id="toFile"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><stripes:label for="toHomespace">To homespace</stripes:label></td>
+                                <td>
+                                    <stripes:radio name="exportType" value="HOMESPACE" id="toHomespace"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <div id="homespace_data">
+                            <table class="formtable">
+                                <tr>
+                                    <td width="120"><label for="datasetName">Dataset name</label></td>
+                                    <td>
+                                        <stripes:text name="datasetName" id="datasetName" style="width: 350px;"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="folder">Folder</label></td>
+                                    <td>
+                                        <stripes:select name="folder" id="folder" style="width: 355px;">
+                                            <c:forEach items="${actionBean.folders}" var="f" varStatus="loop">
+                                                <stripes:option value="${f}" label="${crfn:extractFolder(f)}" />
+                                            </c:forEach>
+                                        </stripes:select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <stripes:checkbox name="overwriteDataset" id="overwriteDataset"/>
+                                        <stripes:label for="overwriteDataset">Overwrite if file/dataset already exists</stripes:label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <table class="formtable">
+                            <tr>
+                                <td align="right">
+                                    <stripes:submit name="execute" value="Execute" id="executeConstruct"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </crfn:form>
+                </div>
+            </c:if>
 
             <%-- Bookmarked queries dialog --%>
             <div id="bookmarksDialog" title="Bookmarked queries">
@@ -390,74 +501,23 @@ PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;
                     No bookmarked queries found.
                 </c:otherwise>
             </c:choose>
-            <%--
-                <div>
-                    <h1>Select one of SPARQL queries</h1>
-                    <crfn:form name="bookmarksForm" action="/sparql" method="get">
-                        <c:if test="${not empty actionBean.defaultGraphUris}">
-                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                                <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${not empty actionBean.namedGraphUris}">
-                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                                <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
-                            </c:forEach>
-                        </c:if>
 
-                        <stripes:select name="fillfrom" onchange="document.bookmarksForm.submit()" style="width:500px">
-                             <stripes:option value="" label="-- Select a bookmarked SPARQL query --" />
-                                 <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                     <stripes:option value="${bookmarkedQuery.subj}" label="${bookmarkedQuery.label}" />
-                                 </c:forEach>
-                        </stripes:select>
-                        <noscript><div><stripes:submit name="" value="Go" id="goButton" /></div></noscript>
-                    </crfn:form>
-                </div>
-                <br />
-                <br />
-                <div>
-                    <h1>Delete bookmarked SPARQL queries</h1>
+            <div id="prefixesDialog" title="Useful namespaces">
+                <ul>
+                    <li>PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</li>
+                    <li>PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</li>
+                    <li>PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</li>
+                    <li>PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</li>
+                    <li>PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</li>
+                    <li>PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</li>
+                    <li>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</li>
+                    <li>PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</li>
+                    <li>PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</li>
+                    <li>PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</li>
+                </ul>
+                <button id="closePrefixesDialog">Close</button>
+            </div>
 
-                    <c:if test="${not empty actionBean.bookmarkedQueries}">
-                        <div style="margin-top: 15px">
-                            <c:url var="deleteBookmarkUrl" value="/sparql">
-                                <c:if test="${not empty actionBean.defaultGraphUris}">
-                                    <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                                        <c:param name="default-graph-uri" value="${defaultGraphUri}" />
-                                    </c:forEach>
-                                </c:if>
-                                <c:if test="${not empty actionBean.namedGraphUris}">
-                                    <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                                        <c:param name="named-graph-uri" value="${namedGraphUri}" />
-                                    </c:forEach>
-                                </c:if>
-                            </c:url>
-                            <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
-                                <div>
-                                    <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
-                                    <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
-                                </div>
-                                <table>
-                                    <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
-                                        <tr>
-                                            <td>
-                                                <stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/>
-                                            </td>
-                                            <td>
-                                                <span title="${bookmarkedQuery.queryString}"><c:out value="${bookmarkedQuery.label}"/></span>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </table>
-                            </crfn:form>
-                        </div>
-                    </c:if>
-                    <c:if test="${empty actionBean.bookmarkedQueries}">
-                        <div class="note-msg">No bookmarked queries currently found!</div>
-                    </c:if>
-                </div>
-            --%>
             </div>
         </div>
 

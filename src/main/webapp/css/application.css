@@ -1,50 +1,54 @@
+/* SPARQL endpoint. */
+span.shaddowHover:hover {
+    background-color: #FFFFFF;
+}
 
 /* Tabbed menus - as used on the front page */
 #tabbedmenu {
-	float:left;
-	width:100%;
-	background: url("http://www.eionet.europa.eu/styles/eionet2007/tab_bg.png") bottom repeat-x;
-	font-size: 0.9em;
-	line-height:normal;
+    float:left;
+    width:100%;
+    background: url("http://www.eionet.europa.eu/styles/eionet2007/tab_bg.png") bottom repeat-x;
+    font-size: 0.9em;
+    line-height:normal;
 }
 #tabbedmenu ul {
-	margin:0;
-	padding:0px 10px 0 10px;
-	list-style:none;
+    margin:0;
+    padding:0px 10px 0 10px;
+    list-style:none;
 }
 #tabbedmenu li {
-	float:left;
-	background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_left.png") no-repeat left top;
+    float:left;
+    background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_left.png") no-repeat left top;
 border-bottom: 3px solid #315076;
-	margin:0;
-	padding:0 0 0 6px;
-	white-space: nowrap;
+    margin:0;
+    padding:0 0 0 6px;
+    white-space: nowrap;
 }
 #tabbedmenu a {
-	display:block;
-	text-decoration: none;
-	font-weight: bold;
-	color: black;
-	background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_right.png") no-repeat right top;
-	padding:3px 8px 2px 0px;
+    display:block;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+    background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_right.png") no-repeat right top;
+    padding:3px 8px 2px 0px;
 }
 
 #tabbedmenu a:hover {
-	text-decoration: none;
-	background-color: transparent;
+    text-decoration: none;
+    background-color: transparent;
 }
 
 #tabbedmenu #currenttab {
-	background-image:url("http://www.eionet.europa.eu/styles/eionet2007/tab_left_on.png");
+    background-image:url("http://www.eionet.europa.eu/styles/eionet2007/tab_left_on.png");
 border-bottom: 3px solid #cedc32;
 }
 
 #tabbedmenu #currenttab span, #tabbedmenu #currenttab a {
-	display:block;
-	text-decoration: none;
-	font-weight: bold;
-	background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_right_on.png") no-repeat right top;
-	padding:3px 8px 2px 0px;
+    display:block;
+    text-decoration: none;
+    font-weight: bold;
+    background:url("http://www.eionet.europa.eu/styles/eionet2007/tab_right_on.png") no-repeat right top;
+    padding:3px 8px 2px 0px;
 }
 
 #tabbedmenuend { clear: left; }
@@ -58,228 +62,228 @@ div.databox {
 
 
 .question {
-	vertical-align: top;
-	font-weight: bold;
+    vertical-align: top;
+    font-weight: bold;
 }
 
 label.required {
-	background: url(http://www.eionet.europa.eu/styles/eionet2007/mandatory.gif) center right no-repeat;
-	padding-right: 12px;
+    background: url(http://www.eionet.europa.eu/styles/eionet2007/mandatory.gif) center right no-repeat;
+    padding-right: 12px;
 }
 
 input.error, textarea.error {
-	color: black;
-	font-style:italic;
-	background:#FF8080;
-	border: 2px inset #A42322;
+    color: black;
+    font-style:italic;
+    background:#FF8080;
+    border: 2px inset #A42322;
 }
 
 input.error[type="radio"], input.error[type="checkbox"], select.error {
-	background-color: white;
-	color: #A42322;
-	font-style: normal;
-	border: 2px solid #A42322;
+    background-color: white;
+    color: #A42322;
+    font-style: normal;
+    border: 2px solid #A42322;
 }
 
 .error-hint {
-	font-size: 80%;
-	margin: 2px;
-	padding: 2px;
-	border: 1px dotted black;
-	background-color: #ffff80;
-	color: black;
+    font-size: 80%;
+    margin: 2px;
+    padding: 2px;
+    border: 1px dotted black;
+    background-color: #ffff80;
+    color: black;
 }
 
 .input-hint {
-	font-size: 80%;
-	vertical-align:top;
+    font-size: 80%;
+    vertical-align:top;
 }
 /* Tables for arranging formulars */
 
 table.formtable {
-/*	border: 1px solid #315076; */
-	border-collapse: collapse;
+/*    border: 1px solid #315076; */
+    border-collapse: collapse;
 }
 
 .formtable th {
-	vertical-align: top;
-	text-align: right;
-	border: none;
-	background: transparent;
+    vertical-align: top;
+    text-align: right;
+    border: none;
+    background: transparent;
 }
 
 .formtable th.scope-col { /* IE6 doesn't understand [scope="col"] */
-	text-align: left;
-	border-bottom: 1px dotted #315076;
+    text-align: left;
+    border-bottom: 1px dotted #315076;
 }
 
 .formtable th[scope="col"] {
-	text-align: left;
-	border-bottom: 1px dotted #315076;
+    text-align: left;
+    border-bottom: 1px dotted #315076;
 }
 
 .formtable td  {
-	vertical-align: top;
+    vertical-align: top;
 }
 
 
 
 .quickjumps {
-	float: right;
-	width: 140px;
-	padding: 0.5em 10px;
+    float: right;
+    width: 140px;
+    padding: 0.5em 10px;
         margin: 0 10px;
-	border: 1px solid #495b6b;
-	background-color : #e5e2dc;
+    border: 1px solid #495b6b;
+    background-color : #e5e2dc;
 }
 
 #rightcolumn.quickjumps {
-	border: none;
-	background-color: white;
+    border: none;
+    background-color: white;
 }
 
 .quickjumps ul {
-	list-style-image: url(http://www.eionet.europa.eu/styles/eionet2007/bullet.gif);
-	list-style-type: square;
-	margin-left: 0;
-	padding-left: 1.5em;
+    list-style-image: url(http://www.eionet.europa.eu/styles/eionet2007/bullet.gif);
+    list-style-type: square;
+    margin-left: 0;
+    padding-left: 1.5em;
 }
 .quickjumps li {
-	font-size: 80%; 
-	font-style: normal; 
-	line-height: normal; 
-	font-weight: bold; 
-	padding-bottom: 0.4em;
+    font-size: 80%;
+    font-style: normal;
+    line-height: normal;
+    font-weight: bold;
+    padding-bottom: 0.4em;
 }
 .quickjumps a, .quickjumps a:visited {
-/*	text-decoration: none; */
-	color: #024176
+/*    text-decoration: none; */
+    color: #024176
 }
 .quickjumps h2 {
-	background-color : #eef7f9;
-	text-align: center;
-	margin-bottom: 0;
-	font-size: 110%;
+    background-color : #eef7f9;
+    text-align: center;
+    margin-bottom: 0;
+    font-size: 110%;
 }
 .quickjumps p {
-	border-top: 1px dotted black;
-	margin-bottom: 0;
-	margin-top: 0.5em;
+    border-top: 1px dotted black;
+    margin-bottom: 0;
+    margin-top: 0.5em;
 }
 
 /* The .operations is for the buttons to the right of the page */
 
 .operations {
         background-color: white;
-	margin: 0;
+    margin: 0;
 }
 .operations h2 {
-	color: black;
+    color: black;
         font-weight: bold;
         background-color: transparent;
-	font-family: verdana, helvetica, sans-serif;
-	font-size: 120%;
-	padding-left: 10px;
+    font-family: verdana, helvetica, sans-serif;
+    font-size: 120%;
+    padding-left: 10px;
 }
 
 .operations ul {
-	list-style: none;
-	list-style-image: none;
-	margin: 0;
-	padding: 0;
+    list-style: none;
+    list-style-image: none;
+    margin: 0;
+    padding: 0;
 }
 
 .operations li {
-	font-size:.75em;
-	font-family: verdana, helvetica, sans-serif;
-	font-weight: bold;
-	line-height: 100%;
-	white-space: nowrap;
+    font-size:.75em;
+    font-family: verdana, helvetica, sans-serif;
+    font-weight: bold;
+    line-height: 100%;
+    white-space: nowrap;
 }
 
 .operations li a {
-	display:block;
-	font-weight: bold;
-	color: #455b6b;
-	text-decoration: none;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
-	padding: 5px 0px 0px 10px;
-	border-bottom: none;
-	width: 170px;
-	height: 22px;
+    display:block;
+    font-weight: bold;
+    color: #455b6b;
+    text-decoration: none;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    padding: 5px 0px 0px 10px;
+    border-bottom: none;
+    width: 170px;
+    height: 22px;
 }
 .operations li a:hover {
-	color: #b20d00;
-	background-color: transparent;
+    color: #b20d00;
+    background-color: transparent;
 }
 .operations li a:active {
-	color: #b20d00;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    color: #b20d00;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 
 .operations li.help a {
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 .operations li.help a:active {
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 
 /* The .operations is for the buttons to the right of the page */
 
 #operations {
-	float:right;
-	background-color: white;
-	margin: 0;
+    float:right;
+    background-color: white;
+    margin: 0;
 }
 #operations h2 {
-	color: black;
+    color: black;
         font-weight: bold;
         background-color: transparent;
-	font-family: verdana, helvetica, sans-serif;
-	font-size: 120%;
-	padding-left: 10px;
+    font-family: verdana, helvetica, sans-serif;
+    font-size: 120%;
+    padding-left: 10px;
 }
 
 #operations ul {
-	list-style: none;
-	list-style-image: none;
-	margin: 0;
-	padding: 0;
+    list-style: none;
+    list-style-image: none;
+    margin: 0;
+    padding: 0;
 }
 
 #operations li {
-	font-size:.75em;
-	font-family: verdana, helvetica, sans-serif;
-	font-weight: bold;
-	line-height: 100%;
-	white-space: nowrap;
+    font-size:.75em;
+    font-family: verdana, helvetica, sans-serif;
+    font-weight: bold;
+    line-height: 100%;
+    white-space: nowrap;
 }
 
 #operations li a {
-	display:block;
-	font-weight: bold;
-	color: #455b6b;
-	text-decoration: none;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
-	padding: 5px 0px 0px 10px;
-	border-bottom: none;
-	width: 170px;
-	height: 22px;
+    display:block;
+    font-weight: bold;
+    color: #455b6b;
+    text-decoration: none;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    padding: 5px 0px 0px 10px;
+    border-bottom: none;
+    width: 170px;
+    height: 22px;
 }
 #operations li a:hover {
-	color: #b20d00;
-	background-color: transparent;
+    color: #b20d00;
+    background-color: transparent;
 }
 #operations li a:active {
-	color: #b20d00;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    color: #b20d00;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 
 #operations li.help a {
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 #operations li.help a:active {
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/button_right.gif') no-repeat;
 }
 
 
@@ -289,82 +293,82 @@ table.formtable {
 .tip-msg, .note-msg,
 .important-msg, .caution-msg, .warning-msg,
 .error-msg {
-	padding: 0.5em 0.5em 0.5em 30px;
-	margin: 0.5em 2em;
-	font-weight: bold;
+    padding: 0.5em 0.5em 0.5em 30px;
+    margin: 0.5em 2em;
+    font-weight: bold;
 }
 .tip-msg strong, .note-msg strong,
 .important-msg strong, .caution-msg strong, .warning-msg strong {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .tip-msg p, .note-msg p,
 .important-msg p, .caution-msg p, .warning-msg p {
-	font-weight: normal;
-	margin: 0.2em 0;
-	padding: 0.6em 2px 2px 0px;
+    font-weight: normal;
+    margin: 0.2em 0;
+    padding: 0.6em 2px 2px 0px;
 }
 
 #workarea .tip-msg ul, #workarea .note-msg ul,
 #workarea .important-msg ul, #workarea .caution-msg ul, #workarea .warning-msg ul {
-	font-weight: normal;
-	margin: 0.2em 0;
-	padding: 0.6em 2px 2px 0px;
-	list-style-type: none;
-	list-style-image: none;
+    font-weight: normal;
+    margin: 0.2em 0;
+    padding: 0.6em 2px 2px 0px;
+    list-style-type: none;
+    list-style-image: none;
 }
 
 .system-msg {
-	border: 2px dashed black;
-	padding: 0.5em;
-	margin: 0.5em 2em;
-	font-weight: bold;
+    border: 2px dashed black;
+    padding: 0.5em;
+    margin: 0.5em 2em;
+    font-weight: bold;
 }
 #workarea .system-msg ul {
-	list-style-type: none;
-	list-style-image: none;
-	padding: 0;
-	margin: 0;
+    list-style-type: none;
+    list-style-image: none;
+    padding: 0;
+    margin: 0;
 }
 
 .tip-msg {
-	border: 1px dotted #6c8ec0;
-	color: #315076;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/tip_ea.gif') 3px 3px no-repeat;
+    border: 1px dotted #6c8ec0;
+    color: #315076;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/tip_ea.gif') 3px 3px no-repeat;
 }
 
 .note-msg {
-	border: 1px dashed black;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/note_ea.gif') 3px 3px no-repeat;
+    border: 1px dashed black;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/note_ea.gif') 3px 3px no-repeat;
 }
 
 .important-msg {
-	border: 1px solid #aaaaaa;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/important_ea.gif') 3px 3px no-repeat;
+    border: 1px solid #aaaaaa;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/important_ea.gif') 3px 3px no-repeat;
 }
 
 .caution-msg {
-	border: 1px dashed black;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/caution_ea.gif') 3px 3px no-repeat;
+    border: 1px dashed black;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/caution_ea.gif') 3px 3px no-repeat;
 }
 
 .warning-msg {
-	border: 1px dashed red;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/warning_ea.gif') 3px 3px no-repeat;
+    border: 1px dashed red;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/warning_ea.gif') 3px 3px no-repeat;
 }
 
 .error-msg {
-	border: 2px dashed red;
-	background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/error.gif') 5px 5px no-repeat;
-	color: #800000;
-	font-size: 110%;
-	font-weight: bold;
+    border: 2px dashed red;
+    background: url('http://www.eionet.europa.eu/styles/eionet2007/admonitions/error.gif') 5px 5px no-repeat;
+    color: #800000;
+    font-size: 110%;
+    font-weight: bold;
 }
 
 .advice-msg, .advise-msg {
-	padding: 0.2em;
-	border: 1px solid #aaa;;
-	background-color: #f7f7f7;
+    padding: 0.2em;
+    border: 1px solid #aaa;;
+    background-color: #f7f7f7;
 }
 
 
@@ -425,7 +429,7 @@ th.order2 a {
 }
 
 .exactMatch {
-	background-color: #D9EDF2;
+    background-color: #D9EDF2;
 }
 
 div.errorHeader {
