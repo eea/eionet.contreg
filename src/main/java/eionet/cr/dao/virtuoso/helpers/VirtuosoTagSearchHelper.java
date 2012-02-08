@@ -95,7 +95,7 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
      */
     public String getWhereContents() {
         String tagPredicate = "tagPredicate";
-        bindings.setString(tagPredicate, Predicates.CR_TAG);
+        bindings.setURI(tagPredicate, Predicates.CR_TAG);
 
         StringBuilder sb = new StringBuilder();
 
@@ -105,7 +105,7 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
 
             sb.append("?s ");
             sb.append("?" + tagPredicate);
-            sb.append("?" + tagLiteral + " .");
+            sb.append(" ?" + tagLiteral + " .");
         }
         return sb.toString();
     }

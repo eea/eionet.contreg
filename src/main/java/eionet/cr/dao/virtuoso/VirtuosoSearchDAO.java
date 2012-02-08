@@ -448,36 +448,15 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         Map<String, String> filters = buildTagsInputParameter(tags);
 
-        // TODO - remove this "hack" if Virtuoso potential bug issue gets clear:
-        // currently Virtuoso inferencing does not work if multiple parameters
-        // find manually all subProperties of cr#tag and add to filter
-
-        List<String> selectedAndTagPredicates = new ArrayList<String>(selectedPredicates);
-
-        Bindings bindings = new Bindings();
-        bindings.setURI("subPropertyOf", Predicates.RDFS_SUBPROPERTY_OF);
-        bindings.setURI("crTagPredicate", Predicates.CR_TAG);
-        SingleObjectReader<String> reader = new SingleObjectReader<String>();
-
-        executeSPARQL(CRTAG_SUBPROPS_SPARQL, bindings, reader);
-        selectedAndTagPredicates.addAll(reader.getResultList());
-        // <--
-
-        // TODO - remove copypaste and replace with searchByFilters() when Virtuosos potential bug issue is solved:
-        // return searchByFilters(filters, null, pagingRequest, sortingRequest, selectedAndTagPredicates);
-
         // create query helper
-        VirtuosoTagSearchHelper helper = new VirtuosoTagSearchHelper(filters, null, pagingRequest, sortingRequest, true);
+        VirtuosoTagSearchHelper helper = new VirtuosoTagSearchHelper(filters, null, pagingRequest, sortingRequest, false);
         helper.setTags(tags);
 
-        // create the list of IN parameters of the query
-        ArrayList<Object> inParams = new ArrayList<Object>();
-
         // let the helper create the query and fill IN parameters
-        String query = helper.getQuery(inParams);
+        String query = helper.getQuery(new ArrayList<Object>());
 
         long startTime = System.currentTimeMillis();
-        logger.trace("Search by filters, executing subject finder query: " + query);
+        logger.debug("Search by filters, executing subject finder query: " + query);
 
         // execute the query, with the IN parameters
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), new SingleObjectReader<String>());
@@ -492,13 +471,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = new String[] {};
-
-            if (selectedAndTagPredicates != null && selectedAndTagPredicates.size() > 0) {
-                neededPredicates = selectedAndTagPredicates.toArray(neededPredicates);
-            }
-            // get the data of all found subjects
-            logger.trace("Search by tags, getting the data of the found subjects");
+            String[] neededPredicates = new String[] {Predicates.CR_TAG};
 
             SubjectDataReader subjectDataReader = new SubjectDataReader(subjectUris);
             resultList = getSubjectsData(subjectUris, neededPredicates, subjectDataReader, false);
