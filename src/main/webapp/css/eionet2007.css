@@ -1,7 +1,8 @@
-/* SPARQL endpoint. */
-span.shaddowHover:hover {
-    background-color: #FFFFFF;
-}
+/*
+  This file is to support templates that DON'T load the Eionet central stylesheet.
+
+  If you edit here, you are probably doing it at the WRONG location.
+*/
 
 /* Folder items icons. */
 td.file {

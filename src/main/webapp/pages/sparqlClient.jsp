@@ -375,16 +375,16 @@ while (l--) {
                         <div>
                             <h2>Useful namespaces</h2>
                             <pre>
-<span id="prefix1" class="shaddowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
-<span id="prefix2" class="shaddowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span>
-<span id="prefix3" class="shaddowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span>
-<span id="prefix4" class="shaddowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span>
-<span id="prefix5" class="shaddowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span>
-<span id="prefix6" class="shaddowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span>
-<span id="prefix7" class="shaddowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
-<span id="prefix8" class="shaddowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span>
-<span id="prefix9" class="shaddowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span>
-<span id="prefix10" class="shaddowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span>
+<span id="prefix1" class="shadowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
+<span id="prefix2" class="shadowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span>
+<span id="prefix3" class="shadowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span>
+<span id="prefix4" class="shadowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span>
+<span id="prefix5" class="shadowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span>
+<span id="prefix6" class="shadowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span>
+<span id="prefix7" class="shadowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
+<span id="prefix8" class="shadowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span>
+<span id="prefix9" class="shadowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span>
+<span id="prefix10" class="shadowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span>
                             </pre>
                         </div>
                     </c:if>

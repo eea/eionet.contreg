@@ -1,6 +1,7 @@
 /* SPARQL endpoint. */
-span.shaddowHover:hover {
+span.shadowHover:hover {
     background-color: #FFFFFF;
+    cursor: pointer;
 }
 
 /* Tabbed menus - as used on the front page */
