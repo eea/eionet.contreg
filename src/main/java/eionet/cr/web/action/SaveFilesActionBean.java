@@ -66,8 +66,12 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     private boolean overwrite;
     private String dataset;
 
+    /** Search criteria to be stored for compiled dataset. */
+    private String searchCriteria;
+
     @DefaultHandler
     public Resolution getFiles() throws DAOException {
+        logger.debug("Criteria: " + searchCriteria);
         if (getUser() == null) {
             addWarningMessage("You are not logged in!");
         } else if (getUser() != null && !getUser().hasPermission("/mergedeliveries", "v")) {
@@ -141,7 +145,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
                 }
 
                 CreateDataset cd = new CreateDataset(Predicates.CR_COMPILED_DATASET, getUser());
-                cd.create(datasetTitle, dataset, folder, selectedFiles, overwrite);
+                cd.create(datasetTitle, dataset, folder, selectedFiles, overwrite, searchCriteria);
 
             } catch (Exception e) {
                 throw new DAOException(e.getMessage(), e);
@@ -317,6 +321,21 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
     public void setNewestExistingDatasets(List<DatasetDTO> newestExistingDatasets) {
         this.newestExistingDatasets = newestExistingDatasets;
+    }
+
+    /**
+     * @return the searchCriteria
+     */
+    public String getSearchCriteria() {
+        return searchCriteria;
+    }
+
+    /**
+     * @param searchCriteria
+     *            the searchCriteria to set
+     */
+    public void setSearchCriteria(String searchCriteria) {
+        this.searchCriteria = searchCriteria;
     }
 
 }

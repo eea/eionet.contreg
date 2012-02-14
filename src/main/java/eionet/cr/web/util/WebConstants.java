@@ -52,4 +52,13 @@ public interface WebConstants {
 
     /** Specifies after login event name. */
     String AFTER_LOGIN_EVENT = "afterLogin";
+
+    /** Delivery filter parameter separator. */
+    String FILTER_SEPARATOR = "||";
+
+    /** Delivery filter parameter's label separator. */
+    String FILTER_LABEL_SEPARATOR = "|";
+
+    /** Not available. */
+    String NOT_AVAILABLE = "N/A";
 }

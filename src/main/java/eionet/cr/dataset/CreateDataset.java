@@ -46,7 +46,7 @@ public class CreateDataset {
         this.user = user;
     }
 
-    public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite)
+    public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite, String searchCriteria)
     throws Exception {
 
         Connection sqlConn = null;
@@ -67,7 +67,7 @@ public class CreateDataset {
             addSource(repoConn, sqlConn, dataset);
 
             // Add metadata
-            addMetadata(repoConn, label, dataset, folder, selectedFiles);
+            addMetadata(repoConn, label, dataset, folder, selectedFiles, searchCriteria);
 
             // Raise the flag that dataset is being compiled
             CurrentLoadedDatasets.addLoadedDataset(dataset, user.getUserName());
@@ -103,7 +103,7 @@ public class CreateDataset {
         }
     }
 
-    private void addMetadata(RepositoryConnection conn, String label, String dataset, String folder, List<String> selectedFiles)
+    private void addMetadata(RepositoryConnection conn, String label, String dataset, String folder, List<String> selectedFiles, String searchCriteria)
     throws DAOException, RepositoryException {
 
         if (!StringUtils.isBlank(folder)) {
@@ -116,6 +116,15 @@ public class CreateDataset {
         }
 
         if (type != null && type.equals(Predicates.CR_COMPILED_DATASET)) {
+            if (StringUtils.isNotEmpty(searchCriteria)) {
+                // store rdf:searchCriteria predicate
+                ObjectDTO criteriaObjectDTO = new ObjectDTO(searchCriteria, true);
+                criteriaObjectDTO.setSourceUri(user.getHomeUri());
+                SubjectDTO criteriaSubjectDTO = new SubjectDTO(dataset, false);
+                criteriaSubjectDTO.addObject(Predicates.CR_SEARCH_CRITERIA, criteriaObjectDTO);
+                DAOFactory.get().getDao(HelperDAO.class).addTriples(conn, criteriaSubjectDTO);
+            }
+
             if (!StringUtils.isBlank(folder)) {
                 // store rdf:type predicate
                 ObjectDTO typeObjectDTO = new ObjectDTO(Predicates.CR_COMPILED_DATASET, false);

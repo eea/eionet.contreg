@@ -96,10 +96,11 @@
                     </div>
                 </crfn:form>
                 <br/>
-                <c:if test="${(not empty param.search) || (not empty param.filterId)}">
+                <c:if test="${(not empty param.search) || (not empty param.filterId) || (not empty param.datasetFilter)}">
                     <c:choose>
                         <c:when test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
                             <crfn:form action="/saveFiles.action" method="post" id="deliveriesForm">
+                                <stripes:hidden name="searchCriteria" value="${deliverySearchActionBean.searchCriteria}" />
                                 <div id="deliveryList">
                                 <display:table name="${actionBean.deliveries}" class="sortable" sort="external" id="listItem"
                                             htmlId="resourcesResultList" requestURI="/deliverySearch.action"

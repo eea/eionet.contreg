@@ -57,6 +57,7 @@
                     </p>
 
                     <stripes:form action="/saveFiles.action" method="post" id="deliveryFilesForm">
+                        <stripes:hidden name="searchCriteria" />
                         <div id="filesList">
                         <table border="0" width="100%" class="datatable">
                             <c:forEach items="${actionBean.deliveryFiles}" var="delivery" varStatus="cnt">

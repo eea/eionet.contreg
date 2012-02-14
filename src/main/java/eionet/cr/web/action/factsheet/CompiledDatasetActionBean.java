@@ -23,8 +23,11 @@ package eionet.cr.web.action.factsheet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -51,11 +54,13 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dataset.CurrentLoadedDatasets;
 import eionet.cr.dataset.LoadTriplesJob;
 import eionet.cr.dataset.LoadTriplesJobListener;
+import eionet.cr.dto.DeliveryFilterDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.util.WebConstants;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
@@ -88,6 +93,9 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     /** */
     private Boolean isUserDataset = null;
 
+    /** Dataset's delivery filters. */
+    private List<DeliveryFilterDTO> filters = new ArrayList<DeliveryFilterDTO>();
+
     /**
      * Action event for displaying dataset sources.
      *
@@ -100,15 +108,64 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
         if (StringUtils.isEmpty(uri)) {
             addCautionMessage("No request criteria specified!");
         } else {
+            Map<String, Integer> predicatePageNumbers = new HashMap<String, Integer>();
+            predicatePageNumbers.put(Predicates.CR_SEARCH_CRITERIA, 1);
+
             HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-            SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
+            SubjectDTO subject = helperDAO.getFactsheet(uri, null, predicatePageNumbers);
             sources = factory.getDao(CompiledDatasetDAO.class).getDetailedDatasetFiles(uri);
 
             FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.COMPILED_DATASET);
+
+            extractFilters(subject);
         }
 
         return new ForwardResolution(COMPILED_DATASET_JSP);
+    }
+
+    /**
+     * Populates the filters property from the dataset data.
+     *
+     * @param dataset
+     */
+    private void extractFilters(SubjectDTO dataset) {
+        Collection<ObjectDTO> filterObjects = dataset.getObjects(Predicates.CR_SEARCH_CRITERIA);
+        for (ObjectDTO o : filterObjects) {
+            DeliveryFilterDTO filter = new DeliveryFilterDTO();
+            String value = o.getDisplayValue();
+            String[] arr = StringUtils.splitByWholeSeparator(value, WebConstants.FILTER_SEPARATOR);
+            if (!WebConstants.NOT_AVAILABLE.equals(arr[0])) {
+                // Obligation value
+                String[] data = getValueAndLabel(arr[0]);
+                filter.setObligation(data[0]);
+                filter.setObligationLabel(data[1]);
+            }
+            if (!WebConstants.NOT_AVAILABLE.equals(arr[1])) {
+                // Locality value
+                String[] data = getValueAndLabel(arr[1]);
+                filter.setLocality(data[0]);
+                filter.setLocalityLabel(data[1]);
+            }
+            if (!WebConstants.NOT_AVAILABLE.equals(arr[2])) {
+                // Year value
+                filter.setYear(arr[2]);
+            }
+            filters.add(filter);
+        }
+    }
+
+    /**
+     * Gets the value and label from the data.
+     *
+     * @param data
+     * @return Array, where element 0 is value and 1 is label.
+     */
+    private String[] getValueAndLabel(String data) {
+        String[] result = new String[2];
+        result[0] = StringUtils.substringBeforeLast(data, WebConstants.FILTER_LABEL_SEPARATOR);
+        result[1] = StringUtils.substringAfterLast(data, WebConstants.FILTER_LABEL_SEPARATOR);
+        return result;
     }
 
     /**
@@ -144,10 +201,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
             // Update source last modified date
             DAOFactory
-            .get()
-            .getDao(HarvestSourceDAO.class)
-            .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                    ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                            ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
             success = true;
         } catch (Exception e) {
@@ -220,10 +277,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
         // Update source last modified date
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
         // Update HARVESTED STATEMENTS
         DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(uri);
@@ -283,7 +340,8 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -304,10 +362,18 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedFiles the selectedFiles to set
+     * @param selectedFiles
+     *            the selectedFiles to set
      */
     public void setSelectedFiles(List<String> selectedFiles) {
         this.selectedFiles = selectedFiles;
+    }
+
+    /**
+     * @return the filters
+     */
+    public List<DeliveryFilterDTO> getFilters() {
+        return filters;
     }
 
 }

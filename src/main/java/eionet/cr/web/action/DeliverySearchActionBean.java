@@ -48,6 +48,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.CustomPaginatedList;
+import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -65,11 +66,17 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     private String locality;
     private String year;
 
+    /** Search criteria to be stored for compiled dataset. */
+    private String searchCriteria;
+
     /** Store delivery filters. */
     private List<DeliveryFilterDTO> deliveryFilters = new ArrayList<DeliveryFilterDTO>();
 
     /** Selected filter id. */
     private Long filterId;
+
+    /** True, when dataset filter search is executed. */
+    private Boolean datasetFilter;
 
     private CustomPaginatedList<DeliveryDTO> deliveries;
 
@@ -90,6 +97,31 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
         if (isUserLoggedIn()) {
             deliveryFilters = DAOFactory.get().getDao(DeliveryFilterDAO.class).getDeliveryFilters(getUserName());
         }
+
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.isNotEmpty(obligation)) {
+            sb.append(obligation);
+            sb.append(WebConstants.FILTER_LABEL_SEPARATOR);
+            sb.append(getObligationLabel(obligation));
+        } else {
+            sb.append(WebConstants.NOT_AVAILABLE);
+        }
+        sb.append(WebConstants.FILTER_SEPARATOR);
+        if (StringUtils.isNotEmpty(locality)) {
+            sb.append(locality);
+            sb.append(WebConstants.FILTER_LABEL_SEPARATOR);
+            sb.append(getLocalityLabel(locality));
+        } else {
+            sb.append(WebConstants.NOT_AVAILABLE);
+        }
+        sb.append(WebConstants.FILTER_SEPARATOR);
+        if (StringUtils.isNotEmpty(year)) {
+            sb.append(year);
+        } else {
+            sb.append(WebConstants.NOT_AVAILABLE);
+        }
+        searchCriteria = sb.toString();
+
         return new ForwardResolution("/pages/deliverySearch.jsp");
     }
 
@@ -116,28 +148,12 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
             deliveryFilter.setUsername(getUserName());
 
             if (StringUtils.isNotEmpty(obligation)) {
-                String obligationLabel = null;
-
-                for (List<UriLabelPair> group : getInstrumentsObligations().values()) {
-                    for (UriLabelPair pair : group) {
-                        if (pair.getUri().equals(obligation)) {
-                            obligationLabel = pair.getLabel();
-                            break;
-                        }
-                    }
-                }
+                String obligationLabel = getObligationLabel(obligation);
                 deliveryFilter.setObligationLabel(obligationLabel);
             }
 
             if (StringUtils.isNotEmpty(locality)) {
-                String localityLabel = null;
-
-                for (ObjectLabelPair pair : getLocalities()) {
-                    if (pair.getLeft().equals(locality)) {
-                        localityLabel = pair.getRight();
-                        break;
-                    }
-                }
+                String localityLabel = getLocalityLabel(locality);
                 deliveryFilter.setLocalityLabel(localityLabel);
             }
 
@@ -148,7 +164,39 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * Action for searching deliveries using a stored filter.
+     * Returns label from the pair collection.
+     *
+     * @param obligationValue
+     * @return
+     */
+    private String getObligationLabel(String obligationValue) {
+        for (List<UriLabelPair> group : getInstrumentsObligations().values()) {
+            for (UriLabelPair pair : group) {
+                if (pair.getUri().equals(obligationValue)) {
+                    return pair.getLabel();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns label from the pair collection.
+     *
+     * @param localityValue
+     * @return
+     */
+    private String getLocalityLabel(String localityValue) {
+        for (ObjectLabelPair pair : getLocalities()) {
+            if (pair.getLeft().equals(localityValue)) {
+                return pair.getRight();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Action for searching deliveries using a user's stored filter.
      *
      * @return
      * @throws DAOException
@@ -167,6 +215,23 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
                                 new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
 
+        return init();
+    }
+
+    /**
+     * Action for searching deliveries from a compiled dataset's stored filter.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution datasetFilterSearch() throws DAOException {
+        deliveries =
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
+                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+        logger.debug("found deliveries: " + deliveries.getFullListSize() + "; " + datasetFilter);
         return init();
     }
 
@@ -269,6 +334,36 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
      */
     public void setFilterId(Long filterId) {
         this.filterId = filterId;
+    }
+
+    /**
+     * @return the searchCriteria
+     */
+    public String getSearchCriteria() {
+        return searchCriteria;
+    }
+
+    /**
+     * @param searchCriteria
+     *            the searchCriteria to set
+     */
+    public void setSearchCriteria(String searchCriteria) {
+        this.searchCriteria = searchCriteria;
+    }
+
+    /**
+     * @return the datasetFilter
+     */
+    public Boolean getDatasetFilter() {
+        return datasetFilter;
+    }
+
+    /**
+     * @param datasetFilter
+     *            the datasetFilter to set
+     */
+    public void setDatasetFilter(Boolean datasetFilter) {
+        this.datasetFilter = datasetFilter;
     }
 
 }

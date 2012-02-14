@@ -101,6 +101,7 @@ public interface Predicates {
     String CR_HARVESTED_STATEMENTS = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#harvestedStatements";
     String CR_COMPILED_DATASET = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#CompiledDataset";
     String CR_GENERATED_FROM = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#generatedFrom";
+    String CR_SEARCH_CRITERIA = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#searchCriteria";
 
     String CR_OBJECTS_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#objectsType";
     String CR_OBJECTS_LABEL_COLUMN = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#objectsLabelColumn";

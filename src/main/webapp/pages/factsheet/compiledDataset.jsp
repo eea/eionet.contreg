@@ -4,6 +4,36 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
 
+    <stripes:layout-component name="head">
+        <script type="text/javascript">
+        // <![CDATA[
+            ( function($) {
+                $(document).ready(function(){
+
+                    // Open dialog
+                    $("#filtersLink").click(function() {
+                        $('#filtersDialog').dialog('open');
+                        return false;
+                    });
+
+                    // Dialog setup
+                    $('#filtersDialog').dialog({
+                        autoOpen: false,
+                        width: 500
+                    });
+
+                    // Close dialog
+                    $("#closeFiltersDialog").click(function() {
+                        $('#filtersDialog').dialog("close");
+                        return false;
+                    });
+                });
+
+             } ) ( jQuery );
+             // ]]>
+         </script>
+     </stripes:layout-component>
+
     <stripes:layout-component name="contents">
 
         <cr:tabMenu tabs="${actionBean.tabs}" />
@@ -24,6 +54,11 @@
                             </stripes:link>
                         </li>
                     </c:if>
+                    <li>
+                        <stripes:link class="link-plain" href="#" id="filtersLink">
+                            Find more deliveries
+                        </stripes:link>
+                    </li>
                     <li>
                         <stripes:link class="link-plain" href="/sparql">
                             <stripes:param name="default-graph-uri" value="${actionBean.uri}" />
@@ -67,6 +102,23 @@
             </div>
         </c:if>
         </crfn:form>
+
+        <div id="filtersDialog" title="Latest search filters">
+            <ul>
+            <c:forEach var="filter" items="${actionBean.filters}">
+                <li>
+                    <stripes:link href="/deliverySearch.action" event="datasetFilterSearch">
+                        <stripes:param name="obligation" value="${filter.obligation}" />
+                        <stripes:param name="locality" value="${filter.locality}" />
+                        <stripes:param name="year" value="${filter.year}" />
+                        <stripes:param name="datasetFilter" value="true" />
+                        <c:out value="${filter.label}" />
+                    </stripes:link>
+                </li>
+            </c:forEach>
+            </ul>
+            <button id="closeFiltersDialog">Cancel</button>
+        </div>
 
     </stripes:layout-component>
 
