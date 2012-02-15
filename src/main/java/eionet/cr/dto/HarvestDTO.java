@@ -20,7 +20,11 @@
  */
 package eionet.cr.dto;
 
+import java.util.Date;
+
 import org.apache.commons.lang.time.DurationFormatUtils;
+
+import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -48,6 +52,13 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     }
 
     public String getDurationString() {
+        if (datetimeStarted == null) {
+            return WebConstants.NOT_AVAILABLE;
+        }
+        if (datetimeFinished == null) {
+            Date now = new Date();
+            return DurationFormatUtils.formatDuration(now.getTime() - datetimeStarted.getTime(), "HH:mm:ss");
+        }
         return DurationFormatUtils.formatDuration(datetimeFinished.getTime() - datetimeStarted.getTime(), "HH:mm:ss");
     }
 
