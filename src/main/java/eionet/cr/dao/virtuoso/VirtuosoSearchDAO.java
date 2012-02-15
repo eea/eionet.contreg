@@ -471,7 +471,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
             // only these predicates will be queried for
-            String[] neededPredicates = new String[] {Predicates.CR_TAG};
+            String[] neededPredicates = new String[] {Predicates.CR_TAG, Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
 
             SubjectDataReader subjectDataReader = new SubjectDataReader(subjectUris);
             resultList = getSubjectsData(subjectUris, neededPredicates, subjectDataReader, false);
