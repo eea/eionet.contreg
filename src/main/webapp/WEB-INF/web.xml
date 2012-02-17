@@ -188,16 +188,20 @@
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/sitemap.xml</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/void.rdf</url-pattern>
+    </servlet-mapping>
 
     <servlet>
-		<servlet-name>rpcrouter</servlet-name>
-		<servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
-	</servlet>
+        <servlet-name>rpcrouter</servlet-name>
+        <servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
+    </servlet>
 
-	<servlet-mapping>
-		<servlet-name>rpcrouter</servlet-name>
-		<url-pattern>/rpcrouter</url-pattern>
-	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rpcrouter</servlet-name>
+        <url-pattern>/rpcrouter</url-pattern>
+    </servlet-mapping>
 
     <!--  AMP feed servlet -->
 

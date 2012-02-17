@@ -131,6 +131,9 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
      */
     private void extractFilters(SubjectDTO dataset) {
         Collection<ObjectDTO> filterObjects = dataset.getObjects(Predicates.CR_SEARCH_CRITERIA);
+        if (filterObjects == null) {
+            return;
+        }
         for (ObjectDTO o : filterObjects) {
             DeliveryFilterDTO filter = new DeliveryFilterDTO();
             String value = o.getDisplayValue();
