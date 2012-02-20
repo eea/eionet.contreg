@@ -101,7 +101,9 @@ public class ReviewsActionBean extends AbstractActionBean {
                 review.setReviewContentType("text/plain");
 
                 // Check if review is obsolete
-                obsolete = DAOFactory.get().getDao(ReviewsDAO.class).isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
+                obsolete =
+                        DAOFactory.get().getDao(ReviewsDAO.class)
+                                .isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
 
                 // Load review content from file.
                 try {
@@ -116,8 +118,8 @@ public class ReviewsActionBean extends AbstractActionBean {
                 }
 
                 // Load attachments list only when it is needed - viewing a review.
-                review.setAttachments(DAOFactory.get().getDao(ReviewsDAO.class).getReviewAttachmentList(
-                        new CRUser(getAttemptedUserName()), reviewId));
+                review.setAttachments(DAOFactory.get().getDao(ReviewsDAO.class)
+                        .getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
             }
         } catch (DAOException ex) {
             logger.error("Error when getting review", ex);
@@ -231,8 +233,8 @@ public class ReviewsActionBean extends AbstractActionBean {
                     DAOFactory.get().getDao(ReviewsDAO.class).deleteReview(getUser(), reviewId, true);
 
                     // Delete review folder and files
-                    FileStore.getInstance(getUserName()).delete("reviews/review"+reviewId);
-                    FileStore.getInstance(getUserName()).deleteFolder("reviews/"+reviewId, true);
+                    FileStore.getInstance(getUserName()).delete("reviews/review" + reviewId);
+                    FileStore.getInstance(getUserName()).deleteFolder("reviews/" + reviewId, true);
 
                     // Delete review harvest source
                     List<String> reviewUris = new ArrayList<String>();
@@ -290,7 +292,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
                     // (but set interval minutes to 0, to avoid it being background-harvested)
                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+                            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
                     // finally, attempt to harvest the uploaded file's contents
                     harvestUploadedFile(attachmentUri, attachment, null, getUserName());
@@ -396,6 +398,7 @@ public class ReviewsActionBean extends AbstractActionBean {
 
     /**
      * Extracts username from review uri
+     *
      * @return username
      */
     public String getAttemptedUserName() {
@@ -415,7 +418,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
-            .replace("\n", "<br/>");
+                    .replace("\n", "<br/>");
         } else {
             return "";
         }

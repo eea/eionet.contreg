@@ -334,10 +334,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -591,8 +591,8 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isCurrentlyHarvested() {
 
-        return uri == null ? false
-                : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentLoadedDatasets.contains(uri));
+        return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentLoadedDatasets
+                .contains(uri));
     }
 
     /**
@@ -715,9 +715,9 @@ public class FactsheetActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public boolean getSubjectIsType(){
+    public boolean getSubjectIsType() {
 
-        if (subjectIsType==null){
+        if (subjectIsType == null) {
 
             List<String> typeUris = ApplicationCache.getTypeUris();
             subjectIsType = Boolean.valueOf(typeUris.contains(this.uri));
@@ -735,31 +735,33 @@ public class FactsheetActionBean extends AbstractActionBean {
 
         logger.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
         String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
-        if (StringUtils.isBlank(value)){
+        if (StringUtils.isBlank(value)) {
             value = "Found no value!";
-        }
-        else{
+        } else {
             value = StringEscapeUtils.escapeXml(value);
         }
         return new StreamingResolution("text/html", value);
     }
 
     /**
-     * @param predicateUri the predicateUri to set
+     * @param predicateUri
+     *            the predicateUri to set
      */
     public void setPredicateUri(String predicateUri) {
         this.predicateUri = predicateUri;
     }
 
     /**
-     * @param objectMD5 the objectMD5 to set
+     * @param objectMD5
+     *            the objectMD5 to set
      */
     public void setObjectMD5(String objectMD5) {
         this.objectMD5 = objectMD5;
     }
 
     /**
-     * @param graphUri the graphUri to set
+     * @param graphUri
+     *            the graphUri to set
      */
     public void setGraphUri(String graphUri) {
         this.graphUri = graphUri;

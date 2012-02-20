@@ -41,15 +41,15 @@ import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
 /**
- * A bean that checks if the subject by the given URI has a type-specific factsheet tab,
- * and if it has indeed, then redirects to that tab. Otherwise redirects simply to {@link FactsheetActionBean}.
+ * A bean that checks if the subject by the given URI has a type-specific factsheet tab, and if it has indeed, then redirects to
+ * that tab. Otherwise redirects simply to {@link FactsheetActionBean}.
  *
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/view.action")
-public class ViewActionBean extends AbstractActionBean{
+public class ViewActionBean extends AbstractActionBean {
 
-    /** */
+    /** Uri. */
     private String uri;
 
     /**
@@ -58,31 +58,31 @@ public class ViewActionBean extends AbstractActionBean{
      * @throws DAOException
      */
     @DefaultHandler
-    public Resolution defaultHandler() throws DAOException{
+    public Resolution defaultHandler() throws DAOException {
 
         RedirectResolution resolution = null;
 
         SubjectDTO subject = StringUtils.isBlank(uri) ? null : DAOFactory.get().getDao(HelperDAO.class).getSubject(uri);
-        if (subject!=null){
+        if (subject != null) {
 
             FactsheetTabMenuHelper tabsHelper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             List<TabElement> typeSpecificTabs = tabsHelper.getTypeSpecificTabs();
-            if (typeSpecificTabs!=null && !typeSpecificTabs.isEmpty()){
+            if (typeSpecificTabs != null && !typeSpecificTabs.isEmpty()) {
 
                 TabElement firstTab = typeSpecificTabs.get(0);
                 String redirectLocation = firstTab.getHref();
-                if (!StringUtils.isBlank(redirectLocation)){
+                if (!StringUtils.isBlank(redirectLocation)) {
 
                     resolution = new RedirectResolution(redirectLocation);
 
                     String event = firstTab.getEvent();
-                    if (!StringUtils.isBlank(event)){
+                    if (!StringUtils.isBlank(event)) {
                         resolution.addParameter(event, "");
                     }
 
                     Map<String, Object> params = firstTab.getParams();
-                    if (params!=null && !params.isEmpty()){
-                        for (Map.Entry<String, Object> param : params.entrySet()){
+                    if (params != null && !params.isEmpty()) {
+                        for (Map.Entry<String, Object> param : params.entrySet()) {
                             resolution.addParameter(param.getKey(), param.getValue());
                         }
                     }
@@ -90,9 +90,9 @@ public class ViewActionBean extends AbstractActionBean{
             }
         }
 
-        if (resolution==null){
+        if (resolution == null) {
             resolution = new RedirectResolution(FactsheetActionBean.class);
-            resolution.addParameter("uri", uri==null ? "" : uri);
+            resolution.addParameter("uri", uri == null ? "" : uri);
         }
 
         return resolution;
@@ -106,7 +106,8 @@ public class ViewActionBean extends AbstractActionBean{
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

@@ -71,14 +71,14 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution list() throws DAOException {
 
-        if (targetType != null){
+        if (targetType != null) {
             targets = DAOFactory.get().getDao(PostHarvestScriptDAO.class).listTargets(targetType);
-            if (targetUrl!=null && !targetsContain(targetUrl)){
+            if (targetUrl != null && !targetsContain(targetUrl)) {
                 targets.add(0, new Pair<String, Integer>(targetUrl, Integer.valueOf(0)));
             }
         }
 
-        if ((targetType==null && StringUtils.isBlank(targetUrl)) || (targetType!=null && !StringUtils.isBlank(targetUrl))){
+        if ((targetType == null && StringUtils.isBlank(targetUrl)) || (targetType != null && !StringUtils.isBlank(targetUrl))) {
             scripts = DAOFactory.get().getDao(PostHarvestScriptDAO.class).list(targetType, targetUrl);
         }
 
@@ -192,7 +192,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      */
     public List<Tab> getTabs() {
 
-        if (tabs==null){
+        if (tabs == null) {
             tabs = Tabs.generate(targetType);
         }
         return tabs;
@@ -225,7 +225,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public String getPageToRender(){
+    public String getPageToRender() {
 
         return SCRIPTS_JSP;
     }
@@ -235,11 +235,11 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * @param url
      * @return
      */
-    private boolean targetsContain(String url){
+    private boolean targetsContain(String url) {
 
-        if (targets!=null && !targets.isEmpty()){
-            for (Pair<String, Integer> pair : targets){
-                if (url.equals(pair.getLeft())){
+        if (targets != null && !targets.isEmpty()) {
+            for (Pair<String, Integer> pair : targets) {
+                if (url.equals(pair.getLeft())) {
                     return true;
                 }
             }

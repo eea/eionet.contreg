@@ -59,9 +59,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** */
     private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n"
-        + "    INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " { ?s cr:tag `bif:lower(?o)` }\n"
-        + "    FROM ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + "\n"
-        + "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
+            + "    INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " { ?s cr:tag `bif:lower(?o)` }\n"
+            + "    FROM ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + "\n"
+            + "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
 
     /** */
     private int id;
@@ -160,8 +160,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
         try {
             testResults =
-                DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -293,7 +293,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(int id) {
         this.id = id;
@@ -307,7 +308,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param title the title to set
+     * @param title
+     *            the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -321,7 +323,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param script the script to set
+     * @param script
+     *            the script to set
      */
     public void setScript(String script) {
         this.script = script;
@@ -335,7 +338,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl the targetUrl to set
+     * @param targetUrl
+     *            the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -349,7 +353,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType the targetType to set
+     * @param targetType
+     *            the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -363,7 +368,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param testSourceUrl the testSourceUrl to set
+     * @param testSourceUrl
+     *            the testSourceUrl to set
      */
     public void setTestSourceUrl(String testSourceUrl) {
         this.testSourceUrl = testSourceUrl;
@@ -385,7 +391,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param active the active to set
+     * @param active
+     *            the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
@@ -399,7 +406,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param ignoreMalformedSparql the ignoreMalformedSparql to set
+     * @param ignoreMalformedSparql
+     *            the ignoreMalformedSparql to set
      */
     public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
         this.ignoreMalformedSparql = ignoreMalformedSparql;
