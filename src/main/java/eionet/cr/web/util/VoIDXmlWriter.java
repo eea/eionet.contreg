@@ -29,6 +29,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dto.UploadDTO;
 
 /**
@@ -82,15 +84,21 @@ public class VoIDXmlWriter {
         for (UploadDTO upload : uploads) {
             writer.writeStartElement(VOID_NS_PREFIX, "Dataset", VOID_NS);
             writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "about", upload.getSubjectUri());
-            writer.writeStartElement(DCT_NS_PREFIX, "title", DCT_NS);
-            writer.writeCharacters(upload.getLabel());
-            writer.writeEndElement();
+            if (StringUtils.isNotEmpty(upload.getLabel())) {
+                writer.writeStartElement(DCT_NS_PREFIX, "title", DCT_NS);
+                writer.writeCharacters(upload.getLabel());
+                writer.writeEndElement();
+                writer.writeStartElement(RDFS_NS_PREFIX, "label", RDFS_NS);
+                writer.writeCharacters(upload.getLabel());
+                writer.writeEndElement();
+            }
             writer.writeStartElement(VOID_NS_PREFIX, "sparqlEndpoint", VOID_NS);
-            writer.writeCharacters(contextRoot + "/sparql?default-graph-uri=" + upload.getSubjectUri());
+            writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "resource", contextRoot + "/sparql");
             writer.writeEndElement();
-            writer.writeStartElement(VOID_NS_PREFIX, "dataDump", VOID_NS);
-            writer.writeCharacters(contextRoot + "/exportTriples.action?uri=" + upload.getSubjectUri());
-            writer.writeEndElement();
+            // writer.writeStartElement(VOID_NS_PREFIX, "dataDump", VOID_NS);
+            // writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "resource", contextRoot + "/exportTriples.action?uri=" +
+            // upload.getSubjectUri());
+            // writer.writeEndElement();
             writer.writeStartElement(DCT_NS_PREFIX, "modified", DCT_NS);
             writer.writeCharacters(upload.getDateModified());
             writer.writeEndElement();
