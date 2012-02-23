@@ -29,6 +29,7 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.DeliveryDTO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -100,7 +101,7 @@ public interface SearchDAO extends DAO {
      * @throws DAOException
      */
     Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash, PagingRequest pagingRequest, SortingRequest sortingRequest)
-    throws DAOException;
+            throws DAOException;
 
     /**
      *
@@ -142,8 +143,8 @@ public interface SearchDAO extends DAO {
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl, PagingRequest pagingRequest,
-            SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<SubjectDTO>> searchBySource(String sourceUrl, PagingRequest pagingRequest, SortingRequest sortingRequest)
+            throws DAOException;
 
     /**
      *
@@ -159,11 +160,11 @@ public interface SearchDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @param selectedPredicates
-     * @return Pair<Integer, List<SubjectDTO>>
+     * @return search result
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchByTags(List<String> tags, PagingRequest pagingRequest,
-            SortingRequest sortingRequest, List<String> selectedPredicates) throws DAOException;
+    SearchResultDTO<SubjectDTO> searchByTags(List<String> tags, PagingRequest pagingRequest, SortingRequest sortingRequest,
+            List<String> selectedPredicates) throws DAOException;
 
     /**
      *
@@ -173,8 +174,8 @@ public interface SearchDAO extends DAO {
      * @return Pair<Integer, List<SubjectDTO>>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchReferences(String subjectUri, PagingRequest pagingRequest,
-            SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<SubjectDTO>>
+            searchReferences(String subjectUri, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * Returns distinct values of all types used in triples.

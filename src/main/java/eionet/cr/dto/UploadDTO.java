@@ -31,6 +31,7 @@ public class UploadDTO {
     private String subjectUri;
     private String label;
     private String dateModified;
+    private String triples;
 
     /**
      *
@@ -80,4 +81,20 @@ public class UploadDTO {
     public void setDateModified(String dateModified) {
         this.dateModified = dateModified;
     }
+
+    /**
+     * @return the triples
+     */
+    public String getTriples() {
+        return triples;
+    }
+
+    /**
+     * @param triples
+     *            the triples to set
+     */
+    public void setTriples(String triples) {
+        this.triples = triples;
+    }
+
 }

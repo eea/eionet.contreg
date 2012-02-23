@@ -88,6 +88,7 @@ public class VoIDXmlWriter {
                 writer.writeStartElement(DCT_NS_PREFIX, "title", DCT_NS);
                 writer.writeCharacters(upload.getLabel());
                 writer.writeEndElement();
+
                 writer.writeStartElement(RDFS_NS_PREFIX, "label", RDFS_NS);
                 writer.writeCharacters(upload.getLabel());
                 writer.writeEndElement();
@@ -95,11 +96,18 @@ public class VoIDXmlWriter {
             writer.writeStartElement(VOID_NS_PREFIX, "sparqlEndpoint", VOID_NS);
             writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "resource", contextRoot + "/sparql");
             writer.writeEndElement();
-            // writer.writeStartElement(VOID_NS_PREFIX, "dataDump", VOID_NS);
-            // writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "resource", contextRoot + "/exportTriples.action?uri=" +
-            // upload.getSubjectUri());
-            // writer.writeEndElement();
+
+            writer.writeStartElement(VOID_NS_PREFIX, "dataDump", VOID_NS);
+            writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "resource",
+                    contextRoot + "/exportTriples.action?uri=" + upload.getSubjectUri());
+            writer.writeEndElement();
+
+            writer.writeStartElement(VOID_NS_PREFIX, "triples", VOID_NS);
+            writer.writeCharacters(upload.getTriples());
+            writer.writeEndElement();
+
             writer.writeStartElement(DCT_NS_PREFIX, "modified", DCT_NS);
+            writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "datatype", "http://www.w3.org/2001/XMLSchema#dateTime");
             writer.writeCharacters(upload.getDateModified());
             writer.writeEndElement();
             writer.writeEndElement();

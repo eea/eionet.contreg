@@ -222,8 +222,12 @@ public class Bindings {
     private static class BlankNode {
         /** node id. */
         String id;
-        /** initializes blank node.
-         * @param id Bode ID (with blank node prefix)
+
+        /**
+         * initializes blank node.
+         *
+         * @param id
+         *            Bode ID (with blank node prefix)
          */
         BlankNode(String id) {
             this.id = id.substring(VirtuosoBaseDAO.BNODE_URI_PREFIX.length());
@@ -235,12 +239,13 @@ public class Bindings {
     }
 
     /**
-     * Common method to set IRI that is suppposed to be URI.
-     * As IRI and URI have different standards if the URI is invalid URI the query has to use IRI() function
-     * and the parameter is given as string not URI.
+     * Common method to set IRI that is suppposed to be URI. As IRI and URI have different standards if the URI is invalid URI the
+     * query has to use IRI() function and the parameter is given as string not URI.
      *
-     * @param name Param Name
-     * @param value Param Value
+     * @param name
+     *            Param Name
+     * @param value
+     *            Param Value
      */
     public void setIRI(String name, String value) {
 
@@ -249,6 +254,15 @@ public class Bindings {
         } else {
             setString(name, value);
         }
+    }
+
+    /**
+     * Returns bindings.
+     *
+     * @return
+     */
+    public HashMap<String, Object> getBindings() {
+        return bindings;
     }
 
 }

@@ -3,7 +3,49 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Tag search">
+
+    <stripes:layout-component name="head">
+        <script type="text/javascript">
+        // <![CDATA[
+        ( function($) {
+            $(document).ready(function() {
+                // Open delete bookmarked queries dialog
+                $("#queryDialogLink").click(function() {
+                    $('#queryDialog').dialog('open');
+                    return false;
+                });
+
+                // Dialog setup
+                $('#queryDialog').dialog({
+                    autoOpen: false,
+                    width: 500
+                });
+
+                // Close dialog
+                $("#closeQueryDialog").click(function() {
+                    $('#queryDialog').dialog("close");
+                    return true;
+                });
+            });
+
+        } ) ( jQuery );
+
+        // ]]>
+        </script>
+    </stripes:layout-component>
+
     <stripes:layout-component name="contents">
+
+    <ul id="dropdown-operations">
+        <li><a href="#">Operations</a>
+            <ul>
+                <li>
+                    <a href="#" id="queryDialogLink">Search query</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
     <h1>Tag search</h1>
     <p>
         A <strong>tag</strong> is a non-hierarchical keyword or term assigned to a piece of information (such as an Internet bookmark, digital image, or computer file). This kind of metadata  helps describe an item and allows it to be found again by browsing or searching. Tags are generally chosen informally and personally by the item's creator or by its viewer.
@@ -62,5 +104,9 @@
             </div>
         </c:otherwise>
     </c:choose>
+
+    <div id="queryDialog" title="Search query">
+        <c:out value="${actionBean.queryString}" />
+    </div>
     </stripes:layout-component>
 </stripes:layout-render>

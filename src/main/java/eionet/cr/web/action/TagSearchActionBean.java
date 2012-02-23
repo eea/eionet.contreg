@@ -34,9 +34,9 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.TagDTO;
-import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -59,6 +59,8 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     private List<TagDTO> tagCloud;
     private String cloudSorted = "name";
     private String searchTag;
+    private String queryString;
+
     // selected tags
     private List<String> selectedTags;
     // columns
@@ -126,17 +128,20 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         List<String> predicates = Arrays.asList(new String[] {Predicates.RDF_TYPE, Predicates.RDFS_LABEL, Predicates.CR_TAG});
 
-        Pair<Integer, List<SubjectDTO>> customSearch =
+        SearchResultDTO<SubjectDTO> searchResult =
                 DAOFactory
                         .get()
                         .getDao(SearchDAO.class)
                         .searchByTags(selectedTags, PagingRequest.create(getPageN()),
                                 new SortingRequest(getSortP(), SortOrder.parse(getSortO())), predicates);
-        resultList = customSearch.getRight();
-        matchCount = customSearch.getLeft();
+        resultList = searchResult.getItems();
+        matchCount = searchResult.getMatchCount();
+        queryString = searchResult.getQuery();
         this.getContext().getRequest().setAttribute("searchTag", "");
 
         getSession().setAttribute(SELECTED_TAGS_CACHE, selectedTags);
+
+        logger.debug("Query: " + searchResult.getQuery());
 
         return new ForwardResolution(TAG_SEARCH_PATH).addParameter("searchTag", "");
     }
@@ -201,7 +206,14 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
-
         return columns;
     }
+
+    /**
+     * @return the queryString
+     */
+    public String getQueryString() {
+        return queryString;
+    }
+
 }

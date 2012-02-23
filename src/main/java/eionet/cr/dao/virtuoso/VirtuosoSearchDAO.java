@@ -19,6 +19,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
+import eionet.cr.dao.helpers.QueryHelper;
 import eionet.cr.dao.readers.DeliverySearchReader;
 import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.SubjectDataReader;
@@ -31,6 +32,7 @@ import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoTagSearchHelper;
 import eionet.cr.dto.DeliveryDTO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
@@ -146,7 +148,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Override
     public Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-                    throws DAOException {
+            throws DAOException {
 
         // create query helper
         Set<String> literalRangeFilters = null;
@@ -443,8 +445,10 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      *             if query fails
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
+    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
             final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
+
+        SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
         Map<String, String> filters = buildTagsInputParameter(tags);
 
@@ -460,6 +464,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // execute the query, with the IN parameters
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), new SingleObjectReader<String>());
+
+        result.setQuery(QueryHelper.getFormatedQuery(query, helper.getQueryBindings()));
 
         logger.debug("Search by tags, find subjects query time " + Util.durationSince(startTime));
 
@@ -485,8 +491,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
 
-        // the result Pair contains total number of subjects and the requested sub-list
-        return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
+        result.setItems(resultList);
+        result.setMatchCount(totalRowCount);
+        return result;
 
     }
 

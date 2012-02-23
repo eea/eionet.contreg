@@ -1000,7 +1000,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         StringBuilder sb = new StringBuilder();
         sb.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ");
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ");
-        sb.append("select ?file, ?label, ?lastModified where { ");
+        sb.append("select ?file, ?label, ?lastModified, ?statements where { ");
         sb.append("?s cr:hasFile ?file . ");
         sb.append("OPTIONAL {?file rdfs:label ?label} . ");
         sb.append("?file cr:harvestedStatements ?statements. ");
@@ -1029,12 +1029,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 Value fileValue = bindingSet.getValue("file");
                 Value titleValue = bindingSet.getValue("label");
                 Value lastModifiedValue = bindingSet.getValue("lastModified");
+                Value statements = bindingSet.getValue("statements");
 
                 UploadDTO uploadDTO = new UploadDTO(fileValue.stringValue());
                 if (titleValue != null) {
                     uploadDTO.setLabel(titleValue.stringValue());
                 }
                 uploadDTO.setDateModified(lastModifiedValue.stringValue());
+                uploadDTO.setTriples(statements.stringValue());
 
                 result.add(uploadDTO);
             }
