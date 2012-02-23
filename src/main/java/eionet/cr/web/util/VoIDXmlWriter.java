@@ -108,7 +108,7 @@ public class VoIDXmlWriter {
 
             writer.writeStartElement(DCT_NS_PREFIX, "modified", DCT_NS);
             writer.writeAttribute(RDF_NS_PREFIX, RDF_NS, "datatype", "http://www.w3.org/2001/XMLSchema#dateTime");
-            writer.writeCharacters(upload.getDateModified());
+            writer.writeCharacters(StringUtils.substringBeforeLast(upload.getDateModified(), "."));
             writer.writeEndElement();
             writer.writeEndElement();
         }
