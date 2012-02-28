@@ -59,31 +59,33 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      *      eionet.cr.util.SortingRequest)
      * @param exactMatch
      *            indicates if only exact amtch of String is searched
-     * @return Pair whre left member is results count and right member is list of matching subjects
+     * @return
      * @throws DAOException
      *             if query fails.
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByFreeText(final SearchExpression expression, final FilterType filterType,
+    public SearchResultDTO<SubjectDTO> searchByFreeText(final SearchExpression expression, final FilterType filterType,
             final boolean exactMatch, final PagingRequest pagingRequest, final SortingRequest sortingRequest) throws DAOException {
+        SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
         // if search expression is null or empty, return empty result
         if (expression == null || expression.isEmpty()) {
-            return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+            return result;
         }
 
         // parse search expression for Virtuoso SPARQL
         VirtuosoFullTextQuery virtQuery = null;
         try {
             virtQuery = VirtuosoFullTextQuery.parse(expression);
-            logger.trace("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
+            logger.debug("Free-text search string parsed for Virtuoso SPARQL: " + virtQuery);
+            logger.debug("Parsed q: " + virtQuery.getParsedQuery());
         } catch (ParseException pe) {
             throw new DAOException("Error parsing the search text", pe);
         }
 
         // if search expression is empty after being parsed for Virtuoso SPARQL, return empty result
         if (virtQuery.getParsedQuery().length() == 0) {
-            return new Pair<Integer, List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
+            return result;
         }
 
         // create query helper
@@ -104,6 +106,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
         matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), matchReader);
+
+        result.setQuery(QueryHelper.getFormatedQuery(query, helper.getQueryBindings()));
 
         logger.debug("Free-text search, find subjects query time " + Util.durationSince(startTime));
 
@@ -135,8 +139,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         }
         logger.debug("Free-text search, total query time " + Util.durationSince(startTime));
 
-        // the result Pair contains total number of subjects and the requested sub-list
-        return new Pair<Integer, List<SubjectDTO>>(totalMatchCount, resultList);
+        result.setItems(resultList);
+        result.setMatchCount(totalMatchCount);
+        return result;
     }
 
     /*
@@ -146,9 +151,11 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * eionet.cr.util.SortingRequest, java.util.List)
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
+    public SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
             throws DAOException {
+
+        SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
         // create query helper
         Set<String> literalRangeFilters = null;
@@ -170,6 +177,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // execute the query, with the IN parameters
         List<String> subjectUris = executeSPARQL(query, bindings, new SingleObjectReader<String>());
+
+        result.setQuery(QueryHelper.getFormatedQuery(query, bindings));
 
         logger.debug("Search by filters, find subjects query time " + Util.durationSince(startTime));
 
@@ -196,11 +205,12 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             totalRowCount = new Integer(getExactRowCount(helper));
         }
 
-        // return new Pair<Integer,List<SubjectDTO>>(0, new LinkedList<SubjectDTO>());
         logger.debug("Search by filters, total query time " + Util.durationSince(startTime));
 
-        // the result Pair contains total number of subjects and the requested sub-list
-        return new Pair<Integer, List<SubjectDTO>>(totalRowCount, resultList);
+        result.setMatchCount(totalRowCount);
+        result.setItems(resultList);
+
+        return result;
     }
 
     /*
@@ -331,7 +341,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * eionet.cr.util.SortingRequest, java.util.List)
      */
     @Override
-    public Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
+    public SearchResultDTO<SubjectDTO> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException {
 
         return searchByFilters(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);

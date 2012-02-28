@@ -46,6 +46,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
@@ -130,6 +131,11 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      * Export columns.
      */
     private List<String> exportColumns;
+
+    /**
+     * Query string.
+     */
+    private String queryString;
 
     /**
      *
@@ -296,15 +302,16 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                         }
                     }
                 }
-                Pair<Integer, List<SubjectDTO>> searchResult =
+                SearchResultDTO<SubjectDTO> searchResult =
                         DAOFactory
                                 .get()
                                 .getDao(SearchDAO.class)
                                 .searchByTypeAndFilters(criteria, false, PagingRequest.create(getPageN()),
                                         new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
 
-                resultList = searchResult.getRight();
-                matchCount = searchResult.getLeft();
+                resultList = searchResult.getItems();
+                matchCount = searchResult.getMatchCount();
+                queryString = searchResult.getQuery();
                 int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
                 exactCount = exactRowCountLimit <= 0 || matchCount <= exactRowCountLimit;
             }
@@ -718,6 +725,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      */
     public void setExportColumns(List<String> exportColumns) {
         this.exportColumns = exportColumns;
+    }
+
+    public String getQueryString() {
+        return queryString;
     }
 
     /**

@@ -21,7 +21,6 @@
 package eionet.cr.dao;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,9 +32,9 @@ import org.junit.Test;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.RdfLoader;
-import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
@@ -56,11 +55,11 @@ public class SearchDAOTest {
     public void testFreeTextSearchCountResults() throws Exception {
 
         PagingRequest pagingRequest = PagingRequest.create(1);
-        Pair<Integer, List<SubjectDTO>> result =
+        SearchResultDTO<SubjectDTO> result =
             DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
                     new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest, null);
 
-        assertEquals(2, result.getLeft().intValue());
+        assertEquals(2, result.getMatchCount());
     }
 
     /**
@@ -75,11 +74,10 @@ public class SearchDAOTest {
         filters.put(Predicates.RDF_TYPE, "http://rod.eionet.europa.eu/schema.rdf#Obligation");
         List<String> selectedPredicates = null;
 
-        Pair<Integer, List<SubjectDTO>> result =
+        SearchResultDTO<SubjectDTO> result =
             DAOFactory.get().getDao(SearchDAO.class)
             .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
 
-        assertEquals(3, result.getLeft().intValue());
-        assertTrue(result.getLeft() > 0);
+        assertEquals(3, result.getMatchCount());
     }
 }

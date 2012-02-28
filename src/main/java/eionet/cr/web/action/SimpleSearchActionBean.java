@@ -41,8 +41,8 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -63,6 +63,11 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private boolean isUri;
     private String simpleFilter;
     private boolean exactMatch;
+
+    /**
+     * Query string.
+     */
+    private String queryString;
 
     /**
      *
@@ -113,15 +118,16 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             }
 
             if (resultList == null || resultList.size() == 0) {
-                Pair<Integer, List<SubjectDTO>> result =
+                SearchResultDTO<SubjectDTO> result =
                         DAOFactory
                                 .get()
                                 .getDao(SearchDAO.class)
                                 .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
                                         new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
-                resultList = result.getRight();
-                matchCount = result.getLeft();
+                resultList = result.getItems();
+                matchCount = result.getMatchCount();
+                queryString = result.getQuery();
 
                 int exactRowCountLimit = DAOFactory.get().getDao(SearchDAO.class).getExactRowCountLimit();
                 exactCount = exactRowCountLimit <= 0 || matchCount <= exactRowCountLimit;
@@ -248,5 +254,9 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     public void setExactMatch(boolean exactMatch) {
         this.exactMatch = exactMatch;
+    }
+
+    public String getQueryString() {
+        return queryString;
     }
 }

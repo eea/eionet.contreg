@@ -39,8 +39,8 @@ import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Pair;
 
 /**
  *
@@ -79,11 +79,11 @@ public class XmlConvFeedServlet extends HttpServlet {
                 Map<String, String> criteria = new HashMap<String, String>();
                 criteria.put(Predicates.CR_SCHEMA, xmlSchema);
 
-                Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(criteria, false, null, null, null, true);
+                SearchResultDTO<SubjectDTO> result = searchDao.searchByFilters(criteria, false, null, null, null, true);
 
-                int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
+                int subjectCount = result.getMatchCount();
                 logger.debug(methodName + ", " + subjectCount + " subjects found in total");
-                subjects = results.getRight();
+                subjects = result.getItems();
             }
 
             SubjectsRDFWriter rdfWriter =

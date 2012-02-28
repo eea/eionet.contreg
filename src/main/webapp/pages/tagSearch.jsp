@@ -36,6 +36,7 @@
 
     <stripes:layout-component name="contents">
 
+    <c:if test="${not empty actionBean.queryString}">
     <ul id="dropdown-operations">
         <li><a href="#">Operations</a>
             <ul>
@@ -45,6 +46,7 @@
             </ul>
         </li>
     </ul>
+    </c:if>
 
     <h1>Tag search</h1>
     <p>
@@ -106,7 +108,15 @@
     </c:choose>
 
     <div id="queryDialog" title="Search query">
-        <c:out value="${actionBean.queryString}" />
+        <c:if test="${not empty actionBean.queryString}">
+            <pre><c:out value="${actionBean.queryString}" /></pre>
+            <crfn:form action="/sparql" method="get">
+                <stripes:hidden name="query" value="${actionBean.queryString}" />
+                <br />
+                <br />
+                <stripes:submit name="noEvent" value="Edit SPARQL query" />
+            </crfn:form>
+        </c:if>
     </div>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -42,9 +42,9 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
@@ -142,12 +142,12 @@ public class XmlRpcServices implements Services {
 
         List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
         try {
-            Pair<Integer, List<SubjectDTO>> search =
+            SearchResultDTO<SubjectDTO> searchResult =
                 DAOFactory.get().getDao(SearchDAO.class)
                 .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, false);
 
             String[] strArray = {};
-            Collection<SubjectDTO> subjects = search.getRight();
+            Collection<SubjectDTO> subjects = searchResult.getItems();
             if (subjects != null) {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
@@ -227,10 +227,10 @@ public class XmlRpcServices implements Services {
 
         Vector result = new Vector();
         try {
-            Pair<Integer, List<SubjectDTO>> search =
+            SearchResultDTO<SubjectDTO> searchResult =
                 DAOFactory.get().getDao(SearchDAO.class)
                 .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, true);
-            Collection<SubjectDTO> subjects = search.getRight();
+            Collection<SubjectDTO> subjects = searchResult.getItems();
             if (subjects != null) {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
 
@@ -362,14 +362,14 @@ public class XmlRpcServices implements Services {
                 Map<String, String> criteria = new HashMap<String, String>();
                 criteria.put(Predicates.CR_SCHEMA, schemaIdentifier);
 
-                Pair<Integer, List<SubjectDTO>> results = searchDao.searchByFilters(criteria, false, null, null, null, true);
+                SearchResultDTO<SubjectDTO> searchResult = searchDao.searchByFilters(criteria, false, null, null, null, true);
 
-                int subjectCount = results == null ? 0 : (results.getRight() == null ? 0 : results.getRight().size());
+                int subjectCount = searchResult.getMatchCount();
 
                 logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema(" + schemaIdentifier + "), " + subjectCount
                         + " subjects found in total");
 
-                subjects = results.getRight();
+                subjects = searchResult.getItems();
 
                 if (subjects != null) {
                     for (SubjectDTO subjectDTO : subjects) {

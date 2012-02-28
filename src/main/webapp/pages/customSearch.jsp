@@ -4,7 +4,49 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Custom search">
 
+    <stripes:layout-component name="head">
+        <script type="text/javascript">
+        // <![CDATA[
+        ( function($) {
+            $(document).ready(function() {
+                // Open delete bookmarked queries dialog
+                $("#queryDialogLink").click(function() {
+                    $('#queryDialog').dialog('open');
+                    return false;
+                });
+
+                // Dialog setup
+                $('#queryDialog').dialog({
+                    autoOpen: false,
+                    width: 500
+                });
+
+                // Close dialog
+                $("#closeQueryDialog").click(function() {
+                    $('#queryDialog').dialog("close");
+                    return true;
+                });
+            });
+
+        } ) ( jQuery );
+
+        // ]]>
+        </script>
+    </stripes:layout-component>
+
     <stripes:layout-component name="contents">
+
+        <c:if test="${not empty actionBean.queryString}">
+        <ul id="dropdown-operations">
+            <li><a href="#">Operations</a>
+                <ul>
+                    <li>
+                        <a href="#" id="queryDialogLink">Search query</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        </c:if>
 
         <h1>Custom search</h1>
         <p>
@@ -86,6 +128,18 @@
                 No available filters found!
             </c:otherwise>
         </c:choose>
+
+        <div id="queryDialog" title="Search query">
+            <c:if test="${not empty actionBean.queryString}">
+                <pre><c:out value="${actionBean.queryString}" /></pre>
+                <crfn:form action="/sparql" method="get">
+                    <stripes:hidden name="query" value="${actionBean.queryString}" />
+                    <br />
+                    <br />
+                    <stripes:submit name="noEvent" value="Edit SPARQL query" />
+                </crfn:form>
+            </c:if>
+        </div>
 
     </stripes:layout-component>
 </stripes:layout-render>

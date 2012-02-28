@@ -33,6 +33,11 @@ import eionet.cr.util.URIUtil;
  */
 public class QueryHelper {
 
+    private static final String PREFIX = "PREFIX";
+    private static final String SELECT = "SELECT";
+    private static final String WHERE = "WHERE";
+    private static final String FROM = "FROM";
+
     public static String getFormatedQuery(String query, Bindings bindings) {
 
         if (bindings != null) {
@@ -51,6 +56,29 @@ public class QueryHelper {
             }
         }
 
-        return query;
+        // On some cases the binding value alrady is surrounded by "'", so this removes the redundant apostrophes
+        query = StringUtils.replace(query, "''", "'");
+
+        return formatSparqlQuery(query);
     }
+
+    private static String formatSparqlQuery(String query) {
+        query = StringUtils.replace(query, PREFIX.toLowerCase(), PREFIX);
+        query = StringUtils.replace(query, SELECT.toLowerCase(), SELECT);
+        query = StringUtils.replace(query, WHERE.toLowerCase(), WHERE);
+        query = StringUtils.replace(query, FROM.toLowerCase(), FROM);
+
+        query = StringUtils.replace(query, " " + PREFIX, "\n" + PREFIX);
+        query = StringUtils.replace(query, " " + SELECT, "\n" + SELECT);
+        query = StringUtils.replace(query, " " + WHERE, "\n" + WHERE);
+        query = StringUtils.replace(query, " " + FROM, "\n" + FROM);
+
+        query = StringUtils.replace(query, "{", "{\n ");
+        query = StringUtils.replace(query, "}", "\n}");
+        query = StringUtils.replace(query, " .", ".\n");
+
+
+        return query.trim();
+    }
+
 }

@@ -5,13 +5,21 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Type search">
 
     <stripes:layout-component name="contents">
-        <c:if test="${not empty actionBean.resultList}">
-            <div id="operations" class="export_div">
+        <ul id="dropdown-operations">
+            <li><a href="#">Operations</a>
                 <ul>
-                    <li><a href="#" id="eport_link">Export</a></li>
+                    <c:if test="${not empty actionBean.resultList}">
+                        <li><a href="#" id="eport_link">Export</a></li>
+                    </c:if>
+                    <c:if test="${not empty actionBean.queryString}">
+                    <li>
+                        <a href="#" id="queryLink">Search query</a>
+                    </li>
+                    </c:if>
                 </ul>
-            </div>
-        </c:if>
+            </li>
+        </ul>
+
         <div style="max-width: 750px;" id="export_form_container">
        <h1>Type search</h1>
        <p>
@@ -57,6 +65,24 @@
                             // Close dialog
                             $("#export_form_submit").click(function() {
                                 $('#dialog').dialog("close");
+                                return true;
+                            });
+
+                            // Open dialog
+                            $("#queryLink").click(function() {
+                                $('#queryDialog').dialog('open');
+                                return false;
+                            });
+
+                            // Dialog setup
+                            $('#queryDialog').dialog({
+                                autoOpen: false,
+                                width: 500
+                            });
+
+                            // Close dialog
+                            $("#closeQueryDialog").click(function() {
+                                $('#queryDialog').dialog("close");
                                 return true;
                             });
 
@@ -194,6 +220,18 @@
         <c:if test="${! empty actionBean.type}">
             <stripes:layout-render name="/pages/common/subjectsResultList.jsp" tableClass="sortable" />
         </c:if>
+        </div>
+
+        <div id="queryDialog" title="Search query">
+            <c:if test="${not empty actionBean.queryString}">
+                <pre><c:out value="${actionBean.queryString}" /></pre>
+                <crfn:form action="/sparql" method="get">
+                    <stripes:hidden name="query" value="${actionBean.queryString}" />
+                    <br />
+                    <br />
+                    <stripes:submit name="noEvent" value="Edit SPARQL query" />
+                </crfn:form>
+            </c:if>
         </div>
     </stripes:layout-component>
 </stripes:layout-render>

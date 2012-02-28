@@ -45,6 +45,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -85,9 +86,12 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String addedFilter;
     private String picklistFilter;
     private String removedFilter;
-    // private Collection<String> picklist;
-
     private Collection<ObjectLabelPair> picklist;
+
+    /**
+     * Query string.
+     */
+    private String queryString;
 
     /**
      *
@@ -135,16 +139,16 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
-        Pair<Integer, List<SubjectDTO>> result =
-            DAOFactory
-            .get()
-            .getDao(SearchDAO.class)
-            .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
-                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
+        SearchResultDTO<SubjectDTO> result =
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
-        List<SubjectDTO> resultList = result.getRight();
+        List<SubjectDTO> resultList = result.getItems();
         SimpleSearchActionBean.setLastModifiedDates(resultList);
 
         // we put the search result list into session and override getResultList() to retrieve the list from session
@@ -153,8 +157,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         session.setAttribute(RESULT_LIST_SESSION_ATTR_NAME, resultList);
 
         // we do the same for matchCount and pagination as well
-        session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getLeft());
+        session.setAttribute(MATCH_COUNT_SESSION_ATTR_NAME, result.getMatchCount());
         session.setAttribute(PAGINATION_SESSION_ATTR_NAME, super.getPagination());
+
+        queryString = result.getQuery();
 
         return new ForwardResolution(ASSOCIATED_JSP);
     }
@@ -233,14 +239,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
             picklist =
-                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                        false);
+                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                            false);
         }
 
         if (picklist == null) {
             picklist =
-                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                        true);
+                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
+                            true);
         }
 
         return picklist;
@@ -511,6 +517,10 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     public boolean isAddFilter() {
         return !StringUtils.isBlank(addedFilter);
+    }
+
+    public String getQueryString() {
+        return queryString;
     }
 
     /**

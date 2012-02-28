@@ -66,13 +66,13 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
     public String getUnorderedQuery(List<Object> inParams) {
 
         StringBuilder buf = new StringBuilder();
-        buf.append("select distinct ?s where {?s ?p ?o");
+        buf.append("select distinct ?s where { ?s ?p ?o");
 
         String typeFilterPart = buildTypeFilterPart();
         if (!StringUtils.isBlank(typeFilterPart)) {
-            buf.append(". ").append(typeFilterPart);
+            buf.append(" . ").append(typeFilterPart);
         }
-        buf.append(". ").append(buildTextFilterPart()).append("}");
+        buf.append(" . ").append(buildTextFilterPart()).append("}");
 
         return buf.toString();
     }
@@ -88,9 +88,9 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
         String typeFilterPart = buildTypeFilterPart();
         if (!StringUtils.isBlank(typeFilterPart)) {
-            buf.append(". ").append(typeFilterPart);
+            buf.append(" . ").append(typeFilterPart);
         }
-        buf.append(". ").append(buildTextFilterPart()).append(". optional {?s ?sortPredicate ?ord}} ORDER BY ");
+        buf.append(" . ").append(buildTextFilterPart()).append(" . optional {?s ?sortPredicate ?ord}} ORDER BY ");
 
         bindings.setURI("sortPredicate", sortPredicate);
         if (sortOrder != null) {
@@ -123,9 +123,9 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
 
         String typeFilterPart = buildTypeFilterPart();
         if (!StringUtils.isBlank(typeFilterPart)) {
-            buf.append(". ").append(typeFilterPart);
+            buf.append(" . ").append(typeFilterPart);
         }
-        buf.append(". ").append(buildTextFilterPart()).append("}");
+        buf.append(" . ").append(buildTextFilterPart()).append("}");
 
         return buf.toString();
     }

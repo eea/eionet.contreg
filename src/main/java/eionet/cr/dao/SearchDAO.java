@@ -52,10 +52,10 @@ public interface SearchDAO extends DAO {
      *            - page request
      * @param sortingRequest
      *            - sorting request to set
-     * @return Pair<Integer, List<SubjectDTO>>
+     * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchByFreeText(SearchExpression expression, FreeTextSearchHelper.FilterType filterType,
+    SearchResultDTO<SubjectDTO> searchByFreeText(SearchExpression expression, FreeTextSearchHelper.FilterType filterType,
             boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
@@ -71,10 +71,10 @@ public interface SearchDAO extends DAO {
      *            - predicates filter
      * @param useInference
      *            if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
-     * @return Pair<Integer, List<SubjectDTO>>
+     * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
+    SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
             throws DAOException;
 
@@ -129,10 +129,10 @@ public interface SearchDAO extends DAO {
      * @param pagingRequest
      * @param sortingRequest
      * @param selectPredicates
-     * @return Pair<Integer, List<SubjectDTO>>
+     * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
      */
-    Pair<Integer, List<SubjectDTO>> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
+    SearchResultDTO<SubjectDTO> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException;
 
     /**

@@ -162,21 +162,21 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
                 }
 
                 if (filterIndex > 1) {
-                    result += ". ";
+                    result += " . ";
                 }
 
                 result += "?s ?" + predicateVariable + " ?" + objectVariable;
-                result += ". filter(?" + predicateVariable + " = ?" + predicateValueVariable + ")";
+                result += " . filter(?" + predicateVariable + " = ?" + predicateValueVariable + ")";
                 bindings.setURI(predicateValueVariable, predicateUri);
 
                 if (Util.isSurroundedWithQuotes(objectValue)) {
-                    result += ". filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
+                    result += " . filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
                     bindings.setString(objectValueVariable, Util.removeSurroundingQuotes(objectValue));
                 } else if (URIUtil.isSchemedURI(objectValue)) {
-                    result += ". filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
+                    result += " . filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
                     bindings.setURI(objectValueVariable, objectValue);
                 } else {
-                    result += ". filter bif:contains(?" + objectVariable + ", ?" + objectValueVariable + ")";
+                    result += " . filter bif:contains(?" + objectVariable + ", ?" + objectValueVariable + ")";
                     bindings.setString(objectValueVariable, objectValue);
                     requiresFullTextSearch = Boolean.TRUE;
                 }
