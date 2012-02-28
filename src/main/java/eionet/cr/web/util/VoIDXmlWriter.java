@@ -76,7 +76,7 @@ public class VoIDXmlWriter {
 
         writer.writeStartElement(RDF_NS_PREFIX, ROOT_ELEMENT, RDF_NS);
         writer.writeNamespace(RDF_NS_PREFIX, RDF_NS);
-        writer.writeNamespace(RDFS_NS_PREFIX, RDFS_NS_PREFIX);
+        writer.writeNamespace(RDFS_NS_PREFIX, RDFS_NS);
         writer.writeNamespace(OWL_NS_PREFIX, OWL_NS);
         writer.writeNamespace(DCT_NS_PREFIX, DCT_NS);
         writer.writeNamespace(VOID_NS_PREFIX, VOID_NS);
