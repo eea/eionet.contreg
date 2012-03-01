@@ -75,8 +75,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
-    // TODO: delete the jsp file
-    private static final String BOOKMARKED_QUERIES_PAGE = "/pages/bookmarkedQueries.jsp";
     private static final String BOOKMARK_PAGE = "/pages/bookmarkQuery.jsp";
 
     /** */
@@ -137,10 +135,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Name of the query to bookmark. */
     private String bookmarkName;
 
+    /** True, if the query to bookmark will be shared. */
+    private boolean sharedBookmark;
+
     /**
      * List of bookmarked queries, each represented by a Map. Relevant only when user is known.
      */
     private List<Map<String, String>> bookmarkedQueries;
+
+    /**
+     * List of shared bookmarked queries, each represented by a Map. Relevant only when user is known.
+     */
+    private List<Map<String, String>> sharedBookmarkedQueries;
 
     /** */
     private List<String> deleteQueries;
@@ -217,57 +223,125 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else if (StringUtils.isBlank(bookmarkName)) {
             addGlobalValidationError("Bookmark name is missing!");
         } else {
-
-            // prepare bookmark subject
-
-            String bookmarksUri = user.getBookmarksUri();
-            String bookmarkUri = buildBookmarkUri(user, bookmarkName);
-
-            SubjectDTO subjectDTO = new SubjectDTO(bookmarkUri, false);
-            ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_SPARQL_BOOKMARK, false);
-            objectDTO.setSourceUri(bookmarksUri);
-            subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
-
-            objectDTO = new ObjectDTO(query, true, XMLSchema.STRING);
-            objectDTO.setSourceUri(bookmarksUri);
-            subjectDTO.addObject(Predicates.CR_SPARQL_QUERY, objectDTO);
-
-            String formatToUse = StringUtils.isBlank(format) ? "text/html" : format;
-            objectDTO = new ObjectDTO(formatToUse, true, XMLSchema.STRING);
-            objectDTO.setSourceUri(bookmarksUri);
-            subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
-
-            objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
-            objectDTO.setSourceUri(bookmarksUri);
-            subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
-
-            objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
-            objectDTO.setSourceUri(bookmarksUri);
-            subjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
-
-            // first remove previous triples of this bookmark (i.e. always overwrite bookmark with the same name)
-            ArrayList<String> predicateUris = new ArrayList<String>();
-            predicateUris.add(Predicates.RDF_TYPE);
-            predicateUris.add(Predicates.CR_SPARQL_QUERY);
-            predicateUris.add(Predicates.DC_FORMAT);
-            predicateUris.add(Predicates.CR_USE_INFERENCE);
-            predicateUris.add(Predicates.RDFS_LABEL);
-
-            List<String> subjectUris = Collections.singletonList(bookmarkUri);
-            List<String> sourceUris = Collections.singletonList(bookmarksUri);
-
-            HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
-            dao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
-
-            // now save the bookmark subject
-            dao.addTriples(subjectDTO);
-
+            if (sharedBookmark) {
+                if (!isSharedBookmarkPrivilege()) {
+                    addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
+                    return new ForwardResolution(FORM_PAGE);
+                }
+                storeSharedBookmark();
+            } else {
+                storePersonalBookmark();
+            }
             // log and display message about successful operation
-            logger.debug("Query bookmarked with URI: " + bookmarksUri);
+            logger.debug("Is shared: " + sharedBookmark);
             addSystemMessage("Successfully bookmarked query: " + bookmarkName);
         }
 
         return new ForwardResolution(FORM_PAGE);
+    }
+
+    /**
+     * Stores user's SPARQL bookmark.
+     *
+     * @throws DAOException
+     */
+    private void storePersonalBookmark() throws DAOException {
+        CRUser user = getUser();
+        // prepare bookmark subject
+        String bookmarksUri = user.getBookmarksUri();
+        String bookmarkUri = buildBookmarkUri(bookmarksUri, bookmarkName);
+
+        SubjectDTO subjectDTO = new SubjectDTO(bookmarkUri, false);
+        ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_SPARQL_BOOKMARK, false);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
+
+        objectDTO = new ObjectDTO(query, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.CR_SPARQL_QUERY, objectDTO);
+
+        String formatToUse = StringUtils.isBlank(format) ? "text/html" : format;
+        objectDTO = new ObjectDTO(formatToUse, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
+
+        objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
+
+        objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
+
+        // first remove previous triples of this bookmark (i.e. always overwrite bookmark with the same name)
+        ArrayList<String> predicateUris = new ArrayList<String>();
+        predicateUris.add(Predicates.RDF_TYPE);
+        predicateUris.add(Predicates.CR_SPARQL_QUERY);
+        predicateUris.add(Predicates.DC_FORMAT);
+        predicateUris.add(Predicates.CR_USE_INFERENCE);
+        predicateUris.add(Predicates.RDFS_LABEL);
+
+        List<String> subjectUris = Collections.singletonList(bookmarkUri);
+        List<String> sourceUris = Collections.singletonList(bookmarksUri);
+
+        HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
+        dao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+
+        // now save the bookmark subject
+        dao.addTriples(subjectDTO);
+        logger.debug("Query bookmarked with URI: " + bookmarksUri);
+    }
+
+    /**
+     * Stores shared SPARQL bookmark.
+     *
+     * @throws DAOException
+     */
+    private void storeSharedBookmark() throws DAOException {
+        CRUser user = getUser();
+        // prepare bookmark subject
+        String bookmarksUri = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparqlbookmarks";
+        String bookmarkUri = buildBookmarkUri(bookmarksUri, bookmarkName);
+
+        SubjectDTO subjectDTO = new SubjectDTO(bookmarkUri, false);
+        ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_SPARQL_BOOKMARK, false);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.RDF_TYPE, objectDTO);
+
+        objectDTO = new ObjectDTO(query, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.CR_SPARQL_QUERY, objectDTO);
+
+        String formatToUse = StringUtils.isBlank(format) ? "text/html" : format;
+        objectDTO = new ObjectDTO(formatToUse, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
+
+        objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
+
+        objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
+        objectDTO.setSourceUri(bookmarksUri);
+        subjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
+
+        // first remove previous triples of this bookmark (i.e. always overwrite bookmark with the same name)
+        ArrayList<String> predicateUris = new ArrayList<String>();
+        predicateUris.add(Predicates.RDF_TYPE);
+        predicateUris.add(Predicates.CR_SPARQL_QUERY);
+        predicateUris.add(Predicates.DC_FORMAT);
+        predicateUris.add(Predicates.CR_USE_INFERENCE);
+        predicateUris.add(Predicates.RDFS_LABEL);
+
+        List<String> subjectUris = Collections.singletonList(bookmarkUri);
+        List<String> sourceUris = Collections.singletonList(bookmarksUri);
+
+        HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
+        dao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+
+        // now save the bookmark subject
+        dao.addTriples(subjectDTO);
+        logger.debug("Query bookmarked with URI: " + bookmarksUri);
     }
 
     /**
@@ -306,7 +380,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -370,6 +444,19 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
+     * Checks if user has update rights to "sparqlbookmarks" ACL.
+     *
+     * @return true, if user can add/delete shared SPARQL bookmars.
+     */
+    public boolean isSharedBookmarkPrivilege() {
+        if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/sparqlbookmarks", "u")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      *
      * @param query
      * @param format
@@ -387,7 +474,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 TupleQueryResult queryResult = null;
                 try {
                     // Evaluate ASK query
-                    //if (isAskQuery) {
+                    // if (isAskQuery) {
                     if (queryObject instanceof BooleanQuery) {
                         isAskQuery = true;
                         Boolean result = ((BooleanQuery) queryObject).evaluate();
@@ -425,7 +512,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             resultAsk = result.toString();
                         }
                         // Evaluate CONSTRUCT query. Returns XML format
-                        //} else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
+                        // } else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
                     } else if (queryObject instanceof GraphQuery) {
                         if (!format.equals(FORMAT_HTML)) {
                             RDFXMLWriter writer = new RDFXMLWriter(out);
@@ -498,11 +585,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public int exportToHomespace(String dataset) {
         int nrOfTriples = 0;
         try {
-            //Maximum Rows count
+            // Maximum Rows count
             int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
-            nrOfTriples = DAOFactory.get().getDao(HelperDAO.class).addTriples(
-                    query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
+            nrOfTriples =
+                    DAOFactory.get().getDao(HelperDAO.class)
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -514,17 +602,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
-                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                DAOFactory
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
-                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                DAOFactory
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -564,7 +656,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             String datasetUri = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
             boolean exists = DAOFactory.get().getDao(FolderDAO.class).fileOrFolderExists(datasetUri);
             if (exists) {
-                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \""+folder+"\"!");
+                addGlobalValidationError("File named \"" + datasetName + "\" already exists in folder \"" + folder + "\"!");
             }
         }
 
@@ -596,7 +688,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             logger.debug("Deleting these bookmarked queries: " + deleteQueries);
 
-            List<String> sourceUris = Collections.singletonList(user.getBookmarksUri());
+            List<String> sourceUris = new ArrayList<String>();
+            if (sharedBookmark) {
+                if (!isSharedBookmarkPrivilege()) {
+                    addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
+                    return new ForwardResolution(FORM_PAGE);
+                }
+                sourceUris.add(GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparqlbookmarks");
+            } else {
+                sourceUris.add(user.getBookmarksUri());
+            }
             DAOFactory.get().getDao(HelperDAO.class).deleteSubjectPredicates(deleteQueries, null, sourceUris);
 
             if (deleteQueries.size() == 1) {
@@ -738,6 +839,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
+     * Returns bookmarked queries.
+     *
      * @return the bookmarkedQueries
      * @throws DAOException
      */
@@ -752,14 +855,29 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
+     * Returns shared bookmarked queries.
      *
-     * @param user
+     * @return
+     * @throws DAOException
+     */
+    public List<Map<String, String>> getSharedBookmarkedQueries() throws DAOException {
+
+        if (sharedBookmarkedQueries == null) {
+            sharedBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getSharedSparqlBookmarks();
+        }
+        return sharedBookmarkedQueries;
+    }
+
+    /**
+     * Returns bookmark's uri.
+     *
+     * @param bookmarkGraphUri
      * @param bookmarkName
      * @return
      */
-    private static String buildBookmarkUri(CRUser user, String bookmarkName) {
+    private String buildBookmarkUri(String bookmarkGraphUri, String bookmarkName) {
 
-        return new StringBuilder(user.getBookmarksUri()).append("/").append(Hashes.spoHash(bookmarkName)).toString();
+        return new StringBuilder(bookmarkGraphUri).append("/").append(Hashes.spoHash(bookmarkName)).toString();
     }
 
     /**
@@ -843,6 +961,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     public void setOverwriteDataset(boolean overwriteDataset) {
         this.overwriteDataset = overwriteDataset;
+    }
+
+    /**
+     * @return the sharedBookmark
+     */
+    public boolean isSharedBookmark() {
+        return sharedBookmark;
+    }
+
+    /**
+     * @param sharedBookmark
+     *            the sharedBookmark to set
+     */
+    public void setSharedBookmark(boolean sharedBookmark) {
+        this.sharedBookmark = sharedBookmark;
     }
 
 }

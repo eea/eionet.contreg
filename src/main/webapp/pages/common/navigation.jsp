@@ -20,6 +20,7 @@
         <li><a href="tagSearch.action">Tag search</a></li>
         <li><a href="recentUploads.action">Recent uploads</a></li>
         <li><a href="sparql">SPARQL endpoint</a></li>
+        <li><a href="sharedSparqlBookmars.action">Shared SPARQL bookmarks</a></li>
         <li><a href="sources.action">Harvesting sources</a></li>
         <li><a href="harvestQueue.action">Harvest queue</a></li>
         <li><a href="home">User homes</a></li>

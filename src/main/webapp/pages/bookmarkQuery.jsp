@@ -31,9 +31,19 @@
         <crfn:form id="bookmarkQueryForm" action="${saveBookmarkUrl}" method="post">
             <div style="padding-top:20px">
 
-                <label for="bookmarkNameText" class="question">Bookmark name:</label><br/>
+                <label for="bookmarkNameText" class="question">Bookmark name:</label>
+                <br/>
                 <stripes:text name="bookmarkName" id="bookmarkNameText" size="100"/>
-                <stripes:submit name="bookmark" value="Save"/><br/>
+                <br/>
+
+                <c:if test="${actionBean.sharedBookmarkPrivilege}">
+                    <label for="sharedBookmarkCheck" class="question">Shared bookmark:</label>
+                    <stripes:checkbox name="sharedBookmark" id="sharedBookmarkCheck" />
+                    <br/>
+                </c:if>
+
+                <stripes:submit name="bookmark" value="Save"/>
+                <br/>
                 <span class="input-hint">Hint: use existing query's name to overwrite it</span>
 
                 <stripes:hidden name="query" value="${actionBean.query}"/>

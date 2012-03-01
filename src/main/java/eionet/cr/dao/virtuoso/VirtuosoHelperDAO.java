@@ -1278,6 +1278,25 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     /**
+     * Returns shared SPARQL bookmarks.
+     *
+     * @param user CR user whose bookmarks are returned
+     * @return List<Map<String, String>>
+     * @throws DAOException if query fails.
+     */
+    public List<Map<String, String>> getSharedSparqlBookmarks() throws DAOException {
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("bookmarksHome", GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparqlbookmarks");
+        bindings.setURI("rdfType", Predicates.RDF_TYPE);
+        bindings.setURI("sparqlBookmark", Subjects.CR_SPARQL_BOOKMARK);
+        bindings.setURI("rdfsLabel", Predicates.RDFS_LABEL);
+        bindings.setURI("sparqlQuery", Predicates.CR_SPARQL_QUERY);
+
+        return executeSPARQL(SPARQL_BOOKMARKS_SPARQL, bindings, new MapReader());
+    }
+
+    /**
      * @throws DAOException
      * @see eionet.cr.dao.HelperDAO#getSourceLastModifiedDates(Set)
      */

@@ -376,6 +376,14 @@ public interface HelperDAO extends DAO {
     List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException;
 
     /**
+     * Returns shared SPARQL bookmark queries.
+     *
+     * @return List<Map<String, String>>
+     * @throws DAOException
+     */
+    List<Map<String, String>> getSharedSparqlBookmarks() throws DAOException;
+
+    /**
      * Returns triples of an harvest source.
      *
      * @param sourceUrl

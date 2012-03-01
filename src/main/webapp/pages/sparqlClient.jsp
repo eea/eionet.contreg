@@ -38,13 +38,13 @@
             ( function($) {
                 $(document).ready(
                     function(){
-                        // Open delete bookmarked queries dialog
+                        // Open bookmarked queries dialog
                         $("#bookmarksLink").click(function() {
                             $('#bookmarksDialog').dialog('open');
                             return false;
                         });
 
-                        // Delete bookmarked queries dialog setup
+                        // Bookmarked queries dialog setup
                         $('#bookmarksDialog').dialog({
                             autoOpen: false,
                             width: 600
@@ -53,6 +53,24 @@
                         // Close dialog
                         $("#deleteBookmarked").click(function() {
                             $('#bookmarksDialog').dialog("close");
+                            return true;
+                        });
+
+                        // Open shared bookmarked queries dialog
+                        $("#sharedBookmarksLink").click(function() {
+                            $('#sharedBookmarksDialog').dialog('open');
+                            return false;
+                        });
+
+                        // Shared bookmarked queries dialog setup
+                        $('#sharedBookmarksDialog').dialog({
+                            autoOpen: false,
+                            width: 600
+                        });
+
+                        // Close dialog
+                        $("#deleteSahredBookmarked").click(function() {
+                            $('#sharedBookmarksDialog').dialog("close");
                             return true;
                         });
 
@@ -221,9 +239,12 @@
         <ul id="dropdown-operations">
             <li><a href="#">Operations</a>
                 <ul>
+                    <li>
+                        <a href="#" id="sharedBookmarksLink">Shared bookmarked queries</a>
+                    </li>
                     <c:if test="${actionBean.user != null}">
                     <li>
-                        <a href="#" id="bookmarksLink">Bookmarked queries</a>
+                        <a href="#" id="bookmarksLink">My bookmarked queries</a>
                     </li>
                     </c:if>
                     <li>
@@ -390,6 +411,7 @@ while (l--) {
                     </c:if>
                 </div>
             </crfn:form>
+        </div>
 
             <c:if test="${actionBean.userLoggedIn}">
                 <div id="constructDialog" title="Save result to ">
@@ -501,6 +523,67 @@ while (l--) {
                     No bookmarked queries found.
                 </c:otherwise>
             </c:choose>
+            </div>
+
+            <%-- Shared bookmarked queries dialog --%>
+            <div id="sharedBookmarksDialog" title="Bookmarked queries">
+            <h1>Shared bookmarked SPARQL queries</h1>
+            <c:choose>
+                <c:when test="${not empty actionBean.sharedBookmarkedQueries}">
+                    <c:url var="deleteBookmarkUrl" value="/sparql">
+                        <c:if test="${not empty actionBean.defaultGraphUris}">
+                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                <c:param name="default-graph-uri" value="${defaultGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+                        <c:if test="${not empty actionBean.namedGraphUris}">
+                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                <c:param name="named-graph-uri" value="${namedGraphUri}" />
+                            </c:forEach>
+                        </c:if>
+                    </c:url>
+                    <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
+                    <stripes:hidden name="sharedBookmark" value="true" />
+                    <table>
+                        <c:forEach items="${actionBean.sharedBookmarkedQueries}" var="bookmarkedQuery">
+                        <tr>
+                            <c:if test="${actionBean.sharedBookmarkPrivilege}">
+                            <td width="1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
+                            </c:if>
+                            <td width="99%">
+                                <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
+                                    <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                            <stripes:param name="default-graph-uri" value="${defaultGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:if test="${not empty actionBean.namedGraphUris}">
+                                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                            <stripes:param name="named-graph-uri" value="${namedGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:out value="${bookmarkedQuery.label}"/>
+                                </stripes:link>
+                            </td>
+                        </tr>
+                        </c:forEach>
+                        <c:if test="${actionBean.sharedBookmarkPrivilege}">
+                        <tr>
+                            <td colspan="2" align="right" style="padding-top: 5px">
+                                <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
+                            </td>
+                        </tr>
+                        </c:if>
+                    </table>
+                    </crfn:form>
+                </c:when>
+                <c:otherwise>
+                    No bookmarked queries found.
+                </c:otherwise>
+            </c:choose>
+            </div>
 
             <div id="prefixesDialog" title="Useful namespaces">
                 <ul>
@@ -517,9 +600,6 @@ while (l--) {
                 </ul>
                 <button id="closePrefixesDialog">Close</button>
             </div>
-
-            </div>
-        </div>
 
     </stripes:layout-component>
 </stripes:layout-render>
