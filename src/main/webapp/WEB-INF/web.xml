@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
          http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-         version="2.4">
+    version="2.4">
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!--            context parameters          -->
+    <!-- context parameters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <display-name>${application.displayName}</display-name>
@@ -37,7 +36,7 @@
     </context-param>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!--              filters                   -->
+    <!-- filters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <filter>
@@ -47,6 +46,15 @@
     <filter-mapping>
         <filter-name>HomespaceUrlFilter</filter-name>
         <url-pattern>/home/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>SparqlBookmarksUrlFilter</filter-name>
+        <filter-class>eionet.cr.web.filters.SparqlBookmarksUrlFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SparqlBookmarksUrlFilter</filter-name>
+        <url-pattern>/sparqlbookmarks/*</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -113,7 +121,7 @@
     </filter-mapping>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!--              listeners                 -->
+    <!-- listeners -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <listener>
@@ -130,10 +138,10 @@
     </listener>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!--              servlets                  -->
+    <!-- servlets -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <!--  StripesDispatcher -->
+    <!-- StripesDispatcher -->
 
     <servlet>
         <servlet-name>StripesDispatcher</servlet-name>
@@ -203,7 +211,7 @@
         <url-pattern>/rpcrouter</url-pattern>
     </servlet-mapping>
 
-    <!--  AMP feed servlet -->
+    <!-- AMP feed servlet -->
 
     <servlet>
         <servlet-name>AmpServlet</servlet-name>
@@ -215,7 +223,7 @@
         <url-pattern>/ampService</url-pattern>
     </servlet-mapping>
 
-    <!--  Update template servlet -->
+    <!-- Update template servlet -->
 
     <servlet>
         <servlet-name>RefreshTemplateServlet</servlet-name>

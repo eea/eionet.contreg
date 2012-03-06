@@ -37,7 +37,7 @@ import eionet.cr.dao.HelperDAO;
  *
  * @author Juhan Voolaid
  */
-@UrlBinding("/sharedSparqlBookmars.action")
+@UrlBinding("/sharedSparqlBookmarks.action")
 public class SharedSparqlBookmarksActionBean extends AbstractActionBean {
 
     /**
