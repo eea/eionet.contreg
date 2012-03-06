@@ -245,8 +245,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                     URI source = conn.getValueFactory().createURI(sourceUri);
 
                     if (object.isLiteral()) {
-                        Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
-                        conn.add(sub, pred, literalObject, source);
+                        // Literal can't have both language and type
+                        if (!StringUtils.isBlank(object.getLanguage())) {
+                            Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getLanguage());
+                            conn.add(sub, pred, literalObject, source);
+                        } else {
+                            Literal literalObject = conn.getValueFactory().createLiteral(object.toString(), object.getDatatype());
+                            conn.add(sub, pred, literalObject, source);
+                        }
                     } else {
                         URI resourceObject = conn.getValueFactory().createURI(object.toString());
                         conn.add(sub, pred, resourceObject, source);

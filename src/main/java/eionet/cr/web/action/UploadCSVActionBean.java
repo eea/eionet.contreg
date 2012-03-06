@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +46,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryException;
 
@@ -109,6 +111,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** Columns detected in the uploaded file (it's the titles of the columns). */
     private List<String> columns;
+
+    /** Column labels detected in the uploaded file (titles without type and language code). */
+    private List<String> columnLabels;
 
     /** The type of objects contained in the file (user-given free text). */
     private String objectsType;
@@ -267,13 +272,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public void extractObjects(CSVReader csvReader) throws IOException, DAOException {
 
-        // Set columns by reading the first line.
+        // Set columns and columnLabels by reading the first line.
         String[] columnsArray = csvReader.readNext();
         if (columnsArray == null || columnsArray.length == 0) {
             columns = new ArrayList<String>();
+            columnLabels = new ArrayList<String>();
         } else {
             // We do trimming, because CSV Reader doesn't do it
             columns = Arrays.asList(trimAll(columnsArray));
+            if (columns != null && columns.size() > 0) {
+                columnLabels = new ArrayList<String>();
+                for (String col : columns) {
+                    col = StringUtils.substringBefore(col, ":");
+                    col = StringUtils.substringBefore(col, "@");
+                    columnLabels.add(col.trim());
+                }
+            }
         }
 
         // Read the contained objects by reading the rest of lines.
@@ -301,14 +315,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
         String subjectUri = fileUri + "/" + extractObjectId(line);
         SubjectDTO subject = new SubjectDTO(subjectUri, false);
 
-        // Detect subject label, add it to DTO.
-        String subjectLabel = extractObjectLabel(line);
-        if (subjectLabel != null) {
-            ObjectDTO labelObject = new ObjectDTO(subjectLabel, true);
-            labelObject.setSourceUri(fileUri);
-            subject.addObject(Predicates.RDFS_LABEL, labelObject);
-        }
-
         // Add rdf:type to DTO.
         ObjectDTO typeObject = new ObjectDTO(objectsTypeUri, false);
         typeObject.setSourceUri(fileUri);
@@ -324,18 +330,30 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // Get column title, skip this column if it's the label column, otherwise replace spaces.
             String column = columns.get(i);
-            if (column.equals(labelColumn)) {
-                continue;
-            } else {
-                column = column.replace(" ", "_");
+
+            // Extract column type and language code
+            String type = StringUtils.substringAfter(column, ":");
+            if (type != null && type.length() == 0) {
+                type = null;
+            }
+            String lang = StringUtils.substringAfter(column, "@");
+            if (lang != null && lang.length() == 0) {
+                lang = null;
             }
 
+            // Get column label
+            column = columnLabels.get(i);
+            column = column.replace(" ", "_");
+
             // Create ObjectDTO representing the given column's value on this line
-            ObjectDTO objectDTO = createValueObject(column, line[i]);
+            ObjectDTO objectDTO = createValueObject(column, line[i], type, lang);
             objectDTO.setSourceUri(fileUri);
 
             // Add ObjectDTO to the subject.
             String predicateUri = fileUri + "#" + column;
+            if (column.equals(labelColumn)) {
+                predicateUri = Predicates.RDFS_LABEL;
+            }
             subject.addObject(predicateUri, objectDTO);
         }
 
@@ -347,39 +365,59 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @param value
      * @return
      */
-    private ObjectDTO createValueObject(String column, String value) {
+    private ObjectDTO createValueObject(String column, String value, String type, String lang) {
+
+        HashMap<String, URI> types = new HashMap<String, URI>();
+        types.put("url", null);
+        types.put("uri", null);
+        types.put("date", XMLSchema.DATE);
+        types.put("datetime", XMLSchema.DATETIME);
+        types.put("boolean", XMLSchema.BOOLEAN);
+        types.put("integer", XMLSchema.INTEGER);
+        types.put("int", XMLSchema.INT);
+        types.put("long", XMLSchema.LONG);
+        types.put("double", XMLSchema.DOUBLE);
+        types.put("decimal", XMLSchema.DECIMAL);
+        types.put("float", XMLSchema.FLOAT);
+
+        // If type is not defined, but column name matches one of the types, then use column name as datatype
+        if (type == null) {
+            if (types.keySet().contains(column.toLowerCase())) {
+                type = column.toLowerCase();
+            }
+        }
 
         ObjectDTO objectDTO = null;
-
-        if (column.equalsIgnoreCase("url") || column.equalsIgnoreCase("uri")) {
-            objectDTO = new ObjectDTO(value, false);
-        } else if (column.equalsIgnoreCase("date")) {
-            objectDTO = new ObjectDTO(value, true, XMLSchema.DATE);
-        } else if (column.equalsIgnoreCase("datetime")) {
-            objectDTO = new ObjectDTO(value, true, XMLSchema.DATETIME);
-        } else if (column.equalsIgnoreCase("boolean")) {
-            objectDTO = new ObjectDTO(value.equalsIgnoreCase("true") ? "true" : "false", true, XMLSchema.BOOLEAN);
-        } else if (column.equalsIgnoreCase("number")) {
-
-            try {
-                Integer.parseInt(value);
-                objectDTO = new ObjectDTO(value, true, XMLSchema.INTEGER);
-            } catch (NumberFormatException nfe1) {
+        if (!StringUtils.isBlank(type)) {
+            if (type.equalsIgnoreCase("url") || type.equalsIgnoreCase("uri")) {
+                objectDTO = new ObjectDTO(value, lang, false, false, null);
+            } else if (types.keySet().contains(type.toLowerCase())) {
+                if (type.equalsIgnoreCase("boolean")) {
+                    value = value.equalsIgnoreCase("true") ? "true" : "false";
+                }
+                URI datatype = types.get(type.toLowerCase());
+                objectDTO = new ObjectDTO(value, lang, true, false, datatype);
+            } else if (type.equalsIgnoreCase("number")) {
                 try {
-                    Long.parseLong(value);
-                    objectDTO = new ObjectDTO(value, true, XMLSchema.LONG);
-                } catch (NumberFormatException nfe2) {
+                    Integer.parseInt(value);
+                    objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.INTEGER);
+                } catch (NumberFormatException nfe1) {
                     try {
-                        Double.parseDouble(value);
-                        objectDTO = new ObjectDTO(value, true, XMLSchema.DOUBLE);
-                    } catch (NumberFormatException nfe3) {
-                        // ignore deliberately
+                        Long.parseLong(value);
+                        objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.LONG);
+                    } catch (NumberFormatException nfe2) {
+                        try {
+                            Double.parseDouble(value);
+                            objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.DOUBLE);
+                        } catch (NumberFormatException nfe3) {
+                            // ignore deliberately
+                        }
                     }
                 }
             }
         }
 
-        return objectDTO==null ? new ObjectDTO(value, true) : objectDTO;
+        return objectDTO==null ? new ObjectDTO(value, lang, true, false, null) : objectDTO;
     }
 
     /**
@@ -393,7 +431,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
         if (uniqueColumns != null && !uniqueColumns.isEmpty()) {
 
             for (String uniqueCol : uniqueColumns) {
-                int colIndex = columns.indexOf(uniqueCol);
+                int colIndex = columnLabels.indexOf(uniqueCol);
                 if (colIndex >= 0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])) {
                     if (buf.length() > 0) {
                         buf.append("_");
@@ -404,24 +442,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
 
         return buf.length() == 0 ? UUID.randomUUID().toString() : buf.toString();
-    }
-
-    /**
-     *
-     * @param line
-     * @return
-     */
-    public String extractObjectLabel(String[] line) {
-
-        String result = null;
-        if (!StringUtils.isBlank(labelColumn)) {
-            int colIndex = columns.indexOf(labelColumn);
-            if (colIndex >= 0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])) {
-                result = line[colIndex];
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -616,10 +636,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
             try {
                 csvReader = createCSVReader(false);
                 String[] columnsArray = csvReader.readNext();
-                if (columnsArray == null || columnsArray.length == 0) {
-                    columns = new ArrayList<String>();
-                } else {
-                    columns = Arrays.asList(trimAll(columnsArray));
+                columns = new ArrayList<String>();
+                if (columnsArray != null && columnsArray.length > 0) {
+                    for (String col : columnsArray) {
+                        String colLabel = StringUtils.substringBefore(col, ":").trim();
+                        colLabel = StringUtils.substringBefore(colLabel, "@").trim();
+                        columns.add(colLabel);
+                    }
+                    //columns = Arrays.asList(trimAll(columnsArray));
                 }
             } finally {
                 close(csvReader);
