@@ -348,6 +348,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
+        title = StringUtils.replace(title, " ", "%20");
+
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (folderDAO.fileOrFolderExists(uri, title)) {
             addCautionMessage("File or folder with the same name already exists.");

@@ -31,6 +31,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
+import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
@@ -279,22 +280,37 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String url = StringUtils.substringBefore(source.getUrl(), "#");
         long urlHash = Hashes.spoHash(url);
 
-        List<Object> values = new ArrayList<Object>();
-        values.add(url);
-        values.add(Long.valueOf(urlHash));
-        values.add(source.getEmails());
-        values.add(Integer.valueOf(source.getIntervalMinutes()));
-        values.add(YesNoBoolean.format(source.isPrioritySource()));
-        if (source.getOwner() == null || source.getOwner().length() == 0) {
-            values.add("harvester");
-        } else {
-            values.add(source.getOwner());
-        }
+        PreparedStatement ps = null;
         try {
-            int o = SQLUtil.executeUpdateReturnAutoID(ADD_SOURCE_SQL, values, conn);
-            return o;
+            conn = getSQLConnection();
+            ps = conn.prepareStatement(ADD_SOURCE_SQL);
+            ps.setString(1, url);
+            ps.setLong(2, Long.valueOf(urlHash));
+            ps.setString(3, source.getEmails());
+            ps.setInt(4, Integer.valueOf(source.getIntervalMinutes()));
+            ps.setString(5, YesNoBoolean.format(source.isPrioritySource()));
+            if (StringUtils.isEmpty(source.getOwner())) {
+                ps.setString(6, "harvester");
+            } else {
+                ps.setString(6, source.getOwner());
+            }
+            ps.executeUpdate();
+            ps = conn.prepareStatement("select identity_value()");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next())
+                return rs.getInt(1);
+            else
+                throw new CRException("No auto-generated keys returned!");
         } catch (Exception e) {
-            throw new DAOException("Failed to add source", e);
+            throw new DAOException(e.toString(), e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.toString(), e);
+                }
+            }
         }
     }
 
