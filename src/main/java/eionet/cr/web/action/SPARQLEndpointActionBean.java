@@ -978,4 +978,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         this.sharedBookmark = sharedBookmark;
     }
 
+    public boolean getTrueValue() {
+        return true;
+    }
+
 }

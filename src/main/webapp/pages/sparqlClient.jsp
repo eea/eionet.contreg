@@ -542,8 +542,8 @@ while (l--) {
                             </c:forEach>
                         </c:if>
                     </c:url>
-                    <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
-                    <stripes:hidden name="sharedBookmark" value="true" />
+                    <crfn:form id="sharedBookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
+                    <stripes:hidden name="sharedBookmark" value="${actionBean.trueValue}" />
                     <table>
                         <c:forEach items="${actionBean.sharedBookmarkedQueries}" var="bookmarkedQuery">
                         <tr>
@@ -572,7 +572,7 @@ while (l--) {
                         <tr>
                             <td colspan="2" align="right" style="padding-top: 5px">
                                 <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
-                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
+                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('sharedBookmarkedQueriesForm');return false"/>
                             </td>
                         </tr>
                         </c:if>
