@@ -15,20 +15,17 @@
              <span style="padding-left:20px"><strong>Hits per page:&nbsp;</strong><c:out value="${actionBean.nrOfHits}"/></span>
         </div>
 
-        <c:url var="saveBookmarkUrl" value="/sparql">
+        <crfn:form id="bookmarkQueryForm" action="/sparql" method="post">
             <c:if test="${not empty actionBean.defaultGraphUris}">
                 <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                    <c:param name="default-graph-uri" value="${defaultGraphUri}" />
+                    <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
                 </c:forEach>
             </c:if>
             <c:if test="${not empty actionBean.namedGraphUris}">
                 <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                    <c:param name="named-graph-uri" value="${namedGraphUri}" />
+                    <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
                 </c:forEach>
             </c:if>
-        </c:url>
-
-        <crfn:form id="bookmarkQueryForm" action="${saveBookmarkUrl}" method="post">
             <div style="padding-top:20px">
 
                 <label for="bookmarkNameText" class="question">Bookmark name:</label>

@@ -233,7 +233,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 storePersonalBookmark();
             }
             // log and display message about successful operation
-            logger.debug("Is shared: " + sharedBookmark);
             addSystemMessage("Successfully bookmarked query: " + bookmarkName);
         }
 
@@ -668,11 +667,34 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
+     * Deletes shared bookmark.
      *
      * @return
      * @throws DAOException
      */
-    public Resolution deleteBookmarked() throws DAOException {
+    public Resolution deleteSharedBookmark() throws DAOException {
+        return deleteBookmarked(true);
+    }
+
+    /**
+     * Deletes personal bookmark.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution deletePersonalBookmark() throws DAOException {
+        return deleteBookmarked(false);
+    }
+
+    /**
+     * Deletes SPARQL bookmarked query from triplestore.
+     *
+     * @param deleteSharedBookmark
+     *            true, if shared bookmark will be deleted, otherwise personal bookmark
+     * @return
+     * @throws DAOException
+     */
+    private Resolution deleteBookmarked(boolean deleteSharedBookmark) throws DAOException {
 
         setGraphUri();
 
@@ -686,10 +708,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = new ForwardResolution(FORM_PAGE);
         if (deleteQueries != null && !deleteQueries.isEmpty()) {
 
+            logger.debug("Delete shared: " + deleteSharedBookmark);
             logger.debug("Deleting these bookmarked queries: " + deleteQueries);
 
             List<String> sourceUris = new ArrayList<String>();
-            if (sharedBookmark) {
+            if (deleteSharedBookmark) {
                 if (!isSharedBookmarkPrivilege()) {
                     addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
                     return new ForwardResolution(FORM_PAGE);
@@ -976,10 +999,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public void setSharedBookmark(boolean sharedBookmark) {
         this.sharedBookmark = sharedBookmark;
-    }
-
-    public boolean getTrueValue() {
-        return true;
     }
 
 }

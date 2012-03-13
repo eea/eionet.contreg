@@ -475,19 +475,17 @@ while (l--) {
             <h1>Bookmarked SPARQL queries</h1>
             <c:choose>
                 <c:when test="${not empty actionBean.bookmarkedQueries}">
-                    <c:url var="deleteBookmarkUrl" value="/sparql">
-                        <c:if test="${not empty actionBean.defaultGraphUris}">
-                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                                <c:param name="default-graph-uri" value="${defaultGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${not empty actionBean.namedGraphUris}">
-                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                                <c:param name="named-graph-uri" value="${namedGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                    </c:url>
-                    <crfn:form id="bookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
+                    <crfn:form id="bookmarkedQueriesForm" action="/sparql" method="post">
+                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                            <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty actionBean.namedGraphUris}">
+                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                            <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
+                        </c:forEach>
+                    </c:if>
                     <table>
                         <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
                         <tr>
@@ -512,7 +510,7 @@ while (l--) {
                         </c:forEach>
                         <tr>
                             <td colspan="2" align="right" style="padding-top: 5px">
-                                <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                <stripes:submit name="deletePersonalBookmark" id="deletePersonalBookmark" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
                                 <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
                             </td>
                         </tr>
@@ -530,20 +528,17 @@ while (l--) {
             <h1>Shared bookmarked SPARQL queries</h1>
             <c:choose>
                 <c:when test="${not empty actionBean.sharedBookmarkedQueries}">
-                    <c:url var="deleteBookmarkUrl" value="/sparql">
-                        <c:if test="${not empty actionBean.defaultGraphUris}">
-                            <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
-                                <c:param name="default-graph-uri" value="${defaultGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${not empty actionBean.namedGraphUris}">
-                            <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
-                                <c:param name="named-graph-uri" value="${namedGraphUri}" />
-                            </c:forEach>
-                        </c:if>
-                    </c:url>
-                    <crfn:form id="sharedBookmarkedQueriesForm" action="${deleteBookmarkUrl}" method="post">
-                    <stripes:hidden name="sharedBookmark" value="${actionBean.trueValue}" />
+                    <crfn:form id="sharedBookmarkedQueriesForm" action="/sparql" method="post">
+                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                            <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty actionBean.namedGraphUris}">
+                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                            <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
+                        </c:forEach>
+                    </c:if>
                     <table>
                         <c:forEach items="${actionBean.sharedBookmarkedQueries}" var="bookmarkedQuery">
                         <tr>
@@ -571,7 +566,7 @@ while (l--) {
                         <c:if test="${actionBean.sharedBookmarkPrivilege}">
                         <tr>
                             <td colspan="2" align="right" style="padding-top: 5px">
-                                <stripes:submit name="deleteBookmarked" id="deleteBookmarked" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                <stripes:submit name="deleteSharedBookmark" id="deleteSharedBookmark" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
                                 <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('sharedBookmarkedQueriesForm');return false"/>
                             </td>
                         </tr>
