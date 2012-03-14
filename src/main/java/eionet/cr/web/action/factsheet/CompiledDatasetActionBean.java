@@ -189,7 +189,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             Scheduler sched = schedFact.getScheduler();
             sched.start();
 
-            JobDetail jobDetail = new JobDetail("LoadTriplesJob", null, LoadTriplesJob.class);
+            JobDetail jobDetail = new JobDetail("ReLoadTriplesJob-" + System.currentTimeMillis(), null, LoadTriplesJob.class);
             jobDetail.getJobDataMap().put("datasetUri", uri);
             jobDetail.getJobDataMap().put("overwrite", true);
             List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(uri);

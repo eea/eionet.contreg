@@ -77,7 +77,7 @@ public class CreateDataset {
             Scheduler sched = schedFact.getScheduler();
             sched.start();
 
-            JobDetail jobDetail = new JobDetail("LoadTriplesJob", null, LoadTriplesJob.class);
+            JobDetail jobDetail = new JobDetail("LoadTriplesJob-" + System.currentTimeMillis(), null, LoadTriplesJob.class);
             jobDetail.getJobDataMap().put("selectedFiles", selectedFiles);
             jobDetail.getJobDataMap().put("datasetUri", dataset);
             jobDetail.getJobDataMap().put("overwrite", overwrite);
