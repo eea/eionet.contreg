@@ -103,7 +103,7 @@
         </c:if>
         </crfn:form>
 
-        <div id="filtersDialog" title="Latest search filters">
+        <div id="filtersDialog" title="Search filters used to compile the dataset">
             <ul>
             <c:forEach var="filter" items="${actionBean.filters}">
                 <li>
