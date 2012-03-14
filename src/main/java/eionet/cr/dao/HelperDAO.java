@@ -213,12 +213,12 @@ public interface HelperDAO extends DAO {
 
     /**
      * @param user
-     * @param url
+     * @param uri
      * @return
      * @throws DAOException
      *             if query fails
      */
-    void deleteUserBookmark(CRUser user, String url) throws DAOException;
+    void deleteUserBookmark(CRUser user, String uri) throws DAOException;
 
     /**
      * @param userBookmarksUri

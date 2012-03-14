@@ -24,14 +24,27 @@
                         <display:table name="${actionBean.bookmarks}" class="sortable" pagesize="20" sort="list" id="bookmark" htmlId="bookmarks" requestURI="${actionBean.urlBinding}" style="width:100%">
                             <c:if test="${actionBean.usersBookmarks}">
                                 <display:column title="" sortable="false" style="width:50px;">
-                                    <stripes:checkbox name="selectedBookmarks" value="${bookmark.bookmarkUrl}"/>
+                                    <stripes:checkbox name="selectedBookmarks" value="${bookmark.uri}"/>
                                 </display:column>
                             </c:if>
                             <display:column title="URL" sortable="true">
-                                <stripes:link href="/factsheet.action">
-                                    ${bookmark.bookmarkTitle}
-                                    <stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
-                                </stripes:link>
+                                <c:choose>
+                                    <c:when test="${not empty bookmark.bookmarkUrl}">
+                                        <stripes:link href="/factsheet.action" title="${bookmark.query}">
+                                            ${bookmark.bookmarkTitle}
+                                            <stripes:param name="uri" value="${bookmark.bookmarkUrl}" />
+                                        </stripes:link>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <stripes:link href="/factsheet.action" title="${bookmark.query}">
+                                            ${bookmark.bookmarkTitle}
+                                            <stripes:param name="uri" value="${bookmark.uri}" />
+                                        </stripes:link>
+                                    </c:otherwise>
+                                </c:choose>
+                            </display:column>
+                            <display:column title="Type" sortable="true">
+                                <c:out value="${bookmark.typeLabel}" />
                             </display:column>
                         </display:table>
                         <c:if test="${actionBean.usersBookmarks}">

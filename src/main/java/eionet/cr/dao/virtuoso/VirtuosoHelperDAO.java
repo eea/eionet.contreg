@@ -627,18 +627,24 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * @see eionet.cr.dao.HelperDAO#deleteUserBookmark(eionet.cr.web.security.CRUser, java.lang.String)
      */
     @Override
-    public void deleteUserBookmark(CRUser user, String url) throws DAOException {
+    public void deleteUserBookmark(CRUser user, String uri) throws DAOException {
 
-        TripleDTO triple = new TripleDTO(user.getHomeItemUri(url), null, null);
+        //TripleDTO triple = new TripleDTO(user.getHomeItemUri(url), null, null);
+        TripleDTO triple = new TripleDTO(uri, null, null);
         triple.setSourceUri(user.getBookmarksUri());
         deleteTriples(Collections.singletonList(triple));
 
     }
 
     private static final String USER_BOOKMARKS_SPARQL =
-        "select distinct ?bookmarkUrl ?bookmarkLabel from ?userBookmarksUri where { ?subject <" + Predicates.CR_BOOKMARK
-        + "> ?bookmarkUrl . OPTIONAL {?subject <" + Predicates.RDFS_LABEL
-        + "> ?bookmarkLabel }} order by ?bookmarkUrl";
+        "select distinct ?subject ?bookmarkUrl ?bookmarkLabel ?type ?query from ?userBookmarksUri where { "
+        + "{ ?subject a <" + Predicates.CR_BOOKMARK_TYPE + ">, ?type . "
+        + "?subject <" + Predicates.CR_BOOKMARK + "> ?bookmarkUrl .  "
+        + "OPTIONAL {?subject <" + Predicates.RDFS_LABEL + "> ?bookmarkLabel } "
+        + "} UNION { ?subject a <" + Predicates.CR_SPARQL_BOOKMARK_TYPE + ">, ?type . "
+        + "?subject  <" + Predicates.CR_SPARQL_QUERY + "> ?query . "
+        + "OPTIONAL {?subject  <" + Predicates.RDFS_LABEL + "> ?bookmarkLabel}"
+        + "}} order by ?subject ";
 
     /*
      * (non-Javadoc)
@@ -664,12 +670,26 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 BindingSet bindingSet = queryResult.next();
                 Value urlValue = bindingSet.getValue("bookmarkUrl");
                 Value labelValue = bindingSet.getValue("bookmarkLabel");
-                if (urlValue != null) {
+                Value queryValue = bindingSet.getValue("query");
+                Value typeValue = bindingSet.getValue("type");
+                Value uriValue = bindingSet.getValue("subject");
+
+                if (uriValue != null) {
                     UserBookmarkDTO bookmark = new UserBookmarkDTO();
-                    bookmark.setBookmarkUrl(urlValue.stringValue());
+                    bookmark.setUri(uriValue.stringValue());
+                    bookmark.setType(typeValue.stringValue());
                     if (labelValue != null) {
                         bookmark.setBookmarkLabel(labelValue.stringValue());
                     }
+                    if (Predicates.CR_BOOKMARK_TYPE.equals(bookmark.getType())) {
+                        bookmark.setTypeLabel("Bookmark");
+                        bookmark.setBookmarkUrl(urlValue.stringValue());
+                    }
+                    if (Predicates.CR_SPARQL_BOOKMARK_TYPE.equals(bookmark.getType())) {
+                        bookmark.setTypeLabel("SPARQL Bookmark");
+                        bookmark.setQuery(queryValue.stringValue());
+                    }
+
                     resultList.add(bookmark);
                 }
 

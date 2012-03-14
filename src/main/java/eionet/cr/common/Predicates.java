@@ -78,6 +78,7 @@ public interface Predicates {
     String CR_LAST_REFRESHED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#lastRefreshed";
     String CR_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userBookmark";
     String CR_BOOKMARK_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Bookmark";
+    String CR_SPARQL_BOOKMARK_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark";
     String CR_SAVETIME = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userSaveTime";
     String CR_HISTORY = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userHistory";
     String CR_TAG = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag";
