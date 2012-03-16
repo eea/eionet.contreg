@@ -53,16 +53,15 @@ public class ExportTriplesActionBean extends AbstractActionBean {
     private String uri;
 
     @DefaultHandler
-    public Resolution defaultHandler(){
+    public Resolution defaultHandler() {
 
         if (StringUtils.isBlank(uri)) {
 
-            if (Util.isWebBrowser(getContext().getRequest())){
-                getContext().getRequest().setAttribute(
-                        StripesExceptionHandler.EXCEPTION_ATTR, new CRException("Graph URI not specified in the request!"));
+            if (Util.isWebBrowser(getContext().getRequest())) {
+                getContext().getRequest().setAttribute(StripesExceptionHandler.EXCEPTION_ATTR,
+                        new CRException("Graph URI not specified in the request!"));
                 return new ForwardResolution(StripesExceptionHandler.ERROR_PAGE);
-            }
-            else{
+            } else {
                 return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND);
             }
         }
@@ -76,7 +75,34 @@ public class ExportTriplesActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * Action event that exports properties of the given uri.
+     *
+     * @return rdf result.
+     */
+    public Resolution exportProperties() {
+
+        if (StringUtils.isBlank(uri)) {
+
+            if (Util.isWebBrowser(getContext().getRequest())) {
+                getContext().getRequest().setAttribute(StripesExceptionHandler.EXCEPTION_ATTR,
+                        new CRException("Graph URI not specified in the request!"));
+                return new ForwardResolution(StripesExceptionHandler.ERROR_PAGE);
+            } else {
+                return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
+
+        return (new StreamingResolution("application/rdf+xml") {
+
+            public void stream(HttpServletResponse response) throws Exception {
+                RDFGenerator.generateProperties(uri, response.getOutputStream());
+            }
+        });
+    }
+
+    /**
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

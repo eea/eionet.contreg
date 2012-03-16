@@ -56,4 +56,36 @@ public final class RDFGenerator {
             SesameUtil.close(conn);
         }
     }
+
+    /**
+     * SPARQL for exporting a graph.
+     */
+    private static final String EXPORT_PROPERTIES_SPARQL = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ";
+
+    /**
+     * Generates RDF of given uri proerties to the output stream.
+     *
+     * @param uri
+     *            source uri
+     * @param output
+     *            OutputStream where the RDF is sent to
+     * @throws CRException
+     *             if generating fails
+     */
+    public static void generateProperties(final String uri, final OutputStream output) throws CRException {
+
+        RepositoryConnection conn = null;
+        RDFHandler rdfxmlWriter = new RDFXMLWriter(output);
+
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            Bindings bindings = new Bindings();
+            bindings.setURI("s", uri);
+            SesameUtil.exportGraphQuery(EXPORT_PROPERTIES_SPARQL, rdfxmlWriter, conn, bindings);
+        } catch (Exception e) {
+            throw new CRException(e.toString(), e);
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
 }

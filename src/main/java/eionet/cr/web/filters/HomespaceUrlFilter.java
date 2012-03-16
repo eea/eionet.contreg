@@ -32,6 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
@@ -42,14 +43,15 @@ import eionet.cr.util.Util;
 import eionet.cr.web.action.DownloadServlet;
 import eionet.cr.web.action.ExportTriplesActionBean;
 import eionet.cr.web.action.TabularDataServlet;
+import eionet.cr.web.action.factsheet.ViewActionBean;
 
 /**
  * Purpose of this filter is to enable RESTful download of files stored at CR. Since it is assumed that all these will have a URL
  * pointing to some user home directory of CR, then this filter is relevant (and should be applied to) only URLs with pattern
  * /home/*.
  *
- * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 and
- * https://svn.eionet.europa.eu/projects/Reportnet/ticket/2054 for more background.
+ * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 and https://svn.eionet.europa.eu/projects/Reportnet/ticket/2054
+ * for more background.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
@@ -71,7 +73,7 @@ public class HomespaceUrlFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-    throws IOException, ServletException {
+            throws IOException, ServletException {
 
         // Pass on if not a HTTP request.
         if (!(servletRequest instanceof HttpServletRequest)) {
@@ -107,15 +109,20 @@ public class HomespaceUrlFilter implements Filter {
                     String redirectLocation = contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString;
 
                     // Override the prepared redirect location in the below special cases.
-                    if (DAOFactory.get().getDao(HelperDAO.class).isTabularDataSubject(requestURL)){
+                    if (DAOFactory.get().getDao(HelperDAO.class).isTabularDataSubject(requestURL)) {
                         // The requested URL is a subject in tabular data (i.e. CSV or TSV) file.
                         redirectLocation = contextPath + TabularDataServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to tabular data subject, redirecting to: " + redirectLocation);
-                    }
-                    else if (isStoredFile(pathInfo) && !isRdfXmlPreferred(httpRequest)){
+                    } else if (isStoredFile(pathInfo) && !isRdfXmlPreferred(httpRequest)) {
                         // The requested URL is a stored file, and requester wants original copy (i.e. not triples)
                         redirectLocation = contextPath + DownloadServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to stored file, redirecting to: " + redirectLocation);
+                    } else if (isSparqlBookmark(pathInfo)) {
+                        if (isRdfXmlPreferred(httpRequest)) {
+                            redirectLocation = contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString + "&exportProperties=";
+                        } else {
+                            redirectLocation = contextPath + Util.getUrlBinding(ViewActionBean.class) + queryString;
+                        }
                     }
 
                     // Redirect to the location resolved above.
@@ -128,6 +135,20 @@ public class HomespaceUrlFilter implements Filter {
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    /**
+     * Checks if requestPath is like user's SPARQL bookmark.
+     *
+     * @param requestPathInfo
+     * @return
+     */
+    private boolean isSparqlBookmark(String requestPathInfo) {
+        String[] data = StringUtils.split(requestPathInfo, "/");
+        if (data != null && data.length == 3 && data[1].equals("bookmarks")) {
+            return true;
+        }
+        return false;
     }
 
     /**
