@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -124,6 +126,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** The columns (i.e. column titles) forming the contained objects' unique identifiers. */
     private List<String> uniqueColumns;
 
+    /** True, when upload is meant for overwriting existing file. */
+    private boolean overwrite;
+
     /**
      * @return
      */
@@ -135,15 +140,34 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /**
      *
      * @return
+     * @throws DAOException
      */
-    public Resolution upload() {
+    public Resolution upload() throws DAOException {
 
         // Prepare resolution.
         ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
 
+        fileName = fileBean.getFileName();
+
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+        if (overwrite) {
+            if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
+                String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+                // Delete existing data
+                FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
+                folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
+                DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
+                fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + fileName));
+            }
+        } else {
+            if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
+                addCautionMessage("File or folder with the same name already exists.");
+                return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri);
+            }
+        }
+
         try {
             // Save the file into user's file-store.
-            fileName = fileBean.getFileName();
             long fileSize = fileBean.getSize();
             relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
             FileStore fileStore = FileStore.getInstance(getUserName());
@@ -199,7 +223,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     @Before(stages = LifecycleStage.EventHandling)
     public void beforeEventHandling() {
 
-        if (fileName==null && fileBean!=null){
+        if (fileName == null && fileBean != null) {
             fileName = fileBean.getFileName();
         }
         fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
@@ -417,7 +441,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             }
         }
 
-        return objectDTO==null ? new ObjectDTO(value, lang, true, false, null) : objectDTO;
+        return objectDTO == null ? new ObjectDTO(value, lang, true, false, null) : objectDTO;
     }
 
     /**
@@ -643,7 +667,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                         colLabel = StringUtils.substringBefore(colLabel, "@").trim();
                         columns.add(colLabel);
                     }
-                    //columns = Arrays.asList(trimAll(columnsArray));
+                    // columns = Arrays.asList(trimAll(columnsArray));
                 }
             } finally {
                 close(csvReader);
@@ -703,7 +727,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setFolderUri(String uri) {
         this.folderUri = uri;
@@ -725,9 +750,18 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fileName the fileName to set
+     * @param fileName
+     *            the fileName to set
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
     }
 }

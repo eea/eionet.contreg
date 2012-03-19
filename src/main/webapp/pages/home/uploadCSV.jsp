@@ -66,8 +66,12 @@
                                     <td><stripes:file name="fileBean" id="fileInput" size="30" /></td>
                                 </tr>
                                 <tr>
+                                    <td><label for="overwriteCheck">File</label></td>
+                                    <td><stripes:checkbox name="overwrite" id="overwriteCheck" /></td>
+                                </tr>
+                                <tr>
                                     <td colspan="2" align="right">
-                                    	<stripes:submit name="upload" onclick="javascript:uploadFile();" value="Upload" />
+                                        <stripes:submit name="upload" onclick="javascript:uploadFile();" value="Upload" />
                                     </td>
                                 </tr>
                             </table>
@@ -76,6 +80,7 @@
 
                     <c:if test="${param.displayWizard!=null}">
                         <crfn:form action="/uploadCSV.action" method="post">
+                            <stripes:hidden name="overwrite" />
                             <table width="360" border="0" cellpadding="3">
                                 <tr>
                                     <td><label class="question">File type</label></td>
@@ -87,7 +92,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                    	<label class="question required" for="objectsTypeInput">Objects type</label>
+                                        <label class="question required" for="objectsTypeInput">Objects type</label>
                                     </td>
                                     <td><stripes:text name="objectsType" id="objectsTypeInput" size="34" /></td>
                                 </tr>
@@ -113,7 +118,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2" align="right">
-                                    	<stripes:hidden name="folderUri"/>
+                                        <stripes:hidden name="folderUri"/>
                                         <stripes:hidden name="relativeFilePath"/>
                                         <stripes:hidden name="fileType"/>
                                         <stripes:hidden name="fileName"/>
