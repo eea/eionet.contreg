@@ -43,39 +43,39 @@
         <div style="margin-top:20px">
 
             <c:if test='${not empty sessionScope.crUser && (actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "i"))}'>
-	            <ul id="dropdown-operations">
-	                <li><a href="#">Operations</a>
-	                    <ul>
-	                        <li>
-	                            <a href="#" id="createFolderLink">Create folder</a>
-	                        </li>
-	                        <li>
-	                            <stripes:link href="/folder.action" event="uploadForm">
-	                                <stripes:param name="uri" value="${actionBean.uri}"/>
-	                                Upload file
-	                            </stripes:link>
-	                        </li>
-	                        <li>
-	                            <stripes:link href="/uploadCSV.action">
-	                                <stripes:param name="folderUri" value="${actionBean.uri}"/>
-	                                Upload CSV/TSV file
-	                            </stripes:link>
-	                        </li>
-	                        <c:if test='${not empty sessionScope.crUser && (actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "u"))}'>
-		                        <li>
-		                            <stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.uri}" title="Edit folder properties">
-		                            Edit folder
-		                            </stripes:link>
-		                        </li>
-	                        </c:if>
-	                    </ul>
-	                </li>
-	            </ul>
+                <ul id="dropdown-operations">
+                    <li><a href="#">Operations</a>
+                        <ul>
+                            <li>
+                                <a href="#" id="createFolderLink">Create folder</a>
+                            </li>
+                            <li>
+                                <stripes:link href="/folder.action" event="uploadForm">
+                                    <stripes:param name="uri" value="${actionBean.uri}"/>
+                                    Upload file
+                                </stripes:link>
+                            </li>
+                            <li>
+                                <stripes:link href="/uploadCSV.action">
+                                    <stripes:param name="folderUri" value="${actionBean.uri}"/>
+                                    Upload CSV/TSV file
+                                </stripes:link>
+                            </li>
+                            <c:if test='${not empty sessionScope.crUser && (actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "u"))}'>
+                                <li>
+                                    <stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.uri}" title="Edit folder properties">
+                                    Edit folder
+                                    </stripes:link>
+                                </li>
+                            </c:if>
+                        </ul>
+                    </li>
+                </ul>
             </c:if>
 
             <h1>
                 <c:choose>
-                	<c:when test="${actionBean.projectFolder}">
+                    <c:when test="${actionBean.projectFolder}">
                         Projects folder
                     </c:when>
                     <c:when test="${actionBean.homeFolder}">
@@ -92,14 +92,20 @@
 
             <crfn:form id="uploadsForm" action="/folder.action" method="post">
                 <stripes:hidden name="uri" value="${actionBean.uri}" />
-                <table>
-                    <tbody>
+                <table style="width:100%">
+                    <colgroup>
+                        <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
+                            <col style="width: 1em;" />
+                        </c:if>
+                        <col />
+                        <col style="width: 30em;" />
+                    </colgroup>
                     <c:if test="${!actionBean.homeFolder && !actionBean.projectFolder}">
                         <tr>
                             <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
                                 <td></td>
                             </c:if>
-                            <td class="upFolder" style="width: 100%">
+                            <td class="upFolder">
                                 [<stripes:link href="/view.action" title="Move to parent folder" style="background: none">
                                     <stripes:param name="uri" value="${actionBean.parentUri}"/>
                                     Parent Directory
@@ -127,7 +133,7 @@
                                 <c:set var="disabled" value="${item.reservedFolder || item.reservedFile}" />
                                 <td><stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" /></td>
                             </c:if>
-                            <td class="${cssClass}" style="width: 100%">
+                            <td class="${cssClass}">
                                 <stripes:link href="/view.action">
                                     <stripes:param name="uri" value="${item.uri}"/>
                                     ${item.name}
@@ -141,7 +147,6 @@
                             </td>
                         </tr>
                     </c:forEach>
-                    </tbody>
                 </table>
 
                 <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
