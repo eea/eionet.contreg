@@ -92,13 +92,13 @@
 
             <crfn:form id="uploadsForm" action="/folder.action" method="post">
                 <stripes:hidden name="uri" value="${actionBean.uri}" />
-                <table style="width:100%">
+                <table class="datatable" style="width:100%">
                     <colgroup>
                         <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
                             <col style="width: 1em;" />
                         </c:if>
                         <col />
-                        <col style="width: 30em;" />
+                        <col style="width: 12em;" />
                     </colgroup>
                     <c:if test="${!actionBean.homeFolder && !actionBean.projectFolder}">
                         <tr>
@@ -152,8 +152,8 @@
                 <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
                     <br />
                     <div>
-                        <stripes:submit name="delete" value="Delete" title="Delete selecetd files"/>
-                        <stripes:submit name="renameForm" value="Rename" title="Rename selecetd file"/>
+                        <stripes:submit name="delete" value="Delete" title="Delete selected files"/>
+                        <stripes:submit name="renameForm" value="Rename" title="Rename selected file"/>
                         <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('uploadsForm');return false"/>
                     </div>
                 </c:if>
