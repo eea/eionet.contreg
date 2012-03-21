@@ -1,6 +1,7 @@
 /**
 * external GIS service funtions
 */
+var map;
 
 function getUrlParameter( name ) {
             name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
@@ -14,10 +15,12 @@ function getUrlParameter( name ) {
 }
 
 function initialize() {
-          map = new esri.Map("map", {
-              extent: new esri.geometry.Extent ($extX1, $extY1, $extX2, $extY2, new esri.SpatialReference({wkid:4326})),
-              showInfoWindowOnClick:true
-            });
+          var obj = {
+                  extent: new esri.geometry.Extent ($extX1, $extY1, $extX2, $extY2, new esri.SpatialReference({wkid:4326})),
+                  showInfoWindowOnClick:true
+          };
+
+          map = new esri.Map("map", obj);
           var layer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_StreetMap_World_2D/MapServer");
           map.addLayer(layer);
 
@@ -67,7 +70,6 @@ function loadMap() {
         $extY2=parseFloat($latitude)+0.5;
 
 
-        var map = null;
         var pos = null;
 
         dojo.addOnLoad(initialize);
