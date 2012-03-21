@@ -66,7 +66,7 @@
                                     <td><stripes:file name="fileBean" id="fileInput" size="30" /></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="overwriteCheck">File</label></td>
+                                    <td><label for="overwriteCheck">Overwrite</label></td>
                                     <td><stripes:checkbox name="overwrite" id="overwriteCheck" /></td>
                                 </tr>
                                 <tr>
