@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -41,6 +42,9 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
  * @author Jaanus Heinlaid
  */
 public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO> {
+
+    /** */
+    protected Logger logger = Logger.getLogger(PredicateObjectsReader.class);
 
     /**  */
     public static final int PREDICATE_PAGE_SIZE = 10;
@@ -72,6 +76,9 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
 
             String value = objectValue.stringValue();
             boolean isLiteral = objectValue instanceof Literal;
+            if (!isLiteral) {
+                value = objectValue.toString();
+            }
             Literal literal = isLiteral ? (Literal) objectValue : null;
             String language = isLiteral ? literal.getLanguage() : null;
 

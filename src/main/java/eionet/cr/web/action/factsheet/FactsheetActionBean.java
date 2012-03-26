@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dataset.CurrentLoadedDatasets;
 import eionet.cr.dto.DatasetDTO;
+import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -158,6 +160,9 @@ public class FactsheetActionBean extends AbstractActionBean {
             setAdminLoggedIn(getUser() != null && getUser().isAdministrator());
 
             subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
+
+            LinkedHashMap<String, Collection<ObjectDTO>> sdf = ((FactsheetDTO) subject).getSortedPredicates();
+            Collection<ObjectDTO> o = sdf.get("http://xmlns.com/foaf/0.1/knows");
 
             FactsheetTabMenuHelper tabsHelper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
 

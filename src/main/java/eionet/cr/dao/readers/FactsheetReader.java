@@ -104,7 +104,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         String objectUri = StringUtils.isBlank(split[3]) ? null : split[3].trim();
 
         boolean isLiteral = objectUri == null;
-        boolean isAnonymous = StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1");
+        boolean isAnonymous = StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1") || split[4].trim().equals("true");
         String graphUri = StringUtils.isBlank(split[5]) ? null : split[5].trim();
         int objectLength = StringUtils.isBlank(split[6]) ? 0 : Integer.parseInt(split[6].trim());
         String objectMD5 = StringUtils.isBlank(split[7]) ? "" : split[6].trim();
