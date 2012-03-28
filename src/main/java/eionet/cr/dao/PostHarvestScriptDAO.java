@@ -21,6 +21,7 @@
 
 package eionet.cr.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,12 +78,13 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param title
      * @param script
      * @param active
-     * @param runOnce TODO
+     * @param runOnce
+     *            TODO
      * @return
      * @throws DAOException
      */
     int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
-    throws DAOException;
+            throws DAOException;
 
     /**
      *
@@ -90,7 +92,8 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param title
      * @param script
      * @param active
-     * @param runOnce TODO
+     * @param runOnce
+     *            TODO
      * @throws DAOException
      */
     void save(int id, String title, String script, boolean active, boolean runOnce) throws DAOException;
@@ -162,5 +165,19 @@ public interface PostHarvestScriptDAO extends DAO {
      * @throws DAOException
      */
     List<Map<String, ObjectDTO>> test(String constructQuery, TargetType targetType, String targetUrl, String harvestedSource)
-    throws DAOException;
+            throws DAOException;
+
+    /**
+     * Checks if there are any post-harvest scripts, that are modified later than last harvest of given harvest source was done. It
+     * checks all the all-source scripts, all type-specific scripts and source-specific scripts that are bound to the given harvest
+     * source.
+     *
+     * @param lastHarvestDate
+     *            date of the last harvest of the harvest source
+     * @param harvestSource
+     *            harvest source
+     * @return true, if scripts have been modified since the last harvest
+     * @throws DAOException
+     */
+    boolean isScriptsModified(Date lastHarvestDate, String harvestSource) throws DAOException;
 }

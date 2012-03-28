@@ -58,6 +58,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -72,7 +73,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class PullHarvest extends BaseHarvest {
@@ -116,7 +117,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param contextSourceDTO
      * @throws DAOException
      */
@@ -226,7 +227,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param urlConn
      * @param noOfTriples
      */
@@ -247,7 +248,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param urlConn
      * @param noOfTriples
      */
@@ -329,7 +330,7 @@ public class PullHarvest extends BaseHarvest {
      * Calculate last harvest date when there is a temporary error with the source. The LAST_HARVEST is not set to current time.
      * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
      * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
-     * 
+     *
      * @param contextSourceDTO - object representing the source with the error.
      * @return the last harvest date + 10 %.
      */
@@ -350,7 +351,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param urlConn
      * @param responseCode
      * @param exception
@@ -414,7 +415,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
-     * 
+     *
      * @param urlConn - connection to the remote source.
      * @return number of triples harvested.
      * @throws IOException
@@ -456,7 +457,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param redirectedToUrl
      * @throws DAOException
      */
@@ -508,7 +509,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param sourceDTO
      * @param redirectionSeen
      * @param redirectedToUrl
@@ -539,7 +540,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Load file into triple store.
-     * 
+     *
      * @param file
      * @param rdfFormat
      * @return number of triples harvested.
@@ -557,7 +558,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Download file from remote source to a temporary file locally. Sideeffect: Adds the file size to the metadata to save in the
      * harvester context.
-     * 
+     *
      * @param urlConn - connection to the remote source.
      * @return object representing the temporary file.
      * @throws IOException if the file is not downloadable.
@@ -624,10 +625,14 @@ public class PullHarvest extends BaseHarvest {
                 boolean hasConversion = !StringUtils.isBlank(conversionStylesheetUrl);
                 boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
 
+                //Check if post-harvest scripts are updated
+                boolean scriptsModified = DAOFactory.get().getDao(PostHarvestScriptDAO.class).isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+
+
                 // "If-Modified-Since" should only be set if there is no modified conversion for this URL.
                 // Because if there is a conversion stylesheet, and it has been modified since last harvest,
                 // we surely want to get the content again, regardless of when the content itself was last modified.
-                if (!hasModifiedConversion) {
+                if (!hasModifiedConversion && !scriptsModified) {
                     LOGGER.debug(loggerMsg("Using if-modified-since, compared to last harvest " + formatDate(lastHarvestDate)));
                     connection.setIfModifiedSince(lastHarvest);
                 }
@@ -638,7 +643,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param connection
      * @return
      * @throws MalformedURLException
@@ -665,7 +670,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return long
      * @throws DAOException
@@ -686,7 +691,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param harvestSourceUrl
      * @return
      * @throws DAOException
@@ -715,7 +720,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Returns RDF format from url connection.
-     * 
+     *
      * @param contentType
      * @return
      */
@@ -746,7 +751,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * 
+     *
      * @param urlConn
      * @return
      */

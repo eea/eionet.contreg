@@ -23,8 +23,10 @@ package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.readers.PostHarvestScriptDTOReader;
 import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
@@ -45,6 +48,7 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
+import eionet.cr.util.sql.SQLResultSetBaseReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
@@ -65,7 +69,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-        + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=? where POST_HARVEST_SCRIPT_ID=?";
+        + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -73,7 +77,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE) values " + "(?,?,?,?,?,?,?)";
+        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,LAST_MODIFIED) values " + "(?,?,?,?,?,?,?,NOW())";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -473,5 +477,51 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         } finally {
             SesameUtil.close(conn);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isScriptsModified(Date lastHarvestDate, String harvestSource) throws DAOException {
+        String sql = "SELECT post_harvest_script_id, target_source_url, target_type_url FROM post_harvest_script WHERE last_modified > ? AND active = ?";
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(lastHarvestDate);
+        values.add("Y");
+
+        List<PostHarvestScriptDTO> scripts = executeSQL(sql, values, new SQLResultSetBaseReader<PostHarvestScriptDTO>() {
+            @Override
+            public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+                String targetSourceUrl = rs.getString("target_source_url");
+                String targetTypeUrl = rs.getString("target_type_url");
+
+                PostHarvestScriptDTO dto = new PostHarvestScriptDTO();
+                dto.setId(rs.getInt("post_harvest_script_id"));
+
+                if (StringUtils.isNotEmpty(targetSourceUrl)) {
+                    dto.setTargetType(TargetType.SOURCE);
+                    dto.setTargetUrl(targetSourceUrl);
+                }
+                if (StringUtils.isNotEmpty(targetTypeUrl)) {
+                    dto.setTargetType(TargetType.TYPE);
+                    dto.setTargetUrl(targetTypeUrl);
+                }
+
+
+                resultList.add(dto);
+            }
+        });
+
+        for (PostHarvestScriptDTO script : scripts) {
+            if (script.getTargetType() == null || TargetType.TYPE.equals(script.getTargetType())) {
+                return true;
+            }
+            if (TargetType.SOURCE.equals(script.getTargetType())) {
+                if (harvestSource.equals(script.getTargetUrl())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
