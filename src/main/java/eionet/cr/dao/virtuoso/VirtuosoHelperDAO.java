@@ -1367,7 +1367,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
     /** */
     private static final String GET_FACTSHEET_ROWS =
-        "select ?pred min(isBlank(?s)) as ?anonSubj "
+        "select ?pred min(xsd:int(isBlank(?s))) as ?anonSubj "
         + "min(bif:either(isLiteral(?o),"
         + "bif:concat(bif:left(str(?o),LEN),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g),'<|>',str(bif:length(str(?o))),'<|>',bif:md5(str(?o))),"
         + "bif:concat(bif:coalesce(str(?oLabel),bif:left(str(?o),LEN)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',bif:left(str(?o),LEN),'<|>',str(isBlank(?o)),'<|>',str(?g),'<|><|>')"
