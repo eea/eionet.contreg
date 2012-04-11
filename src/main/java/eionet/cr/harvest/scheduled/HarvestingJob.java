@@ -114,6 +114,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
 
                 counter++;
+                if (counter==50){
+                    // Just a security measure to avoid an infinite loop here.
+                    // So lets do max 50 urgent harvests at one time.
+                    break;
+                }
 
                 String url = queueItem.getUrl();
                 if (!StringUtils.isBlank(url)) {
@@ -125,7 +130,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                         if (src != null) {
                             pullHarvest(src, true);
                         } else {
-                            LOGGER.trace("Could not find harvest source [" + url + "]");
+                            LOGGER.warn("Urgent harvest URL could not be found in harvest source:" + url);
                         }
                     }
                 }
