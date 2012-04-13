@@ -56,11 +56,10 @@ public class ExporterDAOTest extends VirtuosoExporterDAO {
         }
 
         assertEquals(
-                "DEFINE input:inference'CRInferenceRule' select distinct * where {?s ?p ?o .?s ?p1 ?o1. filter(?p1 = ?p1Val). " +
-                "filter(?o1 = ?o1Val). ?s ?p2 ?o2. filter(?p2 = ?p2Val). filter bif:contains(?o2, ?o2Val) . " +
-                "filter (?p IN (?exportPredicateValue1,?exportPredicateValue2,?exportPredicateValue3," +
-                "?exportPredicateValue4,?exportPredicateValue5))} ORDER BY ?s",
-                sparql);
+                "DEFINE input:inference'CRInferenceRule' select distinct * where {?s ?p ?o .?s ?p1 ?o1 . filter(?p1 = ?p1Val) . "
+                        + "filter(?o1 = ?o1Val) . ?s ?p2 ?o2 . filter(?p2 = ?p2Val) . filter bif:contains(?o2, ?o2Val) . "
+                        + "filter (?p IN (?exportPredicateValue1,?exportPredicateValue2,?exportPredicateValue3,"
+                        + "?exportPredicateValue4,?exportPredicateValue5))} ORDER BY ?s", sparql);
 
         // assertTrue(bindings.toString().indexOf("objectValue1Uri=http://rod.eionet.europa.eu/schema.rdf#Obligation") != -1);
         // assertTrue(bindings.toString().indexOf("exportPredicateValue1=http://www.w3.org/2000/01/rdf-schema#label") != -1);

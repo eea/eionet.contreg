@@ -20,6 +20,7 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.dbunit.dataset.IDataSet;
@@ -32,9 +33,9 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
+    @Override
     protected IDataSet getDataSet() throws Exception {
         return getXmlDataSet("emptydb.xml");
     }
@@ -51,13 +52,21 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase {
         source.setEmails("bob@europe.eu");
         dao.addSource(source);
 
+        // finish harvest
+        source.setStatements(100);
+        source.setLastHarvestFailed(false);
+        source.setLastHarvest(new Date());
+        source.setOwner("system");
+        dao.updateSourceHarvestFinished(source);
+
         source.setUrl("http://rod.eionet.europa.eu/testObligations2");
         source.setIntervalMinutes(10);
         dao.addSource(source);
 
         List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(10);
         assertNotNull(dtos);
-        // First harvest_source will be available after 5 minutes, that's why the list should be empty
-        assertEquals(0, dtos.size());
+        // The first harvest_source has Harvest date field filled with now() and it will be available again in 5 minutes
+        // The second harvest_soruce is not yet harvested and this is returned by the method.
+        assertEquals(1, dtos.size());
     }
 }

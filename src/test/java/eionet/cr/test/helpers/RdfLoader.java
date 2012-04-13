@@ -34,11 +34,12 @@ import eionet.cr.dao.HarvestSourceDAO;
 public class RdfLoader {
 
     private static String graphUri;
+    public static String TEST_GRAPH_URI = "http://test.com/test/";
 
     public RdfLoader(String datasetName) throws Exception {
         InputStream is = getFile(datasetName);
         if (is != null) {
-            graphUri = "http://test.com/test/"+datasetName;
+            graphUri = getGraphUri(datasetName);
             DAOFactory.get().getDao(HarvestSourceDAO.class).loadIntoRepository(is, null, graphUri, true);
         }
     }
@@ -49,5 +50,9 @@ public class RdfLoader {
 
     public String getGraphUri() {
         return graphUri;
+    }
+
+    public static String getGraphUri(String datasetName) {
+        return TEST_GRAPH_URI + datasetName;
     }
 }

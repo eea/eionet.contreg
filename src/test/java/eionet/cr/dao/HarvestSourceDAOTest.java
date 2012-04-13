@@ -40,9 +40,9 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
+    @Override
     protected IDataSet getDataSet() throws Exception {
         return getXmlDataSet("sources-harvests-messages.xml");
     }
@@ -82,7 +82,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
             DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
         assertNotNull(result);
         assertNotNull(result.getRight());
-        assertEquals(42, result.getRight().size());
+        assertEquals(5, result.getRight().size());
     }
 
     @Test

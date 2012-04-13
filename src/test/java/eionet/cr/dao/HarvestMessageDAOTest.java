@@ -39,9 +39,9 @@ public class HarvestMessageDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
+    @Override
     protected IDataSet getDataSet() throws Exception {
         return getXmlDataSet("sources-harvests-messages.xml");
     }
@@ -50,7 +50,7 @@ public class HarvestMessageDAOTest extends CRDatabaseTestCase {
     public void testInsertAndFindHarvestMessage() throws Exception {
 
         HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
-        harvestMessage.setHarvestId(55);
+        harvestMessage.setHarvestId(5);
         harvestMessage.setMessage("test");
         harvestMessage.setStackTrace("teststack");
         harvestMessage.setType("01");
@@ -66,8 +66,8 @@ public class HarvestMessageDAOTest extends CRDatabaseTestCase {
     @Test
     public void testFindHarvestMessagesByHarvestID() throws Exception {
 
-        List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(121);
-        assertEquals(2, messages.size());
+        List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(5);
+        assertEquals(4, messages.size());
     }
 
     @Test

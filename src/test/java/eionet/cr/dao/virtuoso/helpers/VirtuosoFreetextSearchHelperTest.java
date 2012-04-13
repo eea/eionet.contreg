@@ -32,11 +32,11 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
 
-        assertEquals("select distinct ?s where {?s ?p ?o. filter bif:contains(?o, ?objectVal)} limit 15 offset 0", sparql);
+        assertEquals("select distinct ?s where { ?s ?p ?o . filter bif:contains(?o, ?objectVal)} limit 15 offset 0", sparql);
         // assertTrue(helper.getQueryBindings().toString().indexOf("objectValue='water'") != -1);
     }
 
@@ -57,10 +57,10 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
-        assertEquals("select distinct ?s where {?s ?p ?o. filter (?o = ?objectVal)} limit 15 offset 15", sparql);
+        assertEquals("select distinct ?s where { ?s ?p ?o . filter (?o = ?objectVal)} limit 15 offset 15", sparql);
         // assertTrue(helper.getQueryBindings().toString().indexOf("objectValue=water") != -1);
     }
 
@@ -81,11 +81,12 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_FILE);
         String sparql = helper.getQuery(null);
 
-        assertEquals("select distinct ?s where {?s ?p ?o. ?s a ?subjType. filter bif:contains(?o, ?objectVal)} limit 15 offset 0",
+        assertEquals(
+                "select distinct ?s where { ?s ?p ?o . ?s a ?subjType . filter bif:contains(?o, ?objectVal)} limit 15 offset 0",
                 sparql);
 
         // assertTrue(helper.getQueryBindings().toString().indexOf("subjectType=http://cr.eionet.europa.eu/ontologies/contreg.rdf#File")
@@ -99,7 +100,7 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     public static void testSortedQueryLabel() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-            new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
+                new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = false;
         SearchExpression expression = new SearchExpression("ippc");
         VirtuosoFullTextQuery virtExpression = null;
@@ -111,11 +112,11 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
 
-        assertEquals("select distinct ?s where {?s ?p ?o. filter bif:contains(?o, ?objectVal). "
+        assertEquals("select distinct ?s where {?s ?p ?o . filter bif:contains(?o, ?objectVal) . "
                 + "optional {?s ?sortPredicate ?ord}} ORDER BY asc(bif:lcase(bif:either(bif:isnull(?ord), "
                 + "(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr "
                 + "(bif:replace (?s, '/', '#'), '#')+1)), ?ord))) limit 15 offset 0", sparql);
@@ -141,11 +142,11 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
         }
 
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtExpression, exactMatch, pagingRequest, sortingRequest);
         helper.setFilter(FilterType.ANY_OBJECT);
         String sparql = helper.getQuery(null);
 
-        assertEquals("select distinct ?s where {?s ?p ?o. filter (?o = ?objectVal)} limit 15 offset 15", sparql);
+        assertEquals("select distinct ?s where { ?s ?p ?o . filter (?o = ?objectVal)} limit 15 offset 15", sparql);
         // assertTrue(helper.getQueryBindings().toString().indexOf("objectValueUri=http://uri.com") != -1);
         // assertTrue(helper.getQueryBindings().toString().indexOf("objectValueLit=http://uri.com") != -1);
     }

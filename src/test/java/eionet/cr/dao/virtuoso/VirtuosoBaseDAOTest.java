@@ -25,16 +25,16 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
     public void testSubjectsDataQuery() {
 
         String[] uris =
-        {"http://rod.eionet.europa.eu/obligations/392", "http://rod.eionet.europa.eu/instruments/618",
-                "http://rod.eionet.europa.eu/issues/15", "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1752885689",
-                "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1607205326",
-                "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ9599558008",
-                "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ9193135010",
-                "http://www.eea.europa.eu/data-and-maps/figures/potential-climatic-tipping-elements",
-                "http://rod.eionet.europa.eu/obligations/171", "http://rod.eionet.europa.eu/obligations/661",
-                "http://rod.eionet.europa.eu/obligations/606", "http://rod.eionet.europa.eu/obligations/136",
-                "http://rod.eionet.europa.eu/obligations/520", "http://rod.eionet.europa.eu/obligations/522",
-        "http://rod.eionet.europa.eu/obligations/521"};
+                { "http://rod.eionet.europa.eu/obligations/392", "http://rod.eionet.europa.eu/instruments/618",
+                        "http://rod.eionet.europa.eu/issues/15", "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1752885689",
+                        "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1607205326",
+                        "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ9599558008",
+                        "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ9193135010",
+                        "http://www.eea.europa.eu/data-and-maps/figures/potential-climatic-tipping-elements",
+                        "http://rod.eionet.europa.eu/obligations/171", "http://rod.eionet.europa.eu/obligations/661",
+                        "http://rod.eionet.europa.eu/obligations/606", "http://rod.eionet.europa.eu/obligations/136",
+                        "http://rod.eionet.europa.eu/obligations/520", "http://rod.eionet.europa.eu/obligations/522",
+                        "http://rod.eionet.europa.eu/obligations/521" };
 
         List<String> subjectUris = Arrays.asList(uris);
 
@@ -42,7 +42,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
         dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
         // only these predicates will be queried for
-        String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
+        String[] neededPredicates = { Predicates.RDF_TYPE, Predicates.RDFS_LABEL };
 
         // logger.trace("Free-text search, getting the data of the found subjects");
 
@@ -69,23 +69,24 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
     public void testGetSubjectsData() {
         // subjecturis
         String[] s1 =
-        {"http://rod.eionet.europa.eu/obligations/130", "http://rod.eionet.europa.eu/obligations/143",
-                "http://rod.eionet.europa.eu/instruments/381", "http://rod.eionet.europa.eu/instruments/273",
-                "http://rod.eionet.europa.eu/obligations/523", "http://rdfdata.eionet.europa.eu/eper/facilities/01035",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01039",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01046",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01047",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01052",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01053",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01054",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01055",
-                "http://rdfdata.eionet.europa.eu/eper/facilities/01068",
-        "http://rdfdata.eionet.europa.eu/eper/facilities/01074"};
+                { "http://rod.eionet.europa.eu/obligations/130", "http://rod.eionet.europa.eu/obligations/143",
+                        "http://rod.eionet.europa.eu/instruments/381", "http://rod.eionet.europa.eu/instruments/273",
+                        "http://rod.eionet.europa.eu/obligations/523", "http://rdfdata.eionet.europa.eu/eper/facilities/01035",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01039",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01046",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01047",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01052",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01053",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01054",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01055",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01068",
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01074" };
 
         List<String> subjectUris = Arrays.asList(s1);
 
         // predicateuris
-        String[] predicateUris = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#label"};
+        String[] predicateUris =
+                { "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#label" };
 
         SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
         dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
@@ -97,11 +98,10 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
         }
 
         assertEquals(
-                "select * where {graph ?g {?s ?p ?o. filter (?s IN (?subjectValue1,?subjectValue2,?subjectValue3," +
-                "?subjectValue4,?subjectValue5,?subjectValue6,?subjectValue7,?subjectValue8,?subjectValue9,?subjectValue10," +
-                "?subjectValue11,?subjectValue12,?subjectValue13,?subjectValue14,?subjectValue15)) " +
-                "filter (?p IN (?predicateValue1,?predicateValue2)) }} ORDER BY ?s ?p",
-                getSPARQL());
+                "select ?g ?s ?p bif:left(str(?obj),2000) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (?subjectValue1,?subjectValue2,?subjectValue3,"
+                        + "?subjectValue4,?subjectValue5,?subjectValue6,?subjectValue7,?subjectValue8,?subjectValue9,?subjectValue10,"
+                        + "?subjectValue11,?subjectValue12,?subjectValue13,?subjectValue14,?subjectValue15)) "
+                        + "filter (?p IN (?predicateValue1,?predicateValue2)) }} ORDER BY ?s ?p", getSPARQL());
 
     }
 
