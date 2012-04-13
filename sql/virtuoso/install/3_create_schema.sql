@@ -83,6 +83,7 @@ create table CR.cr3user.post_harvest_script
   script LONG VARCHAR,
   position_number INTEGER,
   active VARCHAR(1),
+  run_once character NOT NULL DEFAULT 'Y',
   last_modified datetime,
   PRIMARY KEY (post_harvest_script_id)
 );
