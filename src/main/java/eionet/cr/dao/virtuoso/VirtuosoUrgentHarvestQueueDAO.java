@@ -44,9 +44,9 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestQueueDAO#addQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
      */
+    @Override
     public void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException {
 
         String sql = "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\") VALUES (?,NOW())";
@@ -68,8 +68,8 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
-            SQLUtil.close(conn);
             SQLUtil.close(ps);
+            SQLUtil.close(conn);
         }
     }
 
@@ -79,9 +79,9 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
      */
+    @Override
     public void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
@@ -109,25 +109,25 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
      */
+    @Override
     public List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException {
         return executeSQL(getUrgentHarvestQueueSQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
     }
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#poll()
      */
+    @Override
     public UrgentHarvestQueueItemDTO poll() throws DAOException {
 
         Connection conn = null;
         try {
             conn = getSQLConnection();
             UrgentHarvestQueueItemDTO queueItem = peek(conn);
-            if (queueItem != null){
+            if (queueItem != null) {
                 deleteQueueItem(queueItem, conn);
             }
             return queueItem;
@@ -181,6 +181,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      * @param url
      * @throws DAOException
      */
+    @Override
     public boolean isInQueue(String url) {
 
         boolean ret = false;
@@ -200,8 +201,8 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
             e.printStackTrace();
             return false;
         } finally {
-            SQLUtil.close(conn);
             SQLUtil.close(ps);
+            SQLUtil.close(conn);
         }
         return ret;
     }

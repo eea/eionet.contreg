@@ -112,13 +112,8 @@ public class SQLUtil {
                 }
             }
         } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (pstmt != null)
-                    pstmt.close();
-            } catch (SQLException e) {
-            }
+            SQLUtil.close(rs);
+            SQLUtil.close(pstmt);
         }
 
     }
@@ -166,13 +161,8 @@ public class SQLUtil {
                 }
             }
         } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException e) {
-            }
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
         }
     }
 
@@ -192,8 +182,9 @@ public class SQLUtil {
             return pstmt.executeUpdate();
         } finally {
             try {
-                if (pstmt != null)
+                if (pstmt != null) {
                     pstmt.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -217,18 +208,15 @@ public class SQLUtil {
             pstmt.executeUpdate();
             pstmt = conn.prepareStatement("select identity_value()");
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next())
+            if (rs.next()) {
                 return rs.getInt(1);
-            else
+            } else {
                 throw new CRException("No auto-generated keys returned!");
+            }
         } catch (SQLException sqle) {
             throw new CRException(sqle.toString(), sqle);
         } finally {
-            try {
-                if (pstmt != null)
-                    pstmt.close();
-            } catch (SQLException e) {
-            }
+            SQLUtil.close(pstmt);
         }
     }
 
@@ -311,6 +299,7 @@ public class SQLUtil {
             try {
                 conn.close();
             } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -324,6 +313,7 @@ public class SQLUtil {
             try {
                 stmt.close();
             } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }

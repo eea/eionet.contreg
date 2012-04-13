@@ -80,9 +80,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
-     *
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
+    @Override
     public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 
         try {
@@ -106,7 +106,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /**
      *
      */
-    private void handleUrgentQueue() {
+    protected void handleUrgentQueue() {
 
         try {
             int counter = 0;
@@ -114,7 +114,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
 
                 counter++;
-                if (counter==50){
+                if (counter == 50) {
                     // Just a security measure to avoid an infinite loop here.
                     // So lets do max 50 urgent harvests at one time.
                     break;
@@ -279,8 +279,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
                         from = Math.max(0, Math.min(23, from));
                         to = Math.max(0, Math.min(23, to));
-                        if (to < from)
+                        if (to < from) {
                             to = from;
+                        }
 
                         batchHarvestingHours.add(new HourSpan(from, to));
                     }
@@ -513,6 +514,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /**
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet .ServletContextEvent)
      */
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
         try {
@@ -535,6 +537,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     /**
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet. ServletContextEvent)
      */
+    @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
     }
 }
