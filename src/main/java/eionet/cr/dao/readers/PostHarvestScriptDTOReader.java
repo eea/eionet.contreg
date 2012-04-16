@@ -65,6 +65,7 @@ public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarve
         dto.setPosition(rs.getInt("POSITION_NUMBER"));
         dto.setActive(YesNoBoolean.parse(rs.getString("ACTIVE")));
         dto.setRunOnce(YesNoBoolean.parse(rs.getString("RUN_ONCE")));
+        dto.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
 
         resultList.add(dto);
     }

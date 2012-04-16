@@ -64,7 +64,7 @@ import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public abstract class BaseHarvest implements Harvest {
@@ -101,9 +101,9 @@ public abstract class BaseHarvest implements Harvest {
     private String harvestUser;
 
     /**
-     * 
+     *
      * Class constructor.
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -113,7 +113,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextSourceDTO
      */
     protected BaseHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -150,7 +150,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * @throws HarvestException
-     * 
+     *
      */
     private void startHarvest() throws HarvestException {
 
@@ -172,13 +172,13 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @throws HarvestException
      */
     protected abstract void doHarvest() throws HarvestException;
 
     /**
-     * 
+     *
      * @param dontThrowException
      * @throws HarvestException
      */
@@ -244,9 +244,14 @@ public abstract class BaseHarvest implements Harvest {
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
      * @throws RepositoryException
-     * 
+     *
      */
     private void runPostHarvestScripts() {
+
+        if (getStoredTriplesCount() <= 0) {
+            LOGGER.debug(loggerMsg("Ignoring post-harvest scripts - no triples added from"));
+            return;
+        }
 
         LOGGER.debug(loggerMsg("Running post-harvest scripts"));
 
@@ -295,7 +300,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param scriptDtos
      * @param conn
      * @throws OpenRDFException
@@ -364,7 +369,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Adds source int inference rule, if source is inference rule. (It is done because rule set must be updated after the harvest
      * is done)
-     * 
+     *
      * @throws DAOException
      */
     private void addIntoInferenceRule() throws DAOException {
@@ -429,13 +434,13 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected abstract String getHarvestType();
 
     /**
-     * 
+     *
      * @param date
      */
     protected String formatDate(Date date) {
@@ -443,7 +448,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param messageObject
      * @return
      */
@@ -488,7 +493,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return
      * @throws DAOException
@@ -499,7 +504,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -522,7 +527,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      * @throws DAOException
@@ -541,7 +546,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param predicate
      * @param objectDTO
      */
@@ -562,7 +567,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param messageType
      */
@@ -571,7 +576,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param messageType
      * @param stackTrace
@@ -589,7 +594,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Derives new harvest sources from stored content.
-     * 
+     *
      */
     private void deriveNewHarvestSources() {
 
@@ -637,7 +642,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param throwable
      */
@@ -690,7 +695,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param messageBody
      */
     private void sendErrorMessage(String messageBody) {
@@ -705,7 +710,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected boolean isSendNotifications() {
@@ -721,7 +726,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#isBeingHarvested(java.lang.String)
      */
     @Override

@@ -331,7 +331,8 @@ public class PullHarvest extends BaseHarvest {
      * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
      * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
      *
-     * @param contextSourceDTO - object representing the source with the error.
+     * @param contextSourceDTO
+     *            - object representing the source with the error.
      * @return the last harvest date + 10 %.
      */
     private Date temporaryErrorLastHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -416,7 +417,8 @@ public class PullHarvest extends BaseHarvest {
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
      *
-     * @param urlConn - connection to the remote source.
+     * @param urlConn
+     *            - connection to the remote source.
      * @return number of triples harvested.
      * @throws IOException
      * @throws OpenRDFException
@@ -559,9 +561,11 @@ public class PullHarvest extends BaseHarvest {
      * Download file from remote source to a temporary file locally. Sideeffect: Adds the file size to the metadata to save in the
      * harvester context.
      *
-     * @param urlConn - connection to the remote source.
+     * @param urlConn
+     *            - connection to the remote source.
      * @return object representing the temporary file.
-     * @throws IOException if the file is not downloadable.
+     * @throws IOException
+     *             if the file is not downloadable.
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
@@ -592,7 +596,8 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param connectUrl TODO
+     * @param connectUrl
+     *            TODO
      * @return
      * @throws MalformedURLException
      * @throws IOException
@@ -625,13 +630,15 @@ public class PullHarvest extends BaseHarvest {
                 boolean hasConversion = !StringUtils.isBlank(conversionStylesheetUrl);
                 boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
 
-                //Check if post-harvest scripts are updated
-                boolean scriptsModified = DAOFactory.get().getDao(PostHarvestScriptDAO.class).isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                // Check if post-harvest scripts are updated
+                boolean scriptsModified =
+                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
-
-                // "If-Modified-Since" should only be set if there is no modified conversion for this URL.
-                // Because if there is a conversion stylesheet, and it has been modified since last harvest,
-                // we surely want to get the content again, regardless of when the content itself was last modified.
+                // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
+                // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
+                // harvest, we surely want to get the content again and run the conversion or script on the content, regardless of
+                // when the content itself was last modified.
                 if (!hasModifiedConversion && !scriptsModified) {
                     LOGGER.debug(loggerMsg("Using if-modified-since, compared to last harvest " + formatDate(lastHarvestDate)));
                     connection.setIfModifiedSince(lastHarvest);
@@ -768,6 +775,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
+    @Override
     protected String getHarvestType() {
 
         return HarvestConstants.TYPE_PULL;
@@ -791,7 +799,8 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param isOnDemandHarvest the isOnDemandHarvest to set
+     * @param isOnDemandHarvest
+     *            the isOnDemandHarvest to set
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;
@@ -815,8 +824,9 @@ public class PullHarvest extends BaseHarvest {
 
         // Execute a background thread that will attempt to clear the graph of all redirected sources.
         (new Thread() {
+            @Override
             public void run() {
-                for (String redirectedUrl : PullHarvest.this.redirectedUrls){
+                for (String redirectedUrl : PullHarvest.this.redirectedUrls) {
 
                     try {
                         PullHarvest.LOGGER.debug("Clearing the graph of redirected source " + redirectedUrl);

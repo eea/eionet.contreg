@@ -21,6 +21,8 @@
 
 package eionet.cr.dto;
 
+import java.util.Date;
+
 /**
  *
  * @author Jaanus Heinlaid
@@ -41,6 +43,7 @@ public class PostHarvestScriptDTO {
     private boolean active;
     private boolean runOnce = true;
     private int id;
+    private Date lastModified;
 
     /**
      * @return the active
@@ -155,9 +158,25 @@ public class PostHarvestScriptDTO {
     }
 
     /**
-     * @param runOnce the runOnce to set
+     * @param runOnce
+     *            the runOnce to set
      */
     public void setRunOnce(boolean runOnce) {
         this.runOnce = runOnce;
+    }
+
+    /**
+     * @return the lastModified
+     */
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    /**
+     * @param lastModified
+     *            the lastModified to set
+     */
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 }
