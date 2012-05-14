@@ -115,10 +115,6 @@
                         </tr>
                     </c:if>
                     <c:forEach var="item" items="${actionBean.folderItems}" varStatus="loop">
-                        <stripes:hidden name="selectedItems[${loop.index}].uri" value="${item.uri}" />
-                        <stripes:hidden name="selectedItems[${loop.index}].type" value="${item.type}" />
-                        <stripes:hidden name="selectedItems[${loop.index}].name" value="${item.name}" />
-
                         <c:choose>
                             <c:when test="${item.folder || item.reservedFolder}">
                                 <c:set var="cssClass" value="folder" />
@@ -131,7 +127,12 @@
                         <tr>
                             <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
                                 <c:set var="disabled" value="${item.reservedFolder || item.reservedFile}" />
-                                <td><stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" /></td>
+                                <td>
+                                    <stripes:checkbox name="selectedItems[${loop.index}].selected" disabled="${disabled}" />
+                                    <stripes:hidden name="selectedItems[${loop.index}].uri" value="${item.uri}" />
+                                    <stripes:hidden name="selectedItems[${loop.index}].type" value="${item.type}" />
+                                    <stripes:hidden name="selectedItems[${loop.index}].name" value="${item.name}" />
+                                </td>
                             </c:if>
                             <td class="${cssClass}">
                                 <stripes:link href="/view.action">
