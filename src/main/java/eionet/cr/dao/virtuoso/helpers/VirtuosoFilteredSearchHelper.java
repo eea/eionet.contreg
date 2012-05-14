@@ -177,6 +177,8 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
                     bindings.setURI(objectValueVariable, objectValue);
                 } else {
                     result += " . filter bif:contains(?" + objectVariable + ", ?" + objectValueVariable + ")";
+                    // Quotes are added for bif:contains expression
+                    objectValue = "\"" + objectValue + "\"";
                     bindings.setString(objectValueVariable, objectValue);
                     requiresFullTextSearch = Boolean.TRUE;
                 }
