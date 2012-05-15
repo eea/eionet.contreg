@@ -132,6 +132,10 @@
                         $("#prefix10").click(function() {
                             return handlePrefixClick("PREFIX rod: <http://rod.eionet.europa.eu/schema.rdf#>");
                         });
+                        // Add query prefix #11
+                        $("#prefix11").click(function() {
+                            return handlePrefixClick("PREFIX skos: <http://www.w3.org/2004/02/skos/core#>");
+                        });
 
                     });
             } ) ( jQuery );
@@ -406,6 +410,7 @@ while (l--) {
 <span id="prefix8" class="shadowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span>
 <span id="prefix9" class="shadowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span>
 <span id="prefix10" class="shadowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span>
+<span id="prefix11" class="shadowHover">PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</span>
                             </pre>
                         </div>
                     </c:if>
@@ -592,6 +597,7 @@ while (l--) {
                     <li>PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</li>
                     <li>PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</li>
                     <li>PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</li>
+                    <li>PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</li>
                 </ul>
                 <button id="closePrefixesDialog">Close</button>
             </div>
