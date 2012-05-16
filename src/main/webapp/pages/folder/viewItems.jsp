@@ -151,7 +151,6 @@
                 </table>
 
                 <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
-                    <br />
                     <div>
                         <stripes:submit name="delete" value="Delete" title="Delete selected files"/>
                         <stripes:submit name="renameForm" value="Rename" title="Rename selected file"/>
@@ -159,7 +158,9 @@
                     </div>
                 </c:if>
 
-                <stripes:hidden name="uri" value="${actionBean.uri}" />
+                <fieldset style="display:none">
+                    <stripes:hidden name="uri" value="${actionBean.uri}" />
+                </fieldset>
 
             </crfn:form>
 
@@ -168,7 +169,6 @@
         <%-- Add folder dialog --%>
         <div id="createFolderDialog" title="Create new folder">
             <crfn:form action="/folder.action" method="post">
-                <stripes:hidden name="uri" value="${actionBean.uri}" />
                 <fieldset style="border: 0px;">
                     <label for="txtTitle" style="width: 200px; float: left;">New folder name*:</label>
                     <stripes:text id="txtTitle" name="title"/>
@@ -177,10 +177,13 @@
                     <label for="txtLabel" style="width: 200px; float: left;">Short description:</label>
                     <stripes:text id="txtLabel" name="label"/>
                 </fieldset>
-                <br />
-                <br />
-                <stripes:submit name="createFolder" value="Create" title="Create new folder"/>
-                <button id="closeFolderDialog">Cancel</button>
+                <fieldset style="border: 0px;">
+	                <stripes:submit name="createFolder" value="Create" title="Create new folder"/>
+	                <input type="button" id="closeFolderDialog" value="Cancel"/>
+                </fieldset>
+                <fieldset style="display:none">
+                    <stripes:hidden name="uri" value="${actionBean.uri}" />
+                </fieldset>
             </crfn:form>
         </div>
 
