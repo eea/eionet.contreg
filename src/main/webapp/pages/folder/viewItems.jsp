@@ -91,7 +91,7 @@
             </h1>
 
             <crfn:form id="uploadsForm" action="/folder.action" method="post">
-                <stripes:hidden name="uri" value="${actionBean.uri}" />
+
                 <table class="datatable" style="width:100%">
                     <colgroup>
                         <c:if test='${actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "d")}'>
@@ -158,6 +158,8 @@
                         <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('uploadsForm');return false"/>
                     </div>
                 </c:if>
+
+                <stripes:hidden name="uri" value="${actionBean.uri}" />
 
             </crfn:form>
 
