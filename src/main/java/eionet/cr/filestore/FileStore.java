@@ -248,7 +248,7 @@ public class FileStore {
      */
     public File getFile(String relativePath) {
 
-        if (StringUtils.isBlank(relativePath)){
+        if (StringUtils.isBlank(relativePath)) {
             return null;
         }
 
@@ -283,6 +283,15 @@ public class FileStore {
             } else {
                 logger.info("Could not extract user name from this URI: " + uriString);
             }
+        } else if (FolderUtil.isProjectFolder(uriString)) {
+            String fileName = FolderUtil.extractPathInSpecialFolder(uriString, "project");
+            try {
+                fileName = URLDecoder.decode(fileName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new CRRuntimeException(e);
+            }
+
+            return FileStore.getInstance("project").getFile(fileName);
         } else {
             logger.info("Not a home URI: " + uriString);
         }

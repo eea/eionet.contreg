@@ -131,15 +131,20 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
+        aclPath = FolderUtil.extractAclPath(uri);
 
+        // allow to view the folder by default if there is no ACL
+        boolean allowFolderView = CRUser.hasPermission(aclPath, getUser(), "v", true);
+
+        if (!allowFolderView) {
+            addSystemMessage("Viewing content of this folder is prohibited.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", StringUtils.substringBeforeLast(uri, "/"));
+        }
         initTabs();
-
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         Pair<FolderItemDTO, List<FolderItemDTO>> result = folderDAO.getFolderContents(uri);
         folder = result.getLeft();
         folderItems = result.getRight();
-
-        aclPath = FolderUtil.extractProjectAclPath(uri);
 
         return new ForwardResolution("/pages/folder/viewItems.jsp");
     }
@@ -195,8 +200,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @throws DAOException
      */
     public Resolution rename() throws DAOException {
-        if (!isUserLoggedIn()) {
-            addSystemMessage("Only logged in users can rename files.");
+        aclPath = FolderUtil.extractAclPath(uri);
+        // TODO why renaming needs d-permission
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "d", false);
+        if (!actionAllowed) {
+            addSystemMessage("Only authorized users can rename files.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
@@ -256,10 +264,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         if (uriRenamings.size() > 0) {
             helperDAO.renameUserUploads(uriRenamings);
+            renameAcls(uriRenamings);
         }
         if (fileRenamings.size() > 0) {
 
-            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName())).rename(fileRenamings);
+            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).rename(fileRenamings);
             addSystemMessage("Files renamed successfully!");
         }
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -272,8 +281,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @throws DAOException
      */
     public Resolution delete() throws DAOException {
-        if (!isUserLoggedIn()) {
-            addSystemMessage("Only logged in users can delete files.");
+        aclPath = FolderUtil.extractAclPath(uri);
+
+        // allow to view the folder by default if there is no ACL
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "d", false);
+
+        if (!actionAllowed) {
+            addSystemMessage("Only authorized users can delete files.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
@@ -297,7 +311,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
 
-        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName()));
+        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous()));
 
         // Delete folders
         for (RenameFolderItemDTO item : selectedItems) {
@@ -323,8 +337,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         if (fileOrFolderUris.size() > 0) {
-            folderDAO.deleteFileOrFolderUris(uri, fileOrFolderUris);
+            folderDAO.deleteFileOrFolderUris(FolderUtil.folderContext(uri), fileOrFolderUris);
             DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(fileOrFolderUris);
+            deleteAcls(fileOrFolderUris);
         }
 
         addSystemMessage("Files/folders deleted successfully.");
@@ -334,12 +349,17 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Create new folder.
      *
-     * @return
-     * @throws DAOException
+     * @return Resolution
+     * @throws DAOException if DAO method execution fails
      */
     public Resolution createFolder() throws DAOException {
-        if (!isUserLoggedIn()) {
-            addSystemMessage("Only logged in users can create folders.");
+
+        aclPath = FolderUtil.extractAclPath(uri);
+
+        // check if use r has permission to add entries in the parent
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+        if (!actionAllowed) {
+            addSystemMessage("No permission to add folder.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
@@ -356,24 +376,22 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        String context = getUser().getHomeUri();
-        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        if (uri.startsWith(appHome + "/project")) {
-            context = appHome + "/project";
-        }
+        String context = FolderUtil.folderContext(uri);
 
+        // TODO - can be generalized for all folders not only project when DDC is ready in ACL mechanism
         folderDAO.createFolder(uri, title, label, context);
 
         try {
             if (FolderUtil.isProjectFolder(uri)) {
-                String path = FolderUtil.extractPathInProjectFolder(uri + "/" + title);
+
+                String path = FolderUtil.extractPathInSpecialFolder(uri + "/" + title, "project");
                 if (!StringUtils.isBlank(path)) {
                     String[] tokens = path.split("/");
                     if (tokens != null && tokens.length == 1) {
-                        String aclPath = "/project/" + tokens[0];
-                        HashMap acls = AccessController.getAcls();
-                        if (!acls.containsKey(aclPath)) {
-                            AccessController.addAcl(aclPath, getUserName(), "");
+                        String aclP = "/project/" + tokens[0];
+                        if (!AccessController.getAcls().containsKey(aclP)) {
+                            //KL220512 - anonymous user should not be allowed to add project folders:
+                            AccessController.addAcl(aclP, getUserName(), "");
                         }
                     }
                 }
@@ -398,6 +416,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     public Resolution upload() throws DAOException, IOException {
+        aclPath = FolderUtil.extractAclPath(uri);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+        if (!actionAllowed) {
+            addWarningMessage("Not authorized to upload files");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
         if (uploadedFile == null) {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
@@ -503,10 +527,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         if (uploadedFile == null) {
             throw new CRRuntimeException("Uploaded file object must not be null");
         }
-
+        //use folder context as graph uri
+        String graphUri = FolderUtil.folderContext(uri);
         // prepare cr:hasFile predicate
         ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
-        objectDTO.setSourceUri(uri);
+        //        objectDTO.setSourceUri(uri);
+        objectDTO.setSourceUri(graphUri);
         SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
         homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 
@@ -523,7 +549,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
 
             objectDTO = new ObjectDTO(titleToStore, true);
-            objectDTO.setSourceUri(uri);
+            //objectDTO.setSourceUri(uri);
+            objectDTO.setSourceUri(graphUri);
             fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
             fileSubjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
         }
@@ -553,7 +580,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(getUser().getHomeUri(), false, 0, getUserName()));
+            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -573,7 +600,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         // attempt to harvest the uploaded file
-        harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, null, getUserName());
+        harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, null, getUserNameOrAnonymous());
     }
 
     /**
@@ -601,7 +628,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             } else {
                 filePath = uploadedFile.getFileName();
             }
-            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserName())).add(filePath, replaceExisting, contentStream);
+            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous()))
+            .add(filePath, replaceExisting, contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
@@ -742,6 +770,65 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Renames corresponding ACLs of the renamed folders.
+     * @param renamings renamings hash keys: old urls, values: new urls
+     */
+    private void renameAcls(HashMap<String, String> renamings) {
+        String appHome = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
+        for (String oldUri : renamings.keySet()) {
+            String path = StringUtils.substringAfter(oldUri, appHome);
+            try {
+                if (AccessController.getAcls().containsKey(path)) {
+                    String newAclPath = StringUtils.substringAfter(renamings.get(oldUri), appHome);
+                    AccessController.renameAcl(path, newAclPath);
+                }
+            } catch (SignOnException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Deletes coresponding ACLs of the deleted items.
+     * @param uris array of URIs that are deleted
+     */
+    private void deleteAcls(List<String> uris) {
+        for (String uriToDelete : uris) {
+            try {
+                if (FolderUtil.isProjectFolder(uriToDelete)) {
+
+                    String path = FolderUtil.extractPathInSpecialFolder(uriToDelete, "project");
+                    if (!StringUtils.isBlank(path)) {
+                        String[] tokens = path.split("/");
+                        if (tokens != null && tokens.length == 1) {
+                            String aclP = "/project/" + tokens[0];
+                            if (AccessController.getAcls().containsKey(aclP)) {
+                                AccessController.removeAcl(aclP);
+                            }
+                        }
+                    }
+                }
+            } catch (SignOnException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Returns current username or "anonymous" if not authenticated.
+     * Can be used if username needs to be stored and anonymous user has been given permissions
+     * @return username or anonymous
+     */
+    private String getUserNameOrAnonymous() {
+        if (getUser() != null) {
+            return getUserName();
+        }
+
+        return "anonymous";
     }
 
     /**

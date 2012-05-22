@@ -65,6 +65,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.factsheet.FolderActionBean;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
@@ -170,7 +171,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Save the file into user's file-store.
             long fileSize = fileBean.getSize();
             relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
-            FileStore fileStore = FileStore.getInstance(getUserName());
+            //FileStore fileStore = FileStore.getInstance(getUserName());
+            FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
             // Store file as new source, but don't harvest it
@@ -233,7 +235,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      *
      * @throws DAOException
      */
-    @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
+    @ValidationMethod(on = { UPLOAD_EVENT, SAVE_EVENT })
     public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method
@@ -241,8 +243,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
             return;
         }
 
+
         // for all the above POST events, user must be authorized
-        if (getUser() == null) {
+        String aclPath = FolderUtil.extractAclPath(folderUri);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+
+        if (!actionAllowed) {
             addGlobalValidationError("You are not authorised for this operation!");
             return;
         }
@@ -264,7 +270,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 addGlobalValidationError("No file name specified!");
             }
 
-            File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+            //File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+            File file  =  FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
             if (file == null || !file.exists()) {
                 addGlobalValidationError("Could not find stored file!");
             }
@@ -543,7 +550,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // prepare "folder hasFile file" statement
         ObjectDTO fileObject = ObjectDTO.createResource(fileUri);
-        fileObject.setSourceUri(folderUri);
+        //        fileObject.setSourceUri(folderUri);
+        String folderContext = FolderUtil.folderContext(folderUri);
+        fileObject.setSourceUri(folderContext);
         SubjectDTO folderSubject = new SubjectDTO(folderUri, false);
         folderSubject.addObject(Predicates.CR_HAS_FILE, fileObject);
 
@@ -554,7 +563,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // since folder URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
-        HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
+        //        HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
+        HarvestSourceDTO folderHarvestSource =
+                HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
     }
 
@@ -585,7 +596,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private CSVReader createCSVReader(boolean guessEncoding) throws IOException {
 
         CSVReader result = null;
-        File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+        //File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+        File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
         if (file != null && file.exists()) {
             if (guessEncoding) {
                 Charset charset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));

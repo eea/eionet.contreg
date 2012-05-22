@@ -38,20 +38,28 @@ import eionet.cr.web.security.CRUser;
 public class FolderUtil {
 
     /**
+     * Extract ACL path for special folders: projects and home. Until DDC not done, main project/home folder ACL is used
      *
      * @param uri
-     * @return String
+     *            uri of the folder
+     * @param specialFolderName
+     *            - special folder prefix in the name
+     * @return String acl path of th given folder
      */
-    public static String extractProjectAclPath(String uri) {
+    public static String extractSpecialAclPath(String uri, String specialFolderName) {
+        String appHome = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
+        String aclPath = StringUtils.substringAfter(uri, appHome);
 
-        String aclPath = "/project";
-        String path = extractPathInProjectFolder(uri);
-        if (!StringUtils.isBlank(path)) {
-            String[] tokens = path.split("/");
-            if (tokens != null && tokens.length > 0) {
-                aclPath = "/project/" + tokens[0];
+        if (aclPath.startsWith("/" + specialFolderName)) {
+            String path = extractPathInSpecialFolder(uri, specialFolderName);
+            if (!StringUtils.isBlank(path)) {
+                String[] tokens = path.split("/");
+                if (tokens != null && tokens.length > 0) {
+                    aclPath = "/" + specialFolderName + "/" + tokens[0];
+                }
             }
         }
+
         return aclPath;
     }
 
@@ -64,7 +72,6 @@ public class FolderUtil {
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
         return appHome + "/project";
     }
-
 
     /**
      * Detects if the given URI starts with a CR user home.
@@ -118,41 +125,49 @@ public class FolderUtil {
         }
 
         String str =
-            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
         return StringUtils.substringBefore(str, "/");
     }
 
     /**
-     * Returns the path after the user home folder. For example
-     * if uri is "http://127.0.0.1:8080/cr/home/heinlja/newFolder/newFile.txt" the result is "newFolder/newFile.txt".
+     * Returns the path after the user home folder. For example if uri is
+     * "http://127.0.0.1:8080/cr/home/heinlja/newFolder/newFile.txt" the result is "newFolder/newFile.txt".
+     *
      * @param uri
      * @return
      */
     public static String extractPathInUserHome(String uri) {
         if (!startsWithUserHome(uri)) {
+            if (isProjectFolder(uri)) {
+                return StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL)
+                        + "/project/");
+            }
             return null;
         }
 
         String userName = extractUserName(uri);
 
         String result =
-            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
-                    + userName + "/");
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
+                        + userName + "/");
         return result;
     }
 
     /**
-     * Returns the path after the project folder. For example
-     * if uri is "http://127.0.0.1:8080/cr/project/newFolder/newFile.txt" the result is "newFolder/newFile.txt".
+     * Returns the path after the special folder. For example if uri is "http://127.0.0.1:8080/cr/project/newFolder/newFile.txt" the
+     * result is "newFolder/newFile.txt".
+     *
      * @param uri
+     * @param mainFolder
+     *            special main folder name
      * @return String
      */
-    public static String extractPathInProjectFolder(String uri) {
+    public static String extractPathInSpecialFolder(String uri, String mainFolder) {
 
         String result = null;
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        if (uri.startsWith(appHome + "/project/")) {
-            result = StringUtils.substringAfter(uri, appHome + "/project/");
+        if (uri.startsWith(appHome + "/" + mainFolder + "/")) {
+            result = StringUtils.substringAfter(uri, appHome + "/" + mainFolder + "/");
         }
         return result;
     }
@@ -165,7 +180,7 @@ public class FolderUtil {
 
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
         if (uri.startsWith(appHome + "/project/")) {
-            return extractPathInProjectFolder(uri);
+            return extractPathInSpecialFolder(uri, "project");
         } else if (startsWithUserHome(uri)) {
             return extractPathInUserHome(uri);
         } else {
@@ -174,7 +189,7 @@ public class FolderUtil {
     }
 
     /**
-     * Return all folders where user can store data
+     * Return all folders where user can store data.
      *
      * @param user
      * @return String
@@ -187,10 +202,11 @@ public class FolderUtil {
 
             // Get project folders where user can insert content
             if (CRUser.hasPermission(user.getUserName(), "/project", "i")) {
-                List<String> projectFolders = DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
+                List<String> projectFolders =
+                        DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
                 if (projectFolders != null && projectFolders.size() > 0) {
                     for (String furi : projectFolders) {
-                        String aclPath = FolderUtil.extractProjectAclPath(furi);
+                        String aclPath = FolderUtil.extractPathInSpecialFolder(furi, "project");
                         if (!StringUtils.isBlank(aclPath) && CRUser.hasPermission(user.getUserName(), aclPath, "i")) {
                             folders.add(furi);
                         }
@@ -202,13 +218,36 @@ public class FolderUtil {
     }
 
     /**
+     * Returns the path after the app home URL. For example if uri is "http://127.0.0.1:8080/cr/abc" the result is "abc".
+     *
+     * @param uri
+     * @return String
+     */
+    public static String extractAclPath(String uri) {
+
+        String result = null;
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        if (uri.startsWith(appHome)) {
+            if (uri.startsWith(appHome + "/project")) {
+                result = extractSpecialAclPath(uri, "project");
+            } else if (uri.startsWith(appHome + "/home")) {
+                result = extractSpecialAclPath(uri, "home");
+            } else {
+                result = StringUtils.substringAfter(uri, appHome);
+            }
+        }
+        return result;
+    }
+
+    /**
      * True, if the folder uri is user's home folder.
      *
      * @return
      */
     public static boolean isHomeFolder(String uri) {
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        if (!isProjectFolder(uri) && uri.startsWith(appHome + "/home") && StringUtils.isEmpty(FolderUtil.extractPathInUserHome(uri))) {
+        if (!isProjectFolder(uri) && uri.startsWith(appHome + "/home")
+                && StringUtils.isEmpty(FolderUtil.extractPathInUserHome(uri))) {
             return true;
         }
         return false;
@@ -241,7 +280,8 @@ public class FolderUtil {
     }
 
     /**
-     * Returns FileStore userDir where the files will be stored
+     * Returns FileStore userDir where the files will be stored. Current userdir is returned as other users files can be managed as
+     * well
      *
      * @param uri
      * @param userName
@@ -251,8 +291,29 @@ public class FolderUtil {
         String folder = userName;
         if (FolderUtil.isProjectFolder(uri)) {
             folder = "project";
+        } else if (startsWithUserHome(uri)) {
+            folder = extractUserName(uri);
         }
         return folder;
     }
 
+    /**
+     * Calculates folder context (graph) of the triples of file/folder object.
+     *
+     * @param uri
+     *            URI of the file
+     * @return folder context
+     */
+    public static String folderContext(String uri) {
+        String context = uri;
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+
+        if (FolderUtil.startsWithUserHome(uri)) {
+            context = appHome + FolderUtil.extractSpecialAclPath(uri, "home");
+        } else if (uri.startsWith(appHome + "/project")) {
+            context = appHome + "/project";
+        }
+
+        return context;
+    }
 }

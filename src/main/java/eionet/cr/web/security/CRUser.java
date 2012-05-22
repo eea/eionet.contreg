@@ -67,7 +67,7 @@ public class CRUser {
      */
     public CRUser(String userName) {
 
-        if (StringUtils.isBlank(userName)){
+        if (StringUtils.isBlank(userName)) {
             throw new IllegalArgumentException("User name must not be blank!");
         }
         this.userName = userName;
@@ -101,8 +101,8 @@ public class CRUser {
      * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
      * name of this user.
      *
-     * @param aclPath
-     * @param permission
+     * @param aclPath full ACL path
+     * @param permission permission to check
      * @return
      */
     public boolean hasPermission(String aclPath, String permission) {
@@ -114,10 +114,10 @@ public class CRUser {
      * name of the user found in the given session. If no user found in session, the method will be called with user name set to
      * null.
      *
-     * @param session
-     * @param aclPath
-     * @param permission
-     * @return
+     * @param session current session
+     * @param aclPath full acl path
+     * @param permission permission to be checked
+     * @return true if user hsa the checked permission
      */
     public static boolean hasPermission(HttpSession session, String aclPath, String permission) {
 
@@ -130,15 +130,52 @@ public class CRUser {
         CRUser crUser = (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
 
         // Return false if user is not logged in
-        if (crUser == null) {
-            return false;
-        }
+        //        if (crUser == null) {
+        //            return false;
+        //        }
 
         // get user name from user object, or set to null if user object null
         String userName = crUser == null ? null : crUser.getUserName();
 
         // check if user with this name has this permission in this ACL
         return CRUser.hasPermission(userName, aclPath, permission);
+    }
+
+    /**
+     * Checks is action is allowed.
+     * If ACL does not exist, checks if user is logged in or not
+     * @param aclPath ACL Path
+     * @param user Current user (null if not logged in)
+     * @param permission permission to be checked
+     * @param allowAnonymous - indicates if to allow anonymous users if ACL does not exist
+     * @return true if user can perform the action
+     */
+    public static boolean hasPermission(String aclPath, CRUser user, String permission, boolean allowAnonymous) {
+
+        //allow to view the folder by default if there is no ACL
+        boolean allowAction = true;
+
+        try {
+            AccessControlListIF acl = AccessController.getAcl(aclPath);
+
+            String userName = (user != null ? user.getUserName() : null);
+            if (acl != null) {
+                allowAction = acl.checkPermission(userName, permission);
+            } else {
+                //ACL does not exist - check the additional parameter
+                if (!allowAnonymous) {
+                    allowAction = (user != null);
+                }
+            }
+        } catch (SignOnException e) {
+            // TODO Auto-generated catch block
+            logger.error("Error in ACL check " + e.toString());
+        }
+
+
+
+
+        return allowAction;
     }
 
     /**
@@ -150,10 +187,10 @@ public class CRUser {
      *
      * If the ACL library throws an exception, it is not thrown onwards, but still logged at error level.
      *
-     * @param userName
-     * @param aclPath
-     * @param permission
-     * @return
+     * @param userName username
+     * @param aclPath ACL Path
+     * @param permission Permission to be checked
+     * @return true if user has permission. If no ACL found return false
      */
     public static boolean hasPermission(String userName, String aclPath, String permission) {
 
@@ -414,7 +451,7 @@ public class CRUser {
     public List<String> getReservedFolderAndFileUris() {
 
         // Lazy loading.
-        if (reservedFolderAndFileUris==null){
+        if (reservedFolderAndFileUris == null) {
 
             reservedFolderAndFileUris = new ArrayList<String>();
             reservedFolderAndFileUris.add(getBookmarksUri());
@@ -438,5 +475,24 @@ public class CRUser {
         result.add(CRUser.historyUri(userName));
         result.add(CRUser.reviewsUri(userName));
         return result;
+    }
+
+    /**
+     * Creates default ACL's when a new user is logging in.
+     *
+     */
+    public void createDefaultAcls() {
+
+        // String aclPath, String owner, String description
+        String mainUserAcl = "/home/" + getUserName();
+        try {
+            if (!AccessController.getAcls().containsKey(mainUserAcl)) {
+                AccessController.addAcl(mainUserAcl, getUserName(), "Home folder for " + getUserName());
+            }
+            // TODO subfolders ACL's when DDC will be imple,mented in the acl mechanism
+        } catch (SignOnException e) {
+            // TODO Auto-generated catch block
+            logger.error("Error creating ACL's " + e.toString());
+        }
     }
 }

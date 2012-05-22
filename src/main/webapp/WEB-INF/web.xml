@@ -2,7 +2,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
          http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4">
+     version="2.4">
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- context parameters -->
@@ -46,6 +46,10 @@
     <filter-mapping>
         <filter-name>HomespaceUrlFilter</filter-name>
         <url-pattern>/home/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>HomespaceUrlFilter</filter-name>
+        <url-pattern>/project/*</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -168,6 +172,15 @@
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/project/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    '
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/admin/*</url-pattern>

@@ -135,6 +135,8 @@ public class LoginActionBean extends AbstractActionBean {
             // Creating reserved files and folders into user home
             FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
             dao.createUserHomeFolder(user.getUserName());
+
+            user.createDefaultAcls();
         }
     }
 

@@ -39,6 +39,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.DownloadServlet;
 import eionet.cr.web.action.ExportTriplesActionBean;
@@ -86,6 +87,9 @@ public class HomespaceUrlFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String requestURL = httpRequest.getRequestURL().toString();
 
+
+        boolean isProjectFolder = FolderUtil.isProjectFolder(requestURL);
+
         String contextPath = httpRequest.getContextPath();
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("httpRequest.getRequestURL() = " + requestURL);
@@ -113,13 +117,15 @@ public class HomespaceUrlFilter implements Filter {
                         // The requested URL is a subject in tabular data (i.e. CSV or TSV) file.
                         redirectLocation = contextPath + TabularDataServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to tabular data subject, redirecting to: " + redirectLocation);
-                    } else if (isStoredFile(pathInfo) && !isRdfXmlPreferred(httpRequest)) {
+                        //if project file, do not check the filestore in ordinary way
+                    } else if (isStoredFile(pathInfo, isProjectFolder) && !isRdfXmlPreferred(httpRequest)) {
                         // The requested URL is a stored file, and requester wants original copy (i.e. not triples)
                         redirectLocation = contextPath + DownloadServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to stored file, redirecting to: " + redirectLocation);
                     } else if (isSparqlBookmark(pathInfo)) {
                         if (isRdfXmlPreferred(httpRequest)) {
-                            redirectLocation = contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString + "&exportProperties=";
+                            redirectLocation = contextPath
+                                    + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString + "&exportProperties=";
                         } else {
                             redirectLocation = contextPath + Util.getUrlBinding(ViewActionBean.class) + queryString;
                         }
@@ -156,11 +162,15 @@ public class HomespaceUrlFilter implements Filter {
      * @param requestPathInfo
      * @return
      */
-    private boolean isStoredFile(String requestPathInfo) {
-        int i = requestPathInfo.indexOf('/', 1);
-        String userName = requestPathInfo.substring(1, i);
-        String filePath = requestPathInfo.substring(i + 1);
-        return FileStore.getInstance(userName).getFile(filePath) != null;
+    private boolean isStoredFile(String requestPathInfo, boolean isProjectUri) {
+        if (isProjectUri) {
+            return FileStore.getInstance("project").getFile(requestPathInfo) != null;
+        } else {
+            int i = requestPathInfo.indexOf('/', 1);
+            String userName = requestPathInfo.substring(1, i);
+            String filePath = requestPathInfo.substring(i + 1);
+            return FileStore.getInstance(userName).getFile(filePath) != null;
+        }
     }
 
     /**

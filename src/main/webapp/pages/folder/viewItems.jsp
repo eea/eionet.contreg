@@ -42,7 +42,7 @@
 
         <div style="margin-top:20px">
 
-            <c:if test='${not empty sessionScope.crUser && (actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "i"))}'>
+            <c:if test='${(actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "i"))}'>
                 <ul id="dropdown-operations">
                     <li><a href="#">Operations</a>
                         <ul>
@@ -61,7 +61,7 @@
                                     Upload CSV/TSV file
                                 </stripes:link>
                             </li>
-                            <c:if test='${not empty sessionScope.crUser && (actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "u"))}'>
+                            <c:if test='${(actionBean.usersFolder || crfn:userHasPermission(pageContext.session, actionBean.aclPath, "u"))}'>
                                 <li>
                                     <stripes:link class="link-plain" href="/factsheet.action?edit=&uri=${actionBean.uri}" title="Edit folder properties">
                                     Edit folder
@@ -178,8 +178,8 @@
                     <stripes:text id="txtLabel" name="label"/>
                 </fieldset>
                 <fieldset style="border: 0px;">
-	                <stripes:submit name="createFolder" value="Create" title="Create new folder"/>
-	                <input type="button" id="closeFolderDialog" value="Cancel"/>
+                  <stripes:submit name="createFolder" value="Create" title="Create new folder"/>
+                  <input type="button" id="closeFolderDialog" value="Cancel"/>
                 </fieldset>
                 <fieldset style="display:none">
                     <stripes:hidden name="uri" value="${actionBean.uri}" />

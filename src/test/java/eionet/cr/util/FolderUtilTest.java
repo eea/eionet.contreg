@@ -102,4 +102,22 @@ public class FolderUtilTest extends TestCase {
             fail("Wasn't expecting this exception: " + e.toString());
         }
     }
+
+    public void testExtractAcl() {
+        String aclPath = FolderUtil.extractAclPath("http://127.0.0.1:8080/cr/abc/cba");
+
+        assertEquals("/abc/cba", aclPath);
+    }
+
+    public void testExtractProcectAcl() {
+        String aclPath = FolderUtil.extractAclPath("http://127.0.0.1:8080/cr/project/aux/poux");
+
+        assertEquals("/project/aux", aclPath);
+    }
+
+    public void testEmtpyProcectAcl() {
+        String aclPath = FolderUtil.extractAclPath("http://127.0.0.1:8080/cr");
+
+        assertEquals("", aclPath);
+    }
 }
