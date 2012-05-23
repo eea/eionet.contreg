@@ -27,7 +27,7 @@
                                     <stripes:checkbox name="selectedBookmarks" value="${bookmark.uri}"/>
                                 </display:column>
                             </c:if>
-                            <display:column title="URL" sortable="true">
+                            <display:column title="Title" sortable="true">
                                 <c:choose>
                                     <c:when test="${not empty bookmark.bookmarkUrl}">
                                         <stripes:link href="/factsheet.action" title="${bookmark.query}">
