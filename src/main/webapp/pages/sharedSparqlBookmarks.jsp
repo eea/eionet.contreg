@@ -14,6 +14,7 @@
                     <li>
                         <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
                             <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                            <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
                             <c:out value="${bookmarkedQuery.label}"/>
                         </stripes:link>
                     </li>

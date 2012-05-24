@@ -259,12 +259,16 @@
         </ul>
 
         <h1>SPARQL endpoint</h1>
+        <c:if test="${not empty actionBean.selectedBookmarkName}">
+            <h2>Bookmarked query: <c:out value="${actionBean.selectedBookmarkName}" /></h2>
+        </c:if>
 
         <div style="margin-top: 15px">
             <div style="float:right">
                 <a href="documentation/sparqlfunctions" title="Press Ctrl and click to open help on SPARQL Functions in a new window">SPARQL Functions</a>
             </div>
             <crfn:form name="mainForm" action="/sparql" method="get">
+                <stripes:hidden name="selectedBookmarkName" />
                 <c:if test="${not empty actionBean.defaultGraphUris}">
                     <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
                         <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
@@ -498,6 +502,7 @@ while (l--) {
                             <td width="99%">
                                 <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
                                     <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                                    <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
                                     <c:if test="${not empty actionBean.defaultGraphUris}">
                                         <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
                                             <stripes:param name="default-graph-uri" value="${defaultGraphUri}" />
@@ -553,6 +558,7 @@ while (l--) {
                             <td width="99%">
                                 <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
                                     <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                                    <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
                                     <c:if test="${not empty actionBean.defaultGraphUris}">
                                         <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
                                             <stripes:param name="default-graph-uri" value="${defaultGraphUri}" />

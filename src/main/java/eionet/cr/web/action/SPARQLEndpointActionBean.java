@@ -135,6 +135,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Name of the query to bookmark. */
     private String bookmarkName;
 
+    /** Selected query bookmark name. */
+    private String selectedBookmarkName;
+
     /** True, if the query to bookmark will be shared. */
     private boolean sharedBookmark;
 
@@ -170,7 +173,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             setGraphUri();
 
             fillFromBookmark(fillfrom);
-            addSystemMessage("Query filled from " + fillfrom);
+            // addSystemMessage("Query filled from " + fillfrom);
             return new ForwardResolution(FORM_PAGE);
 
         } else {
@@ -234,6 +237,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
             // log and display message about successful operation
             addSystemMessage("Successfully bookmarked query: " + bookmarkName);
+            selectedBookmarkName = bookmarkName;
         }
 
         return new ForwardResolution(FORM_PAGE);
@@ -999,6 +1003,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public void setSharedBookmark(boolean sharedBookmark) {
         this.sharedBookmark = sharedBookmark;
+    }
+
+    /**
+     * @return the selectedBookmarkName
+     */
+    public String getSelectedBookmarkName() {
+        return selectedBookmarkName;
+    }
+
+    /**
+     * @param selectedBookmarkName
+     *            the selectedBookmarkName to set
+     */
+    public void setSelectedBookmarkName(String selectedBookmarkName) {
+        this.selectedBookmarkName = selectedBookmarkName;
     }
 
 }
