@@ -103,6 +103,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
      * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
      * factsheet links will be created.
      */
+    @Override
     public String format(Object object) {
 
         String result = null;
@@ -118,8 +119,9 @@ public class SubjectPredicateColumn extends SearchResultColumn {
                 } else {
                     result = objectValuesToCSV(objects);
                 }
-                result = buildFactsheetLink(subjectDTO.getUri(), result);
-            } else if (!objects.isEmpty()) {
+                result = buildFactsheetLink(subjectDTO.getUri(), result, false);
+
+            }  else if (!objects.isEmpty()) {
 
                 StringBuffer buf = new StringBuffer();
                 for (ObjectDTO o : objects) {
@@ -135,7 +137,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
                         if (label == null) {
                             label = URIUtil.extractURILabel(o.getValue(), SubjectDTO.NO_LABEL);
                         }
-                        buf.append(buildFactsheetLink(o.getValue(), label));
+                        buf.append(buildFactsheetLink(o.getValue(), label, true));
                     }
                 }
                 result = buf.toString();
@@ -163,9 +165,10 @@ public class SubjectPredicateColumn extends SearchResultColumn {
      *
      * @param uri
      * @param label
-     * @return
+     * @param showTitle true if to show the given object value (typically resource) in the factsheet link
+     * @return formatted HTML code for factsheet link
      */
-    private String buildFactsheetLink(String uri, String label) {
+    private String buildFactsheetLink(String uri, String label, boolean showTitle) {
 
         String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
         int i = factsheetUrlBinding.lastIndexOf("/");
@@ -173,14 +176,19 @@ public class SubjectPredicateColumn extends SearchResultColumn {
         StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
         href.append("uri=").append(Util.urlEncode(uri));
 
-        return new StringBuffer("<a href=\"").append(href).append("\">").append(label).append("</a>").toString();
+        StringBuffer result = new StringBuffer("<a href=\"").append(href).append("\"");
+        result.append(showTitle ? "title=\"" + uri + "\">" : ">");
+        result.append(label).append("</a>");
+        return result.toString();
     }
+
 
     /*
      * (non-Javadoc)
      *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
+    @Override
     public String getSortParamValue() {
         return predicateUri;
     }

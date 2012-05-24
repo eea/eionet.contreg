@@ -177,7 +177,7 @@ public abstract class VirtuosoBaseDAO {
      *             if query fails
      */
     protected <T> T executeUniqueResultSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader)
-    throws DAOException {
+            throws DAOException {
 
         List<T> result = executeSPARQL(sparql, bindings, reader);
         return (result == null || result.isEmpty()) ? null : result.get(0);
@@ -195,7 +195,7 @@ public abstract class VirtuosoBaseDAO {
      *             Default call of getSubjectsData() - SubjectDTO are created if not existing
      */
     protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader)
-    throws DAOException {
+            throws DAOException {
 
         boolean createMissingDTOs = true;
         return getSubjectsData(subjectUris, predicateUris, reader, createMissingDTOs);
@@ -266,8 +266,8 @@ public abstract class VirtuosoBaseDAO {
 
         String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
         String query =
-            "select ?g ?s ?p bif:left(str(?obj)," + WebConstants.MAX_OBJECT_LENGTH
-            + ") as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
+                "select ?g ?s ?p bif:either(isLiteral(?obj), bif:left(str(?obj)," + WebConstants.MAX_OBJECT_LENGTH
+                + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
