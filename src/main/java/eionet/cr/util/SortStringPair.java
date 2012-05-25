@@ -22,4 +22,16 @@ public class SortStringPair {
         }
         return sourcePairs;
     }
+
+    public static List<Pair<String, String>> sortByRightAsc(List<Pair<String, String>> sourcePairs) {
+        // Sorting the types by Pair right.
+        for (int i = 0; i < sourcePairs.size(); i++) {
+            for (int j = i; j < sourcePairs.size(); j++) {
+                if (sourcePairs.get(i).getRight().compareTo(sourcePairs.get(j).getRight()) > 0) {
+                    Collections.swap(sourcePairs, i, j);
+                }
+            }
+        }
+        return sourcePairs;
+    }
 }

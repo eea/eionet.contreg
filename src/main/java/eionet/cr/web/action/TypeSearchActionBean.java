@@ -519,6 +519,44 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
+    *
+    * @return
+    */
+   public List<Pair<String, String>> getAvailableTypesByName() {
+       List<Pair<String, String>> sourceTypes = ApplicationCache.getTypes();
+
+       SortStringPair.sortByRightAsc(sourceTypes);
+
+       int i = 0;
+
+       List<Pair<String, String>> result = new ArrayList<Pair<String,String>>();
+       while (i < sourceTypes.size()) {
+
+           String currentPrefix = "";
+           // Disassembling the prefix
+           if (sourceTypes.get(i).getLeft().replaceAll("[^#]", "").length() > 0) {
+               // Meaning that the url contains #-char
+               currentPrefix = sourceTypes.get(i).getLeft().split("#")[0];
+           } else {
+               // Must be split by last '/'
+               String[] tokens = sourceTypes.get(i).getLeft().split("/");
+               for (int j = 0; j < tokens.length - 1; j++) {
+                   currentPrefix += tokens[j] + "/";
+               }
+           }
+           String nameWithUri = sourceTypes.get(i).getRight() + " (" + currentPrefix + ")";
+           String uri = sourceTypes.get(i).getLeft();
+
+           result.add(new Pair<String, String>(uri, nameWithUri));
+
+           // Incrementing loop counter.
+           i++;
+       }
+
+       return result;
+   }
+
+    /**
      * @return the type
      */
     public String getType() {

@@ -4,6 +4,20 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Type search">
 
+    <stripes:layout-component name="head">
+        <script type="text/javascript">
+        // <![CDATA[
+        ( function($) {
+            $(document).ready(
+                function(){
+                    // Set up tabs
+                    $("#tabs").tabs();
+             });
+        } ) ( jQuery );
+        // ]]>
+        </script>
+    </stripes:layout-component>
+
     <stripes:layout-component name="contents">
         <ul id="dropdown-operations">
             <li><a href="#">Operations</a>
@@ -49,7 +63,6 @@
                 ( function($) {
                     $(document).ready(
                         function(){
-
                             // Open dialog
                             $("#eport_link").click(function() {
                                 $('#dialog').dialog('open');
@@ -91,28 +104,42 @@
 
 // ]]>
                 </script>
-                   <stripes:select name="type">
-                   <c:forEach var="groups" items="${actionBean.availableTypes}">
+                <stripes:select name="type">
+                    <c:forEach var="groups" items="${actionBean.availableTypes}">
                     <optgroup label="${groups.left}">
                         <c:forEach var="type" items="${groups.right}">
                             <stripes:option value="${type.left}">${type.right}</stripes:option>
                         </c:forEach>
                     </optgroup>
-                </c:forEach>
-            </stripes:select>
-
+                    </c:forEach>
+                </stripes:select>
 
                </c:when>
                <c:otherwise>
-                   <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
-                       <c:forEach var="groups" items="${actionBean.availableTypes}">
-                        <optgroup label="${groups.left}">
-                            <c:forEach var="type" items="${groups.right}">
+               <div id="tabs">
+                    <ul style="margin: 0; padding-left: 1em;">
+                        <li><a href="#tabs-1">By type</a></li>
+                        <li><a href="#tabs-2">By URI</a></li>
+                    </ul>
+                    <div id="tabs-1">
+                        <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
+                            <c:forEach var="type" items="${actionBean.availableTypesByName}">
                                 <stripes:option value="${type.left}">${type.right}</stripes:option>
                             </c:forEach>
-                        </optgroup>
-                    </c:forEach>
-                </stripes:select>
+                    </stripes:select>
+                    </div>
+                    <div id="tabs-2">
+                        <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
+                            <c:forEach var="groups" items="${actionBean.availableTypes}">
+                            <optgroup label="${groups.left}">
+                                <c:forEach var="type" items="${groups.right}">
+                                    <stripes:option value="${type.left}">${type.right}</stripes:option>
+                                </c:forEach>
+                            </optgroup>
+                            </c:forEach>
+                        </stripes:select>
+                    </div>
+               </div>
                </c:otherwise>
                </c:choose>
 
