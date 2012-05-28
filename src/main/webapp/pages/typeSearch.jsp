@@ -118,8 +118,8 @@
                <c:otherwise>
                <div id="tabs">
                     <ul style="margin: 0; padding-left: 1em;">
-                        <li><a href="#tabs-1">By type</a></li>
-                        <li><a href="#tabs-2">By URI</a></li>
+                        <li><a href="#tabs-1">By name</a></li>
+                        <li><a href="#tabs-2">By namespace URI</a></li>
                     </ul>
                     <div id="tabs-1">
                         <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
