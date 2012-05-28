@@ -94,6 +94,7 @@
 
                         // Add query prefix #1
                         $("#prefix1").click(function() {
+                            alert("test");
                             return handlePrefixClick("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>");
                         });
                         // Add query prefix #2
@@ -402,20 +403,7 @@ while (l--) {
 
                     <c:if test="${empty actionBean.result || empty actionBean.result.rows}">
                         <div>
-                            <h2>Useful namespaces</h2>
-                            <pre>
-<span id="prefix1" class="shadowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
-<span id="prefix2" class="shadowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span>
-<span id="prefix3" class="shadowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span>
-<span id="prefix4" class="shadowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span>
-<span id="prefix5" class="shadowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span>
-<span id="prefix6" class="shadowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span>
-<span id="prefix7" class="shadowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
-<span id="prefix8" class="shadowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span>
-<span id="prefix9" class="shadowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span>
-<span id="prefix10" class="shadowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span>
-<span id="prefix11" class="shadowHover">PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</span>
-                            </pre>
+                            Hint: for more convenient usage see the operations menu for bookmarked queries and for clickable SPARQL prefixes.
                         </div>
                     </c:if>
                 </div>
@@ -593,17 +581,17 @@ while (l--) {
 
             <div id="prefixesDialog" title="Useful namespaces">
                 <ul>
-                    <li>PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</li>
-                    <li>PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</li>
-                    <li>PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</li>
-                    <li>PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</li>
-                    <li>PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</li>
-                    <li>PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</li>
-                    <li>PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</li>
-                    <li>PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</li>
-                    <li>PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</li>
-                    <li>PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</li>
-                    <li>PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</li>
+                    <li><span id="prefix1" class="shadowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span></li>
+                    <li><span id="prefix2" class="shadowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span></li>
+                    <li><span id="prefix3" class="shadowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span></li>
+                    <li><span id="prefix4" class="shadowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span></li>
+                    <li><span id="prefix5" class="shadowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span></li>
+                    <li><span id="prefix6" class="shadowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span></li>
+                    <li><span id="prefix7" class="shadowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span></li>
+                    <li><span id="prefix8" class="shadowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span></li>
+                    <li><span id="prefix9" class="shadowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span></li>
+                    <li><span id="prefix10" class="shadowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span></li>
+                    <li><span id="prefix11" class="shadowHover">PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</span></li>
                 </ul>
                 <button id="closePrefixesDialog">Close</button>
             </div>
