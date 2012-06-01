@@ -402,8 +402,16 @@ while (l--) {
                     </c:if>
 
                     <c:if test="${empty actionBean.result || empty actionBean.result.rows}">
-                        <div>
-                            Hint: for more convenient usage see the operations menu for bookmarked queries and for clickable SPARQL prefixes.
+                        <br/>
+                        <div class="advice-msg">
+                            On this page you can execute various SPARQL queries against the backend that CR is running on.
+                            For a more convenient use, you can insert common namespace prefixs into your query by selecting
+                            "Useful namespaces" in the Operations menu and clicking the namespaces in the opening pop-up window.
+                            The Operations menu also provides a list of shared bookmarked queries which you can select to
+                            pre-fill your query.<br/><br/>
+                            The output format of the query depends on the one you select from the above select box. In order
+                            to make the query use inference rules, turn on the relevant checkbox. A link to common useful
+                            SPARQL functions is also available below the Operations menu.
                         </div>
                     </c:if>
                 </div>
