@@ -49,6 +49,7 @@ import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -73,6 +74,23 @@ public abstract class BaseHarvest implements Harvest {
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
 
     protected static final int PRESERVED_HARVEST_COUNT = 10;
+
+    /**
+     * Use timeout checking only if last harvest greater than this.
+     * (1hr)
+     */
+    protected static final int DEFAULT_HARVEST_TIMEOUT = 3600000;
+
+
+    /**
+     * Minimal value if harvest timeout is taken into account.
+     */
+    protected static final int MINIMAL_HARVEST_TIMEOUT = 300000;
+
+    /**
+     * harvesting cancelled if harvesting takes more than last harvest duration multiplied with this constant.
+     */
+    protected static final double HARVEST_TIMEOUT_MULTIPLIER = 1.2;
 
     /** */
     private final HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
@@ -101,6 +119,11 @@ public abstract class BaseHarvest implements Harvest {
     private String harvestUser;
 
     /**
+     * Last harvest duration in millis.
+     */
+    private Long lastHarvestDuration;
+
+    /**
      *
      * Class constructor.
      *
@@ -123,6 +146,8 @@ public abstract class BaseHarvest implements Harvest {
         }
         this.contextSourceDTO = contextSourceDTO;
         this.contextUrl = contextSourceDTO.getUrl();
+
+        this.lastHarvestDuration = calculateLastHarvestDuration(contextSourceDTO.getSourceId());
     }
 
     /**
@@ -350,9 +375,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                MessageFormat.format(
-                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                        e.toString(), scriptType, title, parsedQuery);
+                    MessageFormat.format(
+                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                            e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -575,6 +600,10 @@ public abstract class BaseHarvest implements Harvest {
         addHarvestMessage(message, messageType, null);
     }
 
+    @Override
+    public Long getLastHarvestDuration() {
+        return lastHarvestDuration;
+    }
     /**
      *
      * @param message
@@ -733,5 +762,57 @@ public abstract class BaseHarvest implements Harvest {
     public boolean isBeingHarvested(String url) {
 
         return url != null && StringUtils.equals(url, contextUrl);
+    }
+
+    /**
+     * calculates last harvest duration.
+     * @param harvestSourceId source id in the harvest_source
+     * @return time in millis, null if cannot be calculated
+     */
+    private Long calculateLastHarvestDuration(int harvestSourceId) {
+        HarvestDTO lastHarvest = null;
+        Long result = null;
+
+        try {
+            lastHarvest = harvestDAO.getLastHarvestBySourceId(harvestSourceId);
+        } catch (DAOException e) {
+            LOGGER.error(loggerMsg("Error getting last harvest time, returning null " + e));
+        }
+        if (lastHarvest != null) {
+            Date startTime = lastHarvest.getDatetimeStarted();
+            Date endTime = lastHarvest.getDatetimeFinished();
+            if (startTime != null && endTime != null) {
+                result = endTime.getTime() - startTime.getTime();
+            }
+        }
+
+        return result;
+
+    }
+
+    /**
+     * Calculates timeout based on last harvests.
+     * Timeout is not greater than maximum timeout specified in HARVEST_TIMEOUT_TRESHOLD
+     * If last harvest has not taken more than MINIMAL_HARVEST_TIMEOUT minimal timeout is used
+     *
+     * @return timeout in milliseconds
+     */
+    protected int getTimeout() {
+        Long lastHarvestDuration = getLastHarvestDuration();
+
+        //no last harvest, use default timeout
+        int timeout = DEFAULT_HARVEST_TIMEOUT;
+
+        if (lastHarvestDuration != null) {
+            //big sources - last harvest * 1.2
+            timeout = (int)(lastHarvestDuration * HARVEST_TIMEOUT_MULTIPLIER );
+        }
+        //use minimal if last harvest went very quickly
+        if (timeout < MINIMAL_HARVEST_TIMEOUT) {
+            timeout = MINIMAL_HARVEST_TIMEOUT;
+        }
+        LOGGER.info(loggerMsg("Timeout=" + timeout));
+        return timeout;
+
     }
 }

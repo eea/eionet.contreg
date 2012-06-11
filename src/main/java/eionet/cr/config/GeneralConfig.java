@@ -45,6 +45,8 @@ public class GeneralConfig {
     public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
     public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
+    public static final String HARVESTER_MAX_CONTANTLENGTH = "harvester.maximumContentLength";
+    public static final String HARVESTER_HTTP_TIMEOUT = "harvester.httpConnection.timeout";
 
     /** */
     public static final String XMLCONV_LIST_CONVERSIONS_URL = "xmlconv.listConversions.url";

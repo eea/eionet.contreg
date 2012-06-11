@@ -88,6 +88,9 @@ public class PullHarvest extends BaseHarvest {
     private static final int MAX_REDIRECTIONS = 4;
 
     /** */
+    private static final int MAX_CONTENTLENGTH = 5;
+
+    /** */
     private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
     /** Text/plain content type. */
@@ -106,7 +109,7 @@ public class PullHarvest extends BaseHarvest {
     private boolean isOnDemandHarvest;
 
     /** */
-    private List<String> redirectedUrls = new ArrayList<String>();
+    private final List<String> redirectedUrls = new ArrayList<String>();
 
     /**
      * @param contextUrl
@@ -150,6 +153,19 @@ public class PullHarvest extends BaseHarvest {
                 try {
                     responseCode = urlConn.getResponseCode();
                     responseMessage = urlConn.getResponseMessage();
+
+                    String contentLengthValue = urlConn.getHeaderField("Content-Length");
+                    int contentLength = (contentLengthValue != null ?  Integer.parseInt(contentLengthValue) : 0);
+
+                    int maxAllowedContentLength = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_MAX_CONTANTLENGTH, 0);
+
+                    if (maxAllowedContentLength > 0 && contentLength > maxAllowedContentLength) {
+                        LOGGER.error("Source content is more than allowed " + contentLength);
+                        finishWithError(MAX_CONTENTLENGTH, "Source exceeds the allowed maximum content length", new HarvestException("Source exceeds the maximum content length"));
+                        return;
+                    }
+
+
                 } catch (IOException ioe) {
                     // an error when connecting to server is considered a temporary error-
                     // don't throw it, but log in the database and exit
@@ -617,6 +633,11 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Connection", "close");
         connection.setInstanceFollowRedirects(false);
 
+        //NB This is not the whole connection timeout, it occurs if connection cannot be established or it hangs when reading the stream
+        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, DEFAULT_HARVEST_TIMEOUT);
+        connection.setConnectTimeout(httpTimeout);
+        connection.setReadTimeout(httpTimeout);
+
         // Use "If-Modified-Since" header, if this is not an on-demand harvest
         if (!isOnDemandHarvest) {
 
@@ -632,8 +653,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
