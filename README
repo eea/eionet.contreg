@@ -51,7 +51,7 @@ NB!!! For security reasons, be sure to change your Virtuoso administrator passwo
 something other than the default!
 
 ****************************************************************************
-3. Download and build CR source code
+3. Download, configure and build CR source code
 ****************************************************************************
 
 CR source code is kept in a Subversion (SVN) repository located at
@@ -62,31 +62,8 @@ that is denoted by CR_SOURCE_HOME in the below instructions.
 
 Before you can build CR source code, you need to set your environment specific properties.
 For that, make a copy of unittest.properties in CR_SOURCE_HOME, and rename it to local.properties.
-In the resulting file, ensure that the following properties match your environment
-(see further comments inside the properties file):
-
-    virtuoso.db.url
-    virtuoso.db.usr
-    virtuoso.db.pwd
-
-    harvester.batchHarvestingHours
-    harvester.batchHarvestingIntervalSeconds
-    harvester.referrals.intervalMinutes
-    harvester.tempFileDir
-    application.acl.folder
-
-    mail.host
-    mail.user
-    mail.password
-    mail.from
-    mail.sysAdmins
-
-    dataflowPicklistCacheUpdateInterval
-    recentDiscoveredFilesCacheUpdateInterval
-    typeCacheUpdateInterval
-    tagCloudCacheUpdateInterval
-
-    edu.yale.its.tp.cas.client.filter.serverName
+Go through the resulting file and change properties that are specific to your environment or wishes.
+Each property's exact meaning and effect is commented in the file.
 
 Now you are ready to build your CR code. It is built with Maven.
 The following command assumes that Maven's executable (mvn) is on the command path,
@@ -112,7 +89,7 @@ All the below commands shall be executed as 'dba' user.
 The scripts are located in CR_SOURCE_HOME/sql/virtuoso/install directory,
 and the following commands should be executed while being in that directory.
 The commands also assume that ISQL executable is on the command path
-(it is located in VIRTUOSO_HOME/bin directory). 
+(it is located in VIRTUOSO_HOME/bin directory).
 
     Create necessary Virtuoso users for CR:
 
@@ -133,11 +110,38 @@ The commands also assume that ISQL executable is on the command path
     Note that inference is something that is part of Semantic Web and helps CR to self-derive
     conclusions and new information from certain structured data statements, based on a certain
     ruleset. The above command imports CR's default ruleset. It downloads the ruleset from
-    http://svn.eionet.europa.eu/projects/Reportnet/browser/cr3/trunk/src/main/webapp/ontologies/contreg.rdf?format=txt. 
+    http://svn.eionet.europa.eu/projects/Reportnet/browser/cr3/trunk/src/main/webapp/ontologies/contreg.rdf?format=txt.
 
+***********************************************************************
+5. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
+***********************************************************************
+
+This step is required only if you configured CR to use EEA's  Central Authentication Service (CAS) in step 3.
+In other words: if you pointed edu.yale.its.tp.cas.client.filter.loginUrl and edu.yale.its.tp.cas.client.filter.validateUrl
+to EEA's CAS server. In such a case you need to register Eionet's GlobalSign CA certificates in the JVM that runs
+the Tomcat where you deploy CR.
+
+The steps are as follows (note that the expected password for the keystore is "changeit", but don't change it):
+
+a) Go to [http://www.eionet.europa.eu/certificates] and download the certificates called
+GlobalSign-Root-CA.crt and GlobalSign-Domain-Validation-CA.crt to a temporary directory.
+
+b) Check that the GlobalSign-Root-CA.crt certificate is not already in the keystore:
+shell> openssl x509 -fingerprint -md5 -noout -in GlobalSign-Root-CA.crt
+
+Compare the fingerprint to what is already in the keystore:
+shell> keytool -list -keystore $JAVA_HOME/jre/lib/security/cacerts
+
+c) Import the certificate from the .crt file into your JVM's default keystore of  trusted certificates.
+Example:
+shell> keytool -import -file GlobalSign-Root-CA.crt -alias globalsignca28 -keystore $JAVA_HOME/jre/lib/security/cacerts
+This certificate will be added under alias "globalsignca28".
+
+d) Do steps b) and c) for GlobalSign-Domain-Validation-CA.crt as well.
+Store it under the alias 'globalsigndomain14'.
 
 ****************************************************************************
-5. Deploy CR web application and run Tomcat
+6. Deploy CR web application and run Tomcat
 ****************************************************************************
 
 If the build went well, you shall have cr.war file in CR_SOURCE_HOME/target directory.
@@ -153,4 +157,4 @@ URIEncoding="UTF-8"
 useBodyEncodingForURI="true"
 
 Once Tomcat is running, open CR in the browser. It's application context path is /cr,
-unless you renamed cr.war to something else or you chose to deploy CR into a virtual host. 
+unless you renamed cr.war to something else or you chose to deploy CR into a virtual host.
