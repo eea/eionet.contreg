@@ -301,7 +301,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     private void storeSharedBookmark() throws DAOException {
-        CRUser user = getUser();
+
         // prepare bookmark subject
         String bookmarksUri = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparqlbookmarks";
         String bookmarkUri = buildBookmarkUri(bookmarksUri, bookmarkName);
@@ -383,7 +383,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -592,8 +592,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
             nrOfTriples =
-                    DAOFactory.get().getDao(HelperDAO.class)
-                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
+                DAOFactory.get().getDao(HelperDAO.class)
+                .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -605,21 +605,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
