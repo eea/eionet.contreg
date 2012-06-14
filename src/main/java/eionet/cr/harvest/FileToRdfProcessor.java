@@ -51,10 +51,10 @@ import eionet.cr.util.xml.XmlAnalysis;
  *
  * @author Jaanus Heinlaid
  */
-public class FileProcessor {
+public class FileToRdfProcessor {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(FileProcessor.class);
+    private static final Logger LOGGER = Logger.getLogger(FileToRdfProcessor.class);
 
     /** */
     private File file;
@@ -67,7 +67,7 @@ public class FileProcessor {
      * @param file
      * @param contextUrl
      */
-    public FileProcessor(File file, String contextUrl) {
+    public FileToRdfProcessor(File file, String contextUrl) {
 
         if (file == null || contextUrl == null) {
             throw new IllegalArgumentException("File and context URL must not be null!");

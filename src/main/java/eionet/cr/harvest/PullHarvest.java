@@ -46,7 +46,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
@@ -63,6 +62,9 @@ import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.load.ContentLoader;
+import eionet.cr.harvest.load.RDFFormatLoader;
+import eionet.cr.harvest.load.RSSFormatLoader;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
 import eionet.cr.harvest.util.RDFMediaTypes;
@@ -155,16 +157,16 @@ public class PullHarvest extends BaseHarvest {
                     responseMessage = urlConn.getResponseMessage();
 
                     String contentLengthValue = urlConn.getHeaderField("Content-Length");
-                    int contentLength = (contentLengthValue != null ?  Integer.parseInt(contentLengthValue) : 0);
+                    int contentLength = (contentLengthValue != null ? Integer.parseInt(contentLengthValue) : 0);
 
                     int maxAllowedContentLength = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_MAX_CONTANTLENGTH, 0);
 
                     if (maxAllowedContentLength > 0 && contentLength > maxAllowedContentLength) {
                         LOGGER.error("Source content is more than allowed " + contentLength);
-                        finishWithError(MAX_CONTENTLENGTH, "Source exceeds the allowed maximum content length", new HarvestException("Source exceeds the maximum content length"));
+                        finishWithError(MAX_CONTENTLENGTH, "Source exceeds the allowed maximum content length",
+                                new HarvestException("Source exceeds the maximum content length"));
                         return;
                     }
-
 
                 } catch (IOException ioe) {
                     // an error when connecting to server is considered a temporary error-
@@ -347,8 +349,7 @@ public class PullHarvest extends BaseHarvest {
      * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
      * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
      *
-     * @param contextSourceDTO
-     *            - object representing the source with the error.
+     * @param contextSourceDTO - object representing the source with the error.
      * @return the last harvest date + 10 %.
      */
     private Date temporaryErrorLastHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -433,36 +434,37 @@ public class PullHarvest extends BaseHarvest {
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
      *
-     * @param urlConn
-     *            - connection to the remote source.
+     * @param urlConn - connection to the remote source.
      * @return number of triples harvested.
+     *
      * @throws IOException
-     * @throws OpenRDFException
+     * @throws DAOException
      * @throws SAXException
      */
-    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, OpenRDFException, SAXException {
+    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException {
 
         File downloadedFile = null;
         try {
             downloadedFile = downloadFile(urlConn);
 
-            // if response content type is one of RDF, then proceed straight to loading,
-            // otherwise process the file to see if it's zipped, or it's an XML with RDF conversion,
-            // or actually an RDF file
+            // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
+            // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
-            RDFFormat rdfFormat = getRdfFormat(urlConn);
-            if (rdfFormat != null) {
-                return loadFile(downloadedFile, rdfFormat);
+            ContentLoader contentLoader = createContentLoader(urlConn);
+            if (contentLoader != null) {
+                return loadFile(downloadedFile, contentLoader);
             } else {
+                LOGGER.debug(loggerMsg("Downladed file is not in RDF or web feed format, processing the file further"));
                 File processedFile = null;
                 try {
-                    LOGGER.debug(loggerMsg("Server-returned content type is not RDF, processing file further"));
-                    processedFile = new FileProcessor(downloadedFile, getContextUrl()).process();
+                    // The file could be a zipped RDF, an XML with an RDF conversion, or actually a completely valid RDF
+                    // that simply wasn't declared in the server-returned content type.
+                    processedFile = new FileToRdfProcessor(downloadedFile, getContextUrl()).process();
                     if (processedFile != null) {
-                        LOGGER.debug(loggerMsg("File processed into loadable format"));
-                        return loadFile(processedFile, null);
+                        LOGGER.debug(loggerMsg("File processed into RDF format"));
+                        return loadFile(processedFile, new RDFFormatLoader(RDFFormat.RDFXML));
                     } else {
-                        LOGGER.debug(loggerMsg("File couldn't be processed into loadable format"));
+                        LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
                         return 0;
                     }
                 } finally {
@@ -557,31 +559,26 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Load file into triple store.
      *
      * @param file
-     * @param rdfFormat
-     * @return number of triples harvested.
-     * @throws OpenRDFException
-     * @throws IOException
+     * @param contentLoader
+     * @return
+     * @throws DAOException
      */
-    private int loadFile(File file, RDFFormat rdfFormat) throws IOException, OpenRDFException {
+    private int loadFile(File file, ContentLoader contentLoader) throws DAOException {
 
         LOGGER.debug(loggerMsg("Loading file into triple store"));
-
-        int tripleCount = getHarvestSourceDAO().loadIntoRepository(file, rdfFormat, getContextUrl(), true);
+        int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl(), true);
         return tripleCount;
     }
 
     /**
-     * Download file from remote source to a temporary file locally. Sideeffect: Adds the file size to the metadata to save in the
+     * Download file from remote source to a temporary file locally. Side effect: dds the file size to the metadata to save in the
      * harvester context.
      *
-     * @param urlConn
-     *            - connection to the remote source.
+     * @param urlConn - connection to the remote source.
      * @return object representing the temporary file.
-     * @throws IOException
-     *             if the file is not downloadable.
+     * @throws IOException if the file is not downloadable.
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
@@ -612,8 +609,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param connectUrl
-     *            TODO
+     * @param connectUrl TODO
      * @return
      * @throws MalformedURLException
      * @throws IOException
@@ -633,7 +629,8 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Connection", "close");
         connection.setInstanceFollowRedirects(false);
 
-        //NB This is not the whole connection timeout, it occurs if connection cannot be established or it hangs when reading the stream
+        // NB This is not the whole connection timeout, it occurs if connection cannot be established or it hangs when reading the
+        // stream
         int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, DEFAULT_HARVEST_TIMEOUT);
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
@@ -653,8 +650,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -794,6 +791,28 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     *
+     * @param urlConn
+     * @return
+     */
+    private ContentLoader createContentLoader(HttpURLConnection urlConn) {
+
+        RDFFormat rdfFormat = getRdfFormat(urlConn);
+        if (rdfFormat != null) {
+            return new RDFFormatLoader(rdfFormat);
+        }
+
+        String contentType = getSourceContentType(urlConn);
+        if (StringUtils.isBlank(contentType)) {
+            return null;
+        } else if (contentType.startsWith("application/rss+xml")) {
+            return new RSSFormatLoader();
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
     @Override
@@ -820,8 +839,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * @param isOnDemandHarvest
-     *            the isOnDemandHarvest to set
+     * @param isOnDemandHarvest the isOnDemandHarvest to set
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
         this.isOnDemandHarvest = isOnDemandHarvest;

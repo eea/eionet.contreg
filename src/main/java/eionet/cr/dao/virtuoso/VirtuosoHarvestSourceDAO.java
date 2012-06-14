@@ -2,6 +2,7 @@ package eionet.cr.dao.virtuoso;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -41,6 +42,7 @@ import eionet.cr.dao.readers.NewSourcesReaderWriter;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
@@ -82,6 +84,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -95,6 +98,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -108,6 +112,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang .String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -122,6 +127,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -135,6 +141,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -213,6 +220,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     @Override
@@ -234,11 +242,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * Insert a record into the the table of harvest sources in VirtuosoSQL syntax. INSERT SOFT means that if such source already
      * exists then don't insert (like MySQL INSERT IGNORE)
      */
-    private static final String ADD_SOURCE_SQL = "insert soft HARVEST_SOURCE"
+    private static final String ADD_SOURCE_SQL =
+        "insert soft HARVEST_SOURCE"
         + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE) VALUES (?,?,?,NOW(),?,?,?,?)";
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     @Override
@@ -311,6 +321,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO source)
      */
     @Override
@@ -403,6 +414,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
      */
     @Override
@@ -434,6 +446,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceById(java.lang.Integer)
      */
     @Override
@@ -450,6 +463,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
     @Override
@@ -492,6 +506,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
      */
     @Override
@@ -524,6 +539,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
     @Override
@@ -735,6 +751,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
      */
     @Override
@@ -777,6 +794,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -808,6 +826,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -835,6 +854,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -928,6 +948,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -1226,6 +1247,96 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         } catch (RepositoryException e) {
             throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
+    }
+
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.File, eionet.cr.harvest.load.ContentLoader, java.lang.String,
+     *      boolean)
+     */
+    @Override
+    public int loadContent(File file, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent)
+    throws DAOException {
+
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            return loadContent(inputStream, contentLoader, graphUri, clearPreviousContent);
+
+        } catch (FileNotFoundException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+    }
+
+    /**
+     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.InputStream, eionet.cr.harvest.load.ContentLoader, java.lang.String,
+     *      boolean)
+     */
+    @Override
+    public int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent)
+    throws DAOException {
+
+        RepositoryConnection repoConn = null;
+        Connection sqlConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+            sqlConn = SesameUtil.getSQLConnection();
+
+            // We do it in transaction.
+            repoConn.setAutoCommit(false);
+            sqlConn.setAutoCommit(false);
+
+            // If required, clear previous triples of this graph
+            if (clearPreviousContent) {
+                // Create URI and then use its string value to avoid SPARQL injection.
+                URI graphResource = repoConn.getValueFactory().createURI(graphUri);
+                SesameUtil.executeSPARUL("clear graph <" + graphResource.stringValue() + ">", null, repoConn);
+            }
+
+            // Load the content.
+            int triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, graphUri);
+
+            // Commit the changes both in repository connection and SQL connection.
+            // Note that tests with Virtuoso have shown that when loading, for example, 10000 triples
+            // then the time is taken when adding them, not when finally doing the commit. The commit itself takes
+            // a fraction of a second. This might be useful information when trying to abort the loader thread.
+            repoConn.commit();
+            sqlConn.commit();
+
+            return triplesLoaded;
+
+        } catch (Exception e) {
+            SesameUtil.rollback(repoConn);
+            SQLUtil.rollback(sqlConn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(sqlConn);
+            SesameUtil.close(repoConn);
+        }
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            // We do it in transaction.
+            repoConn.setAutoCommit(false);
+
+            String sparul = "delete from <http://cdr.eionet.europa.eu/mt/eea/colrnupsa/envrpipfw/rdf> {?s ?p ?o} " +
+            "where {graph <http://cdr.eionet.europa.eu/mt/eea/colrnupsa/envrpipfw/rdf> {?s ?p ?o}}";
+            SesameUtil.executeSPARUL(sparul, null, repoConn);
+
+            repoConn.commit();
+
+        } catch (Exception e) {
+            SesameUtil.rollback(repoConn);
+            throw new DAOException(e.getMessage(), e);
         } finally {
             SesameUtil.close(repoConn);
         }

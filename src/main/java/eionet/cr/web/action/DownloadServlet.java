@@ -78,6 +78,7 @@ public class DownloadServlet extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         // Process request with content.
         processRequest(request, response, true);
     }

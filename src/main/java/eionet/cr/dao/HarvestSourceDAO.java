@@ -36,6 +36,7 @@ import org.openrdf.rio.RDFParseException;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
@@ -229,7 +230,6 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param file
      * @param rdfFormat
-     *            TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
@@ -237,7 +237,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-            OpenRDFException;
+    OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -245,7 +245,6 @@ public interface HarvestSourceDAO extends DAO {
      *
      * @param inputStream
      * @param rdfFormat
-     *            TODO
      * @param graphUrl
      * @param clearPreviousGraphContent
      * @return
@@ -253,7 +252,29 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException;
+    throws IOException, OpenRDFException;
+
+    /**
+     *
+     * @param file
+     * @param contentLoader
+     * @param graphUri
+     * @param clearPreviousContent
+     * @return
+     * @throws DAOException
+     */
+    int loadContent(File file, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent) throws DAOException;
+
+    /**
+     *
+     * @param inputStream
+     * @param contentLoader
+     * @param graphUri
+     * @param clearPreviousContent
+     * @return
+     * @throws DAOException
+     */
+    int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent) throws DAOException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
@@ -296,7 +317,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException, RepositoryException,
-            IOException;
+    IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -310,7 +331,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO... object)
-            throws DAOException, RepositoryException, IOException;
+    throws DAOException, RepositoryException, IOException;
 
     /**
      *
