@@ -4,20 +4,6 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Type search">
 
-    <stripes:layout-component name="head">
-        <script type="text/javascript">
-        // <![CDATA[
-        ( function($) {
-            $(document).ready(
-                function(){
-                    // Set up tabs
-                    $("#tabs").tabs();
-             });
-        } ) ( jQuery );
-        // ]]>
-        </script>
-    </stripes:layout-component>
-
     <stripes:layout-component name="contents">
         <ul id="dropdown-operations">
             <li><a href="#">Operations</a>
@@ -104,6 +90,7 @@
 
 // ]]>
                 </script>
+
                 <stripes:select name="type">
                     <c:forEach var="groups" items="${actionBean.availableTypes}">
                     <optgroup label="${groups.left}">
@@ -113,23 +100,43 @@
                     </optgroup>
                     </c:forEach>
                 </stripes:select>
-
                </c:when>
                <c:otherwise>
-               <div id="tabs">
-                    <ul style="margin: 0; padding-left: 1em;">
-                        <li><a href="#tabs-1">By name</a></li>
-                        <li><a href="#tabs-2">By namespace URI</a></li>
-                    </ul>
-                    <div id="tabs-1">
-                        <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
+
+               <div id="tabbedmenu">
+                <ul>
+                    <c:choose>
+                        <c:when test="${actionBean.typesByName}">
+                            <li>
+                                <stripes:link href="${actionBean.urlBinding}">
+                                    By namespace URI
+                                    <stripes:param name="typesByName" value="false"/>
+                                </stripes:link>
+                            </li>
+                            <li id="currenttab"><span>By Name</span></li>
+                        </c:when>
+                        <c:otherwise>
+                            <li id="currenttab"><span>By namespace URI</span></li>
+                            <li>
+                                <stripes:link href="${actionBean.urlBinding}">
+                                    By Name
+                                    <stripes:param name="typesByName" value="true"/>
+                                </stripes:link>
+                            </li>
+                        </c:otherwise>
+                    </c:choose>
+                </ul>
+                </div>
+                <c:choose>
+                    <c:when test="${actionBean.typesByName}">
+                        <stripes:select name="type" size="20" style="min-width:550px; width:550px;">
                             <c:forEach var="type" items="${actionBean.availableTypesByName}">
                                 <stripes:option value="${type.left}">${type.right}</stripes:option>
                             </c:forEach>
-                    </stripes:select>
-                    </div>
-                    <div id="tabs-2">
-                        <stripes:select name="type" size="20" style="min-width:450px; width:450px;">
+                        </stripes:select>
+                    </c:when>
+                    <c:otherwise>
+                        <stripes:select name="type" size="20" style="min-width:550px; width:550px;">
                             <c:forEach var="groups" items="${actionBean.availableTypes}">
                             <optgroup label="${groups.left}">
                                 <c:forEach var="type" items="${groups.right}">
@@ -138,8 +145,8 @@
                             </optgroup>
                             </c:forEach>
                         </stripes:select>
-                    </div>
-               </div>
+                    </c:otherwise>
+                </c:choose>
                </c:otherwise>
                </c:choose>
 
