@@ -86,10 +86,12 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("?value ?p <").append(Predicates.CR_COMPILED_DATASET).append("> .");
             query.append("filter (?g = <").append(homeFolder).append(">) .");
             if (!StringUtils.isBlank(excludeFileUri)) {
-                query.append("filter not exists {");
+
+                query.append("filter (!bif:exists ( (select (1) where {");
                 query.append("?value <").append(Predicates.CR_GENERATED_FROM).append("> ?o .");
                 query.append("filter (?o = <").append(excludeFileUri).append(">)");
-                query.append("}");
+                query.append("} ) ) )");
+
             }
             query.append("?value <http://www.w3.org/2000/01/rdf-schema#label> ?name }");
             query.append("?value <").append(Predicates.CR_LAST_MODIFIED).append("> ?modified");
