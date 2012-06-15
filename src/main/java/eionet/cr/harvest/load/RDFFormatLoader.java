@@ -54,7 +54,7 @@ public class RDFFormatLoader implements ContentLoader {
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException {
+    throws IOException, OpenRDFException, ContentParsingException {
 
         // Let Sesame create an RDF parser.
         RDFParser rdfParser = Rio.createParser(rdfFormat, repoConn.getValueFactory());

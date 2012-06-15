@@ -46,10 +46,10 @@ public interface ContentLoader {
      * @param contextUri URI of the graph where the triples will be loaded into.
      *
      * @return Number of triples loaded.
-     *
-     * @throws OpenRDFException
      * @throws IOException
+     * @throws OpenRDFException
+     * @throws ContentParsingException
      */
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException;
+    throws IOException, OpenRDFException, ContentParsingException;
 }
