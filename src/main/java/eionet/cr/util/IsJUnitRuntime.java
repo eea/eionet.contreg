@@ -25,19 +25,19 @@ import org.apache.log4j.Logger;
 
 /**
  * Singleton class indicating if you are currently in JUnit runtime.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class IsJUnitRuntime {
 
     /** */
-    private static Logger LOGGER = Logger.getLogger(IsJUnitRuntime.class);
+    private static final Logger LOGGER = Logger.getLogger(IsJUnitRuntime.class);
 
     /** */
     public static final boolean VALUE = isJUnitRuntime();
 
     /**
-     * 
+     *
      * @return
      */
     private static boolean isJUnitRuntime() {

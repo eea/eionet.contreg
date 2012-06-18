@@ -21,14 +21,14 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class SesameConnectionProvider {
 
     /** */
-    private static Logger LOGGER = Logger.getLogger(SesameConnectionProvider.class);
+    private static final Logger LOGGER = Logger.getLogger(SesameConnectionProvider.class);
 
     /** */
     public static final String READWRITE_DATASOURCE_NAME = "jdbc/readWriteRepo";
@@ -58,8 +58,8 @@ public class SesameConnectionProvider {
             String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
 
             readWriteRepository =
-                    createRepository(GeneralConfig.getRequiredProperty(urlProperty),
-                            GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
+                createRepository(GeneralConfig.getRequiredProperty(urlProperty),
+                        GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
         }
         return readWriteRepository;
     }
@@ -71,15 +71,15 @@ public class SesameConnectionProvider {
 
         if (readOnlyRepository == null) {
             readOnlyRepository =
-                    createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
-                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
-                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
+                createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
+                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
+                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
         }
         return readOnlyRepository;
     }
 
     /**
-     * 
+     *
      * @param url
      * @param usr
      * @param pwd
@@ -120,7 +120,7 @@ public class SesameConnectionProvider {
     }
 
     /**
-     * 
+     *
      * @param dataSourceName
      * @return
      */
@@ -137,7 +137,7 @@ public class SesameConnectionProvider {
 
     /**
      * Returns read-write connection to the repository.
-     * 
+     *
      * @return RepositoryConnection
      * @throws RepositoryException
      */
@@ -163,7 +163,7 @@ public class SesameConnectionProvider {
 
     /**
      * Returns read-only connection to the repository.
-     * 
+     *
      * @return RepositoryConnection connection
      * @throws RepositoryException
      */
@@ -191,7 +191,7 @@ public class SesameConnectionProvider {
      * Returns a {@link java.sql.Connection} to the underlying repository. Uses a {@link javax.sql.DataSource} with name
      * {@link #READWRITE_DATASOURCE_NAME} if such can be found. Otherwise creates a direct connection using the "classical" way
      * through {@link java.sql.DriverManager}.
-     * 
+     *
      * @return Connection
      * @throws SQLException
      */
