@@ -115,8 +115,8 @@
                 <stripes:hidden name="uri" value="${actionBean.uri}" />
 
                 <fieldset style="border: 0px;">
-                    <label for="username" style="width: 200px; float: left;">New owner username:</label>
-                    <stripes:text id="username" name="username"/>
+                    <label for="txtOwner" style="width: 200px; float: left;">New owner username:</label>
+                    <stripes:text id="txtOwner" name="ownerName"/>
                 </fieldset>
                 <br />
                 <br />

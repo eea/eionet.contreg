@@ -69,7 +69,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     private boolean schemaSource;
 
     /** Username when changing owner. */
-    private String username;
+    private String ownerName;
 
     /** Interval multiplyers. */
     private int intervalMultiplier;
@@ -77,10 +77,10 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     static {
         intervalMultipliers = new LinkedHashMap<Integer, String>();
-        intervalMultipliers.put(new Integer(1), "minutes");
-        intervalMultipliers.put(new Integer(60), "hours");
-        intervalMultipliers.put(new Integer(1440), "days");
-        intervalMultipliers.put(new Integer(10080), "weeks");
+        intervalMultipliers.put(Integer.valueOf(1), "minutes");
+        intervalMultipliers.put(Integer.valueOf(60), "hours");
+        intervalMultipliers.put(Integer.valueOf(1440), "days");
+        intervalMultipliers.put(Integer.valueOf(10080), "weeks");
     }
 
     /**
@@ -198,7 +198,7 @@ public class EditSourceActionBean extends AbstractActionBean {
         }
 
         // change owner
-        harvestSource.setOwner(username);
+        harvestSource.setOwner(ownerName);
         factory.getDao(HarvestSourceDAO.class).editSource(harvestSource);
         addSystemMessage("Owner successfully changed.");
 
@@ -395,18 +395,18 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the username
+     * @return the ownerName
      */
-    public String getUsername() {
-        return username;
+    public String getOwnerName() {
+        return ownerName;
     }
 
     /**
-     * @param username
-     *            the username to set
+     * @param ownerName
+     *            the ownerName to set
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
 }

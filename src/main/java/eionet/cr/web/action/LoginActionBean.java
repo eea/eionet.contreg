@@ -173,13 +173,6 @@ public class LoginActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
      *
      * @return
      */

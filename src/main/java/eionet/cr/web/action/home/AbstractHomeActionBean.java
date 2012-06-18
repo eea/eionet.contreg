@@ -42,7 +42,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     protected static final String SHOWPUBLIC_NO = "N";
 
     /** */
-    protected static List<Map<String, String>> tabs;
+    protected static final List<Map<String, String>> tabs;
     private static final Map<String, List<SearchResultColumn>> typesColumns;
 
     // Note: attemptedUserName might be used in some situations where showPublic
