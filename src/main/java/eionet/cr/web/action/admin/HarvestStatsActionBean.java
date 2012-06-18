@@ -35,7 +35,7 @@ import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Action bean for displaying harvest statistics.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/admin/harveststats")
@@ -49,7 +49,7 @@ public class HarvestStatsActionBean extends AbstractActionBean {
 
     /**
      * Handles the page view.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -76,8 +76,7 @@ public class HarvestStatsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param adminLoggedIn
-     *            the adminLoggedIn to set
+     * @param adminLoggedIn the adminLoggedIn to set
      */
     public void setAdminLoggedIn(boolean adminLoggedIn) {
         this.adminLoggedIn = adminLoggedIn;
@@ -91,8 +90,7 @@ public class HarvestStatsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param resultList
-     *            the resultList to set
+     * @param resultList the resultList to set
      */
     public void setResultList(List<HarvestStatDTO> resultList) {
         this.resultList = resultList;

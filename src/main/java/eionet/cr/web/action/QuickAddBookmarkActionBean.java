@@ -19,7 +19,7 @@ import eionet.cr.web.util.RegisterUrl;
 
 /**
  * Bookmarklet backend action bean.
- *
+ * 
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a> (modified for CR)
  */
@@ -102,8 +102,7 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param resource
-     *            the resource to set
+     * @param resource the resource to set
      */
     public void setResource(BookmarkFormDTO resource) {
         this.resource = resource;
@@ -117,8 +116,7 @@ public class QuickAddBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param originalPageUrl
-     *            the originalPageUrl to set
+     * @param originalPageUrl the originalPageUrl to set
      */
     public void setOriginalPageUrl(String originalPageUrl) {
         this.originalPageUrl = originalPageUrl;

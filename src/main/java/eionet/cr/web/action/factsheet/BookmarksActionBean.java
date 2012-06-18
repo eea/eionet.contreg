@@ -45,7 +45,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Bookmarks tab on factsheet page.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/bookmarks.action")
@@ -65,7 +65,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * View action.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -79,7 +79,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * Delete action.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -102,7 +102,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * Initializes tabs.
-     *
+     * 
      * @throws DAOException
      */
     private void initTabs() throws DAOException {
@@ -139,8 +139,7 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -154,8 +153,7 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param tabs
-     *            the tabs to set
+     * @param tabs the tabs to set
      */
     public void setTabs(List<TabElement> tabs) {
         this.tabs = tabs;
@@ -169,8 +167,7 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedBookmarks
-     *            the selectedBookmarks to set
+     * @param selectedBookmarks the selectedBookmarks to set
      */
     public void setSelectedBookmarks(List<String> selectedBookmarks) {
         this.selectedBookmarks = selectedBookmarks;
@@ -184,8 +181,7 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param bookmarks
-     *            the bookmarks to set
+     * @param bookmarks the bookmarks to set
      */
     public void setBookmarks(List<UserBookmarkDTO> bookmarks) {
         this.bookmarks = bookmarks;

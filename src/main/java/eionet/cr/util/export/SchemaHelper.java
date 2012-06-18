@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Helper for writing Microsoft Office compatible xml schema into xml stream.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class SchemaHelper {
@@ -47,7 +47,7 @@ public class SchemaHelper {
 
     /**
      * Class constructor.
-     *
+     * 
      * @param writer
      * @param elements
      */

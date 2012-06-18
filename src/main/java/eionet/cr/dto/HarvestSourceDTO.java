@@ -29,7 +29,7 @@ import java.util.Date;
 
 /**
  * @author altnyris
- *
+ * 
  */
 public class HarvestSourceDTO implements Serializable, Cloneable {
 
@@ -71,8 +71,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param sourceId
-     *            the sourceId to set
+     * @param sourceId the sourceId to set
      */
     public void setSourceId(Integer sourceId) {
         this.sourceId = sourceId;
@@ -86,8 +85,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param url
-     *            the url to set
+     * @param url the url to set
      */
     public void setUrl(String url) {
         this.url = url;
@@ -101,8 +99,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param emails
-     *            the emails to set
+     * @param emails the emails to set
      */
     public void setEmails(String emails) {
         this.emails = emails;
@@ -116,8 +113,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param timeCreated
-     *            the timeCreated to set
+     * @param timeCreated the timeCreated to set
      */
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
@@ -131,8 +127,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param statements
-     *            the statements to set
+     * @param statements the statements to set
      */
     public void setStatements(Integer statements) {
         this.statements = statements;
@@ -146,15 +141,14 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param countUnavail
-     *            the countUnavail to set
+     * @param countUnavail the countUnavail to set
      */
     public void setCountUnavail(Integer countUnavail) {
         this.countUnavail = countUnavail;
     }
 
     /**
-     *
+     * 
      * @return boolean
      */
     public boolean isUnavailable() {
@@ -184,8 +178,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param lastHarvest
-     *            the lastHarvest to set
+     * @param lastHarvest the lastHarvest to set
      */
     public void setLastHarvest(Date lastHarvest) {
         this.lastHarvest = lastHarvest;
@@ -193,7 +186,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -208,8 +201,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param lastHarvestFailed
-     *            the lastHarvestFailed to set
+     * @param lastHarvestFailed the lastHarvestFailed to set
      */
     public void setLastHarvestFailed(boolean lastHarvestFailed) {
         this.lastHarvestFailed = lastHarvestFailed;
@@ -223,8 +215,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * @param urlHash
-     *            the urlHash to set
+     * @param urlHash the urlHash to set
      */
     public void setUrlHash(Long urlHash) {
         this.urlHash = urlHash;
@@ -263,7 +254,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     *
+     * 
      * @param url
      * @param prioritySource
      * @param intervalMinutes
@@ -280,7 +271,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public double getHarvestUrgencyScore() {

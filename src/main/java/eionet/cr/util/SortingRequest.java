@@ -22,7 +22,7 @@ package eionet.cr.util;
 
 /**
  * Encapsulates data about table sorting.
- *
+ * 
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class SortingRequest {
@@ -48,8 +48,7 @@ public class SortingRequest {
     }
 
     /**
-     * @param sortingColumnName
-     *            the sortingColumnName to set
+     * @param sortingColumnName the sortingColumnName to set
      */
     public void setSortingColumnName(String sortingColumnName) {
         this.sortingColumnName = sortingColumnName;
@@ -63,8 +62,7 @@ public class SortingRequest {
     }
 
     /**
-     * @param sortOrder
-     *            the sortOrder to set
+     * @param sortOrder the sortOrder to set
      */
     public void setSortOrder(SortOrder sortOrder) {
         this.sortOrder = sortOrder;
@@ -78,8 +76,7 @@ public class SortingRequest {
     }
 
     /**
-     * @param sortByPredicateObjectHash
-     *            the sortByPredicateObjectHash to set
+     * @param sortByPredicateObjectHash the sortByPredicateObjectHash to set
      */
     public void setSortByPredicateObjectHash(boolean sortByPredicateObjectHash) {
         this.sortByPredicateObjectHash = sortByPredicateObjectHash;

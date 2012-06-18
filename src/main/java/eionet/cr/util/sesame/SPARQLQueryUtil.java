@@ -30,13 +30,13 @@ import eionet.cr.util.Bindings;
 
 /**
  * Utility methods for building SPARQL queries.
- *
+ * 
  * @author Enriko Käsper
  */
 public class SPARQLQueryUtil {
 
     /** Chars not allowed in IRI. */
-    private static char [] badChars = {' ', '{', '}' , '<', '>', '"', '|', '\\', '^', '`' };
+    private static char[] badChars = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};
 
     /**
      * Inference definition in SPARQL.
@@ -45,7 +45,7 @@ public class SPARQLQueryUtil {
 
     /**
      * Constructs inference definition.
-     *
+     * 
      * @return
      */
     public static StringBuilder getCrInferenceDefinition() {
@@ -57,7 +57,7 @@ public class SPARQLQueryUtil {
 
     /**
      * Construct the prefixes definitions.
-     *
+     * 
      * @param namespaces
      * @return
      */
@@ -74,11 +74,9 @@ public class SPARQLQueryUtil {
 
     /**
      * Build SPARQL query heading with prefixes and inference definitions.
-     *
-     * @param useCrInference
-     *            add CRInference rule definition.
-     * @param namespaces
-     *            add namespace prefixes
+     * 
+     * @param useCrInference add CRInference rule definition.
+     * @param namespaces add namespace prefixes
      * @return start of SPARQL query
      */
     public static StringBuilder getSparqlQueryHeader(boolean useCrInference, Namespace... namespaces) {
@@ -97,13 +95,10 @@ public class SPARQLQueryUtil {
      * Builds a comma-separated String of SPARQL aliases the given parameter values. Fills bindings with correct values. Example:
      * urisToCSV(List{<http://uri1.notexist.com>, <http://uri2.notexist.com>}, "subjectValue")= ?subjectValue1,subjectValue2.
      * bindings are filled: subjectValue1=http://uri1.notexist.com, subjectValue2=http://uri2.notexist.com
-     *
-     * @param uriList
-     *            uris to be used as SPARQL parameters
-     * @param variableAliasName
-     *            prefix for the value alias in the SPARQL query
-     * @param bindings
-     *            SPARQL bindings
+     * 
+     * @param uriList uris to be used as SPARQL parameters
+     * @param variableAliasName prefix for the value alias in the SPARQL query
+     * @param bindings SPARQL bindings
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList, String variableAliasName, Bindings bindings) {
@@ -134,9 +129,8 @@ public class SPARQLQueryUtil {
 
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values.
-     *
-     * @param uriList
-     *            uris to be used as SPARQL parameters
+     * 
+     * @param uriList uris to be used as SPARQL parameters
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList) {
@@ -156,7 +150,7 @@ public class SPARQLQueryUtil {
 
     /**
      * Returns CR inference rule definition.
-     *
+     * 
      * @return SPARQL inference rule definition to be used at the bginning of SPARQL sentences.
      */
     public static String getCrInferenceDefinitionStr() {
@@ -166,11 +160,9 @@ public class SPARQLQueryUtil {
     /**
      * Order by clause used in many SPARQL sentences. Composes ORDER BY clause by the optional field (mostly rdfs:label) if label
      * not specified takes the last part of the URI.
-     *
-     * @param aliasName
-     *            alias field name in the sparql
-     * @param sortOrder
-     *            valid sort order for the SPARQL (asc or desc)
+     * 
+     * @param aliasName alias field name in the sparql
+     * @param sortOrder valid sort order for the SPARQL (asc or desc)
      * @return SPARQL fragment.
      */
     public static String getOrderByClause(final String aliasName, final String sortOrder) {
@@ -179,9 +171,9 @@ public class SPARQLQueryUtil {
                 + "bif:lcase(?" + aliasName + ")))";
     }
 
-
     /**
      * Determines if it is valid IRI (for SPARQL).
+     * 
      * @param str given URI
      * @return true if the URI is valid IRI
      */
@@ -194,8 +186,8 @@ public class SPARQLQueryUtil {
     }
 
     /**
-     * Changes SPARQL query to use IRI function for this parameter value.
-     * ?subject -> IRI(?subject)
+     * Changes SPARQL query to use IRI function for this parameter value. ?subject -> IRI(?subject)
+     * 
      * @param query SPARQL query
      * @param paramName parameter to be replaced
      * @return

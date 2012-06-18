@@ -21,9 +21,9 @@
 package eionet.cr.common;
 
 /**
- *
+ * 
  * Type definition ...
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public interface Subjects {

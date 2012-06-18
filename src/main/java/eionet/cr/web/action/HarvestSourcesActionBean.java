@@ -52,7 +52,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
@@ -173,7 +173,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     *
+     * 
      * @param harvestSourceDTO
      * @return
      */
@@ -201,7 +201,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -309,7 +309,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     *
+     * 
      * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes() {
@@ -324,23 +324,21 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     * @param sourceUrl
-     *            the sourceUrl to set
+     * @param sourceUrl the sourceUrl to set
      */
     public void setSourceUrl(List<String> sourceUrl) {
         this.sourceUrl = sourceUrl;
     }
 
     /**
-     *
+     * 
      * @return String
      */
     public String getPagingUrl() {
@@ -355,8 +353,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * @param searchString
-     *            the searchString to set
+     * @param searchString the searchString to set
      */
     public void setSearchString(String searchString) {
         this.searchString = searchString;
@@ -371,7 +368,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     @Override

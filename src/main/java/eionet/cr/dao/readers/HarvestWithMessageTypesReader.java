@@ -28,9 +28,9 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<HarvestDTO> {
 
@@ -41,7 +41,7 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
     private int maxDistinctHarvests;
 
     /**
-     *
+     * 
      * @param maxDistinctHarvests
      */
     public HarvestWithMessageTypesReader(int maxDistinctHarvests) {
@@ -50,7 +50,7 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

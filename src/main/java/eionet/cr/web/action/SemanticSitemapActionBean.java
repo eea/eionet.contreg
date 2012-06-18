@@ -39,7 +39,7 @@ import eionet.cr.web.util.SitemapXmlWriter;
 
 /**
  * Semantic sitemap controller.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sitemap.xml")
@@ -49,12 +49,12 @@ public class SemanticSitemapActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(SemanticSitemapActionBean.class);
 
     /**
-     *
+     * 
      * @return
      */
     @DefaultHandler
     public Resolution getSitemap() {
-        StreamingResolution result = new StreamingResolution("application/xml"){
+        StreamingResolution result = new StreamingResolution("application/xml") {
             public void stream(HttpServletResponse response) throws Exception {
                 List<UploadDTO> uploads = DAOFactory.get().getDao(HelperDAO.class).getAllRdfUploads();
                 SitemapXmlWriter xmlWriter = new SitemapXmlWriter(response.getOutputStream());

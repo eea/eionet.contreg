@@ -36,14 +36,15 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.dao.HarvestQueueDAO#addQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
      */
     @Override
@@ -75,10 +76,11 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /** */
     private static final String addPushHarvestSQL =
-        "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
+            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
      */
     @Override
@@ -109,6 +111,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
      */
     @Override
@@ -118,6 +121,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#poll()
      */
     @Override
@@ -143,7 +147,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     private static final String peekSQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
 
     /**
-     *
+     * 
      * @param conn
      * @return
      * @throws SQLException
@@ -163,7 +167,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     private static final String deleteQueueItemSQL = "delete from URGENT_HARVEST_QUEUE where URL=? and \"TIMESTAMP\"=?";
 
     /**
-     *
+     * 
      * @param queueItem
      * @throws SQLException
      */
@@ -177,7 +181,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
-     *
+     * 
      * @param url
      * @throws DAOException
      */

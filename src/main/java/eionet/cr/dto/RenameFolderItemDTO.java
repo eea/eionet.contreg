@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Folder item object that is used for selecting, renaming and deleting.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class RenameFolderItemDTO {
@@ -46,8 +46,7 @@ public class RenameFolderItemDTO {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -61,8 +60,7 @@ public class RenameFolderItemDTO {
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
@@ -76,8 +74,7 @@ public class RenameFolderItemDTO {
     }
 
     /**
-     * @param newName
-     *            the newName to set
+     * @param newName the newName to set
      */
     public void setNewName(String newName) {
         this.newName = newName;
@@ -91,8 +88,7 @@ public class RenameFolderItemDTO {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(FolderItemDTO.Type type) {
         this.type = type;
@@ -106,8 +102,7 @@ public class RenameFolderItemDTO {
     }
 
     /**
-     * @param selected
-     *            the selected to set
+     * @param selected the selected to set
      */
     public void setSelected(boolean selected) {
         this.selected = selected;

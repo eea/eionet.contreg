@@ -11,22 +11,22 @@ import eionet.cr.util.Bindings;
 
 /**
  * Queries for handling tags.
- *
+ * 
  * @author jaanus
  */
 public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
     /**
      * SPARQL returning distinct values of tags with corresponding tag counts.
      */
-    public static final String GET_TAGS_WITH_FREQUENCIES_SPARQL = "SELECT ?o (count(?o) as ?c) WHERE { ?s ?crTagPredicate ?o } " + " GROUP BY (?o) ORDER BY DESC(?c)";
+    public static final String GET_TAGS_WITH_FREQUENCIES_SPARQL = "SELECT ?o (count(?o) as ?c) WHERE { ?s ?crTagPredicate ?o } "
+            + " GROUP BY (?o) ORDER BY DESC(?c)";
 
     /**
      * Returns tag cloud.
-     *
+     * 
      * @see eionet.cr.dao.TagsDAO#getTagCloud()
      * @return List<TagDTO>
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     @Override
     public List<TagDTO> getTagCloud() throws DAOException {

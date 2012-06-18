@@ -5,9 +5,9 @@ import java.util.Date;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 public class HarvestedUrlCountColumn extends SearchResultColumn {
@@ -20,7 +20,7 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -55,7 +55,7 @@ public class HarvestedUrlCountColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

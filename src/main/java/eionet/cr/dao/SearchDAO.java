@@ -38,20 +38,17 @@ import eionet.cr.web.util.CustomPaginatedList;
 
 /**
  * Interface to define search related dao methods.
- *
+ * 
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface SearchDAO extends DAO {
 
     /**
-     * @param expression
-     *            - search expression to find
+     * @param expression - search expression to find
      * @param filterType
      * @param exactMatch
-     * @param pagingRequest
-     *            - page request
-     * @param sortingRequest
-     *            - sorting request to set
+     * @param pagingRequest - page request
+     * @param sortingRequest - sorting request to set
      * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
      */
@@ -59,18 +56,12 @@ public interface SearchDAO extends DAO {
             boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
-     * @param filters
-     *            - search filters.
-     * @param checkFiltersRange
-     *            - set of literal predicates
-     * @param pagingRequest
-     *            - page request
-     * @param sortingRequest
-     *            - sorting request
-     * @param selectPredicates
-     *            - predicates filter
-     * @param useInference
-     *            if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
+     * @param filters - search filters.
+     * @param checkFiltersRange - set of literal predicates
+     * @param pagingRequest - page request
+     * @param sortingRequest - sorting request
+     * @param selectPredicates - predicates filter
+     * @param useInference if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
      * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
      */
@@ -79,7 +70,7 @@ public interface SearchDAO extends DAO {
             throws DAOException;
 
     /**
-     *
+     * 
      * @param obligation
      * @param locality
      * @param year
@@ -93,7 +84,7 @@ public interface SearchDAO extends DAO {
             PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
-     *
+     * 
      * @param subjectHash
      * @param pagingRequest
      * @param sortingRequest
@@ -104,7 +95,7 @@ public interface SearchDAO extends DAO {
             throws DAOException;
 
     /**
-     *
+     * 
      * @param box
      * @param sourceUri
      * @param pagingRequest
@@ -117,13 +108,13 @@ public interface SearchDAO extends DAO {
             SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
 
     /**
-     *
+     * 
      * @return int
      */
     int getExactRowCountLimit();
 
     /**
-     *
+     * 
      * @param filters
      * @param checkFiltersRange
      * @param pagingRequest
@@ -136,7 +127,7 @@ public interface SearchDAO extends DAO {
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException;
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @param pagingRequest
      * @param sortingRequest
@@ -147,7 +138,7 @@ public interface SearchDAO extends DAO {
             throws DAOException;
 
     /**
-     *
+     * 
      * @param pagingRequest
      * @return Vector<Hashtable<String,Vector<String>>>
      * @throws DAOException
@@ -155,7 +146,7 @@ public interface SearchDAO extends DAO {
     Vector<Hashtable<String, Vector<String>>> searchDeliveriesForROD(PagingRequest pagingRequest) throws DAOException;
 
     /**
-     *
+     * 
      * @param tags
      * @param pagingRequest
      * @param sortingRequest
@@ -167,7 +158,7 @@ public interface SearchDAO extends DAO {
             List<String> selectedPredicates) throws DAOException;
 
     /**
-     *
+     * 
      * @param subjectUri
      * @param pagingRequest
      * @param sortingRequest
@@ -179,10 +170,9 @@ public interface SearchDAO extends DAO {
 
     /**
      * Returns distinct values of all types used in triples.
-     *
+     * 
      * @return ordered list of object values
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      */
     List<SubjectDTO> getTypes() throws DAOException;
 }

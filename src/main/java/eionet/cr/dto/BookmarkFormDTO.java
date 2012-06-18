@@ -18,7 +18,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     *
+     * 
      * @param id
      * @param source
      * @param title
@@ -42,8 +42,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(Long id) {
         this.id = id;
@@ -57,8 +56,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param source
-     *            the source to set
+     * @param source the source to set
      */
     public void setSource(String source) {
         this.source = source;
@@ -72,8 +70,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -87,8 +84,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param description
-     *            the description to set
+     * @param description the description to set
      */
     public void setDescription(String description) {
         this.description = description;
@@ -102,8 +98,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param tags
-     *            the tags to set
+     * @param tags the tags to set
      */
     public void setTags(String tags) {
         this.tags = tags;
@@ -122,8 +117,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * @param methodology
-     *            the methodology to set
+     * @param methodology the methodology to set
      */
     public void setMethodology(String methodology) {
         this.methodology = methodology;

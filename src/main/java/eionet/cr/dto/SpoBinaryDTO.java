@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class SpoBinaryDTO {
 
@@ -34,7 +34,7 @@ public class SpoBinaryDTO {
     private boolean mustEmbed;
 
     /**
-     *
+     * 
      * @param subjectHash
      */
     public SpoBinaryDTO(long subjectHash) {
@@ -50,8 +50,7 @@ public class SpoBinaryDTO {
     }
 
     /**
-     * @param contentType
-     *            the contentType to set
+     * @param contentType the contentType to set
      */
     public void setContentType(String contentType) {
         this.contentType = contentType;
@@ -65,8 +64,7 @@ public class SpoBinaryDTO {
     }
 
     /**
-     * @param language
-     *            the language to set
+     * @param language the language to set
      */
     public void setLanguage(String language) {
         this.language = language;
@@ -80,8 +78,7 @@ public class SpoBinaryDTO {
     }
 
     /**
-     * @param mustEmbed
-     *            the mustEmbed to set
+     * @param mustEmbed the mustEmbed to set
      */
     public void setMustEmbed(boolean mustEmbed) {
         this.mustEmbed = mustEmbed;

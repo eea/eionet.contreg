@@ -29,9 +29,9 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO> {
 
@@ -39,7 +39,7 @@ public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO> {
     private Map<Long, SubjectDTO> subjectsMap;
 
     /**
-     *
+     * 
      * @param subjectsMap
      */
     public MinimalSubjectReader(Map<Long, SubjectDTO> subjectsMap) {
@@ -48,7 +48,7 @@ public class MinimalSubjectReader extends SQLResultSetBaseReader<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

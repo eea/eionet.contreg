@@ -7,17 +7,17 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 
 /**
- *
+ * 
  * @author meie
- *
+ * 
  */
 public class Tabs {
 
     /**
-     *
+     * 
      * @return
      */
-    public static List<Tab> generate(TargetType targetType){
+    public static List<Tab> generate(TargetType targetType) {
 
         String urlBinding = PostHarvestScriptsActionBean.class.getAnnotation(UrlBinding.class).value();
         List<Tab> tabs = new ArrayList<Tab>();

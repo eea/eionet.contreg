@@ -50,10 +50,10 @@ import eionet.cr.web.action.factsheet.ViewActionBean;
  * Purpose of this filter is to enable RESTful download of files stored at CR. Since it is assumed that all these will have a URL
  * pointing to some user home directory of CR, then this filter is relevant (and should be applied to) only URLs with pattern
  * /home/*.
- *
+ * 
  * See https://svn.eionet.europa.eu/projects/Reportnet/ticket/2464 and https://svn.eionet.europa.eu/projects/Reportnet/ticket/2054
  * for more background.
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
 public class HomespaceUrlFilter implements Filter {
@@ -87,7 +87,6 @@ public class HomespaceUrlFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String requestURL = httpRequest.getRequestURL().toString();
 
-
         boolean isProjectFolder = FolderUtil.isProjectFolder(requestURL);
 
         String contextPath = httpRequest.getContextPath();
@@ -117,15 +116,16 @@ public class HomespaceUrlFilter implements Filter {
                         // The requested URL is a subject in tabular data (i.e. CSV or TSV) file.
                         redirectLocation = contextPath + TabularDataServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to tabular data subject, redirecting to: " + redirectLocation);
-                        //if project file, do not check the filestore in ordinary way
+                        // if project file, do not check the filestore in ordinary way
                     } else if (isStoredFile(pathInfo, isProjectFolder) && !isRdfXmlPreferred(httpRequest)) {
                         // The requested URL is a stored file, and requester wants original copy (i.e. not triples)
                         redirectLocation = contextPath + DownloadServlet.URL_PATTERN + queryString;
                         LOGGER.debug("URL points to stored file, redirecting to: " + redirectLocation);
                     } else if (isSparqlBookmark(pathInfo)) {
                         if (isRdfXmlPreferred(httpRequest)) {
-                            redirectLocation = contextPath
-                                    + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString + "&exportProperties=";
+                            redirectLocation =
+                                    contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString
+                                            + "&exportProperties=";
                         } else {
                             redirectLocation = contextPath + Util.getUrlBinding(ViewActionBean.class) + queryString;
                         }
@@ -145,7 +145,7 @@ public class HomespaceUrlFilter implements Filter {
 
     /**
      * Checks if requestPath is like user's SPARQL bookmark.
-     *
+     * 
      * @param requestPathInfo
      * @return
      */
@@ -158,7 +158,7 @@ public class HomespaceUrlFilter implements Filter {
     }
 
     /**
-     *
+     * 
      * @param requestPathInfo
      * @return
      */
@@ -185,7 +185,7 @@ public class HomespaceUrlFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.Filter#destroy()
      */
     @Override

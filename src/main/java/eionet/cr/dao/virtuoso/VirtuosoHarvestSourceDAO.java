@@ -1318,27 +1318,4 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             SesameUtil.close(repoConn);
         }
     }
-
-    public static void main(String[] args) throws Exception{
-
-        RepositoryConnection repoConn = null;
-        try {
-            repoConn = SesameUtil.getRepositoryConnection();
-
-            // We do it in transaction.
-            repoConn.setAutoCommit(false);
-
-            String sparul = "delete from <http://cdr.eionet.europa.eu/mt/eea/colrnupsa/envrpipfw/rdf> {?s ?p ?o} " +
-            "where {graph <http://cdr.eionet.europa.eu/mt/eea/colrnupsa/envrpipfw/rdf> {?s ?p ?o}}";
-            SesameUtil.executeSPARUL(sparul, null, repoConn);
-
-            repoConn.commit();
-
-        } catch (Exception e) {
-            SesameUtil.rollback(repoConn);
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SesameUtil.close(repoConn);
-        }
-    }
 }

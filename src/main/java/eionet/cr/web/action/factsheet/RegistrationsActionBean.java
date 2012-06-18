@@ -44,7 +44,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Registrations tab on factsheet page.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/registrations.action")
@@ -61,7 +61,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
 
     /**
      * View action.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -76,7 +76,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
 
     /**
      * Initializes tabs.
-     *
+     * 
      * @throws DAOException
      */
     private void initTabs() throws DAOException {
@@ -113,8 +113,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -128,8 +127,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param tabs
-     *            the tabs to set
+     * @param tabs the tabs to set
      */
     public void setTabs(List<TabElement> tabs) {
         this.tabs = tabs;
@@ -143,8 +141,7 @@ public class RegistrationsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param registrations
-     *            the registrations to set
+     * @param registrations the registrations to set
      */
     public void setRegistrations(List<TripleDTO> registrations) {
         this.registrations = registrations;

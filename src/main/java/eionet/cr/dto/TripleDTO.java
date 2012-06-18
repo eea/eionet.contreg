@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.util.Hashes;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class TripleDTO {
 
@@ -73,13 +73,10 @@ public class TripleDTO {
 
     /**
      * Creates a new TripleDTO object.
-     *
-     * @param subjectUri
-     *            subject URI
-     * @param predicateUri
-     *            predicate Uri
-     * @param object
-     *            Object value
+     * 
+     * @param subjectUri subject URI
+     * @param predicateUri predicate Uri
+     * @param object Object value
      */
     public TripleDTO(String subjectUri, String predicateUri, String object) {
         this.subjectUri = subjectUri;
@@ -89,13 +86,10 @@ public class TripleDTO {
 
     /**
      * Constructor of a new TripleDTO object.
-     *
-     * @param subjectHash
-     *            Hashed subject
-     * @param predicateHash
-     *            hashed predicate
-     * @param objectHash
-     *            hashed object
+     * 
+     * @param subjectHash Hashed subject
+     * @param predicateHash hashed predicate
+     * @param objectHash hashed object
      */
     public TripleDTO(long subjectHash, long predicateHash, long objectHash) {
 
@@ -106,13 +100,10 @@ public class TripleDTO {
 
     /**
      * Constructor of a new TripleDTO object.
-     *
-     * @param subjectHash
-     *            hashed subject
-     * @param predicateHash
-     *            hashed predicate of the triple
-     * @param object
-     *            Object of the triple
+     * 
+     * @param subjectHash hashed subject
+     * @param predicateHash hashed predicate of the triple
+     * @param object Object of the triple
      */
     public TripleDTO(long subjectHash, long predicateHash, String object) {
 
@@ -155,8 +146,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param subjectUri
-     *            the subjectUri to set
+     * @param subjectUri the subjectUri to set
      */
     public void setSubjectUri(String subjectUri) {
         this.subjectUri = subjectUri;
@@ -170,8 +160,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param predicateUri
-     *            the predicateUri to set
+     * @param predicateUri the predicateUri to set
      */
     public void setPredicateUri(String predicateUri) {
         this.predicateUri = predicateUri;
@@ -185,8 +174,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param sourceUri
-     *            the sourceUri to set
+     * @param sourceUri the sourceUri to set
      */
     public void setSourceUri(String sourceUri) {
         this.sourceUri = sourceUri;
@@ -200,8 +188,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDerivSourceUri
-     *            the objectDerivSourceUri to set
+     * @param objectDerivSourceUri the objectDerivSourceUri to set
      */
     public void setObjectDerivSourceUri(String objectDerivSourceUri) {
         this.objectDerivSourceUri = objectDerivSourceUri;
@@ -215,8 +202,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param isAnonymousSubject
-     *            the isAnonymousSubject to set
+     * @param isAnonymousSubject the isAnonymousSubject to set
      */
     public void setAnonymousSubject(boolean isAnonymousSubject) {
         this.isAnonymousSubject = isAnonymousSubject;
@@ -230,8 +216,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param isAnonymousObject
-     *            the isAnonymousObject to set
+     * @param isAnonymousObject the isAnonymousObject to set
      */
     public void setAnonymousObject(boolean isAnonymousObject) {
         this.isAnonymousObject = isAnonymousObject;
@@ -245,8 +230,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param isLiteralObject
-     *            the isLiteralObject to set
+     * @param isLiteralObject the isLiteralObject to set
      */
     public void setLiteralObject(boolean isLiteralObject) {
         this.isLiteralObject = isLiteralObject;
@@ -267,8 +251,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectLanguage
-     *            the objectLanguage to set
+     * @param objectLanguage the objectLanguage to set
      */
     public void setObjectLanguage(String objectLanguage) {
         this.objectLanguage = objectLanguage;
@@ -282,8 +265,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDouble
-     *            the objectDouble to set
+     * @param objectDouble the objectDouble to set
      */
     public void setObjectDouble(Double objectDouble) {
         this.objectDouble = objectDouble;
@@ -297,8 +279,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param sourceHash
-     *            the sourceHash to set
+     * @param sourceHash the sourceHash to set
      */
     public void setSourceHash(Long sourceHash) {
         this.sourceHash = sourceHash;
@@ -312,8 +293,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDerivSourceHash
-     *            the objectDerivSourceHash to set
+     * @param objectDerivSourceHash the objectDerivSourceHash to set
      */
     public void setObjectDerivSourceHash(Long objectDerivSourceHash) {
         this.objectDerivSourceHash = objectDerivSourceHash;
@@ -327,8 +307,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectSourceObjectHash
-     *            the objectSourceObjectHash to set
+     * @param objectSourceObjectHash the objectSourceObjectHash to set
      */
     public void setObjectSourceObjectHash(Long objectSourceObjectHash) {
         this.objectSourceObjectHash = objectSourceObjectHash;
@@ -342,8 +321,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param genTime
-     *            the genTime to set
+     * @param genTime the genTime to set
      */
     public void setGenTime(Long genTime) {
         this.genTime = genTime;
@@ -357,8 +335,7 @@ public class TripleDTO {
     }
 
     /**
-     * @param objectDerivGenTime
-     *            the objectDerivGenTime to set
+     * @param objectDerivGenTime the objectDerivGenTime to set
      */
     public void setObjectDerivGenTime(Long objectDerivGenTime) {
         this.objectDerivGenTime = objectDerivGenTime;

@@ -14,7 +14,7 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
     @Override
@@ -24,7 +24,7 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -35,7 +35,7 @@ public abstract class SQLResultSetBaseReader<T> implements SQLResultSetReader<T>
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override

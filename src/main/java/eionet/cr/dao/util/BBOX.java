@@ -21,9 +21,9 @@
 package eionet.cr.dao.util;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class BBOX {
 
@@ -47,8 +47,7 @@ public class BBOX {
     }
 
     /**
-     * @param latitudeSouth
-     *            the latitudeSouth to set
+     * @param latitudeSouth the latitudeSouth to set
      */
     public void setLatitudeSouth(Double lowerLat) {
         this.latitudeSouth = lowerLat;
@@ -62,8 +61,7 @@ public class BBOX {
     }
 
     /**
-     * @param latitudeNorth
-     *            the latitudeNorth to set
+     * @param latitudeNorth the latitudeNorth to set
      */
     public void setLatitudeNorth(Double upperLat) {
         this.latitudeNorth = upperLat;
@@ -77,8 +75,7 @@ public class BBOX {
     }
 
     /**
-     * @param longitudeWest
-     *            the longitudeWest to set
+     * @param longitudeWest the longitudeWest to set
      */
     public void setLongitudeWest(Double lowerLong) {
         this.longitudeWest = lowerLong;
@@ -92,15 +89,14 @@ public class BBOX {
     }
 
     /**
-     * @param longitudeEast
-     *            the longitudeEast to set
+     * @param longitudeEast the longitudeEast to set
      */
     public void setLongitudeEast(Double upperLong) {
         this.longitudeEast = upperLong;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean isUndefined() {
@@ -108,7 +104,7 @@ public class BBOX {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean hasLatitude() {
@@ -116,7 +112,7 @@ public class BBOX {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean hasLongitude() {

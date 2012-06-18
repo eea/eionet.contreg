@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class HarvestBaseDTO {
 
@@ -42,8 +42,7 @@ public class HarvestBaseDTO {
     }
 
     /**
-     * @param hasFatals
-     *            the hasFatals to set
+     * @param hasFatals the hasFatals to set
      */
     public void setHasFatals(Boolean hasFatals) {
         this.hasFatals = hasFatals;
@@ -57,8 +56,7 @@ public class HarvestBaseDTO {
     }
 
     /**
-     * @param hasErrors
-     *            the hasErrors to set
+     * @param hasErrors the hasErrors to set
      */
     public void setHasErrors(Boolean hasErrors) {
         this.hasErrors = hasErrors;
@@ -72,15 +70,14 @@ public class HarvestBaseDTO {
     }
 
     /**
-     * @param hasWarnings
-     *            the hasWarnings to set
+     * @param hasWarnings the hasWarnings to set
      */
     public void setHasWarnings(Boolean hasWarnings) {
         this.hasWarnings = hasWarnings;
     }
 
     /**
-     *
+     * 
      * @param dto
      * @param messageType
      */

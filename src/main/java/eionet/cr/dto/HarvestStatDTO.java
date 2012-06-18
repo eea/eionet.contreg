@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Data of harvest statistics.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class HarvestStatDTO extends HarvestDTO {
@@ -45,8 +45,7 @@ public class HarvestStatDTO extends HarvestDTO {
     }
 
     /**
-     * @param sourceUrl
-     *            the sourceUrl to set
+     * @param sourceUrl the sourceUrl to set
      */
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
@@ -60,8 +59,7 @@ public class HarvestStatDTO extends HarvestDTO {
     }
 
     /**
-     * @param duration
-     *            the duration to set
+     * @param duration the duration to set
      */
     public void setDuration(Long duration) {
         this.duration = duration;
@@ -75,8 +73,7 @@ public class HarvestStatDTO extends HarvestDTO {
     }
 
     /**
-     * @param statementDuration
-     *            the statementDuration to set
+     * @param statementDuration the statementDuration to set
      */
     public void setStatementDuration(Long statementDuration) {
         this.statementDuration = statementDuration;

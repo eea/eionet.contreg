@@ -29,14 +29,14 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Util;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class SesameUtil {
 
     /**
-     *
+     * 
      * @return RepositoryConnection
      * @throws RepositoryException
      */
@@ -46,7 +46,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @return Connection
      * @throws SQLException
      */
@@ -56,7 +56,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param bindings
@@ -71,7 +71,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param bindings
@@ -118,7 +118,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param reader
@@ -127,13 +127,13 @@ public class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-    throws OpenRDFException, ResultSetReaderException {
+            throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param reader
@@ -153,7 +153,7 @@ public class SesameUtil {
      * {@link UnsupportedOperationException} if the given connection is not a {@link VirtuosoRepositoryConnection}, because it uses
      * {@link VirtuosoRepositoryConnection#executeSPARUL(String)} to execute the given SPARQL/Update statement. The latter supports
      * not variable bindings, hence no bindings given in the method's input too.
-     *
+     * 
      * @param sparul The SPARUL statement to execute.
      * @param conn The repository connection to operate on.
      * @param defaultGraphUri
@@ -179,7 +179,7 @@ public class SesameUtil {
 
     /**
      * Executes a SPARQL/Update (SPARUL) query (i.e. one that performs modifications on data).
-     *
+     * 
      * @param sparul
      * @param conn repository connection
      * @param bindings Query bindings
@@ -188,7 +188,7 @@ public class SesameUtil {
      * @throws MalformedQueryException
      */
     public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-    QueryEvaluationException, MalformedQueryException {
+            QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
@@ -199,7 +199,7 @@ public class SesameUtil {
 
     /**
      * Executes SPARQL Query producing RDF and exports to the passed RDF handler.
-     *
+     * 
      * @param sparql SPARQL for (CONSTRUCT) query
      * @param rdfHandler RDF handler for output RDF format
      * @param conn RepositoryConnection
@@ -222,7 +222,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param queryResult Query Result
      */
     public static void close(final TupleQueryResult queryResult) {
@@ -236,7 +236,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param queryResult
      */
     public static void close(GraphQueryResult queryResult) {
@@ -250,7 +250,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param repo
      */
     public static void shutdown(Repository repo) {
@@ -264,7 +264,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param conn
      */
     public static void close(RepositoryConnection conn) {
@@ -279,7 +279,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param conn
      */
     public static void rollback(RepositoryConnection conn) {
@@ -294,7 +294,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param sparulQuery
      * @return
      */
@@ -313,7 +313,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param sparqlQuery
      * @return
      */
@@ -332,7 +332,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param query
      * @return
      */
@@ -342,7 +342,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param query
      * @return
      */
@@ -352,7 +352,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param query
      * @return
      */
@@ -362,7 +362,7 @@ public class SesameUtil {
     }
 
     /**
-     *
+     * 
      * @param query
      * @return
      */
@@ -373,13 +373,14 @@ public class SesameUtil {
 
     /**
      * Sets dataset to query, if default-graph-uri or named-graph-uri parameters are used.
-     *
+     * 
      * @param query
      * @param connection
      * @param defaultGraphUris
      * @param namedGraphUris
      */
-    public static void setDatasetParameters(Query query, RepositoryConnection connection, String[] defaultGraphUris, String[] namedGraphUris) {
+    public static void setDatasetParameters(Query query, RepositoryConnection connection, String[] defaultGraphUris,
+            String[] namedGraphUris) {
         if (defaultGraphUris != null || namedGraphUris != null) {
             DatasetImpl dataset = new DatasetImpl();
             if (defaultGraphUris != null) {

@@ -110,7 +110,7 @@ public class XMLExporterTest extends TestCase {
 
     /**
      * XmlError mocked class for setting private data MockXmlExporter
-     *
+     * 
      * @author Enriko Käsper, TietoEnator Estonia AS
      */
     class MockXmlExporter extends XmlExporter {

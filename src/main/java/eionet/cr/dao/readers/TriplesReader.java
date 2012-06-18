@@ -32,9 +32,9 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dto.TripleDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
 
@@ -46,7 +46,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
      */
     public List<TripleDTO> getResultList() {
@@ -55,7 +55,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -81,7 +81,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override

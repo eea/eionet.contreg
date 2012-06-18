@@ -45,9 +45,9 @@ import eionet.cr.web.util.job.TagCloudCacheUpdater;
 import eionet.cr.web.util.job.TypeCacheUpdater;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 @SuppressWarnings("unchecked")
 public class JobScheduler implements ServletContextListener {
@@ -78,7 +78,7 @@ public class JobScheduler implements ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws SchedulerException
      */
@@ -90,7 +90,7 @@ public class JobScheduler implements ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param cronExpression
      * @param jobDetails
      * @throws SchedulerException
@@ -109,7 +109,7 @@ public class JobScheduler implements ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param repeatInterval
      * @param jobDetails
      * @throws SchedulerException
@@ -129,7 +129,7 @@ public class JobScheduler implements ServletContextListener {
     }
 
     /**
-     *
+     * 
      * @param jobListener
      * @throws SchedulerException
      */
@@ -146,7 +146,7 @@ public class JobScheduler implements ServletContextListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

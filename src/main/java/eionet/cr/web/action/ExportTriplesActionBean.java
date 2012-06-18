@@ -40,7 +40,7 @@ import eionet.cr.web.util.StripesExceptionHandler;
 
 /**
  * Action bean that exports the triples of a given graph as RDF/XML into servlet output stream.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/exportTriples.action")
@@ -76,7 +76,7 @@ public class ExportTriplesActionBean extends AbstractActionBean {
 
     /**
      * Action event that exports properties of the given uri.
-     *
+     * 
      * @return rdf result.
      */
     public Resolution exportProperties() {
@@ -101,8 +101,7 @@ public class ExportTriplesActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

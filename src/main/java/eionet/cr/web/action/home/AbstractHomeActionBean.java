@@ -25,9 +25,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 public abstract class AbstractHomeActionBean extends AbstractActionBean {
@@ -297,7 +297,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @param uploadedFile
      * @param dcTitle
@@ -343,7 +343,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param uploadedFile
      */
     protected void deleteUploadedFile(FileBean uploadedFile) {
@@ -360,7 +360,7 @@ public abstract class AbstractHomeActionBean extends AbstractActionBean {
     /**
      * Returns URI of the page where username is replaced with real username. to be used in sorting. Assumed that section is lsat
      * part of urlbinding.
-     *
+     * 
      * @return correct URL for sorting.
      */
     public String getParsedUrlBinding() {

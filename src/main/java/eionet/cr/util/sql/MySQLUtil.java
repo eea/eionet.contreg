@@ -30,14 +30,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class MySQLUtil {
 
     /**
-     *
+     * 
      * @param tableName
      * @param valueMap
      * @return
@@ -70,7 +70,7 @@ public class MySQLUtil {
     }
 
     /**
-     *
+     * 
      * @param tableName
      * @param valueMap
      * @param criteriaMap
@@ -113,7 +113,7 @@ public class MySQLUtil {
     }
 
     /**
-     *
+     * 
      * @param conn
      * @return
      * @throws SQLException
@@ -138,7 +138,7 @@ public class MySQLUtil {
     }
 
     /**
-     *
+     * 
      * @param conn
      * @return
      * @throws SQLException

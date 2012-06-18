@@ -22,7 +22,7 @@
 package eionet.cr.harvest;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class NoRedirectLocationException extends HarvestException {
@@ -35,7 +35,7 @@ public class NoRedirectLocationException extends HarvestException {
     }
 
     /**
-     *
+     * 
      * @param message
      */
     public NoRedirectLocationException(String message) {

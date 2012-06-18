@@ -64,9 +64,9 @@ import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UploadHarvest extends BaseHarvest {
 
@@ -77,7 +77,7 @@ public class UploadHarvest extends BaseHarvest {
     private FileBean fileBean;
 
     /**
-     *
+     * 
      * @param contextSourceDTO
      * @param fileBean
      * @param fileTitle
@@ -187,7 +187,7 @@ public class UploadHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param noOfTriples
      */
     private void finishWithOK(int noOfTriples) {
@@ -206,7 +206,7 @@ public class UploadHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param error
      * @param noOfTriples
      */
@@ -238,7 +238,7 @@ public class UploadHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws ParserConfigurationException
      */
@@ -264,7 +264,7 @@ public class UploadHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param xmlAnalysis
      * @param fileBean
      * @return
@@ -322,7 +322,7 @@ public class UploadHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param xmlAnalysis
      * @return
      * @throws IOException
@@ -370,12 +370,14 @@ public class UploadHarvest extends BaseHarvest {
         return HarvestConstants.TYPE_PUSH;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
      */
     @Override
     protected void afterFinish() {
         // TODO Auto-generated method stub
-        
+
     }
 }

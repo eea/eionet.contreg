@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Tab formbean in tab menu.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class TabElement {
@@ -48,7 +48,7 @@ public class TabElement {
 
     /**
      * Class constructor.
-     *
+     * 
      * @param title
      * @param href
      * @param selectedTitle
@@ -56,12 +56,12 @@ public class TabElement {
     public TabElement(String title, String href, String selectedTitle) {
         this.title = title;
         this.href = href;
-        selected = selectedTitle==null ? false : title.equals(selectedTitle);
+        selected = selectedTitle == null ? false : title.equals(selectedTitle);
     }
 
     /**
      * Adds request parameter.
-     *
+     * 
      * @param key
      * @param value
      */
@@ -77,8 +77,7 @@ public class TabElement {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -92,8 +91,7 @@ public class TabElement {
     }
 
     /**
-     * @param href
-     *            the href to set
+     * @param href the href to set
      */
     public void setHref(String href) {
         this.href = href;
@@ -107,8 +105,7 @@ public class TabElement {
     }
 
     /**
-     * @param params
-     *            the params to set
+     * @param params the params to set
      */
     public void setParams(Map<String, Object> params) {
         this.params = params;
@@ -122,8 +119,7 @@ public class TabElement {
     }
 
     /**
-     * @param selected
-     *            the selected to set
+     * @param selected the selected to set
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
@@ -137,8 +133,7 @@ public class TabElement {
     }
 
     /**
-     * @param event
-     *            the event to set
+     * @param event the event to set
      */
     public void setEvent(String event) {
         this.event = event;

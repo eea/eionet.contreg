@@ -31,9 +31,9 @@ import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Helper class for testing Stripes action beans.
- *
+ * 
  * @author gerasvad, altnyris
- *
+ * 
  */
 public abstract class AbstractStripesMvcTestHelper extends AbstractActionBean {
 

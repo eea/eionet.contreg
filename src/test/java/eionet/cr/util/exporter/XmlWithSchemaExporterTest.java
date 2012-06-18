@@ -115,14 +115,14 @@ public class XmlWithSchemaExporterTest extends TestCase {
 
     /**
      * XmlError mocked class for setting private data MockXmlExporter
-     *
+     * 
      * @author Enriko Käsper, TietoEnator Estonia AS
      */
     class MockXmlWithSchemaExporter extends XmlWithSchemaExporter {
 
         /**
          * Override getDataset and construct the result of xml-rpc method (DDServiceClient.getDataset())
-         *
+         * 
          */
 
         public MockXmlWithSchemaExporter() {

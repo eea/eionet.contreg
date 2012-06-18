@@ -87,8 +87,7 @@ public interface Predicates {
     String CR_HAS_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFeedback";
     String CR_FEEDBACK_FOR = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#feedbackFor";
     String CR_USER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#user";
-    String CR_USER_REVIEW_LAST_NUMBER =
-        "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
+    String CR_USER_REVIEW_LAST_NUMBER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#userReviewLastNumber";
     String CR_HAS_ATTACHMENT = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasAttachment";
     String CR_HAS_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFile";
     String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";

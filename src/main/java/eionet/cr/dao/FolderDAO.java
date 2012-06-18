@@ -28,7 +28,7 @@ import eionet.cr.util.Pair;
 
 /**
  * Folder DAO.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public interface FolderDAO extends DAO {
@@ -36,17 +36,15 @@ public interface FolderDAO extends DAO {
     /**
      * Creates home folder for the given user name. The latter must not be null or blank! Creates also all reserved folders under
      * the newly created home folder.
-     *
-     * @param userName
-     *            Given user name
-     * @throws DAOException
-     *             Thrown when a database-access error occurs.
+     * 
+     * @param userName Given user name
+     * @throws DAOException Thrown when a database-access error occurs.
      */
     void createUserHomeFolder(String userName) throws DAOException;
 
     /**
      * Creates a new folder in the given parent folder. Both given parameters must not be null or blank.
-     *
+     * 
      * @param parentFolderUri - URI of the new folder's parent folder.
      * @param folderName - The new folder's name.
      * @param folderLabel - The logical folder's name.
@@ -58,12 +56,10 @@ public interface FolderDAO extends DAO {
     /**
      * Returns true if a folder or file with the given name exists in the given parent folder. If it doesn't exist, returns false.
      * Both given parameters must not be null or blank.
-     *
-     * @param parentFolderUri
-     *            The given parent folder URI.
-     * @param folderName
-     *            The given folder name.
-     *
+     * 
+     * @param parentFolderUri The given parent folder URI.
+     * @param folderName The given folder name.
+     * 
      * @return See description above.
      * @throws DAOException
      */
@@ -71,10 +67,9 @@ public interface FolderDAO extends DAO {
 
     /**
      * Returns true if a folder or file with the given URI exists, otherwise returns false. The given URI must not be null.
-     *
-     * @param folderUri
-     *            The given folder URI.
-     *
+     * 
+     * @param folderUri The given folder URI.
+     * 
      * @return See description above.
      * @throws DAOException
      */
@@ -82,7 +77,7 @@ public interface FolderDAO extends DAO {
 
     /**
      * Returns all sub folders + parent folder.
-     *
+     * 
      * @param uri - Parent folder uri.
      * @return List<String>.
      * @throws DAOException
@@ -91,10 +86,9 @@ public interface FolderDAO extends DAO {
 
     /**
      * True, if folder is not empty and has files or folders.
-     *
-     * @param folderUri
-     *            The given folder URI.
-     *
+     * 
+     * @param folderUri The given folder URI.
+     * 
      * @return
      * @throws DAOException
      */
@@ -102,7 +96,7 @@ public interface FolderDAO extends DAO {
 
     /**
      * Deletes uploaded files/folders data.
-     *
+     * 
      * @param folderUri
      * @param subjectUris
      * @throws DAOException
@@ -112,7 +106,7 @@ public interface FolderDAO extends DAO {
     /**
      * Returns the contents (files and folders) of the folder with given uri. The Pair.left is the current folder and Pair.right is
      * sorted collection of folder contents.
-     *
+     * 
      * @param uri
      * @return
      * @throws DAOException

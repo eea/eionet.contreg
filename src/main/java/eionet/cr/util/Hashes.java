@@ -26,16 +26,16 @@ import java.security.MessageDigest;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class Hashes {
 
     private static final long SEED = 0xcbf29ce484222325L;
 
     /**
-     *
+     * 
      * @param s
      * @return long
      */
@@ -44,7 +44,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param s
      * @param seed
      * @return long
@@ -54,7 +54,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param s
      * @return
      */
@@ -63,7 +63,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param s
      * @return
      */
@@ -79,7 +79,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param s
      * @return String
      */
@@ -88,7 +88,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param src
      * @param algorithm
      * @return String
@@ -121,7 +121,7 @@ public class Hashes {
     }
 
     /**
-     *
+     * 
      * @param args
      */
     public static void main(String[] args) {

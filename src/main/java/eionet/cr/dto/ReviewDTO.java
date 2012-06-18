@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 public class ReviewDTO implements Serializable {

@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Search result.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class SearchResultDTO<T> {
@@ -47,8 +47,7 @@ public class SearchResultDTO<T> {
     }
 
     /**
-     * @param items
-     *            the items to set
+     * @param items the items to set
      */
     public void setItems(List<T> items) {
         this.items = items;
@@ -62,8 +61,7 @@ public class SearchResultDTO<T> {
     }
 
     /**
-     * @param matchCount
-     *            the matchCount to set
+     * @param matchCount the matchCount to set
      */
     public void setMatchCount(int matchCount) {
         this.matchCount = matchCount;
@@ -77,8 +75,7 @@ public class SearchResultDTO<T> {
     }
 
     /**
-     * @param query
-     *            the query to set
+     * @param query the query to set
      */
     public void setQuery(String query) {
         this.query = query;

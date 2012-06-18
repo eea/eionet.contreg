@@ -29,9 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class GeneralConfig {
 
@@ -145,7 +145,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @param name
      * @return
      */
@@ -158,7 +158,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @param key
      * @param defaultValue
      * @return
@@ -173,11 +173,9 @@ public class GeneralConfig {
 
     /**
      * Returns integer property.
-     *
-     * @param key
-     *            property key in the properties file
-     * @param defaultValue
-     *            default value that is returned if not specified or in incorrect format
+     * 
+     * @param key property key in the properties file
+     * @param defaultValue default value that is returned if not specified or in incorrect format
      * @return property value or default if not specified correctly
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
@@ -199,7 +197,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @param key
      * @return
      * @throws CRConfigException
@@ -214,7 +212,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static synchronized Properties getProperties() {
@@ -226,7 +224,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static synchronized boolean useVirtuoso() {
@@ -236,7 +234,7 @@ public class GeneralConfig {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static synchronized boolean isUseCentralAuthenticationService() {

@@ -24,7 +24,7 @@ package eionet.cr.dto;
 import java.util.Date;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PostHarvestScriptDTO {
@@ -53,8 +53,7 @@ public class PostHarvestScriptDTO {
     }
 
     /**
-     * @param active
-     *            the active to set
+     * @param active the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
@@ -103,48 +102,42 @@ public class PostHarvestScriptDTO {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * @param targetType
-     *            the targetType to set
+     * @param targetType the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
     }
 
     /**
-     * @param targetUrl
-     *            the targetUrl to set
+     * @param targetUrl the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     * @param script
-     *            the script to set
+     * @param script the script to set
      */
     public void setScript(String script) {
         this.script = script;
     }
 
     /**
-     * @param position
-     *            the position to set
+     * @param position the position to set
      */
     public void setPosition(int position) {
         this.position = position;
@@ -158,8 +151,7 @@ public class PostHarvestScriptDTO {
     }
 
     /**
-     * @param runOnce
-     *            the runOnce to set
+     * @param runOnce the runOnce to set
      */
     public void setRunOnce(boolean runOnce) {
         this.runOnce = runOnce;
@@ -173,8 +165,7 @@ public class PostHarvestScriptDTO {
     }
 
     /**
-     * @param lastModified
-     *            the lastModified to set
+     * @param lastModified the lastModified to set
      */
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;

@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class PredicateDTO {
 
@@ -31,7 +31,7 @@ public class PredicateDTO {
     private String value;
 
     /**
-     *
+     * 
      * @param value
      */
     public PredicateDTO(String value) {
@@ -47,7 +47,7 @@ public class PredicateDTO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -56,7 +56,7 @@ public class PredicateDTO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -73,7 +73,7 @@ public class PredicateDTO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {

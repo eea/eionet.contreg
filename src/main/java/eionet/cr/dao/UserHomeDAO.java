@@ -30,14 +30,14 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Interface to define methods related to users home folder.
- *
+ * 
  * @author Enriko Käsper
  */
 public interface UserHomeDAO extends DAO {
 
     /**
      * Get the contents of user folder or users root folder. The result contains the list of UserFolderDTO objects.
-     *
+     * 
      * @param parentFolder
      * @param filters
      * @param pagingRequest

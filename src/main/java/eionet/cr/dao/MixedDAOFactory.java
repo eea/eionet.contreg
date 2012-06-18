@@ -3,9 +3,9 @@ package eionet.cr.dao;
 import eionet.cr.dao.virtuoso.VirtuosoDAOFactory;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class MixedDAOFactory extends DAOFactory {
 
@@ -13,7 +13,7 @@ public class MixedDAOFactory extends DAOFactory {
     private static MixedDAOFactory instance;
 
     /**
-     *
+     * 
      * @return
      */
     public static MixedDAOFactory get() {
@@ -26,7 +26,7 @@ public class MixedDAOFactory extends DAOFactory {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
      */
     @Override

@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Singleton class indicating if you are currently in JUnit runtime.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class IsJUnitRuntime {
@@ -37,7 +37,7 @@ public class IsJUnitRuntime {
     public static final boolean VALUE = isJUnitRuntime();
 
     /**
-     *
+     * 
      * @return
      */
     private static boolean isJUnitRuntime() {

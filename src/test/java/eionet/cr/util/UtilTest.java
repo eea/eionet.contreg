@@ -28,9 +28,9 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UtilTest extends TestCase {
 

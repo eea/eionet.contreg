@@ -54,9 +54,9 @@ import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 @UrlBinding("/references.action")
 public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
@@ -81,7 +81,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -129,7 +129,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
@@ -173,8 +173,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -188,8 +187,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param anonHash
-     *            the anonHash to set
+     * @param anonHash the anonHash to set
      */
     public void setAnonHash(long hash) {
         this.anonHash = hash;
@@ -210,7 +208,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean isUriResolvable() {

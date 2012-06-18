@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 /**
  * Type definition ...
- *
+ * 
  * @author Kaido Laine
  */
 public class URLUtilTest extends TestCase {
@@ -34,10 +34,12 @@ public class URLUtilTest extends TestCase {
         String url = "http://ok";
         assertEquals("http://ok", URLUtil.escapeIRI(url));
     }
+
     public void testReplaceBadCharsnotOK() {
         String url = "http://a.b.c/{aaa}";
         assertEquals("http://a.b.c/%7Baaa%7D", URLUtil.escapeIRI(url));
     }
+
     public void testReplaceSpaces() {
         String url = "http://a.b.c/ aaa b ";
         assertEquals("http://a.b.c/%20aaa%20b%20", URLUtil.escapeIRI(url));

@@ -23,9 +23,9 @@ package eionet.cr.harvest.util.arp;
 import com.hp.hpl.jena.rdf.arp.AResource;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class AResourceImpl implements AResource {
 
@@ -33,7 +33,7 @@ public class AResourceImpl implements AResource {
     private String uri;
 
     /**
-     *
+     * 
      * @param uri
      */
     public AResourceImpl(String uri) {
@@ -42,7 +42,7 @@ public class AResourceImpl implements AResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.hp.hpl.jena.rdf.arp.AResource#getAnonymousID()
      */
     public String getAnonymousID() {
@@ -51,7 +51,7 @@ public class AResourceImpl implements AResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.hp.hpl.jena.rdf.arp.AResource#getURI()
      */
     public String getURI() {
@@ -60,7 +60,7 @@ public class AResourceImpl implements AResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.hp.hpl.jena.rdf.arp.AResource#getUserData()
      */
     public Object getUserData() {
@@ -69,7 +69,7 @@ public class AResourceImpl implements AResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.hp.hpl.jena.rdf.arp.AResource#isAnonymous()
      */
     public boolean isAnonymous() {
@@ -78,7 +78,7 @@ public class AResourceImpl implements AResource {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.hp.hpl.jena.rdf.arp.AResource#setUserData(java.lang.Object)
      */
     public void setUserData(Object obj) {

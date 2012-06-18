@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  * Dataset DTO object.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class DatasetDTO {
@@ -38,7 +38,6 @@ public class DatasetDTO {
 
     /** Last modified date. */
     private Date modified;
-
 
     @Override
     public boolean equals(Object o) {
@@ -61,8 +60,7 @@ public class DatasetDTO {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -76,8 +74,7 @@ public class DatasetDTO {
     }
 
     /**
-     * @param label
-     *            the label to set
+     * @param label the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -91,8 +88,7 @@ public class DatasetDTO {
     }
 
     /**
-     * @param modified
-     *            the modified to set
+     * @param modified the modified to set
      */
     public void setModified(Date modified) {
         this.modified = modified;

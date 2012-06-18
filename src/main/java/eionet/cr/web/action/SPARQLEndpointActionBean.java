@@ -56,9 +56,9 @@ import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -155,7 +155,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private List<String> deleteQueries;
 
     /**
-     *
+     * 
      * @return
      * @throws OpenRDFException
      * @throws DAOException
@@ -188,7 +188,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
      * to use inference.
-     *
+     * 
      * @throws DAOException
      */
     private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
@@ -206,7 +206,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -245,7 +245,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Stores user's SPARQL bookmark.
-     *
+     * 
      * @throws DAOException
      */
     private void storePersonalBookmark() throws DAOException {
@@ -297,7 +297,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Stores shared SPARQL bookmark.
-     *
+     * 
      * @throws DAOException
      */
     private void storeSharedBookmark() throws DAOException {
@@ -348,7 +348,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return Resolution
      * @throws OpenRDFException
      */
@@ -383,7 +383,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -448,7 +448,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Checks if user has update rights to "sparqlbookmarks" ACL.
-     *
+     * 
      * @return true, if user can add/delete shared SPARQL bookmars.
      */
     public boolean isSharedBookmarkPrivilege() {
@@ -460,7 +460,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param query
      * @param format
      * @param out
@@ -592,8 +592,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
             nrOfTriples =
-                DAOFactory.get().getDao(HelperDAO.class)
-                .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
+                    DAOFactory.get().getDao(HelperDAO.class)
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -605,21 +605,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -672,7 +672,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes shared bookmark.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -682,7 +682,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes personal bookmark.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -692,9 +692,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes SPARQL bookmarked query from triplestore.
-     *
-     * @param deleteSharedBookmark
-     *            true, if shared bookmark will be deleted, otherwise personal bookmark
+     * 
+     * @param deleteSharedBookmark true, if shared bookmark will be deleted, otherwise personal bookmark
      * @return
      * @throws DAOException
      */
@@ -745,8 +744,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param query
-     *            the query to set
+     * @param query the query to set
      */
     public void setQuery(String query) {
         this.query = query;
@@ -760,7 +758,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public long getExecutionTime() {
@@ -842,24 +840,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fillfrom
-     *            the fillfrom to set
+     * @param fillfrom the fillfrom to set
      */
     public void setFillfrom(String fillfrom) {
         this.fillfrom = fillfrom;
     }
 
     /**
-     * @param queryfrom
-     *            the queryfrom to set
+     * @param queryfrom the queryfrom to set
      */
     public void setQueryfrom(String queryfrom) {
         this.queryfrom = queryfrom;
     }
 
     /**
-     * @param bookmarkName
-     *            the bookmarkName to set
+     * @param bookmarkName the bookmarkName to set
      */
     public void setBookmarkName(String bookmarkName) {
         this.bookmarkName = bookmarkName;
@@ -867,7 +862,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns bookmarked queries.
-     *
+     * 
      * @return the bookmarkedQueries
      * @throws DAOException
      */
@@ -883,7 +878,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns shared bookmarked queries.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -897,7 +892,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns bookmark's uri.
-     *
+     * 
      * @param bookmarkGraphUri
      * @param bookmarkName
      * @return
@@ -908,8 +903,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param deleteQueries
-     *            the deleteQueries to set
+     * @param deleteQueries the deleteQueries to set
      */
     public void setDeleteQueries(List<String> deleteQueries) {
         this.deleteQueries = deleteQueries;
@@ -998,8 +992,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param sharedBookmark
-     *            the sharedBookmark to set
+     * @param sharedBookmark the sharedBookmark to set
      */
     public void setSharedBookmark(boolean sharedBookmark) {
         this.sharedBookmark = sharedBookmark;
@@ -1013,8 +1006,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedBookmarkName
-     *            the selectedBookmarkName to set
+     * @param selectedBookmarkName the selectedBookmarkName to set
      */
     public void setSelectedBookmarkName(String selectedBookmarkName) {
         this.selectedBookmarkName = selectedBookmarkName;

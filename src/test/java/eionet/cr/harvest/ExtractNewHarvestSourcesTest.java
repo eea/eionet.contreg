@@ -33,15 +33,15 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {
@@ -53,7 +53,7 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
 
         try {
             String url =
-                "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/extract-new-sources.xml";
+                    "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/extract-new-sources.xml";
 
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
@@ -66,8 +66,8 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
             harvest.execute();
 
             Pair<Integer, List<HarvestSourceDTO>> resultPair =
-                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .getHarvestSources("http://test.com/datasets#dataset2", null, null);
+                    DAOFactory.get().getDao(HarvestSourceDAO.class)
+                            .getHarvestSources("http://test.com/datasets#dataset2", null, null);
             assertNotNull(resultPair);
             assertNotNull(resultPair.getLeft());
             assertNotNull(resultPair.getRight());

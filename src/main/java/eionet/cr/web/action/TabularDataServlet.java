@@ -44,7 +44,7 @@ import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.TriplesToOutputStream;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class TabularDataServlet extends HttpServlet {
@@ -64,7 +64,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     *
+     * 
      * @param request
      * @param response
      * @throws IOException
@@ -82,10 +82,9 @@ public class TabularDataServlet extends HttpServlet {
         try {
             List<SubjectDTO> subjectTriples = DAOFactory.get().getDao(HelperDAO.class).getSPOsInSubject(subjectUri);
             outputStream = response.getOutputStream();
-            if (isRdfXmlPreferred(request)){
+            if (isRdfXmlPreferred(request)) {
                 TriplesToOutputStream.triplesToRdf(outputStream, subjectUri, subjectTriples);
-            }
-            else{
+            } else {
                 TriplesToOutputStream.triplesToHtml(outputStream, subjectUri, subjectTriples);
             }
         } catch (DAOException e) {
@@ -97,7 +96,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     *
+     * 
      * @param message
      * @param request
      * @param response
@@ -105,7 +104,7 @@ public class TabularDataServlet extends HttpServlet {
      * @throws IOException
      */
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
 
         LOGGER.info(message);
 
@@ -118,7 +117,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     *
+     * 
      * @param exception
      * @param request
      * @param response
@@ -126,7 +125,7 @@ public class TabularDataServlet extends HttpServlet {
      * @throws IOException
      */
     private void handleException(Exception exception, HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
 
         LOGGER.error(exception);
 
@@ -139,7 +138,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     *
+     * 
      * @param httpRequest
      * @return
      */

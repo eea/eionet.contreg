@@ -104,7 +104,8 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         String objectUri = StringUtils.isBlank(split[3]) ? null : split[3].trim();
 
         boolean isLiteral = objectUri == null;
-        boolean isAnonymous = StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1") || split[4].trim().equals("true");
+        boolean isAnonymous =
+            StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1") || split[4].trim().equals("true");
         String graphUri = StringUtils.isBlank(split[5]) ? null : split[5].trim();
         int objectLength = StringUtils.isBlank(split[6]) ? 0 : Integer.parseInt(split[6].trim());
         String objectMD5 = StringUtils.isBlank(split[7]) ? "" : split[6].trim();
@@ -129,7 +130,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         // characters that we got here.
         if (isLiteral) {
             String value = objectDTO.getValue();
-            if (objectLength > WebConstants.MAX_OBJECT_LENGTH && !DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5)){
+            if (objectLength > WebConstants.MAX_OBJECT_LENGTH && !DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5)) {
                 objectDTO.setObjectMD5(objectMD5);
                 LOGGER.trace("Object's database-calculated length is " + objectLength);
             }
@@ -143,20 +144,5 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
      */
     public FactsheetDTO getFactsheetDTO() {
         return factsheetDTO;
-    }
-
-    public static void main(String[] args) {
-
-        String str = "Aiova<|>lv<|><|><|>0<|>http://sws.geonames.org/4862182/about.rdf";
-        String[] ss = StringUtils.splitByWholeSeparatorPreserveAllTokens(str, "<|>");
-        for (int i = 0; i < ss.length; i++) {
-            System.out.println(i + " = _" + ss[i] + "_");
-        }
-
-        // str = "<> <>  <>  <> http://lod.geospecies.org/ses/22ERa <> false <> http://rdf.geospecies.org/geospecies.rdf.gz";
-        // ss = StringUtils.splitByWholeSeparator(str, "<>");
-        // for (int i=0; i<ss.length; i++){
-        // System.out.println(i + " = _" + ss[i].trim() + "_");
-        // }
     }
 }

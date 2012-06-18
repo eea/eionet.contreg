@@ -41,7 +41,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScripts")
@@ -64,7 +64,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     private List<Integer> selectedIds;
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -86,7 +86,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -101,7 +101,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -116,7 +116,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -127,7 +127,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -138,7 +138,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     @ValidationMethod(on = {"delete", "activateDeactivate", "moveUp", "moveDown"})
@@ -164,8 +164,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType
-     *            the targetType to set
+     * @param targetType the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -206,23 +205,21 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl
-     *            the targetUrl to set
+     * @param targetUrl the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
     /**
-     * @param selectedIds
-     *            the selectedIds to set
+     * @param selectedIds the selectedIds to set
      */
     public void setSelectedIds(List<Integer> selectedIds) {
         this.selectedIds = selectedIds;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getPageToRender() {
@@ -231,7 +228,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param url
      * @return
      */

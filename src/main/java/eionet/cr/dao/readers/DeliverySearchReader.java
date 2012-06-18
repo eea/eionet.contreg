@@ -13,9 +13,9 @@ import eionet.cr.dto.DeliveryDTO;
 
 /**
  * Reads delivery objects from Resultset.
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
 
@@ -24,7 +24,7 @@ public class DeliverySearchReader extends ResultSetMixedReader<DeliveryDTO> {
 
     /**
      * converts Bindingset row to DeliveryDTO.
-     *
+     * 
      * @param bindingSet - BindingSet
      * @throws ResultSetReaderException - if error in reading
      */

@@ -23,9 +23,9 @@ package eionet.cr.dao;
 import eionet.cr.common.CRException;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class DAOException extends CRException {
 
@@ -37,7 +37,7 @@ public class DAOException extends CRException {
     }
 
     /**
-     *
+     * 
      * @param message
      */
     public DAOException(String message) {
@@ -45,7 +45,7 @@ public class DAOException extends CRException {
     }
 
     /**
-     *
+     * 
      * @param message
      * @param cause
      */

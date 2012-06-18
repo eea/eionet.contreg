@@ -4,9 +4,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class UserBookmarkDTO {
 
@@ -29,7 +29,7 @@ public class UserBookmarkDTO {
     private String typeLabel;
 
     /**
-     *
+     * 
      * @return
      */
     public String getBookmarkUrl() {
@@ -37,7 +37,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     *
+     * 
      * @param bookmarkUrl
      */
     public void setBookmarkUrl(String bookmarkUrl) {
@@ -45,7 +45,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getBookmarkUrlHtmlFormatted() {
@@ -68,8 +68,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * @param query
-     *            the query to set
+     * @param query the query to set
      */
     public void setQuery(String query) {
         this.query = query;
@@ -83,8 +82,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
@@ -98,8 +96,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * @param typeLabel
-     *            the typeLabel to set
+     * @param typeLabel the typeLabel to set
      */
     public void setTypeLabel(String typeLabel) {
         this.typeLabel = typeLabel;
@@ -113,15 +110,14 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getBookmarkTitle() {

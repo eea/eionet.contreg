@@ -22,9 +22,9 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.UserHomeDAO;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class VirtuosoDAOFactory extends DAOFactory {
 
@@ -63,7 +63,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static VirtuosoDAOFactory get() {
@@ -75,7 +75,7 @@ public class VirtuosoDAOFactory extends DAOFactory {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
      */
     @SuppressWarnings("unchecked")

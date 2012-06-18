@@ -24,9 +24,9 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
 
 /**
  * JSON writer.
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class CRJsonWriter implements TupleQueryResultWriter {
     /*-----------*

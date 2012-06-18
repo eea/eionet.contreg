@@ -25,9 +25,9 @@ import java.util.Date;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class SubjectUploadedColumn extends SearchResultColumn {
 
@@ -47,7 +47,7 @@ public class SubjectUploadedColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.search.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -66,7 +66,7 @@ public class SubjectUploadedColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

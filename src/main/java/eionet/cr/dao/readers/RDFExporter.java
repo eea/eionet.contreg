@@ -40,7 +40,7 @@ public class RDFExporter extends ResultSetMixedReader {
     private OutputStream output;
 
     /**
-     *
+     * 
      * @param sourceHash
      * @param output
      * @throws DAOException
@@ -59,7 +59,7 @@ public class RDFExporter extends ResultSetMixedReader {
     }
 
     /**
-     *
+     * 
      * @param sourceHash
      * @param output
      * @throws DAOException
@@ -76,7 +76,7 @@ public class RDFExporter extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -140,7 +140,7 @@ public class RDFExporter extends ResultSetMixedReader {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private String getNamespaceDeclarations() {
@@ -175,7 +175,7 @@ public class RDFExporter extends ResultSetMixedReader {
     }
 
     /**
-     *
+     * 
      * @param namespaceHash
      * @return
      */
@@ -239,7 +239,7 @@ public class RDFExporter extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

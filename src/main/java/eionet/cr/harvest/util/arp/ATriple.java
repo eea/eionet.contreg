@@ -23,9 +23,9 @@ package eionet.cr.harvest.util.arp;
 import com.hp.hpl.jena.rdf.arp.AResource;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class ATriple {
 
@@ -44,7 +44,7 @@ public class ATriple {
     }
 
     /**
-     *
+     * 
      * @param subject
      * @param predicate
      * @param object
@@ -106,48 +106,42 @@ public class ATriple {
     }
 
     /**
-     * @param subject
-     *            the subject to set
+     * @param subject the subject to set
      */
     private void setSubject(AResource subject) {
         this.subject = subject;
     }
 
     /**
-     * @param predicate
-     *            the predicate to set
+     * @param predicate the predicate to set
      */
     private void setPredicate(AResource predicate) {
         this.predicate = predicate;
     }
 
     /**
-     * @param object
-     *            the object to set
+     * @param object the object to set
      */
     private void setObject(String object) {
         this.object = object;
     }
 
     /**
-     * @param objectLang
-     *            the objectLang to set
+     * @param objectLang the objectLang to set
      */
     private void setObjectLang(String objectLang) {
         this.objectLang = objectLang;
     }
 
     /**
-     * @param litObject
-     *            the litObject to set
+     * @param litObject the litObject to set
      */
     private void setLitObject(boolean litObject) {
         this.litObject = litObject;
     }
 
     /**
-     * @param anonObject
-     *            the anonObject to set
+     * @param anonObject the anonObject to set
      */
     private void setAnonObject(boolean anonObject) {
         this.anonObject = anonObject;

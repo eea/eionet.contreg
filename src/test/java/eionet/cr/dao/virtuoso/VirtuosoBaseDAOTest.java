@@ -25,7 +25,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
     public void testSubjectsDataQuery() {
 
         String[] uris =
-                { "http://rod.eionet.europa.eu/obligations/392", "http://rod.eionet.europa.eu/instruments/618",
+                {"http://rod.eionet.europa.eu/obligations/392", "http://rod.eionet.europa.eu/instruments/618",
                         "http://rod.eionet.europa.eu/issues/15", "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1752885689",
                         "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ1607205326",
                         "http://planner.eionet.europa.eu/WorkPlan_2010/PRJ9599558008",
@@ -34,7 +34,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
                         "http://rod.eionet.europa.eu/obligations/171", "http://rod.eionet.europa.eu/obligations/661",
                         "http://rod.eionet.europa.eu/obligations/606", "http://rod.eionet.europa.eu/obligations/136",
                         "http://rod.eionet.europa.eu/obligations/520", "http://rod.eionet.europa.eu/obligations/522",
-                        "http://rod.eionet.europa.eu/obligations/521" };
+                        "http://rod.eionet.europa.eu/obligations/521"};
 
         List<String> subjectUris = Arrays.asList(uris);
 
@@ -42,7 +42,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
         dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
 
         // only these predicates will be queried for
-        String[] neededPredicates = { Predicates.RDF_TYPE, Predicates.RDFS_LABEL };
+        String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
 
         // logger.trace("Free-text search, getting the data of the found subjects");
 
@@ -69,7 +69,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
     public void testGetSubjectsData() {
         // subjecturis
         String[] s1 =
-                { "http://rod.eionet.europa.eu/obligations/130", "http://rod.eionet.europa.eu/obligations/143",
+                {"http://rod.eionet.europa.eu/obligations/130", "http://rod.eionet.europa.eu/obligations/143",
                         "http://rod.eionet.europa.eu/instruments/381", "http://rod.eionet.europa.eu/instruments/273",
                         "http://rod.eionet.europa.eu/obligations/523", "http://rdfdata.eionet.europa.eu/eper/facilities/01035",
                         "http://rdfdata.eionet.europa.eu/eper/facilities/01039",
@@ -80,13 +80,12 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
                         "http://rdfdata.eionet.europa.eu/eper/facilities/01054",
                         "http://rdfdata.eionet.europa.eu/eper/facilities/01055",
                         "http://rdfdata.eionet.europa.eu/eper/facilities/01068",
-                        "http://rdfdata.eionet.europa.eu/eper/facilities/01074" };
+                        "http://rdfdata.eionet.europa.eu/eper/facilities/01074"};
 
         List<String> subjectUris = Arrays.asList(s1);
 
         // predicateuris
-        String[] predicateUris =
-                { "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#label" };
+        String[] predicateUris = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#label"};
 
         SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
         dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);

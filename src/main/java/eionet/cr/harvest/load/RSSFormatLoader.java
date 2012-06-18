@@ -54,7 +54,7 @@ import eionet.cr.common.Predicates;
 
 /**
  * Implementation of {@link ContentLoader} for the content in RRS/Atom format.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class RSSFormatLoader implements ContentLoader {
@@ -67,7 +67,7 @@ public class RSSFormatLoader implements ContentLoader {
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException, ContentParsingException {
+            throws IOException, OpenRDFException, ContentParsingException {
 
         SyndFeedInput input = new SyndFeedInput();
         try {
@@ -91,7 +91,7 @@ public class RSSFormatLoader implements ContentLoader {
     }
 
     /**
-     *
+     * 
      * @param feed
      * @throws RepositoryException
      */
@@ -104,7 +104,7 @@ public class RSSFormatLoader implements ContentLoader {
 
         String feedTitle = feed.getTitle(); // to be mapped into dcterms:title and rdfs:label
 
-        if (StringUtils.isNotBlank(feedTitle)){
+        if (StringUtils.isNotBlank(feedTitle)) {
             statement = vf.createStatement(feedURI, vf.createURI(Predicates.DCTERMS_TITLE), vf.createLiteral(feedTitle));
             statements.add(statement);
         }
@@ -112,13 +112,12 @@ public class RSSFormatLoader implements ContentLoader {
         List feedAuthors = feed.getAuthors(); // to be mapped into dcterms:creator
         for (Iterator iterator = feedAuthors.iterator(); iterator.hasNext();) {
             Object author = iterator.next();
-            if (author instanceof SyndPerson){
+            if (author instanceof SyndPerson) {
                 SyndPerson person = (SyndPerson) author;
                 String personUri = person.getUri();
-                if (StringUtils.isNotBlank(personUri)){
+                if (StringUtils.isNotBlank(personUri)) {
                 }
-            }
-            else if (author != null){
+            } else if (author != null) {
 
             }
         }
@@ -135,7 +134,7 @@ public class RSSFormatLoader implements ContentLoader {
     }
 
     /**
-     *
+     * 
      * @param item
      */
     private int saveFeedItemMetadata(SyndEntry item, SyndFeed feed) {
@@ -157,7 +156,7 @@ public class RSSFormatLoader implements ContentLoader {
 
     /**
      * Removes any HTML content from the given text.
-     *
+     * 
      * @param text
      * @return
      */

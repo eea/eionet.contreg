@@ -43,9 +43,9 @@ import eionet.cr.dto.TagDTO;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- *
+ * 
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- *
+ * 
  */
 
 @UrlBinding("/json/{$event}.action")
@@ -55,7 +55,7 @@ public class JsonActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(JsonActionBean.class);
 
     /**
-     *
+     * 
      * @return
      */
     @DefaultHandler
@@ -65,7 +65,7 @@ public class JsonActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution tags() {
@@ -86,7 +86,7 @@ public class JsonActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -113,7 +113,7 @@ public class JsonActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -146,7 +146,7 @@ public class JsonActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param suggestions
      * @param query
      * @return

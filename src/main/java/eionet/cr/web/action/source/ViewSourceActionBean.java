@@ -45,7 +45,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * View source tab.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sourceView.action")
@@ -68,7 +68,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
     /**
      * Action event for displaying the source data and history.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -91,7 +91,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
     /**
      * Action event for scheduling urgent harvest.
-     *
+     * 
      * @return Resolution
      * @throws DAOException
      * @throws HarvestException
@@ -109,7 +109,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
     /**
      * Returns source's interval minutes.
-     *
+     * 
      * @return String
      */
     public String getIntervalMinutesDisplay() {
@@ -124,7 +124,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
     /**
      * Returns formated time of minutes.
-     *
+     * 
      * @param minutes
      * @return
      */
@@ -151,7 +151,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
     /**
      * Chekcs if user is owner of the harvest source.
-     *
+     * 
      * @param harvestSourceDTO
      * @return
      */
@@ -180,8 +180,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

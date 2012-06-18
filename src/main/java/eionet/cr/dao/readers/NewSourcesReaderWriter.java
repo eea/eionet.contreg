@@ -39,22 +39,21 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- * Reads harvest source URLs from the given binding set,
- * and inserts them into HARVEST_SOURCE table, using {@link PreparedStatement}
+ * Reads harvest source URLs from the given binding set, and inserts them into HARVEST_SOURCE table, using {@link PreparedStatement}
  * and execution by batches (to save performance).
- *
+ * 
  * @author Jaanus Heinlaid
  */
-public class NewSourcesReaderWriter extends ResultSetMixedReader{
+public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(NewSourcesReaderWriter.class);
 
     /** */
     private static final String INSERT_SQL = "insert soft HARVEST_SOURCE "
-        + "(URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),"
-        + Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))) + ")";
+            + "(URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),"
+            + Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))) + ")";
 
     /** */
     private static final int BATCH_LIMIT = 1000;
@@ -71,11 +70,12 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
 
     /**
      * Class constructor.
+     * 
      * @param sqlConn
      */
     public NewSourcesReaderWriter(Connection sqlConn) {
 
-        if (sqlConn==null){
+        if (sqlConn == null) {
             throw new IllegalArgumentException("Connection must not be null!");
         }
         this.sqlConn = sqlConn;
@@ -88,7 +88,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
         String sourceUrl = getFirstBindingStringValue(bindingSet);
-        if (!StringUtils.isBlank(sourceUrl)){
+        if (!StringUtils.isBlank(sourceUrl)) {
 
             sourceCount++;
             try {
@@ -97,9 +97,9 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
                 getPreparedStatement().addBatch();
                 currentBatchSize++;
 
-                if (currentBatchSize == BATCH_LIMIT){
+                if (currentBatchSize == BATCH_LIMIT) {
 
-                    if (LOGGER.isTraceEnabled()){
+                    if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace("Inserting " + currentBatchSize + " sources");
                     }
 
@@ -107,7 +107,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
                     getPreparedStatement().clearParameters();
                     currentBatchSize = 0;
 
-                    if (LOGGER.isTraceEnabled()){
+                    if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace(sourceCount + " sources inserted so far");
                     }
                 }
@@ -123,19 +123,18 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
      */
     public void finish() throws ResultSetReaderException {
 
-        try{
-            if (currentBatchSize > 0){
+        try {
+            if (currentBatchSize > 0) {
 
-                if (LOGGER.isTraceEnabled()){
+                if (LOGGER.isTraceEnabled()) {
                     LOGGER.trace("Inserting " + currentBatchSize + " sources");
                 }
                 getPreparedStatement().executeBatch();
-                if (LOGGER.isTraceEnabled()){
+                if (LOGGER.isTraceEnabled()) {
                     LOGGER.trace(sourceCount + " sources inserted in total");
                 }
             }
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             throw new ResultSetReaderException(e.getMessage(), e);
         }
     }
@@ -143,7 +142,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
     /**
      *
      */
-    public void closeResources(){
+    public void closeResources() {
         SQLUtil.close(preparedStatement);
     }
 
@@ -182,7 +181,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader{
     public PreparedStatement getPreparedStatement() throws SQLException {
 
         // Lazy loading.
-        if (preparedStatement==null){
+        if (preparedStatement == null) {
             preparedStatement = sqlConn.prepareStatement(INSERT_SQL);
         }
 

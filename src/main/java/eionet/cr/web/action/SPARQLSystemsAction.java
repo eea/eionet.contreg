@@ -36,7 +36,7 @@ import eionet.cr.web.sparqlClient.helpers.SPARQLEndpoints;
 
 /**
  * Action bean for other SPARQL systems. Currently provides SPARQL client functionality.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sparqlclient")
@@ -59,7 +59,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
 
     /**
      * Submits SPARQL query.
-     *
+     * 
      * @return Resolution
      */
     @DefaultHandler
@@ -82,7 +82,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return List<String>
      */
     public List<String> getEndpoints() {
@@ -98,8 +98,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
     }
 
     /**
-     * @param endpoint
-     *            the endpoint to set
+     * @param endpoint the endpoint to set
      */
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
@@ -113,8 +112,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
     }
 
     /**
-     * @param query
-     *            the query to set
+     * @param query the query to set
      */
     public void setQuery(String query) {
         this.query = query;
@@ -128,8 +126,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
     }
 
     /**
-     * @param explore
-     *            the explore to set
+     * @param explore the explore to set
      */
     public void setExplore(String explore) {
         this.explore = explore;

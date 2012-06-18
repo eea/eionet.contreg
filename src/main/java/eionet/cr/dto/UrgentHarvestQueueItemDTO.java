@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import java.io.Serializable;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UrgentHarvestQueueItemDTO implements Serializable {
 
@@ -48,8 +48,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable {
     }
 
     /**
-     * @param url
-     *            the url to set
+     * @param url the url to set
      */
     public void setUrl(String url) {
         this.url = url;
@@ -63,8 +62,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable {
     }
 
     /**
-     * @param timeAdded
-     *            the timeAdded to set
+     * @param timeAdded the timeAdded to set
      */
     public void setTimeAdded(java.util.Date timeAdded) {
         this.timeAdded = timeAdded;
@@ -78,15 +76,14 @@ public class UrgentHarvestQueueItemDTO implements Serializable {
     }
 
     /**
-     * @param pushedContent
-     *            the pushedContent to set
+     * @param pushedContent the pushedContent to set
      */
     public void setPushedContent(String pushedContent) {
         this.pushedContent = pushedContent;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public boolean isPushHarvest() {

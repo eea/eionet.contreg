@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class HarvestMessageDTO implements java.io.Serializable {
 
@@ -50,8 +50,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * @param harvestId
-     *            the harvestId to set
+     * @param harvestId the harvestId to set
      */
     public void setHarvestId(Integer harvestId) {
         this.harvestId = harvestId;
@@ -65,8 +64,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
@@ -80,8 +78,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * @param message
-     *            the message to set
+     * @param message the message to set
      */
     public void setMessage(String message) {
         this.message = message;
@@ -95,8 +92,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * @param stackTrace
-     *            the stackTrace to set
+     * @param stackTrace the stackTrace to set
      */
     public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
@@ -117,7 +113,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     *
+     * 
      * @param message
      * @param messageType
      * @param stackTrace

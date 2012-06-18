@@ -51,9 +51,9 @@ import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 /**
  * Interceptor that saves to the session last action except login action.
  * <p>
- *
+ * 
  * @author gerasvad
- *
+ * 
  */
 @Intercepts(value = LifecycleStage.EventHandling)
 public class ActionEventInterceptor implements Interceptor {
@@ -64,7 +64,7 @@ public class ActionEventInterceptor implements Interceptor {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see net.sourceforge.stripes.controller.Interceptor#intercept(net.sourceforge.stripes.controller.ExecutionContext)
      */
     public Resolution intercept(ExecutionContext context) throws Exception {
@@ -85,9 +85,9 @@ public class ActionEventInterceptor implements Interceptor {
                 actionEventURL = "/home/" + userName;
             } else {
                 actionEventURL =
-                    getActionName(actionBean.getClass()) + "?"
-                    + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
-                    + getRequestParameters(request);
+                        getActionName(actionBean.getClass()) + "?"
+                                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
+                                + getRequestParameters(request);
 
                 // this will handle pretty url integration
                 actionEventURL = postProcess(actionEventURL);
@@ -100,7 +100,7 @@ public class ActionEventInterceptor implements Interceptor {
     }
 
     /**
-     *
+     * 
      * @param actionEventURL
      * @return
      */
@@ -136,7 +136,7 @@ public class ActionEventInterceptor implements Interceptor {
     }
 
     /**
-     *
+     * 
      * @param actionBeanClass
      * @return
      */
@@ -152,7 +152,7 @@ public class ActionEventInterceptor implements Interceptor {
     }
 
     /**
-     *
+     * 
      * @param eventMethod
      * @return
      */
@@ -171,7 +171,7 @@ public class ActionEventInterceptor implements Interceptor {
     }
 
     /**
-     *
+     * 
      * @param request
      * @return
      */

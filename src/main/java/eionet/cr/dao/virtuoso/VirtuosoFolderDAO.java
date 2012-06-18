@@ -64,7 +64,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
@@ -74,7 +74,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
-        "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
+            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
     /**
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
@@ -421,7 +421,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     }
 
     /**
-     *
+     * 
      * @param user
      * @return
      */

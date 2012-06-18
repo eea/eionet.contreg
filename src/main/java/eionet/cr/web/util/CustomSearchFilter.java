@@ -21,9 +21,9 @@
 package eionet.cr.web.util;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class CustomSearchFilter {
 
@@ -41,8 +41,7 @@ public class CustomSearchFilter {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -56,8 +55,7 @@ public class CustomSearchFilter {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -71,8 +69,7 @@ public class CustomSearchFilter {
     }
 
     /**
-     * @param description
-     *            the description to set
+     * @param description the description to set
      */
     public void setDescription(String description) {
         this.description = description;
@@ -86,8 +83,7 @@ public class CustomSearchFilter {
     }
 
     /**
-     * @param provideValues
-     *            the provideValues to set
+     * @param provideValues the provideValues to set
      */
     public void setProvideValues(boolean provideValues) {
         this.provideValues = provideValues;

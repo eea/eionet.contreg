@@ -27,12 +27,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.openrdf.model.Literal;
 
-import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.util.Util;
 
 /**
  * Utility functions for operating with objects of {@link Literal} class.
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class LiteralUtil {
@@ -40,12 +39,12 @@ public class LiteralUtil {
     /**
      * Null-safe method that gets the given literal's {@link Date} value. Null-safe means that it will simply return null if the
      * given literal is null. Null is also returned if the literal could not be parsed into {@link Date}.
-     *
+     * 
      * The method first tries to get the date value by trying {@link Literal#calendarValue()}. If that fails, the method tries to
-     * parse the literal's string value with {@link BaseHarvest#DATE_FORMATTER}. If the fails too, null is returned.
-     *
-     * @param literal
-     *            The literal whose date value is returned.
+     * parse the literal's string value with {@link eionet.cr.harvest.BaseHarvest#DATE_FORMATTER}. If the fails too, null is
+     * returned.
+     * 
+     * @param literal The literal whose date value is returned.
      * @return The date value of the given literal.
      */
     public static Date getDateValue(Literal literal) {

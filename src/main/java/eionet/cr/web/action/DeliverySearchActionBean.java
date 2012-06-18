@@ -51,9 +51,9 @@ import eionet.cr.web.util.CustomPaginatedList;
 import eionet.cr.web.util.WebConstants;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/deliverySearch.action")
 public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
@@ -88,7 +88,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -127,7 +127,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -165,7 +165,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Returns label from the pair collection.
-     *
+     * 
      * @param obligationValue
      * @return
      */
@@ -182,7 +182,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Returns label from the pair collection.
-     *
+     * 
      * @param localityValue
      * @return
      */
@@ -197,7 +197,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Action for searching deliveries using a user's stored filter.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -220,7 +220,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Action for searching deliveries from a compiled dataset's stored filter.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -287,24 +287,21 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * @param obligation
-     *            the obligation to set
+     * @param obligation the obligation to set
      */
     public void setObligation(String obligation) {
         this.obligation = obligation;
     }
 
     /**
-     * @param locality
-     *            the locality to set
+     * @param locality the locality to set
      */
     public void setLocality(String locality) {
         this.locality = locality;
     }
 
     /**
-     * @param year
-     *            the year to set
+     * @param year the year to set
      */
     public void setYear(String year) {
         this.year = year;
@@ -329,8 +326,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * @param filterId
-     *            the filterId to set
+     * @param filterId the filterId to set
      */
     public void setFilterId(Long filterId) {
         this.filterId = filterId;
@@ -344,8 +340,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * @param searchCriteria
-     *            the searchCriteria to set
+     * @param searchCriteria the searchCriteria to set
      */
     public void setSearchCriteria(String searchCriteria) {
         this.searchCriteria = searchCriteria;
@@ -359,8 +354,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * @param datasetFilter
-     *            the datasetFilter to set
+     * @param datasetFilter the datasetFilter to set
      */
     public void setDatasetFilter(Boolean datasetFilter) {
         this.datasetFilter = datasetFilter;

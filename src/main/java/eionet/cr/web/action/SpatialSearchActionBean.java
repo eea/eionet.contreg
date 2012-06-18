@@ -52,9 +52,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 @UrlBinding("/spatialSearch.action")
 public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
@@ -80,7 +80,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     private String contextUrl;
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -94,7 +94,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -129,7 +129,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @return
      */
     private Collection<SubjectDTO> filterPlacemarks(Collection<SubjectDTO> placemarks) {
@@ -156,7 +156,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @param latit
      * @param longit
      * @param delta
@@ -181,7 +181,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @param subject
      * @return
      */
@@ -190,7 +190,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @param subject
      * @return
      */
@@ -199,7 +199,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution googleEarthIntro() {
@@ -208,7 +208,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -231,7 +231,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -254,7 +254,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
@@ -289,7 +289,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     *
+     * 
      * @return
      */
     private BBOX createBBOX() {
@@ -311,8 +311,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param latS
-     *            the latS to set
+     * @param latS the latS to set
      */
     public void setLatS(Double lat1) {
         this.latS = lat1;
@@ -326,8 +325,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param latN
-     *            the latN to set
+     * @param latN the latN to set
      */
     public void setLatN(Double lat2) {
         this.latN = lat2;
@@ -341,8 +339,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param longW
-     *            the longW to set
+     * @param longW the longW to set
      */
     public void setLongW(Double long1) {
         this.longW = long1;
@@ -356,15 +353,14 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param longE
-     *            the longE to set
+     * @param longE the longE to set
      */
     public void setLongE(Double long2) {
         this.longE = long2;
     }
 
     /**
-     *
+     * 
      * @param bbox
      */
     public void setBBOX(String bbox) {
@@ -379,8 +375,7 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
     }
 
     /**
-     * @param source
-     *            the source to set
+     * @param source the source to set
      */
     public void setSource(String source) {
         this.source = source;

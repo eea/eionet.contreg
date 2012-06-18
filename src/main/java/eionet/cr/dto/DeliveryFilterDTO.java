@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Delivery filter.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class DeliveryFilterDTO {
@@ -56,7 +56,7 @@ public class DeliveryFilterDTO {
 
     /**
      * Returns displayable label of the filter.
-     *
+     * 
      * @return
      */
     public String getLabel() {
@@ -82,8 +82,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(Long id) {
         this.id = id;
@@ -97,8 +96,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param obligation
-     *            the obligation to set
+     * @param obligation the obligation to set
      */
     public void setObligation(String obligation) {
         this.obligation = obligation;
@@ -112,8 +110,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param locality
-     *            the locality to set
+     * @param locality the locality to set
      */
     public void setLocality(String locality) {
         this.locality = locality;
@@ -127,8 +124,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param year
-     *            the year to set
+     * @param year the year to set
      */
     public void setYear(String year) {
         this.year = year;
@@ -142,8 +138,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param username
-     *            the username to set
+     * @param username the username to set
      */
     public void setUsername(String username) {
         this.username = username;
@@ -157,8 +152,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param obligationLabel
-     *            the obligationLabel to set
+     * @param obligationLabel the obligationLabel to set
      */
     public void setObligationLabel(String obligationLabel) {
         this.obligationLabel = obligationLabel;
@@ -172,8 +166,7 @@ public class DeliveryFilterDTO {
     }
 
     /**
-     * @param localityLabel
-     *            the localityLabel to set
+     * @param localityLabel the localityLabel to set
      */
     public void setLocalityLabel(String localityLabel) {
         this.localityLabel = localityLabel;

@@ -32,14 +32,15 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override
@@ -71,7 +72,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     public void testGetHarvestSourceByUrl() throws Exception {
 
         HarvestSourceDTO dto =
-            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
         assertNotNull(dto);
     }
 
@@ -79,7 +80,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     public void testGetHarvestSources() throws Exception {
 
         Pair<Integer, List<HarvestSourceDTO>> result =
-            DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
         assertNotNull(result);
         assertNotNull(result.getRight());
         assertEquals(5, result.getRight().size());

@@ -12,7 +12,7 @@ import org.quartz.JobListener;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public class LoadTriplesJobListener implements JobListener {
 

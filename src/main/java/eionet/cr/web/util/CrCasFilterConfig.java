@@ -33,9 +33,9 @@ import eionet.cr.config.GeneralConfig;
 
 /**
  * An implementation of {@link FilterConfig} that reads configs from property file.
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class CrCasFilterConfig implements FilterConfig {
 
@@ -45,9 +45,8 @@ public class CrCasFilterConfig implements FilterConfig {
     private static ConcurrentHashMap<String, String> crInitParamsMap = null;
 
     /**
-     *
-     * @param defaultConfig
-     *            {@link FilterConfig} from web context.
+     * 
+     * @param defaultConfig {@link FilterConfig} from web context.
      */
     @SuppressWarnings("unchecked")
     private CrCasFilterConfig(FilterConfig defaultConfig) {
@@ -66,7 +65,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.FilterConfig#getFilterName()
      */
     public String getFilterName() {
@@ -75,7 +74,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.FilterConfig#getInitParameter(java.lang.String)
      */
     public String getInitParameter(String parameterKey) {
@@ -84,7 +83,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.FilterConfig#getInitParameterNames()
      */
     public Enumeration<String> getInitParameterNames() {
@@ -93,7 +92,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see javax.servlet.FilterConfig#getServletContext()
      */
     public ServletContext getServletContext() {
@@ -101,9 +100,8 @@ public class CrCasFilterConfig implements FilterConfig {
     }
 
     /**
-     *
-     * @param defaultConfig
-     *            defaultConfig {@link FilterConfig} from web context.
+     * 
+     * @param defaultConfig defaultConfig {@link FilterConfig} from web context.
      * @return an instance of {@link CrCasFilterConfig}.
      */
     public static CrCasFilterConfig getInstance(FilterConfig defaultConfig) {
@@ -115,7 +113,7 @@ public class CrCasFilterConfig implements FilterConfig {
     }
 
     /**
-     *
+     * 
      * @param defaultConfig
      */
     private static synchronized void initFilterParams(FilterConfig defaultConfig) {
@@ -130,7 +128,7 @@ public class CrCasFilterConfig implements FilterConfig {
 
     /**
      * Enum of CR web context related keys.
-     *
+     * 
      */
     public enum CRInitParameterKey {
 

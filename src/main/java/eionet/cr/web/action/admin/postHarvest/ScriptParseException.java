@@ -24,7 +24,7 @@ package eionet.cr.web.action.admin.postHarvest;
 import eionet.cr.common.CRException;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class ScriptParseException extends CRException {
@@ -52,7 +52,7 @@ public class ScriptParseException extends CRException {
     }
 
     /**
-     *
+     * 
      * @param throwable
      */
     public ScriptParseException(Throwable throwable) {

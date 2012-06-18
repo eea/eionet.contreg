@@ -59,8 +59,7 @@ public class Pair<L, R> implements Serializable {
     }
 
     /**
-     * @param left
-     *            the left to set
+     * @param left the left to set
      */
     public void setLeft(L id) {
         this.left = id;
@@ -74,8 +73,7 @@ public class Pair<L, R> implements Serializable {
     }
 
     /**
-     * @param right
-     *            the right to set
+     * @param right the right to set
      */
     public void setRight(R value) {
         this.right = value;

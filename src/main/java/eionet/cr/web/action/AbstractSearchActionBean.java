@@ -33,9 +33,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
 
@@ -53,10 +53,9 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     private Pagination pagination;
 
     /**
-     *
+     * 
      * @return
-     * @throws DAOException
-     *             TODO
+     * @throws DAOException TODO
      */
     public abstract Resolution search() throws DAOException;
 
@@ -67,7 +66,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     public abstract List<SearchResultColumn> getColumns() throws DAOException;
 
     /**
-     *
+     * 
      * @return
      */
     public Collection<T> getResultList() {
@@ -75,15 +74,14 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param resultList
-     *            the resultList to set
+     * @param resultList the resultList to set
      */
     public void setResultList(List<T> resultList) {
         this.resultList = resultList;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public int getMaxResultSetSize() {
@@ -91,7 +89,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     protected List<SearchResultColumn> getDefaultColumns() {
@@ -127,8 +125,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param pageN
-     *            the pageN to set
+     * @param pageN the pageN to set
      */
     public void setPageN(int pageNumber) {
         this.pageN = pageNumber < 1 ? 1 : pageNumber;
@@ -142,8 +139,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param sortO
-     *            the sortO to set
+     * @param sortO the sortO to set
      */
     public void setSortO(String sortOrder) {
         this.sortO = sortOrder;
@@ -157,8 +153,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * @param sortP
-     *            the sortP to set
+     * @param sortP the sortP to set
      */
     public void setSortP(String sortPredicate) {
         this.sortP = sortPredicate;
@@ -179,7 +174,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Pagination getPagination() {

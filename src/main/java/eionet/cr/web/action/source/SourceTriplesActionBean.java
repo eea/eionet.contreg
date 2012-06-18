@@ -44,7 +44,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Source triples tab.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sourceTriples.action")
@@ -61,7 +61,7 @@ public class SourceTriplesActionBean extends AbstractActionBean {
 
     /**
      * Action event for displaying the source triples.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -83,7 +83,7 @@ public class SourceTriplesActionBean extends AbstractActionBean {
 
     /**
      * Chekcs if user is owner of the harvest source.
-     *
+     * 
      * @param harvestSourceDTO
      * @return
      */
@@ -112,8 +112,7 @@ public class SourceTriplesActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

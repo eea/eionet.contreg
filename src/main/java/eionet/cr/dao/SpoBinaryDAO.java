@@ -25,22 +25,22 @@ import java.util.List;
 import eionet.cr.dto.SpoBinaryDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 // TODO - change this DAO and table name because there is nothing to do either with SPO or Binary
 public interface SpoBinaryDAO extends DAO {
 
     /**
-     *
+     * 
      * @param dto
      * @throws DAOException
      */
     void add(SpoBinaryDTO dto) throws DAOException;
 
     /**
-     *
+     * 
      * @param subjectUri
      * @return TODO
      * @throws DAOException
@@ -48,7 +48,7 @@ public interface SpoBinaryDAO extends DAO {
     SpoBinaryDTO get(String subjectUri) throws DAOException;
 
     /**
-     *
+     * 
      * @param subjectUri
      * @return
      * @throws DAOException
@@ -56,7 +56,7 @@ public interface SpoBinaryDAO extends DAO {
     boolean exists(String subjectUri) throws DAOException;
 
     /**
-     *
+     * 
      * @param subjectUris
      * @throws DAOException
      */

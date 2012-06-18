@@ -28,14 +28,13 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
-import eionet.cr.dao.DAOException;
 import eionet.doc.DocumentationService;
 import eionet.doc.dto.DocPageDTO;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
@@ -47,9 +46,9 @@ public class DocumentationActionBean extends AbstractActionBean {
     private DocPageDTO pageObject;
 
     /**
-     *
+     * 
      * @return Resolution
-     * @throws DAOException - if query fails
+     * @throws Exception
      */
     @DefaultHandler
     public Resolution view() throws Exception {
@@ -65,7 +64,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Edit page
-     *
+     * 
      * @return Resolution
      * @throws Exception
      */
@@ -83,10 +82,10 @@ public class DocumentationActionBean extends AbstractActionBean {
     }
 
     /**
-     * Adds content into documentation table
-     *
+     * Adds content into documentation table.
+     * 
      * @return Resolution
-     * @throws DAOException
+     * @throws Exception
      */
     public Resolution addContent() throws Exception {
         if (isUserLoggedIn()) {
@@ -114,15 +113,15 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Deletes content
-     *
+     * 
      * @return Resolution
-     * @throws DAOException
+     * @throws Exception
      */
     public Resolution delete() throws Exception {
 
         if (isUserLoggedIn()) {
             // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
-            if (pageObject != null && pageObject.getDocIds() != null &&  pageObject.getDocIds().size() > 0) {
+            if (pageObject != null && pageObject.getDocIds() != null && pageObject.getDocIds().size() > 0) {
                 DocumentationService.getInstance().delete(pageObject);
             } else {
                 addWarningMessage("No objects selected!");

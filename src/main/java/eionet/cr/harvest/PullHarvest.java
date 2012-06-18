@@ -75,7 +75,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PullHarvest extends BaseHarvest {
@@ -122,7 +122,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param contextSourceDTO
      * @throws DAOException
      */
@@ -245,7 +245,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param noOfTriples
      */
@@ -266,7 +266,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param noOfTriples
      */
@@ -348,7 +348,7 @@ public class PullHarvest extends BaseHarvest {
      * Calculate last harvest date when there is a temporary error with the source. The LAST_HARVEST is not set to current time.
      * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
      * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
-     *
+     * 
      * @param contextSourceDTO - object representing the source with the error.
      * @return the last harvest date + 10 %.
      */
@@ -369,7 +369,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @param responseCode
      * @param exception
@@ -433,10 +433,10 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
-     *
+     * 
      * @param urlConn - connection to the remote source.
      * @return number of triples harvested.
-     *
+     * 
      * @throws IOException
      * @throws DAOException
      * @throws SAXException
@@ -477,7 +477,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param redirectedToUrl
      * @throws DAOException
      */
@@ -529,7 +529,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param sourceDTO
      * @param redirectionSeen
      * @param redirectedToUrl
@@ -559,7 +559,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param file
      * @param contentLoader
      * @return
@@ -575,7 +575,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Download file from remote source to a temporary file locally. Side effect: dds the file size to the metadata to save in the
      * harvester context.
-     *
+     * 
      * @param urlConn - connection to the remote source.
      * @return object representing the temporary file.
      * @throws IOException if the file is not downloadable.
@@ -618,7 +618,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException
      */
     private HttpURLConnection openUrlConnection(String connectUrl) throws MalformedURLException, IOException, DAOException,
-    SAXException, ParserConfigurationException {
+            SAXException, ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -650,8 +650,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -668,7 +668,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param connection
      * @return
      * @throws MalformedURLException
@@ -695,7 +695,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param url
      * @return long
      * @throws DAOException
@@ -716,7 +716,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param harvestSourceUrl
      * @return
      * @throws DAOException
@@ -725,7 +725,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String result = null;
 
@@ -745,7 +745,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Returns RDF format from url connection.
-     *
+     * 
      * @param contentType
      * @return
      */
@@ -776,7 +776,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @return
      */
@@ -791,7 +791,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
+     * 
      * @param urlConn
      * @return
      */

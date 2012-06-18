@@ -21,9 +21,9 @@
 package eionet.cr.common;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class CRRuntimeException extends RuntimeException {
 

@@ -32,9 +32,9 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Creates new dataset/file under given user folder. Imports triples from provided URIs/files.
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public class CreateDataset {
 
@@ -46,8 +46,8 @@ public class CreateDataset {
         this.user = user;
     }
 
-    public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite, String searchCriteria)
-    throws Exception {
+    public void create(String label, String dataset, String folder, List<String> selectedFiles, boolean overwrite,
+            String searchCriteria) throws Exception {
 
         Connection sqlConn = null;
         RepositoryConnection repoConn = null;
@@ -103,8 +103,8 @@ public class CreateDataset {
         }
     }
 
-    private void addMetadata(RepositoryConnection conn, String label, String dataset, String folder, List<String> selectedFiles, String searchCriteria)
-    throws DAOException, RepositoryException {
+    private void addMetadata(RepositoryConnection conn, String label, String dataset, String folder, List<String> selectedFiles,
+            String searchCriteria) throws DAOException, RepositoryException {
 
         if (!StringUtils.isBlank(folder)) {
             // prepare cr:hasFile predicate
@@ -158,13 +158,13 @@ public class CreateDataset {
     private void addSource(RepositoryConnection repConn, Connection conn, String dataset) throws Exception {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(conn, HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
+                .addSourceIgnoreDuplicate(conn, HarvestSourceDTO.create(dataset, false, 0, user.getUserName()));
 
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .insertUpdateSourceMetadata(repConn, dataset, Predicates.CR_LAST_MODIFIED,
-                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(repConn, dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
     }
 
 }

@@ -38,9 +38,9 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public class SearchDAOTest {
 
@@ -56,15 +56,18 @@ public class SearchDAOTest {
 
         PagingRequest pagingRequest = PagingRequest.create(1);
         SearchResultDTO<SubjectDTO> result =
-            DAOFactory.get().getDao(SearchDAO.class).searchByFreeText(
-                    new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT, false, pagingRequest, null);
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByFreeText(new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT,
+                                false, pagingRequest, null);
 
         assertEquals(2, result.getMatchCount());
     }
 
     /**
      * @throws Exception
-     *
+     * 
      */
     @Test
     public void testSearchByTypeAndFilters() throws Exception {
@@ -75,8 +78,8 @@ public class SearchDAOTest {
         List<String> selectedPredicates = null;
 
         SearchResultDTO<SubjectDTO> result =
-            DAOFactory.get().getDao(SearchDAO.class)
-            .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
+                DAOFactory.get().getDao(SearchDAO.class)
+                        .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
 
         assertEquals(3, result.getMatchCount());
     }

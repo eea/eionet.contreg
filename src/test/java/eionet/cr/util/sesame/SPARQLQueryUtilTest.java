@@ -28,7 +28,7 @@ import eionet.cr.util.Bindings;
 
 /**
  * Test SPARQLQueryUtil methods.
- *
+ * 
  * @author Enriko Käsper
  */
 public class SPARQLQueryUtilTest extends TestCase {

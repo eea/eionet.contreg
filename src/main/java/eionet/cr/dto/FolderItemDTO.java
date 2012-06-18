@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Folder item DTO.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class FolderItemDTO implements Comparable<FolderItemDTO> {
@@ -58,7 +58,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is reserved folder.
-     *
+     * 
      * @return
      */
     public boolean isReservedFolder() {
@@ -67,7 +67,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is folder.
-     *
+     * 
      * @return
      */
     public boolean isFolder() {
@@ -76,7 +76,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is file.
-     *
+     * 
      * @return
      */
     public boolean isFile() {
@@ -85,7 +85,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is reserved file.
-     *
+     * 
      * @return
      */
     public boolean isReservedFile() {
@@ -111,8 +111,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -126,8 +125,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -141,8 +139,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(Type type) {
         this.type = type;
@@ -156,8 +153,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
@@ -171,8 +167,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
     }
 
     /**
-     * @param lastModified
-     *            the lastModified to set
+     * @param lastModified the lastModified to set
      */
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;

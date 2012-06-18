@@ -22,13 +22,13 @@
 package eionet.cr.harvest;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class ResponseCodeUtil {
 
     /**
-     *
+     * 
      * @param code
      * @return
      */
@@ -37,7 +37,7 @@ public class ResponseCodeUtil {
     }
 
     /**
-     *
+     * 
      * @param code
      * @return
      */
@@ -46,7 +46,7 @@ public class ResponseCodeUtil {
     }
 
     /**
-     *
+     * 
      * @param code
      * @return
      */
@@ -55,7 +55,7 @@ public class ResponseCodeUtil {
     }
 
     /**
-     *
+     * 
      * @param code
      * @return
      */
@@ -64,7 +64,7 @@ public class ResponseCodeUtil {
     }
 
     /**
-     *
+     * 
      * @param code
      * @return
      */

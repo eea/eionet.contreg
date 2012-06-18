@@ -4,9 +4,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 @UrlBinding(value = "/home/?")

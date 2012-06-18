@@ -34,7 +34,7 @@ import eionet.cr.dao.virtuoso.VirtuosoUserHomeDAO;
 
 /**
  * Tests the factory getDao methods.
- *
+ * 
  * @author altnyris
  */
 public class DaoFactoryTest extends TestCase {

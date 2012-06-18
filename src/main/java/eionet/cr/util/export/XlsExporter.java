@@ -55,7 +55,7 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
 
     /**
      * exports custom search to XLS format.
-     *
+     * 
      * @param customSearch
      * @return
      * @throws IOException

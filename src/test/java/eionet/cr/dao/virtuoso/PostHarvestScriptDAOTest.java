@@ -37,14 +37,15 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- *
- *
+ * 
+ * 
  * @author Enriko Käsper
  */
 public class PostHarvestScriptDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
+     * 
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override
@@ -53,9 +54,9 @@ public class PostHarvestScriptDAOTest extends CRDatabaseTestCase {
     }
 
     String script =
-        "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject a cr:File } FROM ?harvestedSource";
+            "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject a cr:File } FROM ?harvestedSource";
     String script2 =
-        "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject <http://www.w3.org/2000/01/rdf-schema#label> \"new soruce\" } FROM ?harvestedSource";
+            "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject <http://www.w3.org/2000/01/rdf-schema#label> \"new soruce\" } FROM ?harvestedSource";
 
     @Test
     public void testInsert() throws DAOException {

@@ -31,15 +31,15 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.dbunit.DatabaseTestCase#getConnection()
      */
     @Override
@@ -50,13 +50,13 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     protected abstract IDataSet getDataSet() throws Exception;
 
     /**
-     *
+     * 
      * @param fileName
      * @return
      * @throws DataSetException

@@ -26,7 +26,7 @@ import eionet.cr.util.URLUtil;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public class LoadTriplesJob implements Job {
 
@@ -73,8 +73,8 @@ public class LoadTriplesJob implements Job {
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
                 if (source != null) {
                     String triplesCnt =
-                        DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .getHarvestSourceMetadata(uri, Predicates.CR_HARVESTED_STATEMENTS);
+                            DAOFactory.get().getDao(HarvestSourceDAO.class)
+                                    .getHarvestSourceMetadata(uri, Predicates.CR_HARVESTED_STATEMENTS);
                     if (!StringUtils.isBlank(triplesCnt) && Integer.parseInt(triplesCnt) > 0) {
                         triplesExist = true;
                     }

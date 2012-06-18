@@ -23,14 +23,14 @@ package eionet.cr.common;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public interface SubjectProcessor {
 
     /**
-     *
+     * 
      * @param subject
      */
     void process(SubjectDTO subject);

@@ -39,9 +39,9 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDAO {
 
@@ -50,7 +50,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.SpoBinaryDAO#add(eionet.cr.dto.SpoBinaryDTO)
      */
     public void add(SpoBinaryDTO dto) throws DAOException {
@@ -89,7 +89,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.SpoBinaryDAO#get(java.lang.String)
      */
     public SpoBinaryDTO get(String subjectUri) throws DAOException {
@@ -131,7 +131,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.SpoBinaryDAO#exists(java.lang.String)
      */
     public boolean exists(String subjectUri) throws DAOException {
@@ -144,8 +144,8 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         try {
             conn = getSQLConnection();
             Object o =
-                SQLUtil.executeSingleReturnValueQuery(sqlExists,
-                        Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+                    SQLUtil.executeSingleReturnValueQuery(sqlExists,
+                            Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
             return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
@@ -156,7 +156,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.SpoBinaryDAO#delete(java.util.List)
      */
     @Override

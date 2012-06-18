@@ -5,15 +5,15 @@ import org.dbunit.dataset.IDataSet;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class RDFExporterTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {

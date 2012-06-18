@@ -9,9 +9,9 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
 
@@ -19,7 +19,7 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
     private Bindings bindings;
 
     /**
-     *
+     * 
      * @param sourceUrl
      * @param pagingRequest
      * @param sortingRequest
@@ -44,7 +44,7 @@ public class VirtuosoSearchBySourceHelper extends AbstractSearchHelper {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override

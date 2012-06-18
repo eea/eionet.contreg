@@ -74,7 +74,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Folder tab on factsheet page.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/folder.action")
@@ -125,7 +125,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Action event for displaying folder contents.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -151,7 +151,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Displays the renaming form.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -195,7 +195,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Handles the renaming event.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -276,7 +276,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Handles deletion event.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -348,7 +348,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Create new folder.
-     *
+     * 
      * @return Resolution
      * @throws DAOException if DAO method execution fails
      */
@@ -390,7 +390,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                     if (tokens != null && tokens.length == 1) {
                         String aclP = "/project/" + tokens[0];
                         if (!AccessController.getAcls().containsKey(aclP)) {
-                            //KL220512 - anonymous user should not be allowed to add project folders:
+                            // KL220512 - anonymous user should not be allowed to add project folders:
                             AccessController.addAcl(aclP, getUserName(), "");
                         }
                     }
@@ -406,7 +406,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Displays the upload form.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -527,11 +527,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         if (uploadedFile == null) {
             throw new CRRuntimeException("Uploaded file object must not be null");
         }
-        //use folder context as graph uri
+        // use folder context as graph uri
         String graphUri = FolderUtil.folderContext(uri);
         // prepare cr:hasFile predicate
         ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
-        //        objectDTO.setSourceUri(uri);
+        // objectDTO.setSourceUri(uri);
         objectDTO.setSourceUri(graphUri);
         SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
         homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
@@ -549,7 +549,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
 
             objectDTO = new ObjectDTO(titleToStore, true);
-            //objectDTO.setSourceUri(uri);
+            // objectDTO.setSourceUri(uri);
             objectDTO.setSourceUri(graphUri);
             fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
             fileSubjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
@@ -579,8 +579,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory.get().getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+            DAOFactory
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(
+                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -605,7 +608,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Stores file data into filesystem and database.
-     *
+     * 
      * @throws DAOException
      * @throws IOException
      */
@@ -628,8 +631,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             } else {
                 filePath = uploadedFile.getFileName();
             }
-            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous()))
-            .add(filePath, replaceExisting, contentStream);
+            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
+                    contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
@@ -637,7 +640,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Harvests file.
-     *
+     * 
      * @param sourceUrl
      * @param uploadedFile
      * @param dcTitle
@@ -688,7 +691,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Initializes tabs.
-     *
+     * 
      * @throws DAOException
      */
     private void initTabs() throws DAOException {
@@ -705,7 +708,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Returns null, if all the folders from the items are empty. Folder name, if it is not.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -726,7 +729,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Returns null, if all the selected items are not reserved. Returns file or folder name, if it is reserved.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -742,7 +745,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Returns true, if none of the items are marked selected.
-     *
+     * 
      * @return
      */
     private boolean itemsNotSelected() {
@@ -759,7 +762,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * True, if currently logged in user is viewing his home folder or one of sub folders.
-     *
+     * 
      * @return
      */
     public boolean isUsersFolder() {
@@ -772,9 +775,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         return false;
     }
 
-
     /**
      * Renames corresponding ACLs of the renamed folders.
+     * 
      * @param renamings renamings hash keys: old urls, values: new urls
      */
     private void renameAcls(HashMap<String, String> renamings) {
@@ -794,6 +797,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Deletes coresponding ACLs of the deleted items.
+     * 
      * @param uris array of URIs that are deleted
      */
     private void deleteAcls(List<String> uris) {
@@ -819,8 +823,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * Returns current username or "anonymous" if not authenticated.
-     * Can be used if username needs to be stored and anonymous user has been given permissions
+     * Returns current username or "anonymous" if not authenticated. Can be used if username needs to be stored and anonymous user
+     * has been given permissions
+     * 
      * @return username or anonymous
      */
     private String getUserNameOrAnonymous() {
@@ -833,7 +838,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * True, if the folder uri is user's home folder.
-     *
+     * 
      * @return
      */
     public boolean isHomeFolder() {
@@ -842,7 +847,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * True, if the folder uri is project root folder.
-     *
+     * 
      * @return
      */
     public boolean isProjectFolder() {
@@ -851,7 +856,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Returns parent folder uri. If it is home folder uri, current uri is returned.
-     *
+     * 
      * @return
      */
     public String getParentUri() {
@@ -869,8 +874,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -898,8 +902,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param folderItems
-     *            the folderItems to set
+     * @param folderItems the folderItems to set
      */
     public void setFolderItems(List<FolderItemDTO> folderItems) {
         this.folderItems = folderItems;
@@ -913,8 +916,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param selectedItems
-     *            the selectedItems to set
+     * @param selectedItems the selectedItems to set
      */
     public void setSelectedItems(List<RenameFolderItemDTO> selectedItems) {
         this.selectedItems = selectedItems;
@@ -928,8 +930,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -943,8 +944,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param uploadedFile
-     *            the uploadedFile to set
+     * @param uploadedFile the uploadedFile to set
      */
     public void setUploadedFile(FileBean uploadedFile) {
         this.uploadedFile = uploadedFile;
@@ -958,8 +958,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param replaceExisting
-     *            the replaceExisting to set
+     * @param replaceExisting the replaceExisting to set
      */
     public void setReplaceExisting(boolean replaceExisting) {
         this.replaceExisting = replaceExisting;
@@ -973,8 +972,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param renameItems
-     *            the renameItems to set
+     * @param renameItems the renameItems to set
      */
     public void setRenameItems(List<RenameFolderItemDTO> renameItems) {
         this.renameItems = renameItems;
@@ -988,8 +986,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param label
-     *            the label to set
+     * @param label the label to set
      */
     public void setLabel(String label) {
         this.label = label;

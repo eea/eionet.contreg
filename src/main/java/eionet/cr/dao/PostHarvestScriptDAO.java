@@ -32,13 +32,13 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Pair;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public interface PostHarvestScriptDAO extends DAO {
 
     /**
-     *
+     * 
      * @param targetType
      * @param targetUrl
      * @return
@@ -47,7 +47,7 @@ public interface PostHarvestScriptDAO extends DAO {
     List<PostHarvestScriptDTO> list(PostHarvestScriptDTO.TargetType targetType, String targetUrl) throws DAOException;
 
     /**
-     *
+     * 
      * @param targetType
      * @param targetUrl
      * @return
@@ -56,7 +56,7 @@ public interface PostHarvestScriptDAO extends DAO {
     List<PostHarvestScriptDTO> listActive(PostHarvestScriptDTO.TargetType targetType, String targetUrl) throws DAOException;
 
     /**
-     *
+     * 
      * @param types
      * @return
      * @throws DAOException
@@ -64,7 +64,7 @@ public interface PostHarvestScriptDAO extends DAO {
     List<PostHarvestScriptDTO> listActiveForTypes(List<String> types) throws DAOException;
 
     /**
-     *
+     * 
      * @param id
      * @return
      * @throws DAOException
@@ -72,14 +72,13 @@ public interface PostHarvestScriptDAO extends DAO {
     PostHarvestScriptDTO fetch(int id) throws DAOException;
 
     /**
-     *
+     * 
      * @param targetType
      * @param targetUrl
      * @param title
      * @param script
      * @param active
-     * @param runOnce
-     *            TODO
+     * @param runOnce TODO
      * @return
      * @throws DAOException
      */
@@ -87,33 +86,32 @@ public interface PostHarvestScriptDAO extends DAO {
             throws DAOException;
 
     /**
-     *
+     * 
      * @param id
      * @param title
      * @param script
      * @param active
-     * @param runOnce
-     *            TODO
+     * @param runOnce TODO
      * @throws DAOException
      */
     void save(int id, String title, String script, boolean active, boolean runOnce) throws DAOException;
 
     /**
-     *
+     * 
      * @param ids
      * @throws DAOException
      */
     void delete(List<Integer> ids) throws DAOException;
 
     /**
-     *
+     * 
      * @param ids
      * @throws DAOException
      */
     void activateDeactivate(List<Integer> ids) throws DAOException;
 
     /**
-     *
+     * 
      * @param targetType
      * @return
      * @throws DAOException
@@ -125,11 +123,11 @@ public interface PostHarvestScriptDAO extends DAO {
      * integer. Any negative integer is considered as moving up (e.g. position 3 becomes 2), any positive integer is considered
      * moving down (e.g. position 3 becomes 4). The absolute value of the direction is ignored, as the moving is always done by one
      * step only (i.e. direction of -3 does not mean that the moving will be done 3 steps up). A direction of 0 is illegal.
-     *
+     * 
      * Scripts are identified by the given target type, target URL and script ids. If the ids are null or empty, the method returns
      * immediately without doing anything. Target type and target url can be null or blank, in which case the method operates on
      * all-source scripts.
-     *
+     * 
      * @param targetType
      * @param targetUrl
      * @param ids
@@ -139,7 +137,7 @@ public interface PostHarvestScriptDAO extends DAO {
     void move(TargetType targetType, String targetUrl, Set<Integer> selectedIds, int direction) throws DAOException;
 
     /**
-     *
+     * 
      * @param targetType
      * @param targetUrl
      * @param title
@@ -149,14 +147,14 @@ public interface PostHarvestScriptDAO extends DAO {
     boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException;
 
     /**
-     *
+     * 
      * @param query
      * @return
      */
     List<Map<String, ObjectDTO>> test(String query) throws DAOException;
 
     /**
-     *
+     * 
      * @param constructQuery
      * @param targetType
      * @param targetUrl
@@ -171,11 +169,9 @@ public interface PostHarvestScriptDAO extends DAO {
      * Checks if there are any post-harvest scripts, that are modified later than last harvest of given harvest source was done. It
      * checks all the all-source scripts, all type-specific scripts and source-specific scripts that are bound to the given harvest
      * source.
-     *
-     * @param lastHarvestDate
-     *            date of the last harvest of the harvest source
-     * @param harvestSource
-     *            harvest source
+     * 
+     * @param lastHarvestDate date of the last harvest of the harvest source
+     * @param harvestSource harvest source
      * @return true, if scripts have been modified since the last harvest
      * @throws DAOException
      */

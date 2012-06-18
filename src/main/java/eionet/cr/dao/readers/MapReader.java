@@ -12,15 +12,15 @@ import org.openrdf.query.BindingSet;
 /**
  * Generic Reader iterates through resultset rows and stores the query result as Map object, where keys are bindingNames (aliases in
  * query).
- *
+ * 
  * @author Enriko Käsper
- *
+ * 
  */
 public class MapReader extends ResultSetMixedReader<Map<String, String>> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -30,7 +30,7 @@ public class MapReader extends ResultSetMixedReader<Map<String, String>> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

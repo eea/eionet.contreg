@@ -39,14 +39,14 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * User home folder methods in Virtuoso.
- *
+ * 
  * @author Enriko Käsper
  */
 public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.UserHomeDAO#getFolderContents(java.lang.String)
      */
     @Override
@@ -75,7 +75,7 @@ public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO 
 
             // only these predicates will be queried for
             String[] neededPredicates =
-            {Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE, Predicates.CR_HAS_FOLDER};
+                    {Predicates.RDFS_LABEL, Predicates.RDF_TYPE, Predicates.CR_HAS_FILE, Predicates.CR_HAS_FOLDER};
 
             if (selectedPredicates != null && selectedPredicates.size() > 0) {
                 neededPredicates = selectedPredicates.toArray(neededPredicates);

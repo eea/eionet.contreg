@@ -28,14 +28,14 @@ import java.util.Map;
 import eionet.cr.util.Util;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class PredicateLabels extends HashMap<String, HashMap<String, HashSet<String>>> {
 
     /**
-     *
+     * 
      * @param predicate
      * @param label
      * @param language
@@ -59,7 +59,7 @@ public class PredicateLabels extends HashMap<String, HashMap<String, HashSet<Str
     }
 
     /**
-     *
+     * 
      * @param languages
      * @return
      */

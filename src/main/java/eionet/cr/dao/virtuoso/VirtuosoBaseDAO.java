@@ -28,9 +28,9 @@ import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.WebConstants;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public abstract class VirtuosoBaseDAO {
 
@@ -42,7 +42,7 @@ public abstract class VirtuosoBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     *
+     * 
      * @return
      */
     protected Connection getSQLConnection() throws SQLException {
@@ -51,7 +51,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     *
+     * 
      * @param graphUri
      * @throws DAOException
      */
@@ -69,7 +69,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param bindings
@@ -92,7 +92,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sparql
      * @param reader
@@ -107,15 +107,11 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL query that updates data.
-     *
-     * @param sparql
-     *            SPARQL
-     * @param bindings
-     *            Query bindings, if no bindings, null is accepted as the value
-     * @param conn
-     *            Virtuoso repository connection
-     * @throws DAOException
-     *             if update fails
+     * 
+     * @param sparql SPARQL
+     * @param bindings Query bindings, if no bindings, null is accepted as the value
+     * @param conn Virtuoso repository connection
+     * @throws DAOException if update fails
      */
     protected void executeSPARUL(String sparql, Bindings bindings, RepositoryConnection conn) throws DAOException {
         try {
@@ -126,7 +122,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     *
+     * 
      * @param sparul
      * @param defautGraphUri
      * @return
@@ -149,14 +145,13 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL with no bindings that is expected to have only one result and returns the unique value.
-     *
+     * 
      * @param <T>
      * @param sql
      * @param params
      * @param reader
      * @return
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     protected <T> T executeUniqueResultSPARQL(String sql, SPARQLResultSetReader<T> reader) throws DAOException {
 
@@ -165,16 +160,14 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL that is expected to have only one result and returns the unique value.
-     *
+     * 
      * @param <T>
      * @param sparql
-     * @param bindings
-     *            Binding values for the prepared SPARQL
+     * @param bindings Binding values for the prepared SPARQL
      * @param params
      * @param reader
      * @return
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     protected <T> T executeUniqueResultSPARQL(String sparql, Bindings bindings, SPARQLResultSetReader<T> reader)
             throws DAOException {
@@ -184,15 +177,11 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * @param subjectUris
-     *            subject URIs
-     * @param predicateUris
-     *            array of needed predicate URIs
-     * @param reader
-     *            subject reader
+     * @param subjectUris subject URIs
+     * @param predicateUris array of needed predicate URIs
+     * @param reader subject reader
      * @return List<SubjectDTO> list of Subject data objects
-     * @throws DAOException
-     *             Default call of getSubjectsData() - SubjectDTO are created if not existing
+     * @throws DAOException Default call of getSubjectsData() - SubjectDTO are created if not existing
      */
     protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader)
             throws DAOException {
@@ -203,18 +192,13 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Returns list of Data objects of given subjects for given predicates.
-     *
-     * @param subjectUris
-     *            list of subject URIs
-     * @param predicateUris
-     *            array of predicates which data is requested
-     * @param reader
-     *            bindingset reader
-     * @param createMissingDTOs
-     *            indicates if to create a SubjectDTO object if it does not exist
+     * 
+     * @param subjectUris list of subject URIs
+     * @param predicateUris array of predicates which data is requested
+     * @param reader bindingset reader
+     * @param createMissingDTOs indicates if to create a SubjectDTO object if it does not exist
      * @return List<SubjectDTO> list of Subject data objects
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
     protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader,
             boolean createMissingDTOs) throws DAOException {
@@ -246,16 +230,13 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Returns a SPARQL query that will retrieve the given subjects' given predicates. Predicates and graphs are optional.
-     *
+     * 
      * For very long objects, only first 2000 characters will be returned, to prevent VirtuosoException: SR319: Max row length
      * exceeded exception (temp col)
-     *
-     * @param subjectUris
-     *            - collection of subjects whose data is being queried
-     * @param predicateUris
-     *            - array of predicates that are queried (if null or empty, no predicate filter is applied)
-     * @param bindings
-     *            - SPARQL variable bindings to fill when building the returned query
+     * 
+     * @param subjectUris - collection of subjects whose data is being queried
+     * @param predicateUris - array of predicates that are queried (if null or empty, no predicate filter is applied)
+     * @param bindings - SPARQL variable bindings to fill when building the returned query
      * @return String the SPARQL query
      */
     private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris, Bindings bindings) {
@@ -267,7 +248,7 @@ public abstract class VirtuosoBaseDAO {
         String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
         String query =
                 "select ?g ?s ?p bif:either(isLiteral(?obj), bif:left(str(?obj)," + WebConstants.MAX_OBJECT_LENGTH
-                + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
+                        + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
@@ -281,9 +262,8 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Count the total number of rows retrieved by the query constructed in SearchHelper.
-     *
-     * @param helper
-     *            SearchHelper object.
+     * 
+     * @param helper SearchHelper object.
      * @return number of rows
      * @throws DAOException
      */
@@ -297,9 +277,8 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Count the total number of rows retrieved by the query constructed in SearchHelper.
-     *
-     * @param helper
-     *            SearchHelper object.
+     * 
+     * @param helper SearchHelper object.
      * @param inParams
      * @return number of rows
      * @throws DAOException
@@ -312,15 +291,11 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
-     *
-     * @param <T>
-     *            - type of the returned object
-     * @param sql
-     *            - sql string
-     * @param params
-     *            - parameters to insert into sql string
-     * @param reader
-     *            - reader, to convert resultset
+     * 
+     * @param <T> - type of the returned object
+     * @param sql - sql string
+     * @param params - parameters to insert into sql string
+     * @param reader - reader, to convert resultset
      * @return result of the sql query
      * @throws DAOException
      */
@@ -340,11 +315,9 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * executes insert or update with given sql and parameters.
-     *
-     * @param sql
-     *            - sql string to execute
-     * @param params
-     *            - sql params
+     * 
+     * @param sql - sql string to execute
+     * @param params - sql params
      * @throws DAOException
      */
     protected void executeSQL(String sql, List<?> params) throws DAOException {
@@ -367,7 +340,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param sql
      * @param params
@@ -382,7 +355,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Orders the map the same way as subjectUris list is ordered. Returns new list.
-     *
+     * 
      * @param <T>
      * @param subjectUris
      * @param map

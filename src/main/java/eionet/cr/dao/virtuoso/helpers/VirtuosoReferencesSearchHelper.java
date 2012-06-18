@@ -12,9 +12,9 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
@@ -29,13 +29,10 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * Creates a new helper object.
-     *
-     * @param subjectUri
-     *            resource subject URI.
-     * @param pagingRequest
-     *            paging request from the UI
-     * @param sortingRequest
-     *            sorting request for theresults table
+     * 
+     * @param subjectUri resource subject URI.
+     * @param pagingRequest paging request from the UI
+     * @param sortingRequest sorting request for theresults table
      */
     public VirtuosoReferencesSearchHelper(String subjectUri, PagingRequest pagingRequest, SortingRequest sortingRequest) {
 
@@ -48,13 +45,14 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
-        String sparql = "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=" + (isValidIRI ? "?subjectUri"
-                :  "IRI(?subjectUri)")  + ")";
+        String sparql =
+                "select distinct ?s where {?s ?p ?o. filter(isURI(?o) && ?o=" + (isValidIRI ? "?subjectUri" : "IRI(?subjectUri)")
+                        + ")";
 
         if (sortPredicate != null && (Predicates.RDFS_LABEL.equals(sortPredicate) || Predicates.RDF_TYPE.equals(sortPredicate))) {
             sparql += " . OPTIONAL {?s ?sortPredicate ?oorderby }";
@@ -89,8 +87,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
-        return (isValidIRI ?  REFERENCES_UNORDERED_SPARQL
-                : SPARQLQueryUtil.parseIRIQuery(REFERENCES_UNORDERED_SPARQL, "subjectUri"));
+        return (isValidIRI ? REFERENCES_UNORDERED_SPARQL : SPARQLQueryUtil
+                .parseIRIQuery(REFERENCES_UNORDERED_SPARQL, "subjectUri"));
     }
 
     /**
@@ -108,11 +106,9 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * returns sparql query for getting predicates for reference subjects.
-     *
-     * @param subjectUris
-     *            subject uris of the references
-     * @param sourceUri
-     *            resource subject URI.
+     * 
+     * @param subjectUris subject uris of the references
+     * @param sourceUri resource subject URI.
      * @return SPARQL query for getting subjects data.
      */
     public String getSubjectsDataQuery(Collection<String> subjectUris, String sourceUri) {
@@ -126,7 +122,8 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         String sourceUriBinding = (isValidIRI ? "?sourceUri" : "IRI(?sourceUri)");
         String sparql =
                 "select * where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-                        + Predicates.RDF_TYPE + "> || <" + Predicates.RDFS_LABEL + "> || (isURI(?o) && ?o=" + sourceUriBinding + "))}} ORDER BY ?s";
+                        + Predicates.RDF_TYPE + "> || <" + Predicates.RDFS_LABEL + "> || (isURI(?o) && ?o=" + sourceUriBinding
+                        + "))}} ORDER BY ?s";
 
         return sparql;
     }
@@ -138,7 +135,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * Bindings to be used in subjects data query. For safety are kept separately from main query bindings
-     *
+     * 
      * @return bindings for subject data query
      */
     public Bindings getSubjectDataBindings() {

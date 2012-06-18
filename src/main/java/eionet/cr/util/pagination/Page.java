@@ -21,9 +21,9 @@
 package eionet.cr.util.pagination;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class Page {
 
@@ -40,8 +40,7 @@ public class Page {
     }
 
     /**
-     * @param number
-     *            the number to set
+     * @param number the number to set
      */
     public void setNumber(int number) {
         this.number = number;
@@ -55,8 +54,7 @@ public class Page {
     }
 
     /**
-     * @param selected
-     *            the selected to set
+     * @param selected the selected to set
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
@@ -70,7 +68,7 @@ public class Page {
     }
 
     /**
-     *
+     * 
      * @param href
      */
     public void setHref(String href) {

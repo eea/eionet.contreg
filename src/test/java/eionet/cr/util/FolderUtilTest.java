@@ -24,9 +24,9 @@ import junit.framework.TestCase;
 import eionet.cr.config.GeneralConfig;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class FolderUtilTest extends TestCase {
 
@@ -44,10 +44,9 @@ public class FolderUtilTest extends TestCase {
         assertFalse(FolderUtil.startsWithUserHome(appHomeUrl));
         assertFalse(FolderUtil.startsWithUserHome(""));
         assertFalse(FolderUtil.startsWithUserHome(" "));
-        try{
+        try {
             assertFalse(FolderUtil.startsWithUserHome(null));
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             fail("Wasn't expecting this exception: " + e.toString());
         }
     }
@@ -55,12 +54,11 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
-    public void testExtarctUserName(){
+    public void testExtarctUserName() {
 
-        try{
+        try {
             assertEquals(null, FolderUtil.extractUserName(null));
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             fail("Wasn't expecting this exception: " + e.toString());
         }
 
@@ -81,9 +79,9 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
-    public void testIsUserReservedUri(){
+    public void testIsUserReservedUri() {
 
-        try{
+        try {
             assertFalse(FolderUtil.isUserReservedUri(null));
             assertFalse(FolderUtil.isUserReservedUri(""));
             assertFalse(FolderUtil.isUserReservedUri(" "));
@@ -97,8 +95,7 @@ public class FolderUtilTest extends TestCase {
             assertFalse(FolderUtil.isUserReservedUri(appHomeUrl + "/home/heinlja/"));
             assertFalse(FolderUtil.isUserReservedUri(appHomeUrl + "/home/heinlja"));
             assertFalse(FolderUtil.isUserReservedUri(appHomeUrl + "/home/"));
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             fail("Wasn't expecting this exception: " + e.toString());
         }
     }

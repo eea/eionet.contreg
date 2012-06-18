@@ -48,7 +48,7 @@ import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class FileToRdfProcessor {
@@ -63,7 +63,7 @@ public class FileToRdfProcessor {
     private String contextUrl;
 
     /**
-     *
+     * 
      * @param file
      * @param contextUrl
      */
@@ -78,7 +78,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     *
+     * 
      * @param messageObject
      * @return
      */
@@ -87,7 +87,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws IOException
      * @throws SAXException
@@ -136,7 +136,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     *
+     * 
      * @param file
      * @return
      */
@@ -160,7 +160,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     *
+     * 
      * @param file
      * @return
      * @throws IOException
@@ -194,7 +194,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     *
+     * 
      * @param conversionSchema
      * @return
      * @throws SAXException
@@ -214,14 +214,13 @@ public class FileToRdfProcessor {
         }
 
         // If no conversion was found by the file's URL, look by the given conversion schema
-        if (StringUtils.isBlank(conversionId)){
+        if (StringUtils.isBlank(conversionId)) {
             try {
                 conversionId = ConversionsParser.parseForSchema(conversionSchema).getRdfConversionId();
             } catch (ParserConfigurationException e) {
                 throw new CRRuntimeException("SAX parser configuration error");
             }
-        }
-        else{
+        } else {
             LOGGER.trace(loggerMsg("Found conversion by the file's URL"));
         }
 

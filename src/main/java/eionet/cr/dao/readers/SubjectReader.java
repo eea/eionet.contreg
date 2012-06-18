@@ -29,9 +29,9 @@ import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class SubjectReader extends ResultSetMixedReader<String> {
 
@@ -40,7 +40,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
      */
     public List<String> getResultList() {
@@ -49,7 +49,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -57,7 +57,7 @@ public class SubjectReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override

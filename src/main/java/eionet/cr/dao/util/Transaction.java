@@ -31,9 +31,9 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class Transaction {
 
@@ -55,7 +55,7 @@ public class Transaction {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -103,7 +103,7 @@ public class Transaction {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param implementedInterface
      * @return

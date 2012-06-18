@@ -31,7 +31,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * DAO methods for compiled datasets in Virtuoso.
- *
+ * 
  * @author altnyris
  */
 public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements CompiledDatasetDAO {
@@ -53,20 +53,17 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
             query.append("OPTIONAL {?s <").append(Predicates.DC_TITLE).append("> ?title } ");
             query.append("} ORDER BY ?s");
 
-            /*StringBuffer query = new StringBuffer();
-            query.append("select ?s ?o ?title count(?s1) ?triplesCnt where {");
-            query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
-            query.append("filter(?s IN (").append(SPARQLQueryUtil.urisToCSV(deliveryUris)).append("))");
-            query.append("OPTIONAL {?o <").append(Predicates.CR_HARVESTED_STATEMENTS).append("> ?triplesCnt}");
-            query.append("OPTIONAL {");
-            query.append("?o ?p ?title .");
-            query.append("filter (?p IN (<").append(Predicates.DC_TITLE).append(">,");
-            query.append("<").append(Predicates.DCTERMS_TITLE).append(">,");
-            query.append("<").append(Predicates.RDFS_LABEL).append(">))");
-            query.append("}");
-            query.append("graph ?o {");
-            query.append("?s1 ?p1 ?o1");
-            query.append("}} ORDER BY ?s");*/
+            /*
+             * StringBuffer query = new StringBuffer(); query.append("select ?s ?o ?title count(?s1) ?triplesCnt where {");
+             * query.append("?s <").append(Predicates.ROD_HAS_FILE).append("> ?o . ");
+             * query.append("filter(?s IN (").append(SPARQLQueryUtil.urisToCSV(deliveryUris)).append("))");
+             * query.append("OPTIONAL {?o <").append(Predicates.CR_HARVESTED_STATEMENTS).append("> ?triplesCnt}");
+             * query.append("OPTIONAL {"); query.append("?o ?p ?title .");
+             * query.append("filter (?p IN (<").append(Predicates.DC_TITLE).append(">,");
+             * query.append("<").append(Predicates.DCTERMS_TITLE).append(">,");
+             * query.append("<").append(Predicates.RDFS_LABEL).append(">))"); query.append("}"); query.append("graph ?o {");
+             * query.append("?s1 ?p1 ?o1"); query.append("}} ORDER BY ?s");
+             */
 
             ret = executeSPARQL(query.toString(), new DeliveryFilesReader());
         }

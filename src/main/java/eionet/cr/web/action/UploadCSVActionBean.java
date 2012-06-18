@@ -69,9 +69,9 @@ import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
- *
+ * 
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -139,7 +139,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -171,7 +171,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Save the file into user's file-store.
             long fileSize = fileBean.getSize();
             relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
-            //FileStore fileStore = FileStore.getInstance(getUserName());
+            // FileStore fileStore = FileStore.getInstance(getUserName());
             FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
@@ -196,7 +196,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution save() {
@@ -232,17 +232,16 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
-    @ValidationMethod(on = { UPLOAD_EVENT, SAVE_EVENT })
+    @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
     public void validatePostEvent() throws DAOException {
 
         // the below validation is relevant only when the event is requested through POST method
         if (!isPostRequest()) {
             return;
         }
-
 
         // for all the above POST events, user must be authorized
         String aclPath = FolderUtil.extractAclPath(folderUri);
@@ -270,8 +269,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 addGlobalValidationError("No file name specified!");
             }
 
-            //File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
-            File file  =  FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
+            // File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+            File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
             if (file == null || !file.exists()) {
                 addGlobalValidationError("Could not find stored file!");
             }
@@ -296,7 +295,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param csvReader
      * @throws IOException
      * @throws DAOException
@@ -452,7 +451,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param line
      * @return
      */
@@ -476,7 +475,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     private void preloadWizardInputs() throws DAOException {
@@ -511,7 +510,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @throws IOException
      * @throws RepositoryException
      * @throws DAOException
-     *
+     * 
      */
     private void saveWizardInputs() throws DAOException, RepositoryException, IOException {
 
@@ -529,7 +528,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param csvReader
      */
     private void close(CSVReader csvReader) {
@@ -543,14 +542,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     private void linkFileToFolder() throws DAOException {
 
         // prepare "folder hasFile file" statement
         ObjectDTO fileObject = ObjectDTO.createResource(fileUri);
-        //        fileObject.setSourceUri(folderUri);
+        // fileObject.setSourceUri(folderUri);
         String folderContext = FolderUtil.folderContext(folderUri);
         fileObject.setSourceUri(folderContext);
         SubjectDTO folderSubject = new SubjectDTO(folderUri, false);
@@ -563,14 +562,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // since folder URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
-        //        HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
+        // HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
         HarvestSourceDTO folderHarvestSource =
                 HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
     }
 
     /**
-     *
+     * 
      * @param fileSize
      * @throws Exception
      */
@@ -596,7 +595,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private CSVReader createCSVReader(boolean guessEncoding) throws IOException {
 
         CSVReader result = null;
-        //File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
+        // File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
         File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
         if (file != null && file.exists()) {
             if (guessEncoding) {
@@ -611,7 +610,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param strings
      */
     private static String[] trimAll(String[] strings) {
@@ -739,15 +738,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setFolderUri(String uri) {
         this.folderUri = uri;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public char getDelimiter() {
@@ -762,8 +760,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fileName
-     *            the fileName to set
+     * @param fileName the fileName to set
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;

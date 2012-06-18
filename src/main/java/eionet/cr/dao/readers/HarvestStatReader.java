@@ -30,7 +30,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * Harvest statistics result set reader.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class HarvestStatReader extends SQLResultSetBaseReader<HarvestStatDTO> {

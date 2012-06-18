@@ -46,9 +46,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.factsheet.CompiledDatasetActionBean;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 @UrlBinding("/saveFiles.action")
 public class SaveFilesActionBean extends DisplaytagSearchActionBean {
@@ -331,8 +331,7 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * @param searchCriteria
-     *            the searchCriteria to set
+     * @param searchCriteria the searchCriteria to set
      */
     public void setSearchCriteria(String searchCriteria) {
         this.searchCriteria = searchCriteria;

@@ -21,14 +21,14 @@
 package eionet.cr.dao;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public abstract class DAOFactory {
 
     /**
-     *
+     * 
      * @return DAOFactory
      * @throws DAOException
      */
@@ -38,7 +38,7 @@ public abstract class DAOFactory {
     }
 
     /**
-     *
+     * 
      * @param <T>
      * @param implementedInterface
      * @return <T extends DAO>

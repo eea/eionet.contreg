@@ -42,7 +42,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#generateNewReviewId(eionet.cr.web.security.CRUser )
      */
     @Override
@@ -78,14 +78,14 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getHomeUri(), true, 0, user.getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getHomeUri(), true, 0, user.getUserName()));
 
         return newId;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getLastReviewId(eionet.cr.web.security.CRUser)
      */
     @Override
@@ -108,7 +108,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#addReview(eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
@@ -117,7 +117,6 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         insertReviewToDB(review, user, reviewId);
         return reviewId;
     }
-
 
     private void insertReviewToDB(ReviewDTO review, CRUser user, int reviewId) throws DAOException {
 
@@ -160,12 +159,12 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
         // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(userReviewUri, true, 0, user.getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(userReviewUri, true, 0, user.getUserName()));
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#saveReview(int, eionet.cr.dto.ReviewDTO, eionet.cr.web.security.CRUser)
      */
     @Override
@@ -175,16 +174,12 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     }
 
-    private static final String USER_REVIEWS_SPARQL = "select ?s ?p ?o where { " +
-    "?s ?p ?o. { " +
-    "select distinct ?s where { " +
-    "?s ?type ?feedback. " +
-    "?s ?user ?userHomeUri " +
-    "}}} order by ?s ?p ?o";
+    private static final String USER_REVIEWS_SPARQL = "select ?s ?p ?o where { " + "?s ?p ?o. { " + "select distinct ?s where { "
+            + "?s ?type ?feedback. " + "?s ?user ?userHomeUri " + "}}} order by ?s ?p ?o";
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReviewList(eionet.cr.web.security.CRUser)
      */
     @Override
@@ -238,7 +233,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReview(eionet.cr.web.security.CRUser, int)
      */
     @Override
@@ -253,7 +248,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /**
      * Get title and feedbackFor reference for a review.
-     *
+     * 
      * @param reviewUri - URI of review.
      * @return ReviewDTO
      * @throws DAOException if query fails
@@ -301,18 +296,15 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.ReviewsDAO#isReviewObsolete(java.util.String reviewUri, java.util.String objectUri)
      */
     @Override
     public boolean isReviewObsolete(String reviewUri, String objectUri) throws DAOException {
 
         boolean ret = true;
-        String query = "ASK where {" +
-        "?objectUri ?pred ?date1 ." +
-        "?reviewUri ?pred ?date2 ." +
-        "FILTER (?date2 >= ?date1) " +
-        "}";
+        String query =
+                "ASK where {" + "?objectUri ?pred ?date1 ." + "?reviewUri ?pred ?date2 ." + "FILTER (?date2 >= ?date1) " + "}";
 
         RepositoryConnection con = null;
         try {
@@ -344,7 +336,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getReviewAttachmentList(eionet.cr.web.security .CRUser, int)
      */
     @Override
@@ -361,7 +353,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteReview(eionet.cr.web.security.CRUser, int, boolean)
      */
     @Override
@@ -396,7 +388,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
             conn.remove(sub, pred, null, context);
 
             // Remove cross-link
-            String sparql = "select ?s where {?s <" + Predicates.CR_HAS_FEEDBACK + "> <"+reviewSubjectURI+">}";
+            String sparql = "select ?s where {?s <" + Predicates.CR_HAS_FEEDBACK + "> <" + reviewSubjectURI + ">}";
             String reviewObject = executeUniqueResultSPARQL(sparql, new SingleObjectReader<String>());
             if (!StringUtils.isBlank(reviewObject)) {
                 URI reviewObjectSub = conn.getValueFactory().createURI(reviewObject);
@@ -420,7 +412,7 @@ public class VirtuosoReviewsDAO extends VirtuosoBaseDAO implements ReviewsDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#deleteAttachment(eionet.cr.web.security.CRUser, int, java.lang.String)
      */
     @Override

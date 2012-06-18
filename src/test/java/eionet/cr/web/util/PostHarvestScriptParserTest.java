@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import eionet.cr.web.action.admin.postHarvest.ScriptParseException;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PostHarvestScriptParserTest extends TestCase {
@@ -38,7 +38,7 @@ public class PostHarvestScriptParserTest extends TestCase {
     private String harvestedSource = "?" + HARVESTED_SOURCE_VARIABLE;
 
     /**
-     *
+     * 
      * @throws ScriptParseException
      */
     public void testDeriveConstructFromModify() throws ScriptParseException {
@@ -75,7 +75,7 @@ public class PostHarvestScriptParserTest extends TestCase {
     }
 
     /**
-     *
+     * 
      * @throws ScriptParseException
      */
     public void testDeriveConstructFromInsert() throws ScriptParseException {
@@ -112,7 +112,7 @@ public class PostHarvestScriptParserTest extends TestCase {
     }
 
     /**
-     *
+     * 
      * @throws ScriptParseException
      */
     public void testDeriveConstructFromDelete() throws ScriptParseException {

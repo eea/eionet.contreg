@@ -27,8 +27,6 @@ import junit.framework.TestCase;
  * Test for GeneralConfig methods.
  */
 
-
-
 public class GeneralConfigTest extends TestCase {
 
     public static void testGetIntPropertyCorrect() {

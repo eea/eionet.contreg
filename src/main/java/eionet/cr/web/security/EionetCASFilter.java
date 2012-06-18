@@ -41,9 +41,9 @@ import edu.yale.its.tp.cas.client.filter.CASFilter;
 import eionet.cr.web.util.CrCasFilterConfig;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class EionetCASFilter extends CASFilter {
 
@@ -53,7 +53,7 @@ public class EionetCASFilter extends CASFilter {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see edu.yale.its.tp.cas.client.filter.CASFilter#init(javax.servlet.FilterConfig)
      */
     public void init(FilterConfig config) throws ServletException {
@@ -68,7 +68,7 @@ public class EionetCASFilter extends CASFilter {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see edu.yale.its.tp.cas.client.filter.CASFilter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
      * javax.servlet.FilterChain)
      */
@@ -105,7 +105,7 @@ public class EionetCASFilter extends CASFilter {
     }
 
     /**
-     *
+     * 
      * @param request
      * @return
      */
@@ -114,7 +114,7 @@ public class EionetCASFilter extends CASFilter {
     }
 
     /**
-     *
+     * 
      * @param req
      * @param forSubscription
      * @return
@@ -137,17 +137,17 @@ public class EionetCASFilter extends CASFilter {
     }
 
     /**
-     *
+     * 
      * @param request
      * @return
      */
     public static String getCASLogoutURL(HttpServletRequest request) {
         return casLoginUrl.replaceFirst("/login", "/logout") + "?url=" + request.getScheme() + "://" + serverName
-        + request.getContextPath();
+                + request.getContextPath();
     }
 
     /**
-     *
+     * 
      * @param request
      * @return
      */
@@ -156,7 +156,7 @@ public class EionetCASFilter extends CASFilter {
     }
 
     /**
-     *
+     * 
      * @param aRegexFragment
      * @return
      */
@@ -212,9 +212,9 @@ public class EionetCASFilter extends CASFilter {
 }
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 class CASFilterChain implements FilterChain {
 

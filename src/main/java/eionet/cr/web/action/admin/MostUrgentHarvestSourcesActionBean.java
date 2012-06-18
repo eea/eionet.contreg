@@ -13,10 +13,10 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- * Action bean that lists the top N most urgent harvest sources.
- * It differs from the {@link HarvestSourceDAO#getNextScheduledSources(int)} functionality
- * in that it also lists sources where the harvest urgency score is less than 1.
- *
+ * Action bean that lists the top N most urgent harvest sources. It differs from the
+ * {@link HarvestSourceDAO#getNextScheduledSources(int)} functionality in that it also lists sources where the harvest urgency score
+ * is less than 1.
+ * 
  * @author Jaak Kapten
  * @author Jaanus Heinlaid
  */

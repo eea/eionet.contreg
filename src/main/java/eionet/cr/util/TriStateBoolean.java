@@ -21,9 +21,9 @@
 package eionet.cr.util;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public enum TriStateBoolean {
 

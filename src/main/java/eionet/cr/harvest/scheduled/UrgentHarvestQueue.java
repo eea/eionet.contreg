@@ -35,9 +35,9 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UrgentHarvestQueue {
 
@@ -46,9 +46,8 @@ public class UrgentHarvestQueue {
 
     /**
      * Adds a pull-harvest to the urgent queue.
-     *
-     * @param url
-     *            URL to put on the queue
+     * 
+     * @param url URL to put on the queue
      * @throws HarvestException
      */
     public static synchronized void addPullHarvest(String url) throws HarvestException {
@@ -57,7 +56,7 @@ public class UrgentHarvestQueue {
     }
 
     /**
-     *
+     * 
      * @param urls
      * @throws HarvestException
      */
@@ -83,10 +82,9 @@ public class UrgentHarvestQueue {
 
     /**
      * Adds a push-harvest to the urgent queue. Since it is pushed, the content is already provided.
-     *
+     * 
      * @param pushContent
-     * @param url
-     *            URL to register it on
+     * @param url URL to register it on
      * @throws HarvestException
      */
     public static synchronized void addPushHarvest(String pushContent, String url) throws HarvestException {
@@ -104,7 +102,7 @@ public class UrgentHarvestQueue {
     }
 
     /**
-     *
+     * 
      * @return UrgentHarvestQueueItemDTO
      * @throws DAOException
      */
@@ -114,7 +112,7 @@ public class UrgentHarvestQueue {
     }
 
     /**
-     *
+     * 
      * @return boolean
      * @throws DAOException
      */

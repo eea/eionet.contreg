@@ -16,9 +16,9 @@ import eionet.cr.util.URIUtil;
 
 /**
  * Reads delivery files from Resultset.
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> {
 
@@ -26,11 +26,9 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
 
     /**
      * converts Bindingset row to DeliveryFilesDTO.
-     *
-     * @param bindingSet
-     *            BindingSet
-     * @throws ResultSetReaderException
-     *             if error in reading
+     * 
+     * @param bindingSet BindingSet
+     * @throws ResultSetReaderException if error in reading
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {
@@ -54,7 +52,8 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
                     if (!StringUtils.isBlank(title)) {
                         file.setTitle(title);
                     }
-                    String triplesCnt = bindingSet.getValue("triplesCnt") != null ? bindingSet.getValue("triplesCnt").stringValue() : null;
+                    String triplesCnt =
+                            bindingSet.getValue("triplesCnt") != null ? bindingSet.getValue("triplesCnt").stringValue() : null;
                     if (!StringUtils.isBlank(triplesCnt)) {
                         file.setTriplesCnt(new Integer(triplesCnt).intValue());
                     }

@@ -43,7 +43,7 @@ import eionet.cr.util.Pair;
 
 /**
  * A place to hold all application caches.
- *
+ * 
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class ApplicationCache implements ServletContextListener {
@@ -87,7 +87,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Returnes application cache.
-     *
+     * 
      * @return Cache - main application cache
      */
     private static Cache getCache() {
@@ -96,9 +96,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * update recent resource cache.
-     *
-     * @param update
-     *            List<Pair<String, String>> resources to be updated
+     * 
+     * @param update List<Pair<String, String>> resources to be updated
      */
     public static void updateRecentResourceCache(final List<Pair<String, String>> update) {
         getCache().put(new Element(RECENT_RESOURCES_CACHE, update));
@@ -106,9 +105,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * get recently discovered files.
-     *
-     * @param limit
-     *            - how many files to fetch
+     * 
+     * @param limit - how many files to fetch
      * @return List<Pair<String, String>>
      */
     @SuppressWarnings("unchecked")
@@ -126,9 +124,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * update tag cloud.
-     *
-     * @param update
-     *            List<TagDTO> tags to be updated
+     * 
+     * @param update List<TagDTO> tags to be updated
      */
     public static void updateTagCloudCache(final List<TagDTO> update) {
         getCache().put(new Element(TAG_CLOUD_CACHE, update));
@@ -136,9 +133,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * get tag cloud.
-     *
-     * @param limit
-     *            - how many tags to fetch
+     * 
+     * @param limit - how many tags to fetch
      * @return List<TagDTO>
      */
     @SuppressWarnings("unchecked")
@@ -161,9 +157,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Returns tag cloud list sorted by tag name.
-     *
-     * @param limit
-     *            returned list size
+     * 
+     * @param limit returned list size
      * @return List<TagDTO>
      */
 
@@ -176,9 +171,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Returns tag cloud list sorted by tag count.
-     *
-     * @param limit
-     *            returned list size
+     * 
+     * @param limit returned list size
      * @return List<TagDTO>
      */
     public static List<TagDTO> getTagCloudSortedByCount(final int limit) {
@@ -190,11 +184,9 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Update delivery search picklist cache.
-     *
-     * @param picklistCache
-     *            - picklist cache
-     * @param localitiesCache
-     *            - localities cache
+     * 
+     * @param picklistCache - picklist cache
+     * @param localitiesCache - localities cache
      */
     public static void updateDeliverySearchPicklistCache(final Map<UriLabelPair, ArrayList<UriLabelPair>> picklistCache,
             final Collection<ObjectLabelPair> localitiesCache) {
@@ -204,7 +196,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached localities.
-     *
+     * 
      * @return Collection<ObjectLabelPair>
      */
     @SuppressWarnings("unchecked")
@@ -217,7 +209,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Fetch delivery search picklist cache.
-     *
+     * 
      * @return Map<String, List<UriLabelPair>>
      */
     @SuppressWarnings("unchecked")
@@ -230,7 +222,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Fetch cached obligations.
-     *
+     * 
      * @return Collection<ObjectLabelPair>
      */
     public static Collection<ObjectLabelPair> getObligations() {
@@ -246,7 +238,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached instruments.
-     *
+     * 
      * @return Collection
      */
     public static Collection<ObjectLabelPair> getInstruments() {
@@ -261,7 +253,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * Fetch the URIs of cached types.
-     *
+     * 
      * @return Collection
      */
     public static List<String> getTypeUris() {
@@ -275,7 +267,7 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached types.
-     *
+     * 
      * @return List<Pair<String, String>> types
      */
     @SuppressWarnings("unchecked")
@@ -289,9 +281,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * update type cache.
-     *
-     * @param types
-     *            List<Pair<String, String>> Types to be updated
+     * 
+     * @param types List<Pair<String, String>> Types to be updated
      */
     public static void updateTypes(final List<Pair<String, String>> types) {
 
@@ -315,9 +306,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * updates type columns cache.
-     *
-     * @param update
-     *            Map<String, Map<String, String>> - cache to be updated
+     * 
+     * @param update Map<String, Map<String, String>> - cache to be updated
      */
     public static void updateTypeColumns(final Map<String, Map<String, String>> update) {
         getCache().put(new Element(TYPE_COLUMNS_CACHE, update));
@@ -325,9 +315,8 @@ public class ApplicationCache implements ServletContextListener {
 
     /**
      * fetch cached type columns.
-     *
-     * @param type
-     *            String
+     * 
+     * @param type String
      * @return Map<String, String>
      */
     @SuppressWarnings("unchecked")

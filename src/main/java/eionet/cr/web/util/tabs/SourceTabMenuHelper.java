@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * Tab menu helper for source page.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class SourceTabMenuHelper {
@@ -39,7 +39,7 @@ public class SourceTabMenuHelper {
 
     /**
      * Class constructor.
-     *
+     * 
      * @param uri
      * @param editable
      */
@@ -50,9 +50,8 @@ public class SourceTabMenuHelper {
 
     /**
      * Returns tabs.
-     *
-     * @param selected
-     *            - selected tab's title
+     * 
+     * @param selected - selected tab's title
      * @return
      */
     public List<TabElement> getTabs(String selected) {

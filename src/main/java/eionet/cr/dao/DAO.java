@@ -22,7 +22,7 @@ package eionet.cr.dao;
 
 /**
  * Marker interface to mark dao interfaces.
- *
+ * 
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public interface DAO {

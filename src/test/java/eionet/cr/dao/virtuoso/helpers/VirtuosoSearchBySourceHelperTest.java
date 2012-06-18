@@ -11,7 +11,7 @@ public class VirtuosoSearchBySourceHelperTest extends TestCase {
         String sourceUrl = "http://www.eionet.europa.eu/rdf/portal_types.rdf";
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
-            new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
+                new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
 
         VirtuosoSearchBySourceHelper helper = new VirtuosoSearchBySourceHelper(sourceUrl, pagingRequest, sortingRequest);
 

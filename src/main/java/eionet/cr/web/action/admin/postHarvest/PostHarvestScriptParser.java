@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PostHarvestScriptParser {
@@ -41,7 +41,7 @@ public class PostHarvestScriptParser {
     public static final String ASSOCIATED_TYPE_VARIABLE = "thisType";
 
     /**
-     *
+     * 
      * @param script
      * @param harvestedSource
      * @param associatedType
@@ -65,7 +65,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @param graphUri
      * @return
@@ -87,8 +87,8 @@ public class PostHarvestScriptParser {
         if (containsToken(result, "WHERE")) {
             if (!containsToken(result, "FROM")) {
                 result =
-                    substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
-                    + substringAfterToken(result, "WHERE");
+                        substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
+                                + substringAfterToken(result, "WHERE");
             }
         } else {
             result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
@@ -112,7 +112,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @param harvestedSource
      * @return
@@ -210,7 +210,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @return
      * @throws ScriptParseException
@@ -286,7 +286,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @param harvestedSource
      * @return
@@ -362,7 +362,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @return
      * @throws ScriptParseException
@@ -432,7 +432,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @param harvestedSource
      * @return
@@ -508,7 +508,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param script
      * @return
      * @throws ScriptParseException
@@ -577,7 +577,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param token
      * @return
@@ -599,7 +599,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param token
      * @return
@@ -628,7 +628,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param token
      * @return
@@ -667,11 +667,11 @@ public class PostHarvestScriptParser {
      * string, the string itself is returned. If token1 is present in the string, but token2 is not, then the substring after token1
      * is returned. Similarly, if token2 is present in the string, but token1 is not, then the substring before token1 is returned.
      * If neither tokens are present in the string, the string is returned as it is.
-     *
+     * 
      * If the given string is blank (i.e. null or empty after trimmed), the given string is returned as it is. If token1 is not
      * blank, but token2 is, the method returns substring after token1. If token2 is not blank, but token1 is, the method returns
      * substring before token1. If both tokens are blank, the string is returned as it is.
-     *
+     * 
      * @param str The given string.
      * @param token1 token1
      * @param token2 token2
@@ -694,7 +694,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param tokenToReplace
      * @param replacement
@@ -728,7 +728,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param tokens
      * @return
      */
@@ -744,7 +744,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @param start
      * @param end
@@ -760,7 +760,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @return
      */
@@ -776,7 +776,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @return
      */
@@ -792,7 +792,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param str
      * @return
      */
@@ -815,7 +815,7 @@ public class PostHarvestScriptParser {
     }
 
     /**
-     *
+     * 
      * @param args
      * @throws ScriptParseException
      */
@@ -849,7 +849,7 @@ public class PostHarvestScriptParser {
         // System.out.println(deriveConstructFromDelete(s, "url1"));
 
         String s =
-            "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} FROM <url2> FROM ?harvestedSource WHERE {whereTemplate}";
+                "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} FROM <url2> FROM ?harvestedSource WHERE {whereTemplate}";
         System.out.println(deriveConstruct(s, "url1"));
 
         s = "MODIFY <url1> DELETE {deleteTemplate} INSERT {insertTemplate} FROM <url2> FROM ?harvestedSource";

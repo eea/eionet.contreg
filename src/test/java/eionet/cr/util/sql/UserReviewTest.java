@@ -17,13 +17,13 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 public class UserReviewTest extends TestCase {
 
-    private static String[] TEST_USER_NAMES = { "kaptejaa", "test2" };
+    private static String[] TEST_USER_NAMES = {"kaptejaa", "test2"};
 
     @Override
     protected void setUp() throws Exception {

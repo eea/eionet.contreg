@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class UploadDTO {
 
@@ -34,7 +34,7 @@ public class UploadDTO {
     private String triples;
 
     /**
-     *
+     * 
      * @param subjectUri
      */
     public UploadDTO(String subjectUri) {
@@ -60,8 +60,7 @@ public class UploadDTO {
     }
 
     /**
-     * @param label
-     *            the label to set
+     * @param label the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -75,8 +74,7 @@ public class UploadDTO {
     }
 
     /**
-     * @param dateModified
-     *            the dateModified to set
+     * @param dateModified the dateModified to set
      */
     public void setDateModified(String dateModified) {
         this.dateModified = dateModified;
@@ -90,8 +88,7 @@ public class UploadDTO {
     }
 
     /**
-     * @param triples
-     *            the triples to set
+     * @param triples the triples to set
      */
     public void setTriples(String triples) {
         this.triples = triples;

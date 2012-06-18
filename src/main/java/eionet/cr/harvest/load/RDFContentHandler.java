@@ -36,9 +36,9 @@ import org.openrdf.rio.RDFHandlerException;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- * Implementation of OpenRDF's {@link RDFHandler} that will be used by implementations of {@link ContentLoader}.
- * Contains callback methods for listening to the content coming from {@link ContentLoader} and loading them into repository.
- *
+ * Implementation of OpenRDF's {@link RDFHandler} that will be used by implementations of {@link ContentLoader}. Contains callback
+ * methods for listening to the content coming from {@link ContentLoader} and loading them into repository.
+ * 
  * @author Jaanus Heinlaid
  */
 public class RDFContentHandler implements RDFHandler {
@@ -66,7 +66,7 @@ public class RDFContentHandler implements RDFHandler {
      * @param sqlConn
      * @param contextUri The URI of the graph where the triples will be loaded into.
      */
-    public RDFContentHandler(RepositoryConnection repoConn, Connection sqlConn, String contextUri){
+    public RDFContentHandler(RepositoryConnection repoConn, Connection sqlConn, String contextUri) {
 
         this.repoConn = repoConn;
         this.sqlConn = sqlConn;
@@ -113,7 +113,7 @@ public class RDFContentHandler implements RDFHandler {
         try {
             repoConn.add(rdfStatement, context);
             triplesLoaded++;
-            if (triplesLoaded % BATCH_SIZE == 0){
+            if (triplesLoaded % BATCH_SIZE == 0) {
                 LOGGER.trace("Statement counter = " + triplesLoaded);
             }
         } catch (RepositoryException e) {

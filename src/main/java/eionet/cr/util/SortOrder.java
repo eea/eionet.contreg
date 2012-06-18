@@ -23,9 +23,9 @@ package eionet.cr.util;
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public enum SortOrder {
 
@@ -35,7 +35,7 @@ public enum SortOrder {
     private String s;
 
     /**
-     *
+     * 
      * @param s
      */
     SortOrder(String s) {
@@ -44,7 +44,7 @@ public enum SortOrder {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Enum#toString()
      */
     public String toString() {
@@ -52,7 +52,7 @@ public enum SortOrder {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String toSQL() {
@@ -60,7 +60,7 @@ public enum SortOrder {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public SortOrder toOpposite() {
@@ -71,7 +71,7 @@ public enum SortOrder {
     }
 
     /**
-     *
+     * 
      * @param order
      * @return
      */
@@ -83,7 +83,7 @@ public enum SortOrder {
     }
 
     /**
-     *
+     * 
      * @param s
      * @return
      */

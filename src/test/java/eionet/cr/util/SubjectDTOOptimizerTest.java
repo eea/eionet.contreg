@@ -5,8 +5,8 @@ import java.util.List;
 import junit.framework.TestCase;
 
 /**
- *
- *
+ * 
+ * 
  * @author Jaanus Heinlaid
  */
 public class SubjectDTOOptimizerTest extends TestCase {

@@ -33,9 +33,9 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public class HelperDAOTest {
 
@@ -49,8 +49,8 @@ public class HelperDAOTest {
     @Test
     public void testGetSampleTriples() throws Exception {
         List<TripleDTO> result =
-            DAOFactory.get().getDao(HelperDAO.class)
-            .getSampleTriplesInSource(loader.getGraphUri(), PagingRequest.create(1, 10));
+                DAOFactory.get().getDao(HelperDAO.class)
+                        .getSampleTriplesInSource(loader.getGraphUri(), PagingRequest.create(1, 10));
 
         assertNotNull(result);
         assertEquals(100, result.size());

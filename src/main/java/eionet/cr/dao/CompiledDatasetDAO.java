@@ -28,13 +28,13 @@ import eionet.cr.dto.SubjectDTO;
 
 /**
  * Interface to define compiled dataset related dao methods.
- *
+ * 
  * @author altnyris
  */
 public interface CompiledDatasetDAO extends DAO {
 
     /**
-     *
+     * 
      * @param deliveryUris
      * @return List<DeliveryFilesDTO>
      * @throws DAOException
@@ -42,7 +42,7 @@ public interface CompiledDatasetDAO extends DAO {
     List<DeliveryFilesDTO> getDeliveryFiles(List<String> deliveryUris) throws DAOException;
 
     /**
-     *
+     * 
      * @param homeFolder
      * @param excludeFileUri - if provided, then compiled datasets that include this file, are not returned
      * @return List<DatasetDTO>
@@ -51,7 +51,7 @@ public interface CompiledDatasetDAO extends DAO {
     List<DatasetDTO> getCompiledDatasets(String homeFolder, String excludeFileUri) throws DAOException;
 
     /**
-     *
+     * 
      * @param dataset
      * @return List<String>
      * @throws DAOException
@@ -60,7 +60,7 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      * Returns list of compiled dataset source files. Only uri and lastModifiedDate properties are populated.
-     *
+     * 
      * @param dataset
      * @return
      * @throws DAOException
@@ -69,7 +69,7 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      * Saves compiled dataset into new graph
-     *
+     * 
      * @param selectedFiles
      * @param datasetUri
      * @param overwrite
@@ -79,7 +79,7 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      * Removes all dataset triples.
-     *
+     * 
      * @param datasetUri
      * @param contextUri
      * @throws DAOException
@@ -88,20 +88,17 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      * Removes triples from compiled dataset that also exists in the selectedFiles.
-     *
-     * @param datasetUri
-     *            compiled dataset graph
-     * @param selectedFiles
-     *            grpahs which triples must be removed
+     * 
+     * @param datasetUri compiled dataset graph
+     * @param selectedFiles grpahs which triples must be removed
      * @throws DAOException
      */
     void removeFiles(String datasetUri, List<String> selectedFiles) throws DAOException;
 
     /**
      * Check if compiled dataset exists
-     *
-     * @param uri
-     *            dataset URI
+     * 
+     * @param uri dataset URI
      * @throws DAOException
      * @return boolean
      */
@@ -109,11 +106,9 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      * Returns true, if compiled datset's lastModified property is older than one of the selected files.
-     *
-     * @param datasetUri
-     *            compiled dataset's uri
-     * @param selectedFiles
-     *            collections of graph uris
+     * 
+     * @param datasetUri compiled dataset's uri
+     * @param selectedFiles collections of graph uris
      * @return
      * @throws DAOException
      */

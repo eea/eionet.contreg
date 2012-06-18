@@ -7,7 +7,7 @@ public class ResultValue {
     private boolean isLiteral;
 
     /**
-     *
+     * 
      * @param value
      * @param isLiteral
      */
@@ -25,8 +25,7 @@ public class ResultValue {
     }
 
     /**
-     * @param value
-     *            the value to set
+     * @param value the value to set
      */
     public void setValue(String value) {
         this.value = value;
@@ -40,8 +39,7 @@ public class ResultValue {
     }
 
     /**
-     * @param isLiteral
-     *            the isLiteral to set
+     * @param isLiteral the isLiteral to set
      */
     public void setLiteral(boolean isLiteral) {
         this.isLiteral = isLiteral;
@@ -49,7 +47,7 @@ public class ResultValue {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {

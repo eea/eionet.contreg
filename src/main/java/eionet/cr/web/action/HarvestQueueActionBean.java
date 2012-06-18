@@ -42,9 +42,9 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 @UrlBinding("/harvestQueue.action")
 public class HarvestQueueActionBean extends AbstractActionBean {
@@ -82,10 +82,9 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
-     * @throws DAOException
-     *             if relational database is unavailable.
+     * @throws DAOException if relational database is unavailable.
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -104,7 +103,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /**
      * Get queue type. This is not the queueType variable used in {@link #getQueueTypes()}.
-     *
+     * 
      * @return the queueType
      */
     public String getQueueType() {
@@ -117,9 +116,8 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /**
      * Set queue type. This is not the queueType variable used in {@link #getQueueTypes()}.
-     *
-     * @param queueType
-     *            the queueType to set
+     * 
+     * @param queueType the queueType to set
      */
     public void setQueueType(String queueType) {
         this.queueType = queueType;
@@ -141,7 +139,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /**
      * Get a list of queue types - urgent and batch - for the tabs.
-     *
+     * 
      * @return list of queue types.
      */
     public List<Map<String, String>> getQueueTypes() {
@@ -168,7 +166,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return true if the queue is the urgent queue.
      */
     public boolean isTypeUrgent() {
@@ -176,7 +174,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return true if the queue is the batch queue.
      */
     public boolean isTypeBatch() {
@@ -184,7 +182,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getBatchHarvestingHours() {

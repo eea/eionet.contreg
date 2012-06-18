@@ -15,9 +15,9 @@ import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class ResourceRenameHandler implements RDFHandler {
 
@@ -36,7 +36,7 @@ public class ResourceRenameHandler implements RDFHandler {
     private int handledStatementCount;
 
     /**
-     *
+     * 
      * @param repoConn
      */
     public ResourceRenameHandler(RepositoryConnection repoConn, Map<String, String> renamings) {
@@ -51,7 +51,7 @@ public class ResourceRenameHandler implements RDFHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.openrdf.rio.RDFHandler#handleStatement(org.openrdf.model.Statement)
      */
     @Override
@@ -86,7 +86,7 @@ public class ResourceRenameHandler implements RDFHandler {
     }
 
     /**
-     *
+     * 
      * @throws RepositoryException
      */
     public void execute() throws RepositoryException {
@@ -112,7 +112,7 @@ public class ResourceRenameHandler implements RDFHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.openrdf.rio.RDFHandler#endRDF()
      */
     @Override
@@ -121,7 +121,7 @@ public class ResourceRenameHandler implements RDFHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.openrdf.rio.RDFHandler#handleComment(java.lang.String)
      */
     @Override
@@ -130,7 +130,7 @@ public class ResourceRenameHandler implements RDFHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.openrdf.rio.RDFHandler#handleNamespace(java.lang.String, java.lang.String)
      */
     @Override
@@ -139,7 +139,7 @@ public class ResourceRenameHandler implements RDFHandler {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.openrdf.rio.RDFHandler#startRDF()
      */
     @Override
@@ -147,7 +147,7 @@ public class ResourceRenameHandler implements RDFHandler {
     }
 
     /**
-     *
+     * 
      * @param oldUri
      * @return
      */

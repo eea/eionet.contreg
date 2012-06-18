@@ -9,7 +9,7 @@ public class XmlUtil {
 
     /**
      * write xml element start tag, data and end tag into XmlStreamWriter
-     *
+     * 
      * @param writer
      * @param element
      * @param value
@@ -24,7 +24,7 @@ public class XmlUtil {
     /**
      * Escape invalid characters that are not allowed in XML element names if the name is not still valid, then replace it with
      * INVALID_ELEMENT_NAME
-     *
+     * 
      */
     public static String getEscapedElementName(String elementName) {
 

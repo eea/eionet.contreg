@@ -23,7 +23,7 @@ import eionet.cr.util.sesame.SesameUtil;
 
 /**
  * @author Risto Alt
- *
+ * 
  */
 public class InferencingTest {
 
@@ -46,16 +46,11 @@ public class InferencingTest {
     @Test
     public void testInverseOf() throws Exception {
         RepositoryConnection con = null;
-        String query = "DEFINE input:inference '"
-            + GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME)
-            + "'"
-            + " PREFIX test: <http://test.com/test/test-schema.rdf#>"
-            + " SELECT ?s"
-            + " FROM <http://test.com/test/persons.rdf>"
-            + " WHERE"
-            + "{"
-            + "?s test:hasParent <http://test.com/test/person/1>"
-            +"}";
+        String query =
+                "DEFINE input:inference '" + GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'"
+                        + " PREFIX test: <http://test.com/test/test-schema.rdf#>" + " SELECT ?s"
+                        + " FROM <http://test.com/test/persons.rdf>" + " WHERE" + "{"
+                        + "?s test:hasParent <http://test.com/test/person/1>" + "}";
         try {
             con = SesameConnectionProvider.getRepositoryConnection();
             TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);

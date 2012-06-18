@@ -140,7 +140,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     private boolean typesByName;
 
     /**
-     *
+     * 
      * @return Resolution.
      * @throws Exception
      */
@@ -177,7 +177,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /**
      * Exports search result as a file.
-     *
+     * 
      * @return Resolution.
      * @throws Exception
      */
@@ -280,7 +280,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -393,7 +393,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public Resolution setSearchColumns() {
@@ -422,7 +422,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() throws DAOException {
@@ -447,7 +447,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<Pair<String, String>> getAvailableTypesNoGroup() {
@@ -455,7 +455,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<Pair<String, List<Pair<String, String>>>> getAvailableTypes() {
@@ -521,7 +521,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<Pair<String, String>> getAvailableTypesByName() {
@@ -566,8 +566,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
@@ -581,15 +580,14 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param selectedColumns
-     *            the selectedColumns to set
+     * @param selectedColumns the selectedColumns to set
      */
     public void setSelectedColumns(List<String> selectedColumns) {
         this.selectedColumns = selectedColumns;
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -660,7 +658,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -677,8 +675,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param selectedFilter
-     *            the selectedFilter to set
+     * @param selectedFilter the selectedFilter to set
      */
     public void setNewFilter(String selectedFilter) {
         this.newFilter = selectedFilter;
@@ -692,8 +689,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param selectedFilters
-     *            the selectedFilters to set
+     * @param selectedFilters the selectedFilters to set
      */
     public void setSelectedFilters(Map<String, String> selectedFilters) {
         this.selectedFilters = selectedFilters;
@@ -707,8 +703,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param removeFilter
-     *            the removeFilter to set
+     * @param removeFilter the removeFilter to set
      */
     public void setClearFilter(String removeFilter) {
         this.clearFilter = removeFilter;
@@ -729,8 +724,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param uriResourceIdentifier
-     *            the uriResourceIdentifier to set
+     * @param uriResourceIdentifier the uriResourceIdentifier to set
      */
     public void setUriResourceIdentifier(boolean uriResourceIdentifier) {
         this.uriResourceIdentifier = uriResourceIdentifier;
@@ -752,7 +746,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /**
      * set exportFormat parameter (xls, xml, ...)
-     *
+     * 
      * @param exportFormat
      */
     public void setExportFormat(String exportFormat) {
@@ -760,8 +754,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     * @param exportColumns
-     *            the exportColumns to set
+     * @param exportColumns the exportColumns to set
      */
     public void setExportColumns(List<String> exportColumns) {
         this.exportColumns = exportColumns;
@@ -772,7 +765,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     }
 
     /**
-     *
+     * 
      * @param map
      * @return
      */
@@ -804,15 +797,15 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /**
      * Case-insensitive string comparator that handles null arguments.
-     *
+     * 
      * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
-     *
+     * 
      */
     private class CaseInsensitiveStringComparator implements Comparator<String> {
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
         public int compare(String str1, String str2) {

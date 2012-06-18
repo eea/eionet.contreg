@@ -20,11 +20,10 @@
  */
 package eionet.cr.dto;
 
-
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public class PairDTO {
 
@@ -45,9 +44,12 @@ public class PairDTO {
     public void setName(String name) {
         this.name = name;
     }
+
     public String getValue() {
         return value;
     }
+
     public void setValue(String value) {
         this.value = value;
-    }}
+    }
+}

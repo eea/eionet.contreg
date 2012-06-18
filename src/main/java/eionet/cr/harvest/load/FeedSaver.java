@@ -26,7 +26,7 @@ import java.sql.Connection;
 import org.openrdf.repository.RepositoryConnection;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class FeedSaver {
@@ -41,7 +41,7 @@ public class FeedSaver {
      * @param sqlConn
      * @param contextUri
      */
-    public FeedSaver(RepositoryConnection repoConn, Connection sqlConn, String contextUri){
+    public FeedSaver(RepositoryConnection repoConn, Connection sqlConn, String contextUri) {
         this.repoConn = repoConn;
         this.sqlConn = sqlConn;
         this.contextUri = contextUri;

@@ -22,9 +22,9 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class FileStore {
 
@@ -37,7 +37,7 @@ public class FileStore {
     private final File userDir;
 
     /**
-     *
+     * 
      * @param userName
      */
     private FileStore(String userName) {
@@ -50,7 +50,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param userName
      * @return FileStore
      */
@@ -59,7 +59,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param filePath file folder path with file name
      * @param overwrite
      * @param inputStream
@@ -81,7 +81,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param filePath
      * @param overwrite
      * @param fileBean
@@ -96,7 +96,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param fileName
      * @param overwrite
      * @param reader
@@ -119,7 +119,7 @@ public class FileStore {
 
     /**
      * Returns file object of the uploaded file in the file system.
-     *
+     * 
      * @param filePath file folder path with file name
      * @param overwrite
      * @throws FileAlreadyExistsException
@@ -163,7 +163,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param filePath
      */
     public void delete(String filePath) {
@@ -176,7 +176,7 @@ public class FileStore {
 
     /**
      * True, if folder is deleted.
-     *
+     * 
      * @param folderPath
      * @return
      */
@@ -186,7 +186,7 @@ public class FileStore {
 
     /**
      * True, if folder is deleted.
-     *
+     * 
      * @param folderPath
      * @param cleanFolderFirst - removes all files from folder before deleting it
      * @return boolean
@@ -209,7 +209,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param renamings
      */
     public void rename(Map<String, String> renamings) {
@@ -235,14 +235,12 @@ public class FileStore {
     }
 
     /**
-     * Gets file by the relative path given. Relative means
-     * relative to the user's file-store directory.
-     *
-     * If no such file found, return null. Otherwise returns
-     * {@link File} reference to the found file.
-     *
+     * Gets file by the relative path given. Relative means relative to the user's file-store directory.
+     * 
+     * If no such file found, return null. Otherwise returns {@link File} reference to the found file.
+     * 
      * If the given relative path is blank, return null.
-     *
+     * 
      * @param relativePath
      * @return File
      */
@@ -261,7 +259,7 @@ public class FileStore {
     }
 
     /**
-     *
+     * 
      * @param uriString
      * @return File
      */

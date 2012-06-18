@@ -48,7 +48,7 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScript")
@@ -83,7 +83,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String testError;
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -106,7 +106,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -133,7 +133,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -169,7 +169,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -194,7 +194,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private RedirectResolution resolutionToScripts() {
@@ -210,7 +210,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     @ValidationMethod(on = {"save"})
@@ -257,7 +257,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @throws DAOException
      */
     @ValidationMethod(on = {"test"})
@@ -293,8 +293,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(int id) {
         this.id = id;
@@ -308,8 +307,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -323,8 +321,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param script
-     *            the script to set
+     * @param script the script to set
      */
     public void setScript(String script) {
         this.script = script;
@@ -338,8 +335,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl
-     *            the targetUrl to set
+     * @param targetUrl the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -353,8 +349,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType
-     *            the targetType to set
+     * @param targetType the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -368,15 +363,14 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param testSourceUrl
-     *            the testSourceUrl to set
+     * @param testSourceUrl the testSourceUrl to set
      */
     public void setTestSourceUrl(String testSourceUrl) {
         this.testSourceUrl = testSourceUrl;
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<String> getTypeUris() {
@@ -391,8 +385,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param active
-     *            the active to set
+     * @param active the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
@@ -406,8 +399,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param ignoreMalformedSparql
-     *            the ignoreMalformedSparql to set
+     * @param ignoreMalformedSparql the ignoreMalformedSparql to set
      */
     public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
         this.ignoreMalformedSparql = ignoreMalformedSparql;
@@ -425,7 +417,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getPageToRender() {
@@ -434,7 +426,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getBackToTargetUrl() {
@@ -442,7 +434,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @param backToTargetUrl
      */
     public void setBackToTargetUrl(String backToTargetUrl) {
@@ -450,7 +442,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<Map<String, ObjectDTO>> getTestResults() {
@@ -458,7 +450,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public List<String> getTestResultColumns() {
@@ -492,7 +484,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getHarvestedSourceVariable() {
@@ -500,7 +492,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getAssociatedTypeVariable() {

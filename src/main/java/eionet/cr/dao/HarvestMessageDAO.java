@@ -25,14 +25,14 @@ import java.util.List;
 import eionet.cr.dto.HarvestMessageDTO;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public interface HarvestMessageDAO extends DAO {
 
     /**
-     *
+     * 
      * @param harvestID
      * @return List<HarvestMessageDTO>
      * @throws DAOException
@@ -40,7 +40,7 @@ public interface HarvestMessageDAO extends DAO {
     List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException;
 
     /**
-     *
+     * 
      * @param messageID
      * @return HarvestMessageDTO
      * @throws DAOException
@@ -48,7 +48,7 @@ public interface HarvestMessageDAO extends DAO {
     HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException;
 
     /**
-     *
+     * 
      * @param harvestMessageDTO
      * @return Integer
      * @throws DAOException
@@ -56,7 +56,7 @@ public interface HarvestMessageDAO extends DAO {
     Integer insertHarvestMessage(HarvestMessageDTO harvestMessageDTO) throws DAOException;
 
     /**
-     *
+     * 
      * @param messageId
      * @throws DAOException
      */

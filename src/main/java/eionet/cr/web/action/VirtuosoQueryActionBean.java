@@ -16,9 +16,9 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 @UrlBinding("/virtuosoQuery.action")
 public class VirtuosoQueryActionBean extends AbstractActionBean {
@@ -26,7 +26,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
     private String query;
 
     /**
-     *
+     * 
      * @return
      */
     @DefaultHandler
@@ -35,7 +35,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return
      * @throws Exception
      */
@@ -81,9 +81,9 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @author jaanus
-     *
+     * 
      */
     private class ResultReader extends SPARQLResultSetBaseReader {
 
@@ -95,7 +95,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#startResultSet()
          */
         protected void startResultSet() {
@@ -117,7 +117,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
          */
         @Override
@@ -141,7 +141,7 @@ public class VirtuosoQueryActionBean extends AbstractActionBean {
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see eionet.cr.util.sesame.SPARQLResultSetBaseReader#endResultSet()
          */
         @Override

@@ -38,7 +38,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
- *
+ * 
  * @author Jaanus Heinlaid
  */
 public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO> {
@@ -115,7 +115,7 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
     }
 
     /**
-     *
+     * 
      * @param value
      * @param language
      * @return

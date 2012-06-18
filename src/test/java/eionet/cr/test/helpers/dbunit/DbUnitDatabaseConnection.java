@@ -29,14 +29,14 @@ import org.dbunit.database.IDatabaseConnection;
 import eionet.cr.util.sesame.SesameUtil;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public abstract class DbUnitDatabaseConnection {
 
     /**
-     *
+     * 
      * @return
      * @throws Exception
      */
@@ -48,7 +48,7 @@ public abstract class DbUnitDatabaseConnection {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private static Properties getConfigProperties() {

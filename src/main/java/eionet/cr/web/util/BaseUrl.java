@@ -3,11 +3,11 @@ package eionet.cr.web.util;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *
- *
- * A single-purpose class that serves the base URL of requests coming to this application.
- * It is referenced in JSP classes, so caution when considering this class for deletion!
- *
+ * 
+ * 
+ * A single-purpose class that serves the base URL of requests coming to this application. It is referenced in JSP classes, so
+ * caution when considering this class for deletion!
+ * 
  * @author Risto Alt
  * @author Jaanus Heinlaid
  */
@@ -18,7 +18,7 @@ public class BaseUrl {
     static String baseUrl = "";
 
     /**
-     *
+     * 
      * @param request
      * @return
      */

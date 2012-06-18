@@ -8,9 +8,9 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- *
+ * 
  */
 
 @UrlBinding("/admin")

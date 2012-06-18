@@ -29,15 +29,15 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dto.PairDTO;
 
 /**
- *
+ * 
  * @author Risto Alt
- *
+ * 
  */
 public class PairReader extends ResultSetMixedReader<PairDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -45,7 +45,7 @@ public class PairReader extends ResultSetMixedReader<PairDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override

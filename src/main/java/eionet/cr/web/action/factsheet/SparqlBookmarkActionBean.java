@@ -42,7 +42,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Sparql bookmark tab controller.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sparqlBookmark.action")
@@ -75,10 +75,9 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return boolean
-     * @throws DAOException
-     *             if query fails if query fails
+     * @throws DAOException if query fails if query fails
      */
     public boolean getSubjectIsUserBookmark() throws DAOException {
 
@@ -97,8 +96,7 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -112,8 +110,7 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param subject
-     *            the subject to set
+     * @param subject the subject to set
      */
     public void setSubject(SubjectDTO subject) {
         this.subject = subject;

@@ -50,7 +50,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Edit source tab.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sourceEdit.action")
@@ -85,7 +85,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Action event for displaying the source edit form.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -112,7 +112,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Action event for saving the source.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -141,7 +141,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Action for deleting the source.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -179,7 +179,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Action for changing the owner.
-     *
+     * 
      * @return
      * @throws DAOException
      */
@@ -207,7 +207,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Chekcs if user is owner of the harvest source.
-     *
+     * 
      * @param harvestSourceDTO
      * @return
      */
@@ -230,7 +230,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Manages ruleset.
-     *
+     * 
      * @param url
      * @throws DAOException
      */
@@ -247,7 +247,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Validates source for editing.
-     *
+     * 
      * @return
      */
     private boolean validateEditSource() {
@@ -291,7 +291,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Chekcs if user is owner of the harvest source.
-     *
+     * 
      * @return
      */
     public boolean isUserOwner() {
@@ -299,7 +299,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * 
      * @return int
      */
     public int getSelectedIntervalMultiplier() {
@@ -308,7 +308,7 @@ public class EditSourceActionBean extends AbstractActionBean {
 
     /**
      * Returns all the valid media types.
-     *
+     * 
      * @return
      */
     public List<String> getMediaTypes() {
@@ -328,8 +328,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -343,8 +342,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param harvestSource
-     *            the harvestSource to set
+     * @param harvestSource the harvestSource to set
      */
     public void setHarvestSource(HarvestSourceDTO harvestSource) {
         this.harvestSource = harvestSource;
@@ -358,8 +356,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param schemaSource
-     *            the schemaSource to set
+     * @param schemaSource the schemaSource to set
      */
     public void setSchemaSource(boolean schemaSource) {
         this.schemaSource = schemaSource;
@@ -380,8 +377,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param intervalMultiplier
-     *            the intervalMultiplier to set
+     * @param intervalMultiplier the intervalMultiplier to set
      */
     public void setIntervalMultiplier(int intervalMultiplier) {
         this.intervalMultiplier = intervalMultiplier;
@@ -402,8 +398,7 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param ownerName
-     *            the ownerName to set
+     * @param ownerName the ownerName to set
      */
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;

@@ -7,9 +7,9 @@ import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetReader<T> {
 
@@ -21,7 +21,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#startResultSet(java.util.List)
      */
     public void startResultSet(List<String> bindingNames) {
@@ -38,7 +38,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -49,7 +49,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override
@@ -58,7 +58,7 @@ public abstract class SPARQLResultSetBaseReader<T> implements SPARQLResultSetRea
     }
 
     /**
-     *
+     * 
      * @param bindingSet
      * @param bindingName
      * @return

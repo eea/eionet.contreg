@@ -27,15 +27,15 @@ import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- *
+ * 
  * @author heinljab
- *
+ * 
  */
 public class HarvestMessageDTOReader extends SQLResultSetBaseReader<HarvestMessageDTO> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

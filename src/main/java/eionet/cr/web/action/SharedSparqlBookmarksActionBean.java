@@ -34,7 +34,7 @@ import eionet.cr.dao.HelperDAO;
 
 /**
  * Shared SPARQL bookmars action bean.
- *
+ * 
  * @author Juhan Voolaid
  */
 @UrlBinding("/sharedSparqlBookmarks.action")

@@ -31,14 +31,14 @@ import eionet.cr.util.Util;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
- *
+ * 
  * @author altnyris
- *
+ * 
  */
 public class DeliverySearchTableDecorator extends TableDecorator {
 
     /**
-     *
+     * 
      * @return
      */
     public String getTitle() {

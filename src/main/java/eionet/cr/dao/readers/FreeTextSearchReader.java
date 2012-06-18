@@ -10,9 +10,9 @@ import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  * @param <T>
  */
 public class FreeTextSearchReader<T> extends ResultSetMixedReader<T> {
@@ -22,7 +22,7 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @SuppressWarnings("unchecked")
@@ -37,7 +37,7 @@ public class FreeTextSearchReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")

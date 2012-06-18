@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import eionet.cr.util.Hashes;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
 public class LabelPredicates {
@@ -77,7 +77,7 @@ public class LabelPredicates {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public static String getCommaSeparatedHashes() {

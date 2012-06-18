@@ -32,9 +32,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class ObjectDTO implements Serializable {
 
@@ -70,14 +70,14 @@ public class ObjectDTO implements Serializable {
 
     private ObjectDTO labelObject;
 
-    /** Repository-returned MD5 hash of the object.
-     * Used to indicate {@link #value} is different than the actual value in the repository is different.
-     * For example {@link #value} might contain only a substring of what's really in the database.
+    /**
+     * Repository-returned MD5 hash of the object. Used to indicate {@link #value} is different than the actual value in the
+     * repository is different. For example {@link #value} might contain only a substring of what's really in the database.
      */
     private String objectMD5;
 
     /**
-     *
+     * 
      * @param value
      * @param language
      * @param literal
@@ -95,7 +95,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param value
      * @param language
      * @param literal
@@ -106,7 +106,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param value
      * @param literal
      */
@@ -115,7 +115,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param value
      * @param literal
      * @param datatype
@@ -125,7 +125,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param hash
      * @param sourceHash
      * @param derivSourceHash
@@ -140,7 +140,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param hash
      * @param sourceHash
      * @param derivSourceHash
@@ -187,7 +187,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -196,7 +196,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -215,7 +215,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -223,7 +223,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @return long
      */
     public long getHash() {
@@ -238,8 +238,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSource
-     *            the derivSourceUri to set
+     * @param derivSource the derivSourceUri to set
      */
     public void setDerivSourceUri(String derivSource) {
         this.derivSourceUri = derivSource;
@@ -253,15 +252,14 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param source
-     *            the sourceUri to set
+     * @param source the sourceUri to set
      */
     public void setSourceUri(String source) {
         this.sourceUri = source;
     }
 
     /**
-     *
+     * 
      * @return String
      */
     public String getSourceSmart() {
@@ -283,15 +281,14 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceObjectHash
-     *            the sourceObjectHash to set
+     * @param sourceObjectHash the sourceObjectHash to set
      */
     public void setSourceObjectHash(long sourceObjectHash) {
         this.sourceObjectHash = sourceObjectHash;
     }
 
     /**
-     *
+     * 
      * @param hash
      */
     public void setHash(long hash) {
@@ -306,8 +303,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSourceGenTime
-     *            the derivSourceGenTime to set
+     * @param derivSourceGenTime the derivSourceGenTime to set
      */
     public void setDerivSourceGenTime(long derivSourceGenTime) {
         this.derivSourceGenTime = derivSourceGenTime;
@@ -321,8 +317,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param derivSourceHash
-     *            the derivSourceHash to set
+     * @param derivSourceHash the derivSourceHash to set
      */
     public void setDerivSourceHash(long derivSourceHash) {
         this.derivSourceHash = derivSourceHash;
@@ -336,7 +331,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @return long
      */
     public long getSourceHashSmart() {
@@ -344,15 +339,14 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceHash
-     *            the sourceHash to set
+     * @param sourceHash the sourceHash to set
      */
     public void setSourceHash(long sourceHash) {
         this.sourceHash = sourceHash;
     }
 
     /**
-     *
+     * 
      * @return String
      */
     public String getId() {
@@ -368,8 +362,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param sourceObjectValue
-     *            the derviedLiteralValue to set
+     * @param sourceObjectValue the derviedLiteralValue to set
      */
     public void setDerviedLiteralValue(String sourceObjectValue) {
         this.derviedLiteralValue = sourceObjectValue;
@@ -382,7 +375,7 @@ public class ObjectDTO implements Serializable {
     /**
      * Returns datatype label to display. If the namespace is known replaces it with the prefix defined in Namespace otherwise
      * returns URL with full namespace
-     *
+     * 
      * @return String datatype label
      */
     public String getDataTypeLabel() {
@@ -399,7 +392,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param datatype
      */
     public void setDatatype(URI datatype) {
@@ -407,7 +400,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param value
      * @return
      */
@@ -416,7 +409,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param value
      * @param datatype
      * @return
@@ -426,7 +419,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @param uri
      * @return
      */
@@ -442,7 +435,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public String getDisplayValue() {
@@ -456,8 +449,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * @param labelObject
-     *            the labelObject to set
+     * @param labelObject the labelObject to set
      */
     public void setLabelObject(ObjectDTO labelObject) {
         this.labelObject = labelObject;

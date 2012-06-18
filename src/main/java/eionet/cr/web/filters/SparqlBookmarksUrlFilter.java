@@ -38,7 +38,7 @@ import eionet.cr.web.action.ExportTriplesActionBean;
 
 /**
  * Forwards SPARQL url to export triples action bean.
- *
+ * 
  * @author Juhan Voolaid
  */
 public class SparqlBookmarksUrlFilter implements Filter {
@@ -51,7 +51,9 @@ public class SparqlBookmarksUrlFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String requestURL = ((HttpServletRequest) request).getRequestURL().toString();
         String uri = URLEncoder.encode(requestURL, "UTF-8");
-        String redirectLocation = ((HttpServletRequest) request).getContextPath() + Util.getUrlBinding(ExportTriplesActionBean.class) + "?uri=" + uri;
+        String redirectLocation =
+                ((HttpServletRequest) request).getContextPath() + Util.getUrlBinding(ExportTriplesActionBean.class) + "?uri="
+                        + uri;
         // Redirect to the location resolved above.
         ((HttpServletResponse) response).sendRedirect(redirectLocation);
     }

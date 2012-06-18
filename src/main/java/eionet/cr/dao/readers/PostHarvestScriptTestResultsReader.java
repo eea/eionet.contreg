@@ -12,9 +12,9 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class PostHarvestScriptTestResultsReader extends SPARQLResultSetBaseReader<Map<String, ObjectDTO>> {
 
@@ -25,9 +25,9 @@ public class PostHarvestScriptTestResultsReader extends SPARQLResultSetBaseReade
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
         LinkedHashMap<String, ObjectDTO> rowMap = new LinkedHashMap<String, ObjectDTO>();
-        if (bindingSet != null && bindingSet.size() > 0 && bindingNames!=null && !bindingNames.isEmpty()) {
+        if (bindingSet != null && bindingSet.size() > 0 && bindingNames != null && !bindingNames.isEmpty()) {
 
-            for (String bindingName : bindingNames){
+            for (String bindingName : bindingNames) {
 
                 Binding binding = bindingSet.getBinding(bindingName);
                 Value bindingValue = binding.getValue();

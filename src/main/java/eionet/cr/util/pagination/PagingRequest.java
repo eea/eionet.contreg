@@ -42,7 +42,7 @@ public class PagingRequest {
     }
 
     /**
-     *
+     * 
      * @param pageNumber
      * @return
      */
@@ -52,7 +52,7 @@ public class PagingRequest {
     }
 
     /**
-     *
+     * 
      * @param pageNumber
      * @param itemsPerPage
      * @return
@@ -77,7 +77,7 @@ public class PagingRequest {
     }
 
     /**
-     *
+     * 
      * @return
      */
     public int getOffset() {
@@ -86,7 +86,7 @@ public class PagingRequest {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
