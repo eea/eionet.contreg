@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -25,7 +24,7 @@ import eionet.cr.util.export.XmlUtil;
 
 /**
  * A {@link TupleQueryResultWriter} that writes tuple query results in the XML with Schema (Microsoft Office format).
- * 
+ *
  * @author Juhan Voolaid
  */
 public class CRXmlSchemaWriter implements TupleQueryResultWriter {
@@ -46,7 +45,13 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
      */
     private XMLStreamWriter writer = null;
 
-    public CRXmlSchemaWriter(OutputStream out) throws XMLStreamException, FactoryConfigurationError {
+    /**
+     *
+     * Class constructor.
+     * @param out
+     * @throws XMLStreamException
+     */
+    public CRXmlSchemaWriter(OutputStream out) throws XMLStreamException {
         writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out, ENCODING);
         elements = new LinkedHashMap<String, XmlElementMetadata>();
         validNames = new HashSet<String>();

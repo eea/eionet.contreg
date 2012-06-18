@@ -24,7 +24,6 @@ package eionet.cr.web.util;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -33,7 +32,7 @@ import eionet.cr.dto.UploadDTO;
 
 /**
  * Sitemap xml writer.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class SitemapXmlWriter {
@@ -56,13 +55,19 @@ public class SitemapXmlWriter {
      */
     private XMLStreamWriter writer = null;
 
-    public SitemapXmlWriter(OutputStream out) throws XMLStreamException, FactoryConfigurationError {
+    /**
+     *
+     * Class constructor.
+     * @param out
+     * @throws XMLStreamException
+     */
+    public SitemapXmlWriter(OutputStream out) throws XMLStreamException {
         writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out, ENCODING);
     }
 
     /**
      * Writes sitemap xml into stream based of the uploads data.
-     * 
+     *
      * @param uploads
      * @throws XMLStreamException
      */

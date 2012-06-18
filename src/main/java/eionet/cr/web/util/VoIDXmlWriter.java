@@ -24,7 +24,6 @@ package eionet.cr.web.util;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,7 +34,7 @@ import eionet.cr.dto.UploadDTO;
 
 /**
  * VoID xml writer.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class VoIDXmlWriter {
@@ -60,14 +59,21 @@ public class VoIDXmlWriter {
      */
     private XMLStreamWriter writer = null;
 
-    public VoIDXmlWriter(OutputStream out, String contextRoot) throws XMLStreamException, FactoryConfigurationError {
+    /**
+     *
+     * Class constructor.
+     * @param out
+     * @param contextRoot
+     * @throws XMLStreamException
+     */
+    public VoIDXmlWriter(OutputStream out, String contextRoot) throws XMLStreamException {
         writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out, ENCODING);
         this.contextRoot = contextRoot;
     }
 
     /**
      * Writes sitemap xml into stream based of the uploads data.
-     * 
+     *
      * @param uploads
      * @throws XMLStreamException
      */

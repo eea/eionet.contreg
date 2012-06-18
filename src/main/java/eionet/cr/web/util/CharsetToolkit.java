@@ -2,7 +2,6 @@ package eionet.cr.web.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -254,7 +253,13 @@ public class CharsetToolkit {
         return this.defaultCharset;
     }
 
-    public static Charset guessEncoding(File f, int bufferLength) throws FileNotFoundException, IOException {
+    /**
+     * @param f
+     * @param bufferLength
+     * @return
+     * @throws IOException
+     */
+    public static Charset guessEncoding(File f, int bufferLength) throws IOException {
         FileInputStream fis = new FileInputStream(f);
         byte[] buffer = new byte[bufferLength];
         fis.read(buffer);
@@ -264,8 +269,14 @@ public class CharsetToolkit {
         return toolkit.guessEncoding();
     }
 
-    public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset) throws FileNotFoundException,
-    IOException {
+    /**
+     * @param f
+     * @param bufferLength
+     * @param defaultCharset
+     * @return
+     * @throws IOException
+     */
+    public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset) throws IOException {
         FileInputStream fis = new FileInputStream(f);
         byte[] buffer = new byte[bufferLength];
         fis.read(buffer);
