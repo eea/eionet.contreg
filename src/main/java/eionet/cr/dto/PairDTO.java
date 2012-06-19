@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 public class PairDTO {
 

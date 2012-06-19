@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class TripleDTO {
 
@@ -73,7 +73,7 @@ public class TripleDTO {
 
     /**
      * Creates a new TripleDTO object.
-     * 
+     *
      * @param subjectUri subject URI
      * @param predicateUri predicate Uri
      * @param object Object value
@@ -86,7 +86,7 @@ public class TripleDTO {
 
     /**
      * Constructor of a new TripleDTO object.
-     * 
+     *
      * @param subjectHash Hashed subject
      * @param predicateHash hashed predicate
      * @param objectHash hashed object
@@ -100,7 +100,7 @@ public class TripleDTO {
 
     /**
      * Constructor of a new TripleDTO object.
-     * 
+     *
      * @param subjectHash hashed subject
      * @param predicateHash hashed predicate of the triple
      * @param object Object of the triple

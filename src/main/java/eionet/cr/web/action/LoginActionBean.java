@@ -52,9 +52,9 @@ import eionet.cr.web.security.CRUser;
  * Action bean that deals with user login/logout.
  * <p>
  * In CAS context Action bean simply delegates user login/logout to CAS.
- * 
+ *
  * @author gerasvad, altnyris
- * 
+ *
  */
 @UrlBinding(LOGIN_ACTION)
 public class LoginActionBean extends AbstractActionBean {
@@ -74,7 +74,7 @@ public class LoginActionBean extends AbstractActionBean {
 
     /**
      * Action method deals with user logging in.
-     * 
+     *
      * @return {@link RedirectResolution} to CAS login URL.
      * @throws DAOException
      */
@@ -110,7 +110,7 @@ public class LoginActionBean extends AbstractActionBean {
 
     /**
      * Method redirects to last event occurred before logging in.
-     * 
+     *
      * @return redirect resolution to last event occurred before logging in.
      * @throws DAOException
      */
@@ -126,7 +126,7 @@ public class LoginActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param user
      * @throws DAOException
      */
@@ -142,7 +142,7 @@ public class LoginActionBean extends AbstractActionBean {
 
     /**
      * Action method deals with user logging out.
-     * 
+     *
      * @return {@link RedirectResolution} to CAS logout URL.
      */
     @HandlesEvent(LOGOUT_EVENT)
@@ -171,7 +171,7 @@ public class LoginActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isLoginFailure() {

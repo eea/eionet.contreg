@@ -38,7 +38,7 @@ import eionet.cr.web.action.ExportTriplesActionBean;
 
 /**
  * Forwards SPARQL url to export triples action bean.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class SparqlBookmarksUrlFilter implements Filter {

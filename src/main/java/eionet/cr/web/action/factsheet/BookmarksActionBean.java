@@ -45,7 +45,7 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Bookmarks tab on factsheet page.
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/bookmarks.action")
@@ -65,7 +65,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * View action.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -79,7 +79,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * Delete action.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -102,7 +102,7 @@ public class BookmarksActionBean extends AbstractActionBean {
 
     /**
      * Initializes tabs.
-     * 
+     *
      * @throws DAOException
      */
     private void initTabs() throws DAOException {

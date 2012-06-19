@@ -56,9 +56,9 @@ import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
@@ -155,7 +155,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private List<String> deleteQueries;
 
     /**
-     * 
+     *
      * @return
      * @throws OpenRDFException
      * @throws DAOException
@@ -188,7 +188,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
      * to use inference.
-     * 
+     *
      * @throws DAOException
      */
     private void fillFromBookmark(String bookmarkedQueryUri) throws DAOException {
@@ -206,7 +206,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -245,7 +245,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Stores user's SPARQL bookmark.
-     * 
+     *
      * @throws DAOException
      */
     private void storePersonalBookmark() throws DAOException {
@@ -297,7 +297,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Stores shared SPARQL bookmark.
-     * 
+     *
      * @throws DAOException
      */
     private void storeSharedBookmark() throws DAOException {
@@ -348,7 +348,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws OpenRDFException
      */
@@ -448,7 +448,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Checks if user has update rights to "sparqlbookmarks" ACL.
-     * 
+     *
      * @return true, if user can add/delete shared SPARQL bookmars.
      */
     public boolean isSharedBookmarkPrivilege() {
@@ -460,7 +460,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param query
      * @param format
      * @param out
@@ -589,11 +589,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         int nrOfTriples = 0;
         try {
             // Maximum Rows count
-            int MAX_ROWS_COUNT = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
+            int maxRowsCount = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, MAX_ROWS_COUNT);
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -672,7 +672,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes shared bookmark.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -682,7 +682,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes personal bookmark.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -692,7 +692,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Deletes SPARQL bookmarked query from triplestore.
-     * 
+     *
      * @param deleteSharedBookmark true, if shared bookmark will be deleted, otherwise personal bookmark
      * @return
      * @throws DAOException
@@ -758,7 +758,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public long getExecutionTime() {
@@ -862,7 +862,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns bookmarked queries.
-     * 
+     *
      * @return the bookmarkedQueries
      * @throws DAOException
      */
@@ -878,7 +878,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns shared bookmarked queries.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -892,7 +892,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Returns bookmark's uri.
-     * 
+     *
      * @param bookmarkGraphUri
      * @param bookmarkName
      * @return

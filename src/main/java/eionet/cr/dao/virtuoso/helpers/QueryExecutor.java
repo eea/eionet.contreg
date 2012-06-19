@@ -13,9 +13,9 @@ import org.openrdf.repository.sparql.SPARQLRepository;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class QueryExecutor {
 
@@ -32,7 +32,7 @@ public class QueryExecutor {
     }
 
     /**
-     * 
+     *
      * @param endpoint
      * @param query
      */
@@ -67,7 +67,7 @@ public class QueryExecutor {
     }
 
     /**
-     * 
+     *
      * @param endpoint
      * @param query
      * @return boolean
@@ -108,7 +108,7 @@ public class QueryExecutor {
             + " UNION {?subj ?pred ?obj . FILTER (?obj = <@exploreSubject@> ) . }\n} LIMIT 50";
 
     /**
-     * 
+     *
      * @param endpoint
      * @param exploreSubject
      * @return String
@@ -121,7 +121,7 @@ public class QueryExecutor {
     }
 
     /**
-     * 
+     *
      * @return QueryResult
      */
     public QueryResult getResults() {

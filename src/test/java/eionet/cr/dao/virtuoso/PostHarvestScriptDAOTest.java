@@ -37,15 +37,15 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
- * 
+ *
+ *
  * @author Enriko Käsper
  */
 public class PostHarvestScriptDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override

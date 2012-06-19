@@ -21,9 +21,9 @@
 package eionet.cr.util.pagination;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class Page {
 
@@ -68,7 +68,7 @@ public class Page {
     }
 
     /**
-     * 
+     *
      * @param href
      */
     public void setHref(String href) {

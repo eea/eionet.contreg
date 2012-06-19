@@ -33,9 +33,9 @@ import eionet.cr.web.util.ApplicationCache;
 
 /**
  * TagCloud cache updater job.
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 public class TagCloudCacheUpdater implements StatefulJob {
 
@@ -44,7 +44,7 @@ public class TagCloudCacheUpdater implements StatefulJob {
 
     /**
      * Executes the job.
-     * 
+     *
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      * @param context current context.
      * @throws JobExecutionException if execution fails.

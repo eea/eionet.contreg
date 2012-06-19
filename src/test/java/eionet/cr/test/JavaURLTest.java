@@ -25,15 +25,15 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class JavaURLTest extends TestCase {
 
     /**
      * This method tests the rdf:about="..." when the base URL ends with a "/"
-     * 
+     *
      * @throws Exception
      */
     public void testURLWithSlash() throws Exception {
@@ -56,7 +56,7 @@ public class JavaURLTest extends TestCase {
 
     /**
      * This method tests the rdf:about="..." when the base url ends with a real file.
-     * 
+     *
      * @throws Exception
      */
     public void testURLWithHash() throws Exception {

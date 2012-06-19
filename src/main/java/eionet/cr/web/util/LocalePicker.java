@@ -28,9 +28,9 @@ import net.sourceforge.stripes.localization.DefaultLocalePicker;
 
 /**
  * Custom locale picker that overrides {@link DefaultLocalePicker}.
- * 
+ *
  * @author gerasvad
- * 
+ *
  */
 public class LocalePicker extends DefaultLocalePicker {
     /**

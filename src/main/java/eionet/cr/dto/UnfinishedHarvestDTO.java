@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UnfinishedHarvestDTO {
 
@@ -59,7 +59,7 @@ public class UnfinishedHarvestDTO {
     }
 
     /**
-     * 
+     *
      * @param source
      * @param genTime
      * @return

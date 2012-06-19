@@ -34,9 +34,9 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class OnDemandHarvester extends Thread {
 
@@ -66,7 +66,7 @@ public class OnDemandHarvester extends Thread {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Thread#run()
      */
     public void run() {
@@ -111,7 +111,7 @@ public class OnDemandHarvester extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private boolean wasException() {
@@ -119,7 +119,7 @@ public class OnDemandHarvester extends Thread {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      * @param userName
      * @return Resolution

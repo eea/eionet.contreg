@@ -12,9 +12,9 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class PostHarvestScriptTestResultsReader extends SPARQLResultSetBaseReader<Map<String, ObjectDTO>> {
 

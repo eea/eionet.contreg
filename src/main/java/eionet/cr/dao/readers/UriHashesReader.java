@@ -27,9 +27,9 @@ import java.util.Map;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class UriHashesReader extends SQLResultSetBaseReader {
@@ -38,7 +38,7 @@ public class UriHashesReader extends SQLResultSetBaseReader {
     private Map<Long, String> urisByHashes;
 
     /**
-     * 
+     *
      * @param urisByHashes
      */
     public UriHashesReader(Map<Long, String> map) {
@@ -47,7 +47,7 @@ public class UriHashesReader extends SQLResultSetBaseReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     @Override

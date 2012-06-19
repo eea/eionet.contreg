@@ -42,9 +42,9 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.web.util.StripesExceptionHandler;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class DownloadServlet extends HttpServlet {
 
@@ -64,7 +64,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process HEAD request. This returns the same headers as GET request, but without content.
-     * 
+     *
      * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
      */
     protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -74,7 +74,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process GET request.
-     * 
+     *
      * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -85,7 +85,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Process the actual request.
-     * 
+     *
      * @param request The request to be processed.
      * @param response The response to be created.
      * @param content Whether the request body should be written (GET) or not (HEAD).
@@ -329,7 +329,7 @@ public class DownloadServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param request
      * @param response
@@ -370,7 +370,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Returns true if the given accept header accepts the given value.
-     * 
+     *
      * @param acceptHeader The accept header.
      * @param toAccept The value to be accepted.
      * @return True if the given accept header accepts the given value.
@@ -385,7 +385,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Returns true if the given match header matches the given value.
-     * 
+     *
      * @param matchHeader The match header.
      * @param toMatch The value to be matched.
      * @return True if the given match header matches the given value.
@@ -399,7 +399,7 @@ public class DownloadServlet extends HttpServlet {
     /**
      * Returns a substring of the given string value from the given begin index to the given end index as a long. If the substring
      * is empty, then -1 will be returned
-     * 
+     *
      * @param value The string value to return a substring as long for.
      * @param beginIndex The begin index of the substring to be returned as long.
      * @param endIndex The end index of the substring to be returned as long.
@@ -412,7 +412,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Copy the given byte range of the given input to the given output.
-     * 
+     *
      * @param input The input to copy the given range to the given output for.
      * @param output The output to copy the given range from the given input for.
      * @param start Start of the byte range.
@@ -446,7 +446,7 @@ public class DownloadServlet extends HttpServlet {
 
     /**
      * Close the given resource.
-     * 
+     *
      * @param resource The resource to be closed.
      */
     private static void close(Closeable resource) {
@@ -473,7 +473,7 @@ public class DownloadServlet extends HttpServlet {
 
         /**
          * Construct a byte range.
-         * 
+         *
          * @param start Start of the byte range.
          * @param end End of the byte range.
          * @param total Total length of the byte source.

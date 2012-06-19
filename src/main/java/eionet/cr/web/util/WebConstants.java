@@ -21,9 +21,9 @@
 package eionet.cr.web.util;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public interface WebConstants {
 

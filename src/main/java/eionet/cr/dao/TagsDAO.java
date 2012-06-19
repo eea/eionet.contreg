@@ -25,14 +25,14 @@ import java.util.List;
 import eionet.cr.dto.TagDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 public interface TagsDAO extends DAO {
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */

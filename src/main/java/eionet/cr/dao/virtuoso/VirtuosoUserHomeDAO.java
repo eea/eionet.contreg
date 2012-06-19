@@ -39,14 +39,14 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * User home folder methods in Virtuoso.
- * 
+ *
  * @author Enriko Käsper
  */
 public class VirtuosoUserHomeDAO extends VirtuosoBaseDAO implements UserHomeDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.UserHomeDAO#getFolderContents(java.lang.String)
      */
     @Override

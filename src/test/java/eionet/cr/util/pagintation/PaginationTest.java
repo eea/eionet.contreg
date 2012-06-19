@@ -24,9 +24,9 @@ import junit.framework.TestCase;
 import eionet.cr.util.pagination.Pagination;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PaginationTest extends TestCase {
 

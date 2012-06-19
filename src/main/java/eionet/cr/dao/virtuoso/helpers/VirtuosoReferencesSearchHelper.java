@@ -12,9 +12,9 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
@@ -29,7 +29,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * Creates a new helper object.
-     * 
+     *
      * @param subjectUri resource subject URI.
      * @param pagingRequest paging request from the UI
      * @param sortingRequest sorting request for theresults table
@@ -45,7 +45,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
@@ -106,7 +106,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * returns sparql query for getting predicates for reference subjects.
-     * 
+     *
      * @param subjectUris subject uris of the references
      * @param sourceUri resource subject URI.
      * @return SPARQL query for getting subjects data.
@@ -135,7 +135,7 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
 
     /**
      * Bindings to be used in subjects data query. For safety are kept separately from main query bindings
-     * 
+     *
      * @return bindings for subject data query
      */
     public Bindings getSubjectDataBindings() {

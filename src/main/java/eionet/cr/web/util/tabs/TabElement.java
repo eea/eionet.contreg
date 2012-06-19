@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Tab formbean in tab menu.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class TabElement {
@@ -48,7 +48,7 @@ public class TabElement {
 
     /**
      * Class constructor.
-     * 
+     *
      * @param title
      * @param href
      * @param selectedTitle
@@ -61,7 +61,7 @@ public class TabElement {
 
     /**
      * Adds request parameter.
-     * 
+     *
      * @param key
      * @param value
      */

@@ -33,7 +33,7 @@ import eionet.cr.dto.SubjectDTO;
 
 /**
  * Helper for creating factsheet tab menu.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class FactsheetTabMenuHelper {
@@ -106,7 +106,7 @@ public class FactsheetTabMenuHelper {
 
     /**
      * Returns tabs.
-     * 
+     *
      * @param selected - selected tab's title
      * @return
      */
@@ -135,7 +135,7 @@ public class FactsheetTabMenuHelper {
 
     /**
      * Returns the list of tab objects without a selected tab.
-     * 
+     *
      * @return
      */
     public List<TabElement> getTypeSpecificTabs() {
@@ -144,7 +144,7 @@ public class FactsheetTabMenuHelper {
 
     /**
      * Returns the list of tab objects with the selected tab.
-     * 
+     *
      * @param selected - the title of the selected tab
      * @return List<TabElement>
      */

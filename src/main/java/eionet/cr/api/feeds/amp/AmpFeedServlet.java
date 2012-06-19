@@ -37,9 +37,9 @@ import eionet.cr.util.sesame.SesameUtil;
 /**
  * The AmpFeedServlet searches for objects of rdf:type "http://rdfdata.eionet.europa.eu/amp/ontology/Output". It then outputs the
  * predicates for which there are XML namespace declarations.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class AmpFeedServlet extends HttpServlet {
 
@@ -53,7 +53,7 @@ public class AmpFeedServlet extends HttpServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override

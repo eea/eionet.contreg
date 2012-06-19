@@ -34,9 +34,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
 
@@ -82,7 +82,7 @@ public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
 
     /**
      * Un-refines the given language code (i.e. "en-GB" becomes "en", "en_us" becomes "en", etc).
-     * 
+     *
      * @param literal
      * @return
      */
@@ -92,7 +92,7 @@ public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
     }
 
     /**
-     * 
+     *
      * @param factsheetDTO
      */
     public void fillPredicateLabels(FactsheetDTO factsheetDTO) {

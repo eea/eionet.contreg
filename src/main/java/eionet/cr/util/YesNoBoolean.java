@@ -21,16 +21,16 @@
 package eionet.cr.util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public enum YesNoBoolean {
 
     Y, N;
 
     /**
-     * 
+     *
      * @param b
      * @return
      */
@@ -39,7 +39,7 @@ public enum YesNoBoolean {
     }
 
     /**
-     * 
+     *
      * @param s
      * @return
      */

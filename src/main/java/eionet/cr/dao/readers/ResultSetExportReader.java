@@ -28,9 +28,9 @@ import java.util.List;
 import eionet.cr.util.export.SubjectExportEvent;
 
 /**
- * 
+ *
  * @author kaspeenr
- * 
+ *
  */
 public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
 
@@ -38,7 +38,7 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
     protected SubjectExportEvent exporter = null;
 
     /**
-     * 
+     *
      * @param exporter
      */
     public ResultSetExportReader(SubjectExportEvent exporter) {
@@ -47,7 +47,7 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
 
@@ -57,14 +57,14 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     public abstract void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
 
@@ -75,7 +75,7 @@ public abstract class ResultSetExportReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
 

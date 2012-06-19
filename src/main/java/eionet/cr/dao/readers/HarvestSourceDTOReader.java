@@ -28,15 +28,15 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSourceDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

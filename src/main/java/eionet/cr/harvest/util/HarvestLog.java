@@ -23,9 +23,9 @@ package eionet.cr.harvest.util;
 import org.apache.commons.logging.Log;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class HarvestLog implements Log {
 
@@ -60,7 +60,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#debug(java.lang.Object)
      */
     public void debug(Object obj) {
@@ -69,7 +69,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#debug(java.lang.Object, java.lang.Throwable)
      */
     public void debug(Object obj, Throwable throwable) {
@@ -78,7 +78,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#error(java.lang.Object)
      */
     public void error(Object obj) {
@@ -87,7 +87,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#error(java.lang.Object, java.lang.Throwable)
      */
     public void error(Object obj, Throwable throwable) {
@@ -96,7 +96,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#fatal(java.lang.Object)
      */
     public void fatal(Object obj) {
@@ -105,7 +105,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#fatal(java.lang.Object, java.lang.Throwable)
      */
     public void fatal(Object obj, Throwable throwable) {
@@ -114,7 +114,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#info(java.lang.Object)
      */
     public void info(Object obj) {
@@ -123,7 +123,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#info(java.lang.Object, java.lang.Throwable)
      */
     public void info(Object obj, Throwable throwable) {
@@ -132,7 +132,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isDebugEnabled()
      */
     public boolean isDebugEnabled() {
@@ -141,7 +141,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isErrorEnabled()
      */
     public boolean isErrorEnabled() {
@@ -150,7 +150,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isFatalEnabled()
      */
     public boolean isFatalEnabled() {
@@ -159,7 +159,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isInfoEnabled()
      */
     public boolean isInfoEnabled() {
@@ -168,7 +168,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isTraceEnabled()
      */
     public boolean isTraceEnabled() {
@@ -177,7 +177,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#isWarnEnabled()
      */
     public boolean isWarnEnabled() {
@@ -186,7 +186,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#trace(java.lang.Object)
      */
     public void trace(Object obj) {
@@ -195,7 +195,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#trace(java.lang.Object, java.lang.Throwable)
      */
     public void trace(Object obj, Throwable throwable) {
@@ -204,7 +204,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#warn(java.lang.Object)
      */
     public void warn(Object obj) {
@@ -213,7 +213,7 @@ public class HarvestLog implements Log {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.commons.logging.Log#warn(java.lang.Object, java.lang.Throwable)
      */
     public void warn(Object obj, Throwable throwable) {
@@ -221,7 +221,7 @@ public class HarvestLog implements Log {
     }
 
     /**
-     * 
+     *
      * @param obj
      * @return
      */

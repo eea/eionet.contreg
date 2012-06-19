@@ -12,9 +12,9 @@ import eionet.cr.util.sesame.SesameUtil;
 
 /**
  * Helper class for generating RDF from SPARQL query.
- * 
+ *
  * @author kaido
- * 
+ *
  */
 public final class RDFGenerator {
 
@@ -32,7 +32,7 @@ public final class RDFGenerator {
 
     /**
      * Generates RDF of given harvest source (graph) to the output stream.
-     * 
+     *
      * @param source String harvest source
      * @param output OutputStream where the RDF is sent to
      * @throws CRException if generating fails
@@ -61,7 +61,7 @@ public final class RDFGenerator {
 
     /**
      * Generates RDF of given uri proerties to the output stream.
-     * 
+     *
      * @param uri source uri
      * @param output OutputStream where the RDF is sent to
      * @throws CRException if generating fails

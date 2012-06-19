@@ -43,9 +43,9 @@ import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
 
@@ -59,7 +59,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
     private Collection<Long> predicateHashes = null;
 
     /**
-     * 
+     *
      * @param subjectsMap
      */
     public SubjectDataReader(Map<Long, SubjectDTO> subjectsMap) {
@@ -68,7 +68,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
     }
 
     /**
-     * 
+     *
      * @param subjectUris
      */
     public SubjectDataReader(List<String> subjectUris) {
@@ -81,7 +81,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -119,7 +119,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
     }
 
     /**
-     * 
+     *
      * @param subjectHash
      * @param subjectDTO
      */
@@ -142,7 +142,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -207,7 +207,7 @@ public class SubjectDataReader extends ResultSetMixedReader<SubjectDTO> {
 
     /**
      * @return String
-     * 
+     *
      */
     public String getPredicateHashesCommaSeparated() {
         return Util.toCSV(predicateHashes);

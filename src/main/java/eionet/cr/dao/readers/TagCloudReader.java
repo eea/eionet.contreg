@@ -10,9 +10,9 @@ import eionet.cr.dto.TagDTO;
 
 /**
  * Reads tag names and counts from Resultset.
- * 
+ *
  * @author kaido
- * 
+ *
  */
 public class TagCloudReader extends ResultSetMixedReader<TagDTO> {
     /**
@@ -27,7 +27,7 @@ public class TagCloudReader extends ResultSetMixedReader<TagDTO> {
 
     /**
      * converts Bindingset row to TagDTO.
-     * 
+     *
      * @param bindingSet BindingSet
      * @throws ResultSetReaderException if error in reading
      */

@@ -34,9 +34,9 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.YesNoBoolean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class RODDeliveryReader extends ResultSetMixedReader {
@@ -67,7 +67,7 @@ public class RODDeliveryReader extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -106,7 +106,7 @@ public class RODDeliveryReader extends ResultSetMixedReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Vector<Hashtable<String, Vector<String>>> getResultVector() {
@@ -115,7 +115,7 @@ public class RODDeliveryReader extends ResultSetMixedReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static Collection<Long> getPredicateHashes() {
@@ -124,7 +124,7 @@ public class RODDeliveryReader extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

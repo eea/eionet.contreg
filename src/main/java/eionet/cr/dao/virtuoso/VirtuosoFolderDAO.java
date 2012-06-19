@@ -64,7 +64,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
@@ -421,7 +421,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     }
 
     /**
-     * 
+     *
      * @param user
      * @return
      */

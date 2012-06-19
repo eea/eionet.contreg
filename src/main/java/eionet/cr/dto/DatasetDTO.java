@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  * Dataset DTO object.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class DatasetDTO {

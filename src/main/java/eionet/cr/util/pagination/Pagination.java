@@ -28,9 +28,9 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.AbstractSearchActionBean;
 
 /**
- * 
+ *
  * @author <a urlPath="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class Pagination {
 
@@ -55,7 +55,7 @@ public class Pagination {
     private List<Page> group;
 
     /**
-     * 
+     *
      * @param matchCount
      * @param curPageNum
      * @param urlPath
@@ -72,7 +72,7 @@ public class Pagination {
     }
 
     /**
-     * 
+     *
      * @param matchCount
      * @param curPageNum
      * @param urlPath
@@ -96,7 +96,7 @@ public class Pagination {
 
     /**
      * Gets pagination based on {@link PagingRequest}.
-     * 
+     *
      * @param pagingRequest
      * @param actionBean
      * @return
@@ -112,7 +112,7 @@ public class Pagination {
     }
 
     /**
-     * 
+     *
      * @param actionBean
      * @return
      */
@@ -152,7 +152,7 @@ public class Pagination {
 
     /**
      * Creates the query string to append to a link for a given page number.
-     * 
+     *
      * @param newPageNum
      * @return
      */
@@ -164,7 +164,7 @@ public class Pagination {
     }
 
     /**
-     * 
+     *
      * @param pageNum
      * @return
      */
@@ -200,7 +200,7 @@ public class Pagination {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static int pageLength() {
@@ -208,7 +208,7 @@ public class Pagination {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static int groupSize() {

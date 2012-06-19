@@ -46,7 +46,7 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Utility class to handle export procedure.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public abstract class Exporter {
@@ -67,7 +67,7 @@ public abstract class Exporter {
 
     /**
      * exports search result into given format.
-     * 
+     *
      * @param customSearch
      * @return
      * @throws IOException
@@ -77,7 +77,7 @@ public abstract class Exporter {
 
     /**
      * Creates Exporter object for given export format.
-     * 
+     *
      * @param exportFormat
      * @return
      */
@@ -130,7 +130,7 @@ public abstract class Exporter {
 
     /**
      * Returns the label of subject's uri or label depending on exportResourceUri value.
-     * 
+     *
      * @return
      */
     protected String getUriOrLabel() {
@@ -141,7 +141,7 @@ public abstract class Exporter {
 
     /**
      * This method creates the PaginRequest object for limiting the rows in the search results.
-     * 
+     *
      * @return
      */
     protected PagingRequest getRowLimitPagingRequest() {
@@ -150,7 +150,7 @@ public abstract class Exporter {
 
     /**
      * Returns the value of subject's uri or label depending on exportResourceUri value.
-     * 
+     *
      * @return
      */
     protected String getUriOrLabelValue(SubjectDTO subject) {
@@ -243,7 +243,7 @@ public abstract class Exporter {
 
     /**
      * Rerturns the number of rows the exporter output can handle
-     * 
+     *
      * @return
      */
     public static Integer getRowsLimit() {
@@ -252,7 +252,7 @@ public abstract class Exporter {
 
     /**
      * Returns the list of selected predicates uris
-     * 
+     *
      * @return
      */
     public List<String> getSelectedColumnsList() {

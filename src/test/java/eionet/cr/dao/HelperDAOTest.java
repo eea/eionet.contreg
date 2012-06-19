@@ -33,9 +33,9 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 public class HelperDAOTest {
 

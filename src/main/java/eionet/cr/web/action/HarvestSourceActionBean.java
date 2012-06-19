@@ -64,7 +64,7 @@ import eionet.cr.web.util.RDFGenerator;
 
 /**
  * Controller for adding new harvest source and for exporting source triples.
- * 
+ *
  * @author altnyris
  */
 @UrlBinding("/source.action")
@@ -117,7 +117,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return HarvestSourceDTO
      */
     public HarvestSourceDTO getHarvestSource() {
@@ -125,7 +125,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param harvestSource
      */
     public void setHarvestSource(HarvestSourceDTO harvestSource) {
@@ -133,7 +133,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return List<HarvestDTO>
      */
     public List<HarvestDTO> getHarvests() {
@@ -141,7 +141,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -152,7 +152,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      * @throws SchedulerException
@@ -206,7 +206,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param url
      * @throws DAOException
      */
@@ -222,7 +222,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      */
     public Resolution export() throws DAOException {
@@ -323,7 +323,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean validateAddEdit() {
@@ -378,7 +378,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Map<Integer,String>
      */
     public Map<Integer, String> getIntervalMultipliers() {
@@ -387,7 +387,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return int
      */
     public int getSelectedIntervalMultiplier() {
@@ -395,7 +395,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getIntervalMinutesDisplay() {
@@ -409,7 +409,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param minutes
      * @return
      */
@@ -436,7 +436,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     /**
      * Returns all the valid media types.
-     * 
+     *
      * @return
      */
     public List<String> getMediaTypes() {
@@ -492,7 +492,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isCurrentlyHarvested() {

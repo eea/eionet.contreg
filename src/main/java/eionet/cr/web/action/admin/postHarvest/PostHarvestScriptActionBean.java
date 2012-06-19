@@ -48,7 +48,7 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScript")
@@ -83,7 +83,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String testError;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -106,7 +106,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -133,7 +133,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -169,7 +169,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -194,7 +194,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private RedirectResolution resolutionToScripts() {
@@ -210,7 +210,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     @ValidationMethod(on = {"save"})
@@ -257,7 +257,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     @ValidationMethod(on = {"test"})
@@ -370,7 +370,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public List<String> getTypeUris() {
@@ -417,7 +417,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getPageToRender() {
@@ -426,7 +426,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getBackToTargetUrl() {
@@ -434,7 +434,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param backToTargetUrl
      */
     public void setBackToTargetUrl(String backToTargetUrl) {
@@ -442,7 +442,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public List<Map<String, ObjectDTO>> getTestResults() {
@@ -450,7 +450,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public List<String> getTestResultColumns() {
@@ -484,7 +484,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getHarvestedSourceVariable() {
@@ -492,7 +492,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getAssociatedTypeVariable() {

@@ -41,9 +41,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * Stripes action generating the list of user home folders. Potentially have search capabilities.
- * 
+ *
  * @author Enriko Käsper
- * 
+ *
  */
 
 @UrlBinding("/home")
@@ -60,7 +60,7 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @Override
@@ -80,7 +80,7 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     @Override

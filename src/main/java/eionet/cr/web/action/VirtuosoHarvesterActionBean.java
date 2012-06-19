@@ -27,7 +27,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     private String sourceUrl;
 
     /**
-     * 
+     *
      * @return
      */
     @DefaultHandler
@@ -36,7 +36,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws OpenRDFException
      * @throws IOException
@@ -101,7 +101,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getSourceUrl() {
@@ -109,7 +109,7 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param sourceUrl
      */
     public void setSourceUrl(String sourceUrl) {

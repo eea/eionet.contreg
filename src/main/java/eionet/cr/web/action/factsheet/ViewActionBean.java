@@ -43,7 +43,7 @@ import eionet.cr.web.util.tabs.TabElement;
 /**
  * A bean that checks if the subject by the given URI has a type-specific factsheet tab, and if it has indeed, then redirects to
  * that tab. Otherwise redirects simply to {@link FactsheetActionBean}.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/view.action")
@@ -53,7 +53,7 @@ public class ViewActionBean extends AbstractActionBean {
     private String uri;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */

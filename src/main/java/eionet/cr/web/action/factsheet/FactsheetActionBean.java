@@ -75,9 +75,9 @@ import eionet.cr.web.util.tabs.TabElement;
 
 /**
  * Factsheet.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
@@ -142,7 +142,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     private List<DatasetDTO> userCompiledDatasets;
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails
      */
@@ -169,7 +169,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Handle for ajax harvesting.
-     * 
+     *
      * @return Resolution
      */
     public Resolution harvestAjax() {
@@ -185,7 +185,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Schedules a harvest for resource.
-     * 
+     *
      * @return view resolution
      * @throws HarvestException if harvesting fails
      * @throws DAOException if query fails
@@ -204,7 +204,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * helper method to eliminate code duplication.
-     * 
+     *
      * @return Pair<Boolean, String> feedback messages
      * @throws HarvestException if harvesting fails
      * @throws DAOException if query fails
@@ -255,7 +255,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails if query fails
      */
@@ -265,7 +265,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails if query fails
      */
@@ -280,7 +280,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails
      */
@@ -295,7 +295,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails if query fails
      */
@@ -334,7 +334,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException if query fails
      */
@@ -510,7 +510,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getUrl() {
@@ -519,7 +519,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * True if admin is logged in.
-     * 
+     *
      * @return boolean
      */
     public boolean isAdminLoggedIn() {
@@ -528,7 +528,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * Setter of admin logged in property.
-     * 
+     *
      * @param adminLoggedIn boolean
      */
     public void setAdminLoggedIn(final boolean adminLoggedIn) {
@@ -536,7 +536,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      * @throws DAOException if query fails if query fails
      */
@@ -566,7 +566,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isCurrentlyHarvested() {
@@ -576,7 +576,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isCompiledDataset() {
@@ -591,7 +591,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws DAOException
      */
@@ -609,7 +609,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkLabel() {
@@ -617,7 +617,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param bookmarkLabel
      */
     public void setBookmarkLabel(String bookmarkLabel) {
@@ -661,7 +661,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param paramName
      * @return
      */
@@ -675,7 +675,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getPredicatePageSize() {
@@ -684,7 +684,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public List<TabElement> getTabs() {
@@ -692,7 +692,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean getSubjectIsType() {
@@ -707,7 +707,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     @HandlesEvent("openPredObjValue")

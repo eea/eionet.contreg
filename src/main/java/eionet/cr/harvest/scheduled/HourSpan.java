@@ -21,9 +21,9 @@
 package eionet.cr.harvest.scheduled;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 class HourSpan {
 
@@ -32,7 +32,7 @@ class HourSpan {
     private int to;
 
     /**
-     * 
+     *
      * @param from
      * @param to
      */
@@ -56,7 +56,7 @@ class HourSpan {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int length() {
@@ -64,7 +64,7 @@ class HourSpan {
     }
 
     /**
-     * 
+     *
      * @param hour
      * @return
      */
@@ -74,7 +74,7 @@ class HourSpan {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

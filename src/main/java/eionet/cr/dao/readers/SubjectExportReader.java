@@ -39,9 +39,9 @@ import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.SubjectExportEvent;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tietoenator.com">Enriko Käsper</a>
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class SubjectExportReader extends ResultSetExportReader {
@@ -55,7 +55,7 @@ public class SubjectExportReader extends ResultSetExportReader {
     private Collection<ObjectDTO> currentObjects = null;
 
     /**
-     * 
+     *
      * @param exporter
      */
     public SubjectExportReader(SubjectExportEvent exporter) {
@@ -64,7 +64,7 @@ public class SubjectExportReader extends ResultSetExportReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetExportReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -165,7 +165,7 @@ public class SubjectExportReader extends ResultSetExportReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override

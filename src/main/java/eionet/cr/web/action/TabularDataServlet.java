@@ -44,7 +44,7 @@ import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.TriplesToOutputStream;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class TabularDataServlet extends HttpServlet {
@@ -64,7 +64,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param request
      * @param response
      * @throws IOException
@@ -96,7 +96,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param request
      * @param response
@@ -117,7 +117,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param exception
      * @param request
      * @param response
@@ -138,7 +138,7 @@ public class TabularDataServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param httpRequest
      * @return
      */

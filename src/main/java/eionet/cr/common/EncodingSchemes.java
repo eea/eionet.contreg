@@ -26,9 +26,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class EncodingSchemes extends HashMap<String, String[]> {
 
@@ -46,7 +46,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static EncodingSchemes getInstance() {
@@ -57,7 +57,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param servletContext
      * @return
@@ -68,7 +68,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @param id
      * @return
      */
@@ -77,7 +77,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param returnSelfIfNull
      * @return
@@ -89,7 +89,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param labels
      * @param servletContext
@@ -103,7 +103,7 @@ public class EncodingSchemes extends HashMap<String, String[]> {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static int getCount() {

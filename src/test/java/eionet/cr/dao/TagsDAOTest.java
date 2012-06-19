@@ -31,9 +31,9 @@ import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.RdfLoader;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 public class TagsDAOTest {
 

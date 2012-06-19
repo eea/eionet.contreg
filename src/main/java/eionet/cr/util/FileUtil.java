@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * File operation utilities.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
 public final class FileUtil {
@@ -54,7 +54,7 @@ public final class FileUtil {
 
     /**
      * Downloads the contents of the given URL into the given file and closes the file.
-     * 
+     *
      * @param urlString downloadable url
      * @param toFile output file location
      * @throws IOException if input of output fails
@@ -78,7 +78,7 @@ public final class FileUtil {
     /**
      * Writes the content of the given InputStream into the given file and closes the file. The caller is responsible for closing
      * the InputStream!
-     * 
+     *
      * @param inputStream InputSream
      * @param toFile File output file
      * @return total bytes count

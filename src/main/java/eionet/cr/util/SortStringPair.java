@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 public class SortStringPair {

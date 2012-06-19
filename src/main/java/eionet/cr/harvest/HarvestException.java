@@ -23,9 +23,9 @@ package eionet.cr.harvest;
 import eionet.cr.common.CRException;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class HarvestException extends CRException {
 
@@ -37,7 +37,7 @@ public class HarvestException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public HarvestException(String message) {
@@ -45,7 +45,7 @@ public class HarvestException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

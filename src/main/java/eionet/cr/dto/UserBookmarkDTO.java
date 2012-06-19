@@ -4,9 +4,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class UserBookmarkDTO {
 
@@ -29,7 +29,7 @@ public class UserBookmarkDTO {
     private String typeLabel;
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkUrl() {
@@ -37,7 +37,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * 
+     *
      * @param bookmarkUrl
      */
     public void setBookmarkUrl(String bookmarkUrl) {
@@ -45,7 +45,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkUrlHtmlFormatted() {
@@ -117,7 +117,7 @@ public class UserBookmarkDTO {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getBookmarkTitle() {

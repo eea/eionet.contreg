@@ -3,9 +3,9 @@ package eionet.cr.harvest.statistics.dto;
 import java.util.Date;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tietoenator.com">Jaak Kapten</a>
- * 
+ *
  */
 
 public class HarvestedUrlCountDTO {

@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Delivery filter.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class DeliveryFilterDTO {
@@ -56,7 +56,7 @@ public class DeliveryFilterDTO {
 
     /**
      * Returns displayable label of the filter.
-     * 
+     *
      * @return
      */
     public String getLabel() {

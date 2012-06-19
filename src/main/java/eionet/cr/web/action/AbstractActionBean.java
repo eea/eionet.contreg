@@ -47,9 +47,9 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Root class for all CR ActionBeans.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public abstract class AbstractActionBean implements ActionBean {
 
@@ -81,7 +81,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sourceforge.stripes.action.ActionBean#getContext()
      */
     @Override
@@ -91,7 +91,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Sets ActionBean context.
-     * 
+     *
      * @param context ActionBeanContext
      * @see net.sourceforge.stripes.action.ActionBean#setContext(net.sourceforge.stripes.action.ActionBeanContext)
      */
@@ -114,7 +114,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Method checks whether user is logged in or not.
-     * 
+     *
      * @return true if user is logged in.
      */
     public final boolean isUserLoggedIn() {
@@ -123,7 +123,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Current user in servlet context.
-     * 
+     *
      * @return CRUser
      */
     public CRUser getUser() {
@@ -133,7 +133,7 @@ public abstract class AbstractActionBean implements ActionBean {
     /**
      * Adds system message. The message will be shown in a simple rectangle and is to provide information on <i>successful</i>
      * actions.
-     * 
+     *
      * @param message Message text in HTML format.
      */
     public void addSystemMessage(String message) {
@@ -142,7 +142,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Same as {@link #addSystemMessage(String)}, but message added at specified index.
-     * 
+     *
      * @param index
      * @param message
      */
@@ -153,7 +153,7 @@ public abstract class AbstractActionBean implements ActionBean {
     /**
      * Adds caution message. The message will be shown wrapped in the &lt;div class="caution-msg"&lt; element. A caution is less
      * severe than a warning. It can e.g. be used when the application has to say to the user that it has ignored some input.
-     * 
+     *
      * @param message Message text in HTML format.
      */
     public void addCautionMessage(final String message) {
@@ -162,7 +162,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Adds warning message. The message will be shown wrapped in the &lt;div class="warning-msg"&lt; element.
-     * 
+     *
      * @param message Message text in HTML format.
      */
     public void addWarningMessage(String message) {
@@ -171,7 +171,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Returns Stripes resource bundle.
-     * 
+     *
      * @return ResourceBundle resources
      */
     public ResourceBundle getBundle() {
@@ -180,7 +180,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getUrlBinding() {
@@ -189,7 +189,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isPostRequest() {
@@ -197,7 +197,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isGetRequest() {
@@ -205,7 +205,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param field
      * @param error
      */
@@ -214,7 +214,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param error
      */
     public void addGlobalValidationError(ValidationError error) {
@@ -222,7 +222,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param simpleErrorMessage
      */
     public void addGlobalValidationError(String simpleErrorMessage) {
@@ -230,7 +230,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean hasValidationErrors() {
@@ -238,7 +238,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public void addMessage(Message message) {
@@ -246,7 +246,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public void addMessage(String message) {
@@ -254,7 +254,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Harvest getCurrentQueuedHarvest() {
@@ -263,7 +263,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Get the user's preferred languages from the browser's accept-language header.
-     * 
+     *
      * @return an unsorted HashSet of languages.
      */
     public List<String> getAcceptedLanguages() {
@@ -282,7 +282,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String[] excludeFromSortAndPagingUrls() {
@@ -290,7 +290,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isHomeContext() {
@@ -298,7 +298,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param isHomeContext
      */
     public void setHomeContext(boolean isHomeContext) {
@@ -306,7 +306,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @param context
      * @return
      */
@@ -316,7 +316,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isEeaTemplate() {

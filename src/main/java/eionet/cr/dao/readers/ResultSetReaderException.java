@@ -3,9 +3,9 @@ package eionet.cr.dao.readers;
 import eionet.cr.common.CRException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class ResultSetReaderException extends CRException {
 
@@ -17,7 +17,7 @@ public class ResultSetReaderException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public ResultSetReaderException(String message) {
@@ -25,7 +25,7 @@ public class ResultSetReaderException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

@@ -32,9 +32,9 @@ import eionet.doc.DocumentationService;
 import eionet.doc.dto.DocPageDTO;
 
 /**
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
@@ -46,7 +46,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     private DocPageDTO pageObject;
 
     /**
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -64,7 +64,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Edit page
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -83,7 +83,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Adds content into documentation table.
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */
@@ -113,7 +113,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
     /**
      * Deletes content
-     * 
+     *
      * @return Resolution
      * @throws Exception
      */

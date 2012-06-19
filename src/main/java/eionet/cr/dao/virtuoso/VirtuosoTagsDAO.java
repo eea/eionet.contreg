@@ -11,7 +11,7 @@ import eionet.cr.util.Bindings;
 
 /**
  * Queries for handling tags.
- * 
+ *
  * @author jaanus
  */
 public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
@@ -23,7 +23,7 @@ public class VirtuosoTagsDAO extends VirtuosoBaseDAO implements TagsDAO {
 
     /**
      * Returns tag cloud.
-     * 
+     *
      * @see eionet.cr.dao.TagsDAO#getTagCloud()
      * @return List<TagDTO>
      * @throws DAOException if query fails

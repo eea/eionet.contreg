@@ -20,9 +20,9 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class Bindings {
 
@@ -40,7 +40,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -49,7 +49,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -58,7 +58,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -67,7 +67,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -76,7 +76,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -85,7 +85,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -94,7 +94,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -103,7 +103,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -112,7 +112,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -121,7 +121,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -130,7 +130,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param name
      * @param value
      */
@@ -149,7 +149,7 @@ public class Bindings {
     }
 
     /**
-     * 
+     *
      * @param query
      * @param valueFactory
      */
@@ -202,7 +202,7 @@ public class Bindings {
 
     /**
      * Textual representation of predicates and values.
-     * 
+     *
      * @return key value (Object.toString()) pairs separated by equal sign.
      */
     public String toString() {
@@ -225,7 +225,7 @@ public class Bindings {
 
         /**
          * initializes blank node.
-         * 
+         *
          * @param id Bode ID (with blank node prefix)
          */
         BlankNode(String id) {
@@ -240,7 +240,7 @@ public class Bindings {
     /**
      * Common method to set IRI that is suppposed to be URI. As IRI and URI have different standards if the URI is invalid URI the
      * query has to use IRI() function and the parameter is given as string not URI.
-     * 
+     *
      * @param name Param Name
      * @param value Param Value
      */
@@ -255,7 +255,7 @@ public class Bindings {
 
     /**
      * Returns bindings.
-     * 
+     *
      * @return
      */
     public HashMap<String, Object> getBindings() {

@@ -45,9 +45,9 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class ConversionsParser {
 
@@ -56,7 +56,7 @@ public class ConversionsParser {
     private String rdfConversionXslFileName = null;
 
     /**
-     * 
+     *
      * @param file
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -78,7 +78,7 @@ public class ConversionsParser {
     }
 
     /**
-     * 
+     *
      * @param inputStream
      * @throws IOException
      * @throws SAXException
@@ -100,7 +100,7 @@ public class ConversionsParser {
     }
 
     /**
-     * 
+     *
      * @param conversionElement
      */
     private void readConversion(Element conversionElement) {
@@ -143,7 +143,7 @@ public class ConversionsParser {
     }
 
     /**
-     * 
+     *
      * @param schemaUri
      * @return
      * @throws IOException
@@ -173,7 +173,7 @@ public class ConversionsParser {
     }
 
     /**
-     * 
+     *
      * @param schemaUri
      * @return
      * @throws ParserConfigurationException

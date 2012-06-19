@@ -3,9 +3,9 @@ package eionet.cr.filestore;
 import java.io.IOException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class FileAlreadyExistsException extends IOException {
 

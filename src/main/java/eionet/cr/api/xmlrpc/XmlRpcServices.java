@@ -51,9 +51,9 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.qawcommons.DataflowResultDto;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class XmlRpcServices implements Services {
 
@@ -65,7 +65,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#getResourcesSinceTimestamp(java.util.Date)
      */
     public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
@@ -125,7 +125,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
      */
     public List dataflowSearch(Map<String, String> criteria) throws CRException {
@@ -178,7 +178,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
      */
     public String pushContent(String content, String sourceUrl) throws CRException {
@@ -203,16 +203,16 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#getEntries(java.util.Hashtable)
-     * 
+     *
      * This method implements what getEntries did in the old Content Registry. It is called by ROD, though it can be used by any
      * other application as well.
-     * 
+     *
      * The purpose is to return all metadata of all resources that match the given criteria. The criteria is given as a
      * <code>java.util.Hashtable</code>, where keys represent metadata attribute names and values represent their values. Data type
      * of both keys and values is <code>java.lang.String</code>.
-     * 
+     *
      * The method returns a <code>java.util.Vector</code> of type <code>java.util.Hashtable</code>. Every such hashtable represents
      * one resource that contains exactly 1 key that is a String that represents the resource's URI. The value is another
      * <code>java.lang.Hashtable</code> where the data type of keys is <code>java.lang.String</code> and the data type of values is
@@ -263,7 +263,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
      */
     public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException {
@@ -292,7 +292,7 @@ public class XmlRpcServices implements Services {
     }
 
     /**
-     * 
+     *
      * @param subjectDTO
      * @param predicateUri
      * @param objType
@@ -313,7 +313,7 @@ public class XmlRpcServices implements Services {
     }
 
     /**
-     * 
+     *
      * @param subjectDTO
      * @param predicateUri
      * @return
@@ -324,7 +324,7 @@ public class XmlRpcServices implements Services {
     }
 
     /**
-     * 
+     *
      * @param objects
      * @return
      */
@@ -344,7 +344,7 @@ public class XmlRpcServices implements Services {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.api.xmlrpc.Services#getXmlFilesBySchema(java.lang.String)
      */
     public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {

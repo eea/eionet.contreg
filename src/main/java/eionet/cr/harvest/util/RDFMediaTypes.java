@@ -29,7 +29,7 @@ import java.util.Map;
 import org.openrdf.rio.RDFFormat;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class RDFMediaTypes {
@@ -52,7 +52,7 @@ public class RDFMediaTypes {
     }
 
     /**
-     * 
+     *
      * @param httpResponseContentType
      * @return
      */
@@ -72,7 +72,7 @@ public class RDFMediaTypes {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static Collection<String> collection() {

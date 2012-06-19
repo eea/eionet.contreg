@@ -33,15 +33,15 @@ import eionet.cr.web.util.WebConstants;
 
 /**
  * JUnit test tests AbstractQawActionBean functionality.
- * 
+ *
  * @author gerasvad, altnyris
- * 
+ *
  */
 public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**
      * Tests method {@link AbstractCrActionBean#getUserName()} when user is logged in.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -59,7 +59,7 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**
      * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is logged in.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -77,7 +77,7 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**
      * Tests method {@link AbstractCrActionBean#isUserLoggedIn()} when user is not logged in.
-     * 
+     *
      * @throws Exception
      */
     @Test

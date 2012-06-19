@@ -39,7 +39,7 @@ import eionet.cr.web.util.SitemapXmlWriter;
 
 /**
  * Semantic sitemap controller.
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/sitemap.xml")
@@ -49,7 +49,7 @@ public class SemanticSitemapActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(SemanticSitemapActionBean.class);
 
     /**
-     * 
+     *
      * @return
      */
     @DefaultHandler

@@ -31,15 +31,15 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class HarvestMessageDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override

@@ -32,9 +32,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.util.FactsheetObjectId;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class ObjectDTO implements Serializable {
 
@@ -77,7 +77,7 @@ public class ObjectDTO implements Serializable {
     private String objectMD5;
 
     /**
-     * 
+     *
      * @param value
      * @param language
      * @param literal
@@ -95,7 +95,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param value
      * @param language
      * @param literal
@@ -106,7 +106,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param value
      * @param literal
      */
@@ -115,7 +115,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param value
      * @param literal
      * @param datatype
@@ -125,7 +125,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param hash
      * @param sourceHash
      * @param derivSourceHash
@@ -140,7 +140,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param hash
      * @param sourceHash
      * @param derivSourceHash
@@ -187,7 +187,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -196,7 +196,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
@@ -215,7 +215,7 @@ public class ObjectDTO implements Serializable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
@@ -223,7 +223,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return long
      */
     public long getHash() {
@@ -259,7 +259,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getSourceSmart() {
@@ -288,7 +288,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param hash
      */
     public void setHash(long hash) {
@@ -331,7 +331,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return long
      */
     public long getSourceHashSmart() {
@@ -346,7 +346,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return String
      */
     public String getId() {
@@ -375,7 +375,7 @@ public class ObjectDTO implements Serializable {
     /**
      * Returns datatype label to display. If the namespace is known replaces it with the prefix defined in Namespace otherwise
      * returns URL with full namespace
-     * 
+     *
      * @return String datatype label
      */
     public String getDataTypeLabel() {
@@ -392,7 +392,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param datatype
      */
     public void setDatatype(URI datatype) {
@@ -400,7 +400,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param value
      * @return
      */
@@ -409,7 +409,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param value
      * @param datatype
      * @return
@@ -419,7 +419,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param uri
      * @return
      */
@@ -435,7 +435,7 @@ public class ObjectDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getDisplayValue() {

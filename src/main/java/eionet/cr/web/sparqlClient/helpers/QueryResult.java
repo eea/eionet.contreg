@@ -16,9 +16,9 @@ import org.openrdf.query.TupleQueryResult;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class QueryResult {
 
@@ -50,7 +50,7 @@ public class QueryResult {
     private static final Log LOGGER = LogFactory.getLog(QueryResult.class);
 
     /**
-     * 
+     *
      * @param queryResult
      * @throws QueryEvaluationException
      */
@@ -166,7 +166,7 @@ public class QueryResult {
 
     /**
      * Shows if all rows were returned (did not exceed maximum rowcount.
-     * 
+     *
      * @return boolean
      */
     public boolean isAllRowsReturned() {
@@ -175,7 +175,7 @@ public class QueryResult {
 
     /**
      * Setter of allRowsReturned.
-     * 
+     *
      * @param allRowsReturned to indicate if full query is returned.
      */
     public void setAllRowsReturned(final boolean allRowsReturned) {

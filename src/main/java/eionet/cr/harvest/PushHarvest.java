@@ -29,9 +29,9 @@ import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class PushHarvest extends BaseHarvest {
 
@@ -39,7 +39,7 @@ public class PushHarvest extends BaseHarvest {
     protected String pushedContent = null;
 
     /**
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -96,7 +96,7 @@ public class PushHarvest extends BaseHarvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
      */
     @Override

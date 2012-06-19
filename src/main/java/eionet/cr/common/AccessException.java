@@ -1,9 +1,9 @@
 package eionet.cr.common;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tietoenator.com">Jaak Kapten</a>
- * 
+ *
  */
 
 public class AccessException extends Exception {
@@ -13,7 +13,7 @@ public class AccessException extends Exception {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

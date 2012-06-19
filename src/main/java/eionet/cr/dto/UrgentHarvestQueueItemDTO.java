@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import java.io.Serializable;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UrgentHarvestQueueItemDTO implements Serializable {
 
@@ -83,7 +83,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isPushHarvest() {

@@ -13,9 +13,9 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.util.Util;
 
 /**
- * 
+ *
  * @author risto
- * 
+ *
  * @param <T>
  */
 public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
@@ -28,7 +28,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -38,7 +38,7 @@ public class RecentUploadsReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")

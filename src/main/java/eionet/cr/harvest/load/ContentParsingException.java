@@ -24,13 +24,13 @@ package eionet.cr.harvest.load;
 import eionet.cr.common.CRException;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class ContentParsingException extends CRException {
 
     /**
-     * 
+     *
      * Class constructor.
      */
     public ContentParsingException() {
@@ -38,7 +38,7 @@ public class ContentParsingException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public ContentParsingException(String message) {
@@ -46,7 +46,7 @@ public class ContentParsingException extends CRException {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

@@ -30,7 +30,7 @@ import eionet.cr.harvest.HarvestException;
 
 /**
  * Test urgent harvests.
- * 
+ *
  * @author Enriko Käsper
  */
 public class UrgentHarvestTest extends TestCase {

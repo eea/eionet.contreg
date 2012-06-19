@@ -24,7 +24,7 @@ import java.util.Collection;
 
 /**
  * Object representing User home folder.
- * 
+ *
  * @author Enriko Käsper
  */
 public class UserFolderDTO {

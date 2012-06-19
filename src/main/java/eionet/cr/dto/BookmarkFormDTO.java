@@ -18,7 +18,7 @@ public class BookmarkFormDTO {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param source
      * @param title

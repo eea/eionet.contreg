@@ -23,7 +23,7 @@ import eionet.cr.util.sesame.SesameUtil;
 
 /**
  * @author Risto Alt
- * 
+ *
  */
 public class InferencingTest {
 

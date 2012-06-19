@@ -33,9 +33,9 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dao.util.UriLabelPair;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class DeliverySearchPicklistReader<T> extends ResultSetMixedReader<T> {
 
@@ -59,7 +59,7 @@ public class DeliverySearchPicklistReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override

@@ -20,7 +20,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 
 /**
  * Harvested URL count per day for the last X (default 42) days.
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  */
 
@@ -56,7 +56,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {

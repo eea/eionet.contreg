@@ -28,9 +28,9 @@ import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.util.WebConstants;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public abstract class VirtuosoBaseDAO {
 
@@ -42,7 +42,7 @@ public abstract class VirtuosoBaseDAO {
     protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
 
     /**
-     * 
+     *
      * @return
      */
     protected Connection getSQLConnection() throws SQLException {
@@ -51,7 +51,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param graphUri
      * @throws DAOException
      */
@@ -69,7 +69,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param bindings
@@ -92,7 +92,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param reader
@@ -107,7 +107,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL query that updates data.
-     * 
+     *
      * @param sparql SPARQL
      * @param bindings Query bindings, if no bindings, null is accepted as the value
      * @param conn Virtuoso repository connection
@@ -122,7 +122,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param sparul
      * @param defautGraphUri
      * @return
@@ -145,7 +145,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL with no bindings that is expected to have only one result and returns the unique value.
-     * 
+     *
      * @param <T>
      * @param sql
      * @param params
@@ -160,7 +160,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Executes SPARQL that is expected to have only one result and returns the unique value.
-     * 
+     *
      * @param <T>
      * @param sparql
      * @param bindings Binding values for the prepared SPARQL
@@ -192,7 +192,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Returns list of Data objects of given subjects for given predicates.
-     * 
+     *
      * @param subjectUris list of subject URIs
      * @param predicateUris array of predicates which data is requested
      * @param reader bindingset reader
@@ -230,10 +230,10 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Returns a SPARQL query that will retrieve the given subjects' given predicates. Predicates and graphs are optional.
-     * 
+     *
      * For very long objects, only first 2000 characters will be returned, to prevent VirtuosoException: SR319: Max row length
      * exceeded exception (temp col)
-     * 
+     *
      * @param subjectUris - collection of subjects whose data is being queried
      * @param predicateUris - array of predicates that are queried (if null or empty, no predicate filter is applied)
      * @param bindings - SPARQL variable bindings to fill when building the returned query
@@ -262,7 +262,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Count the total number of rows retrieved by the query constructed in SearchHelper.
-     * 
+     *
      * @param helper SearchHelper object.
      * @return number of rows
      * @throws DAOException
@@ -277,7 +277,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Count the total number of rows retrieved by the query constructed in SearchHelper.
-     * 
+     *
      * @param helper SearchHelper object.
      * @param inParams
      * @return number of rows
@@ -291,7 +291,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
-     * 
+     *
      * @param <T> - type of the returned object
      * @param sql - sql string
      * @param params - parameters to insert into sql string
@@ -315,7 +315,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * executes insert or update with given sql and parameters.
-     * 
+     *
      * @param sql - sql string to execute
      * @param params - sql params
      * @throws DAOException
@@ -340,7 +340,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * 
+     *
      * @param <T>
      * @param sql
      * @param params
@@ -355,7 +355,7 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      * Orders the map the same way as subjectUris list is ordered. Returns new list.
-     * 
+     *
      * @param <T>
      * @param subjectUris
      * @param map

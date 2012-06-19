@@ -23,9 +23,9 @@ package eionet.cr.dataset;
 import java.util.HashMap;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class CurrentLoadedDatasets {
 
@@ -40,7 +40,7 @@ public class CurrentLoadedDatasets {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param user
      */
@@ -52,7 +52,7 @@ public class CurrentLoadedDatasets {
     }
 
     /**
-     * 
+     *
      * @param url
      */
     public static synchronized void removeLoadedDataset(String url) {
@@ -62,7 +62,7 @@ public class CurrentLoadedDatasets {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return
      */

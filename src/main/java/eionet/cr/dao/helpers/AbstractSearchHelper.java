@@ -31,9 +31,9 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * Abstract helper class for constructing queries. Contains methods for building paging, sorting and inference parts.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public abstract class AbstractSearchHelper implements SearchHelper {
 
@@ -46,7 +46,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
     protected String sortOrder;
 
     /**
-     * 
+     *
      * @param pagingRequest
      * @param sortingRequest
      */
@@ -62,7 +62,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
     }
 
     /**
-     * 
+     *
      * @param inParams
      * @return String
      */
@@ -79,21 +79,21 @@ public abstract class AbstractSearchHelper implements SearchHelper {
     }
 
     /**
-     * 
+     *
      * @param inParams
      * @return
      */
     protected abstract String getOrderedQuery(List<Object> inParams);
 
     /**
-     * 
+     *
      * @param inParams
      * @return String
      */
     public abstract String getUnorderedQuery(List<Object> inParams);
 
     /**
-     * 
+     *
      * @param inParams
      * @return String
      */
@@ -101,7 +101,7 @@ public abstract class AbstractSearchHelper implements SearchHelper {
 
     /**
      * Default implementation of getQueryBindings. Returns null if not specified in the helper implementation.
-     * 
+     *
      * @return prepared query bindings
      */
     @Override

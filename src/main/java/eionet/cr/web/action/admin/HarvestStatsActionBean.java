@@ -35,7 +35,7 @@ import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Action bean for displaying harvest statistics.
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/admin/harveststats")
@@ -49,7 +49,7 @@ public class HarvestStatsActionBean extends AbstractActionBean {
 
     /**
      * Handles the page view.
-     * 
+     *
      * @return
      * @throws DAOException
      */

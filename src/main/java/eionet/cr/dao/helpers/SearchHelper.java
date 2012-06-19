@@ -25,21 +25,21 @@ import java.util.List;
 import eionet.cr.util.Bindings;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public interface SearchHelper {
 
     /**
-     * 
+     *
      * @param inParams
      * @return
      */
     String getQuery(List<Object> inParams);
 
     /**
-     * 
+     *
      * @param inParams
      * @return
      */
@@ -47,7 +47,7 @@ public interface SearchHelper {
 
     /**
      * Bindings of the search query.
-     * 
+     *
      * @return filled query bindings for the query to be used in the PreparedStatement
      */
     Bindings getQueryBindings();

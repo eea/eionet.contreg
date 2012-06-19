@@ -36,7 +36,7 @@ import eionet.cr.web.sparqlClient.helpers.SPARQLEndpoints;
 
 /**
  * Action bean for other SPARQL systems. Currently provides SPARQL client functionality.
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/sparqlclient")
@@ -59,7 +59,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
 
     /**
      * Submits SPARQL query.
-     * 
+     *
      * @return Resolution
      */
     @DefaultHandler
@@ -82,7 +82,7 @@ public class SPARQLSystemsAction extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return List<String>
      */
     public List<String> getEndpoints() {

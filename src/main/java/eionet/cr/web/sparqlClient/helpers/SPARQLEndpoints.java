@@ -12,9 +12,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SPARQLEndpoints extends ArrayList<String> {
 
@@ -62,7 +62,7 @@ public class SPARQLEndpoints extends ArrayList<String> {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static SPARQLEndpoints getInstance() {

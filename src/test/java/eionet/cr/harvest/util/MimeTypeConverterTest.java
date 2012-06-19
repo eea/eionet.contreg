@@ -23,9 +23,9 @@ package eionet.cr.harvest.util;
 import junit.framework.TestCase;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class MimeTypeConverterTest extends TestCase {
 

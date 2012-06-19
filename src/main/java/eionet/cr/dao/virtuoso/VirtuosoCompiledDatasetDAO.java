@@ -31,7 +31,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * DAO methods for compiled datasets in Virtuoso.
- * 
+ *
  * @author altnyris
  */
 public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements CompiledDatasetDAO {

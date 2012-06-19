@@ -25,7 +25,7 @@ import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class EMailAuthenticator extends Authenticator {
@@ -35,7 +35,7 @@ public class EMailAuthenticator extends Authenticator {
     private String password;
 
     /**
-     * 
+     *
      * @param username
      * @param password
      */

@@ -21,9 +21,9 @@
 package eionet.cr.util.sql;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class ParameterizedSQL {
 
@@ -32,7 +32,7 @@ public class ParameterizedSQL {
     private String[] paramNames;
 
     /**
-     * 
+     *
      * @param sqlString
      * @param paramNames
      */

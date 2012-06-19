@@ -7,14 +7,14 @@ import eionet.cr.dao.readers.ResultSetExportReader;
 
 /**
  * Interface for DAO methods dealing with the export of search result lists.
- * 
+ *
  * @author Enriko Käsper
  * @author Jaanus Heinlaid
  */
 public interface ExporterDAO extends DAO {
 
     /**
-     * 
+     *
      * @param filters
      * @param selectedPredicates
      * @param reader

@@ -12,9 +12,9 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
 
@@ -64,7 +64,7 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override

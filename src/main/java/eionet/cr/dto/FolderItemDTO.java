@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Folder item DTO.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class FolderItemDTO implements Comparable<FolderItemDTO> {
@@ -58,7 +58,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is reserved folder.
-     * 
+     *
      * @return
      */
     public boolean isReservedFolder() {
@@ -67,7 +67,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is folder.
-     * 
+     *
      * @return
      */
     public boolean isFolder() {
@@ -76,7 +76,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is file.
-     * 
+     *
      * @return
      */
     public boolean isFile() {
@@ -85,7 +85,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * True, if type is reserved file.
-     * 
+     *
      * @return
      */
     public boolean isReservedFile() {

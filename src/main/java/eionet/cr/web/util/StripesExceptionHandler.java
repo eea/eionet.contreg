@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public class StripesExceptionHandler implements ExceptionHandler {
 
@@ -47,7 +47,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
      */
     public void init(Configuration configuration) throws Exception {
@@ -55,7 +55,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sourceforge.stripes.exception.ExceptionHandler#handle(java.lang.Throwable, javax.servlet.http.HttpServletRequest,
      * javax.servlet.http.HttpServletResponse)
      */
@@ -71,7 +71,7 @@ public class StripesExceptionHandler implements ExceptionHandler {
     }
 
     /**
-     * 
+     *
      * @param servletException
      * @return
      */

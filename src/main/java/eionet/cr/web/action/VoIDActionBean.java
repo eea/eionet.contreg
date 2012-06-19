@@ -39,7 +39,7 @@ import eionet.cr.web.util.VoIDXmlWriter;
 
 /**
  * The Vocabulary of Interlinked Datasets (VoID) action bean. http://www.w3.org/TR/void/
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/void.rdf")
@@ -49,7 +49,7 @@ public class VoIDActionBean extends AbstractActionBean {
 
     /**
      * Handles the request for viewing VoID.
-     * 
+     *
      * @return
      */
     @DefaultHandler

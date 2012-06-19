@@ -36,7 +36,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  * Delivery filter DAO.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class VirtuosoDeliveryFilterDAO extends VirtuosoBaseDAO implements DeliveryFilterDAO {

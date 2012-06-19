@@ -8,20 +8,20 @@ import eionet.cr.dao.readers.ResultSetReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public interface SQLResultSetReader<T> extends ResultSetReader<T> {
 
     /**
-     * 
+     *
      * @param resultSetMetaData
      */
     void startResultSet(ResultSetMetaData resultSetMetaData);
 
     /**
-     * 
+     *
      * @param rs
      * @throws SQLException
      * @throws ResultSetReaderException

@@ -33,16 +33,16 @@ import eionet.cr.dao.readers.ResultSetMixedReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  * @param <T>
  */
 public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -53,7 +53,7 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
 
     /**
      * Reads row from the bindingset that contains only one column.
-     * 
+     *
      * @param bindingSet - Query result bindingset
      */
     @SuppressWarnings("unchecked")

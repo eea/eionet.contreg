@@ -41,7 +41,7 @@ import eionet.cr.util.sql.SQLUtil;
 /**
  * Reads harvest source URLs from the given binding set, and inserts them into HARVEST_SOURCE table, using {@link PreparedStatement}
  * and execution by batches (to save performance).
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class NewSourcesReaderWriter extends ResultSetMixedReader {
@@ -70,7 +70,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /**
      * Class constructor.
-     * 
+     *
      * @param sqlConn
      */
     public NewSourcesReaderWriter(Connection sqlConn) {

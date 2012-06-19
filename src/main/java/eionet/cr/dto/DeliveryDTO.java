@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.util.URIUtil;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class DeliveryDTO extends HarvestBaseDTO implements java.io.Serializable {
 

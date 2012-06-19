@@ -7,7 +7,7 @@ import eionet.cr.common.Namespace;
 public class NamespaceUtil {
 
     /**
-     * 
+     *
      * @param url
      * @return
      */
@@ -25,7 +25,7 @@ public class NamespaceUtil {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return
      */
@@ -42,7 +42,7 @@ public class NamespaceUtil {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param prefix
      */
@@ -51,7 +51,7 @@ public class NamespaceUtil {
     }
 
     /**
-     * 
+     *
      * @param namespace
      * @return
      */

@@ -23,9 +23,9 @@ package eionet.cr.web.action;
 import eionet.cr.util.SortOrder;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public abstract class DisplaytagSearchActionBean extends AbstractActionBean {
 

@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Data of harvest statistics.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class HarvestStatDTO extends HarvestDTO {

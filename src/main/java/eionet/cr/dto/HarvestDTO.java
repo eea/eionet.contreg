@@ -27,9 +27,9 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 import eionet.cr.web.util.WebConstants;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
 

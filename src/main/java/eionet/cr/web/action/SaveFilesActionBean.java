@@ -46,9 +46,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.factsheet.CompiledDatasetActionBean;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/saveFiles.action")
 public class SaveFilesActionBean extends DisplaytagSearchActionBean {

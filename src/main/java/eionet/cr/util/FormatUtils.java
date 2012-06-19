@@ -30,9 +30,9 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- * 
+ *
  * Utility class to hold handy functions for formatting.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public final class FormatUtils {
@@ -45,7 +45,7 @@ public final class FormatUtils {
 
     /**
      * Returns object values for the given predicate in given langauges.
-     * 
+     *
      * @param predicateUri predicate URI
      * @param subjectDTO SubjectDTO data object for subject
      * @param languages Set<String> language codes

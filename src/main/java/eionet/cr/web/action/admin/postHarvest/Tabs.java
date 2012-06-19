@@ -7,14 +7,14 @@ import net.sourceforge.stripes.action.UrlBinding;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 
 /**
- * 
+ *
  * @author meie
- * 
+ *
  */
 public class Tabs {
 
     /**
-     * 
+     *
      * @return
      */
     public static List<Tab> generate(TargetType targetType) {

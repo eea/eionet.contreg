@@ -13,7 +13,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 
 /**
  * About page controller.
- * 
+ *
  * @author Juhan Voolaid
  */
 @UrlBinding("/about.action")
@@ -21,7 +21,7 @@ public class AboutActionBean extends AbstractActionBean {
 
     /**
      * Handles view page.
-     * 
+     *
      * @return
      */
     @DefaultHandler
@@ -32,7 +32,7 @@ public class AboutActionBean extends AbstractActionBean {
 
     /**
      * Returns triple count.
-     * 
+     *
      * @return
      * @throws DAOException
      */

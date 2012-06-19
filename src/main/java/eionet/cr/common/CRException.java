@@ -22,7 +22,7 @@ package eionet.cr.common;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public class CRException extends Exception {
 
@@ -39,7 +39,7 @@ public class CRException extends Exception {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */
@@ -48,9 +48,9 @@ public class CRException extends Exception {
     }
 
     /**
-     * 
+     *
      * Class constructor.
-     * 
+     *
      * @param cause
      */
     public CRException(Throwable cause) {

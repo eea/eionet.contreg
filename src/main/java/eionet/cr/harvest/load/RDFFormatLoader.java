@@ -33,7 +33,7 @@ import org.openrdf.rio.Rio;
 
 /**
  * Implementation of {@link ContentLoader} for the content in {@link RDFFormat}.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class RDFFormatLoader implements ContentLoader {
@@ -43,7 +43,7 @@ public class RDFFormatLoader implements ContentLoader {
 
     /**
      * The loader will expect content in the given {@link RDFFormat}.
-     * 
+     *
      * @param rdfFormat
      */
     public RDFFormatLoader(RDFFormat rdfFormat) {

@@ -5,16 +5,16 @@ import org.dbunit.dataset.IDataSet;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {

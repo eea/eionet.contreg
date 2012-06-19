@@ -54,7 +54,7 @@ import eionet.cr.common.Predicates;
 
 /**
  * Implementation of {@link ContentLoader} for the content in RRS/Atom format.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class RSSFormatLoader implements ContentLoader {
@@ -91,7 +91,7 @@ public class RSSFormatLoader implements ContentLoader {
     }
 
     /**
-     * 
+     *
      * @param feed
      * @throws RepositoryException
      */
@@ -134,7 +134,7 @@ public class RSSFormatLoader implements ContentLoader {
     }
 
     /**
-     * 
+     *
      * @param item
      */
     private int saveFeedItemMetadata(SyndEntry item, SyndFeed feed) {
@@ -156,7 +156,7 @@ public class RSSFormatLoader implements ContentLoader {
 
     /**
      * Removes any HTML content from the given text.
-     * 
+     *
      * @param text
      * @return
      */

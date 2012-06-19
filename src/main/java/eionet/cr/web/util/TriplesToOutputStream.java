@@ -47,7 +47,7 @@ public class TriplesToOutputStream {
     private static final String rdfSNameSpace = "http://www.w3.org/2000/01/rdf-schema#";
 
     /**
-     * 
+     *
      * @param out
      * @param subjectUri
      * @param triples
@@ -122,7 +122,7 @@ public class TriplesToOutputStream {
     }
 
     /**
-     * 
+     *
      * @param out
      * @param subjectUri
      * @param triples

@@ -21,9 +21,9 @@
 package eionet.cr.web.util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class CustomSearchFilter {
 

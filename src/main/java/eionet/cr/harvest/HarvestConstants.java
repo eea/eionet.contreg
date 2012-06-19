@@ -22,7 +22,7 @@
 package eionet.cr.harvest;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class HarvestConstants {

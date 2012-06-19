@@ -8,9 +8,9 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sql.SQLResultSetReader;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, SPARQLResultSetReader<T> {
 
@@ -28,7 +28,7 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#startResultSet(java.sql.ResultSetMetaData)
      */
     @Override
@@ -37,7 +37,7 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
     }
 
     /**
-     * 
+     *
      * @param bindingNames
      */
     public void startResultSet(List<String> bindingNames) {
@@ -46,7 +46,7 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
      */
     @Override
@@ -57,7 +57,7 @@ public abstract class ResultSetMixedReader<T> implements SQLResultSetReader<T>, 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
      */
     @Override

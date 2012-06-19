@@ -33,7 +33,7 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override

@@ -28,15 +28,15 @@ import java.util.Map;
 import eionet.cr.dao.readers.ResultSetReaderException;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class SQLValueReader extends SQLResultSetBaseReader<Map<String, SQLValue>> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

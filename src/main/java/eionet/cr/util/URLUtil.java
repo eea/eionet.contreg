@@ -45,9 +45,9 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class URLUtil {
 
@@ -65,7 +65,7 @@ public class URLUtil {
     private static final List<String> sessionIdentifiers = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
 
     /**
-     * 
+     *
      * @param s
      * @return boolean
      */
@@ -84,7 +84,7 @@ public class URLUtil {
 
     /**
      * Create the User-agent header value from config file.
-     * 
+     *
      * @return the User-agent value.
      */
     public static String userAgentHeader() {
@@ -98,7 +98,7 @@ public class URLUtil {
     /**
      * Connect to the URL and check if it is modified since the timestamp argument. Returns null, if it cannot be determined for
      * sure.
-     * 
+     *
      * @param urlString
      * @param timestamp
      * @return true if it is modified.
@@ -142,7 +142,7 @@ public class URLUtil {
     /**
      * Connect to the URL and check if it exists at the remote end. Local ids are removed (the part after the '#') before
      * connecting.
-     * 
+     *
      * @param urlStr the URL to check.
      * @return true is the URL does <b>NOT</b> exist.
      */
@@ -169,7 +169,7 @@ public class URLUtil {
 
     /**
      * A cross-the-stream-to-get-water replacement for {@link java.net.URL#getHost()}.
-     * 
+     *
      * @param uri
      * @param dflt
      * @return String
@@ -193,7 +193,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return URL
      * @throws MalformedURLException
@@ -205,7 +205,7 @@ public class URLUtil {
 
     /**
      * Escapes IRI's reserved characters in the given URL string.
-     * 
+     *
      * @param url
      * @return
      */
@@ -215,7 +215,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param urlConnection
      */
     public static void disconnect(URLConnection urlConnection) {
@@ -230,7 +230,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param url1
      * @param url2
      * @return
@@ -241,7 +241,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param urlString
      * @return
      */
@@ -316,7 +316,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      * @throws UnsupportedEncodingException
@@ -332,7 +332,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param str
      * @param exceptions
      * @return
@@ -362,7 +362,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param uri
      * @return
      * @throws UnsupportedEncodingException
@@ -392,7 +392,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param str
      * @return
      */
@@ -406,7 +406,7 @@ public class URLUtil {
     }
 
     /**
-     * 
+     *
      * @param path
      * @return
      * @throws UnsupportedEncodingException

@@ -25,9 +25,9 @@ import java.text.SimpleDateFormat;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public abstract class SearchResultColumn {
 
@@ -62,14 +62,14 @@ public abstract class SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @param object
      * @return
      */
     public abstract String format(Object object);
 
     /**
-     * 
+     *
      * @param escapeXml
      */
     public void setEscapeXml(boolean escapeXml) {
@@ -77,7 +77,7 @@ public abstract class SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public abstract String getSortParamValue();

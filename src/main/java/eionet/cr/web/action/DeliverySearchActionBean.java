@@ -51,9 +51,9 @@ import eionet.cr.web.util.CustomPaginatedList;
 import eionet.cr.web.util.WebConstants;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 @UrlBinding("/deliverySearch.action")
 public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
@@ -88,7 +88,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -127,7 +127,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -165,7 +165,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Returns label from the pair collection.
-     * 
+     *
      * @param obligationValue
      * @return
      */
@@ -182,7 +182,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Returns label from the pair collection.
-     * 
+     *
      * @param localityValue
      * @return
      */
@@ -197,7 +197,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Action for searching deliveries using a user's stored filter.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -220,7 +220,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     /**
      * Action for searching deliveries from a compiled dataset's stored filter.
-     * 
+     *
      * @return
      * @throws DAOException
      */

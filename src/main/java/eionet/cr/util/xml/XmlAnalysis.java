@@ -49,9 +49,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import eionet.cr.common.CRException;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class XmlAnalysis {
 
@@ -63,7 +63,7 @@ public class XmlAnalysis {
     private SAXDoctypeReader doctypeReader = new SAXDoctypeReader();
 
     /**
-     * 
+     *
      * @param file
      * @throws SAXException
      * @throws ParserConfigurationException
@@ -98,7 +98,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @param inputStream
      * @return
      * @throws SAXException
@@ -147,7 +147,7 @@ public class XmlAnalysis {
      * Method returns an URI by which conversions for the analyzed file should be looked for. If the file has a declared schema, it
      * is returned. If not, then the method falls back to system DTD. If that one is not found either, the method falls back to
      * public DTD. And should that one be missing too, the method returns fully qualified URI of the file's start element.
-     * 
+     *
      * @return the result
      */
     public String getConversionSchema() {
@@ -171,7 +171,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getStartElemLocalName() {
@@ -179,7 +179,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getStartElemNamespace() {
@@ -187,7 +187,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getSchemaLocation() {
@@ -195,7 +195,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getSchemaNamespace() {
@@ -203,7 +203,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getStartElemUri() {
@@ -222,7 +222,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getSystemDtd() {
@@ -230,7 +230,7 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String getPublicDtd() {
@@ -238,9 +238,9 @@ public class XmlAnalysis {
     }
 
     /**
-     * 
+     *
      * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
-     * 
+     *
      */
     private class Handler extends DefaultHandler {
 
@@ -253,7 +253,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
          * org.xml.sax.Attributes)
          */
@@ -295,7 +295,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
          */
         public void error(SAXParseException e) {
@@ -303,7 +303,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
          */
         public void fatalError(SAXParseException e) {
@@ -311,7 +311,7 @@ public class XmlAnalysis {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.xml.sax.helpers.DefaultHandler#warning(org.xml.sax.SAXParseException)
          */
         public void warning(SAXParseException e) throws SAXException {

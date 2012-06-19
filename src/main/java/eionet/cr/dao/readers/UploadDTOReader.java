@@ -36,9 +36,9 @@ import eionet.cr.dto.UploadDTO;
 import eionet.cr.util.Hashes;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
@@ -55,7 +55,7 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -85,7 +85,7 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.readers.ResultSetMixedReader#getResultList()
      */
     public List<UploadDTO> getResultList() {
@@ -94,7 +94,7 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

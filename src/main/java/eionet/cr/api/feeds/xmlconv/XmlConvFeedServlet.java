@@ -43,9 +43,9 @@ import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class XmlConvFeedServlet extends HttpServlet {
 
@@ -60,7 +60,7 @@ public class XmlConvFeedServlet extends HttpServlet {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

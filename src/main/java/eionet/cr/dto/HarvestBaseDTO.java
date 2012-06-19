@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class HarvestBaseDTO {
 
@@ -77,7 +77,7 @@ public class HarvestBaseDTO {
     }
 
     /**
-     * 
+     *
      * @param dto
      * @param messageType
      */

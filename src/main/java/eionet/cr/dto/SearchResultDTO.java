@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Search result.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class SearchResultDTO<T> {

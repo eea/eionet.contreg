@@ -27,9 +27,9 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class HarvestingJobListener implements JobListener {
 
@@ -40,7 +40,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.quartz.JobListener#getName()
      */
     public String getName() {
@@ -49,7 +49,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
      */
     public void jobExecutionVetoed(JobExecutionContext context) {
@@ -58,7 +58,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
      */
     public void jobToBeExecuted(JobExecutionContext context) {
@@ -67,7 +67,7 @@ public class HarvestingJobListener implements JobListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.quartz.JobListener#jobWasExecuted(org.quartz.JobExecutionContext, org.quartz.JobExecutionException)
      */
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException exception) {

@@ -52,7 +52,7 @@ public class XmlElementMetadata {
 
     /**
      * Apply new length only if it is bigger than exisiting
-     * 
+     *
      * @param length
      */
     public void setMaxLength(int length) {
@@ -63,7 +63,7 @@ public class XmlElementMetadata {
 
     /**
      * Get type value. If no value defined, then it is a STRING
-     * 
+     *
      * @return
      */
     public Type getType() {
@@ -73,7 +73,7 @@ public class XmlElementMetadata {
     /**
      * apply new type only if the type is not a string already or the new type is string It is impossible to change the type
      * numeric, if it is STRING already
-     * 
+     *
      * @param type
      */
     public void setType(Type type) {
@@ -84,7 +84,7 @@ public class XmlElementMetadata {
 
     /**
      * Try to guess the element data type from the given value
-     * 
+     *
      * @param value
      */
     public void setType(String stringValue) {

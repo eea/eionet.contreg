@@ -54,7 +54,7 @@ public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     /**
      * Default construtor. File name with test data is given as the parameter. Supports files in N3 format exported from SPARQL
      * endpoint.
-     * 
+     *
      * @param fileName Test data file name in test-resources.
      */
     public MockVirtuosoBaseDAOTest(String fileName) {

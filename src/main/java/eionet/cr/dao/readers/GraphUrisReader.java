@@ -7,14 +7,14 @@ import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 /**
- * 
+ *
  * @author risto
  */
 public class GraphUrisReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
@@ -23,7 +23,7 @@ public class GraphUrisReader<T> extends ResultSetMixedReader<T> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")

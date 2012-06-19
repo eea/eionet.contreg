@@ -36,7 +36,7 @@ import eionet.cr.web.util.ApplicationCache;
 
 /**
  * Job fills delivery search pick/list cache.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class DeliverySearchPicklistCacheUpdater implements StatefulJob {
@@ -48,7 +48,7 @@ public class DeliverySearchPicklistCacheUpdater implements StatefulJob {
 
     /**
      * Executes the job.
-     * 
+     *
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      * @param context current context.
      * @throws JobExecutionException if execution fails.

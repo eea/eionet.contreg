@@ -33,7 +33,7 @@ import eionet.cr.web.util.ApplicationCache;
 
 /**
  * Job updates cache that contains recent resources.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  */
 public class RecentResourcesCacheUpdater implements StatefulJob {
@@ -49,7 +49,7 @@ public class RecentResourcesCacheUpdater implements StatefulJob {
 
     /**
      * Executes the job.
-     * 
+     *
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      * @param context current context.
      * @throws JobExecutionException if execution fails.

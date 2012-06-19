@@ -14,7 +14,7 @@ public class DateColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {

@@ -29,9 +29,9 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.dao.util.SubProperties;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class SubPropertiesReader extends ResultSetMixedReader {
@@ -40,7 +40,7 @@ public class SubPropertiesReader extends ResultSetMixedReader {
     private SubProperties subProperties;
 
     /**
-     * 
+     *
      * @param subProperties
      */
     public SubPropertiesReader(SubProperties subProperties) {
@@ -53,7 +53,7 @@ public class SubPropertiesReader extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -62,7 +62,7 @@ public class SubPropertiesReader extends ResultSetMixedReader {
 
     /**
      * Reads row from SPARQL bindingset and creates an elemnt in Subproperties hash.
-     * 
+     *
      * @param bindingSet SPARQL query result
      */
     @Override

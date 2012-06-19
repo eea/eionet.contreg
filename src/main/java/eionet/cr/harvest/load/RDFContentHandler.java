@@ -38,7 +38,7 @@ import eionet.cr.util.sql.SQLUtil;
 /**
  * Implementation of OpenRDF's {@link RDFHandler} that will be used by implementations of {@link ContentLoader}. Contains callback
  * methods for listening to the content coming from {@link ContentLoader} and loading them into repository.
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class RDFContentHandler implements RDFHandler {

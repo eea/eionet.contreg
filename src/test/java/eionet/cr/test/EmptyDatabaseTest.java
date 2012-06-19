@@ -28,9 +28,9 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class EmptyDatabaseTest extends DatabaseTestCase {
 

@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 /**
  * Type definition ...
- * 
+ *
  * @author Kaido Laine
  */
 public class URLUtilTest extends TestCase {

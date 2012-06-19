@@ -25,7 +25,7 @@ import eionet.cr.web.action.AbstractActionBean;
 
 /**
  * Action bean for bulk add/delete harvest sources page.
- * 
+ *
  * @author kaido
  */
 @UrlBinding("/admin/bulkharvest")
@@ -45,7 +45,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * View sources bulk management page.
-     * 
+     *
      * @return Resolution
      */
     @DefaultHandler
@@ -60,7 +60,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database and schedule them for harvest.
-     * 
+     *
      * @return Resolution
      */
     public Resolution add() {
@@ -76,7 +76,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Delete parsed (see {@link #parseSourceUrlsString()}) sources from the database.
-     * 
+     *
      * @return Resolution
      */
     public Resolution delete() {
@@ -90,7 +90,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return The string containing source URLs in this request.
      */
     public String getSourceUrlsString() {
@@ -98,7 +98,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param harvestSources The string containing source URLs in this request.
      */
     public void setSourceUrlsString(final String harvestSources) {
@@ -107,7 +107,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * True if the user is authenticated and is an administrator.
-     * 
+     *
      * @return boolean
      */
     public boolean isAdminLoggedIn() {
@@ -123,7 +123,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Parses new-line-separated source URLs into a list that will be used by {@link #add()} and {@link #delete()}.
-     * 
+     *
      * @param strSources
      */
     @Before(stages = {LifecycleStage.EventHandling})

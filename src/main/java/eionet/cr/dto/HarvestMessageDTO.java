@@ -23,9 +23,9 @@ package eionet.cr.dto;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class HarvestMessageDTO implements java.io.Serializable {
 
@@ -113,7 +113,7 @@ public class HarvestMessageDTO implements java.io.Serializable {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param messageType
      * @param stackTrace

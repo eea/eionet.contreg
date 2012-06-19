@@ -26,7 +26,7 @@ import eionet.cr.util.URLUtil;
 
 /**
  * @author Risto Alt
- * 
+ *
  */
 public class LoadTriplesJob implements Job {
 

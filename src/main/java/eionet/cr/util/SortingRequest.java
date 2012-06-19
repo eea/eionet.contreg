@@ -22,7 +22,7 @@ package eionet.cr.util;
 
 /**
  * Encapsulates data about table sorting.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class SortingRequest {

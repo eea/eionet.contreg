@@ -19,7 +19,7 @@ import eionet.cr.web.util.RegisterUrl;
 
 /**
  * Bookmarklet backend action bean.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a> (modified for CR)
  */

@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UploadDTO {
 
@@ -34,7 +34,7 @@ public class UploadDTO {
     private String triples;
 
     /**
-     * 
+     *
      * @param subjectUri
      */
     public UploadDTO(String subjectUri) {

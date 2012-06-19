@@ -41,9 +41,9 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URLUtil;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SubjectsRDFWriter {
 
@@ -81,7 +81,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param prefix
      */
@@ -90,7 +90,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private String getAttributes() {
@@ -110,7 +110,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private String getRootElementEnd() {
@@ -125,7 +125,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @param subjects
      * @param out
      * @throws IOException
@@ -239,7 +239,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return
      */
@@ -249,7 +249,7 @@ public class SubjectsRDFWriter {
     }
 
     /**
-     * 
+     *
      * @param subject
      */
     protected void preProcessSubject(SubjectDTO subject) {

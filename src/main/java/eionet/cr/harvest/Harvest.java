@@ -22,19 +22,19 @@
 package eionet.cr.harvest;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public interface Harvest {
 
     /**
-     * 
+     *
      * @throws HarvestException
      */
     void execute() throws HarvestException;
 
     /**
-     * 
+     *
      * @param harvestUser
      */
     void setHarvestUser(String harvestUser);
@@ -45,7 +45,7 @@ public interface Harvest {
     String getContextUrl();
 
     /**
-     * 
+     *
      * @return
      */
     int getStoredTriplesCount();
@@ -58,8 +58,8 @@ public interface Harvest {
 
     /**
      * Returns last harvest duration in milliseconds.
-     * 
+     *
      * @return time in milliseconds, null if no last (successful) harvest
      */
-    public Long getLastHarvestDuration();
+    Long getLastHarvestDuration();
 }

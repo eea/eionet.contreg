@@ -35,15 +35,15 @@ import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -64,7 +64,7 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private List<TagDTO> getTestData() {

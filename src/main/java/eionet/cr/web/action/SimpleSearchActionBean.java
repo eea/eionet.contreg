@@ -51,9 +51,9 @@ import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @UrlBinding("/simpleSearch.action")
 public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
@@ -70,7 +70,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     private String queryString;
 
     /**
-     * 
+     *
      * @return ForwardResolution
      */
     @DefaultHandler
@@ -80,7 +80,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     public Resolution search() throws DAOException {
@@ -141,7 +141,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /**
      * @throws DAOException
-     * 
+     *
      */
     protected static void setLastModifiedDates(Collection<SubjectDTO> subjects) throws DAOException {
 
@@ -171,7 +171,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
     }
 
     /**
-     * 
+     *
      * @param errors
      */
     @ValidationMethod(on = "search")
@@ -197,7 +197,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
     public List<SearchResultColumn> getColumns() {

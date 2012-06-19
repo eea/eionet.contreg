@@ -67,7 +67,7 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

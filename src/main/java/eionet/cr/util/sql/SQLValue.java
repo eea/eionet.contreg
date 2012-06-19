@@ -28,9 +28,9 @@ import java.sql.Timestamp;
 import java.sql.Types;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class SQLValue {
 
@@ -39,7 +39,7 @@ public class SQLValue {
     private int sqlType;
 
     /**
-     * 
+     *
      * @param value
      * @param sqlType
      */
@@ -255,7 +255,7 @@ public class SQLValue {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -263,7 +263,7 @@ public class SQLValue {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Object getObject() {
@@ -271,7 +271,7 @@ public class SQLValue {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getSQLType() {

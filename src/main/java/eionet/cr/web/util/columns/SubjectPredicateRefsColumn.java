@@ -37,9 +37,9 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
 //same as SubjectPredicateColumn class exept Title is shown as combination of Uri ending + actual label.
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
@@ -69,7 +69,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /**
      * Constructor.
-     * 
+     *
      * @param title
      * @param isSortable
      * @param predicateUri
@@ -97,9 +97,9 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-     * 
+     *
      * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
      * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
      * factsheet links will be created.
@@ -149,7 +149,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @param objects
      * @return
      */
@@ -163,7 +163,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @param uri
      * @param label
      * @return
@@ -181,7 +181,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {
@@ -189,7 +189,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private List<String> getLanguages() {

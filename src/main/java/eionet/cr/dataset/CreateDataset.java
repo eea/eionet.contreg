@@ -32,9 +32,9 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Creates new dataset/file under given user folder. Imports triples from provided URIs/files.
- * 
+ *
  * @author Risto Alt
- * 
+ *
  */
 public class CreateDataset {
 

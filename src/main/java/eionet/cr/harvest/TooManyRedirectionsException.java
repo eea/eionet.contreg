@@ -22,7 +22,7 @@
 package eionet.cr.harvest;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class TooManyRedirectionsException extends HarvestException {
@@ -35,7 +35,7 @@ public class TooManyRedirectionsException extends HarvestException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public TooManyRedirectionsException(String message) {

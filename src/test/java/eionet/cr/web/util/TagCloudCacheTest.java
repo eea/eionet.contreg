@@ -32,9 +32,9 @@ import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
- * 
+ *
  */
 
 public class TagCloudCacheTest {

@@ -27,14 +27,14 @@ import eionet.cr.dto.DeliveryFilterDTO;
 
 /**
  * Delivery filter DAO.
- * 
+ *
  * @author Juhan Voolaid
  */
 public interface DeliveryFilterDAO extends DAO {
 
     /**
      * List of all the user's delivery filters.
-     * 
+     *
      * @param username
      * @return
      * @throws DAOException
@@ -43,7 +43,7 @@ public interface DeliveryFilterDAO extends DAO {
 
     /**
      * Returns delivery filter with given id.
-     * 
+     *
      * @param id
      * @return
      * @throws DAOException
@@ -52,7 +52,7 @@ public interface DeliveryFilterDAO extends DAO {
 
     /**
      * Stores the delivery filter for that user, but also deletes the oldest delivery if there are more than 10 filters.
-     * 
+     *
      * @param username
      * @param deliveryFilter
      * @throws DAOException

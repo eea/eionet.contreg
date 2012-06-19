@@ -34,9 +34,9 @@ import eionet.cr.web.action.factsheet.ReferencesActionBean;
 import eionet.cr.web.util.JstlFunctions;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class ReferringPredicatesColumn extends SearchResultColumn {
 
@@ -45,7 +45,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
     private long referringToHash;
 
     /**
-     * 
+     *
      * @param actionBean
      */
     public ReferringPredicatesColumn(ReferencesActionBean actionBean) {
@@ -60,7 +60,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.search.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -102,7 +102,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

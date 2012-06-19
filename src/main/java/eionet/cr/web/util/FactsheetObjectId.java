@@ -25,9 +25,9 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.dto.ObjectDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class FactsheetObjectId {
 
@@ -35,7 +35,7 @@ public class FactsheetObjectId {
     private static final String SEPARATOR = "|";
 
     /**
-     * 
+     *
      * @param object
      * @return
      */
@@ -50,7 +50,7 @@ public class FactsheetObjectId {
     }
 
     /**
-     * 
+     *
      * @param s
      * @return
      */

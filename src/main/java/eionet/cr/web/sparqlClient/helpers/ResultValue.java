@@ -7,7 +7,7 @@ public class ResultValue {
     private boolean isLiteral;
 
     /**
-     * 
+     *
      * @param value
      * @param isLiteral
      */
@@ -47,7 +47,7 @@ public class ResultValue {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

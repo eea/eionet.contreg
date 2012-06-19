@@ -28,7 +28,7 @@ import eionet.cr.util.URIUtil;
 
 /**
  * Helper utility for getting formated query string.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class QueryHelper {

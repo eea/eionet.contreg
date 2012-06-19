@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 /**
  * Folder item object that is used for selecting, renaming and deleting.
- * 
+ *
  * @author Juhan Voolaid
  */
 public class RenameFolderItemDTO {

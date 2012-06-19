@@ -21,9 +21,9 @@
 package eionet.cr.dao.util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UriLabelPair implements Comparable {
 
@@ -32,7 +32,7 @@ public class UriLabelPair implements Comparable {
     private String label;
 
     /**
-     * 
+     *
      * @param uri
      * @param label
      * @return
@@ -61,7 +61,7 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(Object o) {
@@ -81,7 +81,7 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -95,7 +95,7 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -120,7 +120,7 @@ public class UriLabelPair implements Comparable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

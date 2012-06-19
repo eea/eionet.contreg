@@ -16,9 +16,9 @@ import eionet.cr.util.URIUtil;
 
 /**
  * Reads delivery files from Resultset.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> {
 
@@ -26,7 +26,7 @@ public class DeliveryFilesReader extends ResultSetMixedReader<DeliveryFilesDTO> 
 
     /**
      * converts Bindingset row to DeliveryFilesDTO.
-     * 
+     *
      * @param bindingSet BindingSet
      * @throws ResultSetReaderException if error in reading
      */

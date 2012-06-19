@@ -2,9 +2,9 @@ package eionet.cr.util;
 
 /**
  * Helper class for displaying objects in sorted order in picklists etc.
- * 
+ *
  * @author kaido
- * 
+ *
  */
 public class ObjectLabelPair extends Pair<String, String> implements Comparable<ObjectLabelPair> {
 
@@ -13,7 +13,7 @@ public class ObjectLabelPair extends Pair<String, String> implements Comparable<
 
     /**
      * overrides superclass constructor.
-     * 
+     *
      * @param left object key
      * @param right label
      */

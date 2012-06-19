@@ -23,9 +23,9 @@ package eionet.cr.harvest.util.arp;
 import com.hp.hpl.jena.rdf.arp.AResource;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class ATriple {
 
@@ -44,7 +44,7 @@ public class ATriple {
     }
 
     /**
-     * 
+     *
      * @param subject
      * @param predicate
      * @param object

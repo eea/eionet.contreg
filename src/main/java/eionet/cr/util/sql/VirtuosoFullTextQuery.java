@@ -30,9 +30,9 @@ import eionet.cr.dao.util.SearchExpression;
 
 /**
  * Full text queries.
- * 
+ *
  * @author risto
- * 
+ *
  */
 public class VirtuosoFullTextQuery {
 
@@ -66,7 +66,7 @@ public class VirtuosoFullTextQuery {
     private HashSet<String> phrases = new HashSet<String>();
 
     /**
-     * 
+     *
      * @param query
      * @throws ParseException
      */
@@ -76,7 +76,7 @@ public class VirtuosoFullTextQuery {
     }
 
     /**
-     * 
+     *
      * @param query
      * @return VirtuosoFullTextQuery
      * @throws ParseException
@@ -87,7 +87,7 @@ public class VirtuosoFullTextQuery {
     }
 
     /**
-     * 
+     *
      * @param searchExpression
      * @return VirtuosoFullTextQuery
      * @throws ParseException
@@ -99,7 +99,7 @@ public class VirtuosoFullTextQuery {
 
     /**
      * @throws ParseException
-     * 
+     *
      */
     private void parse() throws ParseException {
 
@@ -209,7 +209,7 @@ public class VirtuosoFullTextQuery {
 
     /**
      * Remove any redundant logical operands and too short words from the beginning of query.
-     * 
+     *
      * @param st
      * @return the cleaned query string
      */
@@ -238,7 +238,7 @@ public class VirtuosoFullTextQuery {
 
     /**
      * Check if the string is a boolean operator.
-     * 
+     *
      * @param s
      * @return true if the string is in the list of boolean operators
      */
@@ -248,7 +248,7 @@ public class VirtuosoFullTextQuery {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

@@ -35,13 +35,13 @@ import eionet.cr.util.sql.SQLUtil;
 
 /**
  * Test Virtuoso Connection.
- * 
+ *
  * @author Enriko Käsper
  */
 public class VirtuosoConnectionTest extends TestCase {
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#tearDown()
      */
     @Override

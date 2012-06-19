@@ -13,15 +13,15 @@ import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
- * 
+ *
  * @author jaanus
- * 
+ *
  */
 public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.ExporterDAO#exportByTypeAndFilters(java.util.Map, java.util.List,
      * eionet.cr.util.sql.ResultSetExportReader)
      */

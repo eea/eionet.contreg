@@ -38,9 +38,9 @@ import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 

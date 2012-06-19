@@ -29,7 +29,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * Helper dao to use in different searches.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  */
@@ -37,7 +37,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Fetches recently discovered files.
-     * 
+     *
      * @param limit how many files to fetch
      * @return List<Pair<String, String>>
      * @throws DAOException if query fails
@@ -46,7 +46,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns array of data objects of latest subjects.
-     * 
+     *
      * @param rdfType String
      * @param limit max size of query result
      * @return Collection<SubjectDTO>
@@ -56,7 +56,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns subjects newer than given timestamp.
-     * 
+     *
      * @param timestamp Timestamp since what the subjects are returned
      * @param limit max size of query
      * @return List<SubjectDTO>
@@ -74,7 +74,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Adds triples to triplestore.
-     * 
+     *
      * @param subjectDTO
      * @throws DAOException if query fails
      */
@@ -82,7 +82,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Adds triples to triplestore.
-     * 
+     *
      * @param conn
      * @param subjectDTO
      * @throws DAOException
@@ -91,7 +91,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Store CONSTRUCT query result into given context
-     * 
+     *
      * @param constructQuery
      * @param context
      * @param defaultGraphUris
@@ -134,7 +134,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Gets sources that have some spatial content.
-     * 
+     *
      * @return List<String>
      * @throws DAOException if query fails
      */
@@ -203,7 +203,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Checks if subject is listed as user bookmark.
-     * 
+     *
      * @param user Current user
      * @param subject Subject URI
      * @return boolean
@@ -262,7 +262,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns all the uploads that are rdf source files.
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -330,7 +330,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns shared SPARQL bookmark queries.
-     * 
+     *
      * @return List<Map<String, String>>
      * @throws DAOException
      */
@@ -338,7 +338,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns triples of an harvest source.
-     * 
+     *
      * @param sourceUrl harvest source url
      * @throws DAOException if query fails.
      * @return list of TripleDTO objects.
@@ -347,7 +347,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns full SPO objects of an harvest source.
-     * 
+     *
      * @param sourceUrl harvest source url
      * @throws DAOException if query fails.
      * @return list of SubjectDTO objects.
@@ -356,9 +356,9 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns full SPO objects of given subject.
-     * 
+     *
      * @param subjectUri
-     * 
+     *
      * @throws DAOException if query fails.
      * @return list of SubjectDTO objects.
      */
@@ -372,7 +372,7 @@ public interface HelperDAO extends DAO {
     Map<String, Date> getSourceLastModifiedDates(Set<String> resourceUris) throws DAOException;
 
     /**
-     * 
+     *
      * @param subjectsToCheck
      * @return
      * @throws DAOException
@@ -380,7 +380,7 @@ public interface HelperDAO extends DAO {
     Set<String> getLiteralRangeSubjects(Set<String> subjectsToCheck) throws DAOException;
 
     /**
-     * 
+     *
      * @param subjectUri
      * @param acceptedLanguages TODO
      * @param predicatePages TODO
@@ -392,7 +392,7 @@ public interface HelperDAO extends DAO {
 
     /**
      * Returns number of harvested triples from the harvest source.
-     * 
+     *
      * @param sourceUri
      * @return
      * @throws DAOException
@@ -400,7 +400,7 @@ public interface HelperDAO extends DAO {
     int getHarvestedStatements(String sourceUri) throws DAOException;
 
     /**
-     * 
+     *
      * @param subjectUri
      * @return
      * @throws DAOException
@@ -408,7 +408,7 @@ public interface HelperDAO extends DAO {
     boolean isTabularDataSubject(String subjectUri) throws DAOException;
 
     /**
-     * 
+     *
      * @param subjectUri
      * @param predicateUri
      * @param objectMD5

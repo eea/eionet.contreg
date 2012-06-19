@@ -32,9 +32,9 @@ import eionet.cr.web.security.EionetCASFilter;
 
 /**
  * Extension of stripes ActionBeanContext.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class CRActionBeanContext extends ActionBeanContext {
 
@@ -48,7 +48,7 @@ public class CRActionBeanContext extends ActionBeanContext {
      * Wrapper method for {@link javax.servlet.ServletRequest.ServletRequest#getParameter(String)}.
      * <p>
      * The wrapper allows to avoid direct usage of {@link javax.servlet.http.HttpServletRequest}.
-     * 
+     *
      * @param parameterName parameter name.
      * @return corresponding parameter value from {@link javax.servlet.http.HttpServletRequest}.
      */
@@ -60,7 +60,7 @@ public class CRActionBeanContext extends ActionBeanContext {
      * Wrapper method for {@link javax.servlet.http.HttpSession#setAttribute(String, eionet.cr.dto.ObjectDTO)}.
      * <p>
      * The wrapper allows to avoid direct usage of {@link javax.servlet.http.HttpSession}.
-     * 
+     *
      * @param name session attribute name.
      * @param value session attribute value.
      */
@@ -70,7 +70,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /**
      * Method returns {@link CRUser} from session.
-     * 
+     *
      * @return {@link CRUser} from session or null if user is not logged in.
      */
     public CRUser getCRUser() {
@@ -80,7 +80,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /**
      * A wrapper for {@link EionetCASFilter#getCASLoginURL(javax.servlet.http.HttpServletRequest)}.
-     * 
+     *
      * @return central authentication system login URL.
      */
     public String getCASLoginURL() {
@@ -89,7 +89,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /**
      * A wrapper for {@link EionetCASFilter#getCASLogoutURL(javax.servlet.http.HttpServletRequest)}.
-     * 
+     *
      * @return central authentication system logout URL.
      */
     public String getCASLogoutURL() {
@@ -97,7 +97,7 @@ public class CRActionBeanContext extends ActionBeanContext {
     }
 
     /**
-     * 
+     *
      * @return last action event URL.
      */
     public String getLastActionEventUrl() {
@@ -120,7 +120,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see net.sourceforge.stripes.action.ActionBeanContext#getSourcePageResolution()
      */
     public Resolution getSourcePageResolution() {
@@ -133,7 +133,7 @@ public class CRActionBeanContext extends ActionBeanContext {
     }
 
     /**
-     * 
+     *
      * @param resolution
      */
     public void setSourcePageResolution(Resolution resolution) {
@@ -142,7 +142,7 @@ public class CRActionBeanContext extends ActionBeanContext {
 
     /**
      * Gets application init parameter.
-     * 
+     *
      * @param key
      * @return String
      */

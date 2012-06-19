@@ -30,9 +30,9 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.util.FolderUtil;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class UserFolderReader extends ResultSetMixedReader<String> {
 
@@ -41,7 +41,7 @@ public class UserFolderReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
      */
     public List<String> getResultList() {
@@ -50,7 +50,7 @@ public class UserFolderReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
@@ -58,7 +58,7 @@ public class UserFolderReader extends ResultSetMixedReader<String> {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query .BindingSet)
      */
     @Override

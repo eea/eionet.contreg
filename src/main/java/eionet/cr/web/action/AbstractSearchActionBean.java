@@ -33,9 +33,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
 
@@ -53,7 +53,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     private Pagination pagination;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException TODO
      */
@@ -66,7 +66,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     public abstract List<SearchResultColumn> getColumns() throws DAOException;
 
     /**
-     * 
+     *
      * @return
      */
     public Collection<T> getResultList() {
@@ -81,7 +81,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getMaxResultSetSize() {
@@ -89,7 +89,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected List<SearchResultColumn> getDefaultColumns() {
@@ -174,7 +174,7 @@ public abstract class AbstractSearchActionBean<T> extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Pagination getPagination() {

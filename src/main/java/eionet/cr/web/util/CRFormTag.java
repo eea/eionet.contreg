@@ -29,7 +29,7 @@ import net.sourceforge.stripes.exception.StripesJspException;
 
 /**
  * Modified Stripes {@link net.sourceforge.stripes.tag.FormTag}. This form tag doesn't include _sourcePage and _fp parameters.
- * 
+ *
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
 public class CRFormTag extends net.sourceforge.stripes.tag.FormTag {

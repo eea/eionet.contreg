@@ -21,9 +21,9 @@
 package eionet.cr.dao.util;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class BBOX {
 
@@ -96,7 +96,7 @@ public class BBOX {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isUndefined() {
@@ -104,7 +104,7 @@ public class BBOX {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean hasLatitude() {
@@ -112,7 +112,7 @@ public class BBOX {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean hasLongitude() {

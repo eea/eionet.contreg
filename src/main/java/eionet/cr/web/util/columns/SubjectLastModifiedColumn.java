@@ -25,15 +25,15 @@ import java.util.Date;
 import eionet.cr.dto.SubjectDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SubjectLastModifiedColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     public String format(Object object) {
@@ -52,7 +52,7 @@ public class SubjectLastModifiedColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     public String getSortParamValue() {

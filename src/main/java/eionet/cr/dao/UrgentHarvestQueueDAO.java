@@ -25,40 +25,40 @@ import java.util.List;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public interface UrgentHarvestQueueDAO extends DAO {
 
     /**
-     * 
+     *
      * @throws DAOException
      */
     void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException;
 
     /**
-     * 
+     *
      * @param queueItem
      * @throws DAOException
      */
     void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException;
 
     /**
-     * 
+     *
      * @return
      */
     List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
     UrgentHarvestQueueItemDTO poll() throws DAOException;
 
     /**
-     * 
+     *
      * @param url
      */
     boolean isInQueue(String url);

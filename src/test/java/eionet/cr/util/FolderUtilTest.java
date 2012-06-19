@@ -24,9 +24,9 @@ import junit.framework.TestCase;
 import eionet.cr.config.GeneralConfig;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class FolderUtilTest extends TestCase {
 

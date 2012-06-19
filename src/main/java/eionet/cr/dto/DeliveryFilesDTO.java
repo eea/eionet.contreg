@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class DeliveryFilesDTO extends HarvestBaseDTO implements java.io.Serializable {
 

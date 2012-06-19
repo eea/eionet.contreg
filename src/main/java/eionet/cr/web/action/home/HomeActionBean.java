@@ -31,9 +31,9 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 
 @UrlBinding("/home/{username}")
@@ -42,7 +42,7 @@ public class HomeActionBean extends AbstractActionBean {
     private String username;
 
     /**
-     * 
+     *
      * @return Resolution
      */
     @DefaultHandler
@@ -62,7 +62,7 @@ public class HomeActionBean extends AbstractActionBean {
 
     /**
      * Sets username request parameter.
-     * 
+     *
      * @param username request parameter
      */
     public void setUsername(String username) {

@@ -43,9 +43,9 @@ import eionet.cr.util.export.ExportException;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class AmpFeedWriter implements SPARQLResultSetReader {
 
@@ -76,7 +76,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     private int writtenSubjectsCount = 0;
 
     /**
-     * 
+     *
      * @param outputStream
      */
     public AmpFeedWriter(OutputStream outputStream) {
@@ -89,7 +89,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -194,7 +194,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
 
     /**
      * @throws IOException
-     * 
+     *
      */
     public void closeRDF() throws IOException {
 
@@ -206,7 +206,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
 
     /**
      * @throws IOException
-     * 
+     *
      */
     public void writeEmptyHeader() throws IOException {
         outputStream.write("<rdf:RDF/>".getBytes());
@@ -214,7 +214,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getRowCount() {
@@ -222,7 +222,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @param namespace
      */
     public void addNamespace(Namespace namespace) {
@@ -230,7 +230,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @param xmlLang
      */
     public void setXmlLang(String xmlLang) {
@@ -238,7 +238,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private String getHeaderAttributes() {
@@ -258,7 +258,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getWrittenTriplesCount() {
@@ -266,7 +266,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getWrittenSubjectsCount() {

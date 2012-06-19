@@ -21,9 +21,9 @@
 package eionet.cr.dto;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SpoBinaryDTO {
 
@@ -34,7 +34,7 @@ public class SpoBinaryDTO {
     private boolean mustEmbed;
 
     /**
-     * 
+     *
      * @param subjectHash
      */
     public SpoBinaryDTO(long subjectHash) {

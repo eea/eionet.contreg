@@ -29,9 +29,9 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
- * 
+ *
  * @author roug
- * 
+ *
  */
 public class PullHarvestTest extends CRDatabaseTestCase {
 
@@ -40,7 +40,7 @@ public class PullHarvestTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {

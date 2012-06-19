@@ -12,7 +12,7 @@ import org.dbunit.dataset.datatype.StringDataType;
 
 /**
  * @author Risto Alt
- * 
+ *
  */
 public class DbUnitVirtuosoDataTypeFactory extends DefaultDataTypeFactory {
 

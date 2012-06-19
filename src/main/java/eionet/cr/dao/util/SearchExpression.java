@@ -24,9 +24,9 @@ import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SearchExpression {
 
@@ -38,7 +38,7 @@ public class SearchExpression {
     private boolean isHash = false;
 
     /**
-     * 
+     *
      * @param s
      */
     public SearchExpression(String s) {
@@ -61,7 +61,7 @@ public class SearchExpression {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isEmpty() {
@@ -70,7 +70,7 @@ public class SearchExpression {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {

@@ -7,9 +7,9 @@ import java.util.List;
 import eionet.cr.dto.PredicateDTO;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 public class TriplesRDFWriter extends SubjectsRDFWriter {
 

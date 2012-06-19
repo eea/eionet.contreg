@@ -24,9 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UploadDateFormatter implements Formatter {
 
@@ -35,7 +35,7 @@ public class UploadDateFormatter implements Formatter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.Formatter#format(java.lang.Object)
      */
     public String format(Object object) {

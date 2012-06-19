@@ -37,7 +37,7 @@ import eionet.cr.test.helpers.RdfLoader;
 
 /**
  * Test Virtuoso Jdbc driver.
- * 
+ *
  * @author Enriko Käsper
  */
 public class VirtuosoJdbcDriverTest extends TestCase {

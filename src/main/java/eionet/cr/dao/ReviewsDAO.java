@@ -7,7 +7,7 @@ import eionet.cr.web.security.CRUser;
 
 /**
  * DAO for reviews functionality.
- * 
+ *
  * @author Risto Alt
  */
 public interface ReviewsDAO extends DAO {
@@ -60,7 +60,7 @@ public interface ReviewsDAO extends DAO {
 
     /**
      * Returns TRUE if last modified date for objectUri is later than last modified date for reviewUri
-     * 
+     *
      * @param reviewUri
      * @param objectUri
      * @return boolean

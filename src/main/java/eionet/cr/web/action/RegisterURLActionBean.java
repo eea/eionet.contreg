@@ -37,9 +37,9 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.util.RegisterUrl;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 @UrlBinding("/registerUrl.action")
 public class RegisterURLActionBean extends AbstractActionBean {
@@ -49,7 +49,7 @@ public class RegisterURLActionBean extends AbstractActionBean {
     private boolean bookmark = false;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -60,7 +60,7 @@ public class RegisterURLActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      * @throws HarvestException

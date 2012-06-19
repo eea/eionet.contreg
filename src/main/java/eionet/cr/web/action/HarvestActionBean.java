@@ -38,9 +38,9 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 @UrlBinding("/harvest.action")
 public class HarvestActionBean extends AbstractActionBean {
@@ -56,7 +56,7 @@ public class HarvestActionBean extends AbstractActionBean {
     private List<HarvestMessageDTO> infos;
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */
@@ -71,7 +71,7 @@ public class HarvestActionBean extends AbstractActionBean {
 
     /**
      * @throws DAOException
-     * 
+     *
      */
     private void loadMessages() throws DAOException {
 
@@ -86,7 +86,7 @@ public class HarvestActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @param messageDTOs
      * @param type
      */

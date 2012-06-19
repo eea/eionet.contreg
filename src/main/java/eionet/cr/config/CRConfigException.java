@@ -23,9 +23,9 @@ package eionet.cr.config;
 import eionet.cr.common.CRRuntimeException;
 
 /**
- * 
+ *
  * @author heinljab
- * 
+ *
  */
 public class CRConfigException extends CRRuntimeException {
 
@@ -37,7 +37,7 @@ public class CRConfigException extends CRRuntimeException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public CRConfigException(String message) {
@@ -45,7 +45,7 @@ public class CRConfigException extends CRRuntimeException {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

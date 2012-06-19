@@ -33,15 +33,15 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
      */
     protected IDataSet getDataSet() throws Exception {

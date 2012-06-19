@@ -17,9 +17,9 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
- * 
+ *
  */
 public class UserReviewTest extends TestCase {
 

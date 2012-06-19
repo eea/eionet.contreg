@@ -29,7 +29,7 @@ import java.util.Date;
 
 /**
  * @author altnyris
- * 
+ *
  */
 public class HarvestSourceDTO implements Serializable, Cloneable {
 
@@ -148,7 +148,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public boolean isUnavailable() {
@@ -186,7 +186,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -254,7 +254,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param prioritySource
      * @param intervalMinutes
@@ -271,7 +271,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public double getHarvestUrgencyScore() {

@@ -31,9 +31,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class MediaTypeToDcmiTypeConverter {
 
@@ -97,7 +97,7 @@ public class MediaTypeToDcmiTypeConverter {
 
     /**
      * Looks up the rdf:type from mimeToRdfMap.
-     * 
+     *
      * @param mimeType the media type to look up
      * @return String containing the rdf:type
      */

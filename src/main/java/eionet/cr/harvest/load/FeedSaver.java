@@ -26,7 +26,7 @@ import java.sql.Connection;
 import org.openrdf.repository.RepositoryConnection;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public class FeedSaver {

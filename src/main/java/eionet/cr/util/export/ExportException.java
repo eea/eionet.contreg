@@ -36,7 +36,7 @@ public class ExportException extends ResultSetReaderException {
     }
 
     /**
-     * 
+     *
      * @param message
      */
     public ExportException(String message) {
@@ -44,7 +44,7 @@ public class ExportException extends ResultSetReaderException {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param cause
      */

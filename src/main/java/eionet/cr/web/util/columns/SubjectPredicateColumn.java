@@ -35,9 +35,9 @@ import eionet.cr.util.Util;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class SubjectPredicateColumn extends SearchResultColumn {
 
@@ -67,7 +67,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
 
     /**
      * Constructor.
-     * 
+     *
      * @param title
      * @param isSortable
      * @param predicateUri
@@ -95,9 +95,9 @@ public class SubjectPredicateColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-     * 
+     *
      * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
      * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
      * factsheet links will be created.
@@ -147,7 +147,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @param objects
      * @return
      */
@@ -161,7 +161,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @param uri
      * @param label
      * @param showTitle true if to show the given object value (typically resource) in the factsheet link
@@ -183,7 +183,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     @Override
@@ -192,7 +192,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     }
 
     /**
-     * 
+     *
      * @return
      */
     private List<String> getLanguages() {

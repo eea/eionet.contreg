@@ -32,15 +32,15 @@ import eionet.cr.util.pagination.PagingRequest;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
- * 
+ *
  * @author altnyris
- * 
+ *
  */
 public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
     @Override
