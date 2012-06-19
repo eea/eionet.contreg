@@ -58,8 +58,8 @@ public class RDFContentHandler implements RDFHandler {
     /** The graph where the triples will be loaded into. */
     private Resource context;
 
-    /** Number of triples loaded. */
-    private int triplesLoaded;
+    /** Number of triples saved. */
+    private int triplesSaved;
 
     /**
      * @param repoConn
@@ -112,9 +112,9 @@ public class RDFContentHandler implements RDFHandler {
         // Add the given statement (i.e. triple) into repository.
         try {
             repoConn.add(rdfStatement, context);
-            triplesLoaded++;
-            if (triplesLoaded % BATCH_SIZE == 0) {
-                LOGGER.trace("Statement counter = " + triplesLoaded);
+            triplesSaved++;
+            if (triplesSaved % BATCH_SIZE == 0) {
+                LOGGER.trace("Statement counter = " + triplesSaved);
             }
         } catch (RepositoryException e) {
             throw new RDFHandlerException(e.getMessage(), e);
@@ -140,7 +140,7 @@ public class RDFContentHandler implements RDFHandler {
     /**
      * @return the triplesLoaded
      */
-    public int getNumberOfTriplesLoaded() {
-        return triplesLoaded;
+    public int getNumberOfTriplesSaved() {
+        return triplesSaved;
     }
 }

@@ -28,7 +28,9 @@ package eionet.cr.common;
  */
 public interface Subjects {
 
-    String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/Item";
+    String RSS_CHANNEL_CLASS = "http://purl.org/rss/1.0/channel";
+    String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/item";
+
     String ROD_OBLIGATION_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Obligation";
     String ROD_INSTRUMENT_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Instrument";
     String ROD_LOCALITY_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Locality";
@@ -49,6 +51,7 @@ public interface Subjects {
     String RDFS_CLASS = "http://www.w3.org/2000/01/rdf-schema#Class";
 
     String RDF_PROPERTY = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
+    String RDF_SEQ = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq";
 
     String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";
     String CR_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Feedback";
@@ -68,4 +71,6 @@ public interface Subjects {
     String DUBLIN_CORE_SOURCE_URL = "http://purl.org/dc/elements/1.1/";
     String AMP_OUTPUT = "http://rdfdata.eionet.europa.eu/amp/ontology/Output";
     String AMPOLD_PRODUCT = "http://moonefish.eea.europa.eu:81/AMP-schema.rdf#Product"; // Phased out
+
+    String FOAF_PERSON_CLASS = "http://xmlns.com/foaf/0.1/Person";
 }

@@ -73,6 +73,6 @@ public class RDFFormatLoader implements ContentLoader {
 
         // Parse the stream, return number of loaded triples.
         rdfParser.parse(inputStream, baseUri);
-        return rdfHandler.getNumberOfTriplesLoaded();
+        return rdfHandler.getNumberOfTriplesSaved();
     }
 }

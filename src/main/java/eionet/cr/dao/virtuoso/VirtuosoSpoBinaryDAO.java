@@ -50,8 +50,9 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
     /** */
     private static final String SQL_GET = "select * from SPO_BINARY where SUBJECT=?";
+
     /** */
-    private static final String sqlExists = "select count(*) from SPO_BINARY where SUBJECT=?";
+    private static final String SQL_EXISTS = "select count(*) from SPO_BINARY where SUBJECT=?";
 
     /*
      * (non-Javadoc)
@@ -143,8 +144,8 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         try {
             conn = getSQLConnection();
             Object o =
-                    SQLUtil.executeSingleReturnValueQuery(sqlExists,
-                            Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
+                SQLUtil.executeSingleReturnValueQuery(SQL_EXISTS,
+                        Collections.singletonList(Long.valueOf(Hashes.spoHash(subjectUri))), conn);
             return o != null && Integer.parseInt(o.toString()) > 0;
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);

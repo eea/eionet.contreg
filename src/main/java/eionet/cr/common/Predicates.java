@@ -44,6 +44,13 @@ public interface Predicates {
 
     String DCTERMS_ALTERNATIVE = "http://purl.org/dc/terms/alternative";
     String DCTERMS_TITLE = "http://purl.org/dc/terms/title";
+    String DCTERMS_CREATOR = "http://purl.org/dc/terms/creator";
+    String DCTERMS_SUBJECT = "http://purl.org/dc/terms/subject";
+    String DCTERMS_CONTRIBUTOR = "http://purl.org/dc/terms/contributor";
+    String DCTERMS_ABSTRACT = "http://purl.org/dc/terms/abstract";
+    String DCTERMS_LANGUAGE = "http://purl.org/dc/terms/language";
+    String DCTERMS_DATE = "http://purl.org/dc/terms/date";
+    String DCTERMS_SOURCE = "http://purl.org/dc/terms/source";
 
     String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
     String RDF_VALUE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#value";
@@ -114,4 +121,9 @@ public interface Predicates {
     String AMP_ONTOLOGY_EEAPROJECT = "http://rdfdata.eionet.europa.eu/amp/ontology/eeaproject";
     String AMP_ONTOLOGY_FORCODE = "http://rdfdata.eionet.europa.eu/amp/ontology/forCode";
     String AMP_ONTOLOGY_FORYEAR = "http://rdfdata.eionet.europa.eu/amp/ontology/forYear";
+
+    String FOAF_NAME = "http://xmlns.com/foaf/0.1/name";
+    String FOAF_MBOX_SHA1SUM = "http://xmlns.com/foaf/0.1/mbox_sha1sum";
+
+    String RSS_ITEMS = "http://purl.org/rss/1.0/items";
 }
