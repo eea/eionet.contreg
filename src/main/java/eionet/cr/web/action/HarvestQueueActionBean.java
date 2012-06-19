@@ -150,15 +150,15 @@ public class HarvestQueueActionBean extends AbstractActionBean {
             // Otherwise it is not thread-safe.
             List<Map<String, String>> qtBuildUp = new ArrayList<Map<String, String>>();
 
-            Map<String, String> queueType = new HashMap<String, String>();
-            queueType.put("title", "Urgent queue");
-            queueType.put("queueType", TYPE_URGENT);
-            qtBuildUp.add(queueType);
+            Map<String, String> qType = new HashMap<String, String>();
+            qType.put("title", "Urgent queue");
+            qType.put("queueType", TYPE_URGENT);
+            qtBuildUp.add(qType);
 
-            queueType = new HashMap<String, String>();
-            queueType.put("title", "Batch queue");
-            queueType.put("queueType", TYPE_BATCH);
-            qtBuildUp.add(queueType);
+            qType = new HashMap<String, String>();
+            qType.put("title", "Batch queue");
+            qType.put("queueType", TYPE_BATCH);
+            qtBuildUp.add(qType);
 
             queueTypes = qtBuildUp;
         }

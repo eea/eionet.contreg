@@ -89,21 +89,21 @@ public class VirtuosoDeliveryFilterDAO extends VirtuosoBaseDAO implements Delive
         selectSql.append("WHERE delivery_filter_id = ? ");
 
         DeliveryFilterDTO result =
-                executeUniqueResultSQL(selectSql.toString(), params, new SQLResultSetBaseReader<DeliveryFilterDTO>() {
-                    @Override
-                    public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-                        DeliveryFilterDTO dto = new DeliveryFilterDTO();
-                        dto.setId(rs.getLong("delivery_filter_id"));
-                        dto.setLocality(rs.getString("locality"));
-                        dto.setLocalityLabel(rs.getString("locality_label"));
-                        dto.setObligation(rs.getString("obligation"));
-                        dto.setObligationLabel(rs.getString("obligation_label"));
-                        dto.setUsername(rs.getString("username"));
-                        dto.setYear(rs.getString("year"));
+            executeUniqueResultSQL(selectSql.toString(), params, new SQLResultSetBaseReader<DeliveryFilterDTO>() {
+                @Override
+                public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
+                    DeliveryFilterDTO dto = new DeliveryFilterDTO();
+                    dto.setId(rs.getLong("delivery_filter_id"));
+                    dto.setLocality(rs.getString("locality"));
+                    dto.setLocalityLabel(rs.getString("locality_label"));
+                    dto.setObligation(rs.getString("obligation"));
+                    dto.setObligationLabel(rs.getString("obligation_label"));
+                    dto.setUsername(rs.getString("username"));
+                    dto.setYear(rs.getString("year"));
 
-                        resultList.add(dto);
-                    }
-                });
+                    resultList.add(dto);
+                }
+            });
 
         return result;
     }
@@ -114,7 +114,8 @@ public class VirtuosoDeliveryFilterDAO extends VirtuosoBaseDAO implements Delive
     @Override
     public void saveDeliveryFilter(DeliveryFilterDTO deliveryFilter) throws DAOException {
         String sql =
-                "insert into delivery_filter (obligation, obligation_label, locality, locality_label, year, username) values (?, ?, ?, ?, ?, ?)";
+            "insert into delivery_filter (obligation, obligation_label, locality, locality_label, year, username) " +
+            "values (?, ?, ?, ?, ?, ?)";
 
         List<Object> params = new ArrayList<Object>();
         params.add(deliveryFilter.getObligation());

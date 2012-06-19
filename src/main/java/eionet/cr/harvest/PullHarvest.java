@@ -678,13 +678,13 @@ public class PullHarvest extends BaseHarvest {
         String location = connection.getHeaderField("Location");
         if (location != null) {
             try {
-                // if location does not seem to be an absolute URI, consider it relative to the
-                // URL of this URL connection
+                // If location does not seem to be an absolute URI, consider it relative to the
+                // URL of this URL connection.
                 if (new URI(location).isAbsolute() == false) {
                     location = new URL(connection.getURL(), location).toString();
                 }
             } catch (URISyntaxException e) {
-                // ignoring on purpose
+                // Ignoring on purpose.
             }
 
             // we want to avoid fragment parts in CR harvest source URLs

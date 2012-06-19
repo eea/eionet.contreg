@@ -66,25 +66,23 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     private static final String SEARCH_SOURCES_SQL =
         "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
-    private static final String getHarvestSourcesFailedSQL =
-        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String searchHarvestSourcesFailedSQL =
+    private static final String GET_HARVEST_SOURCES_FAILED_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE "
+        + "WHERE LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+    private static final String SEARCH_HARVEST_SOURCES_FAILED_SQL =
         "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND"
         + " URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String getHarvestSourcesUnavailableSQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > "
+    private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL > "
         + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String searchHarvestSourcesUnavailableSQL =
+    private static final String SEARCH_HARVEST_SOURCES_UNAVAIL_SQL =
         "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL > "
         + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
-    private static final String getPrioritySources =
-        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)  ";
-    private static final String searchPrioritySources =
+    private static final String GET_PRIORITY_SOURCES_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE "
+        + "WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String SEARCH_PRIORITY_SOURCES_SQL =
         "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND "
         + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -96,9 +94,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 sortingRequest);
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -106,13 +102,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
 
-        return getSources(StringUtils.isBlank(searchString) ? getHarvestSourcesFailedSQL : searchHarvestSourcesFailedSQL,
+        return getSources(StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_FAILED_SQL : SEARCH_HARVEST_SOURCES_FAILED_SQL,
                 searchString, pagingRequest, sortingRequest);
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang .String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -121,7 +115,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             SortingRequest sortingRequest) throws DAOException {
 
         return getSources(
-                StringUtils.isBlank(searchString) ? getHarvestSourcesUnavailableSQL : searchHarvestSourcesUnavailableSQL,
+                StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
                         searchString, pagingRequest, sortingRequest);
     }
 
@@ -135,7 +129,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public Pair<Integer, List<HarvestSourceDTO>> getPrioritySources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
 
-        return getSources(StringUtils.isBlank(searchString) ? getPrioritySources : searchPrioritySources, searchString,
+        return getSources(StringUtils.isBlank(searchString) ? GET_PRIORITY_SOURCES_SQL : SEARCH_PRIORITY_SOURCES_SQL, searchString,
                 pagingRequest, sortingRequest);
     }
 
@@ -154,7 +148,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         String query =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE "
+            + "WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
         if (!StringUtils.isBlank(searchString)) {
             query =
                 "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
@@ -243,8 +238,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * exists then don't insert (like MySQL INSERT IGNORE)
      */
     private static final String ADD_SOURCE_SQL =
-        "insert soft HARVEST_SOURCE"
-        + " (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE) VALUES (?,?,?,NOW(),?,?,?,?)";
+        "insert soft HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE) "
+        + "VALUES (?,?,?,NOW(),?,?,?,?)";
 
     /*
      * (non-Javadoc)
@@ -442,7 +437,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /** */
-    private static final String getSourcesByIdSQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
+    private static final String GET_SOURCES_BY_ID_SQL = "select * from HARVEST_SOURCE where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
@@ -454,12 +449,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceID);
-        List<HarvestSourceDTO> list = executeSQL(getSourcesByIdSQL, values, new HarvestSourceDTOReader());
+        List<HarvestSourceDTO> list = executeSQL(GET_SOURCES_BY_ID_SQL, values, new HarvestSourceDTOReader());
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
     /** */
-    private static final String getSourcesByUrlSQL = "select * from HARVEST_SOURCE where URL_HASH=?";
+    private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -471,7 +466,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         List<Object> values = new ArrayList<Object>();
         values.add(Long.valueOf(Hashes.spoHash(url)));
-        List<HarvestSourceDTO> list = executeSQL(getSourcesByUrlSQL, values, new HarvestSourceDTOReader());
+        List<HarvestSourceDTO> list = executeSQL(GET_SOURCES_BY_URL_SQL, values, new HarvestSourceDTOReader());
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
 
@@ -983,11 +978,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 // no transaction rollback needed, when reached this point
                 isSuccess = true;
             } finally {
-                if (!isSuccess && conn != null) {
-                    try {
-                        conn.rollback();
-                    } catch (RepositoryException e) {
-                    }
+                if (!isSuccess) {
+                    SesameUtil.rollback(conn);
                 }
                 SesameUtil.close(conn);
             }

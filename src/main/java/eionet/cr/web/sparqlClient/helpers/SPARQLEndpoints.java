@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  * @author <a href="mailto:jaanus.heinlaid@tieto.com">Jaanus Heinlaid</a>
  *
  */
-public class SPARQLEndpoints extends ArrayList<String> {
+public final class SPARQLEndpoints extends ArrayList<String> {
 
     /** */
     private static final String FILENAME = "endpoints.xml";

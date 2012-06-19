@@ -51,9 +51,18 @@ public class FactsheetTabMenuHelper {
     private boolean historyFileType;
     private boolean reviewType;
 
+    /** */
     private String latitude;
     private String longitude;
 
+    /**
+     *
+     * Class constructor.
+     * @param uri
+     * @param subject
+     * @param harvesterSourceDao
+     * @throws DAOException
+     */
     public FactsheetTabMenuHelper(String uri, SubjectDTO subject, HarvestSourceDAO harvesterSourceDao) throws DAOException {
         if (subject == null) {
             subject = new SubjectDTO(uri, false);
@@ -80,8 +89,8 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             reviewType =
-                    Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                            || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
@@ -98,8 +107,8 @@ public class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             folderType =
-                    Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                            || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
     }
@@ -217,6 +226,7 @@ public class FactsheetTabMenuHelper {
      * Tab titles.
      */
     public static class TabTitle {
+
         public static final String RESOURCE_PROPERTIES = "Resource properties";
         public static final String RESOURCE_REFERENCES = "Resource references";
         public static final String OBJECTS_IN_SOURCE = "Objects in source";
@@ -228,5 +238,12 @@ public class FactsheetTabMenuHelper {
         public static final String BOOKMARKS = "Bookmarks";
         public static final String REGISTRATIONS = "Registrations";
         public static final String HISTORY = "History";
+
+        /**
+         * Hide utility class constructor.
+         */
+        private TabTitle() {
+            // Just an empty private constructor to avoid instantiating this utility class.
+        }
     }
 }

@@ -40,6 +40,13 @@ public class CurrentLoadedDatasets {
     }
 
     /**
+     * Hide utility class constructor.
+     */
+    private CurrentLoadedDatasets() {
+        // Hide utility class constructor.
+    }
+
+    /**
      *
      * @param url
      * @param user

@@ -28,6 +28,13 @@ public class UnicodeUtils {
     private static HashMap<String, String> entityReferenceMap;
 
     /**
+     * Hide utility class constructor.
+     */
+    private UnicodeUtils() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param entityReference
      * @return
@@ -65,6 +72,7 @@ public class UnicodeUtils {
                         try {
                             decimal = Integer.parseInt(sDecimal);
                         } catch (Exception e) {
+                            // No need to throw or log it.
                         }
                     } else {
                         // handle entity

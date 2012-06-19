@@ -14,6 +14,13 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 public class Tabs {
 
     /**
+     * Hide utility class constructor.
+     */
+    private Tabs() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @return
      */

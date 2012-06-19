@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Namespace;
@@ -26,6 +27,9 @@ import eionet.cr.util.YesNoBoolean;
  * @deprecated
  */
 public class RDFExporter extends ResultSetMixedReader {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(RDFExporter.class);
 
     /** */
     private long sourceHash;
@@ -197,11 +201,15 @@ public class RDFExporter extends ResultSetMixedReader {
         return null;
     }
 
+    /**
+     *
+     * @param outputString
+     */
     private void outputString(String outputString) {
         try {
             output.write(outputString.getBytes());
         } catch (IOException ex) {
-
+            LOGGER.error(ex);
         }
     }
 

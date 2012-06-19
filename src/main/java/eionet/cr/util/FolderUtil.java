@@ -38,6 +38,13 @@ import eionet.cr.web.security.CRUser;
 public class FolderUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private FolderUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Extract ACL path for special folders: projects and home. Until DDC not done, main project/home folder ACL is used
      *
      * @param uri uri of the folder
@@ -120,7 +127,7 @@ public class FolderUtil {
         }
 
         String str =
-                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
+            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
         return StringUtils.substringBefore(str, "/");
     }
 
@@ -143,8 +150,8 @@ public class FolderUtil {
         String userName = extractUserName(uri);
 
         String result =
-                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
-                        + userName + "/");
+            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
+                    + userName + "/");
         return result;
     }
 
@@ -197,7 +204,7 @@ public class FolderUtil {
             // Get project folders where user can insert content
             if (CRUser.hasPermission(user.getUserName(), "/project", "i")) {
                 List<String> projectFolders =
-                        DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
+                    DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
                 if (projectFolders != null && projectFolders.size() > 0) {
                     for (String furi : projectFolders) {
                         String aclPath = FolderUtil.extractPathInSpecialFolder(furi, "project");

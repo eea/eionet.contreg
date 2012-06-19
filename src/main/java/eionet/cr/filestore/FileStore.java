@@ -26,10 +26,10 @@ import eionet.cr.web.security.CRUser;
  * @author jaanus
  *
  */
-public class FileStore {
+public final class FileStore {
 
     /** */
-    private static final Logger logger = Logger.getLogger(FileStore.class);
+    private static final Logger LOGGER = Logger.getLogger(FileStore.class);
 
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
@@ -145,7 +145,7 @@ public class FileStore {
             try {
                 FileUtils.forceMkdir(dir);
             } catch (IOException e) {
-                logger.error("Failed to create folder: " + dir.getAbsolutePath(), e);
+                LOGGER.error("Failed to create folder: " + dir.getAbsolutePath(), e);
             }
         }
 
@@ -231,7 +231,7 @@ public class FileStore {
             }
         }
 
-        logger.debug("Total of " + renamedCount + " files renamed in the file store");
+        LOGGER.debug("Total of " + renamedCount + " files renamed in the file store");
     }
 
     /**
@@ -279,7 +279,7 @@ public class FileStore {
 
                 return FileStore.getInstance(userName).getFile(fileName);
             } else {
-                logger.info("Could not extract user name from this URI: " + uriString);
+                LOGGER.info("Could not extract user name from this URI: " + uriString);
             }
         } else if (FolderUtil.isProjectFolder(uriString)) {
             String fileName = FolderUtil.extractPathInSpecialFolder(uriString, "project");
@@ -291,7 +291,7 @@ public class FileStore {
 
             return FileStore.getInstance("project").getFile(fileName);
         } else {
-            logger.info("Not a home URI: " + uriString);
+            LOGGER.info("Not a home URI: " + uriString);
         }
 
         return null;

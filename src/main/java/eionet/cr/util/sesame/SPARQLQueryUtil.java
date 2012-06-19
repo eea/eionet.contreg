@@ -36,12 +36,19 @@ import eionet.cr.util.Bindings;
 public class SPARQLQueryUtil {
 
     /** Chars not allowed in IRI. */
-    private static char[] badChars = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};
+    private static final char[] BAD_CHARS = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};
 
     /**
      * Inference definition in SPARQL.
      */
-    public static final String inferenceDef = "DEFINE input:inference";
+    public static final String INFERENCE_DEF = "DEFINE input:inference";
+
+    /**
+     * Hide utility class constructor.
+     */
+    private SPARQLQueryUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      * Constructs inference definition.
@@ -50,8 +57,8 @@ public class SPARQLQueryUtil {
      */
     public static StringBuilder getCrInferenceDefinition() {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(inferenceDef).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-                .append("' ");
+        strBuilder.append(INFERENCE_DEF).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
+        .append("' ");
         return strBuilder;
     }
 
@@ -167,8 +174,8 @@ public class SPARQLQueryUtil {
      */
     public static String getOrderByClause(final String aliasName, final String sortOrder) {
         return "ORDER BY " + sortOrder + "(bif:either( bif:isnull(?" + aliasName + ") , "
-                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
-                + "bif:lcase(?" + aliasName + ")))";
+        + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+        + "bif:lcase(?" + aliasName + ")))";
     }
 
     /**
@@ -179,7 +186,7 @@ public class SPARQLQueryUtil {
      */
     public static boolean isIRI(String str) {
 
-        if (StringUtils.containsAny(str, badChars)) {
+        if (StringUtils.containsAny(str, BAD_CHARS)) {
             return false;
         }
         return true;

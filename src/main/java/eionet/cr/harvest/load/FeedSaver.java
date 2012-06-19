@@ -46,4 +46,11 @@ public class FeedSaver {
         this.sqlConn = sqlConn;
         this.contextUri = contextUri;
     }
+
+    /**
+     *
+     */
+    public void save(){
+        // TODO implement this method
+    }
 }

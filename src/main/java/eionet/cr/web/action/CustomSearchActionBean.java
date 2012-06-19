@@ -140,11 +140,11 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         populateSelectedFilters();
         long startTime = System.currentTimeMillis();
         SearchResultDTO<SubjectDTO> result =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
-                        .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
+            DAOFactory
+            .get()
+            .getDao(SearchDAO.class)
+            .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
+                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
         logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
@@ -216,13 +216,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      * @throws DAOException
      */
     public Collection<ObjectLabelPair> getPicklist() throws DAOException {
-        String picklistFilter = getPicklistFilter();
+
+        String picklistFltr = getPicklistFilter();
         if (!isShowPicklist()) {
             return null;
-        } else if (!getAvailableFilters().containsKey(picklistFilter)) {
+        } else if (!getAvailableFilters().containsKey(picklistFltr)) {
             return null;
         }
-        String uri = getAvailableFilters().get(picklistFilter).getUri();
+        String uri = getAvailableFilters().get(picklistFltr).getUri();
         if (Predicates.RDF_TYPE.equals(uri)) {
 
             List<Pair<String, String>> typePairs = ApplicationCache.getTypes();
@@ -239,14 +240,14 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             picklist = ApplicationCache.getInstruments();
         } else if (Predicates.CR_SCHEMA.equals(uri)) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            false);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFltr).getUri(),
+                        false);
         }
 
         if (picklist == null) {
             picklist =
-                    factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFilter).getUri(),
-                            true);
+                factory.getDao(HelperDAO.class).getPicklistForPredicate(getAvailableFilters().get(picklistFltr).getUri(),
+                        true);
         }
 
         return picklist;

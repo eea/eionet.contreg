@@ -49,6 +49,7 @@ public class SearchExpression {
             Long.parseLong(expression);
             isHash = true;
         } catch (NumberFormatException nfe) {
+            // Ignore deliberately.
         }
 
         // Escape spaces

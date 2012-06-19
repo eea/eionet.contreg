@@ -55,8 +55,6 @@ import nl.bitwalker.useragentutils.BrowserType;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
@@ -68,16 +66,13 @@ import eionet.cr.util.export.XmlUtil;
  * @author heinljab
  *
  */
-public class Util {
-
-    /** */
-    private static Log logger = LogFactory.getLog(Util.class);
+public final class Util {
 
     /**
      * Private constructor to prevent public initiation.
      */
     private Util() {
-
+        // Private constructor to prevent public initiation.
     }
 
     /**
@@ -146,7 +141,6 @@ public class Util {
         try {
             return dateFormat.parse(str);
         } catch (ParseException e) {
-            logger.warn("Failed to convert the given string to java.util.Date: " + e.toString(), e);
             return null;
         }
     }
@@ -310,7 +304,7 @@ public class Util {
         }
 
         int[] scopes =
-                {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+        {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {

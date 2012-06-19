@@ -67,7 +67,7 @@ public class RSSFormatLoader implements ContentLoader {
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-            throws IOException, OpenRDFException, ContentParsingException {
+    throws IOException, OpenRDFException, ContentParsingException {
 
         SyndFeedInput input = new SyndFeedInput();
         try {
@@ -116,9 +116,10 @@ public class RSSFormatLoader implements ContentLoader {
                 SyndPerson person = (SyndPerson) author;
                 String personUri = person.getUri();
                 if (StringUtils.isNotBlank(personUri)) {
+                    // TODO implement this block
                 }
             } else if (author != null) {
-
+                // TODO implement this block
             }
         }
 

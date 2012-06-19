@@ -80,11 +80,11 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
 
     private CustomPaginatedList<DeliveryDTO> deliveries;
 
-    private static final Map<String, String> columns = new HashMap<String, String>();
+    private static final Map<String, String> COLUMNS = new HashMap<String, String>();
     static {
-        columns.put("title", Predicates.RDFS_LABEL);
-        columns.put("period", Predicates.ROD_PERIOD);
-        columns.put("date", Predicates.ROD_RELEASED);
+        COLUMNS.put("title", Predicates.RDFS_LABEL);
+        COLUMNS.put("period", Predicates.ROD_PERIOD);
+        COLUMNS.put("date", Predicates.ROD_RELEASED);
     }
 
     /**
@@ -137,7 +137,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .get()
                         .getDao(SearchDAO.class)
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
-                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+                                new SortingRequest(COLUMNS.get(sort), SortOrder.parse(dir)));
 
         // Store search filter
         if (StringUtils.isNotEmpty(obligation) || StringUtils.isNotEmpty(locality) || StringUtils.isNotEmpty(year)) {
@@ -213,7 +213,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .get()
                         .getDao(SearchDAO.class)
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
-                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+                                new SortingRequest(COLUMNS.get(sort), SortOrder.parse(dir)));
 
         return init();
     }
@@ -230,7 +230,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .get()
                         .getDao(SearchDAO.class)
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
-                                new SortingRequest(columns.get(sort), SortOrder.parse(dir)));
+                                new SortingRequest(COLUMNS.get(sort), SortOrder.parse(dir)));
         logger.debug("found deliveries: " + deliveries.getFullListSize() + "; " + datasetFilter);
         return init();
     }

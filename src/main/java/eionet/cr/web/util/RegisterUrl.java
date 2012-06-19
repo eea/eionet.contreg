@@ -20,6 +20,13 @@ import eionet.cr.web.security.CRUser;
 public class RegisterUrl {
 
     /**
+     * Hide utility class constructor.
+     */
+    private RegisterUrl() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Register a URL.
      *
      * @param url - URL to register
@@ -30,7 +37,7 @@ public class RegisterUrl {
      * @throws HarvestException
      */
     public static void register(String url, CRUser user, boolean saveToBookmarks, String label) throws DAOException,
-            HarvestException {
+    HarvestException {
         // register URL
         DAOFactory.get().getDao(HelperDAO.class).registerUserUrl(user, url, saveToBookmarks, label);
 
@@ -39,8 +46,8 @@ public class RegisterUrl {
 
         String urlWithoutFragment = StringUtils.substringBefore(url, "#");
         Integer intervalMinutes =
-                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+            Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);

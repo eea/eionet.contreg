@@ -35,8 +35,7 @@ import net.sourceforge.stripes.validation.ValidationError;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
@@ -62,7 +61,7 @@ public abstract class AbstractActionBean implements ActionBean {
     private static final String WARNING_MESSAGES = "warningMessages";
 
     /** */
-    protected static final Log logger = LogFactory.getLog(AbstractActionBean.class);
+    protected static final Logger logger = Logger.getLogger(AbstractActionBean.class);
 
     /** */
     private CRActionBeanContext context;

@@ -127,6 +127,13 @@ public class GeneralConfig {
     /** */
     private static Properties properties = null;
 
+    /**
+     * Hide utility class constructor.
+     */
+    private GeneralConfig() {
+        // Hide utility class constructor.
+    }
+
     /** */
     private static void init() {
         properties = new Properties();

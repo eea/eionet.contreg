@@ -37,6 +37,13 @@ import java.util.List;
 public class MySQLUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private MySQLUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param tableName
      * @param valueMap
@@ -127,13 +134,8 @@ public class MySQLUtil {
             rs = stmt.executeQuery("select last_insert_id()");
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
         } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException e) {
-            }
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
         }
     }
 
@@ -152,13 +154,8 @@ public class MySQLUtil {
             rs = stmt.executeQuery("select found_rows()");
             return (rs != null && rs.next()) ? new Integer(rs.getInt(1)) : null;
         } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException e) {
-            }
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
         }
     }
 }

@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -52,6 +53,13 @@ public class MediaTypeToDcmiTypeConverter {
     private static Object initializationLock = new Object();
 
     /**
+     * Hide utility class constructor.
+     */
+    private MediaTypeToDcmiTypeConverter() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Loads the mimetypes from the file and puts them into mimeToRdfMap.
      */
     private static void initialize() {
@@ -67,10 +75,7 @@ public class MediaTypeToDcmiTypeConverter {
             LOGGER.error("Failed to load XML-formatted properties from " + MAPPINGS_FILENAME, e);
         } finally {
             if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                }
+                IOUtils.closeQuietly(inputStream);
             }
         }
 

@@ -236,8 +236,8 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      */
     public Resolution search() throws DAOException {
 
-        BBOX bbox = createBBOX();
-        if (!bbox.isUndefined()) {
+        BBOX box = createBBOX();
+        if (!box.isUndefined()) {
 
             Pair<Integer, List<SubjectDTO>> resultPair =
                     DAOFactory
@@ -294,13 +294,13 @@ public class SpatialSearchActionBean extends AbstractSearchActionBean<SubjectDTO
      */
     private BBOX createBBOX() {
 
-        BBOX bbox = new BBOX();
-        bbox.setLatitudeSouth(latS);
-        bbox.setLatitudeNorth(latN);
-        bbox.setLongitudeWest(longW);
-        bbox.setLongitudeEast(longE);
+        BBOX box = new BBOX();
+        box.setLatitudeSouth(latS);
+        box.setLatitudeNorth(latN);
+        box.setLongitudeWest(longW);
+        box.setLongitudeEast(longE);
 
-        return bbox;
+        return box;
     }
 
     /**

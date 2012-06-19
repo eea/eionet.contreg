@@ -11,6 +11,18 @@ import java.util.List;
 
 public class SortStringPair {
 
+    /**
+     * Hide utility class constructor.
+     */
+    private SortStringPair() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
+     *
+     * @param sourcePairs
+     * @return
+     */
     public static List<Pair<String, String>> sortByLeftAsc(List<Pair<String, String>> sourcePairs) {
         // Sorting the types by Pair left.
         for (int i = 0; i < sourcePairs.size(); i++) {
@@ -23,6 +35,11 @@ public class SortStringPair {
         return sourcePairs;
     }
 
+    /**
+     *
+     * @param sourcePairs
+     * @return
+     */
     public static List<Pair<String, String>> sortByRightAsc(List<Pair<String, String>> sourcePairs) {
         // Sorting the types by Pair right.
         for (int i = 0; i < sourcePairs.size(); i++) {

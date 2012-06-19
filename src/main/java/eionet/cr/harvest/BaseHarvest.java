@@ -590,6 +590,9 @@ public abstract class BaseHarvest implements Harvest {
         addHarvestMessage(message, messageType, null);
     }
 
+    /**
+     * @see eionet.cr.harvest.Harvest#getLastHarvestDuration()
+     */
     @Override
     public Long getLastHarvestDuration() {
         return lastHarvestDuration;
@@ -789,14 +792,15 @@ public abstract class BaseHarvest implements Harvest {
      * @return timeout in milliseconds
      */
     protected int getTimeout() {
-        Long lastHarvestDuration = getLastHarvestDuration();
+
+        Long durationOfLastHarvest = getLastHarvestDuration();
 
         // no last harvest, use default timeout
         int timeout = DEFAULT_HARVEST_TIMEOUT;
 
-        if (lastHarvestDuration != null) {
+        if (durationOfLastHarvest != null) {
             // big sources - last harvest * 1.2
-            timeout = (int) (lastHarvestDuration * HARVEST_TIMEOUT_MULTIPLIER);
+            timeout = (int) (durationOfLastHarvest * HARVEST_TIMEOUT_MULTIPLIER);
         }
         // use minimal if last harvest went very quickly
         if (timeout < MINIMAL_HARVEST_TIMEOUT) {

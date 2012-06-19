@@ -383,7 +383,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
             String infCommand =
-                    "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -479,8 +479,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     // Evaluate ASK query
                     // if (isAskQuery) {
                     if (queryObject instanceof BooleanQuery) {
+
                         isAskQuery = true;
-                        Boolean result = ((BooleanQuery) queryObject).evaluate();
+                        Boolean rslt = ((BooleanQuery) queryObject).evaluate();
 
                         // ASK query in XML format
                         if (format != null && format.equals(FORMAT_XML)) {
@@ -489,7 +490,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
                             writer.write("<head></head>");
                             writer.write("<boolean>");
-                            writer.write(result.toString());
+                            writer.write(rslt.toString());
                             writer.write("</boolean>");
                             writer.write("</sparql>");
                             writer.flush();
@@ -499,7 +500,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
                             writer.write("<head></head>");
                             writer.write("<boolean>");
-                            writer.write(result.toString());
+                            writer.write(rslt.toString());
                             writer.write("</boolean>");
                             writer.write("</sparql>");
                             writer.flush();
@@ -507,12 +508,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         } else if (format != null && format.equals(FORMAT_JSON)) {
                             OutputStreamWriter writer = new OutputStreamWriter(out);
                             writer.write("{  \"head\": { \"link\": [] }, \"boolean\": ");
-                            writer.write(result.toString());
+                            writer.write(rslt.toString());
                             writer.write("}");
                             writer.flush();
                             // ASK query in HTML format
                         } else if (format != null && format.equals(FORMAT_HTML)) {
-                            resultAsk = result.toString();
+                            resultAsk = rslt.toString();
                         }
                         // Evaluate CONSTRUCT query. Returns XML format
                         // } else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
@@ -592,8 +593,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             int maxRowsCount = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
             nrOfTriples =
-                    DAOFactory.get().getDao(HelperDAO.class)
-                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                DAOFactory.get().getDao(HelperDAO.class)
+                .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -605,21 +606,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();

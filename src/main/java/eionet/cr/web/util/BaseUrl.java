@@ -18,6 +18,13 @@ public class BaseUrl {
     static String baseUrl = "";
 
     /**
+     * Hide utility class constructor.
+     */
+    private BaseUrl() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param request
      * @return

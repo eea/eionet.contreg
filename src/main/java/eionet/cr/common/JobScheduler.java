@@ -58,22 +58,26 @@ public class JobScheduler implements ServletContextListener {
     /** */
     private static Scheduler quartzScheduler = null;
 
-    private static final Pair<String, JobDetail>[] intervalJobs;
+    /** */
+    private static final Pair<String, JobDetail>[] INTERVAL_JOBS;
 
+    /**
+     *
+     */
     static {
-        intervalJobs =
-                new Pair[] {
-                        new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
-                                DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                DeliverySearchPicklistCacheUpdater.class)),
+        INTERVAL_JOBS =
+            new Pair[] {
+                new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
+                        DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+                        DeliverySearchPicklistCacheUpdater.class)),
                         new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
                                 RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 RecentResourcesCacheUpdater.class)),
-                        new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
-                                TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                TagCloudCacheUpdater.class)),
-                        new Pair(GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL, new JobDetail(TypeCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(), TypeCacheUpdater.class))};
+                                new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
+                                        TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+                                        TagCloudCacheUpdater.class)),
+                                        new Pair(GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL, new JobDetail(TypeCacheUpdater.class.getSimpleName(),
+                                                JobScheduler.class.getName(), TypeCacheUpdater.class))};
 
     }
 
@@ -97,7 +101,7 @@ public class JobScheduler implements ServletContextListener {
      * @throws ParseException
      */
     public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException,
-            ParseException {
+    ParseException {
 
         CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setCronExpression(cronExpression);
@@ -116,7 +120,7 @@ public class JobScheduler implements ServletContextListener {
      * @throws ParseException
      */
     public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException,
-            ParseException {
+    ParseException {
 
         SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setRepeatInterval(repeatInterval);
@@ -155,6 +159,7 @@ public class JobScheduler implements ServletContextListener {
             try {
                 quartzScheduler.shutdown(false);
             } catch (SchedulerException e) {
+                // Ignore deliberately.
             }
         }
     }
@@ -166,7 +171,7 @@ public class JobScheduler implements ServletContextListener {
 
         // schedule interval jobs
 
-        for (Pair<String, JobDetail> job : intervalJobs) {
+        for (Pair<String, JobDetail> job : INTERVAL_JOBS) {
 
             try {
                 String intervString = GeneralConfig.getProperty(job.getLeft());

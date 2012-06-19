@@ -39,12 +39,17 @@ import eionet.cr.dto.SubjectDTO;
  */
 public class TriplesToOutputStream {
 
+    /** */
+    private static final String RDF_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    private static final String RDF_NAMESPACE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    private static final String RDFS_NAMESPACE = "http://www.w3.org/2000/01/rdf-schema#";
+
     /**
-     *
+     * Hide utility class constructor.
      */
-    private static final String rdfHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    private static final String rdfNameSpace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    private static final String rdfSNameSpace = "http://www.w3.org/2000/01/rdf-schema#";
+    private TriplesToOutputStream() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      *
@@ -89,7 +94,7 @@ public class TriplesToOutputStream {
                                         writer.append(object.getValue());
                                     } else {
                                         writer.append("<a href=\"").append(object.getValue()).append("\">")
-                                                .append(object.getValue()).append("</a>");
+                                        .append(object.getValue()).append("</a>");
                                     }
                                     writer.append("</td>");
                                     writer.append("</tr>");
@@ -131,23 +136,23 @@ public class TriplesToOutputStream {
         OutputStreamWriter writer = new OutputStreamWriter(out);
         try {
             if (triples != null) {
-                writer.append(rdfHeader);
-                writer.append("<rdf:RDF xmlns=\"").append(subjectUri + "#").append("\" xmlns:rdf=\"").append(rdfNameSpace)
-                        .append("\" ").append("xmlns:rdfs=\"").append(rdfSNameSpace).append("\">");
+                writer.append(RDF_HEADER);
+                writer.append("<rdf:RDF xmlns=\"").append(subjectUri + "#").append("\" xmlns:rdf=\"").append(RDF_NAMESPACE)
+                .append("\" ").append("xmlns:rdfs=\"").append(RDFS_NAMESPACE).append("\">");
                 for (SubjectDTO subject : triples) {
 
                     writer.append("<rdf:Description rdf:about=\"").append(StringEscapeUtils.escapeXml(subject.getUri()))
-                            .append("\">");
+                    .append("\">");
                     Map<String, Collection<ObjectDTO>> predicates = subject.getPredicates();
                     if (predicates != null) {
                         for (String predicateUri : predicates.keySet()) {
                             Collection<ObjectDTO> objects = predicates.get(predicateUri);
 
                             // Shorten predicate URIs
-                            if (predicateUri.startsWith(rdfNameSpace)) {
-                                predicateUri = predicateUri.replace(rdfNameSpace, "rdf:");
-                            } else if (predicateUri.startsWith(rdfSNameSpace)) {
-                                predicateUri = predicateUri.replace(rdfSNameSpace, "rdfs:");
+                            if (predicateUri.startsWith(RDF_NAMESPACE)) {
+                                predicateUri = predicateUri.replace(RDF_NAMESPACE, "rdf:");
+                            } else if (predicateUri.startsWith(RDFS_NAMESPACE)) {
+                                predicateUri = predicateUri.replace(RDFS_NAMESPACE, "rdfs:");
                             } else if (predicateUri.startsWith(subjectUri)) {
                                 predicateUri = predicateUri.replace(subjectUri + "#", "");
                             }
@@ -156,11 +161,11 @@ public class TriplesToOutputStream {
                                 for (ObjectDTO object : objects) {
                                     if (object.isLiteral()) {
                                         writer.append("<").append(predicateUri).append(">")
-                                                .append(StringEscapeUtils.escapeXml(object.getValue())).append("</")
-                                                .append(predicateUri).append(">");
+                                        .append(StringEscapeUtils.escapeXml(object.getValue())).append("</")
+                                        .append(predicateUri).append(">");
                                     } else {
                                         writer.append("<").append(predicateUri).append(" rdf:resource=\"")
-                                                .append(StringEscapeUtils.escapeXml(object.getValue())).append("\"/>");
+                                        .append(StringEscapeUtils.escapeXml(object.getValue())).append("\"/>");
                                     }
                                 }
                             }

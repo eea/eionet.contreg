@@ -45,7 +45,7 @@ import eionet.cr.util.sql.SQLUtil;
 public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
-    private static final String getHarvestByIdSQL = "select *, USERNAME as \"USER\" from HARVEST where HARVEST_ID=?";
+    private static final String GET_HARVEST_BY_ID_SQL = "select *, USERNAME as \"USER\" from HARVEST where HARVEST_ID=?";
 
     /**
      * {@inheritDoc}
@@ -54,7 +54,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     public HarvestDTO getHarvestById(Integer harvestId) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(harvestId);
-        List<HarvestDTO> list = executeSQL(getHarvestByIdSQL, values, new HarvestDTOReader());
+        List<HarvestDTO> list = executeSQL(GET_HARVEST_BY_ID_SQL, values, new HarvestDTOReader());
         return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
@@ -97,7 +97,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     }
 
     /** */
-    private static final String getLastHarvestBySourceIdSQL = "select top 1 *, USERNAME as \"USER\""
+    private static final String GET_LAST_HARVEST_BY_SOURCE_ID_SQL = "select top 1 *, USERNAME as \"USER\""
             + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
 
     /**
@@ -108,12 +108,12 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
-        List<HarvestDTO> list = executeSQL(getLastHarvestBySourceIdSQL, values, new HarvestDTOReader());
+        List<HarvestDTO> list = executeSQL(GET_LAST_HARVEST_BY_SOURCE_ID_SQL, values, new HarvestDTOReader());
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
     /** */
-    private static final String insertStartedHarvestSQL =
+    private static final String INSERT_STARTED_HARVEST_SQL =
             "insert into HARVEST (HARVEST_SOURCE_ID, TYPE, USERNAME, STATUS, STARTED) values (?, ?, ?, ?, ?)";
 
     /**
@@ -132,7 +132,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            return SQLUtil.executeUpdateReturnAutoID(insertStartedHarvestSQL, values, conn);
+            return SQLUtil.executeUpdateReturnAutoID(INSERT_STARTED_HARVEST_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -141,7 +141,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     }
 
     /** */
-    private static final String updateFinishedHarvestSQL =
+    private static final String UPDATE_FINISHED_HARVEST_SQL =
             "update HARVEST set STATUS=?, FINISHED=?, TOT_STATEMENTS=? where HARVEST_ID=?";
 
     /**
@@ -159,7 +159,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(updateFinishedHarvestSQL, values, conn);
+            SQLUtil.executeUpdate(UPDATE_FINISHED_HARVEST_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {

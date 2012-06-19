@@ -88,12 +88,7 @@ public class XmlAnalysis {
             inputStream = fileBean.getInputStream();
             parse(inputStream);
         } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-            }
+            IOUtils.closeQuietly(inputStream);
         }
     }
 

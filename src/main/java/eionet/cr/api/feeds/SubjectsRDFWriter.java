@@ -48,7 +48,7 @@ import eionet.cr.util.URLUtil;
 public class SubjectsRDFWriter {
 
     /** */
-    private static final Logger logger = Logger.getLogger(SubjectsRDFWriter.class);
+    private static final Logger LOGGER = Logger.getLogger(SubjectsRDFWriter.class);
 
     /** */
     private HashMap<String, String> namespaces = new HashMap<String, String>();
@@ -154,7 +154,7 @@ public class SubjectsRDFWriter {
 
                 String subjectUri = subject.getUri();
                 if (StringUtils.isBlank(subjectUri)) {
-                    logger.error("Subject URI must not be blank (subject hash = " + subject.getUriHash() + ")");
+                    LOGGER.error("Subject URI must not be blank (subject hash = " + subject.getUriHash() + ")");
                     continue;
                 }
 

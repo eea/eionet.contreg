@@ -43,12 +43,12 @@ import eionet.cr.util.Hashes;
 public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
     /** */
-    private static final Logger logger = Logger.getLogger(UploadDTOReader.class);
+    private static final Logger LOGGER = Logger.getLogger(UploadDTOReader.class);
 
     /** */
-    private static final long labelHash = Hashes.spoHash(Predicates.RDFS_LABEL);
-    private static final long lastModifiedHash = Hashes.spoHash(Predicates.CR_LAST_MODIFIED);
-    private static final long dcTitleHash = Hashes.spoHash(Predicates.DC_TITLE);
+    private static final long LABEL_HASH = Hashes.spoHash(Predicates.RDFS_LABEL);
+    private static final long LAST_MODIFIED_HASH = Hashes.spoHash(Predicates.CR_LAST_MODIFIED);
+    private static final long DC_TITLE_HASH = Hashes.spoHash(Predicates.DC_TITLE);
 
     /** */
     private LinkedHashMap<String, UploadDTO> uploadsMap = new LinkedHashMap<String, UploadDTO>();
@@ -70,11 +70,11 @@ public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
         long predicateHash = rs.getLong("PREDICATE");
         String objectValue = rs.getString("OBJECT");
 
-        if (predicateHash == labelHash) {
+        if (predicateHash == LABEL_HASH) {
             uploadDTO.setLabel(objectValue);
-        } else if (predicateHash == lastModifiedHash) {
+        } else if (predicateHash == LAST_MODIFIED_HASH) {
             uploadDTO.setDateModified(objectValue);
-        } else if (predicateHash == dcTitleHash) {
+        } else if (predicateHash == DC_TITLE_HASH) {
 
             // label not yet set, prefer dc:title as the label
             if (StringUtils.isBlank(uploadDTO.getLabel())) {

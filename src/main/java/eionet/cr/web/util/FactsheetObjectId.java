@@ -35,6 +35,13 @@ public class FactsheetObjectId {
     private static final String SEPARATOR = "|";
 
     /**
+     * Hide utility class constructor.
+     */
+    private FactsheetObjectId() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param object
      * @return
@@ -46,7 +53,7 @@ public class FactsheetObjectId {
         }
 
         return new StringBuilder().append(object.getHash()).append(SEPARATOR).append(object.getSourceHash()).append(SEPARATOR)
-                .append(object.getDerivSourceHash()).append(SEPARATOR).append(object.getSourceObjectHash()).toString();
+        .append(object.getDerivSourceHash()).append(SEPARATOR).append(object.getSourceObjectHash()).toString();
     }
 
     /**

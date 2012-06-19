@@ -440,7 +440,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                             Double.parseDouble(value);
                             objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.DOUBLE);
                         } catch (NumberFormatException nfe3) {
-                            // ignore deliberately
+                            // No need to throw or log it.
                         }
                     }
                 }
@@ -536,7 +536,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             try {
                 csvReader.close();
             } catch (Exception e) {
-                // deliberately ignoring
+                // Ignore closing exceptions.
             }
         }
     }
@@ -564,7 +564,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
         // (but set interval minutes to 0, to avoid it being background-harvested)
         // HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
         HarvestSourceDTO folderHarvestSource =
-                HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
+            HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
     }
 

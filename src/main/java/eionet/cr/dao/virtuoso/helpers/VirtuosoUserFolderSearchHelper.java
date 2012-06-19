@@ -63,8 +63,7 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
             strBuilder.append(sortOrder);
         }
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
-            strBuilder
-                    .append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
+            strBuilder.append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
         } else {
             strBuilder.append("(?s)");
         }
@@ -95,7 +94,7 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
      * SPARQL for user home query paramters.
      */
     private static final String USERHOME_QUERY_PARAMETERS = " . ?s a ?type . FILTER (?type  IN (?crFile, ?crUserFolder)) . "
-            + "?parentFolder ?hasPredicate ?s . FILTER (?hasPredicate IN (?hasFile, ?hasFolder))";
+        + "?parentFolder ?hasPredicate ?s . FILTER (?hasPredicate IN (?hasFile, ?hasFolder))";
 
     public String getQueryParameters(List<Object> inParams) {
 

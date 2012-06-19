@@ -34,7 +34,7 @@ import eionet.cr.dao.util.SearchExpression;
  * @author risto
  *
  */
-public class VirtuosoFullTextQuery {
+public final class VirtuosoFullTextQuery {
 
     /** */
     private static final int MIN_WORD_LENGTH = 3;

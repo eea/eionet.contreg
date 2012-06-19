@@ -28,6 +28,13 @@ package eionet.cr.harvest;
 public class ResponseCodeUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private ResponseCodeUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param code
      * @return

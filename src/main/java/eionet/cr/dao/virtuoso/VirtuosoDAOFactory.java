@@ -26,7 +26,7 @@ import eionet.cr.dao.UserHomeDAO;
  * @author jaanus
  *
  */
-public class VirtuosoDAOFactory extends DAOFactory {
+public final class VirtuosoDAOFactory extends DAOFactory {
 
     /** */
     private static VirtuosoDAOFactory instance;

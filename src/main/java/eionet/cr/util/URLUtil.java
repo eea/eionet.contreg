@@ -62,7 +62,7 @@ public class URLUtil {
     private static final String DEFAULT_CHARACTAER_ENCODING = "UTF-8";
 
     /** */
-    private static final List<String> sessionIdentifiers = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
+    private static final List<String> SESSSION_IDENTIFIERS = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
 
     /**
      *
@@ -163,8 +163,8 @@ public class URLUtil {
         }
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
-                || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-                || responseCode == HttpURLConnection.HTTP_VERSION;
+        || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
+        || responseCode == HttpURLConnection.HTTP_VERSION;
     }
 
     /**
@@ -184,7 +184,7 @@ public class URLUtil {
                 host = uri.substring(0, uri.indexOf(url.getPath()));
 
             } catch (Exception ex) {
-
+                // No need to throw or log it.
             }
             return host;
         } else {
@@ -402,7 +402,7 @@ public class URLUtil {
             return false;
         }
 
-        return sessionIdentifiers.contains(str.toUpperCase());
+        return SESSSION_IDENTIFIERS.contains(str.toUpperCase());
     }
 
     /**
@@ -413,7 +413,7 @@ public class URLUtil {
      */
     private static String normalizePath(String path) throws UnsupportedEncodingException {
 
-        for (String sessionId : sessionIdentifiers) {
+        for (String sessionId : SESSSION_IDENTIFIERS) {
 
             int i = path.indexOf(";" + sessionId + "=");
             if (i >= 0) {

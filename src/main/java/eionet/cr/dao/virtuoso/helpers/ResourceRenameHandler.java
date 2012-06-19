@@ -22,7 +22,7 @@ import org.openrdf.rio.RDFHandlerException;
 public class ResourceRenameHandler implements RDFHandler {
 
     /** */
-    private static final Logger logger = Logger.getLogger(ResourceRenameHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(ResourceRenameHandler.class);
 
     /** */
     private ArrayList<Statement> originalStatements = new ArrayList<Statement>();
@@ -94,19 +94,19 @@ public class ResourceRenameHandler implements RDFHandler {
         int originalStatementsSize = originalStatements.size();
         if (originalStatementsSize > 0) {
 
-            logger.debug("Removing " + originalStatementsSize + " original statements from the repository");
+            LOGGER.debug("Removing " + originalStatementsSize + " original statements from the repository");
             repoConn.remove(originalStatements);
         } else {
-            logger.debug("No original statements recorded by the handler");
+            LOGGER.debug("No original statements recorded by the handler");
         }
 
         int renamedStatementsSize = renamedStatements.size();
         if (renamedStatementsSize > 0) {
 
-            logger.debug("Adding " + renamedStatementsSize + " renamed statements to the repository");
+            LOGGER.debug("Adding " + renamedStatementsSize + " renamed statements to the repository");
             repoConn.add(renamedStatements);
         } else {
-            logger.debug("No renamed statements recorded by the handler");
+            LOGGER.debug("No renamed statements recorded by the handler");
         }
     }
 

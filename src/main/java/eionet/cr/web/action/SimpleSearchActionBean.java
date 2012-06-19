@@ -85,10 +85,10 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
      */
     public Resolution search() throws DAOException {
 
-        SearchExpression searchExpression = new SearchExpression(this.searchExpression);
+        SearchExpression searchExpr = new SearchExpression(this.searchExpression);
         FreeTextSearchHelper.FilterType filterType = FreeTextSearchHelper.FilterType.ANY_OBJECT;
 
-        if (!searchExpression.isEmpty()) {
+        if (!searchExpr.isEmpty()) {
 
             if (simpleFilter != null) {
 
@@ -107,10 +107,10 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 }
             }
 
-            if (searchExpression.isUri()) {
+            if (searchExpr.isUri()) {
 
                 this.isUri = true;
-                SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(searchExpression.toString());
+                SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(searchExpr.toString());
                 if (subject != null) {
                     resultList = Collections.singleton(subject);
                     matchCount = 1;
@@ -119,11 +119,11 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
 
             if (resultList == null || resultList.size() == 0) {
                 SearchResultDTO<SubjectDTO> result =
-                        DAOFactory
-                                .get()
-                                .getDao(SearchDAO.class)
-                                .searchByFreeText(searchExpression, filterType, exactMatch, PagingRequest.create(getPageN()),
-                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
+                    DAOFactory
+                    .get()
+                    .getDao(SearchDAO.class)
+                    .searchByFreeText(searchExpr, filterType, exactMatch, PagingRequest.create(getPageN()),
+                            new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
 
                 resultList = result.getItems();
                 matchCount = result.getMatchCount();

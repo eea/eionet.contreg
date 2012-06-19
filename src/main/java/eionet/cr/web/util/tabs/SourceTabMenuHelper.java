@@ -78,8 +78,16 @@ public class SourceTabMenuHelper {
      * Tab titles.
      */
     public static class TabTitle {
+
         public static final String VIEW = "View";
         public static final String EDIT = "Edit";
         public static final String SAMPLE_TRIPLES = "Sample triples";
+
+        /**
+         * Hide utility class constructor.
+         */
+        private TabTitle() {
+            // Just an empty private constructor to avoid instantiating this utility class.
+        }
     }
 }

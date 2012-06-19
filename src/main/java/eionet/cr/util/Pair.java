@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class Pair<L, R> implements Serializable {
 
     /** */
-    private static final String[] excludeFromEquals = new String[] {"right"};
+    private static final String[] EXCLUDE_FROM_EQUALS = new String[] {"right"};
 
     /**
      * serial.
@@ -92,6 +92,6 @@ public class Pair<L, R> implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, excludeFromEquals);
+        return EqualsBuilder.reflectionEquals(this, obj, EXCLUDE_FROM_EQUALS);
     }
 }

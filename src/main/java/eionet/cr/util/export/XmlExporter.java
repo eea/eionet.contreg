@@ -90,6 +90,7 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
                 try {
                     writer.close();
                 } catch (XMLStreamException e) {
+                    // Ignore closing exceptions.
                 }
             }
         }

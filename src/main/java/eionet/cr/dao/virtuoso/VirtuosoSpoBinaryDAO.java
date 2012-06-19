@@ -46,7 +46,12 @@ import eionet.cr.util.sql.SQLUtil;
 public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDAO {
 
     /** */
-    private static final String sqlAdd = "insert soft SPO_BINARY (SUBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?)";
+    private static final String SQL_ADD = "insert soft SPO_BINARY (SUBJECT,OBJ_LANG,DATATYPE,MUST_EMBED) values (?,?,?,?)";
+
+    /** */
+    private static final String SQL_GET = "select * from SPO_BINARY where SUBJECT=?";
+    /** */
+    private static final String sqlExists = "select count(*) from SPO_BINARY where SUBJECT=?";
 
     /*
      * (non-Javadoc)
@@ -63,7 +68,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         PreparedStatement stmt = null;
         try {
             conn = getSQLConnection();
-            stmt = conn.prepareStatement(sqlAdd);
+            stmt = conn.prepareStatement(SQL_ADD);
 
             stmt.setLong(1, dto.getSubjectHash());
 
@@ -84,9 +89,6 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         }
     }
 
-    /** */
-    private static final String sqlGet = "select * from SPO_BINARY where SUBJECT=?";
-
     /*
      * (non-Javadoc)
      *
@@ -103,7 +105,7 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            stmt = conn.prepareStatement(sqlGet);
+            stmt = conn.prepareStatement(SQL_GET);
             stmt.setLong(1, Hashes.spoHash(subjectUri));
             rs = stmt.executeQuery();
             if (rs != null && rs.next()) {
@@ -125,9 +127,6 @@ public class VirtuosoSpoBinaryDAO extends VirtuosoBaseDAO implements SpoBinaryDA
 
         return null;
     }
-
-    /** */
-    private static final String sqlExists = "select count(*) from SPO_BINARY where SUBJECT=?";
 
     /*
      * (non-Javadoc)

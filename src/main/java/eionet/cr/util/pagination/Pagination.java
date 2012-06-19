@@ -32,7 +32,7 @@ import eionet.cr.web.action.AbstractSearchActionBean;
  * @author <a urlPath="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class Pagination {
+public final class Pagination {
 
     /** */
     public static final String PAGE_NUM_PARAM = "pageN";
@@ -160,7 +160,7 @@ public class Pagination {
 
         StringBuffer buf = new StringBuffer(urlPath);
         return buf.append("?").append(queryString.setParameterValue(PAGE_NUM_PARAM, String.valueOf(pageNum)).toURLFormat())
-                .toString();
+        .toString();
     }
 
     /**

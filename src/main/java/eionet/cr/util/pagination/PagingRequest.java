@@ -23,7 +23,7 @@ package eionet.cr.util.pagination;
 /**
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class PagingRequest {
+public final class PagingRequest {
 
     /** */
     private int pageNumber;
@@ -91,6 +91,6 @@ public class PagingRequest {
      */
     public String toString() {
         return new StringBuffer().append("pageNumber=").append(pageNumber).append(",itemsPerPage=").append(itemsPerPage)
-                .toString();
+        .toString();
     }
 }

@@ -67,12 +67,12 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
 
     /** */
-    public static final List<Pair<String, String>> sourceTypes;
+    public static final List<Pair<String, String>> SOURCE_TYPES;
 
     /** */
-    private static final GenericColumn checkboxColumn;
-    private static final HarvestSourcesColumn urlColumn;
-    private static final HarvestSourcesColumn dateColumn;
+    private static final GenericColumn CHECKBOX_COLUMN;
+    private static final HarvestSourcesColumn URL_COLUMN;
+    private static final HarvestSourcesColumn DATE_COLUMN;
 
     /**
      * the string to be searched
@@ -93,28 +93,28 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     /** */
     static {
         // initialize the tabs of the harvest sources page
-        sourceTypes = new LinkedList<Pair<String, String>>();
-        sourceTypes.add(new Pair<String, String>(null, "Tracked files"));
-        sourceTypes.add(new Pair<String, String>(PRIORITY, "Priority"));
-        sourceTypes.add(new Pair<String, String>(SCHEMAS, "Schemas"));
-        sourceTypes.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
-        sourceTypes.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
+        SOURCE_TYPES = new LinkedList<Pair<String, String>>();
+        SOURCE_TYPES.add(new Pair<String, String>(null, "Tracked files"));
+        SOURCE_TYPES.add(new Pair<String, String>(PRIORITY, "Priority"));
+        SOURCE_TYPES.add(new Pair<String, String>(SCHEMAS, "Schemas"));
+        SOURCE_TYPES.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
+        SOURCE_TYPES.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
 
         // initialize column objects that will be used as columns in the harvest sources page
 
-        checkboxColumn = new GenericColumn();
-        checkboxColumn.setTitle("");
-        checkboxColumn.setSortable(false);
-        checkboxColumn.setEscapeXml(false);
+        CHECKBOX_COLUMN = new GenericColumn();
+        CHECKBOX_COLUMN.setTitle("");
+        CHECKBOX_COLUMN.setSortable(false);
+        CHECKBOX_COLUMN.setEscapeXml(false);
 
-        urlColumn = new HarvestSourcesColumn(false);
-        urlColumn.setSortable(true);
-        urlColumn.setTitle("URL");
-        urlColumn.setEscapeXml(false);
+        URL_COLUMN = new HarvestSourcesColumn(false);
+        URL_COLUMN.setSortable(true);
+        URL_COLUMN.setTitle("URL");
+        URL_COLUMN.setEscapeXml(false);
 
-        dateColumn = new HarvestSourcesColumn(true);
-        dateColumn.setSortable(true);
-        dateColumn.setTitle("Last harvest");
+        DATE_COLUMN = new HarvestSourcesColumn(true);
+        DATE_COLUMN.setSortable(true);
+        DATE_COLUMN.setTitle("Last harvest");
     }
 
     /**
@@ -313,7 +313,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
      * @return List<Pair<String, String>>
      */
     public List<Pair<String, String>> getSourceTypes() {
-        return sourceTypes;
+        return SOURCE_TYPES;
     }
 
     /**
@@ -379,10 +379,10 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
             columnList = new ArrayList<SearchResultColumn>();
             // display checkbox only when current session allows update rights in registrations ACL
             if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")) {
-                columnList.add(checkboxColumn);
+                columnList.add(CHECKBOX_COLUMN);
             }
-            columnList.add(urlColumn);
-            columnList.add(dateColumn);
+            columnList.add(URL_COLUMN);
+            columnList.add(DATE_COLUMN);
         }
 
         return columnList;

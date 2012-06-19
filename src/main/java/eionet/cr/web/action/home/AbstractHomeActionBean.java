@@ -32,12 +32,14 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 
 public abstract class AbstractHomeActionBean extends AbstractActionBean {
 
+    /** */
     protected static final String TYPE_BOOKMARK = "bookmark";
     protected static final String TYPE_HISTORY = "history";
     protected static final String TYPE_UPLOADS = "uploads";
     protected static final String TYPE_REGISTRATIONS = "registrations";
     protected static final String TYPE_REVIEWS = "reviews";
 
+    /** */
     protected static final String SHOWPUBLIC_YES = "Y";
     protected static final String SHOWPUBLIC_NO = "N";
 

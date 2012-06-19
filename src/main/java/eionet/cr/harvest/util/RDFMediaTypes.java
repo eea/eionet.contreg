@@ -35,7 +35,14 @@ import org.openrdf.rio.RDFFormat;
 public class RDFMediaTypes {
 
     /** */
-    private static final LinkedHashMap<String, RDFFormat> mappings = init();
+    private static final LinkedHashMap<String, RDFFormat> MAPPINGS = init();
+
+    /**
+     * Hide utility class constructor.
+     */
+    private RDFMediaTypes() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      * @return
@@ -60,7 +67,7 @@ public class RDFMediaTypes {
 
         if (httpResponseContentType != null) {
             String lowerCase = httpResponseContentType.toLowerCase();
-            for (Map.Entry<String, RDFFormat> entry : mappings.entrySet()) {
+            for (Map.Entry<String, RDFFormat> entry : MAPPINGS.entrySet()) {
 
                 if (lowerCase.startsWith(entry.getKey())) {
                     return entry.getValue();
@@ -77,6 +84,6 @@ public class RDFMediaTypes {
      */
     public static Collection<String> collection() {
 
-        return Collections.unmodifiableSet(mappings.keySet());
+        return Collections.unmodifiableSet(MAPPINGS.keySet());
     }
 }

@@ -16,6 +16,7 @@ import org.openrdf.rio.RDFFormat;
 
 import virtuoso.sesame2.driver.VirtuosoRepository;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
@@ -74,24 +75,17 @@ public class VirtuosoHarvesterActionBean extends AbstractActionBean {
             // no transaction rollback needed, when reached this point
             isSuccess = true;
         } finally {
-            if (!isSuccess && conn != null) {
-                try {
-                    conn.rollback();
-                } catch (RepositoryException e) {
-                }
-            }
 
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (RepositoryException e) {
-                }
+            if (!isSuccess) {
+                SesameUtil.rollback(conn);
             }
+            SesameUtil.close(conn);
 
             if (repository != null) {
                 try {
                     repository.shutDown();
                 } catch (RepositoryException e) {
+                    // Ignore shutdown exceptions.
                 }
             }
         }

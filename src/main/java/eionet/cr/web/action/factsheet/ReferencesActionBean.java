@@ -108,8 +108,8 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
             matchCount = searchResult.getLeft();
 
             HashSet<Long> subjectHashes = new HashSet<Long>();
-            for (SubjectDTO subject : resultList) {
-                subjectHashes.add(subject.getUriHash());
+            for (SubjectDTO subj : resultList) {
+                subjectHashes.add(subj.getUriHash());
             }
 
             PredicateLabels predLabels = DAOFactory.get().getDao(HelperDAO.class).getPredicateLabels(subjectHashes);

@@ -35,6 +35,13 @@ public class URIUtil {
     private static HashSet<String> schemes;
 
     /**
+     * Hide utility class constructor.
+     */
+    private URIUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Returns true if the following conditions are all met: - the given string is not null nor empty - the given string passes
      * <code>new java.net.URI(str)</code> without the <code>java.net.URISyntaxException</code> being thrown - the given string is an
      * <strong>absolute</strong> URI, meaning it has a scheme part specified - URI scheme in the given string matches one of those

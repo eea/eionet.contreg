@@ -7,6 +7,13 @@ import eionet.cr.common.Namespace;
 public class NamespaceUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private NamespaceUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param url
      * @return

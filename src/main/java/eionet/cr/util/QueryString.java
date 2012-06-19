@@ -34,7 +34,7 @@ import javax.servlet.ServletRequest;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class QueryString extends HashMap<String, Set<String>> {
+public final class QueryString extends HashMap<String, Set<String>> {
 
     /**
      *

@@ -59,6 +59,13 @@ import eionet.cr.web.util.columns.SearchResultColumn;
 public class JstlFunctions {
 
     /**
+     * Hide utility class constructor.
+     */
+    private JstlFunctions() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Parses the given string with a whitespace tokenizer and looks up the first token whose length exceeds <tt>cutAtLength</tt>.
      * If such a token is found, returns the given string's <code>substring(0, i + cutAtLength) + "..."</code>, where <code>i</code>
      * is the start index of the found token. If no tokens are found that exceed the length of <tt>cutAtLength</tt>, then this
@@ -154,8 +161,8 @@ public class JstlFunctions {
         String curValue = request.getParameter("sortP");
         if (curValue != null && buf.indexOf("sortP=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
-                            "sortP=" + Util.urlEncode(sortParamValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
+                        "sortP=" + Util.urlEncode(sortParamValue)));
         } else {
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
         }
@@ -163,8 +170,8 @@ public class JstlFunctions {
         curValue = request.getParameter("sortO");
         if (curValue != null && buf.indexOf("sortO=") > 0) {
             buf =
-                    new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
-                            "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+                new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
+                        "sortO=" + SortOrder.oppositeSortOrder(curValue)));
         } else {
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
         }
@@ -319,7 +326,7 @@ public class JstlFunctions {
         if (object != null) {
 
             buf.append("[Type: ")
-                    .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
+            .append(object.isLiteral() ? "Literal" : object.isAnonymous() ? "Anonymous resource" : "Resource");
             buf.append("]   [Inferred from object: ").append(getMatchingObjectValue(object.getSourceObjectHash(), allObjects));
             buf.append("]   [Inferred from source: ").append(
                     StringUtils.isBlank(object.getDerivSourceUri()) ? object.getDerivSourceHash() : object.getDerivSourceUri());
@@ -421,7 +428,7 @@ public class JstlFunctions {
 
             try {
                 link.append("&").append(FactsheetActionBean.PAGE_PARAM_PREFIX).append(pageNumber).append("=")
-                        .append(URLEncoder.encode(predicateUri, "UTF-8"));
+                .append(URLEncoder.encode(predicateUri, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 throw new CRRuntimeException("Unsupported encoding", e);
             }
@@ -460,7 +467,7 @@ public class JstlFunctions {
                         if (!isPageParam || !paramValue.equals(predicateUri)) {
                             try {
                                 link.append(URLEncoder.encode(paramName, "UTF-8")).append("=")
-                                        .append(URLEncoder.encode(paramValue, "UTF-8")).append("&");
+                                .append(URLEncoder.encode(paramValue, "UTF-8")).append("&");
                             } catch (UnsupportedEncodingException e) {
                                 throw new CRRuntimeException("Unsupported encoding", e);
                             }

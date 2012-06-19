@@ -58,7 +58,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
             GeneralConfig.FILE_DELETION_JOB_INTERVAL, "20000"));
 
     /** */
-    private static final Collection<File> queuedFiles = Collections.synchronizedSet(new HashSet<File>());
+    private static final Collection<File> QUEUED_FILES = Collections.synchronizedSet(new HashSet<File>());
 
     /** */
     private static final TempFileFilter TEMP_FILE_FILTER = new FileDeletionJob.TempFileFilter();
@@ -101,7 +101,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
 
         ArrayList<File> successfullyDeleted = new ArrayList<File>();
 
-        for (File file : queuedFiles) {
+        for (File file : QUEUED_FILES) {
             if (file != null && file.exists() && file.isFile()) {
                 try {
                     boolean success = file.delete();
@@ -119,7 +119,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
             }
         }
 
-        queuedFiles.removeAll(successfullyDeleted);
+        QUEUED_FILES.removeAll(successfullyDeleted);
     }
 
     /**
@@ -130,7 +130,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
     public static synchronized void register(File file) {
 
         if (file != null) {
-            queuedFiles.add(file);
+            QUEUED_FILES.add(file);
         }
     }
 
@@ -149,7 +149,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     private void queueLeftovers() {
 
-        for (File tempFileDir : TempFilePathGenerator.tempFileDirectories) {
+        for (File tempFileDir : TempFilePathGenerator.TEMP_FILE_DIRECTORIES) {
 
             if (tempFileDir.exists() && tempFileDir.isDirectory()) {
 

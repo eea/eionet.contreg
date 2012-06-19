@@ -47,6 +47,13 @@ public class SesameConnectionProvider {
     private static boolean readOnlyDataSourceMissingLogged = false;
 
     /**
+     * Hide utility class constructor.
+     */
+    private SesameConnectionProvider() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * @return the readWriteRepository
      */
     private static synchronized Repository getReadWriteRepository() {

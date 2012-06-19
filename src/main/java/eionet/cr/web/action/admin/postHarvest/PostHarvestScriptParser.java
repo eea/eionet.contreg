@@ -41,6 +41,13 @@ public class PostHarvestScriptParser {
     public static final String ASSOCIATED_TYPE_VARIABLE = "thisType";
 
     /**
+     * Hide utility class constructor.
+     */
+    private PostHarvestScriptParser() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @param script
      * @param harvestedSource

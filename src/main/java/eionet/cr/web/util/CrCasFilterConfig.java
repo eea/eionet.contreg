@@ -37,7 +37,7 @@ import eionet.cr.config.GeneralConfig;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class CrCasFilterConfig implements FilterConfig {
+public final class CrCasFilterConfig implements FilterConfig {
 
     /** */
     private FilterConfig defaultConfig;

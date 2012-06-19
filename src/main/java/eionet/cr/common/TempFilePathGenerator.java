@@ -33,6 +33,13 @@ import eionet.cr.config.GeneralConfig;
  */
 public class TempFilePathGenerator {
 
+    /**
+     * Hide utility class constructor.
+     */
+    private TempFilePathGenerator() {
+        // Hide utility class constructor.
+    }
+
     /** */
     public static final String PREFIX = "eionet.cr.tempfile-";
 
@@ -40,11 +47,11 @@ public class TempFilePathGenerator {
     private static final String DASH = "-";
 
     /** */
-    public static final Collection<File> tempFileDirectories;
+    public static final Collection<File> TEMP_FILE_DIRECTORIES;
 
     static {
-        tempFileDirectories =
-                Collections.singleton(new File(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION)));
+        TEMP_FILE_DIRECTORIES =
+            Collections.singleton(new File(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION)));
     }
 
     /** */

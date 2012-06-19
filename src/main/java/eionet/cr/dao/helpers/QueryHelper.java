@@ -33,11 +33,25 @@ import eionet.cr.util.URIUtil;
  */
 public class QueryHelper {
 
+    /** */
     private static final String PREFIX = "PREFIX";
     private static final String SELECT = "SELECT";
     private static final String WHERE = "WHERE";
     private static final String FROM = "FROM";
 
+    /**
+     * Hide utility class constructor.
+     */
+    private QueryHelper() {
+        // Hide utility class constructor.
+    }
+
+    /**
+     *
+     * @param query
+     * @param bindings
+     * @return
+     */
     public static String getFormatedQuery(String query, Bindings bindings) {
 
         if (bindings != null) {

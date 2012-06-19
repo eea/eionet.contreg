@@ -36,6 +36,13 @@ import eionet.cr.util.Util;
 public class SesameUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private SesameUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @return RepositoryConnection
      * @throws RepositoryException
@@ -127,7 +134,7 @@ public class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-            throws OpenRDFException, ResultSetReaderException {
+    throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
@@ -188,7 +195,7 @@ public class SesameUtil {
      * @throws MalformedQueryException
      */
     public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-            QueryEvaluationException, MalformedQueryException {
+    QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
@@ -231,6 +238,7 @@ public class SesameUtil {
             try {
                 queryResult.close();
             } catch (QueryEvaluationException e) {
+                // Ignore closing exceptions.
             }
         }
     }
@@ -245,6 +253,7 @@ public class SesameUtil {
             try {
                 queryResult.close();
             } catch (QueryEvaluationException e) {
+                // Ignore closing exceptions.
             }
         }
     }
@@ -259,6 +268,7 @@ public class SesameUtil {
             try {
                 repo.shutDown();
             } catch (RepositoryException e) {
+                // Ignore shutdown exceptions.
             }
         }
     }
@@ -288,7 +298,7 @@ public class SesameUtil {
             try {
                 conn.rollback();
             } catch (RepositoryException e) {
-                // ignoring rollback exceptions
+                // Ignore rollback exceptions.
             }
         }
     }

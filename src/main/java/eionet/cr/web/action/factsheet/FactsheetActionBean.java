@@ -440,8 +440,8 @@ public class FactsheetActionBean extends AbstractActionBean {
             result = new ArrayList<UriLabelPair>();
             if (props != null && !props.isEmpty()) {
 
-                for (String uri : props.keySet()) {
-                    result.add(UriLabelPair.create(uri, props.get(uri)));
+                for (String propUri : props.keySet()) {
+                    result.add(UriLabelPair.create(propUri, props.get(propUri)));
                 }
                 Collections.sort(result);
             }
@@ -647,8 +647,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
                             String[] predicateUris = entry.getValue();
                             if (predicateUris != null) {
-                                for (String predicateUri : predicateUris) {
-                                    predicatePageNumbers.put(predicateUri, pageNumber);
+                                for (String predUri : predicateUris) {
+                                    predicatePageNumbers.put(predUri, pageNumber);
                                 }
                             }
                         }

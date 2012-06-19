@@ -5,7 +5,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class XmlUtil {
 
+    /** */
     public static final String INVALID_ELEMENT_NAME = "unknown";
+
+    /**
+     * Hide utility class constructor.
+     */
+    private XmlUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      * write xml element start tag, data and end tag into XmlStreamWriter

@@ -41,6 +41,13 @@ public class CurrentHarvests {
     }
 
     /**
+     * Hide utility class constructor.
+     */
+    private CurrentHarvests() {
+        // Hide utility class constructor.
+    }
+
+    /**
      * @return the queuedHarvest
      */
     public static synchronized Harvest getQueuedHarvest() {

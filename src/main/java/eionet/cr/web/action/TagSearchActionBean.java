@@ -53,9 +53,11 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
 @UrlBinding("/tagSearch.action")
 public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
+    /** */
     private static final String TAG_SEARCH_PATH = "/pages/tagSearch.jsp";
     private static final String SELECTED_TAGS_CACHE = TypeSearchActionBean.class.getName() + ".selectedTagsCache";
 
+    /** */
     private List<TagDTO> tagCloud;
     private String cloudSorted = "name";
     private String searchTag;
@@ -129,11 +131,11 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
         List<String> predicates = Arrays.asList(new String[] {Predicates.RDF_TYPE, Predicates.RDFS_LABEL, Predicates.CR_TAG});
 
         SearchResultDTO<SubjectDTO> searchResult =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
-                        .searchByTags(selectedTags, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), predicates);
+            DAOFactory
+            .get()
+            .getDao(SearchDAO.class)
+            .searchByTags(selectedTags, PagingRequest.create(getPageN()),
+                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), predicates);
         resultList = searchResult.getItems();
         matchCount = searchResult.getMatchCount();
         queryString = searchResult.getQuery();

@@ -37,6 +37,13 @@ public class IsJUnitRuntime {
     public static final boolean VALUE = isJUnitRuntime();
 
     /**
+     * Hide utility class constructor.
+     */
+    private IsJUnitRuntime() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      *
      * @return
      */

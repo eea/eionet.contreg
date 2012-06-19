@@ -33,7 +33,15 @@ import eionet.cr.common.CRRuntimeException;
  */
 public class Hashes {
 
+    /** */
     private static final long SEED = 0xcbf29ce484222325L;
+
+    /**
+     * Hide utility class constructor.
+     */
+    private Hashes() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      *

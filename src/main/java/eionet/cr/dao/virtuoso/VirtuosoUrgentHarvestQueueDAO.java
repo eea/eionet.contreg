@@ -42,6 +42,16 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
+    /** */
+    private static final String ADD_PISH_HARVEST_SQL =
+            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
+    /** */
+    private static final String GET_URGENT_HARVEST_QUEUE_SQL = "select * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
+    /** */
+    private static final String PEEK_SQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
+    /** */
+    private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE where URL=? and \"TIMESTAMP\"=?";
+
     /*
      * (non-Javadoc)
      *
@@ -74,10 +84,6 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         }
     }
 
-    /** */
-    private static final String addPushHarvestSQL =
-            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
-
     /*
      * (non-Javadoc)
      *
@@ -98,16 +104,13 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(addPushHarvestSQL, values, conn);
+            SQLUtil.executeUpdate(ADD_PISH_HARVEST_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
         }
     }
-
-    /** */
-    private static final String getUrgentHarvestQueueSQL = "select * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
 
     /*
      * (non-Javadoc)
@@ -116,7 +119,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      */
     @Override
     public List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException {
-        return executeSQL(getUrgentHarvestQueueSQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
+        return executeSQL(GET_URGENT_HARVEST_QUEUE_SQL, new ArrayList<Object>(), new HarvestQueueItemDTOReader());
     }
 
     /*
@@ -143,9 +146,6 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         }
     }
 
-    /** */
-    private static final String peekSQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
-
     /**
      *
      * @param conn
@@ -157,14 +157,11 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         List<Object> values = new ArrayList<Object>();
 
         HarvestQueueItemDTOReader rsReader = new HarvestQueueItemDTOReader();
-        SQLUtil.executeQuery(peekSQL, values, rsReader, conn);
+        SQLUtil.executeQuery(PEEK_SQL, values, rsReader, conn);
         List<UrgentHarvestQueueItemDTO> list = rsReader.getResultList();
 
         return (list != null && !list.isEmpty()) ? list.get(0) : null;
     }
-
-    /** */
-    private static final String deleteQueueItemSQL = "delete from URGENT_HARVEST_QUEUE where URL=? and \"TIMESTAMP\"=?";
 
     /**
      *
@@ -177,7 +174,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         values.add(queueItem.getUrl());
         values.add(queueItem.getTimeAdded());
 
-        SQLUtil.executeUpdate(deleteQueueItemSQL, values, conn);
+        SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
     }
 
     /**

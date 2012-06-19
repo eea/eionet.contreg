@@ -37,6 +37,13 @@ import eionet.cr.util.Util;
 public class LiteralUtil {
 
     /**
+     * Hide utility class constructor.
+     */
+    private LiteralUtil() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
+
+    /**
      * Null-safe method that gets the given literal's {@link Date} value. Null-safe means that it will simply return null if the
      * given literal is null. Null is also returned if the literal could not be parsed into {@link Date}.
      *

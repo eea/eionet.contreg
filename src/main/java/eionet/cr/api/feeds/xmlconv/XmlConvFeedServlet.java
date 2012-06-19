@@ -53,7 +53,7 @@ public class XmlConvFeedServlet extends HttpServlet {
     private static final String SCHEMA_PARAM = "schema";
 
     /** */
-    private static final Logger logger = Logger.getLogger(XmlConvFeedServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(XmlConvFeedServlet.class);
 
     /** */
     public static final String INCLUDE_DERIVED_VALUES = "inclDeriv";
@@ -66,7 +66,7 @@ public class XmlConvFeedServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String methodName = XmlConvFeedServlet.class.getSimpleName() + ".doGet()";
-        logger.debug("Entered " + methodName);
+        LOGGER.debug("Entered " + methodName);
 
         response.setContentType("text/xml");
 
@@ -82,7 +82,7 @@ public class XmlConvFeedServlet extends HttpServlet {
                 SearchResultDTO<SubjectDTO> result = searchDao.searchByFilters(criteria, false, null, null, null, true);
 
                 int subjectCount = result.getMatchCount();
-                logger.debug(methodName + ", " + subjectCount + " subjects found in total");
+                LOGGER.debug(methodName + ", " + subjectCount + " subjects found in total");
                 subjects = result.getItems();
             }
 
@@ -96,7 +96,7 @@ public class XmlConvFeedServlet extends HttpServlet {
 
             rdfWriter.write(subjects, response.getOutputStream());
         } catch (Exception e) {
-            logger.error("Error in " + methodName, e);
+            LOGGER.error("Error in " + methodName, e);
             if (!response.isCommitted()) {
                 response.sendError(500);
             }

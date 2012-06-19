@@ -76,12 +76,18 @@ public class HarvestActionBean extends AbstractActionBean {
     private void loadMessages() throws DAOException {
 
         List<HarvestMessageDTO> messageDTOs =
-                DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
+            DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
         if (messageDTOs != null) {
-            loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals = new ArrayList<HarvestMessageDTO>());
-            loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors = new ArrayList<HarvestMessageDTO>());
-            loadMessages(HarvestMessageType.WARNING.toString(), messageDTOs, warnings = new ArrayList<HarvestMessageDTO>());
-            loadMessages(HarvestMessageType.INFO.toString(), messageDTOs, infos = new ArrayList<HarvestMessageDTO>());
+
+            fatals = new ArrayList<HarvestMessageDTO>();
+            errors = new ArrayList<HarvestMessageDTO>();
+            warnings = new ArrayList<HarvestMessageDTO>();
+            infos = new ArrayList<HarvestMessageDTO>();
+
+            loadMessages(HarvestMessageType.FATAL.toString(), messageDTOs, fatals);
+            loadMessages(HarvestMessageType.ERROR.toString(), messageDTOs, errors);
+            loadMessages(HarvestMessageType.WARNING.toString(), messageDTOs, warnings);
+            loadMessages(HarvestMessageType.INFO.toString(), messageDTOs, infos);
         }
     }
 

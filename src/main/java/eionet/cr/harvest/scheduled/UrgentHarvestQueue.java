@@ -25,8 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -42,7 +41,14 @@ import eionet.cr.harvest.HarvestException;
 public class UrgentHarvestQueue {
 
     /** */
-    private static Log logger = LogFactory.getLog(UrgentHarvestQueue.class);
+    private static final Logger LOGGER = Logger.getLogger(UrgentHarvestQueue.class);
+
+    /**
+     * Hide utility class constructor.
+     */
+    private UrgentHarvestQueue() {
+        // Just an empty private constructor to avoid instantiating this utility class.
+    }
 
     /**
      * Adds a pull-harvest to the urgent queue.
@@ -73,7 +79,7 @@ public class UrgentHarvestQueue {
             DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos);
 
             for (Iterator<String> i = urls.iterator(); i.hasNext();) {
-                logger.debug("Pull harvest added to the urgent queue, url = " + i.next());
+                LOGGER.debug("Pull harvest added to the urgent queue, url = " + i.next());
             }
         } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
@@ -95,7 +101,7 @@ public class UrgentHarvestQueue {
 
         try {
             DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPushHarvest(dto);
-            logger.debug("Push harvest added to the urgent queue, url = " + url);
+            LOGGER.debug("Push harvest added to the urgent queue, url = " + url);
         } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
         }

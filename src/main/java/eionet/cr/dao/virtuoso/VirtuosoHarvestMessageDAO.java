@@ -38,7 +38,7 @@ import eionet.cr.util.sql.SQLUtil;
 public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements HarvestMessageDAO {
 
     /** */
-    private static final String q_HarvestMessageByHarvestID = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
+    private static final String GET_HARVEST_MESSAGE_BY_HARVEST_ID_SQL = "select * from HARVEST_MESSAGE where HARVEST_ID=?";
 
     /**
      * {@inheritDoc}
@@ -47,11 +47,11 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     public List<HarvestMessageDTO> findHarvestMessagesByHarvestID(int harvestID) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(harvestID));
-        return executeSQL(q_HarvestMessageByHarvestID, values, new HarvestMessageDTOReader());
+        return executeSQL(GET_HARVEST_MESSAGE_BY_HARVEST_ID_SQL, values, new HarvestMessageDTOReader());
     }
 
     /** */
-    private static final String q_HarvestMessageByMessageID = "select * from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
+    private static final String GET_HARVEST_MESSAGE_BY_MESSAGE_ID_SQL = "select * from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
 
     /**
      * {@inheritDoc}
@@ -60,12 +60,12 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     public HarvestMessageDTO findHarvestMessageByMessageID(int messageID) throws DAOException {
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(messageID));
-        List<HarvestMessageDTO> list = executeSQL(q_HarvestMessageByMessageID, values, new HarvestMessageDTOReader());
+        List<HarvestMessageDTO> list = executeSQL(GET_HARVEST_MESSAGE_BY_MESSAGE_ID_SQL, values, new HarvestMessageDTOReader());
         return list != null && list.size() > 0 ? list.get(0) : null;
     }
 
     /** */
-    private static final String q_insertHarvestMessage =
+    private static final String INSERT_HARVEST_MESSAGE_SQL =
             "insert into HARVEST_MESSAGE (HARVEST_ID, TYPE, MESSAGE, STACK_TRACE) values (?, ?, ?, ?)";
 
     /**
@@ -86,7 +86,7 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            return SQLUtil.executeUpdateReturnAutoID(q_insertHarvestMessage, values, conn);
+            return SQLUtil.executeUpdateReturnAutoID(INSERT_HARVEST_MESSAGE_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -95,7 +95,7 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
     }
 
     /** */
-    private static final String deleteHarvestMessageSQL = "delete from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
+    private static final String DELETE_HARVEST_MESSAGE_SQL = "delete from HARVEST_MESSAGE where HARVEST_MESSAGE_ID=?";
 
     /**
      * {@inheritDoc}
@@ -109,7 +109,7 @@ public class VirtuosoHarvestMessageDAO extends VirtuosoBaseDAO implements Harves
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(deleteHarvestMessageSQL, values, conn);
+            SQLUtil.executeUpdate(DELETE_HARVEST_MESSAGE_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {

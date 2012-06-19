@@ -32,8 +32,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -58,7 +57,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
     public static final int MAX_RESULTS = 20;
 
     /** */
-    private static Log logger = LogFactory.getLog(RecentUploadsActionBean.class);
+    private static final Logger LOGGER = Logger.getLogger(RecentUploadsActionBean.class);
     /** */
     private String type;
 

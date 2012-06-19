@@ -93,7 +93,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content) throws IOException,
-            ServletException {
+    ServletException {
 
         // Get requested file URI from request parameters, send 404 if its missing
         String requestedUri = request.getParameter("uri");
@@ -337,7 +337,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         LOGGER.info(message);
         boolean isWebBrowser = false;
@@ -379,8 +379,8 @@ public class DownloadServlet extends HttpServlet {
         String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
         Arrays.sort(acceptValues);
         return Arrays.binarySearch(acceptValues, toAccept) > -1
-                || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-                || Arrays.binarySearch(acceptValues, "*/*") > -1;
+        || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+        || Arrays.binarySearch(acceptValues, "*/*") > -1;
     }
 
     /**
@@ -434,7 +434,8 @@ public class DownloadServlet extends HttpServlet {
             long toRead = length;
 
             while ((read = input.read(buffer)) > 0) {
-                if ((toRead -= read) > 0) {
+                toRead = toRead - read;
+                if (toRead > 0) {
                     output.write(buffer, 0, read);
                 } else {
                     output.write(buffer, 0, (int) toRead + read);
