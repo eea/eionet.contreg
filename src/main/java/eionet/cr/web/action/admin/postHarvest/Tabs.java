@@ -8,10 +8,10 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 
 /**
  *
- * @author meie
+ * @author jaanus
  *
  */
-public class Tabs {
+public final class Tabs {
 
     /**
      * Hide utility class constructor.

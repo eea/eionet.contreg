@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Risto Alt
  * @author Jaanus Heinlaid
  */
-public class BaseUrl {
+public final class BaseUrl {
 
     /** */
     static boolean valueSet = false;

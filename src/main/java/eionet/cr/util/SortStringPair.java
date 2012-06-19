@@ -9,7 +9,7 @@ import java.util.List;
  *
  */
 
-public class SortStringPair {
+public final class SortStringPair {
 
     /**
      * Hide utility class constructor.

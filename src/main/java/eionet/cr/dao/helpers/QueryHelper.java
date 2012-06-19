@@ -31,7 +31,7 @@ import eionet.cr.util.URIUtil;
  *
  * @author Juhan Voolaid
  */
-public class QueryHelper {
+public final class QueryHelper {
 
     /** */
     private static final String PREFIX = "PREFIX";

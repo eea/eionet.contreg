@@ -152,7 +152,12 @@
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
+
+        <!-- Require a block to contain at least some JavaDoc. -->
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
+
         <module name="LeftCurly"/>
         <module name="NeedBraces">
           <property name="tokens" value="LITERAL_DO, LITERAL_WHILE"/>

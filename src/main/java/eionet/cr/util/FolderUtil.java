@@ -35,7 +35,7 @@ import eionet.cr.web.security.CRUser;
  * @author altnyris
  *
  */
-public class FolderUtil {
+public final class FolderUtil {
 
     /**
      * Hide utility class constructor.

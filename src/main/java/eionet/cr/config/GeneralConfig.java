@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  * @author heinljab
  *
  */
-public class GeneralConfig {
+public final class GeneralConfig {
 
     /** */
     public static final String BUNDLE_NAME = "cr";

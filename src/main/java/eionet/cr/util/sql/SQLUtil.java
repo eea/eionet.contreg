@@ -38,7 +38,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
  * @author heinljab
  *
  */
-public class SQLUtil {
+public final class SQLUtil {
 
     /**
      * Hide utility class constructor.

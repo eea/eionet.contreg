@@ -38,7 +38,7 @@ import eionet.cr.harvest.HarvestException;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class UrgentHarvestQueue {
+public final class UrgentHarvestQueue {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(UrgentHarvestQueue.class);

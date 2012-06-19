@@ -25,7 +25,7 @@ import eionet.cr.config.GeneralConfig;
  * @author jaanus
  *
  */
-public class SesameConnectionProvider {
+public final class SesameConnectionProvider {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(SesameConnectionProvider.class);

@@ -3,7 +3,13 @@ package eionet.cr.util.export;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-public class XmlUtil {
+/**
+ *
+ * Utility class helping in the generation of the Excel files.
+ *
+ * @author Jaanus Heinlaid
+ */
+public final class XmlUtil {
 
     /** */
     public static final String INVALID_ELEMENT_NAME = "unknown";

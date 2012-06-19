@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Juhan Voolaid
  */
-public class SourceTabMenuHelper {
+public final class SourceTabMenuHelper {
 
     /** Source uri. */
     private String uri;

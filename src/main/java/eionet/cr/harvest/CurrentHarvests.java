@@ -27,7 +27,7 @@ import java.util.HashMap;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class CurrentHarvests {
+public final class CurrentHarvests {
 
     /** */
     private static Harvest queuedHarvest;

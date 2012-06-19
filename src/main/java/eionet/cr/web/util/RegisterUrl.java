@@ -17,7 +17,7 @@ import eionet.cr.web.security.CRUser;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class RegisterUrl {
+public final class RegisterUrl {
 
     /**
      * Hide utility class constructor.

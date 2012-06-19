@@ -29,7 +29,7 @@ import eionet.cr.dto.ObjectDTO;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class FactsheetObjectId {
+public final class FactsheetObjectId {
 
     /** */
     private static final String SEPARATOR = "|";

@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import eionet.cr.common.Namespace;
 
-public class NamespaceUtil {
+public final class NamespaceUtil {
 
     /**
      * Hide utility class constructor.

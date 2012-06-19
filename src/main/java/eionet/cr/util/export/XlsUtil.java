@@ -2,7 +2,13 @@ package eionet.cr.util.export;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 
-public class XlsUtil {
+/**
+ *
+ * Utility class helping in the generation of the Excel files.
+ *
+ * @author Jaanus Heinlaid
+ */
+public final class XlsUtil {
 
     /**
      * Hide utility class constructor.

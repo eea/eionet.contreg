@@ -27,7 +27,7 @@ import java.util.HashMap;
  * @author altnyris
  *
  */
-public class CurrentLoadedDatasets {
+public final class CurrentLoadedDatasets {
 
     /** */
     private static HashMap<String, String> loadedDatasets;

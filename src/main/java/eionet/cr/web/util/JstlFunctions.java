@@ -56,7 +56,7 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class JstlFunctions {
+public final class JstlFunctions {
 
     /**
      * Hide utility class constructor.

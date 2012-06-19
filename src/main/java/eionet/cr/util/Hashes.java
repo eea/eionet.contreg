@@ -31,7 +31,7 @@ import eionet.cr.common.CRRuntimeException;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class Hashes {
+public final class Hashes {
 
     /** */
     private static final long SEED = 0xcbf29ce484222325L;

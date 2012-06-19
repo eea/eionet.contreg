@@ -34,7 +34,7 @@ import eionet.cr.util.Util;
  *
  * @author Jaanus Heinlaid
  */
-public class LiteralUtil {
+public final class LiteralUtil {
 
     /**
      * Hide utility class constructor.

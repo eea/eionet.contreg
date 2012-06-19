@@ -37,7 +37,7 @@ import eionet.cr.dto.SubjectDTO;
  * @author Risto Alt
  * @author Jaanus Heinlaid
  */
-public class TriplesToOutputStream {
+public final class TriplesToOutputStream {
 
     /** */
     private static final String RDF_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

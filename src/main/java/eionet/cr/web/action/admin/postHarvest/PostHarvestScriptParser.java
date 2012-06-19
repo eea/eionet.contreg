@@ -31,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Jaanus Heinlaid
  */
-public class PostHarvestScriptParser {
+public final class PostHarvestScriptParser {
 
     /** */
     public static final int TEST_RESULTS_LIMIT = 500;

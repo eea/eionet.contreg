@@ -33,7 +33,7 @@ import eionet.cr.util.Util;
  * @author jaanus
  *
  */
-public class SesameUtil {
+public final class SesameUtil {
 
     /**
      * Hide utility class constructor.

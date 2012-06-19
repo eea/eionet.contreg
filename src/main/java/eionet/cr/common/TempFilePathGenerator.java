@@ -31,7 +31,7 @@ import eionet.cr.config.GeneralConfig;
 /**
  * @author Jaanus Heinlaid
  */
-public class TempFilePathGenerator {
+public final class TempFilePathGenerator {
 
     /**
      * Hide utility class constructor.

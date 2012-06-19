@@ -34,7 +34,7 @@ import java.util.List;
  * @author heinljab
  *
  */
-public class MySQLUtil {
+public final class MySQLUtil {
 
     /**
      * Hide utility class constructor.

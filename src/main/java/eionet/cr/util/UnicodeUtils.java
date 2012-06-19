@@ -22,7 +22,7 @@ package eionet.cr.util;
 
 import java.util.HashMap;
 
-public class UnicodeUtils {
+public final class UnicodeUtils {
 
     /** */
     private static HashMap<String, String> entityReferenceMap;

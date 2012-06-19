@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class MediaTypeToDcmiTypeConverter {
+public final class MediaTypeToDcmiTypeConverter {
 
     /**
      * File containing mimetypes in properties format.

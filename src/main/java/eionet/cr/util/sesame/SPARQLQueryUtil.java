@@ -33,7 +33,7 @@ import eionet.cr.util.Bindings;
  *
  * @author Enriko Käsper
  */
-public class SPARQLQueryUtil {
+public final class SPARQLQueryUtil {
 
     /** Chars not allowed in IRI. */
     private static final char[] BAD_CHARS = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};

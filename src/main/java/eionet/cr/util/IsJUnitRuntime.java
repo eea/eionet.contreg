@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jaanus Heinlaid
  */
-public class IsJUnitRuntime {
+public final class IsJUnitRuntime {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(IsJUnitRuntime.class);

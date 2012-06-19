@@ -36,7 +36,7 @@ import eionet.cr.dto.SubjectDTO;
  *
  * @author Juhan Voolaid
  */
-public class FactsheetTabMenuHelper {
+public final class FactsheetTabMenuHelper {
 
     /** The subject data object found by the requestd URI or URI hash. */
     private final SubjectDTO subject;

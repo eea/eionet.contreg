@@ -50,7 +50,7 @@ public class FeedSaver {
     /**
      *
      */
-    public void save(){
+    public void save() {
         // TODO implement this method
     }
 }

@@ -32,7 +32,7 @@ import org.openrdf.rio.RDFFormat;
  *
  * @author Jaanus Heinlaid
  */
-public class RDFMediaTypes {
+public final class RDFMediaTypes {
 
     /** */
     private static final LinkedHashMap<String, RDFFormat> MAPPINGS = init();

@@ -25,7 +25,7 @@ package eionet.cr.web.util;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class Colors {
+public final class Colors {
 
     /**
      * Hide utility class constructor.

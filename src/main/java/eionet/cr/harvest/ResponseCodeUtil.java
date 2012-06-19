@@ -25,7 +25,7 @@ package eionet.cr.harvest;
  *
  * @author Jaanus Heinlaid
  */
-public class ResponseCodeUtil {
+public final class ResponseCodeUtil {
 
     /**
      * Hide utility class constructor.

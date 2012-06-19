@@ -29,7 +29,7 @@ import java.util.HashSet;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class URIUtil {
+public final class URIUtil {
 
     /** */
     private static HashSet<String> schemes;
