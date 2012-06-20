@@ -175,12 +175,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                     LOGGER.trace("Increasing unavailability count of permanent-error priority source " + sourceDTO.getUrl());
                     sourceDao.increaseUnavailableCount(sourceDTO.getUrl());
                 } else {
-                    LOGGER.trace(sourceDTO.getUrl() + "  will be deleted as a non-priority source with permanent error");
+                    LOGGER.debug(sourceDTO.getUrl() + "  will be deleted as a non-priority source with permanent error");
                     sourcesToDelete.add(sourceDTO.getUrl());
                 }
             } else if (sourceDTO.getCountUnavail() >= 5) {
                 if (!sourceDTO.isPrioritySource()) {
-                    LOGGER.trace(sourceDTO.getUrl() + "  will be deleted as a non-priority source with unavailability >= 5");
+                    LOGGER.debug(sourceDTO.getUrl() + "  will be deleted as a non-priority source with unavailability >= 5");
                     sourcesToDelete.add(sourceDTO.getUrl());
                 }
             } else {
@@ -209,13 +209,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         // Delete sources that were found necessary to delete (if any).
         if (!sourcesToDelete.isEmpty()) {
 
-            LOGGER.trace("Deleting " + sourcesToDelete.size() + " sources found above");
+            LOGGER.debug("Deleting " + sourcesToDelete.size() + " sources found above");
             for (Iterator<String> iter = sourcesToDelete.iterator(); iter.hasNext();) {
 
                 String sourceUrl = iter.next();
                 if (CurrentHarvests.contains(sourceUrl)) {
                     iter.remove();
-                    LOGGER.trace("Skipping deletion of " + sourceUrl + " because it is currently being harvested");
+                    LOGGER.debug("Skipping deletion of " + sourceUrl + " because it is currently being harvested");
                 }
             }
             sourceDao.removeHarvestSources(sourcesToDelete);

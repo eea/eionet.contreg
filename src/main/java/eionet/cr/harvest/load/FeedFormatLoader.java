@@ -28,20 +28,15 @@ import java.sql.Connection;
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryConnection;
 
-import com.sun.syndication.io.FeedException;
-
 /**
- * Implementation of {@link ContentLoader} for the content in RRS/Atom format.
+ * Implementation of {@link ContentLoader} for the content in RRS/Atom format (i.e. feed formats).
  *
  * @author Jaanus Heinlaid
  */
-public class RSSFormatLoader implements ContentLoader {
+public class FeedFormatLoader implements ContentLoader {
 
     /**
-     * @throws IOException
-     * @throws FeedException
-     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection,
-     *      java.sql.Connection, java.lang.String, java.lang.String)
+     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection, java.sql.Connection, java.lang.String, java.lang.String)
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)

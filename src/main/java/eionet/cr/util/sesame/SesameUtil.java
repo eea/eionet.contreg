@@ -406,4 +406,24 @@ public final class SesameUtil {
             query.setDataset(dataset);
         }
     }
+
+    /**
+     *
+     * @param uriString
+     * @param valueFactory
+     * @return
+     */
+    public static boolean isValidURI(String uriString, ValueFactory valueFactory){
+
+        if (StringUtils.isBlank(uriString)){
+            return false;
+        }
+
+        try {
+            valueFactory.createURI(uriString);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 }

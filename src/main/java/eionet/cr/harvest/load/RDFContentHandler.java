@@ -51,7 +51,7 @@ public class RDFContentHandler implements RDFHandler {
      */
     private static final int BATCH_SIZE = 5000;
 
-    /** */
+    /** Connections to the repository and SQL database where the content is persisted into. */
     private RepositoryConnection repoConn;
     private Connection sqlConn;
 

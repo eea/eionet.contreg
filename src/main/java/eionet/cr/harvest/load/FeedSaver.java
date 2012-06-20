@@ -39,6 +39,7 @@ import net.htmlparser.jericho.Source;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -61,24 +62,34 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
+ * Helper class that reads a feed (e.g. RSS, Atom) from the given input stream and saves it into the given context (i.e. graph) in
+ * the given repository. Repository connections and the context are given via constructor, the stream is given via
+ * {@link #save(InputStream)} method.
  *
  * @author Jaanus Heinlaid
  */
 public class FeedSaver {
 
     /** */
+    private static final Logger LOGGER = Logger.getLogger(FeedSaver.class);
+
+    /**
+     * An rdf:Seq item (see RDF specs) is identified like http://www.w3.org/1999/02/22-rdf-syntax-ns#_1 where the number in the end
+     * denotes the item's position in the sequence. This string before the number is this constant.
+     */
     private static final String RDF_SEQUENCE_ITEM_PREFIX = Namespace.RDF.getUri() + "_";
 
-    /** */
+    /** Connections to the repository and SQL database where the content is persisted into. */
     private RepositoryConnection repoConn;
     private Connection sqlConn;
 
-    /** */
+    /** The graph where the triples will be loaded into. */
     private Resource context;
 
-    /** */
+    /** The OpenRDF ValueFactory obtained from {@link #repoConn}. */
     private ValueFactory valueFactory;
 
     /** Number of triples saved. */
@@ -113,16 +124,26 @@ public class FeedSaver {
 
         SyndFeedInput input = new SyndFeedInput();
         try {
+            // Read the feed from the given input stream.
             SyndFeed feed = input.build(new XmlReader(inputStream));
-            saveFeedMetadata(feed);
+            String feedUri = getFeedUri(feed);
 
+            // Save the read feed.
+            saveFeedMetadata(feedUri, feed);
+
+            // Loop through the feed's items, save them all and their relations to the feed as well.
             List feedItems = feed.getEntries();
             if (feedItems != null) {
 
                 for (int i = 0; i < feedItems.size(); i++) {
                     SyndEntry item = (SyndEntry) feedItems.get(i);
-                    saveFeedItemMetadata(item);
-                    saveItemToFeedRelation(feed.getUri(), item.getUri(), i + 1);
+                    String itemUri = getFeedItemUri(item);
+
+                    // Save the feed item's metadata.
+                    saveFeedItemMetadata(itemUri, item);
+
+                    // Save the relation between the feed and the item.
+                    saveItemToFeedRelation(feedUri, itemUri, i + 1);
                 }
             }
         } catch (FeedException e) {
@@ -140,11 +161,46 @@ public class FeedSaver {
     /**
      * @param feed
      * @return
+     */
+    private String getFeedUri(SyndFeed feed) {
+
+        // Get the feed's URI, fall back to its link if URI could not be detected.
+        // If no link could be detected either, fall back to the context URI.
+        String feedUri = feed.getUri();
+        if (!SesameUtil.isValidURI(feedUri, valueFactory)) {
+            feedUri = feed.getLink();
+        }
+        if (!SesameUtil.isValidURI(feedUri, valueFactory)) {
+            LOGGER.warn("Could not detect the feed's URI neither from getUri() nor from getLink(), falling back to context URI!");
+            feedUri = context.stringValue();
+        }
+        return feedUri;
+    }
+
+    /**
+     *
+     * @param item
+     * @return
+     */
+    private String getFeedItemUri(SyndEntry item) {
+
+        // Get the item's URI, fall back to its link if URI could not be detected.
+        String itemUri = item.getUri();
+        if (!SesameUtil.isValidURI(itemUri, valueFactory)) {
+            itemUri = item.getLink();
+        }
+        return itemUri;
+    }
+
+    /**
+     * @param feedUri
+     * @param feed
+     * @return
      * @throws OpenRDFException
      */
-    private void saveFeedMetadata(SyndFeed feed) throws OpenRDFException {
+    private void saveFeedMetadata(String feedUri, SyndFeed feed) throws OpenRDFException {
 
-        String feedUri = feed.getUri();
+        // Save the feed's rdf:type.
         saveResourceTriple(feedUri, Predicates.RDF_TYPE, Subjects.RSS_CHANNEL_CLASS);
 
         // The feed's title mapped into dcterms:title and rdfs:label.
@@ -176,20 +232,20 @@ public class FeedSaver {
     }
 
     /**
+     * @param itemUri
      * @param item
      * @return
      * @throws RepositoryException
      */
-    private void saveFeedItemMetadata(SyndEntry item) throws RepositoryException {
+    private void saveFeedItemMetadata(String itemUri, SyndEntry item) throws RepositoryException {
 
-        String itemUri = item.getUri();
         saveResourceTriple(itemUri, Predicates.RDF_TYPE, Subjects.RSS_ITEM_CLASS);
 
         // Title mapped into dcterms:title and rdfs:label.
         String itemTitle = item.getTitle();
         String itemTitleNormalized = stripOfHtml(itemTitle);
-        saveLiteralTriple(itemTitle, Predicates.DCTERMS_TITLE, itemTitleNormalized);
-        saveLiteralTriple(itemTitle, Predicates.RDFS_LABEL, itemTitleNormalized);
+        saveLiteralTriple(itemUri, Predicates.DCTERMS_TITLE, itemTitleNormalized);
+        saveLiteralTriple(itemUri, Predicates.RDFS_LABEL, itemTitleNormalized);
 
         // Authors mapped into dcterms:creator.
         savePersons(itemUri, Predicates.DCTERMS_CREATOR, item.getAuthors());
@@ -203,7 +259,7 @@ public class FeedSaver {
         // Description mapped into dcterms:abstract.
         SyndContent descriptionContent = item.getDescription();
         if (descriptionContent != null) {
-            saveLiteralTriple(itemUri, Predicates.DCTERMS_ABSTRACT, descriptionContent.getValue());
+            saveLiteralTriple(itemUri, Predicates.DCTERMS_ABSTRACT, stripOfHtml(descriptionContent.getValue()));
         }
 
         // Both published-date and updated-date mapped into dcterms:date
@@ -290,10 +346,11 @@ public class FeedSaver {
             String taxonomyUri = syndCategory.getTaxonomyUri();
             String name = syndCategory.getName();
 
-            if (StringUtils.isNotBlank(taxonomyUri) && StringUtils.isNotBlank(name)) {
+            boolean isValidTaxonomyUri = SesameUtil.isValidURI(taxonomyUri, valueFactory);
+            if (isValidTaxonomyUri && StringUtils.isNotBlank(name)) {
                 saveLiteralTriple(taxonomyUri, Predicates.RDFS_LABEL, name);
                 saveResourceTriple(subjectUri, predicateUri, taxonomyUri);
-            } else if (StringUtils.isNotBlank(taxonomyUri)) {
+            } else if (isValidTaxonomyUri) {
                 saveResourceTriple(subjectUri, predicateUri, taxonomyUri);
             } else {
                 saveLiteralTriple(subjectUri, predicateUri, name);
@@ -370,8 +427,7 @@ public class FeedSaver {
 
         Literal literal = createLiteral(object);
         if (literal != null) {
-            saveTriple(valueFactory.createURI(subjectUri), valueFactory.createURI(predicateUri), literal);
-            triplesSaved++;
+            saveTriple(subjectUri, predicateUri, literal);
         }
     }
 
@@ -388,8 +444,42 @@ public class FeedSaver {
             return;
         }
 
-        saveTriple(valueFactory.createURI(subjectUri), valueFactory.createURI(predicateUri), valueFactory.createURI(objectUri));
-        triplesSaved++;
+        URI objectResource = null;
+        try {
+            objectResource = valueFactory.createURI(objectUri);
+        } catch (IllegalArgumentException e) {
+            // If the given object value could not be converted into OpenRDF URI.
+            objectResource = null;
+        }
+
+        // In case we could not convert the object into resource, try saving it as a literal instead.
+        if (objectResource != null) {
+            saveTriple(subjectUri, predicateUri, objectResource);
+        } else {
+            saveLiteralTriple(subjectUri, predicateUri, objectUri);
+        }
+    }
+
+    /**
+     *
+     * @param subjectUri
+     * @param predicateUri
+     * @param object
+     * @throws RepositoryException
+     */
+    private void saveTriple(String subjectUri, String predicateUri, Value object) throws RepositoryException {
+
+        URI subjectResource = null;
+        try {
+            subjectResource = valueFactory.createURI(subjectUri);
+        } catch (IllegalArgumentException e) {
+            // If the given subject URI string could not be converted into OpenRDF URI.
+            subjectResource = null;
+        }
+
+        if (subjectResource != null) {
+            saveTriple(subjectResource, valueFactory.createURI(predicateUri), object);
+        }
     }
 
     /**

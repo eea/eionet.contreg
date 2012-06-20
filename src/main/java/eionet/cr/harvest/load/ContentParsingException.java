@@ -24,6 +24,7 @@ package eionet.cr.harvest.load;
 import eionet.cr.common.CRException;
 
 /**
+ * Exception thrown on structured content parsing errors.
  *
  * @author Jaanus Heinlaid
  */

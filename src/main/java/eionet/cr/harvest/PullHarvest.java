@@ -64,7 +64,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
-import eionet.cr.harvest.load.RSSFormatLoader;
+import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
 import eionet.cr.harvest.util.RDFMediaTypes;
@@ -452,6 +452,7 @@ public class PullHarvest extends BaseHarvest {
 
             ContentLoader contentLoader = createContentLoader(urlConn);
             if (contentLoader != null) {
+                LOGGER.debug(loggerMsg("Downladed file is in RDF or web feed format"));
                 return loadFile(downloadedFile, contentLoader);
             } else {
                 LOGGER.debug(loggerMsg("Downladed file is not in RDF or web feed format, processing the file further"));
@@ -567,7 +568,7 @@ public class PullHarvest extends BaseHarvest {
      */
     private int loadFile(File file, ContentLoader contentLoader) throws DAOException {
 
-        LOGGER.debug(loggerMsg("Loading file into triple store"));
+        LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
         int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl(), true);
         return tripleCount;
     }
@@ -805,8 +806,8 @@ public class PullHarvest extends BaseHarvest {
         String contentType = getSourceContentType(urlConn);
         if (StringUtils.isBlank(contentType)) {
             return null;
-        } else if (contentType.startsWith("application/rss+xml")) {
-            return new RSSFormatLoader();
+        } else if (contentType.startsWith("application/rss+xml") || contentType.startsWith("application/atom+xml")) {
+            return new FeedFormatLoader();
         } else {
             return null;
         }
