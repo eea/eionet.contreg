@@ -71,6 +71,9 @@ import eionet.cr.web.util.RDFGenerator;
 public class HarvestSourceActionBean extends AbstractActionBean {
 
     /** */
+    public static final List<String> MEDIA_TYPES;
+
+    /** */
     private HarvestSourceDTO harvestSource;
     private List<HarvestDTO> harvests;
 
@@ -114,6 +117,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         intervalMultipliers.put(new Integer(60), "hours");
         intervalMultipliers.put(new Integer(1440), "days");
         intervalMultipliers.put(new Integer(10080), "weeks");
+
+        MEDIA_TYPES = new ArrayList<String>();
+        MEDIA_TYPES.add(null);
+        MEDIA_TYPES.addAll(RDFMediaTypes.collection());
+        MEDIA_TYPES.add("application/rss+xml");
+        MEDIA_TYPES.add("application/atom+xml");
+        MEDIA_TYPES.add("application/octet-stream");
+        MEDIA_TYPES.add("text/plain");
     }
 
     /**
@@ -440,12 +451,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @return
      */
     public List<String> getMediaTypes() {
-        List<String> result = new ArrayList<String>();
-        result.add(null);
-        result.addAll(RDFMediaTypes.collection());
-        result.add("application/octet-stream");
-        result.add("text/plain");
-        return result;
+        return MEDIA_TYPES;
     }
 
     /**

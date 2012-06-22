@@ -24,14 +24,8 @@ package eionet.cr.harvest.load;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Segment;
@@ -58,8 +52,6 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.util.sesame.SesameUtil;
@@ -76,12 +68,6 @@ public class FeedSaver {
     /** */
     private static final Logger LOGGER = Logger.getLogger(FeedSaver.class);
 
-    /**
-     * An rdf:Seq item (see RDF specs) is identified like http://www.w3.org/1999/02/22-rdf-syntax-ns#_1 where the number in the end
-     * denotes the item's position in the sequence. This string before the number is this constant.
-     */
-    private static final String RDF_SEQUENCE_ITEM_PREFIX = Namespace.RDF.getUri() + "_";
-
     /** Connections to the repository and SQL database where the content is persisted into. */
     private RepositoryConnection repoConn;
     private Connection sqlConn;
@@ -94,12 +80,6 @@ public class FeedSaver {
 
     /** Number of triples saved. */
     private int triplesSaved;
-
-    /**
-     * The resource representing the rdf:Seq of feed items. See RSS 1.0 examples from http://web.resource.org/rss/1.0/spec. Is
-     * lazily instantiated below.
-     */
-    private Resource itemsBNode;
 
     /**
      * @param repoConn
@@ -201,7 +181,7 @@ public class FeedSaver {
     private void saveFeedMetadata(String feedUri, SyndFeed feed) throws OpenRDFException {
 
         // Save the feed's rdf:type.
-        saveResourceTriple(feedUri, Predicates.RDF_TYPE, Subjects.RSS_CHANNEL_CLASS);
+        saveResourceTriple(feedUri, Predicates.RDF_TYPE, Subjects.RSSNG_CHANNEL_CLASS);
 
         // The feed's title mapped into dcterms:title and rdfs:label.
         String feedTitle = feed.getTitle();
@@ -239,7 +219,7 @@ public class FeedSaver {
      */
     private void saveFeedItemMetadata(String itemUri, SyndEntry item) throws RepositoryException {
 
-        saveResourceTriple(itemUri, Predicates.RDF_TYPE, Subjects.RSS_ITEM_CLASS);
+        saveResourceTriple(itemUri, Predicates.RDF_TYPE, Subjects.RSSNG_ANNOUNCEMENT_CLASS);
 
         // Title mapped into dcterms:title and rdfs:label.
         String itemTitle = item.getTitle();
@@ -359,31 +339,6 @@ public class FeedSaver {
     }
 
     /**
-     * @param object
-     * @return
-     */
-    private Literal createLiteral(Object object) {
-
-        Literal literal = null;
-        if (object instanceof Date) {
-            GregorianCalendar gregCalendar = new GregorianCalendar();
-            gregCalendar.setTime((Date) object);
-            try {
-                XMLGregorianCalendar xmlGregCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCalendar);
-                literal = valueFactory.createLiteral(xmlGregCalendar);
-            } catch (DatatypeConfigurationException e) {
-                throw new CRRuntimeException("Failed to instantiate XML datatype factory implementation", e);
-            }
-        } else {
-            String objectString = object.toString();
-            if (StringUtils.isNotEmpty(objectString)) {
-                literal = valueFactory.createLiteral(objectString);
-            }
-        }
-        return literal;
-    }
-
-    /**
      *
      * @param feedUri
      * @param itemUri
@@ -396,20 +351,8 @@ public class FeedSaver {
             return;
         }
 
-        if (itemsBNode == null) {
-
-            // The rdf:Seq of feed items is a blank node.
-            itemsBNode = valueFactory.createBNode();
-
-            // Save the triple that states the sequence's rdf:type.
-            saveTriple(itemsBNode, valueFactory.createURI(Predicates.RDF_TYPE), valueFactory.createURI(Subjects.RDF_SEQ));
-
-            // Save the triple that relates the feed to the items.
-            saveTriple(valueFactory.createURI(feedUri), valueFactory.createURI(Predicates.RSS_ITEMS), itemsBNode);
-        }
-
-        // Save the item's presence in the items sequence.
-        saveTriple(itemsBNode, valueFactory.createURI(RDF_SEQUENCE_ITEM_PREFIX + position), valueFactory.createURI(itemUri));
+        saveResourceTriple(feedUri, Predicates.RSSNG_ITEM, itemUri);
+        saveLiteralTriple(itemUri, Predicates.RSSNG_ORDER, Integer.valueOf(position));
     }
 
     /**
@@ -425,7 +368,7 @@ public class FeedSaver {
             return;
         }
 
-        Literal literal = createLiteral(object);
+        Literal literal = SesameUtil.createLiteral(object, valueFactory);
         if (literal != null) {
             saveTriple(subjectUri, predicateUri, literal);
         }
@@ -478,21 +421,9 @@ public class FeedSaver {
         }
 
         if (subjectResource != null) {
-            saveTriple(subjectResource, valueFactory.createURI(predicateUri), object);
+            repoConn.add(subjectResource, valueFactory.createURI(predicateUri), object, context);
+            triplesSaved++;
         }
-    }
-
-    /**
-     *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @throws RepositoryException
-     */
-    private void saveTriple(Resource subject, URI predicate, Value object) throws RepositoryException {
-
-        repoConn.add(subject, predicate, object, context);
-        triplesSaved++;
     }
 
     /**

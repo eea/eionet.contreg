@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+RDF Schema declaration for Rich Site Summary (RSS) NG
+-->
+
+<rdf:RDF xml:base="http://purl.org/rss-ng/1.0/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:dct="http://purl.org/dc/terms/">
+
+    <owl:Ontology rdf:about="">
+        <rdfs:label>Schema for RSS-NG</rdfs:label>
+        <dct:description>RDF Schema declaration for Rich Site Summary (RSS) NG</dct:description>
+        <dct:creator>Søren Roug</dct:creator>
+        <dct:contributor>Jaanus Heinlaid</dct:contributor>
+        <dct:date>$Date: 2009-05-06 15:28:25 +0300 (K, 06 Mai 2009) $</dct:date>
+        <owl:versionInfo>$Id: relational.rdf 7072 2009-05-06 12:28:25Z roug $</owl:versionInfo>
+    </owl:Ontology>
+
+    <!--  Class declarations   -->
+
+    <rdfs:Class rdf:about="Channel">
+        <rdfs:label>Channel</rdfs:label>
+        <rdfs:comment>An RSS information channel.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="Announcement">
+        <rdfs:label>Announcement</rdfs:label>
+        <rdfs:comment>An announcement corresponds to an rss:item in RSS 1.0.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="Image">
+        <rdfs:label>Image</rdfs:label>
+        <rdfs:comment>An RSS image.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="TextInput">
+        <rdfs:label>Text Input</rdfs:label>
+        <rdfs:comment>An RSS text input.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdfs:Class>
+
+    <!--  Property declarations   -->
+
+    <rdf:Property rdf:about="item">
+        <rdfs:label>Item</rdfs:label>
+        <rdfs:comment>Reference to the items in the channel.</rdfs:comment>
+        <rdfs:domain rdf:resource="Channel"/>
+        <rdfs:range rdf:resource="Announcement"/>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="title">
+	    <rdfs:label>Title</rdfs:label>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/title"/>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/title"/>
+	    <rdfs:comment>A descriptive title for the channel or item in HTML.</rdfs:comment>
+	    <rdfs:domain rdf:resource="Channel"/>
+	    <rdfs:domain rdf:resource="Announcement"/>
+	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="link">
+	    <rdfs:label>Link</rdfs:label>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/identifier"/>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/identifier"/>
+	    <rdfs:comment>The URL to which an HTML rendering of the subject will link.</rdfs:comment>
+	    <rdfs:domain rdf:resource="Channel"/>
+        <rdfs:domain rdf:resource="Announcement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="url">
+	    <rdfs:label>URL</rdfs:label>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/identifier"/>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/identifier"/>
+	    <rdfs:comment>The URL of the image to used in the 'src' attribute of the channel's image tag when rendered as HTML.</rdfs:comment>
+	    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="summary">
+	    <rdfs:label>Summary</rdfs:label>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/description"/>
+	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/abstract"/>
+	    <rdfs:comment>A short text summary of the subject in HTML. A summary corresponds to an rss:description in RSS 1.0.</rdfs:comment>
+	    <rdfs:domain rdf:resource="Channel"/>
+        <rdfs:domain rdf:resource="Announcement"/>
+	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="name">
+	    <rdfs:label>Name</rdfs:label>
+	    <rdfs:comment>The text input field's (variable) name.</rdfs:comment>
+	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="order">
+	    <rdfs:label>Order</rdfs:label>
+	    <rdfs:comment>Provides an ordering of the items in the RSS feed. It replaces the rdf:Seq construction in RSS 1.0</rdfs:comment>
+	    <rdfs:domain rdf:resource="Announcement"/>
+	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
+	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+</rdf:RDF>

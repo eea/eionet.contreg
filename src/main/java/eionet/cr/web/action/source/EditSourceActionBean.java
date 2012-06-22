@@ -40,9 +40,9 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.CurrentHarvests;
-import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.HarvestSourceActionBean;
 import eionet.cr.web.action.HarvestSourcesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
@@ -312,12 +312,7 @@ public class EditSourceActionBean extends AbstractActionBean {
      * @return
      */
     public List<String> getMediaTypes() {
-        List<String> result = new ArrayList<String>();
-        result.add(null);
-        result.addAll(RDFMediaTypes.collection());
-        result.add("application/octet-stream");
-        result.add("text/plain");
-        return result;
+        return HarvestSourceActionBean.MEDIA_TYPES;
     }
 
     /**

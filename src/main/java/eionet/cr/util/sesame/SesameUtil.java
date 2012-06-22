@@ -2,9 +2,16 @@ package eionet.cr.util.sesame;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
@@ -24,6 +31,7 @@ import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
 import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Util;
@@ -413,9 +421,9 @@ public final class SesameUtil {
      * @param valueFactory
      * @return
      */
-    public static boolean isValidURI(String uriString, ValueFactory valueFactory){
+    public static boolean isValidURI(String uriString, ValueFactory valueFactory) {
 
-        if (StringUtils.isBlank(uriString)){
+        if (StringUtils.isBlank(uriString)) {
             return false;
         }
 
@@ -425,5 +433,60 @@ public final class SesameUtil {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    /**
+     * Creates and returns an implementation of {@link Literal} from the given object, using the given {@link ValueFactory}. The
+     * implementation (and hence also the datatype) of the literal is chosen based on the class of the given object. A
+     * java.lang.Integer object will return a literal with integer datatype, a java.util.Date object will return a literal with
+     * dateTime datatype, etc.
+     *
+     * Note that when the given object is a String, its language cannot be detected from the method inputs, so you have to use
+     * {@link ValueFactory#createLiteral(String, String)} explicitly.
+     *
+     * Also note that a stirng object is trimmed before creating a literal from it.
+     *
+     * If the given object is null, the returned Literal is also null.
+     * If the given object's datatype could not be detected for some reason, a literal of object.toString() is returned.
+     *
+     * @param object
+     * @param valueFactory
+     * @return
+     */
+    public static Literal createLiteral(Object object, ValueFactory valueFactory) {
+
+        if (object == null) {
+            return null;
+        }
+
+        Literal literal = null;
+        if (object instanceof Date) {
+            GregorianCalendar gregCalendar = new GregorianCalendar();
+            gregCalendar.setTime((Date) object);
+            try {
+                XMLGregorianCalendar xmlGregCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCalendar);
+                literal = valueFactory.createLiteral(xmlGregCalendar);
+            } catch (DatatypeConfigurationException e) {
+                throw new CRRuntimeException("Failed to instantiate XML datatype factory implementation", e);
+            }
+        } else if (object instanceof Boolean) {
+            literal = valueFactory.createLiteral(((Boolean) object).booleanValue());
+        } else if (object instanceof Integer) {
+            literal = valueFactory.createLiteral(((Integer) object).intValue());
+        } else if (object instanceof Long) {
+            literal = valueFactory.createLiteral(((Long) object).longValue());
+        } else if (object instanceof Byte) {
+            literal = valueFactory.createLiteral(((Byte) object).byteValue());
+        } else if (object instanceof Double) {
+            literal = valueFactory.createLiteral(((Double) object).doubleValue());
+        } else if (object instanceof Float) {
+            literal = valueFactory.createLiteral(((Float) object).floatValue());
+        } else if (object instanceof Short) {
+            literal = valueFactory.createLiteral(((Short) object).shortValue());
+        } else {
+            literal = valueFactory.createLiteral(object.toString().trim());
+        }
+
+        return literal;
     }
 }

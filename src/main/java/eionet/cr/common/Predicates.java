@@ -125,5 +125,11 @@ public interface Predicates {
     String FOAF_NAME = "http://xmlns.com/foaf/0.1/name";
     String FOAF_MBOX_SHA1SUM = "http://xmlns.com/foaf/0.1/mbox_sha1sum";
 
-    String RSS_ITEMS = "http://purl.org/rss/1.0/items";
+    String RSSNG_ITEM = "http://purl.org/rss-ng/1.0/item";
+    String RSSNG_ORDER = "http://purl.org/rss-ng/1.0/order";
+    String RSSNG_TITLE = "http://purl.org/rss-ng/1.0/title";
+    String RSSNG_LINK = "http://purl.org/rss-ng/1.0/link";
+    String RSSNG_NAME = "http://purl.org/rss-ng/1.0/name";
+    String RSSNG_URL = "http://purl.org/rss-ng/1.0/url";
+    String RSSNG_SUMMARY = "http://purl.org/rss-ng/1.0/summary";
 }

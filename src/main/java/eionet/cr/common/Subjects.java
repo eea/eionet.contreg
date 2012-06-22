@@ -28,9 +28,6 @@ package eionet.cr.common;
  */
 public interface Subjects {
 
-    String RSS_CHANNEL_CLASS = "http://purl.org/rss/1.0/channel";
-    String RSS_ITEM_CLASS = "http://purl.org/rss/1.0/item";
-
     String ROD_OBLIGATION_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Obligation";
     String ROD_INSTRUMENT_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Instrument";
     String ROD_LOCALITY_CLASS = "http://rod.eionet.europa.eu/schema.rdf#Locality";
@@ -73,4 +70,9 @@ public interface Subjects {
     String AMPOLD_PRODUCT = "http://moonefish.eea.europa.eu:81/AMP-schema.rdf#Product"; // Phased out
 
     String FOAF_PERSON_CLASS = "http://xmlns.com/foaf/0.1/Person";
+
+    String RSSNG_CHANNEL_CLASS = "http://purl.org/rss-ng/1.0/Channel";
+    String RSSNG_ANNOUNCEMENT_CLASS = "http://purl.org/rss-ng/1.0/Announcement";
+    String RSSNG_TEXTINPUT_CLASS = "http://purl.org/rss-ng/1.0/TextInput";
+    String RSSNG_IMAGE_CLASS = "http://purl.org/rss-ng/1.0/Image";
 }
