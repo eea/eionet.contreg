@@ -94,7 +94,11 @@ public final class SesameConnectionProvider {
      */
     private static Repository createRepository(String url, String usr, String pwd) {
 
-        Repository repository = new VirtuosoRepository(url, usr, pwd);
+        // The true in the last paramater means that Virtuoso will batch optimization for mass-executions
+        // of VirtuosoRepositoryConnection's add(Resource subject ...) and add(Statement statement ...) methods.
+        // Without this parameter there is a danger of running into "virtuoso.jdbc3.VirtuosoException:
+        // SR491: Too many open statements" when using a pooled connection.
+        Repository repository = new VirtuosoRepository(url, usr, pwd, true);
         try {
             repository.initialize();
         } catch (RepositoryException e) {
