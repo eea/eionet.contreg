@@ -391,3 +391,9 @@ div.documentContent .expandingArea.active > pre {
   /* We don't actually want to see this text, it's just for sizing */
   visibility: hidden;
 }
+
+/* Fix for odd background image on dialogs */
+#sharedBookmarksDialog, #bookmarksDialog, #prefixesDialog, #constructDialog {
+  background-image: none;
+  background-color: white;
+}
