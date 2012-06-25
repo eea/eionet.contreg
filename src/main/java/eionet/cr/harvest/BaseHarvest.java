@@ -25,6 +25,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -86,6 +87,10 @@ public abstract class BaseHarvest implements Harvest {
      */
     protected static final double HARVEST_TIMEOUT_MULTIPLIER = 1.2;
 
+    /** container for redirected source DTOs. */
+    protected final List<HarvestSourceDTO> redirectedHarvestSources = new ArrayList<HarvestSourceDTO>();
+
+
     /** */
     private final HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
     private final HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
@@ -109,6 +114,9 @@ public abstract class BaseHarvest implements Harvest {
     /** */
     private boolean cleanAllPreviousSourceMetadata;
 
+    /** Shows if the harvest was initiated by the user. */
+    protected boolean isOnDemandHarvest;
+
     /** */
     private String harvestUser;
 
@@ -116,6 +124,14 @@ public abstract class BaseHarvest implements Harvest {
      * Last harvest duration in millis.
      */
     private Long lastHarvestDuration;
+
+    /**
+     * @param isOnDemandHarvest the isOnDemandHarvest parameter to set
+     */
+    public void setOnDemandHarvest(boolean isOnDemandHarvest) {
+        this.isOnDemandHarvest = isOnDemandHarvest;
+    }
+
 
     /**
      *
@@ -236,6 +252,10 @@ public abstract class BaseHarvest implements Harvest {
 
             // add source into inference if it is schema source
             addIntoInferenceRule();
+
+            //delete sources in permanent error state
+            deleteErroneousSources();
+
         } catch (DAOException e) {
 
             if (dontThrowException) {
@@ -365,9 +385,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                MessageFormat.format(
-                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                        e.toString(), scriptType, title, parsedQuery);
+                    MessageFormat.format(
+                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                            e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -392,6 +412,49 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug(loggerMsg("Adding source into inference rule"));
             getHarvestSourceDAO().addSourceIntoInferenceRule(getContextUrl());
         }
+    }
+    /**
+     * Deletes sources with permanent errors after batch harvesting.
+     * @throws DAOException if deleting fails
+     */
+    private void deleteErroneousSources() throws DAOException {
+        LOGGER.debug(loggerMsg("Checking sources that need removal"));
+        HashSet<String> sourcesToDelete = new HashSet<String>();
+
+        boolean sourceInError = false;
+
+        //if the source or redirected sources are in erroneous state, delete them while batch harvesting
+        if (!isOnDemandHarvest) {
+            //check only the current (last redirected) source if there were redirections. If it was failed delete redirected sources as well
+            if (getContextSourceDTO().isPermanentError()) {
+                if (!getContextSourceDTO().isPrioritySource()) {
+                    LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
+                            + "with permanent error");
+                    sourcesToDelete.add(getContextSourceDTO().getUrl());
+                    sourceInError = true;
+
+                }
+            } else if (getContextSourceDTO().getCountUnavail() >= 5) {
+                if (!getContextSourceDTO().isPrioritySource()) {
+                    LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
+                            + "with unavailability >= 5");
+                    sourcesToDelete.add(getContextSourceDTO().getUrl());
+                    sourceInError = true;
+                }
+            }
+            if (sourceInError) {
+                for (HarvestSourceDTO dto : redirectedHarvestSources) {
+                    //delete redirected source  if not in queue and not priority source
+                    LOGGER.debug(dto.getUrl() + "  is a redirected source will be deleted.");
+                    if (!dto.isPrioritySource()) {
+                        sourcesToDelete.add(dto.getUrl());
+                    }
+                }
+            }
+            LOGGER.debug(loggerMsg("sources to be removed count=" + sourcesToDelete.size()));
+            getHarvestSourceDAO().removeHarvestSources(sourcesToDelete);
+        }
+
     }
 
     /**
@@ -446,6 +509,12 @@ public abstract class BaseHarvest implements Harvest {
     private void updateHarvestSourceFinished() throws DAOException {
         LOGGER.debug(loggerMsg("Updating harvest source record"));
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
+
+        //update redirected sources
+        for (HarvestSourceDTO dto : redirectedHarvestSources) {
+            LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
+            getHarvestSourceDAO().updateSourceHarvestFinished(dto);
+        }
     }
 
     /**

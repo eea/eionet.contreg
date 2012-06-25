@@ -63,8 +63,8 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.load.ContentLoader;
-import eionet.cr.harvest.load.RDFFormatLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
+import eionet.cr.harvest.load.RDFFormatLoader;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
 import eionet.cr.harvest.util.RDFMediaTypes;
@@ -108,10 +108,8 @@ public class PullHarvest extends BaseHarvest {
     private boolean isSourceAvailable;
 
     /** */
-    private boolean isOnDemandHarvest;
-
-    /** */
     private final List<String> redirectedUrls = new ArrayList<String>();
+
 
     /**
      * @param contextUrl
@@ -189,6 +187,8 @@ public class PullHarvest extends BaseHarvest {
                     // get redirected-to-url, throw exception if it's missing
                     String redirectedToUrl = getRedirectUrl(urlConn);
                     redirectedUrls.add(connectUrl);
+                    redirectedHarvestSources.add(getContextSourceDTO());
+
                     if (StringUtils.isBlank(redirectedToUrl)) {
                         throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
                     }
@@ -311,6 +311,9 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
         getContextSourceDTO().setCountUnavail(countUnavail);
 
+        //save same error parameters to parent sources where this source was redirected from
+        handleRedirectedHarvestDTOs(lastHarvest, responseCode, sourceNotAvailable);
+
         // add harvest message about the given exception if it's not null
         if (exception != null) {
             String message = exception.getMessage() == null ? exception.toString() : exception.getMessage();
@@ -342,6 +345,35 @@ public class PullHarvest extends BaseHarvest {
                 LOGGER.error("Failed to delete previous content after permanent error", e);
             }
         }
+    }
+
+    /**
+     * Marks redirected sources with error markers.
+     * @param lastHarvest last harvest time
+     * @param responseCode http response code
+     * @param sourceNotAvailable shows if source was available
+     */
+    private void handleRedirectedHarvestDTOs(Date lastHarvest, int responseCode, boolean sourceNotAvailable) {
+        for (HarvestSourceDTO harvestSourceDTO : redirectedHarvestSources) {
+            setErrorsToRedirectedHarvestDTO(harvestSourceDTO, lastHarvest, responseCode, sourceNotAvailable);
+        }
+    }
+    /**
+     * Stores error in HarvestSource DTO.
+     * @param harvestSourceDTO / source DTO object
+     */
+    private void setErrorsToRedirectedHarvestDTO(HarvestSourceDTO harvestSourceDTO, Date lastHarvest, int responseCode,
+            boolean sourceNotAvailable) {
+
+        // if source was not available, the new unavailability-count is increased by one, otherwise reset
+        int countUnavail = sourceNotAvailable ? harvestSourceDTO.getCountUnavail() + 1 : 0;
+
+        harvestSourceDTO.setStatements(0);
+        harvestSourceDTO.setLastHarvest(lastHarvest);
+        harvestSourceDTO.setLastHarvestFailed(true);
+        harvestSourceDTO.setPermanentError(isPermanentError(responseCode));
+        harvestSourceDTO.setCountUnavail(countUnavail);
+
     }
 
     /**
@@ -651,8 +683,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -837,13 +869,6 @@ public class PullHarvest extends BaseHarvest {
 
         // notifications sent only when this is not an on-demand harvest
         return !isOnDemandHarvest;
-    }
-
-    /**
-     * @param isOnDemandHarvest the isOnDemandHarvest to set
-     */
-    public void setOnDemandHarvest(boolean isOnDemandHarvest) {
-        this.isOnDemandHarvest = isOnDemandHarvest;
     }
 
     /**
