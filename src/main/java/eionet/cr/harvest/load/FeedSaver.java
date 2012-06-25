@@ -43,10 +43,14 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
+import com.sun.syndication.feed.WireFeed;
+import com.sun.syndication.feed.rss.Channel;
+import com.sun.syndication.feed.rss.TextInput;
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndImage;
 import com.sun.syndication.feed.synd.SyndPerson;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
@@ -103,6 +107,10 @@ public class FeedSaver {
     public void save(InputStream inputStream) throws ContentParsingException, IOException, OpenRDFException {
 
         SyndFeedInput input = new SyndFeedInput();
+        // This will preserve the original WireFeed, so we can later get it with SyndFeed.originalWireFeed().
+        // See the latter's JavaDoc and other ROME docs for more info. Also look at this.saveTextInputMetadata(...).
+        input.setPreserveWireFeed(true);
+
         try {
             // Read the feed from the given input stream.
             SyndFeed feed = input.build(new XmlReader(inputStream));
@@ -183,17 +191,17 @@ public class FeedSaver {
         // Save the feed's rdf:type.
         saveResourceTriple(feedUri, Predicates.RDF_TYPE, Subjects.RSSNG_CHANNEL_CLASS);
 
-        // The feed's title mapped into dcterms:title and rdfs:label.
+        // The feed's title mapped into rssng:title and rdfs:label.
         String feedTitle = feed.getTitle();
         String feedTitleNormalized = stripOfHtml(feedTitle);
-        saveLiteralTriple(feedUri, Predicates.DCTERMS_TITLE, feedTitleNormalized);
+        saveLiteralTriple(feedUri, Predicates.RSSNG_TITLE, feedTitleNormalized);
         saveLiteralTriple(feedUri, Predicates.RDFS_LABEL, feedTitleNormalized);
 
         // The feed's authors mapped into dcterms:creator.
         savePersons(feedUri, Predicates.DCTERMS_CREATOR, feed.getAuthors());
 
-        // The feed's description mapped into dcterms:abstract.
-        saveLiteralTriple(feedUri, Predicates.DCTERMS_ABSTRACT, stripOfHtml(feed.getDescription()));
+        // The feed's description mapped into rssng:abstract.
+        saveLiteralTriple(feedUri, Predicates.RSSNG_SUMMARY, stripOfHtml(feed.getDescription()));
 
         // The feed's categories mapped into dcterms:subject.
         saveCategories(feedUri, Predicates.DCTERMS_SUBJECT, feed.getCategories());
@@ -209,6 +217,94 @@ public class FeedSaver {
 
         // The feed's charset encoding mapped into cr:charset.
         saveLiteralTriple(feedUri, Predicates.CR_CHARSET, feed.getEncoding());
+
+        // Save the feed image's metadata.
+        saveFeedImageMetadata(feedUri, feed);
+
+        // Save the feed's text input metadata.
+        saveTextInputMetadata(feedUri, feed);
+    }
+
+    /**
+     *
+     * @param feedUri
+     * @param feed
+     * @throws RepositoryException
+     */
+    private void saveFeedImageMetadata(String feedUri, SyndFeed feed) throws RepositoryException{
+
+        SyndImage feedImage = feed.getImage();
+
+        // The image object must not be null, and its URL must not be blank.
+        if (feedImage == null || StringUtils.isBlank(feedImage.getUrl())){
+            return;
+        }
+
+        String imageUrl = feedImage.getUrl();
+
+        // Save the feed image's rdf:type.
+        saveResourceTriple(imageUrl, Predicates.RDF_TYPE, Subjects.RSSNG_IMAGE_CLASS);
+
+        // The image's URl attribute, goes into rssng:url.
+        saveResourceTriple(imageUrl, Predicates.RSSNG_URL, imageUrl);
+
+        // Relation between the feed and the image.
+        saveResourceTriple(feedUri, Predicates.RSSNG_IMAGE, imageUrl);
+
+        // Title goes into rssng:title and rdfs:label.
+        String titleNormalized = stripOfHtml(feedImage.getTitle());
+        saveLiteralTriple(imageUrl, Predicates.RSSNG_TITLE, titleNormalized);
+        saveLiteralTriple(imageUrl, Predicates.RDFS_LABEL, titleNormalized);
+
+        // Description goes into rssng:summary.
+        saveLiteralTriple(imageUrl, Predicates.RSSNG_SUMMARY, stripOfHtml(feedImage.getDescription()));
+
+        // The image's link goes into rssng:link.
+        saveLiteralTriple(imageUrl, Predicates.RSSNG_LINK, feedImage.getLink());
+    }
+
+    /**
+     *
+     * @param feedUri
+     * @param feed
+     * @throws RepositoryException
+     */
+    private void saveTextInputMetadata(String feedUri, SyndFeed feed) throws RepositoryException{
+
+        // SyndFeed itself does not return textInput metadata, because it is a normalization of teh various RSS/Atom formats,
+        // and not all of them have a TextInput. So we get the original WireFeed object that this SyndFeed was created from,
+        // and see if we can get a TextInput from there. For this, we had to call SyndFeedInput.setPreserveWireFeed(true)
+        // earlier on, so that the original WireFeed is preserved indeed.
+
+        WireFeed originalWireFeed = feed.originalWireFeed();
+        if (originalWireFeed == null || !(originalWireFeed instanceof Channel)){
+            return;
+        }
+
+        TextInput textInput = ((Channel) originalWireFeed).getTextInput();
+        // The input must not be null and its link must not be blank.
+        if (textInput == null || StringUtils.isBlank(textInput.getLink())){
+            return;
+        }
+
+        String inputLink = textInput.getLink();
+
+        // Save the text input's rdf:type.
+        saveResourceTriple(inputLink, Predicates.RDF_TYPE, Subjects.RSSNG_TEXTINPUT_CLASS);
+
+        // Relation between the feed and the text input.
+        saveResourceTriple(feedUri, Predicates.RSSNG_TEXTINPUT, inputLink);
+
+        // Title goes into rssng:title and rdfs:label.
+        String titleNormalized = stripOfHtml(textInput.getTitle());
+        saveLiteralTriple(inputLink, Predicates.RSSNG_TITLE, titleNormalized);
+        saveLiteralTriple(inputLink, Predicates.RDFS_LABEL, titleNormalized);
+
+        // Description goes into rssng:summary.
+        saveLiteralTriple(inputLink, Predicates.RSSNG_SUMMARY, stripOfHtml(textInput.getDescription()));
+
+        // The input's field name goes into rssng:name.
+        saveLiteralTriple(inputLink, Predicates.RSSNG_NAME, textInput.getName());
     }
 
     /**
@@ -221,10 +317,10 @@ public class FeedSaver {
 
         saveResourceTriple(itemUri, Predicates.RDF_TYPE, Subjects.RSSNG_ANNOUNCEMENT_CLASS);
 
-        // Title mapped into dcterms:title and rdfs:label.
+        // Title mapped into rssng:title and rdfs:label.
         String itemTitle = item.getTitle();
         String itemTitleNormalized = stripOfHtml(itemTitle);
-        saveLiteralTriple(itemUri, Predicates.DCTERMS_TITLE, itemTitleNormalized);
+        saveLiteralTriple(itemUri, Predicates.RSSNG_TITLE, itemTitleNormalized);
         saveLiteralTriple(itemUri, Predicates.RDFS_LABEL, itemTitleNormalized);
 
         // Authors mapped into dcterms:creator.
@@ -236,10 +332,10 @@ public class FeedSaver {
         // Contributors mapped into dcterms:contributor.
         savePersons(itemUri, Predicates.DCTERMS_CONTRIBUTOR, item.getContributors());
 
-        // Description mapped into dcterms:abstract.
+        // Description mapped into rssng:summary.
         SyndContent descriptionContent = item.getDescription();
         if (descriptionContent != null) {
-            saveLiteralTriple(itemUri, Predicates.DCTERMS_ABSTRACT, stripOfHtml(descriptionContent.getValue()));
+            saveLiteralTriple(itemUri, Predicates.RSSNG_SUMMARY, stripOfHtml(descriptionContent.getValue()));
         }
 
         // Both published-date and updated-date mapped into dcterms:date

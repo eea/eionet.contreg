@@ -73,6 +73,8 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
 	    <rdfs:comment>The URL to which an HTML rendering of the subject will link.</rdfs:comment>
 	    <rdfs:domain rdf:resource="Channel"/>
         <rdfs:domain rdf:resource="Announcement"/>
+        <rdfs:domain rdf:resource="Image"/>
+        <rdfs:domain rdf:resource="TextInput"/>
         <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
 	    <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
@@ -82,6 +84,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
 	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/identifier"/>
 	    <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/identifier"/>
 	    <rdfs:comment>The URL of the image to used in the 'src' attribute of the channel's image tag when rendered as HTML.</rdfs:comment>
+	    <rdfs:domain rdf:resource="Image"/>
 	    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
 	    <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
@@ -100,6 +103,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
     <rdf:Property rdf:about="name">
 	    <rdfs:label>Name</rdfs:label>
 	    <rdfs:comment>The text input field's (variable) name.</rdfs:comment>
+	    <rdfs:domain rdf:resource="TextInput"/>
 	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
 	    <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
@@ -110,6 +114,22 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
 	    <rdfs:domain rdf:resource="Announcement"/>
 	    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
 	    <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="image">
+        <rdfs:label>Image</rdfs:label>
+        <rdfs:comment>Reference to the channel's image.'</rdfs:comment>
+        <rdfs:domain rdf:resource="Channel"/>
+        <rdfs:range rdf:resource="Image"/>
+        <rdfs:isDefinedBy rdf:resource=""/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="textInput">
+        <rdfs:label>TextInput</rdfs:label>
+        <rdfs:comment>Reference to the channel's text input.'</rdfs:comment>
+        <rdfs:domain rdf:resource="Channel"/>
+        <rdfs:range rdf:resource="TextInput"/>
+        <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
 </rdf:RDF>

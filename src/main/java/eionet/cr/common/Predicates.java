@@ -132,4 +132,6 @@ public interface Predicates {
     String RSSNG_NAME = "http://purl.org/rss-ng/1.0/name";
     String RSSNG_URL = "http://purl.org/rss-ng/1.0/url";
     String RSSNG_SUMMARY = "http://purl.org/rss-ng/1.0/summary";
+    String RSSNG_IMAGE = "http://purl.org/rss-ng/1.0/image";
+    String RSSNG_TEXTINPUT = "http://purl.org/rss-ng/1.0/textInput";
 }
