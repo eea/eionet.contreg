@@ -191,6 +191,9 @@ public class FeedSaver {
         // Save the feed's rdf:type.
         saveResourceTriple(feedUri, Predicates.RDF_TYPE, Subjects.RSSNG_CHANNEL_CLASS);
 
+        // Save the feed's link.
+        saveResourceTriple(feedUri, Predicates.RSSNG_LINK, feed.getLink());
+
         // The feed's title mapped into rssng:title and rdfs:label.
         String feedTitle = feed.getTitle();
         String feedTitleNormalized = stripOfHtml(feedTitle);
@@ -292,6 +295,9 @@ public class FeedSaver {
         // Save the text input's rdf:type.
         saveResourceTriple(inputLink, Predicates.RDF_TYPE, Subjects.RSSNG_TEXTINPUT_CLASS);
 
+        // Save the input's link.
+        saveResourceTriple(inputLink, Predicates.RSSNG_LINK, textInput.getLink());
+
         // Relation between the feed and the text input.
         saveResourceTriple(feedUri, Predicates.RSSNG_TEXTINPUT, inputLink);
 
@@ -315,7 +321,11 @@ public class FeedSaver {
      */
     private void saveFeedItemMetadata(String itemUri, SyndEntry item) throws RepositoryException {
 
+        // Save the item's rdf:type.
         saveResourceTriple(itemUri, Predicates.RDF_TYPE, Subjects.RSSNG_ANNOUNCEMENT_CLASS);
+
+        // Save the item's link.
+        saveResourceTriple(itemUri, Predicates.RSSNG_LINK, item.getLink());
 
         // Title mapped into rssng:title and rdfs:label.
         String itemTitle = item.getTitle();
