@@ -4,7 +4,7 @@
 RDF Schema declaration for Rich Site Summary (RSS) NG
 -->
 
-<rdf:RDF xml:base="http://purl.org/rss-ng/1.0/"
+<rdf:RDF xml:base="http://cr.eionet.europa.eu/ontologies/news.rdf"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
@@ -16,30 +16,31 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <dct:creator>Søren Roug</dct:creator>
         <dct:contributor>Jaanus Heinlaid</dct:contributor>
         <dct:date>$Date$</dct:date>
+        <rdfs:seeAlso rdf:resource="https://svn.eionet.europa.eu/projects/LinkedData/wiki/RDF4RSS"/>
         <owl:versionInfo>$Id$</owl:versionInfo>
     </owl:Ontology>
 
     <!--  Class declarations   -->
 
-    <rdfs:Class rdf:about="Channel">
+    <rdfs:Class rdf:ID="Channel">
         <rdfs:label>Channel</rdfs:label>
         <rdfs:comment>An RSS information channel.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdfs:Class>
 
-    <rdfs:Class rdf:about="Announcement">
+    <rdfs:Class rdf:ID="Announcement">
         <rdfs:label>Announcement</rdfs:label>
         <rdfs:comment>An announcement corresponds to an rss:item in RSS 1.0.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdfs:Class>
 
-    <rdfs:Class rdf:about="Image">
+    <rdfs:Class rdf:ID="Image">
         <rdfs:label>Image</rdfs:label>
         <rdfs:comment>An RSS image.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdfs:Class>
 
-    <rdfs:Class rdf:about="TextInput">
+    <rdfs:Class rdf:ID="TextInput">
         <rdfs:label>Text Input</rdfs:label>
         <rdfs:comment>An RSS text input.</rdfs:comment>
         <rdfs:isDefinedBy rdf:resource=""/>
@@ -47,7 +48,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
 
     <!--  Property declarations   -->
 
-    <rdf:Property rdf:about="item">
+    <rdf:Property rdf:ID="item">
         <rdfs:label>Item</rdfs:label>
         <rdfs:comment>Reference to the items in the channel.</rdfs:comment>
         <rdfs:domain rdf:resource="Channel"/>
@@ -55,7 +56,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="title">
+    <rdf:Property rdf:ID="title">
         <rdfs:label>Title</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/title"/>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/title"/>
@@ -66,7 +67,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="link">
+    <rdf:Property rdf:ID="link">
         <rdfs:label>Link</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/identifier"/>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/identifier"/>
@@ -79,7 +80,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="url">
+    <rdf:Property rdf:ID="url">
         <rdfs:label>URL</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/identifier"/>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/identifier"/>
@@ -89,7 +90,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="summary">
+    <rdf:Property rdf:ID="summary">
         <rdfs:label>Summary</rdfs:label>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/elements/1.1/description"/>
         <rdfs:subPropertyOf rdf:resource="http://purl.org/dc/terms/abstract"/>
@@ -100,7 +101,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="name">
+    <rdf:Property rdf:ID="name">
         <rdfs:label>Name</rdfs:label>
         <rdfs:comment>The text input field's (variable) name.</rdfs:comment>
         <rdfs:domain rdf:resource="TextInput"/>
@@ -108,7 +109,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="order">
+    <rdf:Property rdf:ID="order">
         <rdfs:label>Order</rdfs:label>
         <rdfs:comment>Provides an ordering of the items in the RSS feed. It replaces the rdf:Seq construction in RSS 1.0</rdfs:comment>
         <rdfs:domain rdf:resource="Announcement"/>
@@ -116,7 +117,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="image">
+    <rdf:Property rdf:ID="image">
         <rdfs:label>Image</rdfs:label>
         <rdfs:comment>Reference to the channel's image.'</rdfs:comment>
         <rdfs:domain rdf:resource="Channel"/>
@@ -124,7 +125,7 @@ RDF Schema declaration for Rich Site Summary (RSS) NG
         <rdfs:isDefinedBy rdf:resource=""/>
     </rdf:Property>
 
-    <rdf:Property rdf:about="textInput">
+    <rdf:Property rdf:ID="textInput">
         <rdfs:label>TextInput</rdfs:label>
         <rdfs:comment>Reference to the channel's text input.'</rdfs:comment>
         <rdfs:domain rdf:resource="Channel"/>
