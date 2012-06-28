@@ -27,7 +27,7 @@ public final class SortStringPair {
         // Sorting the types by Pair left.
         for (int i = 0; i < sourcePairs.size(); i++) {
             for (int j = i; j < sourcePairs.size(); j++) {
-                if (sourcePairs.get(i).getLeft().compareTo(sourcePairs.get(j).getLeft()) > 0) {
+                if (sourcePairs.get(i).getLeft().compareToIgnoreCase(sourcePairs.get(j).getLeft()) > 0) {
                     Collections.swap(sourcePairs, i, j);
                 }
             }
@@ -44,7 +44,7 @@ public final class SortStringPair {
         // Sorting the types by Pair right.
         for (int i = 0; i < sourcePairs.size(); i++) {
             for (int j = i; j < sourcePairs.size(); j++) {
-                if (sourcePairs.get(i).getRight().compareTo(sourcePairs.get(j).getRight()) > 0) {
+                if (sourcePairs.get(i).getRight().compareToIgnoreCase(sourcePairs.get(j).getRight()) > 0) {
                     Collections.swap(sourcePairs, i, j);
                 }
             }
