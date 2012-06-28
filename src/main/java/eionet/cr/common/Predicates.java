@@ -125,13 +125,13 @@ public interface Predicates {
     String FOAF_NAME = "http://xmlns.com/foaf/0.1/name";
     String FOAF_MBOX_SHA1SUM = "http://xmlns.com/foaf/0.1/mbox_sha1sum";
 
-    String RSSNG_ITEM = "http://purl.org/rss-ng/1.0/item";
-    String RSSNG_ORDER = "http://purl.org/rss-ng/1.0/order";
-    String RSSNG_TITLE = "http://purl.org/rss-ng/1.0/title";
-    String RSSNG_LINK = "http://purl.org/rss-ng/1.0/link";
-    String RSSNG_NAME = "http://purl.org/rss-ng/1.0/name";
-    String RSSNG_URL = "http://purl.org/rss-ng/1.0/url";
-    String RSSNG_SUMMARY = "http://purl.org/rss-ng/1.0/summary";
-    String RSSNG_IMAGE = "http://purl.org/rss-ng/1.0/image";
-    String RSSNG_TEXTINPUT = "http://purl.org/rss-ng/1.0/textInput";
+    String RSSNG_ITEM = "http://cr.eionet.europa.eu/ontologies/news.rdf#item";
+    String RSSNG_ORDER = "http://cr.eionet.europa.eu/ontologies/news.rdf#order";
+    String RSSNG_TITLE = "http://cr.eionet.europa.eu/ontologies/news.rdf#title";
+    String RSSNG_LINK = "http://cr.eionet.europa.eu/ontologies/news.rdf#link";
+    String RSSNG_NAME = "http://cr.eionet.europa.eu/ontologies/news.rdf#name";
+    String RSSNG_URL = "http://cr.eionet.europa.eu/ontologies/news.rdf#url";
+    String RSSNG_SUMMARY = "http://cr.eionet.europa.eu/ontologies/news.rdf#summary";
+    String RSSNG_IMAGE = "http://cr.eionet.europa.eu/ontologies/news.rdf#image";
+    String RSSNG_TEXTINPUT = "http://cr.eionet.europa.eu/ontologies/news.rdf#textInput";
 }

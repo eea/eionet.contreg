@@ -71,8 +71,8 @@ public interface Subjects {
 
     String FOAF_PERSON_CLASS = "http://xmlns.com/foaf/0.1/Person";
 
-    String RSSNG_CHANNEL_CLASS = "http://purl.org/rss-ng/1.0/Channel";
-    String RSSNG_ANNOUNCEMENT_CLASS = "http://purl.org/rss-ng/1.0/Announcement";
-    String RSSNG_TEXTINPUT_CLASS = "http://purl.org/rss-ng/1.0/TextInput";
-    String RSSNG_IMAGE_CLASS = "http://purl.org/rss-ng/1.0/Image";
+    String RSSNG_CHANNEL_CLASS = "http://cr.eionet.europa.eu/ontologies/news.rdf#Channel";
+    String RSSNG_ANNOUNCEMENT_CLASS = "http://cr.eionet.europa.eu/ontologies/news.rdf#Announcement";
+    String RSSNG_TEXTINPUT_CLASS = "http://cr.eionet.europa.eu/ontologies/news.rdf#TextInput";
+    String RSSNG_IMAGE_CLASS = "http://cr.eionet.europa.eu/ontologies/news.rdf#Image";
 }
