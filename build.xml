@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="contreg" default="prepare_apphome" basedir=".">
+
+	<!-- The target that prepares the application's home directory (aka "app-home"). -->
+	<!-- It's the directory for the files that the application needs, but that shouldn't be kept in web-app directory. -->
+    <target name="prepare_apphome" unless="antrun.skip">
+
+    	<!-- Load build properties, expected from ${propertiesFile} -->
+        <loadproperties srcFile="${propertiesFile}"/>
+
+    	<!-- Copy all files from acl directory into the same directory in app-home, unless they already exist in the latter. -->
+    	<copy todir="${application.acl.folder}">
+            <fileset dir="acl">
+            	  <present present="srconly" targetdir="${application.acl.folder}"/>
+            </fileset>
+        </copy>
+
+    	<!-- Always overwrite the acl directory's permission definition file(s). -->
+    	<copy todir="${application.acl.folder}" overwrite="true">
+            <fileset dir="acl" includes="*.prms*"/>
+    		<fileset dir="acl" includes="*.permissions*"/>
+        </copy>
+
+    </target>
+</project>
