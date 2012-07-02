@@ -385,9 +385,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                    MessageFormat.format(
-                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                            e.toString(), scriptType, title, parsedQuery);
+                MessageFormat.format(
+                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                        e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -775,7 +775,18 @@ public abstract class BaseHarvest implements Harvest {
                     if (messageBody == null) {
                         messageBody = new StringBuilder("The following error(s) happened while harvesting\n").append(contextUrl);
                     }
-                    messageBody.append("\n\n---\n\n").append(messageDTO.getStackTrace());
+                    messageBody.append("\n\n---\n\n");
+                    if (StringUtils.isBlank(messageDTO.getMessage()) && StringUtils.isBlank(messageDTO.getStackTrace())){
+                        messageBody.append("No error message could be found!");
+                    }
+                    else{
+                        if (StringUtils.isNotBlank(messageDTO.getMessage())){
+                            messageBody.append(messageDTO.getMessage());
+                        }
+                        if (StringUtils.isNotBlank(messageDTO.getStackTrace())){
+                            messageBody.append("\n").append(messageDTO.getStackTrace());
+                        }
+                    }
                 }
             }
         }
@@ -802,6 +813,11 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
+     * Returns true if harvest errors should be sent as notifications to selected addresses.
+     * Otherwise returns false.
+     *
+     * {@link BaseHarvest} always returns false for this method, as default behavior.
+     * Extending classes can override it.
      *
      * @return
      */
