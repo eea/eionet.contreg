@@ -45,7 +45,7 @@ public final class GeneralConfig {
     public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
     public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
-    public static final String HARVESTER_MAX_CONTANTLENGTH = "harvester.maximumContentLength";
+    public static final String HARVESTER_MAX_CONTENT_LENGTH = "harvester.maximumContentLength";
     public static final String HARVESTER_HTTP_TIMEOUT = "harvester.httpConnection.timeout";
 
     /** */
@@ -196,7 +196,7 @@ public final class GeneralConfig {
             try {
                 value = Integer.valueOf(propValue);
             } catch (Exception e) {
-                logger.warn("Property " + key + " is defined incorrectly in props file: '" + propValue + "', returning default.");
+                // Ignore exceptions resulting from string-to-integer conversion here.
             }
         }
 

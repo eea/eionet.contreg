@@ -45,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
@@ -153,19 +154,6 @@ public class PullHarvest extends BaseHarvest {
                 try {
                     responseCode = urlConn.getResponseCode();
                     responseMessage = urlConn.getResponseMessage();
-
-                    String contentLengthValue = urlConn.getHeaderField("Content-Length");
-                    int contentLength = (contentLengthValue != null ? Integer.parseInt(contentLengthValue) : 0);
-
-                    int maxAllowedContentLength = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_MAX_CONTANTLENGTH, 0);
-
-                    if (maxAllowedContentLength > 0 && contentLength > maxAllowedContentLength) {
-                        LOGGER.error("Source content is more than allowed " + contentLength);
-                        finishWithError(MAX_CONTENTLENGTH, "Source exceeds the allowed maximum content length",
-                                new HarvestException("Source exceeds the maximum content length"));
-                        return;
-                    }
-
                 } catch (IOException ioe) {
                     // an error when connecting to server is considered a temporary error-
                     // don't throw it, but log in the database and exit
@@ -174,6 +162,10 @@ public class PullHarvest extends BaseHarvest {
                     return;
                 }
 
+                // Throws exception when the content-length indicated in HTTP response is more than the maximum allowed.
+                validateContentLength(urlConn);
+
+                // Handle redirection.
                 if (isRedirect(responseCode)) {
 
                     noOfRedirections++;
@@ -662,8 +654,7 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Connection", "close");
         connection.setInstanceFollowRedirects(false);
 
-        // NB This is not the whole connection timeout, it occurs if connection cannot be established or it hangs when reading the
-        // stream
+        // Set the timeout both for establishing the connection, and reading from it once established.
         int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, DEFAULT_HARVEST_TIMEOUT);
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
@@ -683,8 +674,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -842,6 +833,22 @@ public class PullHarvest extends BaseHarvest {
             return new FeedFormatLoader();
         } else {
             return null;
+        }
+    }
+
+    /**
+     *
+     * @param urlConn
+     * @throws ContentTooLongException
+     */
+    private void validateContentLength(HttpURLConnection urlConn) throws ContentTooLongException{
+
+        int maxLengthAllowed = NumberUtils.toInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_MAX_CONTENT_LENGTH));
+        if (maxLengthAllowed > 0){
+            int contentLength = NumberUtils.toInt(urlConn.getHeaderField("Content-Length"));
+            if (contentLength > maxLengthAllowed){
+                throw new ContentTooLongException(contentLength + " is more than the allowed maximum " + maxLengthAllowed);
+            }
         }
     }
 
