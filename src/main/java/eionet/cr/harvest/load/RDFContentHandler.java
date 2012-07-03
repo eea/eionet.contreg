@@ -26,8 +26,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFHandler;
@@ -61,6 +65,9 @@ public class RDFContentHandler implements RDFHandler {
     /** Number of triples saved. */
     private int triplesSaved;
 
+    /** Value factory created from the repository connection. */
+    private ValueFactory valueFactory;
+
     /**
      * @param repoConn
      * @param sqlConn
@@ -70,7 +77,8 @@ public class RDFContentHandler implements RDFHandler {
 
         this.repoConn = repoConn;
         this.sqlConn = sqlConn;
-        this.context = repoConn.getValueFactory().createURI(contextUri);
+        this.valueFactory = repoConn.getValueFactory();
+        this.context = this.valueFactory.createURI(contextUri);
     }
 
     /**
@@ -109,6 +117,9 @@ public class RDFContentHandler implements RDFHandler {
     @Override
     public void handleStatement(Statement rdfStatement) throws RDFHandlerException {
 
+        // Pre-process the statement.
+        rdfStatement = preProcess(rdfStatement);
+
         // Add the given statement (i.e. triple) into repository.
         try {
             repoConn.add(rdfStatement, context);
@@ -135,6 +146,32 @@ public class RDFContentHandler implements RDFHandler {
     @Override
     public void endRDF() throws RDFHandlerException {
         // No specific handling here.
+    }
+
+    /**
+     * Does some pre-processing on the given RDF statement if necessary, and returns the resulting the statement.
+     *
+     * For example objects of http://www.openlinksw.com/schemas/virtrdf#Geometry data-type are converted into
+     * http://www.w3.org/2001/XMLSchema#string, because the former is not supported by Virtuoso's Open-Source edition.
+     *
+     * @param statement
+     * @return
+     */
+    private Statement preProcess(Statement statement) {
+
+        Statement result = statement;
+
+        Value object = statement.getObject();
+        if (object instanceof Literal) {
+            URI datatype = ((Literal) object).getDatatype();
+            if (datatype != null && datatype.stringValue().equals("http://www.openlinksw.com/schemas/virtrdf#Geometry")) {
+                result =
+                    valueFactory.createStatement(statement.getSubject(), statement.getPredicate(),
+                            valueFactory.createLiteral(object.stringValue()));
+            }
+        }
+
+        return result;
     }
 
     /**
