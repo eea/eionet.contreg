@@ -52,7 +52,7 @@ public final class EMailSender {
      * @param body Message
      * @throws MessagingException if sending fails
      */
-    public static void sendToSysAdmin(final String subject, final String body) throws MessagingException {
+    public static void sendToSysAdmin(String subject, String body) throws MessagingException {
         send(getSysAdmins(), subject, body, false);
     }
 
@@ -65,8 +65,8 @@ public final class EMailSender {
      * @param ccSysAdmin whether to CC system administrators
      * @throws MessagingException if sending fails
      */
-    public static void send(final String[] to, final String subject, final String body, final boolean ccSysAdmin)
-            throws MessagingException {
+    public static void send(String[] to, String subject, String body, boolean ccSysAdmin)
+    throws MessagingException {
 
         // if no mail.host specified in the properties, go no further
         String mailHost = GeneralConfig.getProperty("mail.host");
@@ -82,7 +82,7 @@ public final class EMailSender {
         }
         Session session = Session.getDefaultInstance(GeneralConfig.getProperties(), authenticator);
         MimeMessage message = new MimeMessage(session);
-        for (int i = 0; i < to.length; i++) {
+        for (int i = 0; to != null && i < to.length; i++) {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to[i]));
         }
 
@@ -118,6 +118,6 @@ public final class EMailSender {
             }
         }
 
-        return null;
+        return new String[0];
     }
 }

@@ -602,7 +602,7 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Download file from remote source to a temporary file locally. Side effect: dds the file size to the metadata to save in the
+     * Download file from remote source to a temporary file locally. Side effect: adds the file size to the metadata to save in the
      * harvester context.
      *
      * @param urlConn - connection to the remote source.
@@ -879,7 +879,7 @@ public class PullHarvest extends BaseHarvest {
     protected boolean isSendNotifications() {
 
         // notifications sent only when this is not an on-demand harvest
-        return !isOnDemandHarvest;
+        return !isOnDemandHarvest && getContextSourceDTO().isPrioritySource();
     }
 
     /**
