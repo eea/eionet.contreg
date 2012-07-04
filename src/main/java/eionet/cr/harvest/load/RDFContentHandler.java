@@ -37,6 +37,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import eionet.cr.harvest.TimeoutException;
 import eionet.cr.util.sql.SQLUtil;
 
 /**
@@ -69,16 +70,30 @@ public class RDFContentHandler implements RDFHandler {
     private ValueFactory valueFactory;
 
     /**
+     * total time of processing RDF.
+     */
+    private long totalTime;
+
+    /**
+     * total time of processing RDF.
+     */
+    private long startTime;
+
+    private final long timeout;
+
+    /**
      * @param repoConn
      * @param sqlConn
      * @param contextUri The URI of the graph where the triples will be loaded into.
      */
-    public RDFContentHandler(RepositoryConnection repoConn, Connection sqlConn, String contextUri) {
+    public RDFContentHandler(RepositoryConnection repoConn, Connection sqlConn, String contextUri, long timeout) {
 
         this.repoConn = repoConn;
         this.sqlConn = sqlConn;
         this.valueFactory = repoConn.getValueFactory();
         this.context = this.valueFactory.createURI(contextUri);
+
+        this.timeout = timeout;
     }
 
     /**
@@ -87,6 +102,7 @@ public class RDFContentHandler implements RDFHandler {
     @Override
     public void startRDF() throws RDFHandlerException {
         // No specific handling here.
+        startTime = System.currentTimeMillis();
     }
 
     /**
@@ -124,6 +140,13 @@ public class RDFContentHandler implements RDFHandler {
         try {
             repoConn.add(rdfStatement, context);
             triplesSaved++;
+            totalTime = System.currentTimeMillis();
+
+            //check timeout:
+            if (timeout > 0 && (totalTime - startTime > timeout  )) {
+                throw new TimeoutException("Timeout (" + timeout + "ms) exceeded when parsing triples");
+            }
+
             if (triplesSaved % BATCH_SIZE == 0) {
                 LOGGER.trace("Statement counter = " + triplesSaved);
             }

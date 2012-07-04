@@ -46,10 +46,16 @@ public interface ContentLoader {
      * @param contextUri URI of the graph where the triples will be loaded into.
      *
      * @return Number of triples loaded.
-     * @throws IOException
-     * @throws OpenRDFException
-     * @throws ContentParsingException
+     * @throws IOException if I/O error
+     * @throws OpenRDFException if an error occurs in RDF parser
+     * @throws ContentParsingException if content parsing fails
      */
     int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException, ContentParsingException;
+            throws IOException, OpenRDFException, ContentParsingException;
+
+    /**
+     * Sets timeout to the loader. If the timeout is exceeded the loading stops.
+     * @param timeout Timeout in milliseconds
+     */
+    void setTimeout(long timeout);
 }

@@ -39,8 +39,12 @@ import org.openrdf.rio.Rio;
 public class RDFFormatLoader implements ContentLoader {
 
     /** */
-    private RDFFormat rdfFormat;
+    private final RDFFormat rdfFormat;
 
+    /**
+     * timeout for RDF loading.
+     */
+    private long timeout;
     /**
      * The loader will expect content in the given {@link RDFFormat}.
      *
@@ -55,7 +59,7 @@ public class RDFFormatLoader implements ContentLoader {
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException, ContentParsingException {
+            throws IOException, OpenRDFException, ContentParsingException {
 
         // Let Sesame create an RDF parser.
         RDFParser rdfParser = Rio.createParser(rdfFormat, repoConn.getValueFactory());
@@ -67,11 +71,22 @@ public class RDFFormatLoader implements ContentLoader {
         rdfParser.setDatatypeHandling(RDFParser.DatatypeHandling.IGNORE);
 
         // Set the RDF parser's RDF handler to our implementation that loads triples into repository.
-        RDFContentHandler rdfHandler = new RDFContentHandler(repoConn, sqlConn, contextUri);
+        RDFContentHandler rdfHandler = new RDFContentHandler(repoConn, sqlConn, contextUri, timeout);
         rdfParser.setRDFHandler(rdfHandler);
 
         // Parse the stream, return number of loaded triples.
         rdfParser.parse(inputStream, baseUri);
         return rdfHandler.getNumberOfTriplesSaved();
     }
+
+    /**
+     * sets timeout value.
+     * @timeout Timeout in milliseconds
+     */
+    @Override
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+
 }

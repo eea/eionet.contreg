@@ -40,10 +40,17 @@ public class FeedFormatLoader implements ContentLoader {
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-    throws IOException, OpenRDFException, ContentParsingException {
+            throws IOException, OpenRDFException, ContentParsingException {
 
         FeedSaver feedSaver = new FeedSaver(repoConn, sqlConn, contextUri);
         feedSaver.save(inputStream);
         return feedSaver.getNumberOfTriplesSaved();
     }
+
+    @Override
+    public void setTimeout(long timeout) {
+        // not implemented yet
+    }
+
+
 }

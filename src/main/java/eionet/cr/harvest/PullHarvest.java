@@ -475,7 +475,9 @@ public class PullHarvest extends BaseHarvest {
             // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
             ContentLoader contentLoader = createContentLoader(urlConn);
+
             if (contentLoader != null) {
+                contentLoader.setTimeout(getTimeout());
                 LOGGER.debug(loggerMsg("Downladed file is in RDF or web feed format"));
                 return loadFile(downloadedFile, contentLoader);
             } else {
@@ -487,7 +489,9 @@ public class PullHarvest extends BaseHarvest {
                     processedFile = new FileToRdfProcessor(downloadedFile, getContextUrl()).process();
                     if (processedFile != null) {
                         LOGGER.debug(loggerMsg("File processed into RDF format"));
-                        return loadFile(processedFile, new RDFFormatLoader(RDFFormat.RDFXML));
+                        ContentLoader rdfLoader = new RDFFormatLoader(RDFFormat.RDFXML);
+                        rdfLoader.setTimeout(getTimeout());
+                        return loadFile(processedFile, rdfLoader);
                     } else {
                         LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
                         return 0;

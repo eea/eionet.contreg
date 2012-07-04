@@ -73,14 +73,14 @@ public abstract class BaseHarvest implements Harvest {
     protected static final int PRESERVED_HARVEST_COUNT = 10;
 
     /**
-     * Use timeout checking only if last harvest greater than this. (1hr)
+     * Default harvesting timeout if no last harvest. (24hr)
      */
-    protected static final int DEFAULT_HARVEST_TIMEOUT = 3600000;
+    protected static final int DEFAULT_HARVEST_TIMEOUT = 86400000;
 
     /**
-     * Minimal value if harvest timeout is taken into account.
+     * Minimal possible harvest timeout. (10min)
      */
-    protected static final int MINIMAL_HARVEST_TIMEOUT = 300000;
+    protected static final int MINIMAL_HARVEST_TIMEOUT = 600000;
 
     /**
      * harvesting cancelled if harvesting takes more than last harvest duration multiplied with this constant.
@@ -157,7 +157,7 @@ public abstract class BaseHarvest implements Harvest {
         this.contextSourceDTO = contextSourceDTO;
         this.contextUrl = contextSourceDTO.getUrl();
 
-        this.lastHarvestDuration = calculateLastHarvestDuration(contextSourceDTO.getSourceId());
+        this.lastHarvestDuration = calculateLastHarvestDuration(contextSourceDTO);
     }
 
     /**
@@ -385,9 +385,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                MessageFormat.format(
-                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                        e.toString(), scriptType, title, parsedQuery);
+                    MessageFormat.format(
+                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                            e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -425,7 +425,8 @@ public abstract class BaseHarvest implements Harvest {
 
         //if the source or redirected sources are in erroneous state, delete them while batch harvesting
         if (!isOnDemandHarvest) {
-            //check only the current (last redirected) source if there were redirections. If it was failed delete redirected sources as well
+            //check only the current (last redirected) source if there were redirections.
+            //If it was failed delete redirected sources as well
             if (getContextSourceDTO().isPermanentError()) {
                 if (!getContextSourceDTO().isPrioritySource()) {
                     LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
@@ -845,16 +846,23 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * calculates last harvest duration.
-     *
+     * if no result returns 0
+     * if last harvest failed returns DEFAULT (24h)
      * @param harvestSourceId source id in the harvest_source
      * @return time in millis, null if cannot be calculated
      */
-    private Long calculateLastHarvestDuration(int harvestSourceId) {
+    private Long calculateLastHarvestDuration(HarvestSourceDTO harvestSource) {
+
+        //if last harvest failed - return default
+        if (harvestSource.isLastHarvestFailed()) {
+            return (long)DEFAULT_HARVEST_TIMEOUT;
+        }
+
         HarvestDTO lastHarvest = null;
         Long result = null;
 
         try {
-            lastHarvest = harvestDAO.getLastHarvestBySourceId(harvestSourceId);
+            lastHarvest = harvestDAO.getLastHarvestBySourceId(harvestSource.getSourceId());
         } catch (DAOException e) {
             LOGGER.error(loggerMsg("Error getting last harvest time, returning null " + e));
         }
@@ -866,7 +874,7 @@ public abstract class BaseHarvest implements Harvest {
             }
         }
 
-        return result;
+        return  ((result != null && result > 0)  ? result : 0);
 
     }
 
@@ -883,7 +891,7 @@ public abstract class BaseHarvest implements Harvest {
         // no last harvest, use default timeout
         int timeout = DEFAULT_HARVEST_TIMEOUT;
 
-        if (durationOfLastHarvest != null) {
+        if (durationOfLastHarvest != null && durationOfLastHarvest > 0) {
             // big sources - last harvest * 1.2
             timeout = (int) (durationOfLastHarvest * HARVEST_TIMEOUT_MULTIPLIER);
         }
@@ -891,7 +899,7 @@ public abstract class BaseHarvest implements Harvest {
         if (timeout < MINIMAL_HARVEST_TIMEOUT) {
             timeout = MINIMAL_HARVEST_TIMEOUT;
         }
-        LOGGER.info(loggerMsg("Timeout=" + timeout));
+        LOGGER.debug(loggerMsg("Timeout=" + timeout));
         return timeout;
     }
 }
