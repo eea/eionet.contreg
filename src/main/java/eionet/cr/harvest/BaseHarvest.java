@@ -126,6 +126,12 @@ public abstract class BaseHarvest implements Harvest {
     private Long lastHarvestDuration;
 
     /**
+     * Indicates if a fatal error is occured during harvesting.
+     * In case of fatal error sysadmin must be notified for all sources (incl. non-priority)
+     */
+    protected boolean isFatalErrorOccured = false;
+
+    /**
      * @param isOnDemandHarvest the isOnDemandHarvest parameter to set
      */
     public void setOnDemandHarvest(boolean isOnDemandHarvest) {
@@ -901,5 +907,17 @@ public abstract class BaseHarvest implements Harvest {
         }
         LOGGER.debug(loggerMsg("Timeout=" + timeout));
         return timeout;
+    }
+
+    /**
+     * Determines if the given Throwable is fatal exception that occured during harvesting.
+     * Sets isFatal flag to true if exception is fatal
+     * Sysadmins are notified about fatal erros not depending on source priority
+     * @param t Throwable
+     */
+    protected void checkAndSetFatalExceptionFlag(Throwable t) {
+        if (t != null && t instanceof TimeoutException) {
+            isFatalErrorOccured = true;
+        }
     }
 }

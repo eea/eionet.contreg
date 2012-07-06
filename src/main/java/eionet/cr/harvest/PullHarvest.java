@@ -221,6 +221,10 @@ public class PullHarvest extends BaseHarvest {
         } catch (Exception e) {
 
             LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
+
+            //check what caused the DAOException - fatal flag is set to true
+            checkAndSetFatalExceptionFlag(e.getCause());
+
             try {
                 finishWithError(responseCode, responseMessage, e);
             } catch (RuntimeException finishingException) {
@@ -879,7 +883,8 @@ public class PullHarvest extends BaseHarvest {
     protected boolean isSendNotifications() {
 
         // notifications sent only when this is not an on-demand harvest
-        return !isOnDemandHarvest && getContextSourceDTO().isPrioritySource();
+        //or if fatal error (eg Timeout) has occured
+        return !isOnDemandHarvest && (getContextSourceDTO().isPrioritySource() || isFatalErrorOccured);
     }
 
     /**
