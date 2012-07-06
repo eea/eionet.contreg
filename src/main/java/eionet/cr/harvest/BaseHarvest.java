@@ -783,14 +783,13 @@ public abstract class BaseHarvest implements Harvest {
                         messageBody = new StringBuilder("The following error(s) happened while harvesting\n").append(contextUrl);
                     }
                     messageBody.append("\n\n---\n\n");
-                    if (StringUtils.isBlank(messageDTO.getMessage()) && StringUtils.isBlank(messageDTO.getStackTrace())){
+                    if (StringUtils.isBlank(messageDTO.getMessage()) && StringUtils.isBlank(messageDTO.getStackTrace())) {
                         messageBody.append("No error message could be found!");
-                    }
-                    else{
-                        if (StringUtils.isNotBlank(messageDTO.getMessage())){
+                    } else {
+                        if (StringUtils.isNotBlank(messageDTO.getMessage())) {
                             messageBody.append(messageDTO.getMessage());
                         }
-                        if (StringUtils.isNotBlank(messageDTO.getStackTrace())){
+                        if (StringUtils.isNotBlank(messageDTO.getStackTrace())) {
                             messageBody.append("\n").append(messageDTO.getStackTrace());
                         }
                     }
@@ -854,14 +853,14 @@ public abstract class BaseHarvest implements Harvest {
      * calculates last harvest duration.
      * if no result returns 0
      * if last harvest failed returns DEFAULT (24h)
-     * @param harvestSourceId source id in the harvest_source
+     * @param harvestSource harvesting source DTO
      * @return time in millis, null if cannot be calculated
      */
     private Long calculateLastHarvestDuration(HarvestSourceDTO harvestSource) {
 
         //if last harvest failed - return default
         if (harvestSource.isLastHarvestFailed()) {
-            return (long)DEFAULT_HARVEST_TIMEOUT;
+            return (long) DEFAULT_HARVEST_TIMEOUT;
         }
 
         HarvestDTO lastHarvest = null;

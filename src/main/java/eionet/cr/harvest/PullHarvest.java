@@ -849,12 +849,12 @@ public class PullHarvest extends BaseHarvest {
      * @param urlConn
      * @throws ContentTooLongException
      */
-    private void validateContentLength(HttpURLConnection urlConn) throws ContentTooLongException{
+    private void validateContentLength(HttpURLConnection urlConn) throws ContentTooLongException {
 
         int maxLengthAllowed = NumberUtils.toInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_MAX_CONTENT_LENGTH));
-        if (maxLengthAllowed > 0){
+        if (maxLengthAllowed > 0) {
             int contentLength = NumberUtils.toInt(urlConn.getHeaderField("Content-Length"));
-            if (contentLength > maxLengthAllowed){
+            if (contentLength > maxLengthAllowed) {
                 throw new ContentTooLongException(contentLength + " is more than the allowed maximum " + maxLengthAllowed);
             }
         }
