@@ -32,6 +32,8 @@ import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationError;
+import nl.bitwalker.useragentutils.Browser;
+import nl.bitwalker.useragentutils.BrowserType;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -325,5 +327,31 @@ public abstract class AbstractActionBean implements ActionBean {
             ret = Boolean.valueOf(use).booleanValue();
         }
         return ret;
+    }
+
+    /**
+     * Checks is client request comes from web browers.
+     * @return true if request comes from web browser or Mobile browser
+     */
+    protected boolean isWebBrowser() {
+        boolean isWebBrowser = false;
+
+        String userAgentString = getContext().getRequest().getHeader("User-Agent");
+        if (userAgentString != null && userAgentString.trim().length() > 0) {
+
+            Browser browser = Browser.parseUserAgentString(userAgentString);
+            if (browser != null) {
+
+                BrowserType browserType = browser.getBrowserType();
+                if (browserType != null) {
+
+                    if (browserType.equals(BrowserType.WEB_BROWSER) || browserType.equals(BrowserType.MOBILE_BROWSER)) {
+                        isWebBrowser = true;
+                    }
+                }
+            }
+        }
+
+        return isWebBrowser;
     }
 }

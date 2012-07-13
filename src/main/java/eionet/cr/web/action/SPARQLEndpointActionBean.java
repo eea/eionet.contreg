@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -24,10 +25,12 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
@@ -80,6 +83,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private static List<String> xmlFormats = new ArrayList<String>();
 
+    /** Internal variable for HTTP error code. */
+    private int errorCode;
+
     /**
      *
      */
@@ -117,6 +123,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private QueryResult result;
     private String resultAsk;
+
+    private SPARQLParser parser = new SPARQLParser();
 
     /**
      * URI of the bookmarked query to fill the bean's properties from. Camel-case ignored, to keep the corresponding request
@@ -361,7 +369,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             Map paramsMap = getContext().getRequest().getParameterMap();
             boolean paramExists = paramsMap != null && paramsMap.containsKey("query");
             if (!paramExists) {
-                return new ForwardResolution(FORM_PAGE);
+                if (isWebBrowser()) {
+                    return new ForwardResolution(FORM_PAGE);
+                } else {
+                    return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'query' is missing.");
+                }
             }
         }
 
@@ -403,6 +415,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             } else {
                 resolution = new StreamingResolution("application/sparql-results+xml") {
+                    @Override
                     public void stream(HttpServletResponse response) throws Exception {
                         response.setHeader("filename", "sparql-result.xml");
                         runQuery(query, FORMAT_XML, response.getOutputStream());
@@ -412,6 +425,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         } else if (accept[0].equals("application/x-ms-access-export+xml")) {
             resolution = new StreamingResolution("application/x-ms-access-export+xml") {
+                @Override
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(query, FORMAT_XML_SCHEMA, response.getOutputStream());
                 }
@@ -419,6 +433,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             ((StreamingResolution) resolution).setFilename("sparql-result.xml");
         } else if (accept[0].equals("application/sparql-results+json")) {
             resolution = new StreamingResolution("application/sparql-results+json") {
+                @Override
                 public void stream(HttpServletResponse response) throws Exception {
                     runQuery(query, FORMAT_JSON, response.getOutputStream());
                 }
@@ -435,6 +450,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             resolution = new ForwardResolution(FORM_PAGE);
         }
 
+        if (!isWebBrowser() && errorCode != 0) {
+            return new ErrorResolution(errorCode);
+        }
         return resolution;
     }
 
@@ -471,6 +489,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             RepositoryConnection con = null;
             try {
                 con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
                 Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, query);
                 SesameUtil.setDatasetParameters(queryObject, con, defaultGraphUris, namedGraphUris);
 
@@ -571,6 +590,14 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             } catch (Exception e) {
                 e.printStackTrace();
                 addWarningMessage("Encountered exception: " + e.toString());
+
+                //Syntax error in query: http code - 400 - check query syntax with sesame parser
+                if (!isValidSparql(query)) {
+                    errorCode = HttpServletResponse.SC_BAD_REQUEST;
+                } else {
+                    errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                }
+
             } finally {
                 try {
                     if (out != null) {
@@ -1012,5 +1039,24 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public void setSelectedBookmarkName(String selectedBookmarkName) {
         this.selectedBookmarkName = selectedBookmarkName;
     }
+    /**
+     * checks if valid SPARQL by using Sesame parser.
+     * Invalid SPARQL may still work for Virtuoso
+     * @return true if given SPARQL matches SPARQL standard
+     */
+    private boolean isValidSparql(String sparql) {
+        try {
+            //RepositoryConnection.prepareQuery() does not throw MalformedQueryException for some reason
+            //query is parsed to throw malformedQueryException and return correct HTTP code
+            parser.parseQuery(sparql, GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparql");
 
+        } catch (Exception e) {
+            if (e instanceof MalformedQueryException) {
+                addWarningMessage("Invalid SPARQL: " + e.getMessage());
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
