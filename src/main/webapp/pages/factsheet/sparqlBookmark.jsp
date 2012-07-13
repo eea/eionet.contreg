@@ -25,7 +25,6 @@
                 <div align="right">
                     <stripes:link beanclass="eionet.cr.web.action.SPARQLEndpointActionBean" event="execute">
                         <stripes:param name="format" value="text/html" />
-                        <stripes:param name="nrOfHits" value="20" />
                         <stripes:param name="query" value="${actionBean.spqrqlQuery}" />
                         Execute query
                     </stripes:link>

@@ -223,6 +223,12 @@
         <rdfs:label>History file</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
     </rdfs:Class>
+    
+    <rdfs:Class rdf:ID="TableFile">
+        <rdfs:label>Table file</rdfs:label>
+        <rdfs:comment>Uploaded CSV/TSV file type.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="http://cr.eionet.europa.eu/ontologies/contreg.rdf#File"/>
+    </rdfs:Class>
 
     <rdfs:Class rdf:ID="SparqlBookmark">
         <rdfs:label>SPARQL bookmark</rdfs:label>

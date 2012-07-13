@@ -91,6 +91,10 @@
                                     <td><c:out value="${actionBean.fileName}"/></td>
                                 </tr>
                                 <tr>
+                                    <td><label class="question">File title</label></td>
+                                    <td><stripes:text name="fileLabel" size="34" /></td>
+                                </tr>
+                                <tr>
                                     <td>
                                         <label class="question required" for="objectsTypeInput">Objects type</label>
                                     </td>

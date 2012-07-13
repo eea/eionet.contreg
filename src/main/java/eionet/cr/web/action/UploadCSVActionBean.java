@@ -53,6 +53,7 @@ import org.openrdf.repository.RepositoryException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -108,6 +109,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** The URI that will be assigned to the resource representing the file. */
     private String fileUri;
+
+    /** User can specify rdf:label for the file. */
+    private String fileLabel;
 
     /** Stored file's relative path in the user's file-store. */
     private String relativeFilePath;
@@ -299,8 +303,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @param csvReader
      * @throws IOException
      * @throws DAOException
+     * @throws RepositoryException
      */
-    public void extractObjects(CSVReader csvReader) throws IOException, DAOException {
+    public void extractObjects(CSVReader csvReader) throws IOException, DAOException, RepositoryException {
 
         // Set columns and columnLabels by reading the first line.
         String[] columnsArray = csvReader.readNext();
@@ -324,11 +329,24 @@ public class UploadCSVActionBean extends AbstractActionBean {
         String[] line = null;
         String objectsTypeUri = fileUri + "/" + objectsType;
         HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
-        while ((line = csvReader.readNext()) != null) {
 
+        while ((line = csvReader.readNext()) != null) {
             SubjectDTO subject = extractObject(line, objectsTypeUri);
             helperDao.addTriples(subject);
         }
+
+        // Construct a SPARQL query and store it as a property
+        StringBuilder query = new StringBuilder();
+        query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
+        query.append("SELECT * FROM <").append(fileUri).append("> WHERE { \n");
+        for (String column : columnLabels) {
+            String columnUri = "tableFile:" + column.replace(" ", "_");
+            query.append(" ?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append(" . \n");
+        }
+        query.append("}");
+
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_SPARQL_QUERY, ObjectDTO.createLiteral(query.toString()));
 
         // Finally, make sure that the file has the correct number of harvested statements in its predicates.
         DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
@@ -381,10 +399,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // Add ObjectDTO to the subject.
             String predicateUri = fileUri + "#" + column;
-            if (column.equals(labelColumn)) {
-                predicateUri = Predicates.RDFS_LABEL;
-            }
             subject.addObject(predicateUri, objectDTO);
+
+            // If marked as label column, add label property as well
+            if (column.equals(labelColumn)) {
+                subject.addObject(Predicates.RDFS_LABEL, objectDTO);
+            }
         }
 
         return subject;
@@ -504,6 +524,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 }
             }
         }
+
+        if (StringUtils.isEmpty(fileLabel)) {
+            fileLabel = fileName;
+        }
     }
 
     /**
@@ -518,6 +542,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_TYPE, ObjectDTO.createLiteral(objectsType));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
+        if (StringUtils.isNotEmpty(fileLabel)) {
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileLabel));
+        }
 
         ObjectDTO[] uniqueColTitles = new ObjectDTO[uniqueColumns.size()];
         for (int i = 0; i < uniqueColumns.size(); i++) {
@@ -564,7 +591,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
         // (but set interval minutes to 0, to avoid it being background-harvested)
         // HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
         HarvestSourceDTO folderHarvestSource =
-            HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
+                HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
     }
 
@@ -581,6 +608,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.RDF_TYPE, ObjectDTO.createResource(Subjects.CR_TABLE_FILE));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileName));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(fileSize));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
@@ -738,7 +766,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setFolderUri(String uri) {
         this.folderUri = uri;
@@ -760,7 +789,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fileName the fileName to set
+     * @param fileName
+     *            the fileName to set
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
@@ -772,5 +802,13 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public String getFileLabel() {
+        return fileLabel;
+    }
+
+    public void setFileLabel(String fileLabel) {
+        this.fileLabel = fileLabel;
     }
 }

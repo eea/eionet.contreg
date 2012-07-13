@@ -50,6 +50,7 @@ public final class FactsheetTabMenuHelper {
     private boolean registrationsFileType;
     private boolean historyFileType;
     private boolean reviewType;
+    private boolean tableFileType;
 
     /** */
     private String latitude;
@@ -58,6 +59,7 @@ public final class FactsheetTabMenuHelper {
     /**
      *
      * Class constructor.
+     *
      * @param uri
      * @param subject
      * @param harvesterSourceDao
@@ -88,9 +90,13 @@ public final class FactsheetTabMenuHelper {
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            tableFileType = Subjects.CR_TABLE_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
             reviewType =
-                Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                    Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                            || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
@@ -107,8 +113,8 @@ public final class FactsheetTabMenuHelper {
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             folderType =
-                Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                    Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
+                            || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
     }
@@ -116,7 +122,8 @@ public final class FactsheetTabMenuHelper {
     /**
      * Returns tabs.
      *
-     * @param selected - selected tab's title
+     * @param selected
+     *            - selected tab's title
      * @return
      */
     public List<TabElement> getTabs(String selected) {
@@ -154,7 +161,8 @@ public final class FactsheetTabMenuHelper {
     /**
      * Returns the list of tab objects with the selected tab.
      *
-     * @param selected - the title of the selected tab
+     * @param selected
+     *            - the title of the selected tab
      * @return List<TabElement>
      */
     public List<TabElement> getTypeSpecificTabs(String selected) {
@@ -212,6 +220,12 @@ public final class FactsheetTabMenuHelper {
             result.add(t);
         }
 
+        if (tableFileType) {
+            TabElement t = new TabElement(TabTitle.TABLE_FILE_CONTENTS, "/tableFile.action", selected);
+            t.addParam("uri", subject.getUri());
+            result.add(t);
+        }
+
         return result;
     }
 
@@ -238,6 +252,7 @@ public final class FactsheetTabMenuHelper {
         public static final String BOOKMARKS = "Bookmarks";
         public static final String REGISTRATIONS = "Registrations";
         public static final String HISTORY = "History";
+        public static final String TABLE_FILE_CONTENTS = "CSV/TSV contents";
 
         /**
          * Hide utility class constructor.

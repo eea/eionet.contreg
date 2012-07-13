@@ -51,6 +51,7 @@ public interface Subjects {
     String RDF_SEQ = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq";
 
     String CR_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#File";
+    String CR_TABLE_FILE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#TableFile";
     String CR_FEEDBACK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Feedback";
     String CR_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#Bookmark";
     String CR_SPARQL_BOOKMARK = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark";
