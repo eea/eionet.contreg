@@ -592,7 +592,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 addWarningMessage("Encountered exception: " + e.toString());
 
                 //Syntax error in query: http code - 400 - check query syntax with sesame parser
-                if (!isValidSparql(query)) {
+                if (!isValidSparql(e, query)) {
                     errorCode = HttpServletResponse.SC_BAD_REQUEST;
                 } else {
                     errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -1042,16 +1042,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * checks if valid SPARQL by using Sesame parser.
      * Invalid SPARQL may still work for Virtuoso
+     * @param virtuosoException Virtuoso JDBC exception
+     * @param sparql SPARQL query
      * @return true if given SPARQL matches SPARQL standard
      */
-    private boolean isValidSparql(String sparql) {
+    private boolean isValidSparql(Exception virtuosoException, String sparql) {
         try {
             //RepositoryConnection.prepareQuery() does not throw MalformedQueryException for some reason
             //query is parsed to throw malformedQueryException and return correct HTTP code
             parser.parseQuery(sparql, GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparql");
 
         } catch (Exception e) {
-            if (e instanceof MalformedQueryException) {
+            //check also with Sesame parser if SPARQL was invalid and Virtuosos has failed because of invalid query - parse error message
+            //if SPARQL dos not include any SPARQL keywords "SELECT", "ASK" etc ClassCastException is thrown
+            if (virtuosoException instanceof ClassCastException ||
+                    (e instanceof MalformedQueryException && virtuosoException.getMessage().indexOf("SP030: SPARQL compiler") != -1)) {
                 addWarningMessage("Invalid SPARQL: " + e.getMessage());
                 return false;
             }
