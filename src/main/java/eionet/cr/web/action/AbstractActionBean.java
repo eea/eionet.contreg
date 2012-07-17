@@ -330,7 +330,7 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * Checks is client request comes from web browers.
+     * Checks is client request comes from web browser.
      * @return true if request comes from web browser or Mobile browser
      */
     protected boolean isWebBrowser() {

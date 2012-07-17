@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -85,6 +84,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** Internal variable for HTTP error code. */
     private int errorCode;
+
+    /** Error message to be returned to external client. */
+    private String errorMessage;
 
     /**
      *
@@ -372,7 +374,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 if (isWebBrowser()) {
                     return new ForwardResolution(FORM_PAGE);
                 } else {
-                    return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'query' is missing.");
+
+                    return new ErrorStreamingResolution(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'query'"
+                            + "is missing in the request");
+
                 }
             }
         }
@@ -451,7 +456,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         if (!isWebBrowser() && errorCode != 0) {
-            return new ErrorResolution(errorCode);
+            return new ErrorStreamingResolution(errorCode, errorMessage);
         }
         return resolution;
     }
@@ -592,11 +597,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 addWarningMessage("Encountered exception: " + e.toString());
 
                 //Syntax error in query: http code - 400 - check query syntax with sesame parser
-                if (!isValidSparql(e, query)) {
-                    errorCode = HttpServletResponse.SC_BAD_REQUEST;
-                } else {
-                    errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                }
+                handleVirtuosoError(e, query);
 
             } finally {
                 try {
@@ -1040,28 +1041,33 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         this.selectedBookmarkName = selectedBookmarkName;
     }
     /**
-     * checks if valid SPARQL by using Sesame parser.
-     * Invalid SPARQL may still work for Virtuoso
+     * checks the exception returned by Virtuoso and sets error code and message.
      * @param virtuosoException Virtuoso JDBC exception
      * @param sparql SPARQL query
-     * @return true if given SPARQL matches SPARQL standard
      */
-    private boolean isValidSparql(Exception virtuosoException, String sparql) {
+    private void handleVirtuosoError(Exception virtuosoException, String sparql) {
+        errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        errorMessage = virtuosoException.getMessage();
+
         try {
             //RepositoryConnection.prepareQuery() does not throw MalformedQueryException for some reason
             //query is parsed to throw malformedQueryException and return correct HTTP code
             parser.parseQuery(sparql, GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparql");
 
         } catch (Exception e) {
-            //check also with Sesame parser if SPARQL was invalid and Virtuosos has failed because of invalid query - parse error message
+            //check also with Sesame parser if SPARQL was invalid and Virtuosos has failed because of invalid query
+            //then parse error message
             //if SPARQL dos not include any SPARQL keywords "SELECT", "ASK" etc ClassCastException is thrown
-            if (virtuosoException instanceof ClassCastException ||
-                    (e instanceof MalformedQueryException && virtuosoException.getMessage().indexOf("SP030: SPARQL compiler") != -1)) {
+            if (virtuosoException instanceof ClassCastException
+                    || (e instanceof MalformedQueryException && virtuosoException.getMessage().indexOf("syntax error") != -1)) {
                 addWarningMessage("Invalid SPARQL: " + e.getMessage());
-                return false;
+                errorCode = HttpServletResponse.SC_BAD_REQUEST;
+
+                //if sparql does not contain any keywords: SELECT, ASK etc throws ClassCastExcpetion without explanation
+                if (virtuosoException instanceof ClassCastException) {
+                    errorMessage += " Invalid SPARQL: " + sparql;
+                }
             }
         }
-
-        return true;
     }
 }
