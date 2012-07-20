@@ -45,6 +45,7 @@ public class RDFFormatLoader implements ContentLoader {
      * timeout for RDF loading.
      */
     private long timeout;
+
     /**
      * The loader will expect content in the given {@link RDFFormat}.
      *
@@ -55,11 +56,12 @@ public class RDFFormatLoader implements ContentLoader {
     }
 
     /**
-     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection, java.sql.Connection, java.lang.String, java.lang.String)
+     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection,
+     *      java.sql.Connection, java.lang.String, java.lang.String)
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-            throws IOException, OpenRDFException, ContentParsingException {
+    throws IOException, OpenRDFException, ContentParsingException {
 
         // Let Sesame create an RDF parser.
         RDFParser rdfParser = Rio.createParser(rdfFormat, repoConn.getValueFactory());
@@ -81,12 +83,12 @@ public class RDFFormatLoader implements ContentLoader {
 
     /**
      * sets timeout value.
+     *
      * @timeout Timeout in milliseconds
      */
     @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
-
 
 }

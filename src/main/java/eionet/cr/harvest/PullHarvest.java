@@ -601,7 +601,7 @@ public class PullHarvest extends BaseHarvest {
     private int loadFile(File file, ContentLoader contentLoader) throws DAOException {
 
         LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
-        int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl(), true);
+        int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl());
         return tripleCount;
     }
 

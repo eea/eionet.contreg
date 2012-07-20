@@ -391,9 +391,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                    MessageFormat.format(
-                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                            e.toString(), scriptType, title, parsedQuery);
+                MessageFormat.format(
+                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                        e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -544,7 +544,17 @@ public abstract class BaseHarvest implements Harvest {
      * @return
      */
     protected String loggerMsg(Object messageObject) {
-        return messageObject + " [" + contextUrl + "]";
+        return loggerMsg(messageObject, contextUrl);
+    }
+
+    /**
+     *
+     * @param messageObject
+     * @param contextGraphUri
+     * @return
+     */
+    public static String loggerMsg(Object messageObject, String contextGraphUri){
+        return messageObject + " [" + contextGraphUri + "]";
     }
 
     /**

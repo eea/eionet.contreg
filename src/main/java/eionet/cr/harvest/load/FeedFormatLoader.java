@@ -36,21 +36,24 @@ import org.openrdf.repository.RepositoryConnection;
 public class FeedFormatLoader implements ContentLoader {
 
     /**
-     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection, java.sql.Connection, java.lang.String, java.lang.String)
+     * @see eionet.cr.harvest.load.ContentLoader#load(java.io.InputStream, org.openrdf.repository.RepositoryConnection,
+     *      java.sql.Connection, java.lang.String, java.lang.String)
      */
     @Override
     public int load(InputStream inputStream, RepositoryConnection repoConn, Connection sqlConn, String baseUri, String contextUri)
-            throws IOException, OpenRDFException, ContentParsingException {
+    throws IOException, OpenRDFException, ContentParsingException {
 
         FeedSaver feedSaver = new FeedSaver(repoConn, sqlConn, contextUri);
         feedSaver.save(inputStream);
         return feedSaver.getNumberOfTriplesSaved();
     }
 
+    /**
+     * @see eionet.cr.harvest.load.ContentLoader#setTimeout(long)
+     */
     @Override
     public void setTimeout(long timeout) {
         // not implemented yet
     }
-
 
 }

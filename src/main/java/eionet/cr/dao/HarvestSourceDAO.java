@@ -242,22 +242,20 @@ public interface HarvestSourceDAO extends DAO {
      * @param file
      * @param contentLoader
      * @param graphUri
-     * @param clearPreviousContent
      * @return
      * @throws DAOException
      */
-    int loadContent(File file, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent) throws DAOException;
+    int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException;
 
     /**
      *
      * @param inputStream
      * @param contentLoader
      * @param graphUri
-     * @param clearPreviousContent
      * @return
      * @throws DAOException
      */
-    int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri, boolean clearPreviousContent)
+    int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri)
             throws DAOException;
 
     /**
