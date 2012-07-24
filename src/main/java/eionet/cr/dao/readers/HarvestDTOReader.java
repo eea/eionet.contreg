@@ -38,6 +38,7 @@ public class HarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         HarvestDTO harvestDTO = new HarvestDTO();
@@ -55,6 +56,8 @@ public class HarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
         harvestDTO.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
         harvestDTO.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
         harvestDTO.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
+
+        harvestDTO.setResponseCode(new Integer(rs.getInt("HTTP_CODE")));
 
         resultList.add(harvestDTO);
     }

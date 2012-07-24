@@ -71,6 +71,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
                         + " H.HARVEST_SOURCE_ID as SOURCE_ID, H.TYPE as HARVEST_TYPE, H.USERNAME as HARVEST_USER,"
                         + " H.STATUS as STATUS, H.STARTED as STARTED, H.FINISHED as FINISHED,"
                         + " H.ENC_SCHEMES as ENC_SCHEMES, H.TOT_STATEMENTS as TOT_STATEMENTS,"
+                        + " H.HTTP_CODE as HTTP_CODE,"
                         + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
                         + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
                         + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
@@ -99,6 +100,12 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     /** */
     private static final String GET_LAST_HARVEST_BY_SOURCE_ID_SQL = "select top 1 *, USERNAME as \"USER\""
             + " from HARVEST where HARVEST_SOURCE_ID=? order by HARVEST.STARTED desc";
+
+    /**
+     * SQL for last harvest record while harvest has not returned Source not modified http code.
+     */
+    private static final String GET_LAST_REAL_HARVEST_BY_SOURCE_ID_SQL = "select top 1 *, USERNAME as \"USER\""
+            + " from HARVEST where HARVEST_SOURCE_ID=? AND (isnull(http_code) or http_code <> 304) order by HARVEST.STARTED desc";
 
     /**
      * {@inheritDoc}
@@ -142,18 +149,20 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
     /** */
     private static final String UPDATE_FINISHED_HARVEST_SQL =
-            "update HARVEST set STATUS=?, FINISHED=?, TOT_STATEMENTS=? where HARVEST_ID=?";
+            "update HARVEST set STATUS=?, FINISHED=?, TOT_STATEMENTS=?, HTTP_CODE=? where HARVEST_ID=?";
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException {
+    public void updateFinishedHarvest(int harvestId, int noOfTriples, int httpCode) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(HarvestConstants.STATUS_FINISHED);
         values.add(Util.currentDateAsString());
         values.add(new Integer(noOfTriples));
+        values.add(new Integer(httpCode));
+
         values.add(new Integer(harvestId));
 
         Connection conn = null;
@@ -204,5 +213,17 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
         executeSQL(deleteSql.toString(), deleteParams);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HarvestDTO getLastRealHarvestBySourceId(Integer harvestSourceId) throws DAOException {
+        List<Object> values = new ArrayList<Object>();
+        values.add(harvestSourceId);
+        List<HarvestDTO> list = executeSQL(GET_LAST_REAL_HARVEST_BY_SOURCE_ID_SQL, values, new HarvestDTOReader());
+        return list != null && !list.isEmpty() ? list.get(0) : null;
+    }
+
 
 }

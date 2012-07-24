@@ -73,9 +73,9 @@ public abstract class BaseHarvest implements Harvest {
     protected static final int PRESERVED_HARVEST_COUNT = 10;
 
     /**
-     * Default harvesting timeout if no last harvest. (24hr)
+     * Default harvesting timeout if no last harvest. (36hr)
      */
-    protected static final int DEFAULT_HARVEST_TIMEOUT = 86400000;
+    protected static final int DEFAULT_HARVEST_TIMEOUT = 129600000;
 
     /**
      * Minimal possible harvest timeout. (10min)
@@ -130,6 +130,11 @@ public abstract class BaseHarvest implements Harvest {
      * In case of fatal error sysadmin must be notified for all sources (incl. non-priority)
      */
     protected boolean isFatalErrorOccured = false;
+
+    /**
+     * HTTP response code returned from the harvest source.
+     */
+    protected int httpResponseCode;
 
     /**
      * @param isOnDemandHarvest the isOnDemandHarvest parameter to set
@@ -504,7 +509,7 @@ public abstract class BaseHarvest implements Harvest {
 
         LOGGER.debug(loggerMsg("Updating harvest record, saving harvest messages"));
         Integer noOfStatements = getContextSourceDTO().getStatements();
-        getHarvestDAO().updateFinishedHarvest(harvestId, noOfStatements == null ? 0 : noOfStatements);
+        getHarvestDAO().updateFinishedHarvest(harvestId, noOfStatements == null ? 0 : noOfStatements, httpResponseCode);
         for (HarvestMessageDTO messageDTO : harvestMessages) {
             getHarvestMessageDAO().insertHarvestMessage(messageDTO);
         }
@@ -864,7 +869,7 @@ public abstract class BaseHarvest implements Harvest {
      * if no result returns 0
      * if last harvest failed returns DEFAULT (24h)
      * @param harvestSource harvesting source DTO
-     * @return time in millis, null if cannot be calculated
+     * @return time in millis, 0 if cannot be calculated
      */
     private Long calculateLastHarvestDuration(HarvestSourceDTO harvestSource) {
 
@@ -877,7 +882,7 @@ public abstract class BaseHarvest implements Harvest {
         Long result = null;
 
         try {
-            lastHarvest = harvestDAO.getLastHarvestBySourceId(harvestSource.getSourceId());
+            lastHarvest = harvestDAO.getLastRealHarvestBySourceId(harvestSource.getSourceId());
         } catch (DAOException e) {
             LOGGER.error(loggerMsg("Error getting last harvest time, returning null " + e));
         }

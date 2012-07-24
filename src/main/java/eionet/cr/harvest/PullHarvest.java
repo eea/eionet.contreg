@@ -137,7 +137,8 @@ public class PullHarvest extends BaseHarvest {
 
         String initialContextUrl = getContextUrl();
         HttpURLConnection urlConn = null;
-        int responseCode = NO_RESPONSE;
+//        int responseCode = NO_RESPONSE;
+        httpResponseCode = NO_RESPONSE;
         String responseMessage = null;
         int noOfRedirections = 0;
 
@@ -152,7 +153,7 @@ public class PullHarvest extends BaseHarvest {
 
                 urlConn = openUrlConnection(connectUrl);
                 try {
-                    responseCode = urlConn.getResponseCode();
+                    httpResponseCode = urlConn.getResponseCode();
                     responseMessage = urlConn.getResponseMessage();
                 } catch (IOException ioe) {
                     // an error when connecting to server is considered a temporary error-
@@ -166,7 +167,7 @@ public class PullHarvest extends BaseHarvest {
                 validateContentLength(urlConn);
 
                 // Handle redirection.
-                if (isRedirect(responseCode)) {
+                if (isRedirect(httpResponseCode)) {
 
                     noOfRedirections++;
 
@@ -190,7 +191,9 @@ public class PullHarvest extends BaseHarvest {
                     // are not essentially the same
                     if (URLUtil.equalUrls(getContextUrl(), redirectedToUrl) == false) {
 
-                        finishRedirectedHarvest(redirectedToUrl);
+                        finishRedirectedHarvest(redirectedToUrl, httpResponseCode);
+
+
                         LOGGER.debug(loggerMsg("Redirection details saved"));
                         startWithNewContext(redirectedToUrl);
                     } else {
@@ -198,25 +201,27 @@ public class PullHarvest extends BaseHarvest {
                     }
 
                     connectUrl = redirectedToUrl;
+                    //Close redirected URL connection
+                    URLUtil.disconnect(urlConn);
                 }
-            } while (isRedirect(responseCode));
+            } while (isRedirect(httpResponseCode));
 
             // if URL connection returned no errors and its content has been modified since last harvest,
             // proceed to downloading
-            if (!isError(responseCode) && !isNotModified(responseCode)) {
+            if (!isError(httpResponseCode) && !isNotModified(httpResponseCode)) {
 
                 int noOfTriples = downloadAndProcessContent(urlConn);
                 setStoredTriplesCount(noOfTriples);
                 LOGGER.debug(loggerMsg(noOfTriples + " triples loaded"));
                 finishWithOK(urlConn, noOfTriples);
 
-            } else if (isNotModified(responseCode)) {
+            } else if (isNotModified(httpResponseCode)) {
                 LOGGER.debug(loggerMsg("Source not modified since last harvest"));
                 finishWithNotModified(urlConn, 0);
 
-            } else if (isError(responseCode)) {
-                LOGGER.debug(loggerMsg("Server returned error code " + responseCode));
-                finishWithError(responseCode, responseMessage, null);
+            } else if (isError(httpResponseCode)) {
+                LOGGER.debug(loggerMsg("Server returned error code " + httpResponseCode));
+                finishWithError(httpResponseCode, responseMessage, null);
             }
         } catch (Exception e) {
 
@@ -226,7 +231,7 @@ public class PullHarvest extends BaseHarvest {
             checkAndSetFatalExceptionFlag(e.getCause());
 
             try {
-                finishWithError(responseCode, responseMessage, e);
+                finishWithError(httpResponseCode, responseMessage, e);
             } catch (RuntimeException finishingException) {
                 LOGGER.error("Error when finishing up: ", finishingException);
             }
@@ -512,9 +517,10 @@ public class PullHarvest extends BaseHarvest {
     /**
      *
      * @param redirectedToUrl
+     * @param responseCode HTTP Code from the redirected URL
      * @throws DAOException
      */
-    private void finishRedirectedHarvest(String redirectedToUrl) throws DAOException {
+    private void finishRedirectedHarvest(String redirectedToUrl, int responseCode) throws DAOException {
 
         Date redirectionSeen = new Date();
 
@@ -524,7 +530,7 @@ public class PullHarvest extends BaseHarvest {
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update current harvest to finished, set its count of harvested triples to 0
-        getHarvestDAO().updateFinishedHarvest(getHarvestId(), 0);
+        getHarvestDAO().updateFinishedHarvest(getHarvestId(), 0, responseCode);
 
         // insert redirection message to the current harvest
         String message = getContextUrl() + "  redirects to  " + redirectedToUrl;

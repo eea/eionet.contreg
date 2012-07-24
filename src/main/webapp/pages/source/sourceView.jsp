@@ -150,6 +150,7 @@
                             <th scope="col">Finished</th>
                             <th scope="col">Triples</th>
                             <th scope="col">Duration</th>
+                            <th scope="col">Response Code</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -165,6 +166,7 @@
                                     pattern="dd-MM-yy HH:mm:ss" /></td>
                                 <td><c:out value="${harv.totalStatements}" /></td>
                                 <td><c:out value="${harv.durationString}" /></td>
+                                <td><c:out value="${harv.responseCodeString}" /></td>
                                 <td><stripes:link href="/harvest.action">
                                     <img src="${pageContext.request.contextPath}/images/view2.gif"
                                         title="View" alt="View" />

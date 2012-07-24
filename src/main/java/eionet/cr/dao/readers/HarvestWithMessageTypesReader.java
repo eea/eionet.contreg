@@ -53,6 +53,7 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         Integer harvestId = rs.getInt("HARVEST_ID");
@@ -79,6 +80,7 @@ public class HarvestWithMessageTypesReader extends SQLResultSetBaseReader<Harves
             currHarvest.setEncodingSchemes(new Integer(rs.getInt("ENC_SCHEMES")));
             currHarvest.setTotalStatements(new Integer(rs.getInt("TOT_STATEMENTS")));
             currHarvest.setLitObjStatements(new Integer(rs.getInt("LIT_STATEMENTS")));
+            currHarvest.setResponseCode(new  Integer(rs.getInt("HTTP_CODE")));
         }
 
         HarvestBaseDTO.addMessageType(currHarvest, rs.getString("MESSAGE_TYPE"));

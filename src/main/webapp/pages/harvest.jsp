@@ -32,6 +32,12 @@
                     <c:out value="${actionBean.harvestDTO.status}"/>
                 </td>
             </tr>
+             <tr>
+                <td>Response code:</td>
+                <td>
+                    <c:out value="${actionBean.harvestDTO.responseCodeString}"/>
+                </td>
+            </tr>
             <tr>
                 <td>Started:</td>
                 <td><fmt:formatDate value="${actionBean.harvestDTO.datetimeStarted}" pattern="dd MMM yy HH:mm:ss"/></td>

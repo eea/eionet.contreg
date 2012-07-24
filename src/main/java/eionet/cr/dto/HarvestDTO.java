@@ -45,6 +45,9 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     private Integer litObjStatements;
     private String dateString;
 
+    /** http response code. */
+    private int responseCode;
+
     /**
      *
      */
@@ -215,5 +218,21 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     public void setDateString(String dateString) {
         this.dateString = dateString;
     }
+
+    /** HTTP Response Code output.
+     * @return HTTP Response Code String representation
+     */
+    public String getResponseCodeString() {
+        return (responseCode == 0 ? "N/A" : String.valueOf(responseCode));
+    }
+
+    public int getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
 
 }

@@ -47,9 +47,10 @@ public interface HarvestDAO extends DAO {
      *
      * @param harvestId
      * @param noOfTriples
+     * @param httpCode HTTP Code the source returns
      * @throws DAOException
      */
-    void updateFinishedHarvest(int harvestId, int noOfTriples) throws DAOException;
+    void updateFinishedHarvest(int harvestId, int noOfTriples, int httpCode) throws DAOException;
 
     /**
      *
@@ -92,5 +93,14 @@ public interface HarvestDAO extends DAO {
      * @throws DAOException
      */
     void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException;
+
+    /**
+    * Returns last harvest that has really happened.
+    * Harvests that have returned http codes like 304 : source not modified are not queried.
+    * @param harvestSourceId Harvest PK
+    * @return HarvestDTO Harvest data object
+    * @throws DAOException if query fails
+    */
+   HarvestDTO getLastRealHarvestBySourceId(Integer harvestSourceId) throws DAOException;
 
 }
