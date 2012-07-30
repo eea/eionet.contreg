@@ -140,6 +140,9 @@
     <listener>
         <listener-class>eionet.cr.util.FileDeletionJob</listener-class>
     </listener>
+    <listener>
+        <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+    </listener>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
