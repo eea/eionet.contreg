@@ -96,7 +96,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label class="question required" for="objectsTypeInput">Objects type</label>
+                                        <label class="question required" for="objectsTypeInput">Object type</label>
                                     </td>
                                     <td><stripes:text name="objectsType" id="objectsTypeInput" size="34" /></td>
                                 </tr>
@@ -111,7 +111,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top"><label class="question required" for="uniqueColumnsSelect">Unique column</label></td>
+                                    <td valign="top"><label class="question required" for="uniqueColumnsSelect">Column(s) constituting a unique key</label></td>
                                     <td>
                                         <stripes:select name="uniqueColumns" id="uniqueColumnsSelect" value="${actionBean.uniqueColumns}" multiple="true" size="6" style="width: 230px;">
                                             <c:forEach var="col" items="${actionBean.columns}">
