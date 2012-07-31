@@ -10,6 +10,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.ValueFactory;
@@ -42,6 +43,9 @@ import eionet.cr.util.Util;
  *
  */
 public final class SesameUtil {
+
+    /** Logger. */
+    protected static final Logger LOGGER = Logger.getLogger(SesameUtil.class);
 
     /**
      * Hide utility class constructor.
@@ -142,7 +146,7 @@ public final class SesameUtil {
      * @throws ResultSetReaderException
      */
     public static <T> void executeQuery(String sparql, SPARQLResultSetReader<T> reader, RepositoryConnection conn)
-    throws OpenRDFException, ResultSetReaderException {
+            throws OpenRDFException, ResultSetReaderException {
 
         executeQuery(sparql, null, reader, conn);
     }
@@ -169,11 +173,14 @@ public final class SesameUtil {
      * {@link VirtuosoRepositoryConnection#executeSPARUL(String)} to execute the given SPARQL/Update statement. The latter supports
      * not variable bindings, hence no bindings given in the method's input too.
      *
-     * @param sparul The SPARUL statement to execute.
-     * @param conn The repository connection to operate on.
+     * @param sparul
+     *            The SPARUL statement to execute.
+     * @param conn
+     *            The repository connection to operate on.
      * @param defaultGraphUri
      * @return The number triples inserted/updated/deleted
-     * @throws OpenRDFException When a repository access error occurs.
+     * @throws OpenRDFException
+     *             When a repository access error occurs.
      */
     public static int executeSPARUL(String sparul, RepositoryConnection conn, String... defaultGraphUri) throws OpenRDFException {
 
@@ -196,14 +203,16 @@ public final class SesameUtil {
      * Executes a SPARQL/Update (SPARUL) query (i.e. one that performs modifications on data).
      *
      * @param sparul
-     * @param conn repository connection
-     * @param bindings Query bindings
+     * @param conn
+     *            repository connection
+     * @param bindings
+     *            Query bindings
      * @throws RepositoryException
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
      */
     public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-    QueryEvaluationException, MalformedQueryException {
+            QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
@@ -215,14 +224,22 @@ public final class SesameUtil {
     /**
      * Executes SPARQL Query producing RDF and exports to the passed RDF handler.
      *
-     * @param sparql SPARQL for (CONSTRUCT) query
-     * @param rdfHandler RDF handler for output RDF format
-     * @param conn RepositoryConnection
-     * @param bindings Query Bindings
-     * @throws QueryEvaluationException if query evaluation fails
-     * @throws RDFHandlerException if RDF handler fails
-     * @throws MalformedQueryException if query is not formed correctly
-     * @throws RepositoryException if Repository API call fails
+     * @param sparql
+     *            SPARQL for (CONSTRUCT) query
+     * @param rdfHandler
+     *            RDF handler for output RDF format
+     * @param conn
+     *            RepositoryConnection
+     * @param bindings
+     *            Query Bindings
+     * @throws QueryEvaluationException
+     *             if query evaluation fails
+     * @throws RDFHandlerException
+     *             if RDF handler fails
+     * @throws MalformedQueryException
+     *             if query is not formed correctly
+     * @throws RepositoryException
+     *             if Repository API call fails
      */
     public static void exportGraphQuery(final String sparql, final RDFHandler rdfHandler, final RepositoryConnection conn,
             final Bindings bindings) throws QueryEvaluationException, RDFHandlerException, MalformedQueryException,
@@ -238,15 +255,17 @@ public final class SesameUtil {
 
     /**
      *
-     * @param queryResult Query Result
+     * @param queryResult
+     *            Query Result
      */
     public static void close(final TupleQueryResult queryResult) {
 
         if (queryResult != null) {
             try {
                 queryResult.close();
-            } catch (QueryEvaluationException e) {
+            } catch (Exception e) {
                 // Ignore closing exceptions.
+                LOGGER.warn("Exception when closing connection.", e);
             }
         }
     }
@@ -260,8 +279,9 @@ public final class SesameUtil {
         if (queryResult != null) {
             try {
                 queryResult.close();
-            } catch (QueryEvaluationException e) {
+            } catch (Exception e) {
                 // Ignore closing exceptions.
+                LOGGER.warn("Exception when closing connection.", e);
             }
         }
     }
@@ -275,8 +295,9 @@ public final class SesameUtil {
         if (repo != null) {
             try {
                 repo.shutDown();
-            } catch (RepositoryException e) {
+            } catch (Exception e) {
                 // Ignore shutdown exceptions.
+                LOGGER.warn("Exception when closing connection.", e);
             }
         }
     }
@@ -290,8 +311,10 @@ public final class SesameUtil {
         if (conn != null) {
             try {
                 conn.close();
-            } catch (RepositoryException e) {
+            } catch (Exception e) {
                 // ignoring repository closing exceptions
+                LOGGER.warn("Exception when closing connection.", e);
+
             }
         }
     }
@@ -446,8 +469,8 @@ public final class SesameUtil {
      *
      * Also note that a stirng object is trimmed before creating a literal from it.
      *
-     * If the given object is null, the returned Literal is also null.
-     * If the given object's datatype could not be detected for some reason, a literal of object.toString() is returned.
+     * If the given object is null, the returned Literal is also null. If the given object's datatype could not be detected for some
+     * reason, a literal of object.toString() is returned.
      *
      * @param object
      * @param valueFactory
