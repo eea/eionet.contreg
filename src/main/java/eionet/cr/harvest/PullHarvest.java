@@ -531,6 +531,7 @@ public class PullHarvest extends BaseHarvest {
 
         // update the context source's last-harvest and number of statements
         getContextSourceDTO().setLastHarvest(redirectionSeen);
+        getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setStatements(0);
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
