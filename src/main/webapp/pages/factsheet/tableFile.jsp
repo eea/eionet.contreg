@@ -5,6 +5,8 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="CSV/TSV file contents">
     <stripes:layout-component name="contents">
 
+        <cr:tabMenu tabs="${actionBean.tabs}" />
+
         <ul id="dropdown-operations">
             <li><a href="#">Operations</a>
                 <ul>
@@ -19,8 +21,6 @@
                 </ul>
             </li>
         </ul>
-
-        <cr:tabMenu tabs="${actionBean.tabs}" />
 
         <br style="clear:left" />
         <h1>CSV/TSV file contents</h1>

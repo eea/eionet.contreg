@@ -90,6 +90,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** */
     private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
 
+    /** Column name for empty name. */
+    private static final String EMPTY_COLUMN = "Empty";
+
     /** Enum for uploaded files' types. */
     public enum FileType {
         CSV, TSV;
@@ -317,7 +320,11 @@ public class UploadCSVActionBean extends AbstractActionBean {
             columns = Arrays.asList(trimAll(columnsArray));
             if (columns != null && columns.size() > 0) {
                 columnLabels = new ArrayList<String>();
+                int emptyColCount = 1;
                 for (String col : columns) {
+                    if (StringUtils.isEmpty(col)) {
+                        col = EMPTY_COLUMN + emptyColCount++;
+                    }
                     col = StringUtils.substringBefore(col, ":");
                     col = StringUtils.substringBefore(col, "@");
                     columnLabels.add(col.trim());
