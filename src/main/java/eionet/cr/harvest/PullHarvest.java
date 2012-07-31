@@ -49,6 +49,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
@@ -473,8 +474,11 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      * @throws DAOException
      * @throws SAXException
+     * @throws RDFParseException if RDF parsing fails while analyzing file with unknown format
+     * @throws RDFHandlerException  if RDF parsing fails while analyzing file with unknown format
      */
-    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException {
+    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException,
+        SAXException, RDFHandlerException, RDFParseException  {
 
         File downloadedFile = null;
         try {
@@ -493,12 +497,13 @@ public class PullHarvest extends BaseHarvest {
                 LOGGER.debug(loggerMsg("Downladed file is not in RDF or web feed format, processing the file further"));
                 File processedFile = null;
                 try {
-                    // The file could be a zipped RDF, an XML with an RDF conversion, or actually a completely valid RDF
+                    // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
                     // that simply wasn't declared in the server-returned content type.
-                    processedFile = new FileToRdfProcessor(downloadedFile, getContextUrl()).process();
+                    FileToRdfProcessor fileProcessor = new FileToRdfProcessor(downloadedFile, getContextUrl());
+                    processedFile = fileProcessor.process();
                     if (processedFile != null) {
                         LOGGER.debug(loggerMsg("File processed into RDF format"));
-                        ContentLoader rdfLoader = new RDFFormatLoader(RDFFormat.RDFXML);
+                        ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getContentType());
                         rdfLoader.setTimeout(getTimeout());
                         return loadFile(processedFile, rdfLoader);
                     } else {

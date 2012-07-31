@@ -38,6 +38,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.CRRuntimeException;
@@ -45,6 +48,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.xml.ConversionsParser;
+import eionet.cr.util.xml.N3Analysis;
 import eionet.cr.util.xml.XmlAnalysis;
 
 /**
@@ -61,6 +65,11 @@ public class FileToRdfProcessor {
 
     /** */
     private String contextUrl;
+
+    /**
+     * source content type.
+     */
+    private RDFFormat contentType;
 
     /**
      *
@@ -88,11 +97,13 @@ public class FileToRdfProcessor {
 
     /**
      *
-     * @return
-     * @throws IOException
-     * @throws SAXException
+     * @return file if type was known and detected otherwise null
+     * @throws IOException if error at I/O level
+     * @throws SAXException if error in SAX parser when analyzing XML
+     * @throws RDFParseException if RDF parser fails
+     * @throws RDFHandlerException if exception occurs in RDF parser
      */
-    public File process() throws IOException, SAXException {
+    public File process() throws IOException, SAXException, RDFHandlerException, RDFParseException {
 
         // try unzipping (if the file is not zipped, reference to the same file is returned,
         // otherwise reference to the newly created unzipped file is returned)
@@ -119,6 +130,13 @@ public class FileToRdfProcessor {
                     String conversionSchema = xmlAnalysis.getConversionSchema();
                     resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
                 }
+                contentType = RDFFormat.RDFXML;
+            } else {
+                N3Analysis n3Analysis = new N3Analysis();
+                n3Analysis.parse(unzippedFile, this.contextUrl);
+
+                resultFile = unzippedFile;
+                contentType = RDFFormat.N3;
             }
 
             // return the result
@@ -248,6 +266,15 @@ public class FileToRdfProcessor {
 
         return null;
     }
+
+    /**
+     * Returns content type of the analysed and/or converted file.
+     * @return RDF content type
+     */
+    public RDFFormat getContentType() {
+        return contentType;
+    }
+
 
     // /**
     // *
