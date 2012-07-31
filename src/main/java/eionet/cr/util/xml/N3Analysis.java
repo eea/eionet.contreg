@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -80,12 +81,38 @@ public class N3Analysis {
        NTriplesParserFactory factory = new NTriplesParserFactory();
        RDFParser parser = factory.getParser();
        ArrayList<Statement> statements = new ArrayList<Statement>();
-       StatementCollector  collector = new StatementCollector(statements);
+       N3Handler  collector = new N3Handler(statements);
        parser.setRDFHandler(collector);
 
        parser.parse(inputStream, contextUrl);
    }
 
+   /**
+    * Internal N3 handler to aviod Out of memory errors.
+    * @author kaido
+    */
+   private class N3Handler extends StatementCollector {
+       /** internal statements counter. */
+       int counter = 100;
+
+       /**
+        * Initializes Statement handler.
+        * @param statements statements collection not used
+        */
+       N3Handler(Collection<Statement> statements) {
+           super(statements);
+       }
+       @Override
+       public void handleStatement(Statement st) {
+           counter++;
+           //check only first 100 statements
+           //StatemenCollector adds statments to the collection that may cause OutOfMemory while processing large files
+           if (counter <= 100) {
+               super.handleStatement(st);
+           }
+       }
+
+   }
 
 //   public static void main(String[] args) {
 //
