@@ -138,7 +138,6 @@ public class PullHarvest extends BaseHarvest {
 
         String initialContextUrl = getContextUrl();
         HttpURLConnection urlConn = null;
-//        int responseCode = NO_RESPONSE;
         httpResponseCode = NO_RESPONSE;
         String responseMessage = null;
         int noOfRedirections = 0;
@@ -304,7 +303,8 @@ public class PullHarvest extends BaseHarvest {
         int countUnavail = sourceNotAvailable ? getContextSourceDTO().getCountUnavail() + 1 : 0;
 
         // if permanent error, the last harvest date will be set to now, otherwise special logic used
-        Date lastHarvest = isPermanentError(responseCode) ? new Date() : temporaryErrorLastHarvest(getContextSourceDTO());
+        Date now = new Date();
+        Date lastHarvest = isPermanentError(responseCode) ? now : temporaryErrorLastHarvest(now);
 
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(0);
@@ -383,23 +383,33 @@ public class PullHarvest extends BaseHarvest {
      * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
      * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
      *
-     * @param contextSourceDTO - object representing the source with the error.
-     * @return the last harvest date + 10 %.
+     * If no last harvest date can be calculated by this algorithm for whichever reason, or the calculated last harvest happens to
+     * be after the given timestamp of now, then the latter is returned.
+     *
+     * @param now The current harvest timestamp.
+     *
+     * @return the last harvest date + 10%
      */
-    private Date temporaryErrorLastHarvest(HarvestSourceDTO contextSourceDTO) {
+    private Date temporaryErrorLastHarvest(Date now) {
 
         Date lastHarvest = getContextSourceDTO().getLastHarvest();
         if (lastHarvest == null) {
-            // The last harvest date is now - intervalMinutes (e.g. today - 6 weeks)
+            // The last harvest date is now - intervalMinutes (for example: today - 6 weeks)
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MINUTE, -getContextSourceDTO().getIntervalMinutes());
             lastHarvest = c.getTime();
         }
 
         int intervalMinutes = getContextSourceDTO().getIntervalMinutes();
-        int increase = Math.max((intervalMinutes * 10) / 100, 120) * 60 * 1000;
+        int increaseMillis = Math.max((intervalMinutes * 10) / 100, 120) * 60 * 1000;
+        lastHarvest = new Date(lastHarvest.getTime() + increaseMillis);
 
-        return new Date(lastHarvest.getTime() + increase);
+        // Ensure the new last harvest date won't be in the future.
+        if (lastHarvest.after(now)){
+            lastHarvest = now;
+        }
+
+        return lastHarvest;
     }
 
     /**
@@ -478,7 +488,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException  if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException,
-        SAXException, RDFHandlerException, RDFParseException  {
+    SAXException, RDFHandlerException, RDFParseException  {
 
         File downloadedFile = null;
         try {

@@ -17,29 +17,25 @@
             </div>
             <h1>Last 100 Harvests</h1>
             <display:table name="${actionBean.resultList}" class="sortable" id="item" sort="list" requestURI="${actionBean.urlBinding}">
-                <display:column property="sourceUrl" title="URL" sortable="true"/>
-                <display:column title="Harvest start" sortable="true">
+                <display:column title="URL" sortable="true" sortProperty="sourceUrl">
+                    <stripes:link beanclass="${actionBean.harvestDetailsBeanClass.name}">
+                        <stripes:param name="harvestDTO.harvestId" value="${item.harvestId}"/><c:out value="${item.sourceUrl}" />
+                    </stripes:link>
+                </display:column>
+                <display:column title="Started" sortable="true">
                     <fmt:formatDate value="${item.datetimeStarted}" pattern="yyyy-MM-dd HH:mm:ss"/>
                 </display:column>
-                <display:column title="Duration (ms)" sortable="true" sortProperty="duration">
+                <display:column title="Duration" sortable="true" sortProperty="duration">
                     <c:choose>
-                        <c:when test="${item.duration == '0'}">
-                            <c:out value="< 1000" />
-                        </c:when>
-                        <c:otherwise>
-                            ${item.duration}
-                        </c:otherwise>
+                        <c:when test="${item.duration == null}">N/A</c:when>
+                        <c:otherwise>&#126;&nbsp;${item.duration}&nbsp;sec</c:otherwise>
                     </c:choose>
                 </display:column>
                 <display:column property="totalStatements" title="Statements" sortable="true" />
-                <display:column title="Duration/statement (ms)" sortable="true" sortProperty="statementDuration">
+                <display:column title="Duration/statements" sortable="true" sortProperty="durationStatementsRatio">
                     <c:choose>
-                        <c:when test="${item.statementDuration == '0'}">
-                            <c:out value="< 1000" />
-                        </c:when>
-                        <c:otherwise>
-                            ${item.statementDuration}
-                        </c:otherwise>
+                        <c:when test="${item.durationStatementsRatio == null}">N/A</c:when>
+                        <c:otherwise>&#126;&nbsp;<fmt:formatNumber type="number" pattern="0.000" value="${item.durationStatementsRatio}"/></c:otherwise>
                     </c:choose>
                 </display:column>
             </display:table>

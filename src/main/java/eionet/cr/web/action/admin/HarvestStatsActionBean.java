@@ -32,6 +32,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dto.HarvestStatDTO;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.HarvestActionBean;
 
 /**
  * Action bean for displaying harvest statistics.
@@ -96,4 +97,11 @@ public class HarvestStatsActionBean extends AbstractActionBean {
         this.resultList = resultList;
     }
 
+    /**
+     *
+     * @return
+     */
+    public Class getHarvestDetailsBeanClass(){
+        return HarvestActionBean.class;
+    }
 }

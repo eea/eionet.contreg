@@ -21,6 +21,9 @@
 
 package eionet.cr.dto;
 
+import java.text.DecimalFormat;
+import java.util.Date;
+
 /**
  * Data of harvest statistics.
  *
@@ -28,14 +31,11 @@ package eionet.cr.dto;
  */
 public class HarvestStatDTO extends HarvestDTO {
 
+    /** */
+    private static final DecimalFormat DURATION_STATEMENTS_RATIO_FORMAT = new DecimalFormat("#.###");
+
     /** Harvest source url. */
     private String sourceUrl;
-
-    /** Harvest duaration in milliseconds. */
-    private Long duration;
-
-    /** Duration / total statements */
-    private Long statementDuration;
 
     /**
      * @return the sourceUrl
@@ -54,29 +54,32 @@ public class HarvestStatDTO extends HarvestDTO {
     /**
      * @return the duration
      */
-    public Long getDuration() {
-        return duration;
-    }
+    public Integer getDuration() {
 
-    /**
-     * @param duration the duration to set
-     */
-    public void setDuration(Long duration) {
-        this.duration = duration;
+        Date started = this.getDatetimeStarted();
+        Date finished = this.getDatetimeFinished();
+        if (started == null || finished == null) {
+            return null;
+        }
+
+        long duration = Math.max(finished.getTime() / 1000L - started.getTime() / 1000L, 0L);
+        return duration == 0 ? 1 : Long.valueOf(duration).intValue();
     }
 
     /**
      * @return the statementDuration
      */
-    public Long getStatementDuration() {
-        return statementDuration;
-    }
+    public Double getDurationStatementsRatio() {
 
-    /**
-     * @param statementDuration the statementDuration to set
-     */
-    public void setStatementDuration(Long statementDuration) {
-        this.statementDuration = statementDuration;
-    }
+        Integer duration = getDuration();
+        Integer statements = getTotalStatements();
 
+        if (duration == null || duration.intValue() <= 0 || statements == null || statements.intValue() <= 0){
+            return null;
+        }
+        else{
+            double ratio = duration.doubleValue() / statements.doubleValue();
+            return Double.valueOf(Math.round(ratio * 100) / 100.0d);
+        }
+    }
 }
