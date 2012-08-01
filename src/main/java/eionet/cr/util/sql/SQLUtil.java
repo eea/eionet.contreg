@@ -305,7 +305,7 @@ public final class SQLUtil {
         if (conn != null) {
             try {
                 conn.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -319,7 +319,7 @@ public final class SQLUtil {
         if (stmt != null) {
             try {
                 stmt.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -333,8 +333,9 @@ public final class SQLUtil {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 // Ignore closing exceptions.
+                e.printStackTrace();
             }
         }
     }
