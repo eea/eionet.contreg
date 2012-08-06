@@ -105,7 +105,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
      * SQL for last harvest record while harvest has not returned Source not modified http code.
      */
     private static final String GET_LAST_REAL_HARVEST_BY_SOURCE_ID_SQL = "select top 1 *, USERNAME as \"USER\""
-            + " from HARVEST where HARVEST_SOURCE_ID=? AND (isnull(http_code) or http_code <> 304) order by HARVEST.STARTED desc";
+            + " from HARVEST where HARVEST_SOURCE_ID=? AND http_code = 200 order by HARVEST.STARTED desc";
 
     /**
      * {@inheritDoc}
