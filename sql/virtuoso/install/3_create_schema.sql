@@ -29,6 +29,7 @@ create table CR.cr3user.harvest (
     lit_statements integer,
     res_statements integer,
     enc_schemes integer,
+    http_code integer,
     PRIMARY KEY (harvest_id)
 );
 
