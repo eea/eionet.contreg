@@ -9,9 +9,12 @@
     xmlns:rdfs ="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:bibo ="http://purl.org/ontology/bibo/"
     xmlns:dcterms ="http://purl.org/dc/terms/"
+    xmlns:dcat ="http://www.w3.org/ns/dcat#"
     xmlns:void ="http://rdfs.org/ns/void#">
 
-<!-- sitemapindex2void.xslt is identical to sitemap2void.xslt -->
+<!-- sitemapindex2void.xslt is identical to sitemap2void.xslt
+     $Id$
+ -->
 
 <output indent="yes" method="xml" media-type="application/rdf+xml" encoding="UTF-8" omit-xml-declaration="no"/>
 
@@ -52,7 +55,7 @@
 </template>
 
 <template match="sc:dataset">
-    <element name="void:Dataset">
+    <element name="dcat:Dataset">
         <!-- map sc:datasetURI to dataset -->
         <if test="normalize-space(sc:datasetURI) = ''">
             <attribute  name="rdf:ID">
@@ -65,7 +68,7 @@
             </attribute>
         </if>
 
-        <!-- map sc:datasetLabel to rdfs:comment -->
+        <!-- map sc:datasetLabel to rdfs:label -->
         <element name="rdfs:label">
                 <value-of select="sc:datasetLabel" />
         </element>
