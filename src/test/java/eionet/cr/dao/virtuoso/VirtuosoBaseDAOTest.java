@@ -97,7 +97,7 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
         }
 
         assertEquals(
-                "select ?g ?s ?p bif:left(str(?obj),2000) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (?subjectValue1,?subjectValue2,?subjectValue3,"
+                "select ?g ?s ?p bif:either(isLiteral(?obj), fn:substring(str(?obj), 1, 2000), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (?subjectValue1,?subjectValue2,?subjectValue3,"
                         + "?subjectValue4,?subjectValue5,?subjectValue6,?subjectValue7,?subjectValue8,?subjectValue9,?subjectValue10,"
                         + "?subjectValue11,?subjectValue12,?subjectValue13,?subjectValue14,?subjectValue15)) "
                         + "filter (?p IN (?predicateValue1,?predicateValue2)) }} ORDER BY ?s ?p", getSPARQL());
