@@ -67,21 +67,6 @@ div.errorHeader {
     color: #FF0000;
 }
 
-div.csvWizard {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 370px;
-}
-
-div.csvWizardDesc {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 500px;
-    background-color: #D9EDF2;
-    padding: 7px;
-}
 
 table#resourcesResultList {
     width: 100%;

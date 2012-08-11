@@ -438,19 +438,24 @@ div.errorHeader {
 }
 
 div.csvWizard {
+/*
     position: absolute;
     top: 0;
     left: 0;
     width: 370px;
+*/
 }
 
 div.csvWizardDesc {
+/*
     position: absolute;
     top: 0;
     right: 0;
     width: 500px;
+*/
+    margin: 1em;
     background-color: #D9EDF2;
-    padding: 7px;
+    padding: 1em;
 }
 
 table#resourcesResultList {
