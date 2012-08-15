@@ -44,10 +44,12 @@
             <div style="margin-top:3em">
                 <crfn:form id="targetsForm" action="/admin/postHarvestScripts" method="get">
                  <span>Displaying scripts of:</span><br/>
-                 <stripes:select name="targetUrl" id="targetSelect" value="${actionBean.targetUrl}" onchange="this.form.submit();">
+                 <stripes:select name="targetUrl" id="targetSelect" value="${actionBean.targetUrl}" onchange="this.form.submit();" size="10">
+<!--
                       <c:if test="${empty actionBean.targetUrl}">
                          <stripes:option value="" label="-- select a ${fn:toLowerCase(actionBean.targetType)} --"/>
                      </c:if>
+-->
                      <c:forEach items="${actionBean.targets}" var="target">
                          <stripes:option value="${target.left}" label="${target.left}"/>
                      </c:forEach>
