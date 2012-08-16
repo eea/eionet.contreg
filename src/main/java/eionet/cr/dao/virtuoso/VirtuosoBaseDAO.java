@@ -247,7 +247,7 @@ public abstract class VirtuosoBaseDAO {
 
         String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
         String query =
-                "select ?g ?s ?p bif:either(isLiteral(?obj), fn:substring(str(?obj), 1, " + WebConstants.MAX_OBJECT_LENGTH
+                "select ?g ?s ?p bif:either(isLiteral(?obj), bif:substring(str(?obj), 1, " + WebConstants.MAX_OBJECT_LENGTH
                         + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
