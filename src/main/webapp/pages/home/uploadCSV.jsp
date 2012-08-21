@@ -41,7 +41,7 @@
                                 <tr>
                                     <td><label class="question required">File type</label></td>
                                     <td>
-                                        <stripes:radio value="CSV" name="fileType" id="fileTypeCSV"/><label for="fileTypeCSV">CSV - Comma separated values</label><br/>
+                                        <stripes:radio value="CSV" name="fileType" id="fileTypeCSV" checked="CSV" /><label for="fileTypeCSV">CSV - Comma separated values</label><br/>
                                         <stripes:radio value="TSV" name="fileType" id="fileTypeTSV"/><label for="fileTypeTSV">TSV - Tab separated values"</label>
                                     </td>
                                 </tr>
@@ -126,13 +126,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question">Original publisher</label></td>
-                                    <td><stripes:text name="publisher" size="80" disabled="true"/></td>
+                                    <td><label class="question required">Original publisher</label></td>
+                                    <td><stripes:text name="publisher" size="80" /></td>
                                 </tr>
                                 <tr>
                                     <td><label class="question required" for="licenseSelect">Owner's license</label></td>
                                     <td><stripes:select name="license" id="licenseSelect">
-                                            <stripes:option value="" label="© All rights reserved" />
+                                            <stripes:option value="All rights reserved" label="© All rights reserved" />
                                             <stripes:option value="http://creativecommons.org/licenses/by-sa/3.0/" label="CC Attribution-ShareAlike 3.0 - Unported" />
                                             <stripes:option value="http://www.opendatacommons.org/licenses/by/" label="Open Data Commons Attribution (ODC-By)" />
                                             <stripes:option value="http://www.opendatacommons.org/licenses/odbl/" label="Open Database License (ODC-ODbL)" />
@@ -141,9 +141,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question">Copyright attribution</label></td>
-                                    <td><stripes:textarea name="cpAdditional" cols="80" rows="3"/>
+                                    <td><label class="question required">Copyright attribution</label></td>
+                                    <td><stripes:textarea name="attribution" cols="80" rows="3"/>
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td><label class="question required">Source</label></td>
+                                    <td><stripes:text name="source" size="80" /></td>
                                 </tr>
                                 <tr>
                                     <td colspan="2" align="right">

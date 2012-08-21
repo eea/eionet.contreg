@@ -137,6 +137,18 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** True, when upload is meant for overwriting existing file. */
     private boolean overwrite;
 
+    /** Publisher of uploaded material. */
+    private String publisher;
+
+    /** License of uploaded material. */
+    private String license;
+
+    /** Attribution. */
+    private String attribution;
+
+    /** Source of the uploaded material. */
+    private String source;
+
     /**
      * @return
      */
@@ -289,6 +301,18 @@ public class UploadCSVActionBean extends AbstractActionBean {
             if (StringUtils.isBlank(objectsType)) {
                 addGlobalValidationError("No object type specified!");
             }
+
+            if (StringUtils.isBlank(publisher)) {
+                addGlobalValidationError("No original publisher specified!");
+            }
+
+            if (StringUtils.isBlank(attribution)) {
+                addGlobalValidationError("No copyright attribution specified!");
+            }
+
+            if (StringUtils.isBlank(source)) {
+                addGlobalValidationError("No source specified!");
+            }
         }
 
         // if any validation errors were set above, make sure the right resolution is returned
@@ -347,7 +371,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
         query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
         query.append("SELECT * FROM <").append(fileUri).append("> WHERE { \n");
         for (String column : columnLabels) {
-            String columnUri = "tableFile:" + column.replace(" ", "_");
+            column = column.replace(" ", "_");
+            String columnUri = "tableFile:" + column;
             query.append(" ?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append(" . \n");
         }
         query.append("}");
@@ -548,7 +573,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_TYPE, ObjectDTO.createLiteral(objectsType));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
+        if (StringUtils.isNotEmpty(labelColumn)) {
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
+        }
         if (StringUtils.isNotEmpty(fileLabel)) {
             dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileLabel));
         }
@@ -559,6 +586,30 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
 
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_UNIQUE_COLUMN, uniqueColTitles);
+
+        // Copyright information
+        if (StringUtils.isNotEmpty(publisher)) {
+            if (StringUtils.startsWithIgnoreCase(publisher, "http")) {
+                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_PUBLISHER, ObjectDTO.createResource(publisher));
+            } else {
+                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_PUBLISHER, ObjectDTO.createLiteral(publisher));
+            }
+        }
+        if (StringUtils.startsWithIgnoreCase(license, "http")) {
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_LICENSE, ObjectDTO.createResource(license));
+        } else {
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_LICENSE, ObjectDTO.createLiteral(license));
+        }
+        if (StringUtils.isNotEmpty(attribution)) {
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION, ObjectDTO.createLiteral(attribution));
+        }
+        if (StringUtils.isNotEmpty(source)) {
+            if (StringUtils.startsWithIgnoreCase(source, "http")) {
+                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_SOURCE, ObjectDTO.createResource(source));
+            } else {
+                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_SOURCE, ObjectDTO.createLiteral(source));
+            }
+        }
     }
 
     /**
@@ -701,14 +752,17 @@ public class UploadCSVActionBean extends AbstractActionBean {
     public List<String> getColumns() throws IOException {
 
         if (columns == null) {
-
             CSVReader csvReader = null;
             try {
                 csvReader = createCSVReader(false);
                 String[] columnsArray = csvReader.readNext();
                 columns = new ArrayList<String>();
                 if (columnsArray != null && columnsArray.length > 0) {
+                    int emptyColCount = 1;
                     for (String col : columnsArray) {
+                        if (StringUtils.isEmpty(col)) {
+                            col = EMPTY_COLUMN + emptyColCount++;
+                        }
                         String colLabel = StringUtils.substringBefore(col, ":").trim();
                         colLabel = StringUtils.substringBefore(colLabel, "@").trim();
                         columns.add(colLabel);
@@ -818,4 +872,65 @@ public class UploadCSVActionBean extends AbstractActionBean {
     public void setFileLabel(String fileLabel) {
         this.fileLabel = fileLabel;
     }
+
+    /**
+     * @return the publisher
+     */
+    public String getPublisher() {
+        return publisher;
+    }
+
+    /**
+     * @param publisher
+     *            the publisher to set
+     */
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    /**
+     * @return the license
+     */
+    public String getLicense() {
+        return license;
+    }
+
+    /**
+     * @param license
+     *            the license to set
+     */
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    /**
+     * @return the attribution
+     */
+    public String getAttribution() {
+        return attribution;
+    }
+
+    /**
+     * @param attribution
+     *            the attribution to set
+     */
+    public void setAttribution(String attribution) {
+        this.attribution = attribution;
+    }
+
+    /**
+     * @return the source
+     */
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * @param source
+     *            the source to set
+     */
+    public void setSource(String source) {
+        this.source = source;
+    }
+
 }
