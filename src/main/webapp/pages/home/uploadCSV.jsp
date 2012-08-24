@@ -95,17 +95,17 @@
                                     <td><c:out value="${actionBean.fileName}"/></td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question">Table title</label></td>
+                                    <td><label class="question" title="Title of the table that this CSV/TSV file represents.">Table title</label></td>
                                     <td><stripes:text name="fileLabel" size="80" /></td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label class="question required" for="objectsTypeInput">Object type</label>
+                                        <label class="question required" for="objectsTypeInput" title="Type of objects that this CSV/TSV file represents.">Object type</label>
                                     </td>
                                     <td><stripes:text name="objectsType" id="objectsTypeInput" size="34" /></td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question" for="labelSelect">Label column</label></td>
+                                    <td><label class="question" for="labelSelect" title="Column whose value will be used as the row's label whereever other objects link to the row.">Label column</label></td>
                                     <td>
                                         <stripes:select name="labelColumn" id="labelSelect" value="${actionBean.labelColumn}" style="width: 230px;">
                                             <stripes:option value="" label="No label" />
@@ -116,7 +116,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top"><label class="question required" for="uniqueColumnsSelect">Column(s) constituting a unique key</label></td>
+                                    <td valign="top"><label class="question required" for="uniqueColumnsSelect" title="Column(s) constituting a unique key.">Column(s) constituting a unique key</label></td>
                                     <td>
                                         <stripes:select name="uniqueColumns" id="uniqueColumnsSelect" value="${actionBean.uniqueColumns}" multiple="true" size="6" style="min-width: 230px;">
                                             <c:forEach var="col" items="${actionBean.columns}">
@@ -126,11 +126,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required">Original publisher</label></td>
+                                    <td><label class="question required" title="The original publisher of this file.">Original publisher</label></td>
                                     <td><stripes:text name="publisher" size="80" /></td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required" for="licenseSelect">Owner's license</label></td>
+                                    <td><label class="question required" for="licenseSelect" title="Owner's license of this file.">Owner's license</label></td>
                                     <td><stripes:select name="license" id="licenseSelect">
                                             <stripes:option value="All rights reserved" label="© All rights reserved" />
                                             <stripes:option value="http://creativecommons.org/licenses/by-sa/3.0/" label="CC Attribution-ShareAlike 3.0 - Unported" />
@@ -141,12 +141,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required">Copyright attribution</label></td>
+                                    <td><label class="question required" title="Acknowledgement of the original publisher when this file is used.">Copyright attribution</label></td>
                                     <td><stripes:textarea name="attribution" cols="80" rows="3"/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required">Source</label></td>
+                                    <td><label class="question required" title="The original source of this file (e.g. a URL).">Source</label></td>
                                     <td><stripes:text name="source" size="80" /></td>
                                 </tr>
                                 <tr>
@@ -165,7 +165,8 @@
                             <h2>How to fill out the form</h2>
                             <ul>
                                 <li>The Object type is an identifier for the table's type of content. Like a table name in a relational database.</li>
-                                <li>The Label column is a representative field of the row, which will be seen a the link label when other objects links to the row.</li>
+                                <li>The Label column is a representative field of the row, which will be seen as the link label when other objects link to the row.</li>
+								<li>Hints about the various input fields are displayed when placing your mouse over their titles.</li>
                             </ul>
                         </div>
                     </c:if>
