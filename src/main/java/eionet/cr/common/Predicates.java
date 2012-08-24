@@ -53,6 +53,7 @@ public interface Predicates {
     String DCTERMS_SOURCE = "http://purl.org/dc/terms/source";
     String DCTERMS_PUBLISHER = "http://purl.org/dc/terms/publisher";
     String DCTERMS_LICENSE = "http://purl.org/dc/terms/license";
+    String DCTERMS_RIGHTS = "http://purl.org/dc/terms/rights";
     String DCTERMS_BIBLIOGRAPHIC_CITATION = "http://purl.org/dc/terms/bibliographicCitation";
 
     String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";

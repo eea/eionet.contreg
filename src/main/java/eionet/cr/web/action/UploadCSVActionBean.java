@@ -598,7 +598,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
         if (StringUtils.startsWithIgnoreCase(license, "http")) {
             dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_LICENSE, ObjectDTO.createResource(license));
         } else {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_LICENSE, ObjectDTO.createLiteral(license));
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_RIGHTS, ObjectDTO.createLiteral(license));
         }
         if (StringUtils.isNotEmpty(attribution)) {
             dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION, ObjectDTO.createLiteral(attribution));
