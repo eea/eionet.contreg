@@ -91,7 +91,7 @@
                                     <td><c:out value="${actionBean.fileType}"/></td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question">File</label></td>
+                                    <td><label class="question">File name</label></td>
                                     <td><c:out value="${actionBean.fileName}"/></td>
                                 </tr>
                                 <tr>
