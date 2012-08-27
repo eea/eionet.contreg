@@ -87,6 +87,14 @@ public interface CompiledDatasetDAO extends DAO {
     void clearDataset(String datasetUri, String contextUri) throws DAOException;
 
     /**
+     * Clears dataset graph.
+     *
+     * @param datasetUri
+     * @throws DAOException
+     */
+    void clearDatasetData(String datasetUri) throws DAOException;
+
+    /**
      * Removes triples from compiled dataset that also exists in the selectedFiles.
      *
      * @param datasetUri compiled dataset graph

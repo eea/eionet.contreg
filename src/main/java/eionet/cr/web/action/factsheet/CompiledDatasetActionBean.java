@@ -200,6 +200,11 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             sched.addJobListener(listener);
 
             SimpleTrigger trigger = new SimpleTrigger(jobDetail.getName(), null, new Date(), null, 0, 0L);
+
+            // First clear the graph
+            DAOFactory.get().getDao(CompiledDatasetDAO.class).clearDatasetData(uri);
+
+            // Start job
             sched.scheduleJob(jobDetail, trigger);
 
             // Update source last modified date

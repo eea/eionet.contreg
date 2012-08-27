@@ -230,6 +230,24 @@ public class VirtuosoCompiledDatasetDAO extends VirtuosoBaseDAO implements Compi
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearDatasetData(String datasetUri) throws DAOException {
+        RepositoryConnection con = null;
+        try {
+            con = SesameConnectionProvider.getRepositoryConnection();
+
+            con.clear(con.getValueFactory().createURI(datasetUri));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(con);
+        }
+    }
+
+    /**
      * SPARQL for detecting if dataset exists.
      */
     private static final String DATASET_EXISTS_QUERY = "ASK {?graphUri a ?datasetType}";
