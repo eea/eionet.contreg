@@ -90,6 +90,9 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
         String sourceUrl = getFirstBindingStringValue(bindingSet);
         if (!StringUtils.isBlank(sourceUrl)) {
 
+            // Replace spaces from url
+            sourceUrl = StringUtils.replace(sourceUrl.trim(), " ", "%20");
+
             sourceCount++;
             try {
                 getPreparedStatement().setString(1, sourceUrl);
