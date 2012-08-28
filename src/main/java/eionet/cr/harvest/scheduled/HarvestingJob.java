@@ -32,6 +32,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.rio.RDFParseException;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -432,7 +433,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             try {
                 harvest.execute();
             } catch (HarvestException e) {
-                LOGGER.error("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "]", e);
+                if (e.getCause() instanceof RDFParseException) {
+                    LOGGER.warn("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "] - " + e.toString());
+                } else {
+                    LOGGER.error("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "]", e);
+                }
             } finally {
                 CurrentHarvests.setQueuedHarvest(null);
             }
