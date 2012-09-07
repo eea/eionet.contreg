@@ -11,7 +11,7 @@
         <env>local</env>
     </properties>
 
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-snapshot</version>
     <name>cr3</name>
     <url>http://maven.apache.org</url>
 
@@ -35,6 +35,19 @@
         </repository>
 
     </repositories>
+
+    <distributionManagement>
+	    <repository>
+	        <id>archiva.internal</id>
+	        <name>Internal Release Repository</name>
+	        <url>http://archiva.eionet.europa.eu/repository/internal/</url>
+	    </repository>
+ 	    <snapshotRepository>
+	        <id>archiva.snapshots</id>
+	        <name>Internal Snapshot Repository</name>
+	        <url>http://archiva.eionet.europa.eu/repository/snapshots/</url>
+	    </snapshotRepository>
+    </distributionManagement>
 
     <!-- the build configuration -->
     <build>
@@ -213,11 +226,6 @@
     <!-- dependencies -->
 
     <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.5</version>
-        </dependency>
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
