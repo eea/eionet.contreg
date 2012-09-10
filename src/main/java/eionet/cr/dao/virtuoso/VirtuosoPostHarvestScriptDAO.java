@@ -489,7 +489,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         String sql =
             "SELECT post_harvest_script_id, target_source_url, target_type_url "
             + "FROM post_harvest_script WHERE "
-            + "(target_source_url = ? OR target_source_url IS NULL) AND 
+            + "(target_source_url = ? OR target_source_url IS NULL) AND "
             + "last_modified > ? AND active = ? AND target_type_url IS  NULL;";
 
         ArrayList<Object> values = new ArrayList<Object>();
