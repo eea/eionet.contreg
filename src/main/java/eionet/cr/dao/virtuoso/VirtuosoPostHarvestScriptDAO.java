@@ -488,9 +488,12 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
         String sql =
             "SELECT post_harvest_script_id, target_source_url, target_type_url "
-            + "FROM post_harvest_script WHERE last_modified > ? AND active = ?";
+            + "FROM post_harvest_script WHERE "
+            + "(target_source_url = ? OR target_source_url IS NULL) AND 
+            + "last_modified > ? AND active = ? AND target_type_url IS  NULL;";
 
         ArrayList<Object> values = new ArrayList<Object>();
+        values.add(harvestSource);
         values.add(lastHarvestDate);
         values.add("Y");
 
@@ -516,6 +519,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             }
         });
 
+        //TODO: Still looks at the script's target type, but those have been excluded in the SQL
         for (PostHarvestScriptDTO script : scripts) {
             if (script.getTargetType() == null || TargetType.TYPE.equals(script.getTargetType())) {
                 return true;

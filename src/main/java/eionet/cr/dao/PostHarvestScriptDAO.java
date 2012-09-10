@@ -166,9 +166,9 @@ public interface PostHarvestScriptDAO extends DAO {
             throws DAOException;
 
     /**
-     * Checks if there are any post-harvest scripts, that are modified later than last harvest of given harvest source was done. It
-     * checks all the all-source scripts, all type-specific scripts and source-specific scripts that are bound to the given harvest
-     * source.
+     * Checks if there are any post-harvest scripts, that are modified later than last harvest of given harvest source
+     * was done. It checks all the all-source scripts and source-specific scripts that are bound to the given harvest
+     * source. The type-specific scripts are ignored as we don't only know rdf:type from the previous harvest.
      *
      * @param lastHarvestDate date of the last harvest of the harvest source
      * @param harvestSource harvest source
