@@ -220,7 +220,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-            OpenRDFException;
+    OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -248,6 +248,7 @@ public interface HarvestSourceDAO extends DAO {
     int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException;
 
     /**
+     * Loads structured content from the given input stream into the given graph, using the given content loader object.
      *
      * @param inputStream
      * @param contentLoader
@@ -291,7 +292,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-            RepositoryException, IOException;
+    RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.
