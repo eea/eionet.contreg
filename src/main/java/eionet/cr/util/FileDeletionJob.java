@@ -99,14 +99,13 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
     @Override
     public void execute(JobExecutionContext executionContext) throws JobExecutionException {
 
-        ArrayList<File> successfullyDeleted = new ArrayList<File>();
+        ArrayList<File> toBeRemvedFromQueue = new ArrayList<File>();
 
         for (File file : QUEUED_FILES) {
-            if (file != null && file.exists() && file.isFile()) {
+            if (file != null && file.exists()) {
                 try {
-                    boolean success = file.delete();
-                    if (success) {
-                        successfullyDeleted.add(file);
+                    if (file.delete() == true) {
+                        toBeRemvedFromQueue.add(file);
                         LOGGER.debug("File successfully deleted: " + file);
                     } else {
                         LOGGER.debug("Deleting this file failed, trying next time: " + file);
@@ -117,9 +116,12 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
                     LOGGER.error("Unexpected RuntimeException when trying to delete " + file, e);
                 }
             }
+            else{
+                toBeRemvedFromQueue.add(file);
+            }
         }
 
-        QUEUED_FILES.removeAll(successfullyDeleted);
+        QUEUED_FILES.removeAll(toBeRemvedFromQueue);
     }
 
     /**
@@ -129,8 +131,13 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     public static synchronized void register(File file) {
 
-        if (file != null) {
-            QUEUED_FILES.add(file);
+        if (file != null && file.exists()) {
+            if (file.delete() == false){
+                QUEUED_FILES.add(file);
+            }
+            else{
+                LOGGER.debug("File successfully deleted: " + file);
+            }
         }
     }
 
