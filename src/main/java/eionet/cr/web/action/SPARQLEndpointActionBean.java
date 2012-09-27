@@ -30,6 +30,7 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
@@ -72,6 +73,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String FORMAT_XML = "xml";
     private static final String FORMAT_XML_SCHEMA = "xml_schema";
     private static final String FORMAT_JSON = "json";
+    private static final String FORMAT_CSV = "csv";
     private static final String FORMAT_HTML = "html";
     private static final String FORMAT_HTML_PLUS = "html+";
 
@@ -95,6 +97,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         xmlFormats.add("application/sparql-results+xml");
         xmlFormats.add("application/rdf+xml");
         xmlFormats.add("application/xml");
+        xmlFormats.add("application/csv");
         xmlFormats.add("text/xml");
         xmlFormats.add("application/x-binary-rdf-results-table");
         xmlFormats.add("text/boolean"); // For ASK query
@@ -418,6 +421,14 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 } else {
                     resolution = new ForwardResolution(FORM_PAGE);
                 }
+            } else if (accept[0].equals("application/csv")) {
+                resolution = new StreamingResolution("application/csv") {
+                    @Override
+                    public void stream(HttpServletResponse response) throws Exception {
+                        runQuery(query, FORMAT_CSV, response.getOutputStream());
+                    }
+                };
+                ((StreamingResolution) resolution).setFilename("sparql-result.csv");
             } else {
                 resolution = new StreamingResolution("application/sparql-results+xml") {
                     @Override
@@ -587,6 +598,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             if (queryResult != null) {
                                 result = new QueryResult(queryResult, true);
                             }
+                        } else if (format != null && format.equals(FORMAT_CSV)) {
+                            SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(out);
+                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
                         }
                     }
                 } finally {

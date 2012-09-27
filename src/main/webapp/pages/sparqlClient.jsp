@@ -346,6 +346,7 @@ while (l--) {
                             <stripes:option value="application/sparql-results+json" label="JSON" />
                             <stripes:option value="application/sparql-results+xml" label="XML" />
                             <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
+                            <stripes:option value="application/csv" label="CSV" />
                         </stripes:select>
                     </div>
                     <div style="position: absolute; top: 5px; left: 250px;">
