@@ -71,8 +71,8 @@
                     <verbose>false</verbose>
                     <fork>false</fork>
                     <compilerVersion>${java.version}</compilerVersion>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 
