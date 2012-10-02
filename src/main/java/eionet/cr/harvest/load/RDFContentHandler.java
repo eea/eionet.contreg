@@ -84,7 +84,8 @@ public class RDFContentHandler implements RDFHandler {
     /**
      * @param repoConn
      * @param sqlConn
-     * @param contextUri The URI of the graph where the triples will be loaded into.
+     * @param contextUri
+     *            The URI of the graph where the triples will be loaded into.
      */
     public RDFContentHandler(RepositoryConnection repoConn, Connection sqlConn, String contextUri, long timeout) {
 
@@ -142,16 +143,22 @@ public class RDFContentHandler implements RDFHandler {
             triplesSaved++;
             totalTime = System.currentTimeMillis();
 
-            //check timeout:
-            if (timeout > 0 && (totalTime - startTime > timeout  )) {
+            // check timeout:
+            if (timeout > 0 && (totalTime - startTime > timeout)) {
                 throw new TimeoutException("Timeout (" + timeout + "ms) exceeded when parsing triples");
             }
 
             if (triplesSaved % BATCH_SIZE == 0) {
                 LOGGER.trace("Statement counter = " + triplesSaved);
             }
+
         } catch (RepositoryException e) {
-            throw new RDFHandlerException(e.getMessage(), e);
+            String message = e.getMessage();
+            if (message != null && message.contains("VirtuosoException: SR491: Too many open statements")) {
+                LOGGER.debug("Exception happend at triple #" + triplesSaved + ": <" + rdfStatement.getSubject().stringValue()
+                        + "> <" + rdfStatement.getPredicate().stringValue() + "> <" + rdfStatement.getObject().stringValue() + ">");
+            }
+            throw new RDFHandlerException(message, e);
         }
     }
 
@@ -189,8 +196,8 @@ public class RDFContentHandler implements RDFHandler {
             URI datatype = ((Literal) object).getDatatype();
             if (datatype != null && datatype.stringValue().equals("http://www.openlinksw.com/schemas/virtrdf#Geometry")) {
                 result =
-                    valueFactory.createStatement(statement.getSubject(), statement.getPredicate(),
-                            valueFactory.createLiteral(object.stringValue()));
+                        valueFactory.createStatement(statement.getSubject(), statement.getPredicate(),
+                                valueFactory.createLiteral(object.stringValue()));
             }
         }
 
