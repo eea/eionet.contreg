@@ -1323,9 +1323,17 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
             // Load triples into the "original" graph.
             try {
+                repoConn.setAutoCommit(false);
+                sqlConn.setAutoCommit(false);
                 LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into", graphUri));
                 triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, graphUri);
+                repoConn.commit();
+                sqlConn.commit();
+                repoConn.setAutoCommit(true);
+                sqlConn.setAutoCommit(true);
             } catch (Exception e) {
+                SesameUtil.rollback(repoConn);
+                SQLUtil.rollback(sqlConn);
                 throw new DAOException("Failed content loading into " + graphUri, e);
             }
 
