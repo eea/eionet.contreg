@@ -11,38 +11,37 @@
   </tr>
   <tr>
     <td>AVG(<em>Expn</em>)</td>
-    <td>calculates the average value for an expression over a group</td>
-    <td>Supported
-</td>
+    <td>Calculates the average value for an expression over a group</td>
+    <td>Supported</td>
   </tr>
   <tr>
     <td>COUNT(<em>Expn</em>)</td>
-    <td>counts the number of times a given expression has a bound, and non-error value with the aggregate group</td>
+    <td>Counts the number of times a given expression has a bound, and non-error value with the aggregate group</td>
     <td>Supported </td>
   </tr>
   <tr>
-    <td>GROUP_CONCAT(<em>Expn</em>,' ')</td>
-    <td>performs a string concatenation across the values of an expression with a group.</td>
-    <td>Not supported </td>
+    <td>sql:GROUP_CONCAT(<em>Expn</em>,' ')</td>
+    <td>Performs a string concatenation across the values of an expression with a group.</td>
+    <td>Supported </td>
   </tr>
   <tr>
     <td>MAX(<em>Expn</em>)</td>
-    <td>returns the maximum value from a group</td>
-    <td> Supported </td>
+    <td>Returns the maximum value from a group</td>
+    <td>Supported </td>
   </tr>
   <tr>
     <td>MIN(<em>Expn</em>)</td>
-    <td>returns the minimum value from a group</td>
-    <td> Supported </td>
+    <td>Returns the minimum value from a group</td>
+    <td>Supported </td>
   </tr>
   <tr>
-    <td>SAMPLE(<em>Expn</em>)</td>
-    <td>returns an arbitrary value from the multiset passed to it.</td>
-    <td> Not supported </td>
+    <td>sql:SAMPLE(<em>Expn</em>)</td>
+    <td>Returns an arbitrary value from the multiset passed to it.</td>
+    <td>Supported </td>
   </tr>
   <tr>
     <td>SUM(<em>Expn</em>)</td>
-    <td>returns the numeric value obtained by summing the values within the aggregate group</td>
+    <td>Returns the numeric value obtained by summing the values within the aggregate group</td>
     <td>Supported </td>
   </tr>
 </table>
@@ -174,11 +173,6 @@ These functions cast a value from one data type to another. See also <a href="ht
     <td>Supported </td>
   </tr>
   <tr>
-    <td>REGEX( <em>Expn1, Expn2, Expn3</em>)</td>
-    <td>Invokes the XPath fn:matches function to match text against a regular expression pattern. Expn3 are optional pattern matching flags</td>
-    <td>Supported </td>
-  </tr>
-  <tr>
     <td>STR( <em>Expn</em>)</td>
     <td>If <em>Expn</em> is a literal, returns the string without datatype and language code. If <em>Expn</em> is an IRI, then the IRI is returned as a string</td>
     <td>Supported </td>
@@ -186,8 +180,7 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>STRLANG( <em>Expn1, Expn2</em>)</td>
     <td>constructs a literal with lexical form and language tag as specificed by the arguments</td>
-    <td> ?? 
-</td>
+    <td> ??  </td>
   </tr>
   <tr>
     <td>sameTERM( <em>Expn1, Expn2</em>)</td>
@@ -197,95 +190,88 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>URI( <em>Expn</em>)</td>
     <td>The URI function is a synonym for IRI</td>
-    <td> ?? 
-
-</td>
+    <td> ??  </td>
   </tr>
 </table>
-<h2 id="XPathfunctions">XPath functions</h2>
+
+<h2 id="SPARQL11functions">SPARQL 1.1 functions</h2>
 <p>
-SPARQL 1.1 inherits all the <a href="http://www.w3.org/2005/xpath-functions/">XQuery 1.0, XPath 2.0, and XSLT 2.0 functions</a>. The function names are prefixed with <tt>fn:</tt>, and it is not necessary to declare the prefix. Should you need it, here it is:
+<a href="http://www.w3.org/TR/sparql11-query/#SparqlOps">SPARQL 1.1</a> defines additional functions.
 </p>
-<pre>PREFIX fn: &lt;http://www.w3.org/2005/xpath-functions/#&gt;
-</pre>
 <p>
 Actual support is unknown.
 </p>
 <table class="datatable">
-  <tr>
-    <td>fn:boolean(value)</td>
-    <td>Boolean effective value of value.</td>
-    <td> ??  </td>
-  </tr>
   <tr>
     <td>fn:not(value)</td>
     <td>Logical negation of the boolean effective value of value.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:contains(string, substr)</td>
+    <td>contains(string, substr)</td>
     <td>Test whether substr occurs in string.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:starts-with(string, match)</td>
+    <td>strstarts(string, match)</td>
     <td>Test whether string starts with substr.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:ends-with(string, match)</td>
+    <td>strends(string, match)</td>
     <td>Test whether string ends with substr.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:string-length(string)</td>
+    <td>strlen(string)</td>
     <td>Return the length of a string.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:lower-case(string)</td>
+    <td>lcase(string)</td>
     <td>Return a string which is the lower case equivalent of the argument.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:upper-case(string)</td>
+    <td>ucase(string)</td>
     <td>Return a string which is the upper case equivalent of the argument.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:matches(string, pattern [, flags])</td>
+    <td>regex(string, pattern [, flags])</td>
     <td>Regular expression match.</td>
-    <td> ??  </td>
+    <td> Supported  </td>
   </tr>
   <tr>
-    <td>fn:concat(string, ...)</td>
+    <td>concat(string, ...)</td>
     <td>Return the concatenation of strings.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:substring(string, begin [,length])</td>
-    <td>Returns the substring of a string, given by begin  (integer) and, optionally, length length.  Absence of length means to end of string.</td>
-    <td> Not supported </td>
+    <td>substr(string, begin [,length])</td>
+    <td>Returns the substring of a string, given by begin  (integer) and, optionally, length length.  Absence of length means to end of string.
+     The index of the first character in a strings is 1.</td>
+    <td> ?? </td>
   </tr>
   <tr>
-    <td>fn:round(v)</td>
+    <td>round(v)</td>
     <td>Return the nearest integer value to the argument.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:abs(v)</td>
+    <td>abs(v)</td>
     <td>Return the absolute value.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:floor(v)</td>
+    <td>floor(v)</td>
     <td>Return the greatest integer value less than the argument (as a double).</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>fn:ceiling(v)</td>
+    <td>ceil(v)</td>
     <td>Return the smallest integer value than the argument (as a double).</td>
-    <td> Not supported </td>
+    <td> ?? </td>
   </tr>
 </table>
 <h2 id="Virtuosobuilt-infunctions">Virtuoso built-in functions</h2>
@@ -295,7 +281,7 @@ Many more are documented here: <a href="http://docs.openlinksw.com/virtuoso/func
 <table class="datatable">
   <tr>
     <td>bif:substring( <em>string, start, length</em>)</td>
-    <td>Substitute for fn:substring. First character has index 1.</td>
+    <td>Substitute for substr. First character has index 1.</td>
     <td>Supported </td>
   </tr>
   <tr>
