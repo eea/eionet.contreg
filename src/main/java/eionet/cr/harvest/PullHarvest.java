@@ -511,9 +511,9 @@ public class PullHarvest extends BaseHarvest {
                     // that simply wasn't declared in the server-returned content type.
                     FileToRdfProcessor fileProcessor = new FileToRdfProcessor(downloadedFile, getContextUrl());
                     processedFile = fileProcessor.process();
-                    if (processedFile != null) {
+                    if (processedFile != null && fileProcessor.getRdfFormat() != null) {
                         LOGGER.debug(loggerMsg("File processed into RDF format"));
-                        ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getContentType());
+                        ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
                         rdfLoader.setTimeout(getTimeout());
                         return loadFile(processedFile, rdfLoader);
                     } else {
@@ -704,8 +704,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
