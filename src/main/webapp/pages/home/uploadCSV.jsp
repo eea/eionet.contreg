@@ -24,6 +24,21 @@
                     parameters : params
                 });
             }
+
+            ( function($) {
+                $(document).ready(function(){
+                    var toggleLinkDataFields = function(e) {
+                        if ($(this).is(':checked')) {
+                            $("#addLinksRow").show();
+                        } else {
+                            $("#addLinksRow").hide();
+                        }
+                    }
+
+                    $("#addLinksCheckbox").change(toggleLinkDataFields).change();
+
+                });
+            } ) ( jQuery );
         </script>
 
         <h1>Upload CSV/TSV file</h1>
@@ -149,6 +164,51 @@
                                     <td><label class="question required" title="The original source of this file (e.g. a URL).">Source</label></td>
                                     <td><stripes:text name="source" size="80" /></td>
                                 </tr>
+                                <!-- Data linking -->
+                                <tr>
+                                    <td><label class="question" title="If you add links to the data you can join with other datasets over the links.">Add links to the data</label></td>
+                                    <td><stripes:checkbox name="addDataLinkingScripts" id="addLinksCheckbox" /></td>
+                                </tr>
+                                <tr id="addLinksRow">
+                                <td colspan="2">
+                                    <div class="csvWizardDesc">
+                                        <h2>How link-scripts work</h2>
+                                        <ul>
+                                            <li>Choose the link-script and the column name.</li>
+                                            <li>The link-script is added as a post-harvest script and executed.</li>
+                                            <li>It is possible to re-run the scripts when executing the "Harvest" button on the facthseet page</li>
+                                        </ul>
+                                    </div>
+                                    <table>
+                                    <c:forEach items="${actionBean.dataLinkingScripts}" varStatus="loop">
+                                     <tr>
+                                        <td><label class="question required" for="linkedColumnSelect${loop.index}" title="Column to link data with.">Column</label></td>
+                                        <td>
+                                            <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="width: 230px;">
+                                                <stripes:options-collection collection="${actionBean.columns}" />
+                                            </stripes:select>
+                                        </td>
+                                     </tr>
+                                     <tr>
+                                        <td><label class="question required" for="scriptTemplateSelect${loop.index}" title="Linking script.">Linking script</label></td>
+                                        <td>
+                                            <stripes:select name="dataLinkingScripts[${loop.index}].scriptId" id="scriptTemplateSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].scriptId}" style="width: 230px;">
+                                                <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
+                                            </stripes:select>
+                                        </td>
+                                     </tr>
+                                    </c:forEach>
+                                    <tr>
+                                        <td colspan="2">
+                                            <stripes:submit name="addScript" value="Add new script"/>
+                                            <c:if test="${actionBean.removeScriptsAvailable}">
+                                                <stripes:submit name="removeScript" value="Remove last script"/>
+                                            </c:if>
+                                        </td>
+                                    </tr>
+                                    </table>
+                                <td>
+                                </tr>
                                 <tr>
                                     <td colspan="2" align="right">
                                         <stripes:hidden name="folderUri"/>
@@ -166,7 +226,7 @@
                             <ul>
                                 <li>The Object type is an identifier for the table's type of content. Like a table name in a relational database.</li>
                                 <li>The Label column is a representative field of the row, which will be seen as the link label when other objects link to the row.</li>
-								<li>Hints about the various input fields are displayed when placing your mouse over their titles.</li>
+                                <li>Hints about the various input fields are displayed when placing your mouse over their titles.</li>
                             </ul>
                         </div>
                     </c:if>

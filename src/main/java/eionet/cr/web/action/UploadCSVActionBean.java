@@ -49,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -59,12 +60,19 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.helpers.CsvImportHelper;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.CharsetToolkit;
@@ -89,9 +97,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** */
     private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
-
-    /** Column name for empty name. */
-    private static final String EMPTY_COLUMN = "Empty";
 
     /** Enum for uploaded files' types. */
     public enum FileType {
@@ -148,6 +153,15 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** Source of the uploaded material. */
     private String source;
+
+    /** Form parameter, when true, data linking scripts are added. */
+    private boolean addDataLinkingScripts;
+
+    /** Selected scripts/columns data. */
+    private List<DataLinkingScript> dataLinkingScripts;
+
+    /** Available scripts. */
+    private List<ScriptTemplateDTO> scriptTemplates;
 
     /**
      * @return
@@ -225,7 +239,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
             csvReader = createCSVReader(true);
             extractObjects(csvReader);
             saveWizardInputs();
-
+            if (addDataLinkingScripts) {
+                saveDataLinkingScripts();
+                runScripts();
+            }
         } catch (Exception e) {
             LOGGER.error("Exception while reading uploaded file:", e);
             addWarningMessage(e.toString());
@@ -236,6 +253,31 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // If everything went successfully then redirect to the folder items list
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
+    }
+
+    /**
+     * Form action, that adds aditional input for data linking scripts.
+     *
+     * @return
+     */
+    public Resolution addScript() {
+        dataLinkingScripts.add(new DataLinkingScript());
+
+        ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
+        resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
+        return resolution;
+    }
+
+    /**
+     * Form action, that removes the last input for data linking scripts.
+     *
+     * @return
+     */
+    public Resolution removeScript() {
+        dataLinkingScripts.remove(dataLinkingScripts.size() - 1);
+        ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
+        resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
+        return resolution;
     }
 
     /**
@@ -326,12 +368,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
+     * True, if there is more than one script bean available.
+     *
+     * @return
+     */
+    public boolean isRemoveScriptsAvailable() {
+        return dataLinkingScripts.size() > 1;
+    }
+
+    /**
      *
      * @param csvReader
      * @throws IOException
      * @throws DAOException
      * @throws RepositoryException
      */
+    @Deprecated
     public void extractObjects(CSVReader csvReader) throws IOException, DAOException, RepositoryException {
 
         // Set columns and columnLabels by reading the first line.
@@ -347,7 +399,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 int emptyColCount = 1;
                 for (String col : columns) {
                     if (StringUtils.isEmpty(col)) {
-                        col = EMPTY_COLUMN + emptyColCount++;
+                        col = CsvImportHelper.EMPTY_COLUMN + emptyColCount++;
                     }
                     col = StringUtils.substringBefore(col, ":");
                     col = StringUtils.substringBefore(col, "@");
@@ -384,11 +436,24 @@ public class UploadCSVActionBean extends AbstractActionBean {
         DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
     }
 
+    @Deprecated
+    public String[] trimAll(String[] strings) {
+
+        if (strings != null) {
+            for (int i = 0; i < strings.length; i++) {
+                strings[i] = strings[i].trim();
+            }
+        }
+
+        return strings;
+    }
+
     /**
      * @param line
      * @param objectsTypeUri
      * @return
      */
+    @Deprecated
     private SubjectDTO extractObject(String[] line, String objectsTypeUri) {
 
         // Construct subject URI and DTO object.
@@ -447,6 +512,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @param value
      * @return
      */
+    @Deprecated
     private ObjectDTO createValueObject(String column, String value, String type, String lang) {
 
         HashMap<String, URI> types = new HashMap<String, URI>();
@@ -507,6 +573,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @param line
      * @return
      */
+    @Deprecated
     public String extractObjectId(String[] line) {
 
         StringBuilder buf = new StringBuilder();
@@ -537,6 +604,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
             return;
         }
 
+        dataLinkingScripts = new ArrayList<DataLinkingScript>();
+        dataLinkingScripts.add(new DataLinkingScript());
+
         SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
         if (fileSubject != null) {
 
@@ -566,8 +636,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @throws IOException
      * @throws RepositoryException
      * @throws DAOException
-     *
      */
+    @Deprecated
     private void saveWizardInputs() throws DAOException, RepositoryException, IOException {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
@@ -601,7 +671,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
             dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_RIGHTS, ObjectDTO.createLiteral(license));
         }
         if (StringUtils.isNotEmpty(attribution)) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION, ObjectDTO.createLiteral(attribution));
+            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION,
+                    ObjectDTO.createLiteral(attribution));
         }
         if (StringUtils.isNotEmpty(source)) {
             if (StringUtils.startsWithIgnoreCase(source, "http")) {
@@ -609,6 +680,119 @@ public class UploadCSVActionBean extends AbstractActionBean {
             } else {
                 dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_SOURCE, ObjectDTO.createLiteral(source));
             }
+        }
+    }
+
+    /**
+     * Saves the selected data linking script information and stores it as source specific post harvest script.
+     *
+     * @throws DAOException
+     */
+    private void saveDataLinkingScripts() throws DAOException {
+        LOGGER.debug("Saving data linking scripts:");
+
+        PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+        List<PostHarvestScriptDTO> scripts = dao.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+
+        for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
+
+            String columnUri = fileUri + "#" + dataLinkingScript.getColumn();
+            columnUri = "<" + columnUri.replace(" ", "_") + ">";
+
+            ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(dataLinkingScript.getScriptId());
+            String script = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
+
+            try {
+                int existingScriptId = isUniqueScript(scripts, fileUri, scriptTemplate.getName());
+                if (existingScriptId == 0) {
+                    dao.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplate.getName(), script, true, false);
+                } else {
+                    dao.save(existingScriptId, scriptTemplate.getName(), script, true, false);
+                }
+                LOGGER.debug("Data linking script successfully added: " + scriptTemplate.getName() + ", "
+                        + dataLinkingScript.getColumn());
+            } catch (DAOException e) {
+                LOGGER.error("Failed to add data linking script: " + scriptTemplate.getName(), e);
+                addWarningMessage("Failed to add data linking script '" + scriptTemplate.getName() + "': " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Checks if script with given uri and name already exists in database. If so, the id of the script is returned.
+     *
+     * @param scripts
+     * @param uri
+     * @param name
+     * @return
+     */
+    private int isUniqueScript(List<PostHarvestScriptDTO> scripts, String uri, String name) {
+        for (PostHarvestScriptDTO script : scripts) {
+            if (uri.equalsIgnoreCase(script.getTargetUrl()) && name.equalsIgnoreCase(script.getTitle())) {
+                return script.getId();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Runs all the source specific scripts that are stored for the file uri.
+     */
+    private void runScripts() {
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            conn.setAutoCommit(false);
+            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+
+            List<PostHarvestScriptDTO> scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+
+            for (PostHarvestScriptDTO script : scripts) {
+                runScript(script, conn);
+            }
+
+            conn.commit();
+        } catch (Exception e) {
+            SesameUtil.rollback(conn);
+            LOGGER.error("Failed to run data linking scripts", e);
+            addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
+        } finally {
+            SesameUtil.close(conn);
+        }
+    }
+
+    /**
+     * Runs the script.
+     *
+     * @param scriptDto
+     * @param conn
+     */
+    private void runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
+
+        String targetUrl = scriptDto.getTargetUrl();
+        String query = scriptDto.getScript();
+        String title = scriptDto.getTitle();
+        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, targetUrl, null);
+
+        try {
+            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
+            if (updateCount > 0 && !scriptDto.isRunOnce()) {
+                // run maximum 100 times
+                LOGGER.debug("Script's update count was " + updateCount
+                        + ", running it until the count becomes 0, or no more than 100 times ...");
+                int i = 0;
+                int totalUpdateCount = updateCount;
+                for (; updateCount > 0 && i < 100; i++) {
+                    updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, targetUrl);
+                    totalUpdateCount += updateCount;
+                }
+                LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
+            } else {
+                LOGGER.debug("Script's update count was " + updateCount);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to run data linking post-harvest script '" + title + "': " + e.getMessage(), e);
+            addWarningMessage("Failed to run data linking post-harvest script '" + title + "': " + e.getMessage());
         }
     }
 
@@ -678,6 +862,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @return
      * @throws IOException
      */
+    @Deprecated
     private CSVReader createCSVReader(boolean guessEncoding) throws IOException {
 
         CSVReader result = null;
@@ -693,21 +878,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
 
         return result;
-    }
-
-    /**
-     *
-     * @param strings
-     */
-    private static String[] trimAll(String[] strings) {
-
-        if (strings != null) {
-            for (int i = 0; i < strings.length; i++) {
-                strings[i] = strings[i].trim();
-            }
-        }
-
-        return strings;
     }
 
     /**
@@ -761,7 +931,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     int emptyColCount = 1;
                     for (String col : columnsArray) {
                         if (StringUtils.isEmpty(col)) {
-                            col = EMPTY_COLUMN + emptyColCount++;
+                            col = CsvImportHelper.EMPTY_COLUMN + emptyColCount++;
                         }
                         String colLabel = StringUtils.substringBefore(col, ":").trim();
                         colLabel = StringUtils.substringBefore(colLabel, "@").trim();
@@ -838,6 +1008,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      *
      * @return
      */
+    @Deprecated
     public char getDelimiter() {
         return fileType != null && fileType.equals(FileType.TSV) ? '\t' : ',';
     }
@@ -931,6 +1102,47 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public boolean isAddDataLinkingScripts() {
+        return addDataLinkingScripts;
+    }
+
+    public void setAddDataLinkingScripts(boolean addDataLinkingScripts) {
+        this.addDataLinkingScripts = addDataLinkingScripts;
+    }
+
+    /**
+     * @return the dataLinkingScripts
+     */
+    public List<DataLinkingScript> getDataLinkingScripts() {
+        return dataLinkingScripts;
+    }
+
+    /**
+     * @param dataLinkingScripts
+     *            the dataLinkingScripts to set
+     */
+    public void setDataLinkingScripts(List<DataLinkingScript> dataLinkingScripts) {
+        this.dataLinkingScripts = dataLinkingScripts;
+    }
+
+    /**
+     * @return the scriptTemplates
+     */
+    public List<ScriptTemplateDTO> getScriptTemplates() {
+        if (scriptTemplates == null) {
+            scriptTemplates = new ScriptTemplateDaoImpl().getScriptTemplates();
+        }
+        return scriptTemplates;
+    }
+
+    /**
+     * @param scriptTemplates
+     *            the scriptTemplates to set
+     */
+    public void setScriptTemplates(List<ScriptTemplateDTO> scriptTemplates) {
+        this.scriptTemplates = scriptTemplates;
     }
 
 }
