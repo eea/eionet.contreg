@@ -99,10 +99,14 @@ public class FileToRdfProcessor {
     /**
      *
      * @return file if type was known and detected otherwise null
-     * @throws IOException if error at I/O level
-     * @throws SAXException if error in SAX parser when analyzing XML
-     * @throws RDFParseException if RDF parser fails
-     * @throws RDFHandlerException if exception occurs in RDF parser
+     * @throws IOException
+     *             if error at I/O level
+     * @throws SAXException
+     *             if error in SAX parser when analyzing XML
+     * @throws RDFParseException
+     *             if RDF parser fails
+     * @throws RDFHandlerException
+     *             if exception occurs in RDF parser
      */
     public File process() throws IOException, SAXException, RDFHandlerException, RDFParseException {
 
@@ -116,40 +120,43 @@ public class FileToRdfProcessor {
         // initialize result to null
         File resultFile = null;
         try {
-            // See if the unzipped (*if* it was zipped) file is of any RDF format.
-            // If not, see if it is XML that can be converted into RDF.
+            // See if the unzipped (if it was zipped) file is an XML that can be processed into RDF.
+            XmlAnalysis xmlAnalysis = getXmlAnalysis(unzippedFile);
+            if (xmlAnalysis != null) {
 
-            FileRdfFormatDetector rdfFormatDetector = new FileRdfFormatDetector();
-            rdfFormat = rdfFormatDetector.detect(unzippedFile, contextUrl);
-            if (rdfFormat == null){
-
-                // File was not of any RDF format, but log any parsing errors encountered in the process.
-                for (Entry<RDFFormat, Exception> entry : rdfFormatDetector.getParsingExceptions().entrySet()) {
-                    String formatName = entry.getKey().getName();
-                    Exception formatParsingException = entry.getValue();
-                    LOGGER.debug(loggerMsg("Probably not a (valid) " + formatName + " file: " + formatParsingException));
-                }
-
-                // So the file was not of any RDF format, but see if it's an XML that can be converted into RDF.
-                XmlAnalysis xmlAnalysis = getXmlAnalysis(unzippedFile);
-                if (xmlAnalysis != null) {
-
-                    // Get the file's start element: if it is RDF, the result will be the file as it is.
-                    String startElemUri = xmlAnalysis.getStartElemUri();
-                    if (startElemUri != null && startElemUri.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
-                        // Unlikely to reach this block, as we already detected above that the file was not of any RDF format.
-                        LOGGER.debug(loggerMsg("Seems to be XML file with rdf:RDF start element"));
-                        resultFile = unzippedFile;
+                // File seems to be XML.
+                // Get the file's start element: if it is RDF, the result will be the file as it is.
+                String startElemUri = xmlAnalysis.getStartElemUri();
+                if (startElemUri != null && startElemUri.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
+                    // Unlikely to reach this block, as we already detected above that the file was not of any RDF format.
+                    LOGGER.debug(loggerMsg("Seems to be XML file with rdf:RDF start element"));
+                    resultFile = unzippedFile;
+                    rdfFormat = RDFFormat.RDFXML;
+                } else {
+                    // The file's start element was not RDF, so try to convert it to RDF.
+                    LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
+                    String conversionSchema = xmlAnalysis.getConversionSchema();
+                    resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
+                    if (resultFile != null) {
                         rdfFormat = RDFFormat.RDFXML;
-                    } else {
-                        // The file's start element was not RDF, so try to convert it to RDF.
-                        LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
-                        String conversionSchema = xmlAnalysis.getConversionSchema();
-                        resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
-                        if (resultFile != null){
-                            rdfFormat = RDFFormat.RDFXML;
-                        }
                     }
+                }
+            }
+            else{
+                // The file wasn't XML, so see if it is any of the supported RDF formats.
+                FileRdfFormatDetector rdfFormatDetector = new FileRdfFormatDetector();
+                rdfFormat = rdfFormatDetector.detect(unzippedFile, contextUrl);
+                if (rdfFormat != null) {
+                    // File was one of RDF formats, so assign to result file.
+                    resultFile = unzippedFile;
+                } else {
+                    // File was not of any RDF format, but log any parsing errors encountered in the process.
+                    for (Entry<RDFFormat, Exception> entry : rdfFormatDetector.getParsingExceptions().entrySet()) {
+                        String formatName = entry.getKey().getName();
+                        Exception formatParsingException = entry.getValue();
+                        LOGGER.debug(loggerMsg("Probably not a (valid) " + formatName + " file: " + formatParsingException));
+                    }
+
                 }
             }
 
@@ -290,121 +297,4 @@ public class FileToRdfProcessor {
     public RDFFormat getRdfFormat() {
         return rdfFormat;
     }
-
-
-    // /**
-    // *
-    // * @param file
-    // * @param contextUrl
-    // * @return
-    // * @throws IOException
-
-    // */
-    // public File process(File file, String contextUrl) throws IOException {
-    //
-    // if (file == null) {
-    // throw new IllegalArgumentException("File must not be null!");
-    // }
-    //
-    // File unzippedFile = null;
-    // File processedFile = null;
-    // try {
-    // // try unzipping (if not zipped, reference to the same file is returned,
-    // // otherwise reference to the unzipped file is returned)
-    // unzippedFile = tryUnzip(file);
-    //
-    // // try processing as XML (if it turns out to be RDF, reference to the same file
-    // // is returned; otherwise it is attempted to convert the file into RDF, and if
-    // // it indeed succeeds, reference to the converted file is returned)
-    // processedFile = processAsXml(unzippedFile, contextUrl);
-    // return processedFile;
-    //
-    // } catch (ParserConfigurationException e) {
-    // throw new CRRuntimeException("SAX parser configuration error", e);
-    // } catch (IOException e) {
-    // if (throwThisIOException(e)) {
-    // throw e;
-    // } else {
-    // LOGGER.info("Swallowing this file processing exception: " + e.toString());
-    // return null;
-    // }
-    // } catch (SAXException e) {
-    // throw new CRRuntimeException("Expected handler to swallow this SAX parsing error", e);
-    // } finally {
-    // // if the processed file is not the unzipped file, then it means the processed file is
-    // // a new file, in which case we must delete the unzipped file, which is not used any more
-    // if (unzippedFile != null && unzippedFile != processedFile) {
-    // FileDeletionJob.register(unzippedFile);
-    // }
-    // }
-    // }
-
-    // /**
-    // *
-    // * @param file
-    // * @param contextUrl
-    // * @return
-    // * @throws ParserConfigurationException
-    // * @throws SAXException
-    // * @throws IOException
-    // */
-    // private File processAsXml(File file, String contextUrl) throws ParserConfigurationException, SAXException, IOException {
-    //
-    // // run XML analysis
-    // // (will detect if the file is XML, and has a schema or DTD specified; will not throw XML validation errors)
-    // XmlAnalysis xmlAnalysis = new XmlAnalysis();
-    // xmlAnalysis.parse(file);
-    //
-    // // get schema uri, if it's not found then fall back to dtd
-    // String schemaOrDtd = xmlAnalysis.getSchemaLocation();
-    // if (StringUtils.isBlank(schemaOrDtd)) {
-    // schemaOrDtd = xmlAnalysis.getSystemDtd();
-    // if (StringUtils.isBlank(schemaOrDtd)) {
-    // schemaOrDtd = xmlAnalysis.getPublicDtd();
-    // }
-    // }
-    //
-    // // if no schema or DTD still found,
-    // // assume the URI of the starting element to be the schema by which conversions should be looked for
-    // if (StringUtils.isBlank(schemaOrDtd)) {
-    //
-    // schemaOrDtd = xmlAnalysis.getStartElemUri();
-    // if (schemaOrDtd.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
-    //
-    // // file seems to be actually RDF, so return its reference back
-    // return file;
-    // }
-    // }
-    //
-    // // if schema or DTD found, then get its RDF conversion ID
-    // String conversionId = null;
-    // if (!StringUtils.isBlank(schemaOrDtd)) {
-    //
-    // ConversionsParser convParser = ConversionsParser.parseForSchema(schemaOrDtd);
-    // if (convParser != null) {
-    // conversionId = convParser.getRdfConversionId();
-    // }
-    // }
-    //
-    // // if conversion to RDF has been found, run it and return the converted file
-    // if (!StringUtils.isBlank(conversionId)) {
-    //
-    // // prepare conversion URL
-    // String convertUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_CONVERT_URL);
-    // Object[] args = new String[2];
-    // args[0] = URLEncoder.encode(conversionId, "UTF-8");
-    // args[1] = URLEncoder.encode(contextUrl, "UTF-8");
-    // convertUrl = MessageFormat.format(convertUrl, args);
-    //
-    // // run conversion and save the response to a new file
-    // File convertedFile = new File(file.getAbsolutePath() + ".converted");
-    // FileUtil.downloadUrlToFile(convertUrl, convertedFile);
-    //
-    // // return converted file
-    // return convertedFile;
-    // } else {
-    // return null;
-    // }
-    // }
-
 }
