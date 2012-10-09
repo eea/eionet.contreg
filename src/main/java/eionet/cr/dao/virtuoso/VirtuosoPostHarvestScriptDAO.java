@@ -23,7 +23,6 @@ package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,13 +31,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.readers.PostHarvestScriptDTOReader;
 import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
-import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
@@ -48,7 +47,6 @@ import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
-import eionet.cr.util.sql.SQLResultSetBaseReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
@@ -61,47 +59,47 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     /** */
     private static final String LIST_SQL = "select * from POST_HARVEST_SCRIPT where "
-        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by POSITION_NUMBER asc";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_SQL = "select * from POST_HARVEST_SCRIPT where "
-        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and ACTIVE='Y' order by POSITION_NUMBER asc";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and ACTIVE='Y' order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_FOR_TYPES_SQL = "select * from POST_HARVEST_SCRIPT where "
-        + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and ACTIVE='Y' "
-        + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
+            + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and ACTIVE='Y' "
+            + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-        + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
+            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String GET_LAST_POSITION_SQL = "select max(POSITION_NUMBER) as MAX_POS from POST_HARVEST_SCRIPT where "
-        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-        + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,LAST_MODIFIED) values "
-        + "(?,?,?,?,?,?,?,NOW())";
+            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,LAST_MODIFIED) values "
+            + "(?,?,?,?,?,?,?,NOW())";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String LIST_TARGETS_SQL = "select coalesce(TARGET_SOURCE_URL,TARGET_TYPE_URL) as LCOL, count(*) as RCOL "
-        + "from POST_HARVEST_SCRIPT " + "where isnull(TARGET_SOURCE_URL)=? and isnull(TARGET_TYPE_URL)=? "
-        + "group by LCOL order by LCOL";
+            + "from POST_HARVEST_SCRIPT " + "where isnull(TARGET_SOURCE_URL)=? and isnull(TARGET_TYPE_URL)=? "
+            + "group by LCOL order by LCOL";
     /** */
     private static final String ACTIVATE_DEACTIVATE_SQL =
-        "update POST_HARVEST_SCRIPT set ACTIVE=either(starts_with(ACTIVE,'Y'),'N','Y') where POST_HARVEST_SCRIPT_ID=?";
+            "update POST_HARVEST_SCRIPT set ACTIVE=either(starts_with(ACTIVE,'Y'),'N','Y') where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String GET_POSITIONS_SQL = "select cast(POST_HARVEST_SCRIPT_ID as varchar) as LCOL, "
-        + "cast(POSITION_NUMBER as varchar) as RCOL from POST_HARVEST_SCRIPT "
-        + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by RCOL asc";
+            + "cast(POSITION_NUMBER as varchar) as RCOL from POST_HARVEST_SCRIPT "
+            + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by RCOL asc";
     /** */
     private static final String UPDATE_POSITION_SQL =
-        "update POST_HARVEST_SCRIPT set POSITION_NUMBER=? where POST_HARVEST_SCRIPT_ID=?";
+            "update POST_HARVEST_SCRIPT set POSITION_NUMBER=? where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String INCREASE_POSITIONS_SQL = "update POST_HARVEST_SCRIPT set POSITION_NUMBER=POSITION_NUMBER+? "
-        + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
+            + "where coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
 
     /** */
     private static final String EXISTS_SQL = "select count(*) from POST_HARVEST_SCRIPT where "
-        + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
@@ -171,7 +169,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
      */
     @Override
     public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
-    throws DAOException {
+            throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -487,49 +485,15 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     public boolean isScriptsModified(Date lastHarvestDate, String harvestSource) throws DAOException {
 
         String sql =
-            "SELECT post_harvest_script_id, target_source_url, target_type_url "
-            + "FROM post_harvest_script WHERE "
-            + "(target_source_url = ? OR target_source_url IS NULL) AND "
-            + "last_modified > ? AND active = ? AND target_type_url IS  NULL";
+                "SELECT count(*) FROM post_harvest_script WHERE "
+                        + "(target_source_url = ? OR target_source_url IS NULL) AND "
+                        + "last_modified > ? AND active = 'Y' AND target_type_url IS  NULL";
 
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(harvestSource);
         values.add(lastHarvestDate);
-        values.add("Y");
 
-        List<PostHarvestScriptDTO> scripts = executeSQL(sql, values, new SQLResultSetBaseReader<PostHarvestScriptDTO>() {
-            @Override
-            public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
-                String targetSourceUrl = rs.getString("target_source_url");
-                String targetTypeUrl = rs.getString("target_type_url");
-
-                PostHarvestScriptDTO dto = new PostHarvestScriptDTO();
-                dto.setId(rs.getInt("post_harvest_script_id"));
-
-                if (StringUtils.isNotEmpty(targetSourceUrl)) {
-                    dto.setTargetType(TargetType.SOURCE);
-                    dto.setTargetUrl(targetSourceUrl);
-                }
-                if (StringUtils.isNotEmpty(targetTypeUrl)) {
-                    dto.setTargetType(TargetType.TYPE);
-                    dto.setTargetUrl(targetTypeUrl);
-                }
-
-                resultList.add(dto);
-            }
-        });
-
-        //TODO: Still looks at the script's target type, but those have been excluded in the SQL
-        for (PostHarvestScriptDTO script : scripts) {
-            if (script.getTargetType() == null || TargetType.TYPE.equals(script.getTargetType())) {
-                return true;
-            }
-            if (TargetType.SOURCE.equals(script.getTargetType())) {
-                if (harvestSource.equals(script.getTargetUrl())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        Object result = executeUniqueResultSQL(sql, values, new SingleObjectReader<Object>());
+        return result != null && NumberUtils.toInt(result.toString()) > 0;
     }
 }
