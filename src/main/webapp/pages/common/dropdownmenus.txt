@@ -1,18 +1,19 @@
-<!-- Last updated: 2011-09-29T08:22:34Z
+<!-- Last updated: 2012-10-09T07:00:41Z
      To update download http://www.eionet.europa.eu/dropdownmenus.txt -->
         <ul id="dropdowns">
          <li><a href="http://www.eionet.europa.eu/services">Services</a>
           <ul>
            <li><a href="http://www.eionet.europa.eu/helpdesk">Helpdesk</a></li>
-           <li><a href="http://eea.eionet.europa.eu/Public/irc/eionet-circle/Home/main">CIRCA</a></li>
            <li><a href="http://forum.eionet.europa.eu/">Forum</a></li>
-           <li><a href="http://eea.eionet.europa.eu/Members/irc/eionet-circle/Home/central_dir_admin?fn=roles&amp;v=&amp;rd=1&amp;ud=1&amp;od=1">Roles (Restricted)</a></li>
+           <li><a href="http://projects.eionet.europa.eu/">Projects</a></li>
+           <li><a href="http://www.eionet.europa.eu/ldap-roles">Roles</a></li>
            <li><a href="http://planner.eionet.europa.eu/">Workplan</a></li>
            <li><a href="http://uns.eionet.europa.eu/">Subscriptions</a></li>
            <li><a href="http://www.eionet.europa.eu/networknews">News</a></li>
            <li><a href="http://www.eionet.europa.eu/calendar">Calendar</a></li>
            <li><a href="http://www.eionet.europa.eu/training">Training</a></li>
            <li><a href="http://www.eionet.europa.eu/rolemails">NFP mails</a></li>
+           <li><a href="http://archives.eionet.europa.eu/">Archived IGs</a></li>
           </ul>
          </li>
          <li><a href="http://www.eionet.europa.eu/reportnet">Reportnet</a>
@@ -39,6 +40,7 @@
            <li><a href="http://www.eionet.europa.eu/software/design">Design Guidelines</a></li>
            <li><a href="http://www.eionet.europa.eu/software/swstandards">Standards</a></li>
            <li><a href="http://ci.eionet.europa.eu/">Continuous Integration</a></li>
+           <li><a href="http://archiva.eionet.europa.eu/">Maven repository</a></li>
            <li><a href="http://www.eionet.europa.eu/gemet">GEMET Thesaurus</a></li>
           </ul>
          </li>
