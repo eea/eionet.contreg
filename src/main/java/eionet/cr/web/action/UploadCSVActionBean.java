@@ -21,19 +21,10 @@
 package eionet.cr.web.action;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -47,40 +38,27 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.openrdf.model.URI;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.helpers.CsvImportHelper;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.util.FolderUtil;
-import eionet.cr.util.Util;
-import eionet.cr.util.sesame.SesameUtil;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.util.CharsetToolkit;
 
 /**
+ * CSV upload action bean.
  *
  * @author Jaanus Heinlaid
- *
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -124,12 +102,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** Stored file's relative path in the user's file-store. */
     private String relativeFilePath;
 
-    /** Columns detected in the uploaded file (it's the titles of the columns). */
-    private List<String> columns;
-
-    /** Column labels detected in the uploaded file (titles without type and language code). */
-    private List<String> columnLabels;
-
     /** The type of objects contained in the file (user-given free text). */
     private String objectsType;
 
@@ -162,6 +134,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** Available scripts. */
     private List<ScriptTemplateDTO> scriptTemplates;
+
+    /** Column labels detected in the uploaded file (titles without type and language code). */
+    private List<String> columnLabels;
 
     /**
      * @return
@@ -208,11 +183,15 @@ public class UploadCSVActionBean extends AbstractActionBean {
             FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
+            CsvImportHelper helper =
+                    new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
+                            attribution, source);
+
             // Store file as new source, but don't harvest it
-            createFileMetadataAndSource(fileSize);
+            helper.insertFileMetadataAndSource(fileSize, getUserName());
 
             // Add metadata about user folder update
-            linkFileToFolder();
+            helper.linkFileToFolder(folderUri, getUserName());
 
             // Pre-load wizard input values if this has been uploaded already before (so a re-upload now)
             preloadWizardInputs();
@@ -235,20 +214,41 @@ public class UploadCSVActionBean extends AbstractActionBean {
     public Resolution save() {
 
         CSVReader csvReader = null;
+        CsvImportHelper helper =
+                new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
+                        attribution, source);
         try {
-            csvReader = createCSVReader(true);
-            extractObjects(csvReader);
-            saveWizardInputs();
+            csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
+            helper.extractObjects(csvReader);
+            helper.saveWizardInputs();
+
             if (addDataLinkingScripts) {
-                saveDataLinkingScripts();
-                runScripts();
+                // Sava data linking scripts
+                try {
+                    helper.saveDataLinkingScripts(dataLinkingScripts);
+                } catch (DAOException e) {
+                    LOGGER.error("Failed to add data linking script", e);
+                    addWarningMessage("Failed to add data linking script: " + e.getMessage());
+                }
+                // Run data linking scripts
+                try {
+                    List<String> warnings = helper.runScripts();
+                    if (warnings.size() > 0) {
+                        for (String w : warnings) {
+                            addWarningMessage(w);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Failed to run data linking scripts", e);
+                    addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Exception while reading uploaded file:", e);
             addWarningMessage(e.toString());
             return new ForwardResolution(JSP_PAGE);
         } finally {
-            close(csvReader);
+            CsvImportHelper.close(csvReader);
         }
 
         // If everything went successfully then redirect to the folder items list
@@ -378,223 +378,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /**
      *
-     * @param csvReader
-     * @throws IOException
-     * @throws DAOException
-     * @throws RepositoryException
-     */
-    @Deprecated
-    public void extractObjects(CSVReader csvReader) throws IOException, DAOException, RepositoryException {
-
-        // Set columns and columnLabels by reading the first line.
-        String[] columnsArray = csvReader.readNext();
-        if (columnsArray == null || columnsArray.length == 0) {
-            columns = new ArrayList<String>();
-            columnLabels = new ArrayList<String>();
-        } else {
-            // We do trimming, because CSV Reader doesn't do it
-            columns = Arrays.asList(trimAll(columnsArray));
-            if (columns != null && columns.size() > 0) {
-                columnLabels = new ArrayList<String>();
-                int emptyColCount = 1;
-                for (String col : columns) {
-                    if (StringUtils.isEmpty(col)) {
-                        col = CsvImportHelper.EMPTY_COLUMN + emptyColCount++;
-                    }
-                    col = StringUtils.substringBefore(col, ":");
-                    col = StringUtils.substringBefore(col, "@");
-                    columnLabels.add(col.trim());
-                }
-            }
-        }
-
-        // Read the contained objects by reading the rest of lines.
-        String[] line = null;
-        String objectsTypeUri = fileUri + "/" + objectsType;
-        HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
-
-        while ((line = csvReader.readNext()) != null) {
-            SubjectDTO subject = extractObject(line, objectsTypeUri);
-            helperDao.addTriples(subject);
-        }
-
-        // Construct a SPARQL query and store it as a property
-        StringBuilder query = new StringBuilder();
-        query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
-        query.append("SELECT * FROM <").append(fileUri).append("> WHERE { \n");
-        for (String column : columnLabels) {
-            column = column.replace(" ", "_");
-            String columnUri = "tableFile:" + column;
-            query.append(" ?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append(" . \n");
-        }
-        query.append("}");
-
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_SPARQL_QUERY, ObjectDTO.createLiteral(query.toString()));
-
-        // Finally, make sure that the file has the correct number of harvested statements in its predicates.
-        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
-    }
-
-    @Deprecated
-    public String[] trimAll(String[] strings) {
-
-        if (strings != null) {
-            for (int i = 0; i < strings.length; i++) {
-                strings[i] = strings[i].trim();
-            }
-        }
-
-        return strings;
-    }
-
-    /**
-     * @param line
-     * @param objectsTypeUri
-     * @return
-     */
-    @Deprecated
-    private SubjectDTO extractObject(String[] line, String objectsTypeUri) {
-
-        // Construct subject URI and DTO object.
-        String subjectUri = fileUri + "/" + extractObjectId(line);
-        SubjectDTO subject = new SubjectDTO(subjectUri, false);
-
-        // Add rdf:type to DTO.
-        ObjectDTO typeObject = new ObjectDTO(objectsTypeUri, false);
-        typeObject.setSourceUri(fileUri);
-        subject.addObject(Predicates.RDF_TYPE, typeObject);
-
-        // Add all other values.
-        for (int i = 0; i < columns.size(); i++) {
-
-            // If current columns index out of bounds for some reason, then break.
-            if (i >= line.length) {
-                break;
-            }
-
-            // Get column title, skip this column if it's the label column, otherwise replace spaces.
-            String column = columns.get(i);
-
-            // Extract column type and language code
-            String type = StringUtils.substringAfter(column, ":");
-            if (type != null && type.length() == 0) {
-                type = null;
-            }
-            String lang = StringUtils.substringAfter(column, "@");
-            if (lang != null && lang.length() == 0) {
-                lang = null;
-            }
-
-            // Get column label
-            column = columnLabels.get(i);
-            column = column.replace(" ", "_");
-
-            // Create ObjectDTO representing the given column's value on this line
-            ObjectDTO objectDTO = createValueObject(column, line[i], type, lang);
-            objectDTO.setSourceUri(fileUri);
-
-            // Add ObjectDTO to the subject.
-            String predicateUri = fileUri + "#" + column;
-            subject.addObject(predicateUri, objectDTO);
-
-            // If marked as label column, add label property as well
-            if (column.equals(labelColumn)) {
-                subject.addObject(Predicates.RDFS_LABEL, objectDTO);
-            }
-        }
-
-        return subject;
-    }
-
-    /**
-     * @param column
-     * @param value
-     * @return
-     */
-    @Deprecated
-    private ObjectDTO createValueObject(String column, String value, String type, String lang) {
-
-        HashMap<String, URI> types = new HashMap<String, URI>();
-        types.put("url", null);
-        types.put("uri", null);
-        types.put("date", XMLSchema.DATE);
-        types.put("datetime", XMLSchema.DATETIME);
-        types.put("boolean", XMLSchema.BOOLEAN);
-        types.put("integer", XMLSchema.INTEGER);
-        types.put("int", XMLSchema.INT);
-        types.put("long", XMLSchema.LONG);
-        types.put("double", XMLSchema.DOUBLE);
-        types.put("decimal", XMLSchema.DECIMAL);
-        types.put("float", XMLSchema.FLOAT);
-
-        // If type is not defined, but column name matches one of the types, then use column name as datatype
-        if (type == null) {
-            if (types.keySet().contains(column.toLowerCase())) {
-                type = column.toLowerCase();
-            }
-        }
-
-        ObjectDTO objectDTO = null;
-        if (!StringUtils.isBlank(type)) {
-            if (type.equalsIgnoreCase("url") || type.equalsIgnoreCase("uri")) {
-                objectDTO = new ObjectDTO(value, lang, false, false, null);
-            } else if (types.keySet().contains(type.toLowerCase())) {
-                if (type.equalsIgnoreCase("boolean")) {
-                    value = value.equalsIgnoreCase("true") ? "true" : "false";
-                }
-                URI datatype = types.get(type.toLowerCase());
-                objectDTO = new ObjectDTO(value, lang, true, false, datatype);
-            } else if (type.equalsIgnoreCase("number")) {
-                try {
-                    Integer.parseInt(value);
-                    objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.INTEGER);
-                } catch (NumberFormatException nfe1) {
-                    try {
-                        Long.parseLong(value);
-                        objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.LONG);
-                    } catch (NumberFormatException nfe2) {
-                        try {
-                            Double.parseDouble(value);
-                            objectDTO = new ObjectDTO(value, lang, true, false, XMLSchema.DOUBLE);
-                        } catch (NumberFormatException nfe3) {
-                            // No need to throw or log it.
-                        }
-                    }
-                }
-            }
-        }
-
-        return objectDTO == null ? new ObjectDTO(value, lang, true, false, null) : objectDTO;
-    }
-
-    /**
-     *
-     * @param line
-     * @return
-     */
-    @Deprecated
-    public String extractObjectId(String[] line) {
-
-        StringBuilder buf = new StringBuilder();
-        if (uniqueColumns != null && !uniqueColumns.isEmpty()) {
-
-            for (String uniqueCol : uniqueColumns) {
-                int colIndex = columnLabels.indexOf(uniqueCol);
-                if (colIndex >= 0 && colIndex < line.length && !StringUtils.isBlank(line[colIndex])) {
-                    if (buf.length() > 0) {
-                        buf.append("_");
-                    }
-                    buf.append(line[colIndex]);
-                }
-            }
-        }
-
-        return buf.length() == 0 ? UUID.randomUUID().toString() : buf.toString();
-    }
-
-    /**
-     *
      * @throws DAOException
      */
     private void preloadWizardInputs() throws DAOException {
@@ -633,251 +416,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     * @throws IOException
-     * @throws RepositoryException
-     * @throws DAOException
-     */
-    @Deprecated
-    private void saveWizardInputs() throws DAOException, RepositoryException, IOException {
-
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_TYPE, ObjectDTO.createLiteral(objectsType));
-        if (StringUtils.isNotEmpty(labelColumn)) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
-        }
-        if (StringUtils.isNotEmpty(fileLabel)) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileLabel));
-        }
-
-        ObjectDTO[] uniqueColTitles = new ObjectDTO[uniqueColumns.size()];
-        for (int i = 0; i < uniqueColumns.size(); i++) {
-            uniqueColTitles[i] = ObjectDTO.createLiteral(uniqueColumns.get(i));
-        }
-
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_UNIQUE_COLUMN, uniqueColTitles);
-
-        // Copyright information
-        if (StringUtils.isNotEmpty(publisher)) {
-            if (StringUtils.startsWithIgnoreCase(publisher, "http")) {
-                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_PUBLISHER, ObjectDTO.createResource(publisher));
-            } else {
-                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_PUBLISHER, ObjectDTO.createLiteral(publisher));
-            }
-        }
-        if (StringUtils.startsWithIgnoreCase(license, "http")) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_LICENSE, ObjectDTO.createResource(license));
-        } else {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_RIGHTS, ObjectDTO.createLiteral(license));
-        }
-        if (StringUtils.isNotEmpty(attribution)) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION,
-                    ObjectDTO.createLiteral(attribution));
-        }
-        if (StringUtils.isNotEmpty(source)) {
-            if (StringUtils.startsWithIgnoreCase(source, "http")) {
-                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_SOURCE, ObjectDTO.createResource(source));
-            } else {
-                dao.insertUpdateSourceMetadata(fileUri, Predicates.DCTERMS_SOURCE, ObjectDTO.createLiteral(source));
-            }
-        }
-    }
-
-    /**
-     * Saves the selected data linking script information and stores it as source specific post harvest script.
+     * Singleton getter for column labels.
      *
-     * @throws DAOException
-     */
-    private void saveDataLinkingScripts() throws DAOException {
-        LOGGER.debug("Saving data linking scripts:");
-
-        PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
-        List<PostHarvestScriptDTO> scripts = dao.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
-
-        for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
-
-            String columnUri = fileUri + "#" + dataLinkingScript.getColumn();
-            columnUri = "<" + columnUri.replace(" ", "_") + ">";
-
-            ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(dataLinkingScript.getScriptId());
-            String script = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
-
-            try {
-                int existingScriptId = isUniqueScript(scripts, fileUri, scriptTemplate.getName());
-                if (existingScriptId == 0) {
-                    dao.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplate.getName(), script, true, false);
-                } else {
-                    dao.save(existingScriptId, scriptTemplate.getName(), script, true, false);
-                }
-                LOGGER.debug("Data linking script successfully added: " + scriptTemplate.getName() + ", "
-                        + dataLinkingScript.getColumn());
-            } catch (DAOException e) {
-                LOGGER.error("Failed to add data linking script: " + scriptTemplate.getName(), e);
-                addWarningMessage("Failed to add data linking script '" + scriptTemplate.getName() + "': " + e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Checks if script with given uri and name already exists in database. If so, the id of the script is returned.
-     *
-     * @param scripts
-     * @param uri
-     * @param name
      * @return
      */
-    private int isUniqueScript(List<PostHarvestScriptDTO> scripts, String uri, String name) {
-        for (PostHarvestScriptDTO script : scripts) {
-            if (uri.equalsIgnoreCase(script.getTargetUrl()) && name.equalsIgnoreCase(script.getTitle())) {
-                return script.getId();
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Runs all the source specific scripts that are stored for the file uri.
-     */
-    private void runScripts() {
-        RepositoryConnection conn = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            conn.setAutoCommit(false);
-            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
-
-            List<PostHarvestScriptDTO> scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
-
-            for (PostHarvestScriptDTO script : scripts) {
-                runScript(script, conn);
-            }
-
-            conn.commit();
-        } catch (Exception e) {
-            SesameUtil.rollback(conn);
-            LOGGER.error("Failed to run data linking scripts", e);
-            addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
-        } finally {
-            SesameUtil.close(conn);
-        }
-    }
-
-    /**
-     * Runs the script.
-     *
-     * @param scriptDto
-     * @param conn
-     */
-    private void runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
-
-        String targetUrl = scriptDto.getTargetUrl();
-        String query = scriptDto.getScript();
-        String title = scriptDto.getTitle();
-        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, targetUrl, null);
-
-        try {
-            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
-            if (updateCount > 0 && !scriptDto.isRunOnce()) {
-                // run maximum 100 times
-                LOGGER.debug("Script's update count was " + updateCount
-                        + ", running it until the count becomes 0, or no more than 100 times ...");
-                int i = 0;
-                int totalUpdateCount = updateCount;
-                for (; updateCount > 0 && i < 100; i++) {
-                    updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, targetUrl);
-                    totalUpdateCount += updateCount;
-                }
-                LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
-            } else {
-                LOGGER.debug("Script's update count was " + updateCount);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to run data linking post-harvest script '" + title + "': " + e.getMessage(), e);
-            addWarningMessage("Failed to run data linking post-harvest script '" + title + "': " + e.getMessage());
-        }
-    }
-
-    /**
-     *
-     * @param csvReader
-     */
-    private void close(CSVReader csvReader) {
-        if (csvReader != null) {
+    public List<String> getColumnLabels() {
+        if (columnLabels == null) {
             try {
-                csvReader.close();
+                columnLabels = CsvImportHelper.extractColumnLabels(folderUri, relativeFilePath, getUserName(), fileType);
             } catch (Exception e) {
-                // Ignore closing exceptions.
-            }
-        }
-    }
-
-    /**
-     *
-     * @throws DAOException
-     */
-    private void linkFileToFolder() throws DAOException {
-
-        // prepare "folder hasFile file" statement
-        ObjectDTO fileObject = ObjectDTO.createResource(fileUri);
-        // fileObject.setSourceUri(folderUri);
-        String folderContext = FolderUtil.folderContext(folderUri);
-        fileObject.setSourceUri(folderContext);
-        SubjectDTO folderSubject = new SubjectDTO(folderUri, false);
-        folderSubject.addObject(Predicates.CR_HAS_FILE, fileObject);
-
-        logger.debug("Creating the cr:hasFile predicate");
-
-        // persist the prepared "folder hasFile file" statement
-        DAOFactory.get().getDao(HelperDAO.class).addTriples(folderSubject);
-
-        // since folder URI was used above as triple source, add it to HARVEST_SOURCE too
-        // (but set interval minutes to 0, to avoid it being background-harvested)
-        // HarvestSourceDTO folderHarvestSource = HarvestSourceDTO.create(folderUri, false, 0, getUserName());
-        HarvestSourceDTO folderHarvestSource =
-                HarvestSourceDTO.create(folderContext, false, 0, (getUser() != null ? getUserName() : null));
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(folderHarvestSource);
-    }
-
-    /**
-     *
-     * @param fileSize
-     * @throws Exception
-     */
-    private void createFileMetadataAndSource(long fileSize) throws Exception {
-
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, getUserName()));
-
-        String mediaType = fileType.toString();
-        String lastModified = Util.virtuosoDateToString(new Date());
-
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.RDF_TYPE, ObjectDTO.createResource(Subjects.CR_TABLE_FILE));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileName));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(fileSize));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
-    }
-
-    /**
-     * @param guessEncoding
-     * @return
-     * @throws IOException
-     */
-    @Deprecated
-    private CSVReader createCSVReader(boolean guessEncoding) throws IOException {
-
-        CSVReader result = null;
-        // File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
-        File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName())).getFile(relativeFilePath);
-        if (file != null && file.exists()) {
-            if (guessEncoding) {
-                Charset charset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
-                result = new CSVReader(new InputStreamReader(new FileInputStream(file), charset), getDelimiter());
-            } else {
-                result = new CSVReader(new FileReader(file), getDelimiter());
+                LOGGER.error("Exception while reading uploaded file:", e);
+                addWarningMessage(e.toString());
+                return new ArrayList<String>();
             }
         }
 
-        return result;
+        return columnLabels;
     }
 
     /**
@@ -913,38 +467,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public void setObjectsType(String objectType) {
         this.objectsType = objectType;
-    }
-
-    /**
-     * @return
-     * @throws IOException
-     */
-    public List<String> getColumns() throws IOException {
-
-        if (columns == null) {
-            CSVReader csvReader = null;
-            try {
-                csvReader = createCSVReader(false);
-                String[] columnsArray = csvReader.readNext();
-                columns = new ArrayList<String>();
-                if (columnsArray != null && columnsArray.length > 0) {
-                    int emptyColCount = 1;
-                    for (String col : columnsArray) {
-                        if (StringUtils.isEmpty(col)) {
-                            col = CsvImportHelper.EMPTY_COLUMN + emptyColCount++;
-                        }
-                        String colLabel = StringUtils.substringBefore(col, ":").trim();
-                        colLabel = StringUtils.substringBefore(colLabel, "@").trim();
-                        columns.add(colLabel);
-                    }
-                    // columns = Arrays.asList(trimAll(columnsArray));
-                }
-            } finally {
-                close(csvReader);
-            }
-        }
-
-        return columns;
     }
 
     /**
@@ -1002,15 +524,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public void setFolderUri(String uri) {
         this.folderUri = uri;
-    }
-
-    /**
-     *
-     * @return
-     */
-    @Deprecated
-    public char getDelimiter() {
-        return fileType != null && fileType.equals(FileType.TSV) ? '\t' : ',';
     }
 
     /**

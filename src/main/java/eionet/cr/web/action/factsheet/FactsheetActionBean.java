@@ -21,6 +21,7 @@
 package eionet.cr.web.action.factsheet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
+import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -53,6 +55,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
+import eionet.cr.dao.helpers.CsvImportHelper;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dataset.CurrentLoadedDatasets;
@@ -65,10 +68,12 @@ import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.OnDemandHarvester;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.UploadCSVActionBean.FileType;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -144,7 +149,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -187,27 +193,123 @@ public class FactsheetActionBean extends AbstractActionBean {
      * Schedules a harvest for resource.
      *
      * @return view resolution
-     * @throws HarvestException if harvesting fails
-     * @throws DAOException if query fails
+     * @throws HarvestException
+     *             if harvesting fails
+     * @throws DAOException
+     *             if query fails
      */
     public Resolution harvest() throws HarvestException, DAOException {
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
 
-        Pair<Boolean, String> message = harvestNow();
-        if (message.getLeft()) {
-            addWarningMessage(message.getRight());
+        if (isSourceTableFile()) {
+            // Harvest table file
+            try {
+                harvestTableFile();
+                addSystemMessage("Source successfully harvested");
+            } catch (Exception e) {
+                logger.error("Failed to harvest table file", e);
+                addWarningMessage("Failed to harvest table file: " + e.getMessage());
+            }
         } else {
-            addSystemMessage(message.getRight());
+            // Harvest other source
+            Pair<Boolean, String> message = harvestNow();
+            if (message.getLeft()) {
+                addWarningMessage(message.getRight());
+            } else {
+                addSystemMessage(message.getRight());
+            }
+        }
+        return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
+    }
+
+    private boolean isSourceTableFile() {
+        if (subject.getObject(Predicates.RDF_TYPE) != null) {
+            return Subjects.CR_TABLE_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+        }
+        return false;
+    }
+
+    private void harvestTableFile() throws Exception {
+        String labelColumn = getSubjectValue(Predicates.CR_OBJECTS_LABEL_COLUMN);
+        String fileUri = uri;
+        String fileLabel = getSubjectValue(Predicates.RDFS_LABEL);
+        FileType fileType = FileType.valueOf(getSubjectValue(Predicates.CR_MEDIA_TYPE));
+        String objectsType = getSubjectValue(Predicates.CR_OBJECTS_TYPE);
+        String publisher = getSubjectValue(Predicates.DCTERMS_PUBLISHER);
+        String license = getSubjectValue(Predicates.DCTERMS_RIGHTS);
+        String attribution = getSubjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
+        String source = getSubjectValue(Predicates.DCTERMS_SOURCE);
+        long fileSize = Long.parseLong(getSubjectValue(Predicates.CR_BYTE_SIZE));
+
+        List<String> uniqueColumns = new ArrayList<String>();
+        String uniqueColumnsString = getSubjectValue(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
+        if (StringUtils.isNotEmpty(uniqueColumnsString)) {
+            String[] uniqueColumnsArr = subject.getObject(Predicates.CR_OBJECTS_UNIQUE_COLUMN).getValue().split(",");
+            uniqueColumns = Arrays.asList(uniqueColumnsArr);
         }
 
-        return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
+        String folderUri = StringUtils.substringBeforeLast(uri, "/");
+        ;
+        String relativeFilePath = FolderUtil.extractPathInUserHome(fileUri);
+
+        // Clear graph
+        DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri));
+
+        CsvImportHelper helper =
+                new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
+                        attribution, source);
+
+        // Store file as new source, but don't harvest it
+        helper.insertFileMetadataAndSource(fileSize, getUserName());
+
+        // Add metadata about user folder update
+        helper.linkFileToFolder(folderUri, getUserName());
+
+        // Parse and insert triples from file to triplestore
+        CSVReader csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
+
+        try {
+            csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
+            helper.extractObjects(csvReader);
+            helper.saveWizardInputs();
+
+            // Run data linking scripts
+            try {
+                List<String> warnings = helper.runScripts();
+                if (warnings.size() > 0) {
+                    for (String w : warnings) {
+                        addWarningMessage(w);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Failed to run data linking scripts", e);
+                addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            logger.error("Exception while reading uploaded file", e);
+            addWarningMessage("Exception while reading uploaded file: " + e.getMessage());
+        } finally {
+            CsvImportHelper.close(csvReader);
+        }
+
+    }
+
+    private String getSubjectValue(String predicate) {
+        if (subject.getObject(predicate) != null) {
+            return subject.getObject(predicate).getValue();
+        }
+        return null;
     }
 
     /**
      * helper method to eliminate code duplication.
      *
      * @return Pair<Boolean, String> feedback messages
-     * @throws HarvestException if harvesting fails
-     * @throws DAOException if query fails
+     * @throws HarvestException
+     *             if harvesting fails
+     * @throws DAOException
+     *             if query fails
      */
     private Pair<Boolean, String> harvestNow() throws HarvestException, DAOException {
 
@@ -257,7 +359,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails if query fails
+     * @throws DAOException
+     *             if query fails if query fails
      */
     public Resolution edit() throws DAOException {
 
@@ -267,7 +370,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails if query fails
+     * @throws DAOException
+     *             if query fails if query fails
      */
     public Resolution addbookmark() throws DAOException {
         if (isUserLoggedIn()) {
@@ -282,7 +386,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public Resolution removebookmark() throws DAOException {
         if (isUserLoggedIn()) {
@@ -297,7 +402,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails if query fails
+     * @throws DAOException
+     *             if query fails if query fails
      */
     public Resolution save() throws DAOException {
 
@@ -336,7 +442,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public Resolution delete() throws DAOException {
 
@@ -394,7 +501,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param resourceUri the resourceUri to set
+     * @param resourceUri
+     *            the resourceUri to set
      */
     public void setUri(final String resourceUri) {
         this.uri = resourceUri;
@@ -409,7 +517,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /**
      * @return the addibleProperties
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
 
@@ -454,35 +563,40 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param anonymous the anonymous to set
+     * @param anonymous
+     *            the anonymous to set
      */
     public void setAnonymous(final boolean anonymous) {
         this.anonymous = anonymous;
     }
 
     /**
-     * @param subject the subject to set
+     * @param subject
+     *            the subject to set
      */
     public void setSubject(final SubjectDTO subject) {
         this.subject = subject;
     }
 
     /**
-     * @param propertyUri the propertyUri to set
+     * @param propertyUri
+     *            the propertyUri to set
      */
     public void setPropertyUri(final String propertyUri) {
         this.propertyUri = propertyUri;
     }
 
     /**
-     * @param propertyValue the propertyValue to set
+     * @param propertyValue
+     *            the propertyValue to set
      */
     public void setPropertyValue(final String propertyValue) {
         this.propertyValue = propertyValue;
     }
 
     /**
-     * @param rowId the rowId to set
+     * @param rowId
+     *            the rowId to set
      */
     public void setRowId(final List<String> rowId) {
         this.rowId = rowId;
@@ -503,7 +617,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uriHash the uriHash to set
+     * @param uriHash
+     *            the uriHash to set
      */
     public void setUriHash(final long uriHash) {
         this.uriHash = uriHash;
@@ -529,7 +644,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      * Setter of admin logged in property.
      *
-     * @param adminLoggedIn boolean
+     * @param adminLoggedIn
+     *            boolean
      */
     public void setAdminLoggedIn(final boolean adminLoggedIn) {
         this.adminLoggedIn = adminLoggedIn;
@@ -538,7 +654,8 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return boolean
-     * @throws DAOException if query fails if query fails
+     * @throws DAOException
+     *             if query fails if query fails
      */
     public boolean getSubjectIsUserBookmark() throws DAOException {
 
@@ -724,21 +841,24 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param predicateUri the predicateUri to set
+     * @param predicateUri
+     *            the predicateUri to set
      */
     public void setPredicateUri(String predicateUri) {
         this.predicateUri = predicateUri;
     }
 
     /**
-     * @param objectMD5 the objectMD5 to set
+     * @param objectMD5
+     *            the objectMD5 to set
      */
     public void setObjectMD5(String objectMD5) {
         this.objectMD5 = objectMD5;
     }
 
     /**
-     * @param graphUri the graphUri to set
+     * @param graphUri
+     *            the graphUri to set
      */
     public void setGraphUri(String graphUri) {
         this.graphUri = graphUri;

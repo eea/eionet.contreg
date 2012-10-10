@@ -124,7 +124,7 @@
                                     <td>
                                         <stripes:select name="labelColumn" id="labelSelect" value="${actionBean.labelColumn}" style="width: 230px;">
                                             <stripes:option value="" label="No label" />
-                                            <c:forEach var="col" items="${actionBean.columns}">
+                                            <c:forEach var="col" items="${actionBean.columnLabels}">
                                                 <stripes:option value="${col}" label="${col}" />
                                             </c:forEach>
                                         </stripes:select>
@@ -134,7 +134,7 @@
                                     <td valign="top"><label class="question required" for="uniqueColumnsSelect" title="Column(s) constituting a unique key.">Column(s) constituting a unique key</label></td>
                                     <td>
                                         <stripes:select name="uniqueColumns" id="uniqueColumnsSelect" value="${actionBean.uniqueColumns}" multiple="true" size="6" style="min-width: 230px;">
-                                            <c:forEach var="col" items="${actionBean.columns}">
+                                            <c:forEach var="col" items="${actionBean.columnLabels}">
                                                 <stripes:option value="${col}" label="${col}" />
                                             </c:forEach>
                                         </stripes:select>
@@ -185,7 +185,7 @@
                                         <td><label class="question required" for="linkedColumnSelect${loop.index}" title="Column to link data with.">Column</label></td>
                                         <td>
                                             <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="width: 230px;">
-                                                <stripes:options-collection collection="${actionBean.columns}" />
+                                                <stripes:options-collection collection="${actionBean.columnLabels}" />
                                             </stripes:select>
                                         </td>
                                      </tr>
@@ -200,7 +200,7 @@
                                     </c:forEach>
                                     <tr>
                                         <td colspan="2">
-                                            <stripes:submit name="addScript" value="Add new script"/>
+                                            <stripes:submit name="addScript" value="Add another script"/>
                                             <c:if test="${actionBean.removeScriptsAvailable}">
                                                 <stripes:submit name="removeScript" value="Remove last script"/>
                                             </c:if>
