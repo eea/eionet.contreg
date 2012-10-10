@@ -207,7 +207,7 @@
     </toc:downloadLink>
   </xsl:template>
 
-  <xsl:template match="nt:metadata">
+  <xsl:template match="nt:metadata[@format='html']">
     <xsl:if test="normalize-space(.) != ''">
       <toc:metadata>
         <dctype:Text>
