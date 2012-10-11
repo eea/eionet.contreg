@@ -131,7 +131,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top"><label class="question required" for="uniqueColumnsSelect" title="Column(s) constituting a unique key.">Column(s) constituting a unique key</label></td>
+                                    <td valign="top"><label class="question" for="uniqueColumnsSelect" title="Column(s) constituting a unique key.">Column(s) constituting a unique key</label></td>
                                     <td>
                                         <stripes:select name="uniqueColumns" id="uniqueColumnsSelect" value="${actionBean.uniqueColumns}" multiple="true" size="6" style="min-width: 230px;">
                                             <c:forEach var="col" items="${actionBean.columnLabels}">

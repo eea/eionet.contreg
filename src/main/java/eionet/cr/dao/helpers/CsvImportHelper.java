@@ -27,11 +27,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -112,6 +112,12 @@ public class CsvImportHelper {
     /** Source of the uploaded material. */
     private String source;
 
+    /** Incremented id for a row, in case unique columns are not specified. */
+    private int idCounter;
+
+    /** Id formatter. */
+    private DecimalFormat idFormatter;
+
     /**
      * Class constructor.
      *
@@ -128,6 +134,11 @@ public class CsvImportHelper {
      */
     public CsvImportHelper(String labelColumn, List<String> uniqueColumns, String fileUri, String fileLabel, FileType fileType,
             String objectsType, String publisher, String license, String attribution, String source) {
+
+        if (uniqueColumns == null) {
+            uniqueColumns = new ArrayList<String>();
+        }
+
         this.labelColumn = labelColumn;
         this.uniqueColumns = uniqueColumns;
         this.fileUri = fileUri;
@@ -138,6 +149,7 @@ public class CsvImportHelper {
         this.license = license;
         this.attribution = attribution;
         this.source = source;
+        idFormatter = new DecimalFormat("000000");
     }
 
     /**
@@ -566,6 +578,7 @@ public class CsvImportHelper {
     private String extractObjectId(String[] line) {
 
         StringBuilder buf = new StringBuilder();
+        String result = null;
         if (uniqueColumns != null && !uniqueColumns.isEmpty()) {
 
             for (String uniqueCol : uniqueColumns) {
@@ -577,9 +590,12 @@ public class CsvImportHelper {
                     buf.append(line[colIndex]);
                 }
             }
+            result = buf.toString();
+        } else {
+            result = idFormatter.format(++idCounter);
         }
 
-        return buf.length() == 0 ? UUID.randomUUID().toString() : buf.toString();
+        return result;
     }
 
     /**

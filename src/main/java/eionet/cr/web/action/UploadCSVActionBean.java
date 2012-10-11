@@ -336,10 +336,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 addGlobalValidationError("Could not find stored file!");
             }
 
-            if (uniqueColumns == null || uniqueColumns.size() == 0) {
-                addGlobalValidationError("No unique column selected!");
-            }
-
             if (StringUtils.isBlank(objectsType)) {
                 addGlobalValidationError("No object type specified!");
             }
