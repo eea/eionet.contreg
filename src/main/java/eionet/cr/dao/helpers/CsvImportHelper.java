@@ -275,9 +275,22 @@ public class CsvImportHelper {
         String objectsTypeUri = fileUri + "/" + objectsType;
         HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
 
-        while ((line = csvReader.readNext()) != null) {
-            SubjectDTO subject = extractObject(line, objectsTypeUri);
-            helperDao.addTriples(subject);
+        RepositoryConnection conn = SesameUtil.getRepositoryConnection();
+        conn.setAutoCommit(false);
+        try {
+            while ((line = csvReader.readNext()) != null) {
+                SubjectDTO subject = extractObject(line, objectsTypeUri);
+                helperDao.addTriples(conn, subject);
+            }
+            conn.commit();
+        } catch (DAOException e) {
+            SesameUtil.rollback(conn);
+            throw e;
+        } catch (RepositoryException e) {
+            SesameUtil.rollback(conn);
+            throw e;
+        } finally {
+            SesameUtil.close(conn);
         }
 
         // Construct a SPARQL query and store it as a property
