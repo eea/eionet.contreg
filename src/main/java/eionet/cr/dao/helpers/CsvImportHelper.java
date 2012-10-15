@@ -300,7 +300,7 @@ public class CsvImportHelper {
         for (String column : columnLabels) {
             column = column.replace(" ", "_");
             String columnUri = "tableFile:" + column;
-            query.append(" ?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append(" . \n");
+            query.append(" OPTIONAL {?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append("} . \n");
         }
         query.append("}");
 
