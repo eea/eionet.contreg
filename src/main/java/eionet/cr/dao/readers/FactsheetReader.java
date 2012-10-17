@@ -76,7 +76,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         String predicateUri = getStringValue(bindingSet, "pred");
         factsheetDTO.setObjectCount(predicateUri, Integer.parseInt(getStringValue(bindingSet, "objCount")));
 
-        ObjectDTO objectDTO = parseObjectData(getStringValue(bindingSet, "objData"));
+        ObjectDTO objectDTO = parseObjectData(getStringValue(bindingSet, "objData"), predicateUri);
         if (objectDTO != null) {
             factsheetDTO.addObject(predicateUri, objectDTO);
         }
@@ -87,7 +87,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
      * @param objectData
      * @return
      */
-    private ObjectDTO parseObjectData(String objectData) {
+    private ObjectDTO parseObjectData(String objectData, String predUri) {
 
         if (StringUtils.isBlank(objectData)) {
             return null;
@@ -95,7 +95,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
 
         String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(objectData, OBJECT_DATA_SPLITTER);
         if (split == null || split.length > 8) {
-            throw new CRRuntimeException("Was expecting a length >=8 for the split array");
+            throw new CRRuntimeException("Was expecting a length <=8 for the split array");
         }
 
         String label = StringUtils.isBlank(split[0]) ? "" : split[0].trim();
@@ -105,10 +105,10 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
 
         boolean isLiteral = objectUri == null;
         boolean isAnonymous =
-            StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1") || split[4].trim().equals("true");
+                StringUtils.isBlank(split[4]) ? false : split[4].trim().equals("1") || split[4].trim().equals("true");
         String graphUri = StringUtils.isBlank(split[5]) ? null : split[5].trim();
         int objectLength = StringUtils.isBlank(split[6]) ? 0 : Integer.parseInt(split[6].trim());
-        String objectMD5 = StringUtils.isBlank(split[7]) ? "" : split[6].trim();
+        String objectMD5 = StringUtils.isBlank(split[7]) ? "" : split[7].trim();
 
         ObjectDTO objectDTO = null;
         if (isLiteral) {
@@ -130,6 +130,9 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         // characters that we got here.
         if (isLiteral) {
             String value = objectDTO.getValue();
+            if (subjectUri.equals("http://dbpedia.org/resource/Estonia") && predUri.equals("http://dbpedia.org/ontology/abstract")){
+                System.out.println(">>> " + language + ", " + objectMD5);
+            }
             if (objectLength > WebConstants.MAX_OBJECT_LENGTH && !DigestUtils.md5Hex(value).equalsIgnoreCase(objectMD5)) {
                 objectDTO.setObjectMD5(objectMD5);
                 LOGGER.trace("Object's database-calculated length is " + objectLength);
