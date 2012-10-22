@@ -89,7 +89,7 @@ public class TableFileActionBean extends AbstractActionBean {
         TupleQueryResult result = null;
         RepositoryConnection con = null;
         try {
-            con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+            con = SesameConnectionProvider.getRepositoryConnection();
             Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, spqrqlQuery);
             result = ((TupleQuery) queryObject).evaluate();
 

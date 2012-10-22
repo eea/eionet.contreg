@@ -222,27 +222,32 @@ public class UploadCSVActionBean extends AbstractActionBean {
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();
 
+            // Save data-linking scripts, if any added.
             if (addDataLinkingScripts) {
-                // Sava data linking scripts
                 try {
+                    LOGGER.debug("Saving data-linking scripts for " + fileUri);
                     helper.saveDataLinkingScripts(dataLinkingScripts);
                 } catch (DAOException e) {
                     LOGGER.error("Failed to add data linking script", e);
                     addWarningMessage("Failed to add data linking script: " + e.getMessage());
                 }
-                // Run data linking scripts
-                try {
-                    List<String> warnings = helper.runScripts();
-                    if (warnings.size() > 0) {
-                        for (String w : warnings) {
-                            addWarningMessage(w);
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Failed to run data linking scripts", e);
-                    addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
-                }
             }
+
+            // Run all post-harvest scripts specific to this source (i.e. the uploaded file).
+            // This will run both the data data-linking scripts saved in the previous block, plus any that existed already.
+            try {
+                LOGGER.debug("Running all source-specific post-harvest scripts of " + fileUri);
+                List<String> warnings = helper.runScripts();
+                if (warnings.size() > 0) {
+                    for (String w : warnings) {
+                        addWarningMessage(w);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Failed to run data linking scripts", e);
+                addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
+            }
+
         } catch (Exception e) {
             LOGGER.error("Exception while reading uploaded file:", e);
             addWarningMessage(e.toString());
