@@ -174,7 +174,7 @@
                                     <div class="csvWizardDesc">
                                         <h2>How link-scripts work</h2>
                                         <ul>
-                                            <li>Choose the link-script and the column name.</li>
+                                            <li>Choose the link-script and the column name for which you want to create links.</li>
                                             <li>The link-script is added as a post-harvest script and executed.</li>
                                             <li>It is possible to re-run the scripts when executing the "Harvest" button on the facthseet page</li>
                                         </ul>

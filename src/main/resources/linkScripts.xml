@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="countryCodeMatchingScript.name">
+        Match country codes or names with the EEA contries vocabulary
+    </entry>
+    <entry key="countryCodeMatchingScript.script">
+<![CDATA[
+PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+INSERT INTO ?harvestedSource
+{ ?rowuri eea:forCountry ?countryuri }
+FROM ?harvestedSource
+FROM <http://rdfdata.eionet.europa.eu/eea/countries.rdf>
+
+WHERE {
+  GRAPH ?harvestedSource {
+    ?rowuri [TABLECOLUMN] ?value
+  }
+  GRAPH <http://rdfdata.eionet.europa.eu/eea/countries.rdf> {
+    {
+     ?countryuri skos:notation ?label
+    } UNION {
+     ?countryuri skos:prefLabel ?label
+    } UNION {
+     ?countryuri skos:altLabel ?label
+    } UNION {
+     ?countryuri skos:hiddenLabel ?label
+    }
+  }
+  FILTER (LANG(?label) IN ("","en") && bif:lower(?label) = bif:lower(?value))
+}
+]]>
+    </entry>
+    <entry key="testScript.name">
+        Test script
+    </entry>
+    <entry key="testScript.script">
+    </entry>
+</properties>

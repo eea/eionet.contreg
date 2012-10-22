@@ -21,7 +21,6 @@
 
 package eionet.cr.filestore;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.ScriptTemplateDAO;
 import eionet.cr.dto.ScriptTemplateDTO;
 
@@ -42,20 +40,23 @@ import eionet.cr.dto.ScriptTemplateDTO;
  */
 public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
 
-    private static final String PROPERTIES_FILE = "scripts.properties";
-
     /** Logger. */
     private static final Logger LOGGER = Logger.getLogger(ScriptTemplateDaoImpl.class);
 
-    private Properties properties;
+    /** */
+    private static final String PROPERTIES_FILE_NAME = "linkScripts.xml";
 
-    public ScriptTemplateDaoImpl() {
-        properties = new Properties();
+    /** */
+    private static final Properties PROPERTIES = new Properties();
 
+    /**
+     *
+     */
+    static{
         try {
-            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE));
-        } catch (IOException e) {
-            LOGGER.error("Failed to load properties from " + PROPERTIES_FILE, e);
+            PROPERTIES.loadFromXML(ScriptTemplateDaoImpl.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+        } catch (Exception e) {
+            LOGGER.error("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
         }
     }
 
@@ -64,8 +65,9 @@ public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
      */
     @Override
     public List<ScriptTemplateDTO> getScriptTemplates() {
+
         Map<String, ScriptTemplateDTO> scripts = new HashMap<String, ScriptTemplateDTO>();
-        for (Object key : properties.keySet()) {
+        for (Object key : PROPERTIES.keySet()) {
             String id = StringUtils.substringBefore((String) key, ".");
             String property = StringUtils.substringAfterLast((String) key, ".");
 
@@ -77,11 +79,11 @@ public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
             }
 
             if (property.equals("name")) {
-                script.setName(properties.getProperty((String) key));
+                script.setName(PROPERTIES.getProperty((String) key).trim());
             }
 
             if (property.equals("script")) {
-                script.setScript(properties.getProperty((String) key));
+                script.setScript(PROPERTIES.getProperty((String) key).trim());
             }
 
         }
@@ -96,17 +98,17 @@ public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
     public ScriptTemplateDTO getScriptTemplate(String id) {
         ScriptTemplateDTO result = new ScriptTemplateDTO();
         result.setId(id);
-        for (Object key : properties.keySet()) {
+        for (Object key : PROPERTIES.keySet()) {
             String currentId = StringUtils.substringBefore((String) key, ".");
             String property = StringUtils.substringAfterLast((String) key, ".");
 
             if (currentId.equals(id)) {
                 if (property.equals("name")) {
-                    result.setName(properties.getProperty((String) key));
+                    result.setName(PROPERTIES.getProperty((String) key).trim());
                 }
 
                 if (property.equals("script")) {
-                    result.setScript(properties.getProperty((String) key));
+                    result.setScript(PROPERTIES.getProperty((String) key).trim());
                 }
             }
         }
