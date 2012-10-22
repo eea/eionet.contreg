@@ -143,8 +143,6 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         getSession().setAttribute(SELECTED_TAGS_CACHE, selectedTags);
 
-        logger.debug("Query: " + searchResult.getQuery());
-
         return new ForwardResolution(TAG_SEARCH_PATH).addParameter("searchTag", "");
     }
 

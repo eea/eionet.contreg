@@ -12,6 +12,9 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.displaytag.properties.SortOrderEnum;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Value;
+import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
@@ -22,6 +25,7 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.QueryHelper;
 import eionet.cr.dao.readers.DeliverySearchReader;
 import eionet.cr.dao.readers.FreeTextSearchReader;
+import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -32,6 +36,7 @@ import eionet.cr.dao.virtuoso.helpers.VirtuosoReferencesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoSearchBySourceHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoTagSearchHelper;
 import eionet.cr.dto.DeliveryDTO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
@@ -40,6 +45,7 @@ import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
 import eionet.cr.web.util.CustomPaginatedList;
@@ -57,9 +63,11 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression,
      *      eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest)
-     * @param exactMatch indicates if only exact amtch of String is searched
+     * @param exactMatch
+     *            indicates if only exact amtch of String is searched
      * @return
-     * @throws DAOException if query fails.
+     * @throws DAOException
+     *             if query fails.
      */
     @Override
     public SearchResultDTO<SubjectDTO> searchByFreeText(final SearchExpression expression, final FilterType filterType,
@@ -440,15 +448,20 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      *
      * @see eionet.cr.dao.SearchDAO#searchByTags(java.util.List, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest, java.util.List)
-     * @param tags List<String> - tag names
-     * @param selectedPredicates List<String> - predicates to be shown
-     * @param pagingRequest sortingRequest PagingRequest
-     * @param sortingRequest pagingRequest SortingRequest
+     * @param tags
+     *            List<String> - tag names
+     * @param selectedPredicates
+     *            List<String> - predicates to be shown
+     * @param pagingRequest
+     *            sortingRequest PagingRequest
+     * @param sortingRequest
+     *            pagingRequest SortingRequest
      * @return Pair <Integer, List<SubjectDTO>>
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
-    @Override
-    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
+    @Deprecated
+    public SearchResultDTO<SubjectDTO> searchByTagsOld(final List<String> tags, final PagingRequest pagingRequest,
             final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
@@ -501,9 +514,175 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     }
 
     /**
+     * Search by tags implementation in Virtuoso.
+     *
+     * @param tags
+     *            List<String> - tag names
+     * @param selectedPredicates
+     *            List<String> - predicates to be shown
+     * @param pagingRequest
+     *            sortingRequest PagingRequest
+     * @param sortingRequest
+     *            pagingRequest SortingRequest
+     *
+     * @return search result
+     * @throws DAOException
+     *             if query fails
+     */
+    @Override
+    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
+            final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
+        SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
+
+        Map<String, String> sortingMap = new HashMap<String, String>();
+        sortingMap.put(Predicates.CR_TAG, "tag");
+        sortingMap.put(Predicates.RDFS_LABEL, "label");
+        sortingMap.put(Predicates.RDF_TYPE, "type");
+
+        Bindings bindings = new Bindings();
+        String tagPredicate = "tagPredicate";
+        bindings.setURI(tagPredicate, Predicates.CR_TAG);
+
+        StringBuilder query = new StringBuilder();
+        query.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>");
+        query.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>");
+        query.append("SELECT ?bookmark ?label ?tags ?types WHERE { ");
+        for (int i = 0; i < tags.size(); i++) {
+            String tagLiteral = "tagLiteral" + i;
+            bindings.setString(tagLiteral, tags.get(i));
+
+            query.append("?bookmark ");
+            query.append("?" + tagPredicate);
+            query.append(" ?" + tagLiteral + " .");
+        }
+        query.append("{");
+        query.append(" SELECT ?bookmark (sql:group_concat(?tag,', ') AS ?tags)");
+        query.append(" WHERE { {SELECT DISTINCT ?bookmark ?tag { ?bookmark cr:tag ?tag. } }} GROUP BY ?bookmark");
+        query.append("} ");
+        query.append("OPTIONAL {");
+        query.append(" {");
+        query.append("  SELECT ?bookmark (sql:group_concat(?type,', ') AS ?types)");
+        query.append("  WHERE { {SELECT DISTINCT ?bookmark (STR(?type) AS ?type) { ?bookmark a ?type.} }");
+        query.append("  } GROUP BY ?bookmark");
+        query.append(" }");
+        query.append("}");
+        query.append("OPTIONAL {");
+        query.append(" {");
+        query.append("  SELECT ?bookmark (sql:sample(?label) AS ?label)");
+        query.append("  WHERE {?bookmark rdfs:label ?label.}");
+        query.append(" }");
+        query.append("}");
+        query.append("} GROUP BY ?bookmark ");
+
+        if (sortingRequest != null) {
+            if (StringUtils.isNotEmpty(sortingRequest.getSortingColumnName())) {
+                if (StringUtils.isNotEmpty(sortingMap.get(sortingRequest.getSortingColumnName()))) {
+                    query.append("ORDER BY " + sortingRequest.getSortOrder() + "(?"
+                            + sortingMap.get(sortingRequest.getSortingColumnName()) + ")");
+                }
+            }
+        }
+
+        if (pagingRequest != null) {
+            query.append(" LIMIT ").append(pagingRequest.getItemsPerPage()).append(" OFFSET ").append(pagingRequest.getOffset());
+        }
+
+        List<SubjectDTO> resultList = executeSPARQL(query.toString(), bindings, new SPARQLResultSetReader<SubjectDTO>() {
+            private List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+
+            @Override
+            public List<SubjectDTO> getResultList() {
+                return subjects;
+            }
+
+            @Override
+            public void endResultSet() {
+            }
+
+            @Override
+            public void startResultSet(List<String> bindingNames) {
+            }
+
+            @Override
+            public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+
+                Value subjectValue = bindingSet.getValue("bookmark");
+                String subjectUri = subjectValue.stringValue();
+
+                Value labelValue = bindingSet.getValue("label");
+                String label = null;
+                if (labelValue != null) {
+                    label = labelValue.stringValue();
+                }
+
+                Value tagsValue = bindingSet.getValue("tags");
+                String tags = tagsValue.stringValue();
+
+                Value typesValue = bindingSet.getValue("types");
+                String types = null;
+                if (typesValue != null) {
+                    types = typesValue.stringValue();
+                }
+
+                boolean anonymousSubject = subjectValue instanceof BNode;
+                if (anonymousSubject) {
+                    subjectUri = BNODE_URI_PREFIX + subjectUri;
+                }
+
+                SubjectDTO subject = new SubjectDTO(subjectUri, anonymousSubject);
+
+                if (StringUtils.isNotEmpty(label)) {
+                    ObjectDTO labelObject = new ObjectDTO(label, true);
+                    subject.addObject(Predicates.RDFS_LABEL, labelObject);
+                }
+
+                String[] tagsArr = tags.split(",");
+                for (String tag : tagsArr) {
+                    ObjectDTO tagsObject = new ObjectDTO(tag.trim(), true);
+                    subject.addObject(Predicates.CR_TAG, tagsObject);
+                }
+
+                if (StringUtils.isNotEmpty(types)) {
+                    String[] typesArr = types.split(",");
+                    for (String type : typesArr) {
+                        ObjectDTO typeUri = new ObjectDTO(type.trim(), false);
+                        subject.addObject(Predicates.RDF_TYPE, typeUri);
+                    }
+                }
+
+                subjects.add(subject);
+            }
+
+        });
+
+        if (pagingRequest != null) {
+            StringBuilder countQuery = new StringBuilder();
+            countQuery.append("SELECT COUNT(DISTINCT ?s) WHERE {");
+            for (int i = 0; i < tags.size(); i++) {
+                String tagLiteral = "tagLiteral" + i;
+                bindings.setString(tagLiteral, tags.get(i));
+
+                countQuery.append("?s ");
+                countQuery.append("?" + tagPredicate);
+                countQuery.append(" ?" + tagLiteral + " .");
+            }
+            countQuery.append("}");
+
+            String total = executeUniqueResultSPARQL(countQuery.toString(), bindings, new SingleObjectReader<String>());
+            result.setMatchCount(Integer.parseInt(total));
+        }
+
+        result.setItems(resultList);
+        result.setQuery(QueryHelper.getFormatedQuery(query.toString(), bindings));
+
+        return result;
+    }
+
+    /**
      * Helper method to convert array of tag to a map required by search method.
      *
-     * @param tags List<String> tag names
+     * @param tags
+     *            List<String> tag names
      * @return Map<String, String> in format [tag predicate: tag name]
      */
     private Map<String, String> buildTagsInputParameter(final List<String> tags) {

@@ -82,16 +82,42 @@ public final class QueryHelper {
         query = StringUtils.replace(query, WHERE.toLowerCase(), WHERE);
         query = StringUtils.replace(query, FROM.toLowerCase(), FROM);
 
-        query = StringUtils.replace(query, " " + PREFIX, "\n" + PREFIX);
-        query = StringUtils.replace(query, " " + SELECT, "\n" + SELECT);
-        query = StringUtils.replace(query, " " + WHERE, "\n" + WHERE);
-        query = StringUtils.replace(query, " " + FROM, "\n" + FROM);
+        query = StringUtils.replace(query, PREFIX, "\n" + PREFIX);
+        query = StringUtils.replace(query, SELECT, "\n" + SELECT);
+        query = StringUtils.replace(query, WHERE, "\n" + WHERE);
+        query = StringUtils.replace(query, FROM, "\n" + FROM);
 
         query = StringUtils.replace(query, "{", "{\n ");
         query = StringUtils.replace(query, "}", "\n}");
         query = StringUtils.replace(query, " .", ".\n");
 
-        return query.trim();
+        String lines[] = query.split("\n");
+        StringBuilder result = new StringBuilder();
+        int spaces = 0;
+        for (String line : lines) {
+            line = line.trim();
+            if (StringUtils.isNotEmpty(line)) {
+                result.append(StringUtils.leftPad(line, spaces + line.length()));
+                result.append("\n");
+                spaces = countSpaces(spaces, line);
+            }
+        }
+        return result.toString();
+    }
+
+    private static int countSpaces(int spaces, String line) {
+        int result = 0;
+
+        int begin = StringUtils.countMatches(line, "{");
+        int end = StringUtils.countMatches(line, "}");
+
+        result = spaces + begin - end;
+
+        if (result < 0) {
+            return 0;
+        } else {
+            return result;
+        }
     }
 
 }
