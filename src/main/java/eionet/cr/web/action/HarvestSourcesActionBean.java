@@ -59,6 +59,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /** */
     private static final String UNAVAILABLE_TYPE = "unavail";
+    private static final String UNAUHTORIZED_HARVESTS = "unauth";
     private static final String PRIORITY = "priority";
     private static final String FAILED_HARVESTS = "failed";
     private static final String SCHEMAS = "schemas";
@@ -98,7 +99,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         SOURCE_TYPES.add(new Pair<String, String>(PRIORITY, "Priority"));
         SOURCE_TYPES.add(new Pair<String, String>(SCHEMAS, "Schemas"));
         SOURCE_TYPES.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
-        SOURCE_TYPES.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Unavaliable"));
+        SOURCE_TYPES.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Permanent failures"));
+        SOURCE_TYPES.add(new Pair<String, String>(UNAUHTORIZED_HARVESTS, "Unauthorized"));
 
         // initialize column objects that will be used as columns in the harvest sources page
 
@@ -145,6 +147,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                                 sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
                 pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
+            } else if (UNAUHTORIZED_HARVESTS.equals(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
             } else if (SCHEMAS.equals(type)) {
                 // Get comma separated sources that are included into
                 // inferencing ruleset

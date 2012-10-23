@@ -520,11 +520,13 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void updateHarvestSourceFinished() throws DAOException {
         LOGGER.debug(loggerMsg("Updating harvest source record"));
+        getContextSourceDTO().setLastHarvestId(harvestId);
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         //update redirected sources
         for (HarvestSourceDTO dto : redirectedHarvestSources) {
             LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
+            dto.setLastHarvestId(harvestId);
             getHarvestSourceDAO().updateSourceHarvestFinished(dto);
         }
     }

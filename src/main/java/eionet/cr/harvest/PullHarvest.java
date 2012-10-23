@@ -543,6 +543,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvest(redirectionSeen);
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setStatements(0);
+        getContextSourceDTO().setLastHarvestId(getHarvestId());
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update current harvest to finished, set its count of harvested triples to 0

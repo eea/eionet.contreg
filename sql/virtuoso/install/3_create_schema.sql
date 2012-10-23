@@ -39,6 +39,7 @@ create table CR.cr3user.harvest_source (
     url varchar(1024) NOT NULL,
     emails varchar(255) DEFAULT NULL,
     time_created datetime NOT NULL,
+    last_harvest_id integer,
     statements integer,
     count_unavail integer NOT NULL DEFAULT 0,
     last_harvest datetime,
