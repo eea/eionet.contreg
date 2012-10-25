@@ -535,9 +535,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
         Map<String, String> sortingMap = new HashMap<String, String>();
-        sortingMap.put(Predicates.CR_TAG, "tag");
-        sortingMap.put(Predicates.RDFS_LABEL, "label");
-        sortingMap.put(Predicates.RDF_TYPE, "type");
+        sortingMap.put(Predicates.CR_TAG, "tags");
+        sortingMap.put(Predicates.RDFS_LABEL, "oneLabel");
+        sortingMap.put(Predicates.RDF_TYPE, "sortTypes");
 
         Bindings bindings = new Bindings();
         String tagPredicate = "tagPredicate";
@@ -546,7 +546,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         StringBuilder query = new StringBuilder();
         query.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>");
         query.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>");
-        query.append("SELECT ?bookmark ?label ?tags ?types WHERE { ");
+        query.append("SELECT ?bookmark ?oneLabel ?tags ?types ?sortTypes WHERE { ");
         for (int i = 0; i < tags.size(); i++) {
             String tagLiteral = "tagLiteral" + i;
             bindings.setString(tagLiteral, tags.get(i));
@@ -562,13 +562,14 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         query.append("OPTIONAL {");
         query.append(" {");
         query.append("  SELECT ?bookmark (sql:group_concat(?type,', ') AS ?types)");
+        query.append("  sql:group_concat(bif:substring(?type, bif:strrchr(bif:replace(?type, '/', '#'), '#')+2, 5),', ') AS ?sortTypes");
         query.append("  WHERE { {SELECT DISTINCT ?bookmark (STR(?type) AS ?type) { ?bookmark a ?type.} }");
         query.append("  } GROUP BY ?bookmark");
         query.append(" }");
         query.append("}");
         query.append("OPTIONAL {");
         query.append(" {");
-        query.append("  SELECT ?bookmark (sql:sample(?label) AS ?label)");
+        query.append("  SELECT ?bookmark (bif:min(?label) AS ?oneLabel)");
         query.append("  WHERE {?bookmark rdfs:label ?label.}");
         query.append(" }");
         query.append("}");
@@ -609,7 +610,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
                 Value subjectValue = bindingSet.getValue("bookmark");
                 String subjectUri = subjectValue.stringValue();
 
-                Value labelValue = bindingSet.getValue("label");
+                Value labelValue = bindingSet.getValue("oneLabel");
                 String label = null;
                 if (labelValue != null) {
                     label = labelValue.stringValue();
