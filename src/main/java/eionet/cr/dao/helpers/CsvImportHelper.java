@@ -382,9 +382,9 @@ public class CsvImportHelper {
 
             int existingScriptId = isUniqueScript(scripts, fileUri, scriptTemplate.getName());
             if (existingScriptId == 0) {
-                dao.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplate.getName(), script, true, false);
+                dao.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplate.getName(), script, true, true);
             } else {
-                dao.save(existingScriptId, scriptTemplate.getName(), script, true, false);
+                dao.save(existingScriptId, scriptTemplate.getName(), script, true, true);
             }
         }
     }
