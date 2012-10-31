@@ -150,8 +150,10 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
         }
 
+        String associatedType = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
+
         try {
-            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, harvestedSource);
+            executedTestQuery = PostHarvestScriptParser.deriveConstruct(script, harvestedSource, associatedType);
         } catch (ScriptParseException e) {
             addWarningMessage(e.toString());
         }
@@ -161,7 +163,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults =
                     DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                    .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }

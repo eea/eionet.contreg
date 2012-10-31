@@ -94,8 +94,8 @@ public final class PostHarvestScriptParser {
         if (containsToken(result, "WHERE")) {
             if (!containsToken(result, "FROM")) {
                 result =
-                    substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
-                    + substringAfterToken(result, "WHERE");
+                        substringBeforeToken(result, "WHERE") + "FROM <" + graphUri + "> WHERE"
+                                + substringAfterToken(result, "WHERE");
             }
         } else {
             result = result + " FROM <" + graphUri + "> WHERE {?s ?p ?o}";
@@ -122,10 +122,11 @@ public final class PostHarvestScriptParser {
      *
      * @param script
      * @param harvestedSource
+     * @param associatedType
      * @return
      * @throws ScriptParseException
      */
-    public static String deriveConstruct(String script, String harvestedSource) throws ScriptParseException {
+    public static String deriveConstruct(String script, String harvestedSource, String associatedType) throws ScriptParseException {
 
         if (script == null || StringUtils.isBlank(script)) {
             return script;
@@ -144,76 +145,11 @@ public final class PostHarvestScriptParser {
             result = replaceToken(result, "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
         }
 
+        if (result != null && !StringUtils.isBlank(associatedType)) {
+            result = replaceToken(result, "?" + ASSOCIATED_TYPE_VARIABLE, "<" + associatedType + ">");
+        }
+
         return result == null ? null : result.trim();
-    }
-
-    /**
-     * @param script
-     * @param harvestedSource
-     * @return
-     * @throws ScriptParseException
-     */
-    private static String deriveConstructFromModifyOLD(String script, String harvestedSource) throws ScriptParseException {
-
-        String datasetClause = null;
-        String deleteTemplate = null;
-        String insertTemplate = null;
-        String wherePattern = null;
-
-        if (!containsToken(script, "DELETE")) {
-            throw new ScriptParseException("Expecting MODIFY statement to contain DELETE!");
-        } else if (!containsToken(substringAfterToken(script, "DELETE"), "INSERT")) {
-            throw new ScriptParseException("Expecting MODIFY statement to contain DELETE and INSERT!");
-        }
-
-        datasetClause = substringBetweenTokens(script, "MODIFY", "DELETE");
-        deleteTemplate = substringBetweenTokens(script, "DELETE", "INSERT");
-
-        String afterInsert = substringAfterToken(script, "INSERT");
-        if (containsToken(afterInsert, "WHERE")) {
-            insertTemplate = substringBetweenTokens(script, "INSERT", "WHERE");
-            wherePattern = substringAfterToken(afterInsert, "WHERE");
-            if (StringUtils.isBlank(wherePattern) || !wherePattern.trim().startsWith("{")) {
-                throw new ScriptParseException("Could not detect WHERE pattern!");
-            }
-        } else {
-            insertTemplate = afterInsert;
-        }
-
-        String deleteTemplTrimd = deleteTemplate == null ? null : deleteTemplate.trim();
-        if (StringUtils.isEmpty(deleteTemplTrimd) || !(deleteTemplTrimd.startsWith("{") && deleteTemplTrimd.endsWith("}"))) {
-            throw new ScriptParseException("Could not detect DELETE template!");
-        }
-
-        String insertTemplTrimd = insertTemplate == null ? null : insertTemplate.trim();
-        if (StringUtils.isEmpty(insertTemplTrimd) || !(insertTemplTrimd.startsWith("{") && insertTemplTrimd.endsWith("}"))) {
-            throw new ScriptParseException("Could not detect INSERT template!");
-        }
-
-        String result = substringBeforeToken(script, "MODIFY");
-        result += "CONSTRUCT";
-        result += insertTemplate;
-        if (!Character.isWhitespace(result.charAt(result.length() - 1))) {
-            result += " ";
-        }
-
-        if (!StringUtils.isBlank(datasetClause)) {
-            String[] graphs = StringUtils.split(datasetClause);
-            for (int i = 0; i < graphs.length; i++) {
-                String graph = StringUtils.replace(graphs[i], "?" + HARVESTED_SOURCE_VARIABLE, "<" + harvestedSource + ">");
-                result += "FROM " + graph + " ";
-            }
-        }
-
-        if (!StringUtils.isBlank(wherePattern)) {
-            result += "WHERE" + wherePattern;
-        } else {
-            result += "WHERE {?s ?p ?o}";
-        }
-        result = result.trim();
-        result += " LIMIT " + TEST_RESULTS_LIMIT;
-
-        return result;
     }
 
     /**
