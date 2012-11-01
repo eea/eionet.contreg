@@ -2,6 +2,21 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 
+    <entry key="addLabel.name">Add label from column</entry>
+    <entry key="addLabel.script">
+<![CDATA[
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+INSERT INTO ?harvestedSource {
+    ?rowuri rdfs:label ?label
+}
+FROM ?harvestedSource
+WHERE {
+    ?rowuri [TABLECOLUMN] ?label
+}
+]]></entry>
+
+
     <entry key="countryCodeMatching.name">Match country codes with the EEA contries vocabulary (fast)</entry>
     <entry key="countryCodeMatching.script">
 <![CDATA[
@@ -9,11 +24,9 @@ PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-INSERT INTO ?harvestedSource
-{ ?rowuri eea:forCountry ?countryuri }
-FROM ?harvestedSource
-FROM <http://rdfdata.eionet.europa.eu/eea/countries.rdf>
-
+INSERT INTO ?harvestedSource {
+    ?rowuri eea:forCountry ?countryuri
+}
 WHERE {
   GRAPH ?harvestedSource {
     ?rowuri [TABLECOLUMN] ?value
@@ -36,24 +49,22 @@ PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-INSERT INTO ?harvestedSource
-{ ?rowuri eea:forCountry ?countryuri }
-FROM ?harvestedSource
-FROM <http://rdfdata.eionet.europa.eu/eea/countries.rdf>
-
+INSERT INTO ?harvestedSource {
+    ?rowuri eea:forCountry ?countryuri
+}
 WHERE {
   GRAPH ?harvestedSource {
     ?rowuri [TABLECOLUMN] ?value
   }
   GRAPH <http://rdfdata.eionet.europa.eu/eea/countries.rdf> {
     {
-     ?countryuri skos:notation ?label
+      ?countryuri skos:notation ?label
     } UNION {
-     ?countryuri skos:prefLabel ?label
+      ?countryuri skos:prefLabel ?label
     } UNION {
-     ?countryuri skos:altLabel ?label
+      ?countryuri skos:altLabel ?label
     } UNION {
-     ?countryuri skos:hiddenLabel ?label
+      ?countryuri skos:hiddenLabel ?label
     }
   }
   FILTER (LANG(?label) IN ("","en") && bif:lower(?label) = bif:lower(?value))
@@ -148,7 +159,7 @@ WHERE {
 }
 ]]></entry>
 
-<!-- See http://docs.openlinksw.com/virtuoso/sparqlextensions.html#rdfsparulexamples7 -->
+
     <entry key="ynConvert.name">Convert 'Yes' and 'No' to boolean datatype</entry>
     <entry key="ynConvert.script"><![CDATA[
 PREFIX spin: <http://spinrdf.org/spin#>
