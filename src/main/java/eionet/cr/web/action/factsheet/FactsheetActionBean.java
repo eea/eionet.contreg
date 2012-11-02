@@ -74,6 +74,7 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.UploadCSVActionBean.FileType;
+import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -335,20 +336,21 @@ public class FactsheetActionBean extends AbstractActionBean {
 
                 /* give feedback to the user */
 
-                if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING))
+                if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING)) {
                     message = "The resource is currently being harvested by another user or background harvester!";
-                else if (resolution.equals(OnDemandHarvester.Resolution.UNCOMPLETE))
+                } else if (resolution.equals(OnDemandHarvester.Resolution.UNCOMPLETE)) {
                     message = "The harvest hasn't finished yet, but continues in the background!";
-                else if (resolution.equals(OnDemandHarvester.Resolution.COMPLETE))
+                } else if (resolution.equals(OnDemandHarvester.Resolution.COMPLETE)) {
                     message = "The harvest has been completed!";
-                else if (resolution.equals(OnDemandHarvester.Resolution.SOURCE_UNAVAILABLE))
+                } else if (resolution.equals(OnDemandHarvester.Resolution.SOURCE_UNAVAILABLE)) {
                     message = "The resource was not available!";
-                else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA))
+                } else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA)) {
                     message = "The resource contained no RDF data!";
-                // else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
-                // message = "Source redirects to another source that has recently been harvested! Will not harvest.";
-                else
+                    // else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
+                    // message = "Source redirects to another source that has recently been harvested! Will not harvest.";
+                } else {
                     message = "No feedback given from harvest!";
+                }
             }
             return new Pair<Boolean, String>(false, message);
         } else {
@@ -431,10 +433,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(
-                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .addSourceIgnoreDuplicate(
+                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -864,6 +866,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         this.graphUri = graphUri;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<DatasetDTO> getUserCompiledDatasets() {
         if (userCompiledDatasets == null && !StringUtils.isBlank(uri)) {
             try {
@@ -876,8 +882,19 @@ public class FactsheetActionBean extends AbstractActionBean {
         return userCompiledDatasets;
     }
 
+    /**
+     *
+     * @param userCompiledDatasets
+     */
     public void setUserCompiledDatasets(List<DatasetDTO> userCompiledDatasets) {
         this.userCompiledDatasets = userCompiledDatasets;
     }
 
+    /**
+     *
+     * @return
+     */
+    public Class getViewSourceActionBeanClass(){
+        return ViewSourceActionBean.class;
+    }
 }

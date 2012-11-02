@@ -120,7 +120,9 @@
                                         </c:if>
                                         <c:if test="${sourceReadActionsAllowed}">
                                             <li>
-                                                <stripes:link class="link-plain" href="/source.action?view=&harvestSource.url=${ subjectUrl }">Source details</stripes:link>
+                                                <stripes:link class="link-plain" beanclass="${actionBean.viewSourceActionBeanClass.name}">Source details
+                                                    <stripes:param name="uri" value="${subjectUrl}"/>
+                                                </stripes:link>
                                             </li>
                                             <li>
                                                 <stripes:link class="link-plain" href="/source.action?export=&harvestSource.url=${subjectUrl}">Export triples</stripes:link>

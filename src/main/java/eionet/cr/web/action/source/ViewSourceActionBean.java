@@ -78,11 +78,14 @@ public class ViewSourceActionBean extends AbstractActionBean {
         if (StringUtils.isEmpty(uri)) {
             addCautionMessage("No request criteria specified!");
         } else {
-            schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
-            harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
+            if (harvestSource != null){
+                schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
+                harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
+            }
 
-            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner(harvestSource));
+            boolean isUserOwner = harvestSource==null ? false : isUserOwner(harvestSource);
+            SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner);
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.VIEW);
         }
 
