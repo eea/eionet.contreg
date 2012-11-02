@@ -69,8 +69,7 @@ Now you are ready to build your CR code. It is built with Maven.
 The following command assumes that Maven's executable (mvn) is on the command path,
 and that it is run while being in CR_SOURCE_HOME directory:
 
-    shell> mvn -Dmaven.test.skip=true clean install
-
+    shell> mvn -Dmaven.test.skip=true clean install
 
 ****************************************************************************
 4. Import CR database creation scripts
