@@ -2,7 +2,7 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 
-    <entry key="addLabel.name">Add label from column</entry>
+    <entry key="addLabel.name">Add rdfs:label from column</entry>
     <entry key="addLabel.script">
 <![CDATA[
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -183,4 +183,14 @@ WHERE {
 }
 ]]></entry>
 
+    <entry key="deleteColumn.name">Delete column</entry>
+    <entry key="deleteColumn.script"><![CDATA[
+DELETE FROM ?harvestedSource {
+    ?s [TABLECOLUMN] ?o
+}
+FROM ?harvestedSource
+WHERE {
+    ?s [TABLECOLUMN] ?o
+}
+]]></entry>
 </properties>
