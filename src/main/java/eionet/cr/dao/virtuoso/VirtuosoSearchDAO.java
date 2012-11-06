@@ -4,9 +4,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -43,6 +45,7 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
@@ -56,6 +59,9 @@ import eionet.cr.web.util.CustomPaginatedList;
  * @author jaanus
  */
 public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
+
+    /** Sort object constant. */
+    private static final String SORT_OBJECT_VALUE_VARIABLE = "sortObjVal";
 
     /**
      * Free text search implementation in Virtuoso.
@@ -147,6 +153,195 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         result.setItems(resultList);
         result.setMatchCount(totalMatchCount);
+        return result;
+    }
+
+    /**
+     * Faster version of "searchByFilters" that is currently work in progress. In future it should replace searchByFilters method,
+     * but at the moment it is only used in "searchByTypeAndFilters". Currently sorting is not working yet because of strange behavior
+     * in Virtuoso triplestore. Because of Sesame driver, the query gets executed in Java output mode (sparql define output:format
+     * '_JAVA_') and because of that, sorting is not working. For more info, see task #3584.
+     *
+     * @param filters
+     * @param checkFiltersRange
+     * @param pagingRequest
+     * @param sortingRequest
+     * @param selectPredicates
+     * @param useInference
+     * @return
+     * @throws DAOException
+     */
+    private SearchResultDTO<SubjectDTO> searchByFilters2(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
+            throws DAOException {
+
+        SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
+        Bindings bindings = new Bindings();
+
+        final Map<String, String> predicates = new LinkedHashMap<String, String>();
+        for (String predicateUri : selectPredicates) {
+            predicates.put(URIUtil.extractURILabel(predicateUri), predicateUri);
+        }
+
+        StringBuilder query = new StringBuilder();
+        if (useInference) {
+            query.append("DEFINE input:inference'CRInferenceRule' ");
+        }
+        query.append("SELECT ?s");
+        for (String predicate : predicates.keySet()) {
+            query.append(" ?" + predicate);
+        }
+        query.append(" WHERE { ");
+        query.append(getWhereContents(filters, bindings) + " . ");
+        for (String predicate : predicates.keySet()) {
+            query.append(" OPTIONAL {{");
+            query.append("SELECT ?s (sql:group_concat(?" + predicate + ",', ') AS ?" + predicate + ") WHERE { ");
+            query.append(" {");
+            query.append("  SELECT DISTINCT ?s (STR(?" + predicate + ") AS ?" + predicate + ") {");
+            query.append("   ?s <" + predicates.get(predicate) + "> ?" + predicate + ".");
+            query.append("  } order by asc(?" + predicate + ")");
+            query.append(" }");
+            query.append("} GROUP BY ?s ");
+            query.append("}}");
+        }
+        if (sortingRequest != null && StringUtils.isNotEmpty(sortingRequest.getSortingColumnName())) {
+            String sortPredicate = URIUtil.extractURILabel(sortingRequest.getSortingColumnName()) + "_sorting";
+            String sortPredicateUri = predicates.get(URIUtil.extractURILabel(sortingRequest.getSortingColumnName()));
+            if (sortPredicateUri != null) {
+                query.append(" OPTIONAL {");
+                query.append(" {");
+                query.append("  SELECT ?s (sql:group_concat(?" + sortPredicate + ",', ') AS ?" + sortPredicate + ")");
+                query.append("  sql:group_concat(bif:substring(?" + sortPredicate + ", bif:strrchr(bif:concat('#', bif:replace(?"
+                        + sortPredicate + ", '/', '#')), '#')+1, 10),', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
+                query.append("  WHERE { {SELECT DISTINCT ?s (STR(?" + sortPredicate + ") AS ?" + sortPredicate + ") { ?s <"
+                        + sortPredicateUri + "> ?" + sortPredicate + ".} ORDER BY ASC(?" + sortPredicate + ") }");
+                query.append("  } GROUP BY ?s");
+                query.append(" }");
+                query.append("}");
+            }
+        }
+        query.append("}");
+        if (sortingRequest != null) {
+            if (StringUtils.isNotEmpty(sortingRequest.getSortingColumnName())) {
+                String sortColumn = SORT_OBJECT_VALUE_VARIABLE;
+                query.append(" ORDER BY " + sortingRequest.getSortOrder() + "(?" + sortColumn + ")");
+            }
+        }
+        if (pagingRequest != null) {
+            query.append(" LIMIT ").append(pagingRequest.getItemsPerPage()).append(" OFFSET ").append(pagingRequest.getOffset());
+        }
+
+        List<SubjectDTO> resultList = executeSPARQL(query.toString(), bindings, new SPARQLResultSetReader<SubjectDTO>() {
+            private List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
+
+            @Override
+            public List<SubjectDTO> getResultList() {
+                return subjects;
+            }
+
+            @Override
+            public void endResultSet() {
+            }
+
+            @Override
+            public void startResultSet(List<String> bindingNames) {
+            }
+
+            @Override
+            public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+
+                Value subjectValue = bindingSet.getValue("s");
+                String subjectUri = subjectValue.stringValue();
+
+                boolean anonymousSubject = subjectValue instanceof BNode;
+                if (anonymousSubject) {
+                    subjectUri = BNODE_URI_PREFIX + subjectUri;
+                }
+                SubjectDTO subject = new SubjectDTO(subjectUri, anonymousSubject);
+
+                for (String predicate : predicates.keySet()) {
+                    Value value = bindingSet.getValue(predicate);
+                    if (value == null) {
+                        continue;
+                    }
+
+                    String valueString = value.stringValue();
+
+                    String[] valuesArr = valueString.split(",");
+                    for (String val : valuesArr) {
+                        ObjectDTO obj = new ObjectDTO(val.trim(), !URIUtil.isSchemedURI(val.trim()));
+                        subject.addObject(predicates.get(predicate), obj);
+                    }
+                }
+
+                subjects.add(subject);
+            }
+
+        });
+
+        if (pagingRequest != null) {
+            StringBuilder countQuery = new StringBuilder();
+            countQuery.append("SELECT COUNT(DISTINCT ?s) WHERE {");
+            countQuery.append(getWhereContents(filters, bindings));
+            countQuery.append("}");
+
+            String total = executeUniqueResultSPARQL(countQuery.toString(), bindings, new SingleObjectReader<String>());
+            result.setMatchCount(Integer.parseInt(total));
+        }
+
+        result.setItems(resultList);
+        result.setQuery(QueryHelper.getFormatedQuery(query.toString(), bindings));
+
+        return result;
+    }
+
+    /**
+     * Builds the query 's "where contents", i.e. the part that goes in between the curly brackets in "where {}".
+     *
+     * @return Query parameter string for SPARQL
+     */
+    private String getWhereContents(Map<String, String> filters, Bindings bindings) {
+
+        String result = "";
+        int filterIndex = 0;
+
+        for (Entry<String, String> entry : filters.entrySet()) {
+
+            String predicateUri = entry.getKey();
+            String objectValue = entry.getValue();
+
+            if (!StringUtils.isBlank(predicateUri) && !StringUtils.isBlank(objectValue)) {
+
+                filterIndex++;
+
+                String predicateVariable = "p" + filterIndex;
+                String objectVariable = "o" + filterIndex;
+                String predicateValueVariable = predicateVariable + "Val";
+                String objectValueVariable = objectVariable + "Val";
+
+                if (filterIndex > 1) {
+                    result += " . ";
+                }
+
+                result += "?s ?" + predicateVariable + " ?" + objectVariable;
+                result += " . filter(?" + predicateVariable + " = ?" + predicateValueVariable + ")";
+                bindings.setURI(predicateValueVariable, predicateUri);
+
+                if (Util.isSurroundedWithQuotes(objectValue)) {
+                    result += " . filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
+                    bindings.setString(objectValueVariable, Util.removeSurroundingQuotes(objectValue));
+                } else if (URIUtil.isSchemedURI(objectValue)) {
+                    result += " . filter(?" + objectVariable + " = ?" + objectValueVariable + ")";
+                    bindings.setURI(objectValueVariable, objectValue);
+                } else {
+                    result += " . filter bif:contains(?" + objectVariable + ", ?" + objectValueVariable + ")";
+                    // Quotes are added for bif:contains expression
+                    objectValue = "\"" + objectValue + "\"";
+                    bindings.setString(objectValueVariable, objectValue);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -350,7 +545,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     public SearchResultDTO<SubjectDTO> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException {
 
-        return searchByFilters(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);
+        return searchByFilters2(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);
     }
 
     /*
