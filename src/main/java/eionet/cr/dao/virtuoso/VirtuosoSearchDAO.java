@@ -158,9 +158,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
     /**
      * Faster version of "searchByFilters" that is currently work in progress. In future it should replace searchByFilters method,
-     * but at the moment it is only used in "searchByTypeAndFilters". Currently sorting is not working yet because of strange behavior
-     * in Virtuoso triplestore. Because of Sesame driver, the query gets executed in Java output mode (sparql define output:format
-     * '_JAVA_') and because of that, sorting is not working. For more info, see task #3584.
+     * but at the moment it is only used in "searchByTypeAndFilters". Currently sorting is not working yet because of strange
+     * behavior in Virtuoso triplestore. Because of Sesame driver, the query gets executed in Java output mode (sparql define
+     * output:format '_JAVA_') and because of that, sorting is not working. For more info, see task #3584.
      *
      * @param filters
      * @param checkFiltersRange
@@ -187,7 +187,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         if (useInference) {
             query.append("DEFINE input:inference'CRInferenceRule' ");
         }
-        query.append("SELECT ?s");
+        query.append("SELECT ?s ?" + SORT_OBJECT_VALUE_VARIABLE);
         for (String predicate : predicates.keySet()) {
             query.append(" ?" + predicate);
         }
@@ -211,16 +211,16 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
                 query.append(" OPTIONAL {");
                 query.append(" {");
                 query.append("  SELECT ?s (sql:group_concat(?" + sortPredicate + ",', ') AS ?" + sortPredicate + ")");
-                query.append("  sql:group_concat(bif:substring(?" + sortPredicate + ", bif:strrchr(bif:concat('#', bif:replace(?"
-                        + sortPredicate + ", '/', '#')), '#')+1, 10),', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
-                query.append("  WHERE { {SELECT DISTINCT ?s (STR(?" + sortPredicate + ") AS ?" + sortPredicate + ") { ?s <"
+                query.append("  sql:group_concat(bif:subseq(?" + sortPredicate + ", bif:strrchr(bif:concat('#', bif:replace(?"
+                        + sortPredicate + ", '/', '#')), '#')),', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
+                query.append("  WHERE { {SELECT DISTINCT ?s (bif:lcase(STR(?" + sortPredicate + ")) AS ?" + sortPredicate + ") { ?s <"
                         + sortPredicateUri + "> ?" + sortPredicate + ".} ORDER BY ASC(?" + sortPredicate + ") }");
                 query.append("  } GROUP BY ?s");
                 query.append(" }");
                 query.append("}");
             }
         }
-        query.append("}");
+        query.append("} GROUP BY ?s ");
         if (sortingRequest != null) {
             if (StringUtils.isNotEmpty(sortingRequest.getSortingColumnName())) {
                 String sortColumn = SORT_OBJECT_VALUE_VARIABLE;
