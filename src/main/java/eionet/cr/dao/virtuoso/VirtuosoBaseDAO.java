@@ -248,7 +248,7 @@ public abstract class VirtuosoBaseDAO {
         String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
         String query =
                 "select ?g ?s ?p bif:either(isLiteral(?obj), bif:substring(str(?obj), 1, " + WebConstants.MAX_OBJECT_LENGTH
-                        + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
+                + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
 
         // if only certain predicates needed, add relevant filter
         if (predicateUris != null && predicateUris.length > 0) {
@@ -374,4 +374,14 @@ public abstract class VirtuosoBaseDAO {
         return resultList;
     }
 
+    /**
+     * Just delegates the call to {@link SesameUtil#createSPARQLVariablesCSV(String, int)}.
+     *
+     * @param varName
+     * @param times
+     * @return
+     */
+    protected String variablesCSV(String varName, int times){
+        return SesameUtil.createSPARQLVariablesCSV(varName, times);
+    }
 }

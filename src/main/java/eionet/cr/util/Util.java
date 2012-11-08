@@ -304,7 +304,7 @@ public final class Util {
         }
 
         int[] scopes =
-        {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+            {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
@@ -390,6 +390,27 @@ public final class Util {
                     buf.append(",");
                 }
                 buf.append(it.next());
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     *
+     * @param coll
+     * @param surroundWith
+     * @return
+     */
+    public static String toCSV(Collection coll, String surroundWith) {
+
+        StringBuffer buf = new StringBuffer();
+        if (coll != null) {
+            for (Iterator it = coll.iterator(); it.hasNext();) {
+
+                if (buf.length() > 0) {
+                    buf.append(",");
+                }
+                buf.append(surroundWith).append(it.next()).append(surroundWith);
             }
         }
         return buf.toString();
@@ -525,6 +546,7 @@ public final class Util {
 
         ArrayList<String> result = new ArrayList<String>(languageMap.keySet());
         Collections.sort(result, new Comparator() {
+            @Override
             public int compare(Object o1, Object o2) {
                 return (-1) * languageMap.get(o1).compareTo(languageMap.get(o2));
             }

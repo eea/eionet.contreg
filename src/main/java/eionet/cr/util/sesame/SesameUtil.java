@@ -212,7 +212,7 @@ public final class SesameUtil {
      * @throws MalformedQueryException
      */
     public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-            QueryEvaluationException, MalformedQueryException {
+    QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
@@ -511,5 +511,27 @@ public final class SesameUtil {
         }
 
         return literal;
+    }
+
+    /**
+     * For input values of "name" and 5 returns "?name1, ?name2, ?name3, ?name4, ?name5".
+     * For input values of "title" and 6 returns "?title1, ?title2, ?title3, ?title4, ?title5, ?title6".
+     * And so forth.
+     *
+     * @param varName
+     * @param times
+     * @return
+     */
+    public static String createSPARQLVariablesCSV(String varName, int times){
+
+        StringBuilder sb = new StringBuilder();
+        for (int i=1; i <= times; i++){
+            if (i > 1){
+                sb.append(", ");
+            }
+            sb.append("?").append(varName).append(i);
+        }
+
+        return sb.toString();
     }
 }

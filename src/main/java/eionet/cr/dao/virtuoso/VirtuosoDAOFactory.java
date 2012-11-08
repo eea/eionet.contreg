@@ -3,6 +3,7 @@ package eionet.cr.dao.virtuoso;
 import java.util.HashMap;
 import java.util.Map;
 
+import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAO;
 import eionet.cr.dao.DAOFactory;
@@ -60,6 +61,7 @@ public final class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(FolderDAO.class, VirtuosoFolderDAO.class);
         registeredDaos.put(ReviewsDAO.class, VirtuosoReviewsDAO.class);
         registeredDaos.put(DeliveryFilterDAO.class, VirtuosoDeliveryFilterDAO.class);
+        registeredDaos.put(BrowseVoidDatasetsDAO.class, VirtuosoBrowseVoidDatasetsDAO.class);
     }
 
     /**
@@ -78,6 +80,7 @@ public final class VirtuosoDAOFactory extends DAOFactory {
      *
      * @see eionet.cr.dao.DAOFactory#getDao(java.lang.Class)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends DAO> T getDao(Class<T> implementedInterface) {
 

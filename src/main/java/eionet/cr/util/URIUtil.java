@@ -60,11 +60,13 @@ public final class URIUtil {
 
         try {
             URI uri = new URI(str);
-            if (!uri.isAbsolute()) // we consider legal only those URIs that have a scheme part specified
+            if (!uri.isAbsolute()) {
                 return false;
+            }
 
-            if (schemes == null)
+            if (schemes == null) {
                 initSchemes();
+            }
 
             return schemes.contains(uri.getScheme());
         } catch (URISyntaxException e) {
