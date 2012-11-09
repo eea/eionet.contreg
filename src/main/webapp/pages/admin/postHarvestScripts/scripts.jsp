@@ -32,6 +32,10 @@
                             <stripes:param name="targetType" value="${actionBean.targetType}"/>
                             <stripes:param name="backToTargetUrl" value="${actionBean.targetUrl}"/>
                         </stripes:link>
+                        <stripes:link href="/sourceView.action" title="Schedule urgent harvest" event="scheduleUrgentHarvest">
+                            <c:out value="Schedule urgent harvest" />
+                            <stripes:param name="uri" value="${actionBean.targetUrl}"/>
+                        </stripes:link>
                      </li>
                  </c:if>
              </c:if>

@@ -34,8 +34,11 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.web.action.AbstractActionBean;
@@ -63,6 +66,9 @@ public class ViewSourceActionBean extends AbstractActionBean {
     /** Harvest history. */
     private List<HarvestDTO> harvests;
 
+    /** Source specific post harvest scripts. */
+    private List<PostHarvestScriptDTO> postHarvestScripts;
+
     /** Is schema source. */
     private boolean schemaSource;
 
@@ -79,12 +85,13 @@ public class ViewSourceActionBean extends AbstractActionBean {
             addCautionMessage("No request criteria specified!");
         } else {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
-            if (harvestSource != null){
+            postHarvestScripts = factory.getDao(PostHarvestScriptDAO.class).list(PostHarvestScriptDTO.TargetType.SOURCE, uri);
+            if (harvestSource != null) {
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
                 harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
             }
 
-            boolean isUserOwner = harvestSource==null ? false : isUserOwner(harvestSource);
+            boolean isUserOwner = harvestSource == null ? false : isUserOwner(harvestSource);
             SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner);
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.VIEW);
         }
@@ -176,6 +183,15 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
+     * Target type for adding source-specific post-harvest script.
+     *
+     * @return the targetType
+     */
+    public TargetType getTargetType() {
+        return TargetType.SOURCE;
+    }
+
+    /**
      * @return the uri
      */
     public String getUri() {
@@ -183,7 +199,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -215,6 +232,13 @@ public class ViewSourceActionBean extends AbstractActionBean {
      */
     public List<HarvestDTO> getHarvests() {
         return harvests;
+    }
+
+    /**
+     * @return the postHarvestScripts
+     */
+    public List<PostHarvestScriptDTO> getPostHarvestScripts() {
+        return postHarvestScripts;
     }
 
 }
