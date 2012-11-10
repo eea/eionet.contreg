@@ -210,15 +210,5 @@ WHERE {
 }
 ]]></entry>
 
-    <entry key="deleteColumn.name">Delete column</entry>
-    <entry key="deleteColumn.script"><![CDATA[
-DELETE FROM ?harvestedSource {
-    ?s [TABLECOLUMN] ?o
-}
-FROM ?harvestedSource
-WHERE {
-    ?s [TABLECOLUMN] ?o
-}
-]]></entry>
 
 </properties>
