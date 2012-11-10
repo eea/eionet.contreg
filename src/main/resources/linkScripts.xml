@@ -193,4 +193,32 @@ WHERE {
     ?s [TABLECOLUMN] ?o
 }
 ]]></entry>
+
+    <entry key="commaConvert.name">Convert numbers with comma and thousands separator to decimal point format</entry>
+    <entry key="commaConvert.script"><![CDATA[
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?record [TABLECOLUMN] ?val.
+}
+INSERT {
+    ?record [TABLECOLUMN] `bif:replace(bif:regexp_replace(?val,'[ .]',''),',','.')`
+}
+WHERE {
+    GRAPH ?harvestedSource {
+        ?record [TABLECOLUMN] ?val
+    }
+}
+]]></entry>
+
+    <entry key="deleteColumn.name">Delete column</entry>
+    <entry key="deleteColumn.script"><![CDATA[
+DELETE FROM ?harvestedSource {
+    ?s [TABLECOLUMN] ?o
+}
+FROM ?harvestedSource
+WHERE {
+    ?s [TABLECOLUMN] ?o
+}
+]]></entry>
+
 </properties>
