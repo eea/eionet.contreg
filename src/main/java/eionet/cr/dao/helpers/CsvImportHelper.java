@@ -296,11 +296,11 @@ public class CsvImportHelper {
         // Construct a SPARQL query and store it as a property
         StringBuilder query = new StringBuilder();
         query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
-        query.append("SELECT * FROM <").append(fileUri).append("> WHERE { \n");
+        query.append("SELECT *\nFROM <").append(fileUri).append(">\nWHERE {\n");
         for (String column : columnLabels) {
             column = column.replace(" ", "_");
             String columnUri = "tableFile:" + column;
-            query.append(" OPTIONAL {?").append(objectsType).append(" ").append(columnUri).append(" ?").append(column).append("} . \n");
+            query.append(" OPTIONAL { _:rec ").append(columnUri).append(" ?").append(column).append(" } .\n");
         }
         query.append("}");
 
