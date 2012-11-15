@@ -38,6 +38,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.readers.PostHarvestScriptDTOReader;
 import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
+import eionet.cr.dao.util.PostHarvestScriptSet;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
@@ -331,6 +332,9 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             SQLUtil.executeQuery(LIST_SQL, values, reader, conn);
             List<PostHarvestScriptDTO> scripts = reader.getResultList();
 
+            //helper object for handling min, max positions and real count of scripts
+            PostHarvestScriptSet scriptSet = new PostHarvestScriptSet(scripts);
+
             // If even one script is already at position 1 then moving up is not considered possible.
             // And conversely, if even one script is already at the last position, then moving down
             // is not considered possible either.
@@ -341,7 +345,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 // we do this check only for scripts that have been selected
                 if (ids.contains(script.getId())) {
                     int position = script.getPosition();
-                    if ((direction < 0 && position == 1) || (direction > 0 && position == scripts.size())) {
+                    if ((direction < 0 && position == scriptSet.getMinPosition()) || (direction > 0 && position == scriptSet.getMaxPosition())) {
                         isMovingPossible = false;
                     } else {
                         selectedPositions.add(position);
@@ -353,16 +357,17 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
                 if (direction < 0) {
                     for (Integer selectedPosition : selectedPositions) {
-                        int i = selectedPosition - 1;
-                        PostHarvestScriptDTO scriptToMove = scripts.get(i);
+                        PostHarvestScriptDTO scriptToMove = scriptSet.getScriptByPosition(selectedPosition);
+                        int i = scripts.indexOf(scriptToMove);
+
                         scripts.set(i, scripts.get(i - 1));
                         scripts.set(i - 1, scriptToMove);
                     }
                 } else {
                     for (int j = selectedPositions.size() - 1; j >= 0; j--) {
+                        PostHarvestScriptDTO scriptToMove = scriptSet.getScriptByPosition(selectedPositions.get(j));
+                        int i = scripts.indexOf(scriptToMove);
 
-                        int i = selectedPositions.get(j) - 1;
-                        PostHarvestScriptDTO scriptToMove = scripts.get(i);
                         scripts.set(i, scripts.get(i + 1));
                         scripts.set(i + 1, scriptToMove);
                     }
