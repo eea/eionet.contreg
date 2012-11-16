@@ -167,7 +167,8 @@ public class FileRdfFormatDetector {
         /** */
         int statementCounter = 0;
 
-        /**
+        /*
+         * (non-Javadoc)
          * @see org.openrdf.rio.helpers.RDFHandlerBase#handleStatement(org.openrdf.model.Statement)
          */
         @Override

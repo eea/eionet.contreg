@@ -130,8 +130,9 @@ public class PullHarvest extends BaseHarvest {
         super(contextSourceDTO);
     }
 
-    /**
-     * @see eionet.cr.harvest.temp.BaseHarvest#doHarvest()
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#doHarvest()
      */
     @Override
     protected void doHarvest() throws HarvestException {
@@ -883,7 +884,8 @@ public class PullHarvest extends BaseHarvest {
         }
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
     @Override
@@ -899,7 +901,8 @@ public class PullHarvest extends BaseHarvest {
         return isSourceAvailable;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.BaseHarvest#isSendNotifications()
      */
     @Override
@@ -910,7 +913,8 @@ public class PullHarvest extends BaseHarvest {
         return !isOnDemandHarvest && (getContextSourceDTO().isPrioritySource() || isFatalErrorOccured);
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested(java.lang.String)
      */
     @Override
@@ -920,8 +924,9 @@ public class PullHarvest extends BaseHarvest {
         return result == true ? result : redirectedUrls.contains(url);
     }
 
-    /**
-     * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#afterFinish()
      */
     @Override
     protected void afterFinish() {

@@ -63,6 +63,7 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
     }
 
@@ -126,7 +127,8 @@ public class SPOReader extends ResultSetMixedReader<SubjectDTO> {
         currentObjects.add(object);
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.dao.readers.ResultSetMixedReader#getResultList()
      */
     @Override

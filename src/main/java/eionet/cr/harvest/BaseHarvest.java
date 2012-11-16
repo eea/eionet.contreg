@@ -171,8 +171,9 @@ public abstract class BaseHarvest implements Harvest {
         this.lastHarvestDuration = calculateLastHarvestDuration(contextSourceDTO);
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.Harvest#execute()
      */
     @Override
     public final void execute() throws HarvestException {
@@ -396,9 +397,9 @@ public abstract class BaseHarvest implements Harvest {
             }
         } catch (Exception e) {
             String message =
-                MessageFormat.format(
-                        "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
-                        e.toString(), scriptType, title, parsedQuery);
+                    MessageFormat.format(
+                            "Got exception *** {0} *** when executing the following {1} post-harvest script titled \"{2}\":\n{3}",
+                            e.toString(), scriptType, title, parsedQuery);
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
@@ -564,7 +565,8 @@ public abstract class BaseHarvest implements Harvest {
         return messageObject + " [" + contextGraphUri + "]";
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#getContextUrl()
      */
     @Override
@@ -683,7 +685,8 @@ public abstract class BaseHarvest implements Harvest {
         addHarvestMessage(message, messageType, null);
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#getLastHarvestDuration()
      */
     @Override
@@ -727,7 +730,8 @@ public abstract class BaseHarvest implements Harvest {
         }
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#getStoredTriplesCount()
      */
     @Override
@@ -742,7 +746,8 @@ public abstract class BaseHarvest implements Harvest {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.harvest.Harvest#setHarvestUser(java.lang.String)
      */
     @Override

@@ -76,7 +76,8 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) values (?,?,now(),0)";
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
      */
     @Override
@@ -117,7 +118,8 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
@@ -207,8 +209,9 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         return fileOrFolderExists(parentFolderUri + folderName);
     }
 
-    /**
-     * @see eionet.cr.dao.FolderDAO#folderExists(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.FolderDAO#fileOrFolderExists(java.lang.String)
      */
     @Override
     public boolean fileOrFolderExists(String folderUri) throws DAOException {

@@ -181,7 +181,7 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
                     currSubjBuf.append(" rdf:resource=\"").append(objValueEscaped).append("\"/>");
                 } else {
                     currSubjBuf.append(">").append(objValueEscaped).append("</").append(namespaces.get(predNsUri)).append(":")
-                            .append(predLocalName).append(">");
+                    .append(predLocalName).append(">");
                 }
 
                 writtenTriplesCount++;
@@ -273,15 +273,27 @@ public class AmpFeedWriter implements SPARQLResultSetReader {
         return writtenSubjectsCount;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.readers.ResultSetReader#getResultList()
+     */
     @Override
     public List getResultList() {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.readers.ResultSetReader#endResultSet()
+     */
     @Override
     public void endResultSet() {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#startResultSet(java.util.List)
+     */
     @Override
     public void startResultSet(List bindingNames) {
     }

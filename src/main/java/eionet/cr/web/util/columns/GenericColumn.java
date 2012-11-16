@@ -32,8 +32,9 @@ import eionet.cr.web.action.HarvestSourcesActionBean;
  */
 public class GenericColumn extends SearchResultColumn {
 
-    /**
-     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object) {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     @Override
     public String format(Object object) {
@@ -46,8 +47,9 @@ public class GenericColumn extends SearchResultColumn {
         return "";
     }
 
-    /**
-     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue() {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.util.columns.SearchResultColumn#getSortParamValue()
      */
     @Override
     public String getSortParamValue() {

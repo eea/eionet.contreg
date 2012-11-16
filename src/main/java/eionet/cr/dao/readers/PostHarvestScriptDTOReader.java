@@ -37,7 +37,8 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  */
 public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarvestScriptDTO> {
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override

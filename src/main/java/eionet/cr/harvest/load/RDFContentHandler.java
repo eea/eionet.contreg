@@ -97,7 +97,8 @@ public class RDFContentHandler implements RDFHandler {
         this.timeout = timeout;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see org.openrdf.rio.RDFHandler#startRDF()
      */
     @Override
@@ -106,7 +107,8 @@ public class RDFContentHandler implements RDFHandler {
         startTime = System.currentTimeMillis();
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see org.openrdf.rio.RDFHandler#handleNamespace(java.lang.String, java.lang.String)
      */
     @Override
@@ -128,7 +130,8 @@ public class RDFContentHandler implements RDFHandler {
         }
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see org.openrdf.rio.RDFHandler#handleStatement(org.openrdf.model.Statement)
      */
     @Override
@@ -162,7 +165,8 @@ public class RDFContentHandler implements RDFHandler {
         }
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see org.openrdf.rio.RDFHandler#handleComment(java.lang.String)
      */
     @Override
@@ -170,7 +174,8 @@ public class RDFContentHandler implements RDFHandler {
         // No specific handling here.
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see org.openrdf.rio.RDFHandler#endRDF()
      */
     @Override

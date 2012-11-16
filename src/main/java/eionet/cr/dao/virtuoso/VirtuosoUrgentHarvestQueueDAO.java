@@ -177,10 +177,9 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
     }
 
-    /**
-     *
-     * @param url
-     * @throws DAOException
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String)
      */
     @Override
     public boolean isInQueue(String url) {

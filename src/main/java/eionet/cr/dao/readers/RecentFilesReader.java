@@ -17,11 +17,9 @@ import eionet.cr.util.Util;
  */
 public class RecentFilesReader extends ResultSetMixedReader<Pair<String, String>> {
 
-    /**
-     * Reads row from Bindingset to resultList.
-     *
-     * @param bindingSet SPARQL result
-     * @throws ResultSetReaderException if reading fails
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
     public void readRow(final BindingSet bindingSet) throws ResultSetReaderException {
@@ -45,14 +43,11 @@ public class RecentFilesReader extends ResultSetMixedReader<Pair<String, String>
 
     }
 
-    /**
-     * Reads row from SQL resultset to resultList.
-     *
-     * @deprecated
-     * @param rs SQL resultSet
-     * @throws ResultSetReaderException if reading fails
-     * @throws SQLException if database query fails
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
+    @Deprecated
     @Override
     public void readRow(final ResultSet rs) throws SQLException, ResultSetReaderException {
         throw new UnsupportedOperationException("Method not supported");

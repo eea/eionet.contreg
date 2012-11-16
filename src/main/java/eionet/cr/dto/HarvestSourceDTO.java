@@ -197,6 +197,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      *
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return new StringBuffer().append("Harvest source ").append(url).toString();
     }
@@ -329,7 +330,8 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
         return ((double) secondsSinceLastTime) / ((double) intervalSeconds);
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#clone()
      */
     @Override

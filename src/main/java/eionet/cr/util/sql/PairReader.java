@@ -45,16 +45,18 @@ public class PairReader<T, T1> extends ResultSetMixedReader<Pair<T, T1>> {
      */
     public static final String RIGHTCOL = "RCOL";
 
-    /**
-     * @see eionet.cr.util.sql.ResultSetListReader#getResultList() {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.readers.ResultSetMixedReader#getResultList()
      */
     @Override
     public List<Pair<T, T1>> getResultList() {
         return resultList;
     }
 
-    /**
-     * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet) {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
     @SuppressWarnings("unchecked")

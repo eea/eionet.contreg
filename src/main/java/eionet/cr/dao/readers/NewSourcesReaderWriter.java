@@ -38,6 +38,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  * Reads harvest source URLs from the given binding set, and inserts them into HARVEST_SOURCE table, using {@link PreparedStatement}
  * and execution by batches (to save performance).
@@ -66,6 +67,10 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /** */
     private int sourceCount;
+
+    /**
+     *
+     */
     private int currentBatchSize;
 
     /**
@@ -81,7 +86,8 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
         this.sqlConn = sqlConn;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -150,7 +156,10 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
     }
 
     /**
+     *
+     *
      * @param bindingSet
+     * @return
      */
     private String getFirstBindingStringValue(BindingSet bindingSet) {
 
@@ -198,7 +207,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
         return sourceCount;
     }
 
-    /**
+    /* (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override

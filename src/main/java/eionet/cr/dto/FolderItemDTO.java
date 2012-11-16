@@ -92,8 +92,9 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
         return Type.RESERVED_FILE.equals(type);
     }
 
-    /**
-     * {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
     public int compareTo(FolderItemDTO o) {

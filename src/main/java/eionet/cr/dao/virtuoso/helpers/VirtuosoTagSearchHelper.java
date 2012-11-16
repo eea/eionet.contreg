@@ -49,6 +49,9 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
 
     /**
      * Returns sorted query for tagged data search.
+     *
+     * @param inParams
+     * @return
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
@@ -65,7 +68,7 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
         // those predicates, then the last part of subject URI must be used instead.
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
             strBuilder.append("(bif:either( bif:isnull(?sortObject) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ")
-                    .append("bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
+            .append("bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
         } else if (Predicates.RDF_TYPE.equals(sortPredicate)) {
             // Replace all / with # and then get the string after last #
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?sortObject, '/', '#'), bif:strrchr (bif:replace ").append(
@@ -93,6 +96,7 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
      *
      * @return Query parameter string for SPARQL
      */
+    @Override
     public String getWhereContents() {
         String tagPredicate = "tagPredicate";
         bindings.setURI(tagPredicate, Predicates.CR_TAG);

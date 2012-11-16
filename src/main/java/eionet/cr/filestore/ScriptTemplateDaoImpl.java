@@ -52,7 +52,7 @@ public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
     /**
      *
      */
-    static{
+    static {
         try {
             PROPERTIES.loadFromXML(ScriptTemplateDaoImpl.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
         } catch (Exception e) {

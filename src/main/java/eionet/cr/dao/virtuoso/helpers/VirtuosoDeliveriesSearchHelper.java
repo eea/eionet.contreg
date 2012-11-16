@@ -91,6 +91,9 @@ public class VirtuosoDeliveriesSearchHelper extends AbstractSearchHelper {
 
     /**
      * SPARQL for getting count of subjects in the source.
+     *
+     * @param inParams
+     * @return
      */
     @Override
     public String getCountQuery(List<Object> inParams) {

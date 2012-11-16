@@ -21,10 +21,12 @@ public interface SQLResultSetReader<T> extends ResultSetReader<T> {
     void startResultSet(ResultSetMetaData resultSetMetaData);
 
     /**
+     * Reads the current row from the given {@link ResultSet} object. Assumes that {@link ResultSet#next()} has been called, i.e.
+     * we are indeed at a "current" row.
      *
-     * @param rs
-     * @throws SQLException
-     * @throws ResultSetReaderException
+     * @param rs The given result-set
+     * @throws SQLException If database error occurs.
+     * @throws ResultSetReaderException If the result-set reader (if any assigned) throws some error.
      */
     void readRow(ResultSet rs) throws SQLException, ResultSetReaderException;
 }

@@ -24,11 +24,14 @@ public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair
 
     private boolean extractLabels;
 
-    /**
-     * If label exists use label otherwise take last part of object URI.
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
+
+        // If label exists use label otherwise take last part of object URI.
         // TODO - take lang into account?
         if (bindingSet != null && bindingSet.size() > 0) {
             Value label = bindingSet.getValue("label");
@@ -49,6 +52,7 @@ public class ObjectLabelReader extends SPARQLResultSetBaseReader<ObjectLabelPair
         }
     }
 
+    @Override
     public void endResultSet() {
 
         Collections.sort(resultList);

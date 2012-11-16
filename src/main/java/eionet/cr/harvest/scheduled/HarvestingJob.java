@@ -517,8 +517,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         return getDailyActiveMinutes().intValue() > 0;
     }
 
-    /**
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet .ServletContextEvent)
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -540,8 +541,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         }
     }
 
-    /**
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet. ServletContextEvent)
+    /*
+     * (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

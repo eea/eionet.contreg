@@ -21,9 +21,9 @@ public class ObjectLabelPair extends Pair<String, String> implements Comparable<
         super(left, right);
     }
 
-    /**
-     * @param other the other ObjectLabelPair
-     * @return int @see Comparable.compareTo()
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
     public int compareTo(final ObjectLabelPair other) {

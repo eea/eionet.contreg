@@ -33,9 +33,9 @@ import net.sourceforge.stripes.localization.DefaultLocalePicker;
  *
  */
 public class LocalePicker extends DefaultLocalePicker {
+
     /**
      * {@inheritDoc}
-     * <p>
      * If parent method returns null then the method returns UTF-8 as default character encoding.
      */
     @Override

@@ -111,8 +111,9 @@ public class UploadHarvest extends BaseHarvest {
         setCleanAllPreviousSourceMetadata(true);
     }
 
-    /**
-     * @see eionet.cr.harvest.temp.BaseHarvest#doHarvest()
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#doHarvest()
      */
     @Override
     protected void doHarvest() throws HarvestException {
@@ -273,7 +274,7 @@ public class UploadHarvest extends BaseHarvest {
      * @throws IOException
      */
     private File convert(XmlAnalysis xmlAnalysis, FileBean fileBean) throws IOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         // detect conversion id, if it's blank then return null, as no point in going further
         String conversionId = getConversionId(xmlAnalysis);
@@ -365,6 +366,7 @@ public class UploadHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
+    @Override
     protected String getHarvestType() {
 
         return HarvestConstants.TYPE_PUSH;

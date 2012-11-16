@@ -51,10 +51,9 @@ public class SingleObjectReader<T> extends ResultSetMixedReader<T> {
         resultList.add((T) rs.getObject(1));
     }
 
-    /**
-     * Reads row from the bindingset that contains only one column.
-     *
-     * @param bindingSet - Query result bindingset
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @SuppressWarnings("unchecked")
     @Override

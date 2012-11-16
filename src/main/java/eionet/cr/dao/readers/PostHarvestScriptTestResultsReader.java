@@ -18,7 +18,8 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
  */
 public class PostHarvestScriptTestResultsReader extends SPARQLResultSetBaseReader<Map<String, ObjectDTO>> {
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

@@ -79,16 +79,18 @@ public class Pair<L, R> implements Serializable {
         this.right = value;
     }
 
-    /**
-     * @see java.lang.Object#hashCode() {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object) {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {

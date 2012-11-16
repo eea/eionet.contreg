@@ -61,7 +61,8 @@ public class HomespaceUrlFilter implements Filter {
     /** */
     private static final Logger LOGGER = Logger.getLogger(HomespaceUrlFilter.class);
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
     @Override
@@ -69,7 +70,8 @@ public class HomespaceUrlFilter implements Filter {
         // no initialization actions required
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     @Override
@@ -125,7 +127,7 @@ public class HomespaceUrlFilter implements Filter {
                         if (isRdfXmlPreferred(httpRequest)) {
                             redirectLocation =
                                     contextPath + Util.getUrlBinding(ExportTriplesActionBean.class) + queryString
-                                            + "&exportProperties=";
+                                    + "&exportProperties=";
                         } else {
                             redirectLocation = contextPath + Util.getUrlBinding(ViewActionBean.class) + queryString;
                         }

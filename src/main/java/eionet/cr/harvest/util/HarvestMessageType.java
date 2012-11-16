@@ -42,7 +42,8 @@ public enum HarvestMessageType {
         this.value = value;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see java.lang.Enum#toString()
      */
     @Override

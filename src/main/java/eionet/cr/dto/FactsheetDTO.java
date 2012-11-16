@@ -126,7 +126,8 @@ public class FactsheetDTO extends SubjectDTO {
      */
     class PredicateComparator implements Comparator<String> {
 
-        /**
+        /*
+         * (non-Javadoc)
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
         @Override

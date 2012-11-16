@@ -44,8 +44,9 @@ public class HarvestSourcesColumn extends SearchResultColumn {
         this.dateFormat = dateFormat;
     }
 
-    /**
-     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object) {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      */
     @Override
     public String format(Object object) {

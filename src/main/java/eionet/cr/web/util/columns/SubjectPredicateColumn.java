@@ -93,9 +93,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
         this.predicateUri = predicateUri;
     }
 
-    /*
-     * (non-Javadoc)
-     *
+    /**
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
      *
      * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to

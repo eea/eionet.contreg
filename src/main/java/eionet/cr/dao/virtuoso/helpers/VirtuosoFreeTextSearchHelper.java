@@ -72,8 +72,9 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         return buf.toString();
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.helpers.FreeTextSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
@@ -125,6 +126,10 @@ public class VirtuosoFreeTextSearchHelper extends FreeTextSearchHelper {
         return buf.toString();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getQueryBindings()
+     */
     @Override
     public Bindings getQueryBindings() {
         return bindings;

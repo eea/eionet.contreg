@@ -46,7 +46,7 @@ public class EMailAuthenticator extends Authenticator {
     }
 
     /**
-     * @see javax.mail.Authenticator#getPasswordAuthentication()
+     * {@inheritDoc}
      */
     @Override
     public PasswordAuthentication getPasswordAuthentication() {

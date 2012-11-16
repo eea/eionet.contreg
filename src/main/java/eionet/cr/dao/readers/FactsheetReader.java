@@ -63,7 +63,8 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         this.subjectUri = subjectUri;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override

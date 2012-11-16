@@ -34,8 +34,9 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  */
 public class MinimalHarvestDTOReader extends SQLResultSetBaseReader<HarvestDTO> {
 
-    /**
-     * {@inheritDoc}
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {

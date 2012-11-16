@@ -17,6 +17,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  *
  * @author Enriko Käsper
@@ -29,8 +30,20 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
 
     /** */
     private Map<String, String> filters;
+
+    /**
+     *
+     */
     private Set<String> literalRangeFilters;
+
+    /**
+     *
+     */
     private Boolean requiresFullTextSearch = null;
+
+    /**
+     *
+     */
     protected Bindings bindings;
 
     /**
@@ -76,8 +89,9 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         bindings = new Bindings();
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getUnorderedQuery(java.util.List)
      */
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
@@ -88,8 +102,9 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         return strBuilder.toString();
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getOrderedQuery(java.util.List)
      */
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
@@ -106,7 +121,7 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         // those predicates, then the last part of subject URI must be used instead.
         if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
             strBuilder.append("(bif:either( bif:isnull(?sortObject) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), ")
-                    .append("bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
+            .append("bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObject)))");
         } else if (Predicates.RDF_TYPE.equals(sortPredicate)) {
             // Replace all / with # and then get the string after last #
             strBuilder.append("(bif:lcase(bif:subseq (bif:replace (?sortObject, '/', '#'), bif:strrchr (bif:replace ").append(
@@ -119,8 +134,9 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         return StringUtils.replace(strBuilder.toString(), "?sortObject", "?" + SORT_OBJECT_VALUE_VARIABLE);
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getCountQuery(java.util.List)
      */
     @Override
     public String getCountQuery(List<Object> inParams) {
@@ -193,6 +209,9 @@ public class VirtuosoFilteredSearchHelper extends AbstractSearchHelper {
         return result;
     }
 
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.helpers.AbstractSearchHelper#getQueryBindings()
+     */
     @Override
     public Bindings getQueryBindings() {
         return bindings;

@@ -119,7 +119,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         DATE_COLUMN.setTitle("Last harvest");
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @Override
@@ -392,8 +393,9 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         return columnList;
     }
 
-    /**
-     *
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.web.action.AbstractActionBean#excludeFromSortAndPagingUrls()
      */
     @Override
     public String[] excludeFromSortAndPagingUrls() {

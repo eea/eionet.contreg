@@ -49,8 +49,9 @@ public class PushHarvest extends BaseHarvest {
         this.pushedContent = pushedContent;
     }
 
-    /**
-     * @see eionet.cr.harvest.temp.BaseHarvest#doHarvest()
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.harvest.BaseHarvest#doHarvest()
      */
     @Override
     protected void doHarvest() throws HarvestException {
@@ -76,6 +77,7 @@ public class PushHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
+    @Override
     protected String getHarvestType() {
 
         return HarvestConstants.TYPE_PUSH;
@@ -84,6 +86,7 @@ public class PushHarvest extends BaseHarvest {
     /**
      * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested(java.lang.String)
      */
+    @Override
     public boolean isBeingHarvested(String url) {
         boolean ret = false;
         if (url != null) {

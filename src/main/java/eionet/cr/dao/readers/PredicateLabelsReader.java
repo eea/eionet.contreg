@@ -53,7 +53,8 @@ public class PredicateLabelsReader extends SPARQLResultSetBaseReader {
         this.acceptedLanguages = acceptedLanguages;
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
