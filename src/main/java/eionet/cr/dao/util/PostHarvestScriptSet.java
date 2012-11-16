@@ -14,8 +14,12 @@ public class PostHarvestScriptSet {
     /** private script container. */
     private List<PostHarvestScriptDTO> scripts;
 
-    /** count of scripts for the type/url. */
-    private int scriptCount;
+    /** holder for minimal Position. */
+    private int minPos;
+
+    /** holder for maximum Position. */
+    private int maxPos;
+
 
     /**
      * Initializes the container based on script lists.
@@ -23,7 +27,8 @@ public class PostHarvestScriptSet {
      */
     public PostHarvestScriptSet(List<PostHarvestScriptDTO> phScripts) {
         this.scripts = phScripts;
-        this.scriptCount = phScripts.size();
+
+        init();
     }
 
 
@@ -46,7 +51,7 @@ public class PostHarvestScriptSet {
      * @return int
      */
     public int getMaxPosition() {
-        return scripts.get(scriptCount - 1).getPosition();
+        return maxPos;
     }
 
     /**
@@ -55,6 +60,29 @@ public class PostHarvestScriptSet {
      * @return int
      */
     public int getMinPosition() {
-        return scripts.get(0).getPosition();
+        return minPos;
+    }
+
+
+    /**
+     * Inits min max values.
+     */
+
+    private void init() {
+        int maxVal = Integer.MIN_VALUE;
+        int minVal = Integer.MAX_VALUE;
+
+        for (PostHarvestScriptDTO script : scripts) {
+               int pos = script.getPosition();
+            if (pos < minVal) {
+                minVal = pos;
+            }
+            if (pos > maxVal) {
+                maxVal = pos;
+            }
+        }
+
+        this.minPos = minVal;
+        this.maxPos = maxVal;
     }
 }

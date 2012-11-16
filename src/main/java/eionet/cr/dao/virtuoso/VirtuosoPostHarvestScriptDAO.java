@@ -374,7 +374,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 }
             }
 
-            values.add(0, Integer.valueOf(scripts.size()));
+            values.add(0, Integer.valueOf(scriptSet.getMaxPosition()));
             SQLUtil.executeUpdate(INCREASE_POSITIONS_SQL, values, conn);
 
             for (int i = 0; i < scripts.size(); i++) {
