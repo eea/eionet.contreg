@@ -20,7 +20,6 @@
 
 package eionet.cr.dto;
 
-import java.util.Collection;
 
 /**
  * Object representing User home folder.
@@ -28,6 +27,16 @@ import java.util.Collection;
  * @author Enriko Käsper
  */
 public class UserFolderDTO {
+
+    /**
+     * User files count.
+     */
+    private int subFilesCount;
+
+    /**
+     * User Folders count.
+     */
+    private int subFoldersCount;
 
     /**
      * Folder URL.
@@ -41,14 +50,6 @@ public class UserFolderDTO {
      * Parent folder URL.
      */
     private String parentFolderUrl;
-    /**
-     * List of sub folder URLs.
-     */
-    private Collection<String> subFolders;
-    /**
-     * List of file URLs.
-     */
-    private Collection<String> subFiles;
 
     public String getUrl() {
         return url;
@@ -58,21 +59,6 @@ public class UserFolderDTO {
         this.url = url;
     }
 
-    public Collection<String> getSubFolders() {
-        return subFolders;
-    }
-
-    public void setSubFolders(Collection<String> subFolders) {
-        this.subFolders = subFolders;
-    }
-
-    public Collection<String> getSubFiles() {
-        return subFiles;
-    }
-
-    public void setSubFiles(Collection<String> subFiles) {
-        this.subFiles = subFiles;
-    }
 
     public String getParentFolderUrl() {
         return parentFolderUrl;
@@ -88,5 +74,21 @@ public class UserFolderDTO {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public int getSubFilesCount() {
+        return subFilesCount;
+    }
+
+    public int getSubFoldersCount() {
+        return subFoldersCount;
+    }
+
+    public void setSubFilesCount(int subFilesCount) {
+        this.subFilesCount = subFilesCount;
+    }
+
+    public void setSubFoldersCount(int subFoldersCount) {
+        this.subFoldersCount = subFoldersCount;
     }
 }

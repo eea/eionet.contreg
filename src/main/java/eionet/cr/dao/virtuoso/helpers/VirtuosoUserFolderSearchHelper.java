@@ -22,7 +22,6 @@ package eionet.cr.dao.virtuoso.helpers;
 import java.util.List;
 
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.helpers.AbstractSearchHelper;
@@ -39,7 +38,34 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
  */
 public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
 
-    private String parentFolderUri;
+    /**
+     * SPARQL for home folders.
+     */
+    private static final String USER_HOMES_SPARQL =
+
+        SPARQLQueryUtil.getSparqlQueryHeader(true)
+        .append("SELECT ?parent ?subject bif:either( bif:isnull(?lbl) , ?subject, ?lbl) as ?label ?fileCount ?folderCount ")
+        .append("WHERE {")
+        .append("?subject a <").append(Subjects.CR_USER_FOLDER).append("> .")
+        .append("?parent ?hasPredicate ?subject . ")
+        .append(" FILTER (?hasPredicate IN (<").append(Predicates.CR_HAS_FILE).append(">, <").append(Predicates.CR_HAS_FOLDER).append(">)) .")
+        .append("  FILTER(?parent= ?parentFolder)")
+
+        .append("  { SELECT ?subject (count(?file) AS ?fileCount)")
+        .append("  WHERE { ?subject <").append(Predicates.CR_HAS_FILE).append("> ?file")
+        .append("    } GROUP BY ?subject}")
+
+        .append("  { SELECT ?subject (count(?folder) AS ?folderCount)")
+        .append("  WHERE { ?subject <").append(Predicates.CR_HAS_FOLDER).append("> ?folder ")
+        .append("    } GROUP BY ?subject}")
+
+        .append("OPTIONAL {  {")
+        .append("SELECT ?subject ?lbl ")
+        .append("WHERE { ?subject rdfs:label ?lbl }  }  }")
+        .append("} GROUP BY ?subject ").toString();
+
+
+    //private String parentFolderUri;
     private Bindings bindings;
 
     public VirtuosoUserFolderSearchHelper(String parentFolderUri, PagingRequest pagingRequest, SortingRequest sortingRequest) {
@@ -48,25 +74,21 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
         if (parentFolderUri == null || !URLUtil.isURL(parentFolderUri)) {
             throw new CRRuntimeException("Parent folder has to be defined!");
         }
-        this.parentFolderUri = parentFolderUri;
+        //this.parentFolderUri = parentFolderUri;
         bindings = new Bindings();
+        bindings.setURI("parentFolder", parentFolderUri);
+
     }
 
     @Override
     protected String getOrderedQuery(List<Object> inParams) {
+        StringBuilder strBuilder = new StringBuilder(USER_HOMES_SPARQL);
+        strBuilder.append(" ORDER BY ");
 
-        StringBuilder strBuilder = SPARQLQueryUtil.getSparqlQueryHeader(true);
-        strBuilder.append("select distinct ?s where { ?s ?p ?o ");
-        strBuilder.append(getQueryParameters(inParams));
-        strBuilder.append("} ORDER BY ");
         if (sortOrder != null) {
             strBuilder.append(sortOrder);
         }
-        if (Predicates.RDFS_LABEL.equals(sortPredicate)) {
-            strBuilder.append("(bif:either( bif:isnull(?oorderby) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?oorderby)))");
-        } else {
-            strBuilder.append("(?s)");
-        }
+        strBuilder.append("(bif:either( bif:isnull(?label) , (bif:lcase(bif:subseq (bif:replace (?subject, '/', '#'), bif:strrchr (bif:replace (?subject, '/', '#'), '#')+1))) , bif:lcase(?label)))");
 
         return strBuilder.toString();
     }
@@ -74,44 +96,17 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
     @Override
     public String getUnorderedQuery(List<Object> inParams) {
 
-        StringBuilder strBuilder = SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF);
-        strBuilder.append("select distinct ?s where { ?s ?p ?o ");
-        strBuilder.append(getQueryParameters(inParams));
-        strBuilder.append("}");
-        return strBuilder.toString();
+        return USER_HOMES_SPARQL;
     }
 
     @Override
     public String getCountQuery(List<Object> inParams) {
-        StringBuilder strBuilder = SPARQLQueryUtil.getSparqlQueryHeader(true);
-        strBuilder.append("select count(distinct ?s) where { ?s ?p ?o ");
-        strBuilder.append(getQueryParameters(inParams));
-        strBuilder.append("}");
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("SELECT count(distinct(?s)) WHERE {?s ?p ?o . ?s a <").append(Subjects.CR_USER_FOLDER).append(">}");
+
         return strBuilder.toString();
     }
 
-    /**
-     * SPARQL for user home query paramters.
-     */
-    private static final String USERHOME_QUERY_PARAMETERS = " . ?s a ?type . FILTER (?type  IN (?crFile, ?crUserFolder)) . "
-        + "?parentFolder ?hasPredicate ?s . FILTER (?hasPredicate IN (?hasFile, ?hasFolder))";
-
-    public String getQueryParameters(List<Object> inParams) {
-
-        String s = USERHOME_QUERY_PARAMETERS;
-        bindings.setURI("parentFolder", parentFolderUri);
-        bindings.setURI("hasFile", Predicates.CR_HAS_FILE);
-        bindings.setURI("hasFolder", Predicates.CR_HAS_FOLDER);
-        bindings.setURI("crFile", Subjects.CR_FILE);
-        bindings.setURI("crUserFolder", Subjects.CR_USER_FOLDER);
-
-        if (sortPredicate != null) {
-            s += " . OPTIONAL {?s ?sortPredicateValue ?oorderby }";
-            bindings.setURI("sortPredicateValue", sortPredicate);
-        }
-
-        return s; // strBuilder.toString();
-    }
 
     @Override
     public Bindings getQueryBindings() {

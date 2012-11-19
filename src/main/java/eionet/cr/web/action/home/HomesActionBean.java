@@ -34,6 +34,7 @@ import eionet.cr.dto.UserFolderDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.AbstractSearchActionBean;
 import eionet.cr.web.security.CRUser;
@@ -56,6 +57,21 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
 
     static {
         COLUMNS = new ArrayList<SearchResultColumn>();
+        SearchResultColumn col = new SearchResultColumn("User home folders", true) {
+
+            @Override
+            public String getSortParamValue() {
+                // TODO Auto-generated method stub
+                return "label";
+            }
+
+            @Override
+            public String format(Object object) {
+                return object.toString();
+            }
+        };
+
+        COLUMNS.add(col);
     }
 
     /*
@@ -68,12 +84,17 @@ public class HomesActionBean extends AbstractSearchActionBean<UserFolderDTO> {
     public Resolution search() throws DAOException {
 
         UserHomeDAO userHomeDAO = DAOFactory.get().getDao(UserHomeDAO.class);
+
+        PagingRequest pagingRequest = PagingRequest.create(getPageN());
+        SortingRequest sortingRequest = new SortingRequest(getSortP(), SortOrder.parse(sortO));
+
         Pair<Integer, List<UserFolderDTO>> folders =
-                userHomeDAO.getFolderContents(CRUser.rootHomeUri(), null, PagingRequest.create(getPageN()), new SortingRequest(
-                        getSortP(), SortOrder.parse(getSortO())), null);
+                userHomeDAO.getFolderContents(CRUser.rootHomeUri(), null, pagingRequest, sortingRequest, null);
 
         resultList = folders.getRight();
         matchCount = folders.getLeft();
+
+        setPagination(Pagination.createPagination(matchCount, pagingRequest.getPageNumber(), this));
 
         return new ForwardResolution(HOMES_PATH);
     }
