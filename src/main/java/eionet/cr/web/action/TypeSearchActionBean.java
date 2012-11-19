@@ -218,8 +218,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
         if (!StringUtils.isBlank(type)) {
             return new RedirectResolution(FactsheetActionBean.class).addParameter("uri", type);
-        } else
+        } else {
             return new ForwardResolution(TYPE_SEARCH_PATH);
+        }
     }
 
     /**
@@ -280,9 +281,9 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
+    @Override
     public Resolution search() throws DAOException {
         logger.trace("**************  START SEARCH REQUEST  ***********");
         if (!StringUtils.isBlank(type)) {
@@ -306,10 +307,10 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
                 }
                 SearchResultDTO<SubjectDTO> searchResult =
                         DAOFactory
-                                .get()
-                                .getDao(SearchDAO.class)
-                                .searchByTypeAndFilters(criteria, false, PagingRequest.create(getPageN()),
-                                        new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByTypeAndFilters(criteria, false, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())), selectedColumns);
 
                 resultList = searchResult.getItems();
                 matchCount = searchResult.getMatchCount();
@@ -425,6 +426,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
+    @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
 
         List<SearchResultColumn> columns = new LinkedList<SearchResultColumn>();
@@ -610,17 +612,17 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
             Map<String, String> result = new LinkedHashMap<String, String>();
 
-            List<SubjectDTO> usedPredicates = DAOFactory.get().getDao(HelperDAO.class).getPredicatesUsedForType(type);
+            List<Pair<String, String>> usedPredicates = DAOFactory.get().getDao(HelperDAO.class).getPredicatesUsedForType(type);
 
             result.put(Predicates.RDFS_LABEL, "Title");
             if (usedPredicates != null && !usedPredicates.isEmpty()) {
 
-                for (SubjectDTO subject : usedPredicates) {
-                    if (subject != null && !subject.isAnonymous()) {
+                for (Pair<String, String> pair : usedPredicates) {
+                    if (pair != null) {
 
-                        String uri = subject.getUri();
-                        String label = subject.getObjectValue(Predicates.RDFS_LABEL);
-                        if (StringUtils.isBlank(label)) {
+                        String uri = pair.getLeft();
+                        String label = pair.getRight();
+                        if (StringUtils.isBlank(label) || label.equalsIgnoreCase("null")) {
                             label = URIUtil.extractURILabel(uri, uri);
                         }
 
@@ -808,16 +810,18 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
          *
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
+        @Override
         public int compare(String str1, String str2) {
 
-            if (str1 == null && str2 == null)
+            if (str1 == null && str2 == null) {
                 return 0;
-            else if (str1 == null && str2 != null)
+            } else if (str1 == null && str2 != null) {
                 return -1;
-            else if (str1 != null && str2 == null)
+            } else if (str1 != null && str2 == null) {
                 return 1;
-            else
+            } else {
                 return (str1).compareToIgnoreCase(str2);
+            }
         }
     }
 

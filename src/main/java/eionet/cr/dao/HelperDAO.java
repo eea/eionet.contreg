@@ -126,11 +126,12 @@ public interface HelperDAO extends DAO {
     String getSubjectSchemaUri(String subjectUri) throws DAOException;
 
     /**
+     *
      * @param typeUri
-     * @return List<SubjectDTO>
+     * @return
      * @throws DAOException if query fails
      */
-    List<SubjectDTO> getPredicatesUsedForType(String typeUri) throws DAOException;
+    List<Pair<String, String>> getPredicatesUsedForType(String typeUri) throws DAOException;
 
     /**
      * Gets sources that have some spatial content.

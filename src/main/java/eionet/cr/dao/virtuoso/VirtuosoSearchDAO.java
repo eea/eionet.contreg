@@ -173,7 +173,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      */
     private SearchResultDTO<SubjectDTO> searchByFilters2(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
         Bindings bindings = new Bindings();
@@ -210,9 +210,13 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             if (sortPredicateUri != null) {
                 query.append(" OPTIONAL {");
                 query.append(" {");
-                query.append("  SELECT ?s (sql:group_concat(?" + sortPredicate + ",', ') AS ?" + sortPredicate + ")");
-                query.append("  sql:group_concat(bif:subseq(?" + sortPredicate + ", bif:strrchr(bif:concat('#', bif:replace(?"
-                        + sortPredicate + ", '/', '#')), '#')),', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
+                query.append("  SELECT ?s");
+                query.append(" sql:group_concat(bif:either(bif:starts_with(?" + sortPredicate + ", 'http://') +");
+                query.append(" bif:starts_with(?" + sortPredicate + ", 'ftp://') +");
+                query.append(" bif:starts_with(?" + sortPredicate + ", 'news://'),");
+                query.append(" bif:subseq(?" + sortPredicate + ",");
+                query.append(" bif:strrchr(bif:replace(?" + sortPredicate + ", '/', '#'), '#')), ?" + sortPredicate + "),");
+                query.append(" ', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
                 query.append("  WHERE { {SELECT DISTINCT ?s (bif:lcase(STR(?" + sortPredicate + ")) AS ?" + sortPredicate + ") { ?s <"
                         + sortPredicateUri + "> ?" + sortPredicate + ".} ORDER BY ASC(?" + sortPredicate + ") }");
                 query.append("  } GROUP BY ?s");
@@ -354,7 +358,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Override
     public SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
