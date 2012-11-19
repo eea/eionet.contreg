@@ -237,4 +237,38 @@ WHERE {
 }
 ]]></entry>
 
+    <entry key="trimConvert.name">Trim spaces from beginning and end</entry>
+    <entry key="trimConvert.script"><![CDATA[
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?record [TABLECOLUMN] ?value
+}
+INSERT {
+    ?record [TABLECOLUMN] `bif:trim(?value)`
+}
+WHERE {
+    GRAPH ?harvestedSource {
+        ?record [TABLECOLUMN] ?value
+        FILTER(DATATYPE(?value) = xsd:string && bif:trim(?value) != ?value)
+    }
+}
+]]></entry>
+
+    <entry key="addLangConvert.name">Add English language code</entry>
+    <entry key="addLangConvert.script"><![CDATA[
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?record [TABLECOLUMN] ?value
+}
+INSERT {
+    ?record [TABLECOLUMN] `STRLANG(STR(?value),'en')`
+}
+WHERE {
+    GRAPH ?harvestedSource {
+        ?record [TABLECOLUMN] ?value
+        FILTER(DATATYPE(?value) = xsd:string)
+    }
+}
+]]></entry>
+
 </properties>
