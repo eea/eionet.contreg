@@ -5,19 +5,19 @@
 */
 
 /* Folder items icons. */
-td.file {
+.datatable td.file {
     background: url('../images/file.gif') no-repeat left top;
     background-position: 0px 3px;
     padding-left: 20px;
 }
 
-td.folder {
+.datatable td.folder {
     background: url('../images/folder.gif') no-repeat left top;
     background-position: 0px 3px;
     padding-left: 20px;
 }
 
-td.upFolder {
+.datatable td.upFolder {
     background: url('../images/up.gif') no-repeat left top;
     background-position: 0px 3px;
     padding-left: 20px;
