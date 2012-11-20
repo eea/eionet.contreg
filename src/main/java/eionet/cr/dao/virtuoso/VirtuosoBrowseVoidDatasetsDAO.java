@@ -68,7 +68,6 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("  FILTER (LANG(?label) IN ('en','')).\n");
 
         if (creators != null && !creators.isEmpty()) {
-            // sb.append("  FILTER (?creator = 'Eurostat').\n");
             sb.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
             for (int i = 0; i < creators.size(); i++) {
                 bindings.setString("crt" + (i + 1), creators.get(i));
