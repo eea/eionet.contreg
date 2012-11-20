@@ -42,6 +42,8 @@ import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptActionBean;
+import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -66,8 +68,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
     /** Harvest history. */
     private List<HarvestDTO> harvests;
 
-    /** Source specific post harvest scripts. */
-    private List<PostHarvestScriptDTO> postHarvestScripts;
+    /** Number of post-harvest scripts available for this source. */
+    private int noOfPostHarvestScripts;
 
     /** Is schema source. */
     private boolean schemaSource;
@@ -85,7 +87,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
             addCautionMessage("No request criteria specified!");
         } else {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
-            postHarvestScripts = factory.getDao(PostHarvestScriptDAO.class).list(PostHarvestScriptDTO.TargetType.SOURCE, uri);
+            noOfPostHarvestScripts =
+                    factory.getDao(PostHarvestScriptDAO.class).list(PostHarvestScriptDTO.TargetType.SOURCE, uri).size();
             if (harvestSource != null) {
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
                 harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
@@ -235,10 +238,29 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the postHarvestScripts
+     * Returns the Java class object of the post-harvest script action bean class. This method is used in JSP for building a
+     * refactoring-safe link to adding a post-harvest script for this source.
+     *
+     * @return The class in question.
      */
-    public List<PostHarvestScriptDTO> getPostHarvestScripts() {
-        return postHarvestScripts;
+    public Class getPostHarvestScriptActionBeanClass() {
+        return PostHarvestScriptActionBean.class;
     }
 
+    /**
+     * Returns the Java class object of the post-harvest scripts action bean class. This method is used in JSP for building a
+     * refactoring-safe link to listing the source's post-harvest scripts.
+     *
+     * @return
+     */
+    public Class getPostHarvestScriptsActionBeanClass() {
+        return PostHarvestScriptsActionBean.class;
+    }
+
+    /**
+     * @return the noOfPostHarvestScripts
+     */
+    public int getNoOfPostHarvestScripts() {
+        return noOfPostHarvestScripts;
+    }
 }

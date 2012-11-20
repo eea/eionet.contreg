@@ -10,9 +10,41 @@
             <h1>No harvest source by this criteria was found!</h1>
         </c:if>
         <c:if test="${actionBean.harvestSource != null}">
+
             <cr:tabMenu tabs="${actionBean.tabs}" />
-            <br />
-            <br />
+
+            <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
+                <ul id="dropdown-operations">
+                    <li><a href="#">Operations</a>
+                    <ul>
+                        <li>
+                            <stripes:link beanclass="${actionBean.class.name}" event="scheduleUrgentHarvest" title="Schedule urgent harvest of this source">
+                                <c:out value="Schedule urgent harvest"/>
+                                <stripes:param name="uri" value="${actionBean.uri}"/>
+                            </stripes:link>
+                        </li>
+                        <li>
+                            <stripes:link beanclass="${actionBean.postHarvestScriptActionBeanClass.name}" title="Add a post-harvest script for this source">
+                                <c:out value="Add post-harvest script"/>
+                                <stripes:param name="targetUrl" value="${actionBean.uri}" />
+                                <stripes:param name="targetType" value="SOURCE"/>
+                                <stripes:param name="cancelUrl" value="${actionBean.urlBinding}?uri=${actionBean.uri}"/>
+                            </stripes:link>
+                        </li>
+                        <c:if test="${actionBean.noOfPostHarvestScripts > 0}">
+                            <li>
+	                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View the ${actionBean.noOfPostHarvestScripts} post-harvest script(s) of this source">
+	                                <c:out value="View post-harvest scripts"/>
+	                                <stripes:param name="targetUrl" value="${actionBean.uri}" />
+	                                <stripes:param name="targetType" value="SOURCE"/>
+	                            </stripes:link>
+                            </li>
+                        </c:if>
+                    </ul>
+                </ul>
+            </c:if>
+
+            <br /><br />
             <h1>View source</h1>
 
             <c:if test="${actionBean.harvestSource.permanentError}">
@@ -129,17 +161,16 @@
                 </tr>
 
                 <tr>
-                    <td colspan="2" style="padding-top: 10px">
-                        <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
-                            <crfn:form action="/sourceView.action">
-                                <stripes:hidden name="uri" />
-                                <stripes:submit name="scheduleUrgentHarvest" value="Schedule urgent harvest" />
-                            </crfn:form>
-                            <crfn:form action="/admin/postHarvestScript">
-                                <stripes:hidden name="targetUrl" value="${actionBean.uri}" />
-                                <stripes:hidden name="targetType" />
-                                <stripes:submit name="defaultHandler" value="Add post-harvest script" />
-                            </crfn:form>
+                    <td colspan="2" style="font-size:0.8em;">
+                        <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
+                            <c:out value="0 post-harvest scripts available for this source."/>
+                        </c:if>
+                        <c:if test="${actionBean.noOfPostHarvestScripts > 0}">
+                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View post-harvest scripts of this source">
+                                <c:out value="There is ${actionBean.noOfPostHarvestScripts} post-harvest scripts available for this source."/>
+                                <stripes:param name="targetUrl" value="${actionBean.uri}" />
+                                <stripes:param name="targetType" value="SOURCE"/>
+                            </stripes:link>
                         </c:if>
                     </td>
                 </tr>
@@ -198,22 +229,10 @@
                     </table>
                 </c:when>
                 <c:otherwise>
-                    No history found.
+                    No harvest history found!
                 </c:otherwise>
             </c:choose>
         </c:if>
-
-        <%-- Post harvest scripts --%>
-        <display:table name="${actionBean.postHarvestScripts}" id="item" class="datatable" sort="list" requestURI="${actionBean.urlBinding}">
-            <display:setProperty name="basic.msg.empty_list" value="No post-harvest scripts found."/>
-            <display:caption>Source specific post-harvest scripts:</display:caption>
-
-            <display:column title="Title">
-                <span title="${item.script}">${item.title}</span>
-            </display:column>
-            <display:column property="lastModified" title="Last modified"/>
-            <display:column property="active" title="Active"/>
-        </display:table>
 
     </stripes:layout-component>
 

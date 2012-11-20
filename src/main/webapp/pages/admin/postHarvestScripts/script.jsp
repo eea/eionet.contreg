@@ -162,6 +162,9 @@ while (l--) {
             <c:if test="${not empty actionBean.backToTargetUrl}">
                 <stripes:hidden name="backToTargetUrl"/>
             </c:if>
+            <c:if test="${not empty actionBean.cancelUrl}">
+                <stripes:hidden name="cancelUrl"/>
+            </c:if>
             <input type="hidden" name="ignoreMalformedSparql" value="${actionBean.ignoreMalformedSparql}"/>
 
         </crfn:form>

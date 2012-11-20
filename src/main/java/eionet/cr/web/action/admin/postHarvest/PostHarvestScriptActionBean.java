@@ -83,6 +83,12 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String testError;
 
     /**
+     * The URL to redirect to when Cancel event called. Used when the script creating/editing page has been reached, for example,
+     * from harvest source view page.
+     */
+    private String cancelUrl;
+
+    /**
      *
      * @return
      * @throws DAOException
@@ -128,7 +134,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
             return resolutionToScripts();
         } else {
-            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id);
+            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id).addParameter("cancelUrl",
+                    cancelUrl);
         }
     }
 
@@ -179,6 +186,10 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
         if (logger.isTraceEnabled()) {
             logger.trace("Handling cancel event");
+        }
+
+        if (StringUtils.isNotBlank(cancelUrl)) {
+            return new RedirectResolution(cancelUrl);
         }
 
         if (StringUtils.isBlank(targetUrl) && !StringUtils.isBlank(backToTargetUrl)) {
@@ -295,7 +306,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(int id) {
         this.id = id;
@@ -309,7 +321,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param title the title to set
+     * @param title
+     *            the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -323,7 +336,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param script the script to set
+     * @param script
+     *            the script to set
      */
     public void setScript(String script) {
         this.script = script;
@@ -337,7 +351,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl the targetUrl to set
+     * @param targetUrl
+     *            the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
@@ -351,7 +366,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType the targetType to set
+     * @param targetType
+     *            the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -365,7 +381,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param testSourceUrl the testSourceUrl to set
+     * @param testSourceUrl
+     *            the testSourceUrl to set
      */
     public void setTestSourceUrl(String testSourceUrl) {
         this.testSourceUrl = testSourceUrl;
@@ -387,7 +404,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param active the active to set
+     * @param active
+     *            the active to set
      */
     public void setActive(boolean active) {
         this.active = active;
@@ -401,7 +419,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param ignoreMalformedSparql the ignoreMalformedSparql to set
+     * @param ignoreMalformedSparql
+     *            the ignoreMalformedSparql to set
      */
     public void setIgnoreMalformedSparql(boolean ignoreMalformedSparql) {
         this.ignoreMalformedSparql = ignoreMalformedSparql;
@@ -499,6 +518,21 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     public String getAssociatedTypeVariable() {
         return PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE;
+    }
+
+    /**
+     * @return the cancelUrl
+     */
+    public String getCancelUrl() {
+        return cancelUrl;
+    }
+
+    /**
+     * @param cancelUrl
+     *            the cancelUrl to set
+     */
+    public void setCancelUrl(String cancelUrl) {
+        this.cancelUrl = cancelUrl;
     }
 
     //
