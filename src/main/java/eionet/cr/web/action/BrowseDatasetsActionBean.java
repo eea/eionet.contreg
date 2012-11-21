@@ -22,6 +22,7 @@
 package eionet.cr.web.action;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -52,14 +53,32 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     /** Forward path to the JSP that handles the display and faceted browsing of VoID datasets. */
     private static final String BROWSE_DATASETS_JSP = "/pages/browseDatasets.jsp";
 
-    /** The creator to search by. Corresponds to http://purl.org/dc/terms/creator. */
-    private String creator;
+    /** The creator (http://purl.org/dc/terms/creator) to search by. */
+    private List<String> creator;
 
-    /** The subject to search by. Corresponds to http://purl.org/dc/terms/subject. */
-    private String subject;
+    /** The subject (http://purl.org/dc/terms/subject) to search by. */
+    private List<String> subject;
 
     /** The found datasets. */
     private List<VoidDatasetsResultRow> datasets;
+
+    /** The list of available creators (http://purl.org/dc/terms/creator) to search by. */
+    private List<String> availableCreators;
+
+    /** The list of available subjects (http://purl.org/dc/terms/creator) to search by. */
+    private List<String> availableSubjects;
+
+    /** Indicates the number of user-selected creators before he changed his selection on the form. */
+    private int prevCrtSize;
+
+    /** Indicates the number of user-selected subjects before he changes his selection on the form. */
+    private int prevSbjSize;
+
+    /** A dummy hash-map that is easy to access in JSP in order to determine whether a creator has been selected. */
+    private HashMap<String,String> selectedCreators = new HashMap<String, String>();
+
+    /** A dummy hash-map that is easy to access in JSP in order to determine whether a subject has been selected. */
+    private HashMap<String,String> selectedSubjects = new HashMap<String, String>();
 
     /**
      *
@@ -69,44 +88,81 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     @DefaultHandler
     public Resolution defaultEvent() throws DAOException{
 
-        List<String> creators = Collections.singletonList(creator);
-        List<String> subjects = Collections.singletonList(subject);
-
-        LOGGER.debug("Searching for VoID datasets, creators = " + creators + ", subjects = " + subjects);
+        LOGGER.debug(" - ");
+        LOGGER.debug("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
 
         BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
-        datasets = dao.findDatasets(creators, subjects);
+        datasets = dao.findDatasets(creator, subject);
 
         LOGGER.debug(datasets.size() + " datasets found!");
+        LOGGER.debug("Populating available creators and subjects");
+
+        if (isCreatorsChanged()){
+            LOGGER.debug("Creators changed");
+            availableSubjects = dao.findSubjects(creator);
+            //availableCreators = dao.findCreators(availableSubjects);
+            availableCreators = dao.findCreators(null);
+        }
+        else if (isSubjectsChanged()){
+            LOGGER.debug("Subjects changed");
+            availableCreators = dao.findCreators(subject);
+            //availableSubjects = dao.findSubjects(availableCreators);
+            availableSubjects = dao.findSubjects(null);
+        }
+        else{
+            availableCreators = dao.findCreators(subject);
+            availableSubjects = dao.findSubjects(creator);
+        }
+
+        beforeRender();
         return new ForwardResolution(BROWSE_DATASETS_JSP);
     }
 
     /**
-     * @return the creator
+     * Assign and prepare some necessary fields for the JSP render.
      */
-    public String getCreator() {
-        return creator;
+    private void beforeRender(){
+
+        if (creator != null){
+            for (String crt : creator){
+                selectedCreators.put(crt, crt);
+            }
+        }
+
+        if (subject != null){
+            for (String sbj : subject){
+                selectedSubjects.put(sbj, sbj);
+            }
+        }
+
+        LOGGER.debug("seletedCreators = " + selectedCreators);
+        LOGGER.debug("seletedSubjects = " + selectedSubjects);
+
+        prevSbjSize = subject == null ? 0 : subject.size();
+        prevCrtSize = creator == null ? 0 : creator.size();
+
+        Collections.sort(availableCreators);
+        Collections.sort(availableSubjects);
     }
 
     /**
-     * @param creator the creator to set
+     * Returns true if user changed his creators' selection, otherwise return false.
+     *
+     * @return the boolean as described
      */
-    public void setCreator(String creator) {
-        this.creator = creator;
+    private boolean isCreatorsChanged(){
+        int crtSize = creator==null ? 0 : creator.size();
+        return crtSize != prevCrtSize;
     }
 
     /**
-     * @return the subject
+     * Returns true if user changed his subjects' selection, otherwise return false.
+     *
+     * @return the boolean as described
      */
-    public String getSubject() {
-        return subject;
-    }
-
-    /**
-     * @param subject the subject to set
-     */
-    public void setSubject(String subject) {
-        this.subject = subject;
+    private boolean isSubjectsChanged(){
+        int sbjSize = subject==null ? 0 : subject.size();
+        return sbjSize != prevSbjSize;
     }
 
     /**
@@ -124,5 +180,89 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
      */
     public Class getFactsheetActionBeanClass(){
         return FactsheetActionBean.class;
+    }
+
+    /**
+     * @return the availableCreators
+     */
+    public List<String> getAvailableCreators() {
+        return availableCreators;
+    }
+
+    /**
+     * @return the availableSubjects
+     */
+    public List<String> getAvailableSubjects() {
+        return availableSubjects;
+    }
+
+    /**
+     * @return the creator
+     */
+    public List<String> getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator the creator to set
+     */
+    public void setCreator(List<String> creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * @return the subject
+     */
+    public List<String> getSubject() {
+        return subject;
+    }
+
+    /**
+     * @param subject the subject to set
+     */
+    public void setSubject(List<String> subject) {
+        this.subject = subject;
+    }
+
+    /**
+     * @return the prevCrtSize
+     */
+    public int getPrevCrtSize() {
+        return prevCrtSize;
+    }
+
+    /**
+     * @param prevCrtSize the prevCrtSize to set
+     */
+    public void setPrevCrtSize(int prevCrtSize) {
+        this.prevCrtSize = prevCrtSize;
+    }
+
+    /**
+     * @return the prevSbjSize
+     */
+    public int getPrevSbjSize() {
+        return prevSbjSize;
+    }
+
+    /**
+     * @param prevSbjSize the prevSbjSize to set
+     */
+    public void setPrevSbjSize(int prevSbjSize) {
+        this.prevSbjSize = prevSbjSize;
+    }
+
+    /**
+     * @return the selectedCreators
+     */
+    public HashMap<String, String> getSelectedCreators() {
+        return selectedCreators;
+    }
+
+    /**
+     * @return the selectedSubjects
+     */
+    public HashMap<String, String> getSelectedSubjects() {
+        return selectedSubjects;
     }
 }
