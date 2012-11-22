@@ -82,12 +82,12 @@
                                         <c:set var="isCreatorChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;">
+                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();">
                                             <a href="javascript:void(0);" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();" title="Select this creator">
                                                 <c:out value="${availableCreator}"/>
                                             </a>
                                         </td>
-                                        <td style="width:7%">
+                                        <td style="width:7%" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();">
                                             <input type="checkbox" id="creator_${creatorsLoop.index}" name="creator" value="${availableCreator}" onchange="return submitFiltersForm();" title="Select this creator" ${isCreatorChecked}/>
                                         </td>
                                     </tr>
@@ -121,12 +121,12 @@
                                         <c:set var="isSubjectChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;">
+                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();">
                                             <a href="javascript:void(0);" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();" title="Select this subject">
                                                 <c:out value="${availableSubject}"/>
                                             </a>
                                         </td>
-                                        <td style="width:7%">
+                                        <td style="width:7%" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();">
                                             <input type="checkbox" id="subject_${subjectsLoop.index}" name="subject" value="${availableSubject}" onchange="return submitFiltersForm();" title="Select this subject" ${isSubjectChecked}/>
                                         </td>
                                     </tr>
