@@ -19,6 +19,7 @@
 -->
         <li><a href="tagSearch.action">Tag search</a></li>
         <li><a href="recentUploads.action">Recent uploads</a></li>
+        <li><a href="browseDatasets.action">Browse datasets</a></li>
         <li><a href="sparql">SPARQL endpoint</a></li>
         <li><a href="sharedSparqlBookmarks.action">Shared SPARQL bookmarks</a></li>
         <li><a href="sources.action">Harvesting sources</a></li>

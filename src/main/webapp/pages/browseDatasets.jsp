@@ -10,6 +10,42 @@
         function submitFiltersForm(){
             document.getElementById('loadingMessage').style.visibility='visible';
             document.getElementById('filtersForm').submit();
+            return true;
+        }
+
+        function clearFilters(filterName){
+
+            var i;
+            var formElems = document.getElementById('filtersForm').elements;
+            var formElemsLen = formElems.length;
+
+            for (i=0; i<formElemsLen; i++){
+                if (formElems[i].name == filterName){
+                    if (formElems[i].type == 'checkbox'){
+                        if (formElems[i].checked == true){
+                            formElems[i].checked = false;
+                        }
+                    }
+                }
+            }
+
+            return submitFiltersForm();
+        }
+
+        function clearerChanged(clearer, filterName){
+
+            if (clearer.checked == true){
+                clearer.checked = false;
+                return false;
+            }
+            else{
+                return clearFilters(filterName);
+            }
+        }
+
+        function toggleCheckbox(id){
+            var chkbox = document.getElementById(id);
+            chkbox.checked = !chkbox.checked;
         }
 
         // ]]>
@@ -29,14 +65,16 @@
                         <table style="background-color:#CCCCCC;color:#FFFFFF;font-weight:bold;width:100%;">
                             <tr>
                                 <td style="padding-left:5px;">Creator</td>
-                                <td style="width:7%;"><input type="checkbox"/></td>
+                                <td style="width:7%;">
+                                    <input type="checkbox" name="creatorsClearer" title="Clear this filter" onchange="clearerChanged(this,'creator');" ${empty actionBean.selectedCreators ? '' : 'checked="checked"'}}/>
+                                </td>
                             </tr>
                         </table>
                     </div>
                     <div style="height:130px;overflow:auto;background-color:#F2F2F2;">
                         <c:if test="${not empty actionBean.availableCreators}">
                             <table style="width:100%;height:100%;background-color:#F2F2F2;">
-                                <c:forEach items="${actionBean.availableCreators}" var="availableCreator">
+                                <c:forEach items="${actionBean.availableCreators}" var="availableCreator" varStatus="creatorsLoop">
                                     <c:if test="${not empty actionBean.selectedCreators[availableCreator]}">
                                         <c:set var="isCreatorChecked" value='checked="checked"'/>
                                     </c:if>
@@ -45,12 +83,12 @@
                                     </c:if>
                                     <tr>
                                         <td style="padding-left:5px;font-size:0.8em;">
-                                            <a href="#" onclick="return false;" title="Select this creator">
+                                            <a href="javascript:void(0);" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();" title="Select this creator">
                                                 <c:out value="${availableCreator}"/>
                                             </a>
                                         </td>
                                         <td style="width:7%">
-                                            <input type="checkbox" name="creator" value="${availableCreator}" onchange="submitFiltersForm();return true;" title="Select this creator" ${isCreatorChecked}/>
+                                            <input type="checkbox" id="creator_${creatorsLoop.index}" name="creator" value="${availableCreator}" onchange="return submitFiltersForm();" title="Select this creator" ${isCreatorChecked}/>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -66,14 +104,16 @@
                         <table style="background-color:#CCCCCC;color:#FFFFFF;font-weight:bold;width:100%;">
                             <tr>
                                 <td style="padding-left:5px;">Subject</td>
-                                <td style="width:7%;"><input type="checkbox"/></td>
+                                <td style="width:7%;">
+                                    <input type="checkbox" name="subjectsClearer" title="Clear this filter" onchange="clearerChanged(this,'subject');" ${empty actionBean.selectedSubjects ? '' : 'checked="checked"'}}/>
+                                </td>
                             </tr>
                         </table>
                     </div>
                     <div style="height:130px;overflow:auto;background-color:#F2F2F2;">
                         <c:if test="${not empty actionBean.availableSubjects}">
                             <table style="width:100%;height:100%;background-color:#F2F2F2;">
-                                <c:forEach items="${actionBean.availableSubjects}" var="availableSubject">
+                                <c:forEach items="${actionBean.availableSubjects}" var="availableSubject" varStatus="subjectsLoop">
                                     <c:if test="${not empty actionBean.selectedSubjects[availableSubject]}">
                                         <c:set var="isSubjectChecked" value='checked="checked"'/>
                                     </c:if>
@@ -82,12 +122,12 @@
                                     </c:if>
                                     <tr>
                                         <td style="padding-left:5px;font-size:0.8em;">
-                                            <a href="#" onclick="return false;" title="Select this subject">
+                                            <a href="javascript:void(0);" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();" title="Select this subject">
                                                 <c:out value="${availableSubject}"/>
                                             </a>
                                         </td>
                                         <td style="width:7%">
-                                            <input type="checkbox" name="subject" value="${availableSubject}" onchange="submitFiltersForm();return true;" title="Select this subject" ${isSubjectChecked}/>
+                                            <input type="checkbox" id="subject_${subjectsLoop.index}" name="subject" value="${availableSubject}" onchange="return submitFiltersForm();" title="Select this subject" ${isSubjectChecked}/>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -104,7 +144,7 @@
 
         </crfn:form>
         <br/>
-        <display:table name="${actionBean.datasets}" class="datatable" id="dataset" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:98%;">
+        <display:table name="${actionBean.datasets}" class="sortable" id="dataset" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:98%;">
 
             <display:setProperty name="paging.banner.item_name" value="dataset"/>
             <display:setProperty name="paging.banner.items_name" value="datasets"/>

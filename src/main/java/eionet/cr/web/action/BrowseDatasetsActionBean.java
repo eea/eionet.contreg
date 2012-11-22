@@ -88,23 +88,23 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     @DefaultHandler
     public Resolution defaultEvent() throws DAOException{
 
-        LOGGER.debug(" - ");
-        LOGGER.debug("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
+        LOGGER.trace(" - ");
+        LOGGER.trace("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
 
         BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
         datasets = dao.findDatasets(creator, subject);
 
-        LOGGER.debug(datasets.size() + " datasets found!");
-        LOGGER.debug("Populating available creators and subjects");
+        LOGGER.trace(datasets.size() + " datasets found!");
+        LOGGER.trace("Populating available creators and subjects");
 
         if (isCreatorsChanged()){
-            LOGGER.debug("Creators changed");
+            LOGGER.trace("Creators changed");
             availableSubjects = dao.findSubjects(creator);
             //availableCreators = dao.findCreators(availableSubjects);
             availableCreators = dao.findCreators(null);
         }
         else if (isSubjectsChanged()){
-            LOGGER.debug("Subjects changed");
+            LOGGER.trace("Subjects changed");
             availableCreators = dao.findCreators(subject);
             //availableSubjects = dao.findSubjects(availableCreators);
             availableSubjects = dao.findSubjects(null);
@@ -134,9 +134,6 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
                 selectedSubjects.put(sbj, sbj);
             }
         }
-
-        LOGGER.debug("seletedCreators = " + selectedCreators);
-        LOGGER.debug("seletedSubjects = " + selectedSubjects);
 
         prevSbjSize = subject == null ? 0 : subject.size();
         prevCrtSize = creator == null ? 0 : creator.size();
