@@ -129,7 +129,9 @@
       </dcterms:subject>
       <toc:hasView><xsl:attribute name="rdf:resource">http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=<xsl:value-of select="nt:code"/></xsl:attribute></toc:hasView>
       <void:dataDump><xsl:attribute name="rdf:resource">http://eurostat.linked-statistics.org/data/<xsl:value-of select="nt:code"/>.rdf</xsl:attribute></void:dataDump>
+      <!--
       <void:dataDump><xsl:attribute name="rdf:resource">http://eurostat.linked-statistics.org/dsd/<xsl:value-of select="nt:code"/>.ttl</xsl:attribute></void:dataDump>
+      -->
       <xsl:apply-templates/>
       <xsl:call-template name="create-tags"><xsl:with-param name="text" select="nt:code"/></xsl:call-template>
     </void:Dataset>
