@@ -52,7 +52,6 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -76,10 +75,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String GET_HARVEST_SOURCES_FAILED_SQL =
         "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
-        + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) AND LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+        + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) AND LAST_HARVEST_FAILED = 'Y' "
+        + "AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_FAILED_SQL =
-        "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) "
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
+        + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) "
         + "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL >= "
@@ -426,7 +427,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         try {
             sourcesDeleteStatement = conn.prepareStatement(DELETE_HARVEST_SOURCES);
             urgentQueueDeleteStatement = conn.prepareStatement(DELETE_FROM_URGENT_HARVEST_QUEUE);
-            if (GeneralConfig.isUseInferencing()){
+            if (GeneralConfig.isUseInferencing()) {
                 rulesetDeleteStatement = conn.prepareStatement(DELETE_FROM_RULESET);
             }
 
@@ -436,21 +437,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 sourcesDeleteStatement.setLong(1, urlHash);
                 urgentQueueDeleteStatement.setString(1, sourceUrl);
-                if (GeneralConfig.isUseInferencing()){
+                if (GeneralConfig.isUseInferencing()) {
                     rulesetDeleteStatement.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
                     rulesetDeleteStatement.setString(2, sourceUrl);
                 }
 
                 sourcesDeleteStatement.addBatch();
                 urgentQueueDeleteStatement.addBatch();
-                if (GeneralConfig.isUseInferencing()){
+                if (GeneralConfig.isUseInferencing()) {
                     rulesetDeleteStatement.addBatch();
                 }
             }
 
             sourcesDeleteStatement.executeBatch();
             urgentQueueDeleteStatement.executeBatch();
-            if (GeneralConfig.isUseInferencing()){
+            if (GeneralConfig.isUseInferencing()) {
                 rulesetDeleteStatement.executeBatch();
             }
         } finally {
@@ -878,7 +879,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         ResultSet rs = null;
 
         boolean ret = false;
-        if (GeneralConfig.isUseInferencing()){
+        if (GeneralConfig.isUseInferencing()) {
             try {
                 conn = SesameUtil.getSQLConnection();
                 stmt = conn.prepareStatement("SELECT RS_NAME FROM DB.DBA.sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
@@ -941,7 +942,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         PreparedStatement stmt = null;
         boolean ret = false;
 
-        if (GeneralConfig.isUseInferencing()){
+        if (GeneralConfig.isUseInferencing()) {
             try {
                 conn = SesameUtil.getSQLConnection();
                 stmt = conn.prepareStatement("DB.DBA.rdfs_rule_set (?, ?, 1)");
@@ -954,8 +955,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 SQLUtil.close(stmt);
                 SQLUtil.close(conn);
             }
-        }else{
-            ret=true;
+        } else {
+            ret = true;
         }
 
         return ret;
@@ -1223,9 +1224,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * SPARQL for getting new sources based on the given source.
      */
-    private static final String NEW_SOURCES_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr() + "PREFIX cr: "
-    + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
-    + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+    private static final String NEW_SOURCES_SPARQL = "PREFIX cr: "
+        + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
+        + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
 
     /*
      * (non-Javadoc)
@@ -1283,6 +1284,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String SOURCES_ABOVE_URGENCY_THRESHOLD_SQL = "select count(*) from HARVEST_SOURCE where"
         + " INTERVAL_MINUTES > 0 and (<seconds_since_last_harvest> / <harvest_interval_seconds>) > ?";
 
+    /**
+     * { @inheritDoc }.
+     */
     @Override
     public int getNumberOfSourcesAboveUrgencyThreshold(double threshold) throws DAOException {
 
@@ -1426,11 +1430,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     *
-     * @param sqlConn
-     * @param oldGraph
-     * @param newGraph
-     * @throws SQLException
+     * Replace graph URI with new one.
+     * @param sqlConn Connection.
+     * @param oldGraph Existing graph URI.
+     * @param newGraph The new URI of the graph.
+     * @throws SQLException Database error.
      */
     private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph) throws SQLException {
 

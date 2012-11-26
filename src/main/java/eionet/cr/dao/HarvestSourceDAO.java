@@ -251,7 +251,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-            OpenRDFException;
+    OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -266,7 +266,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException;
+    throws IOException, OpenRDFException;
 
     /**
      *
@@ -330,7 +330,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-            RepositoryException, IOException;
+    RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -344,7 +344,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO... object)
-            throws DAOException, RepositoryException, IOException;
+    throws DAOException, RepositoryException, IOException;
 
     /**
      *
@@ -429,7 +429,8 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Derives new harvest sources from the graph represented by the given source url, and inserts them into the HARVEST_SOURCE
-     * table.
+     * table. The method does not use inferencing for finding new soureces. They are created by POST-HARVEST scripts with SPARQL
+     * INSERT statements.
      *
      * @param sourceUrl
      *            The given source URL.
