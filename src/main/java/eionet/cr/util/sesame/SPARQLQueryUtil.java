@@ -36,7 +36,7 @@ import eionet.cr.util.Bindings;
 public final class SPARQLQueryUtil {
 
     /** Chars not allowed in IRI. */
-    private static final char[] BAD_CHARS = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};
+    private static final char[] BAD_CHARS = { ' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`' };
 
     /**
      * Inference definition in SPARQL.
@@ -56,9 +56,12 @@ public final class SPARQLQueryUtil {
      * @return
      */
     public static StringBuilder getCrInferenceDefinition() {
+
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(INFERENCE_DEF).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-        .append("' ");
+        if (GeneralConfig.isUseInferencing()) {
+            strBuilder.append(INFERENCE_DEF).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
+            .append("' ");
+        }
         return strBuilder;
     }
 

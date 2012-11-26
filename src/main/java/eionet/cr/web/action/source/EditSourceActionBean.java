@@ -36,6 +36,7 @@ import net.sourceforge.stripes.validation.SimpleError;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -236,11 +237,13 @@ public class EditSourceActionBean extends AbstractActionBean {
      */
     private void manageRuleset(String url) throws DAOException {
 
-        boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
-        if (schemaSource && !isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
-        } else if (!schemaSource && isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
+        if (GeneralConfig.isUseInferencing()){
+            boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
+            if (schemaSource && !isAlreadyInRuleset) {
+                factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
+            } else if (!schemaSource && isAlreadyInRuleset) {
+                factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
+            }
         }
 
     }

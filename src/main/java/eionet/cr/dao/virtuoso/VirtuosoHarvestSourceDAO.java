@@ -52,6 +52,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -68,42 +69,43 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String TEMP_GRAPH_SUFFIX = "_temp";
     /** */
     private static final String GET_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
     private static final String SEARCH_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
     private static final String GET_HARVEST_SOURCES_FAILED_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
-                    + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) AND LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
+        + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) AND LAST_HARVEST_FAILED = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_FAILED_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) " +
-                    "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) "
+        + "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL >= "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+        + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_UNAVAIL_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL >= "
-                    + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL >= "
+        + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String GET_PRIORITY_SOURCES_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE "
-            + "WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        + "WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
     private static final String SEARCH_PRIORITY_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND "
-                    + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+        "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND "
+        + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
     private static final String RENAME_GRAPH_SQL =
-            "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('new') WHERE g = iri_to_id ('old',0)";
+        "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('new') WHERE g = iri_to_id ('old',0)";
 
     /** class logger. */
     private static final Logger LOGGER = Logger.getLogger(VirtuosoHarvestSourceDAO.class);
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.pagination.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
     @Override
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestSources(String searchString, PagingRequest pagingRequest,
@@ -115,7 +117,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.pagination.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
     @Override
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesFailed(String searchString, PagingRequest pagingRequest,
@@ -169,8 +172,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             countQuery.append("AND HS.URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ");
 
             rowCount =
-                    Integer.parseInt(executeUniqueResultSQL(countQuery.toString(), params, new SingleObjectReader<Object>())
-                            .toString());
+                Integer.parseInt(executeUniqueResultSQL(countQuery.toString(), params, new SingleObjectReader<Object>())
+                        .toString());
         }
 
         return new Pair<Integer, List<HarvestSourceDTO>>(rowCount, list);
@@ -178,7 +181,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang.String, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
+     * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang.String, eionet.cr.util.pagination.PagingRequest,
+     * eionet.cr.util.SortingRequest)
      */
     @Override
     public Pair<Integer, List<HarvestSourceDTO>> getHarvestSourcesUnavailable(String searchString, PagingRequest pagingRequest,
@@ -191,7 +195,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -205,7 +208,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -218,12 +220,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         String query =
-                "SELECT<pagingParams> * FROM HARVEST_SOURCE "
-                        + "WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE "
+            + "WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
         if (!StringUtils.isBlank(searchString)) {
             query =
-                    "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
-                            + " URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+                "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
+                + " URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
         }
         query = query.replace("<sources>", sourceUris);
 
@@ -269,8 +271,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             StringBuffer buf = new StringBuffer("select count(*) from (").append(queryWithoutOrderAndLimit).append(") as foo");
 
             rowCount =
-                    Integer.parseInt(executeUniqueResultSQL(buf.toString(), inParamsWithoutOrderAndLimit,
-                            new SingleObjectReader<Object>()).toString());
+                Integer.parseInt(executeUniqueResultSQL(buf.toString(), inParamsWithoutOrderAndLimit,
+                        new SingleObjectReader<Object>()).toString());
         }
 
         return new Pair<Integer, List<HarvestSourceDTO>>(rowCount, list);
@@ -280,12 +282,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * Calculation of number of sources needed to be harvested in VirtuosoSQL syntax.
      */
     private static final String URGENCY_SOURCES_COUNT = "select count(*) from HARVEST_SOURCE where"
-            + " INTERVAL_MINUTES > 0 AND -datediff('second', now(), coalesce(LAST_HARVEST,"
-            + " dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED))) / (INTERVAL_MINUTES*60) >= 1.0";
+        + " INTERVAL_MINUTES > 0 AND -datediff('second', now(), coalesce(LAST_HARVEST,"
+        + " dateadd('minute', -INTERVAL_MINUTES, TIME_CREATED))) / (INTERVAL_MINUTES*60) >= 1.0";
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     @Override
@@ -308,12 +309,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * exists then don't insert (like MySQL INSERT IGNORE)
      */
     private static final String ADD_SOURCE_SQL =
-            "insert soft HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE) "
-                    + "VALUES (?,?,?,NOW(),?,?,?,?)";
+        "insert soft HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE) "
+        + "VALUES (?,?,?,NOW(),?,?,?,?)";
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     @Override
@@ -386,7 +386,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO source)
      */
     @Override
@@ -427,7 +426,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         try {
             sourcesDeleteStatement = conn.prepareStatement(DELETE_HARVEST_SOURCES);
             urgentQueueDeleteStatement = conn.prepareStatement(DELETE_FROM_URGENT_HARVEST_QUEUE);
-            rulesetDeleteStatement = conn.prepareStatement(DELETE_FROM_RULESET);
+            if (GeneralConfig.isUseInferencing()){
+                rulesetDeleteStatement = conn.prepareStatement(DELETE_FROM_RULESET);
+            }
 
             for (String sourceUrl : sourceUrls) {
 
@@ -435,17 +436,23 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 sourcesDeleteStatement.setLong(1, urlHash);
                 urgentQueueDeleteStatement.setString(1, sourceUrl);
-                rulesetDeleteStatement.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-                rulesetDeleteStatement.setString(2, sourceUrl);
+                if (GeneralConfig.isUseInferencing()){
+                    rulesetDeleteStatement.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+                    rulesetDeleteStatement.setString(2, sourceUrl);
+                }
 
                 sourcesDeleteStatement.addBatch();
                 urgentQueueDeleteStatement.addBatch();
-                rulesetDeleteStatement.addBatch();
+                if (GeneralConfig.isUseInferencing()){
+                    rulesetDeleteStatement.addBatch();
+                }
             }
 
             sourcesDeleteStatement.executeBatch();
             urgentQueueDeleteStatement.executeBatch();
-            rulesetDeleteStatement.executeBatch();
+            if (GeneralConfig.isUseInferencing()){
+                rulesetDeleteStatement.executeBatch();
+            }
         } finally {
             SQLUtil.close(sourcesDeleteStatement);
             SQLUtil.close(urgentQueueDeleteStatement);
@@ -475,11 +482,10 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String EDIT_SOURCE_SQL = "update HARVEST_SOURCE set URL=?, URL_HASH=?, EMAILS=?, INTERVAL_MINUTES=?,"
-            + " PRIORITY_SOURCE=?, SOURCE_OWNER=?, MEDIA_TYPE=? where HARVEST_SOURCE_ID=?";
+        + " PRIORITY_SOURCE=?, SOURCE_OWNER=?, MEDIA_TYPE=? where HARVEST_SOURCE_ID=?";
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
      */
     @Override
@@ -511,7 +517,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceById(java.lang.Integer)
      */
     @Override
@@ -528,7 +533,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
     @Override
@@ -542,13 +546,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL = "select top <limit> * from HARVEST_SOURCE where"
-            + " count_unavail < 5 AND" + " INTERVAL_MINUTES > 0 and <seconds_since_last_harvest> >= <harvest_interval_seconds>"
-            + " order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+        + " count_unavail < 5 AND" + " INTERVAL_MINUTES > 0 and <seconds_since_last_harvest> >= <harvest_interval_seconds>"
+        + " order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
 
     /** */
     private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
-            + "abs(datediff('second', now(), coalesce(LAST_HARVEST, dateadd('second', -1*INTERVAL_MINUTES*60, TIME_CREATED)))) "
-            + "as float)";
+        + "abs(datediff('second', now(), coalesce(LAST_HARVEST, dateadd('second', -1*INTERVAL_MINUTES*60, TIME_CREATED)))) "
+        + "as float)";
 
     /** */
     private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
@@ -572,7 +576,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
      */
     @Override
@@ -583,7 +586,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String INCREASE_UNAVAIL_COUNT =
-            "update HARVEST_SOURCE set COUNT_UNAVAIL=(COUNT_UNAVAIL+1) where URL_HASH=?";
+        "update HARVEST_SOURCE set COUNT_UNAVAIL=(COUNT_UNAVAIL+1) where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -606,17 +609,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
     @Override
     public Pair<Integer, List<HarvestedUrlCountDTO>> getLatestHarvestedURLs(int days) throws DAOException {
 
         StringBuffer buf =
-                new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+            new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
+            .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+            .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+            .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -651,7 +653,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String GET_MOST_URGENT_HARVEST_SOURCES = "select top <limit> * from HARVEST_SOURCE where "
-            + " INTERVAL_MINUTES > 0 order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+        + " INTERVAL_MINUTES > 0 order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
 
     /*
      * (non-Javadoc)
@@ -714,8 +716,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String UPDATE_SOURCE_HARVEST_FINISHED_SQL =
-            "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?,"
-                    + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? where URL_HASH=?";
+        "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?,"
+        + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -823,7 +825,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
      */
     @Override
@@ -833,40 +834,40 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         ResultSet rs = null;
         String ret = "";
         PreparedStatement stmt = null;
-        try {
-            conn = SesameUtil.getSQLConnection();
-            stmt = conn.prepareStatement("SELECT RS_URI FROM DB.DBA.sys_rdf_schema where RS_NAME = ?");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-            rs = stmt.executeQuery();
+        if (GeneralConfig.isUseInferencing()) {
+            try {
+                conn = SesameUtil.getSQLConnection();
+                stmt = conn.prepareStatement("SELECT RS_URI FROM DB.DBA.sys_rdf_schema where RS_NAME = ?");
+                stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+                rs = stmt.executeQuery();
 
-            StringBuffer sb = new StringBuffer();
-            while (rs.next()) {
-                String graphUri = rs.getString("RS_URI");
-                if (!StringUtils.isBlank(graphUri)) {
-                    sb.append("'").append(graphUri).append("'");
-                    sb.append(",");
+                StringBuffer sb = new StringBuffer();
+                while (rs.next()) {
+                    String graphUri = rs.getString("RS_URI");
+                    if (!StringUtils.isBlank(graphUri)) {
+                        sb.append("'").append(graphUri).append("'");
+                        sb.append(",");
+                    }
                 }
-            }
 
-            ret = sb.toString();
-            // remove last comma
-            if (!StringUtils.isBlank(ret)) {
-                ret = ret.substring(0, ret.lastIndexOf(","));
+                ret = sb.toString();
+                // remove last comma
+                if (!StringUtils.isBlank(ret)) {
+                    ret = ret.substring(0, ret.lastIndexOf(","));
+                }
+            } catch (Exception e) {
+                throw new DAOException(e.getMessage(), e);
+            } finally {
+                SQLUtil.close(rs);
+                SQLUtil.close(stmt);
+                SQLUtil.close(conn);
             }
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(rs);
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
         }
-
         return ret;
     }
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -877,28 +878,29 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         ResultSet rs = null;
 
         boolean ret = false;
-        try {
-            conn = SesameUtil.getSQLConnection();
-            stmt = conn.prepareStatement("SELECT RS_NAME FROM DB.DBA.sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-            stmt.setString(2, url);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                ret = true;
+        if (GeneralConfig.isUseInferencing()){
+            try {
+                conn = SesameUtil.getSQLConnection();
+                stmt = conn.prepareStatement("SELECT RS_NAME FROM DB.DBA.sys_rdf_schema where RS_NAME = ? AND RS_URI = ?");
+                stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+                stmt.setString(2, url);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    ret = true;
+                }
+            } catch (Exception e) {
+                throw new DAOException(e.getMessage(), e);
+            } finally {
+                SQLUtil.close(rs);
+                SQLUtil.close(stmt);
+                SQLUtil.close(conn);
             }
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(rs);
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
         }
         return ret;
     }
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -908,25 +910,28 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         PreparedStatement stmt = null;
         boolean ret = false;
 
-        try {
-            conn = SesameUtil.getSQLConnection();
-            stmt = conn.prepareStatement("DB.DBA.rdfs_rule_set (?, ?)");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-            stmt.setString(2, url);
-            ret = stmt.execute();
+        if (GeneralConfig.isUseInferencing()) {
+            try {
+                conn = SesameUtil.getSQLConnection();
+                stmt = conn.prepareStatement("DB.DBA.rdfs_rule_set (?, ?)");
+                stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+                stmt.setString(2, url);
+                ret = stmt.execute();
 
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
+            } catch (Exception e) {
+                throw new DAOException(e.getMessage(), e);
+            } finally {
+                SQLUtil.close(stmt);
+                SQLUtil.close(conn);
+            }
+        } else {
+            ret = true;
         }
         return ret;
     }
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -936,18 +941,23 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         PreparedStatement stmt = null;
         boolean ret = false;
 
-        try {
-            conn = SesameUtil.getSQLConnection();
-            stmt = conn.prepareStatement("DB.DBA.rdfs_rule_set (?, ?, 1)");
-            stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
-            stmt.setString(2, url);
-            ret = stmt.execute();
-        } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            SQLUtil.close(stmt);
-            SQLUtil.close(conn);
+        if (GeneralConfig.isUseInferencing()){
+            try {
+                conn = SesameUtil.getSQLConnection();
+                stmt = conn.prepareStatement("DB.DBA.rdfs_rule_set (?, ?, 1)");
+                stmt.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
+                stmt.setString(2, url);
+                ret = stmt.execute();
+            } catch (Exception e) {
+                throw new DAOException(e.getMessage(), e);
+            } finally {
+                SQLUtil.close(stmt);
+                SQLUtil.close(conn);
+            }
+        }else{
+            ret=true;
         }
+
         return ret;
     }
 
@@ -957,7 +967,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
+    throws IOException, OpenRDFException {
 
         InputStream inputStream = null;
         try {
@@ -971,12 +981,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.InputStream, org.openrdf.rio.RDFFormat, java.lang.String, boolean)
+     * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.InputStream, org.openrdf.rio.RDFFormat, java.lang.String,
+     * boolean)
      */
     @Override
     public int
     loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
+    throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1021,7 +1032,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -1072,7 +1082,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void insertMetadata(SubjectDTO subjectDTO, RepositoryConnection conn, URI contextURI, URI subject)
-            throws RepositoryException {
+    throws RepositoryException {
 
         for (String predicateUri : subjectDTO.getPredicates().keySet()) {
 
@@ -1097,7 +1107,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * SPARQL for getting source metadata.
      */
     private static final String SOURCE_METADATA_SPARQL = "select ?o where {graph ?g { ?subject ?predicate ?o . "
-            + "filter (?g = ?deploymentHost)}}";
+        + "filter (?g = ?deploymentHost)}}";
 
     /*
      * (non-Javadoc)
@@ -1134,11 +1144,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(org.openrdf.repository.RepositoryConnection, java.lang.String, java.lang.String, eionet.cr.dto.ObjectDTO[])
+     * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(org.openrdf.repository.RepositoryConnection, java.lang.String,
+     * java.lang.String, eionet.cr.dto.ObjectDTO[])
      */
     @Override
     public void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO... object)
-            throws RepositoryException {
+    throws RepositoryException {
 
         URI harvesterContext = conn.getValueFactory().createURI(GeneralConfig.HARVESTER_URI);
         URI sub = conn.getValueFactory().createURI(subject);
@@ -1181,7 +1192,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String FILTER_BY_SUBSTRING_SQL =
-            "select top(@offset,@limit) URL from HARVEST_SOURCE where URL like (?) order by URL asc";
+        "select top(@offset,@limit) URL from HARVEST_SOURCE where URL like (?) order by URL asc";
 
     /*
      * (non-Javadoc)
@@ -1212,9 +1223,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * SPARQL for getting new sources based on the given source.
      */
-    private static final String NEW_SOURCES_SPARQL = "DEFINE input:inference 'CRInferenceRule' PREFIX cr: "
-            + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
-            + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
+    private static final String NEW_SOURCES_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr() + "PREFIX cr: "
+    + "<http://cr.eionet.europa.eu/ontologies/contreg.rdf#> SELECT ?s FROM ?sourceUrl FROM ?deploymentHost WHERE "
+    + "{ ?s a cr:File . OPTIONAL { ?s cr:lastRefreshed ?refreshed } FILTER( !BOUND(?refreshed)) }";
 
     /*
      * (non-Javadoc)
@@ -1270,7 +1281,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String SOURCES_ABOVE_URGENCY_THRESHOLD_SQL = "select count(*) from HARVEST_SOURCE where"
-            + " INTERVAL_MINUTES > 0 and (<seconds_since_last_harvest> / <harvest_interval_seconds>) > ?";
+        + " INTERVAL_MINUTES > 0 and (<seconds_since_last_harvest> / <harvest_interval_seconds>) > ?";
 
     @Override
     public int getNumberOfSourcesAboveUrgencyThreshold(double threshold) throws DAOException {
@@ -1284,7 +1295,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         params.add(Double.valueOf(threshold));
 
         String query =
-                SOURCES_ABOVE_URGENCY_THRESHOLD_SQL.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
+            SOURCES_ABOVE_URGENCY_THRESHOLD_SQL.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
         query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
 
         Object o = executeUniqueResultSQL(query, params, new SingleObjectReader<Object>());

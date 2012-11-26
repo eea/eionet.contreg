@@ -48,6 +48,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
@@ -102,7 +103,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // create query helper
         VirtuosoFreeTextSearchHelper helper =
-                new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
+            new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
 
         // Set Filter
         helper.setFilter(filterType);
@@ -173,7 +174,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      */
     private SearchResultDTO<SubjectDTO> searchByFilters2(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-                    throws DAOException {
+            throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
         Bindings bindings = new Bindings();
@@ -185,7 +186,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         StringBuilder query = new StringBuilder();
         if (useInference) {
-            query.append("DEFINE input:inference'CRInferenceRule' ");
+            query.append(SPARQLQueryUtil.getCrInferenceDefinition());
         }
         query.append("SELECT ?s ?" + SORT_OBJECT_VALUE_VARIABLE);
         for (String predicate : predicates.keySet()) {
@@ -358,7 +359,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Override
     public SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-                    throws DAOException {
+            throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
@@ -368,7 +369,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             literalRangeFilters = DAOFactory.get().getDao(HelperDAO.class).getLiteralRangeSubjects(filters.keySet());
         }
         VirtuosoFilteredSearchHelper helper =
-                new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
+            new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
 
         // create the list of IN parameters of the query
 
@@ -431,7 +432,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         CustomPaginatedList<DeliveryDTO> ret = new CustomPaginatedList<DeliveryDTO>();
 
         VirtuosoDeliveriesSearchHelper helper =
-                new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
+            new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
 
         // let the helper create the query and fill IN parameters
         ArrayList<Object> inParams = new ArrayList<Object>();

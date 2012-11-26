@@ -49,6 +49,7 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.export.ExportFormat;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
@@ -402,8 +403,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // then add inferencing command to the query
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
-            String infCommand =
-                "DEFINE input:inference '" + GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME) + "'";
+            String infCommand =SPARQLQueryUtil.getCrInferenceDefinitionStr();
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {

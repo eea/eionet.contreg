@@ -43,6 +43,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.SchedulerException;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -210,8 +211,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     }
                 }
             }
-        } else
+        } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
+        }
 
         return resolution;
     }
@@ -223,13 +225,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     private void manageRuleset(String url) throws DAOException {
 
-        boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
-        if (schemaSource && !isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
-        } else if (!schemaSource && isAlreadyInRuleset) {
-            factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
+        if (GeneralConfig.isUseInferencing()){
+            boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
+            if (schemaSource && !isAlreadyInRuleset) {
+                factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
+            } else if (!schemaSource && isAlreadyInRuleset) {
+                factory.getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(url);
+            }
         }
-
     }
 
     /**
@@ -252,6 +255,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
                     resolution = (new StreamingResolution("application/rdf+xml") {
 
+                        @Override
                         public void stream(HttpServletResponse response) throws Exception {
                             RDFGenerator.generate(harvestSource.getUrl(), response.getOutputStream());
                         }

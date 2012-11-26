@@ -158,8 +158,9 @@ public final class GeneralConfig {
      */
     public static synchronized String getProperty(String key) {
 
-        if (properties == null)
+        if (properties == null) {
             init();
+        }
 
         return properties.getProperty(key);
     }
@@ -172,8 +173,9 @@ public final class GeneralConfig {
      */
     public static synchronized String getProperty(String key, String defaultValue) {
 
-        if (properties == null)
+        if (properties == null) {
             init();
+        }
 
         return properties.getProperty(key, defaultValue);
     }
@@ -212,10 +214,11 @@ public final class GeneralConfig {
     public static synchronized String getRequiredProperty(String key) {
 
         String value = getProperty(key);
-        if (value == null || value.trim().length() == 0)
+        if (value == null || value.trim().length() == 0) {
             throw new CRConfigException("Missing required property: " + key);
-        else
+        } else {
             return value;
+        }
     }
 
     /**
@@ -224,8 +227,9 @@ public final class GeneralConfig {
      */
     public static synchronized Properties getProperties() {
 
-        if (properties == null)
+        if (properties == null) {
             init();
+        }
 
         return properties;
     }
@@ -248,5 +252,15 @@ public final class GeneralConfig {
 
         String useCentralAuthenticationService = getProperty(USE_CENTRAL_AUTHENTICATION_SERVICE);
         return StringUtils.isBlank(useCentralAuthenticationService) || !useCentralAuthenticationService.equals("false");
+    }
+
+    /**
+     * If ruleset name property is available in cr.properties, then use inferencing in queries.
+     * @return
+     */
+    public static synchronized boolean isUseInferencing() {
+
+        String crRulesetName = getProperty(VIRTUOSO_CR_RULESET_NAME);
+        return !StringUtils.isBlank(crRulesetName);
     }
 }

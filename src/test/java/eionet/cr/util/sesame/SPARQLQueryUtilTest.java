@@ -33,7 +33,7 @@ import eionet.cr.util.Bindings;
  */
 public class SPARQLQueryUtilTest extends TestCase {
 
-    private static final String CR_INFERENCE_DEF = "DEFINE input:inference'CRInferenceRule' ";
+    private static final String CR_INFERENCE_DEF = SPARQLQueryUtil.getCrInferenceDefinitionStr();
     private static final String CR_NAMESPACE_DEF = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ";
     private static final String RDF_NAMESPACE_DEF = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ";
     private static final String RDFS_NAMESPACE_DEF = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ";
@@ -43,7 +43,7 @@ public class SPARQLQueryUtilTest extends TestCase {
      */
     public static void testCrInference() {
 
-        assertEquals(CR_INFERENCE_DEF, SPARQLQueryUtil.getCrInferenceDefinition().toString());
+        assertEquals(CR_INFERENCE_DEF, SPARQLQueryUtil.getCrInferenceDefinitionStr());
     }
 
     /**
