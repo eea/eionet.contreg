@@ -169,7 +169,10 @@ public class FileToRdfProcessor {
             // if the result that's going to be returned is not the unzipped file,
             // then delete the latter, as it won't be used outside of this method any more
             // (this includes the case where the result is null)
-            if (resultFile != unzippedFile) {
+
+            //if file = unzippedFile (in case it could not be unzipped) it is deleted in the calling method
+            //will be excluded here to prevent local non-RDF (binary) files to be deleted
+            if (resultFile != unzippedFile && file != unzippedFile) {
                 FileDeletionJob.register(unzippedFile);
             }
         }
@@ -184,8 +187,12 @@ public class FileToRdfProcessor {
 
         GZIPInputStream inputStream = null;
         FileOutputStream outputStream = null;
+        FileInputStream fis = null;
+
         try {
-            inputStream = new GZIPInputStream(new FileInputStream(file));
+            //closing GZIPInputStream does not seem to close the given InputStream
+            fis = new FileInputStream(file);
+            inputStream = new GZIPInputStream(fis);
             File unzippedFile = new File(file.getAbsolutePath() + ".unzipped");
             outputStream = new FileOutputStream(unzippedFile);
             IOUtils.copy(inputStream, outputStream);
@@ -194,6 +201,7 @@ public class FileToRdfProcessor {
         } catch (IOException e) {
             return file;
         } finally {
+            IOUtils.closeQuietly(fis);
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }

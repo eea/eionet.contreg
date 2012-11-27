@@ -435,7 +435,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         String fileUri = getUploadedFileSubjectUri();
 
         // check if the file exists
-        fileExists = DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(fileUri);
+        fileExists = DAOFactory.get().getDao(FolderDAO.class).fileOrFolderExists(fileUri);
 
         // if file exists and replace not requested, report a warning
         if (!replaceExisting && fileExists) {

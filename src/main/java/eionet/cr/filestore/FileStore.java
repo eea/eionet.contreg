@@ -34,6 +34,9 @@ public final class FileStore {
     /** */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
+    /**
+     * current user home folder.
+     */
     private final File userDir;
 
     /**
@@ -60,7 +63,8 @@ public final class FileStore {
 
     /**
      *
-     * @param filePath file folder path with file name
+     * @param filePath
+     *            file folder path with file name
      * @param overwrite
      * @param inputStream
      * @return File
@@ -120,7 +124,8 @@ public final class FileStore {
     /**
      * Returns file object of the uploaded file in the file system.
      *
-     * @param filePath file folder path with file name
+     * @param filePath
+     *            file folder path with file name
      * @param overwrite
      * @throws FileAlreadyExistsException
      */
@@ -188,7 +193,8 @@ public final class FileStore {
      * True, if folder is deleted.
      *
      * @param folderPath
-     * @param cleanFolderFirst - removes all files from folder before deleting it
+     * @param cleanFolderFirst
+     *            - removes all files from folder before deleting it
      * @return boolean
      */
     public boolean deleteFolder(String folderPath, boolean cleanFolderFirst) {
@@ -296,4 +302,38 @@ public final class FileStore {
 
         return null;
     }
+
+    /**
+     * Checks if the resource is in local filestore.
+     *
+     * @param uriString
+     *            given URI
+     * @return true if a filestore uri. Does not check if file really exists
+     */
+    public static boolean isFileStoreUri(String uriString) {
+        return CRUser.isHomeUri(uriString) || FolderUtil.isProjectFolder(uriString);
+    }
+
+    /**
+     * Checks if the resource is in local filestore and is folder.
+     *
+     * @param uriString
+     *            given URI
+     * @return true if a filestore folder uri. Checks if file really exists
+     */
+    public static boolean isFolderUri(String uriString) {
+
+        try {
+            if (isFileStoreUri(uriString)) {
+                File f = getByUri(uriString);
+                return f.isDirectory();
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
+
+    }
+
 }

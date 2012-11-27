@@ -21,7 +21,6 @@
 package eionet.cr.web.action.factsheet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +44,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
-import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
@@ -55,7 +53,6 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.SpoBinaryDAO;
-import eionet.cr.dao.helpers.CsvImportHelper;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dataset.CurrentLoadedDatasets;
@@ -68,12 +65,11 @@ import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.OnDemandHarvester;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
-import eionet.cr.util.FolderUtil;
+import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
-import eionet.cr.web.action.UploadCSVActionBean.FileType;
 import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
@@ -126,6 +122,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** True, if URI is harvest source. */
     private boolean uriIsHarvestSource;
 
+    /** True, if URI is local folder. */
+    private boolean uriIsFolder;
+
     /** */
     private String bookmarkLabel;
 
@@ -169,6 +168,8 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             tabs = tabsHelper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
             uriIsHarvestSource = tabsHelper.isUriIsHarvestSource();
+            uriIsFolder = tabsHelper.isUriFolder();
+
         }
 
         return new ForwardResolution("/pages/factsheet/factsheet.jsp");
@@ -203,10 +204,14 @@ public class FactsheetActionBean extends AbstractActionBean {
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
 
-        if (isSourceTableFile()) {
+        if (subject != null && CsvImportUtil.isSourceTableFile(subject)) {
             // Harvest table file
             try {
-                harvestTableFile();
+                //harvestTableFile();
+                List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
+                for (String msg : warnings) {
+                    addWarningMessage(msg);
+                }
                 addSystemMessage("Source successfully harvested");
             } catch (Exception e) {
                 logger.error("Failed to harvest table file", e);
@@ -222,85 +227,6 @@ public class FactsheetActionBean extends AbstractActionBean {
             }
         }
         return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
-    }
-
-    private boolean isSourceTableFile() {
-        if (subject.getObject(Predicates.RDF_TYPE) != null) {
-            return Subjects.CR_TABLE_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
-        }
-        return false;
-    }
-
-    private void harvestTableFile() throws Exception {
-        String labelColumn = getSubjectValue(Predicates.CR_OBJECTS_LABEL_COLUMN);
-        String fileUri = uri;
-        String fileLabel = getSubjectValue(Predicates.RDFS_LABEL);
-        FileType fileType = FileType.valueOf(getSubjectValue(Predicates.CR_MEDIA_TYPE));
-        String objectsType = getSubjectValue(Predicates.CR_OBJECTS_TYPE);
-        String publisher = getSubjectValue(Predicates.DCTERMS_PUBLISHER);
-        String license = getSubjectValue(Predicates.DCTERMS_RIGHTS);
-        String attribution = getSubjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
-        String source = getSubjectValue(Predicates.DCTERMS_SOURCE);
-        long fileSize = Long.parseLong(getSubjectValue(Predicates.CR_BYTE_SIZE));
-
-        List<String> uniqueColumns = new ArrayList<String>();
-        String uniqueColumnsString = getSubjectValue(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
-        if (StringUtils.isNotEmpty(uniqueColumnsString)) {
-            String[] uniqueColumnsArr = subject.getObject(Predicates.CR_OBJECTS_UNIQUE_COLUMN).getValue().split(",");
-            uniqueColumns = Arrays.asList(uniqueColumnsArr);
-        }
-
-        String folderUri = StringUtils.substringBeforeLast(uri, "/");
-        ;
-        String relativeFilePath = FolderUtil.extractPathInUserHome(fileUri);
-
-        // Clear graph
-        DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri));
-
-        CsvImportHelper helper =
-                new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
-                        attribution, source);
-
-        // Store file as new source, but don't harvest it
-        helper.insertFileMetadataAndSource(fileSize, getUserName());
-
-        // Add metadata about user folder update
-        helper.linkFileToFolder(folderUri, getUserName());
-
-        // Parse and insert triples from file to triplestore
-        CSVReader csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
-
-        try {
-            csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
-            helper.extractObjects(csvReader);
-            helper.saveWizardInputs();
-
-            // Run data linking scripts
-            try {
-                List<String> warnings = helper.runScripts();
-                if (warnings.size() > 0) {
-                    for (String w : warnings) {
-                        addWarningMessage(w);
-                    }
-                }
-            } catch (Exception e) {
-                logger.error("Failed to run data linking scripts", e);
-                addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
-            }
-        } catch (Exception e) {
-            logger.error("Exception while reading uploaded file", e);
-            addWarningMessage("Exception while reading uploaded file: " + e.getMessage());
-        } finally {
-            CsvImportHelper.close(csvReader);
-        }
-
-    }
-
-    private String getSubjectValue(String predicate) {
-        if (subject.getObject(predicate) != null) {
-            return subject.getObject(predicate).getValue();
-        }
-        return null;
     }
 
     /**
@@ -894,7 +820,16 @@ public class FactsheetActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getViewSourceActionBeanClass(){
+    public Class getViewSourceActionBeanClass() {
         return ViewSourceActionBean.class;
+    }
+
+    public boolean isUriIsFolder() {
+        return uriIsFolder;
+    }
+
+    public void setUriIsFolder(boolean uriIsFolder) {
+        this.uriIsFolder = uriIsFolder;
+
     }
 }

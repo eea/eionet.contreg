@@ -237,6 +237,13 @@ public final class FactsheetTabMenuHelper {
     }
 
     /**
+     * True if the resource is a local folder.
+     */
+    public boolean isUriFolder() {
+        return folderType;
+    }
+
+    /**
      * Tab titles.
      */
     public static class TabTitle {

@@ -31,16 +31,22 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
+import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptActionBean;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean;
@@ -113,10 +119,27 @@ public class ViewSourceActionBean extends AbstractActionBean {
 
         harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
-        // schedule the harvest
-        UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
 
-        addSystemMessage("Successfully scheduled for urgent harvest!");
+        if (subject != null && CsvImportUtil.isSourceTableFile(subject)) {
+            try {
+                List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
+                for (String msg : warnings) {
+                    addWarningMessage(msg);
+                }
+            } catch (Exception e) {
+                addCautionMessage("Harvesting CSV/TSV file failed " + e);
+            }
+        } else if (subject.getObject(Predicates.RDF_TYPE) != null
+                && (Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue()) || Subjects.CR_USER_FOLDER
+                        .equals(subject.getObject(Predicates.RDF_TYPE).getValue()))) {
+            addSystemMessage("Folder cannot be harvested!");
+        } else {
+            // schedule the harvest
+            UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+            addSystemMessage("Successfully scheduled for urgent harvest!");
+        }
         return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", uri);
     }
 

@@ -26,7 +26,9 @@ import static eionet.cr.harvest.ResponseCodeUtil.isNotModified;
 import static eionet.cr.harvest.ResponseCodeUtil.isPermanentError;
 import static eionet.cr.harvest.ResponseCodeUtil.isRedirect;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +38,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,11 +62,13 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
@@ -112,7 +117,6 @@ public class PullHarvest extends BaseHarvest {
     /** */
     private final List<String> redirectedUrls = new ArrayList<String>();
 
-
     /**
      * @param contextUrl
      * @throws HarvestException
@@ -130,12 +134,139 @@ public class PullHarvest extends BaseHarvest {
         super(contextSourceDTO);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.harvest.BaseHarvest#doHarvest()
+    /**
+     * Harvests file in a local filestore.
+     * Does not load it through /home servlet but takes it directly from the file system
+     * @param file Given file
+     * @param contentType content type saved in earlier harvest
+     * @return number of triples
+     * @throws IOException if error in I/O
+     * @throws DAOException if DAO call fails.
+     * @throws SAXException if parsing fails
+     * @throws RDFHandlerException if error in RDF handler
+     * @throws RDFParseException if error in RDF parsing
      */
-    @Override
-    protected void doHarvest() throws HarvestException {
+    private int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
+            RDFHandlerException, RDFParseException {
+
+        // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
+        // Otherwise try to process the file into RDF format and *then* proceed to loading.
+
+        ContentLoader contentLoader = getLocalFileContentloader(file, contentType);
+
+        if (contentLoader != null) {
+            contentLoader.setTimeout(getTimeout());
+            LOGGER.debug(loggerMsg("Filestore file is in RDF or web feed format"));
+            return loadFile(file, contentLoader);
+        } else {
+            LOGGER.debug(loggerMsg("Filestore file is not in RDF or web feed format, processing the file further"));
+            File processedFile = null;
+            try {
+                // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
+                // that simply wasn't declared in the server-returned content type.
+                FileToRdfProcessor fileProcessor = new FileToRdfProcessor(file, getContextUrl());
+                processedFile = fileProcessor.process();
+                if (processedFile != null && fileProcessor.getRdfFormat() != null) {
+                    LOGGER.debug(loggerMsg("File processed into RDF format"));
+                    ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
+                    rdfLoader.setTimeout(getTimeout());
+                    return loadFile(processedFile, rdfLoader);
+                } else {
+                    LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
+                    return 0;
+                }
+            } finally {
+                if (processedFile != null &&  !file.getPath().equals(processedFile.getPath())) {
+                    FileDeletionJob.register(processedFile);
+                }
+            }
+        }
+    }
+
+    /**
+     * Harvests file already uploaded to a CR folder and residing in the filestore.
+     *
+     * @throws HarvestException
+     *             if harvest fails
+     */
+    private void doLocalFileHarvest() throws HarvestException {
+        String initialContextUrl = getContextUrl();
+
+        httpResponseCode = NO_RESPONSE;
+        File file = null;
+        String responseMessage = null;
+
+        try {
+
+            String message = "Opening connection to local file";
+            LOGGER.debug(loggerMsg(message));
+
+            file = FileStore.getByUri(initialContextUrl);
+
+            if (file == null) {
+                finishWithError(NO_RESPONSE, "The file does not exist", new HarvestException("The file does not exist"));
+                return;
+            }
+
+            isSourceAvailable = true;
+
+            // if URL connection returned no errors and its content has been modified since last harvest,
+            // proceed to downloading
+
+            // get content type and title from previously saved triples
+            SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getFactsheet(initialContextUrl, null, null);
+            String contentType = (subject != null ? subject.getObjectValue(Predicates.CR_MEDIA_TYPE) : null);
+            String fileTitle = (subject != null ? subject.getObjectValue(Predicates.DC_TITLE) : null);
+
+            int noOfTriples = processLocalContent(file, contentType);
+
+            // for local files store N/A as http response code
+
+            setStoredTriplesCount(noOfTriples);
+            LOGGER.debug(loggerMsg(noOfTriples + " triples loaded"));
+
+            if (!StringUtils.isBlank(fileTitle)) {
+                addSourceMetadata(Predicates.DC_TITLE, ObjectDTO.createLiteral(fileTitle));
+            }
+            if (!StringUtils.isBlank(contentType)) {
+                addSourceMetadata(Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(contentType));
+            }
+
+            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(file.length())));
+            addSourceMetadata(Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
+
+            httpResponseCode = 0;
+            finishWithOK(null, noOfTriples);
+
+        } catch (Exception e) {
+
+            LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
+
+            // check what caused the DAOException - fatal flag is set to true
+            checkAndSetFatalExceptionFlag(e.getCause());
+
+            try {
+                finishWithError(httpResponseCode, responseMessage, e);
+            } catch (RuntimeException finishingException) {
+                LOGGER.error("Error when finishing up: ", finishingException);
+            }
+            if (e instanceof HarvestException) {
+                throw (HarvestException) e;
+            } else {
+                throw new HarvestException(e.getMessage(), e);
+            }
+
+        }
+
+    }
+
+    /**
+     * Harvests external source.
+     *
+     * @throws HarvestException
+     *             if harvest fails
+     */
+    private void doUrlHarvest() throws HarvestException {
 
         String initialContextUrl = getContextUrl();
         HttpURLConnection urlConn = null;
@@ -153,6 +284,7 @@ public class PullHarvest extends BaseHarvest {
                 LOGGER.debug(loggerMsg(message));
 
                 urlConn = openUrlConnection(connectUrl);
+
                 try {
                     httpResponseCode = urlConn.getResponseCode();
                     responseMessage = urlConn.getResponseMessage();
@@ -194,7 +326,6 @@ public class PullHarvest extends BaseHarvest {
 
                         finishRedirectedHarvest(redirectedToUrl, httpResponseCode);
 
-
                         LOGGER.debug(loggerMsg("Redirection details saved"));
                         startWithNewContext(redirectedToUrl);
                     } else {
@@ -228,7 +359,7 @@ public class PullHarvest extends BaseHarvest {
 
             LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
 
-            //check what caused the DAOException - fatal flag is set to true
+            // check what caused the DAOException - fatal flag is set to true
             checkAndSetFatalExceptionFlag(e.getCause());
 
             try {
@@ -244,6 +375,25 @@ public class PullHarvest extends BaseHarvest {
         } finally {
             URLUtil.disconnect(urlConn);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.harvest.BaseHarvest#doHarvest()
+     */
+    @Override
+    protected void doHarvest() throws HarvestException {
+
+        // check if the file is on the local filestore folder
+        boolean isLocalFile = FileStore.isFileStoreUri(getContextUrl());
+
+        if (isLocalFile) {
+            doLocalFileHarvest();
+        } else {
+            doUrlHarvest();
+        }
+
     }
 
     /**
@@ -314,7 +464,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
         getContextSourceDTO().setCountUnavail(countUnavail);
 
-        //save same error parameters to parent sources where this source was redirected from
+        // save same error parameters to parent sources where this source was redirected from
         handleRedirectedHarvestDTOs(lastHarvest, responseCode, sourceNotAvailable);
 
         // add harvest message about the given exception if it's not null
@@ -352,18 +502,25 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Marks redirected sources with error markers.
-     * @param lastHarvest last harvest time
-     * @param responseCode http response code
-     * @param sourceNotAvailable shows if source was available
+     *
+     * @param lastHarvest
+     *            last harvest time
+     * @param responseCode
+     *            http response code
+     * @param sourceNotAvailable
+     *            shows if source was available
      */
     private void handleRedirectedHarvestDTOs(Date lastHarvest, int responseCode, boolean sourceNotAvailable) {
         for (HarvestSourceDTO harvestSourceDTO : redirectedHarvestSources) {
             setErrorsToRedirectedHarvestDTO(harvestSourceDTO, lastHarvest, responseCode, sourceNotAvailable);
         }
     }
+
     /**
      * Stores error in HarvestSource DTO.
-     * @param harvestSourceDTO / source DTO object
+     *
+     * @param harvestSourceDTO
+     *            / source DTO object
      */
     private void setErrorsToRedirectedHarvestDTO(HarvestSourceDTO harvestSourceDTO, Date lastHarvest, int responseCode,
             boolean sourceNotAvailable) {
@@ -387,7 +544,8 @@ public class PullHarvest extends BaseHarvest {
      * If no last harvest date can be calculated by this algorithm for whichever reason, or the calculated last harvest happens to
      * be after the given timestamp of now, then the latter is returned.
      *
-     * @param now The current harvest timestamp.
+     * @param now
+     *            The current harvest timestamp.
      *
      * @return the last harvest date + 10%
      */
@@ -406,7 +564,7 @@ public class PullHarvest extends BaseHarvest {
         lastHarvest = new Date(lastHarvest.getTime() + increaseMillis);
 
         // Ensure the new last harvest date won't be in the future.
-        if (lastHarvest.after(now)){
+        if (lastHarvest.after(now)) {
             lastHarvest = now;
         }
 
@@ -479,17 +637,20 @@ public class PullHarvest extends BaseHarvest {
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
      *
-     * @param urlConn - connection to the remote source.
+     * @param urlConn
+     *            - connection to the remote source.
      * @return number of triples harvested.
      *
      * @throws IOException
      * @throws DAOException
      * @throws SAXException
-     * @throws RDFParseException if RDF parsing fails while analyzing file with unknown format
-     * @throws RDFHandlerException  if RDF parsing fails while analyzing file with unknown format
+     * @throws RDFParseException
+     *             if RDF parsing fails while analyzing file with unknown format
+     * @throws RDFHandlerException
+     *             if RDF parsing fails while analyzing file with unknown format
      */
-    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException,
-    SAXException, RDFHandlerException, RDFParseException  {
+    private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
+            RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -502,10 +663,10 @@ public class PullHarvest extends BaseHarvest {
 
             if (contentLoader != null) {
                 contentLoader.setTimeout(getTimeout());
-                LOGGER.debug(loggerMsg("Downladed file is in RDF or web feed format"));
+                LOGGER.debug(loggerMsg("Downloaded file is in RDF or web feed format"));
                 return loadFile(downloadedFile, contentLoader);
             } else {
-                LOGGER.debug(loggerMsg("Downladed file is not in RDF or web feed format, processing the file further"));
+                LOGGER.debug(loggerMsg("Downloaded file is not in RDF or web feed format, processing the file further"));
                 File processedFile = null;
                 try {
                     // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
@@ -533,7 +694,8 @@ public class PullHarvest extends BaseHarvest {
     /**
      *
      * @param redirectedToUrl
-     * @param responseCode HTTP Code from the redirected URL
+     * @param responseCode
+     *            HTTP Code from the redirected URL
      * @throws DAOException
      */
     private void finishRedirectedHarvest(String redirectedToUrl, int responseCode) throws DAOException {
@@ -633,9 +795,11 @@ public class PullHarvest extends BaseHarvest {
      * Download file from remote source to a temporary file locally. Side effect: adds the file size to the metadata to save in the
      * harvester context.
      *
-     * @param urlConn - connection to the remote source.
+     * @param urlConn
+     *            - connection to the remote source.
      * @return object representing the temporary file.
-     * @throws IOException if the file is not downloadable.
+     * @throws IOException
+     *             if the file is not downloadable.
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
@@ -674,8 +838,8 @@ public class PullHarvest extends BaseHarvest {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    private HttpURLConnection openUrlConnection(String connectUrl) throws IOException, DAOException,
-    SAXException, ParserConfigurationException {
+    private HttpURLConnection openUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
+            ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -707,7 +871,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -756,20 +920,20 @@ public class PullHarvest extends BaseHarvest {
      * @return long
      * @throws DAOException
      */
-    private long getLastHarvestTimestamp(String url) throws DAOException {
-
-        long result = 0;
-
-        HarvestSourceDTO dto = getHarvestSource(url);
-        if (dto != null) {
-            Date lastHarvestDate = dto.getLastHarvest();
-            if (lastHarvestDate != null) {
-                result = lastHarvestDate.getTime();
-            }
-        }
-
-        return result;
-    }
+//    private long getLastHarvestTimestamp(String url) throws DAOException {
+//
+//        long result = 0;
+//
+//        HarvestSourceDTO dto = getHarvestSource(url);
+//        if (dto != null) {
+//            Date lastHarvestDate = dto.getLastHarvest();
+//            if (lastHarvestDate != null) {
+//                result = lastHarvestDate.getTime();
+//            }
+//        }
+//
+//        return result;
+//    }
 
     /**
      *
@@ -781,7 +945,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String result = null;
 
@@ -829,6 +993,72 @@ public class PullHarvest extends BaseHarvest {
         }
 
         return RDFMediaTypes.toRdfFormat(contentType);
+    }
+
+    /**
+     * Returns content loader for local files.
+     * @param file File to re-harvest
+     * @param contentType content type originally stored
+     * @return ContentLoader
+     */
+
+    private ContentLoader getLocalFileContentloader(File file, String contentType) {
+
+        ContentLoader contentLoader = null;
+
+        if (contentType == null) {
+            contentType = getContextSourceDTO().getMediaType();
+        }
+
+        // try to guess contentType
+        if (contentType == null) {
+            InputStream is = null;
+            try {
+                is = new BufferedInputStream(new FileInputStream(file));
+                contentType = URLConnection.guessContentTypeFromStream(is);
+            } catch (Exception e) {
+                LOGGER.warn(loggerMsg("Error getting content type for " + file.getPath()));
+
+            } finally {
+                IOUtils.closeQuietly(is);
+            }
+
+        }
+
+        if (contentType == null) {
+            return null;
+        }
+
+        //content type is not null
+        if (contentType.startsWith("application/rss+xml") || contentType.startsWith("application/atom+xml")) {
+            contentLoader = new FeedFormatLoader();
+        } else {
+            //TODO refactor?
+            RDFFormat rdfFormat = null;
+            if (contentType.equals(CONTENT_TYPE_TEXT)) {
+                String fileName = file.getName();
+                String[] arr = fileName.split("\\.");
+                if (arr.length > 0) {
+                    String ext = arr[arr.length - 1];
+                    if (StringUtils.isNotEmpty(ext)) {
+                        if (ext.equalsIgnoreCase(EXT_TTL)) {
+                            rdfFormat = RDFFormat.TURTLE;
+                        }
+                        if (ext.equalsIgnoreCase(EXT_N3)) {
+                            rdfFormat = RDFFormat.N3;
+                        }
+                    }
+                }
+            } else {
+                rdfFormat = RDFMediaTypes.toRdfFormat(contentType);
+            }
+
+            if (rdfFormat != null) {
+                contentLoader = new RDFFormatLoader(rdfFormat);
+            }
+        }
+
+        return contentLoader;
     }
 
     /**
@@ -886,6 +1116,7 @@ public class PullHarvest extends BaseHarvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.BaseHarvest#getHarvestType()
      */
     @Override
@@ -903,18 +1134,20 @@ public class PullHarvest extends BaseHarvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.BaseHarvest#isSendNotifications()
      */
     @Override
     protected boolean isSendNotifications() {
 
         // notifications sent only when this is not an on-demand harvest
-        //or if fatal error (eg Timeout) has occured
+        // or if fatal error (eg Timeout) has occured
         return !isOnDemandHarvest && (getContextSourceDTO().isPrioritySource() || isFatalErrorOccured);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.BaseHarvest#isBeingHarvested(java.lang.String)
      */
     @Override
@@ -926,6 +1159,7 @@ public class PullHarvest extends BaseHarvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.BaseHarvest#afterFinish()
      */
     @Override

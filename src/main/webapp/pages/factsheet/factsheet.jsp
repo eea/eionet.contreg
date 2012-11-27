@@ -86,7 +86,7 @@
                         <c:set var="registrationsAllowed" value='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'/>
 
                         <c:set var="editAllowed" value="${registrationsAllowed && !subject.anonymous}"/>
-                        <c:set var="harvestAllowed" value="${editAllowed && subjectUrl!=null && !actionBean.currentlyHarvested}"/>
+                        <c:set var="harvestAllowed" value="${editAllowed && subjectUrl!=null && !actionBean.currentlyHarvested && !actionBean.uriIsFolder}"/>
                         <c:set var="sourceReadActionsAllowed" value="${actionBean.uriIsHarvestSource}"/>
                         <c:set var="downloadAllowed" value="${actionBean.subjectDownloadable}"/>
                         <c:set var="addBookmarkAllowed" value="${registrationsAllowed && !actionBean.subjectIsUserBookmark}"/>
