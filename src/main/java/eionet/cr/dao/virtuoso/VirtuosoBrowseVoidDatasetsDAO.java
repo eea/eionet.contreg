@@ -49,23 +49,25 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         Bindings bindings = new Bindings();
 
         StringBuilder sb = new StringBuilder();
+        sb.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n");
         sb.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
         sb.append("PREFIX void: <http://rdfs.org/ns/void#>\n");
         sb.append("\n");
-        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects\n");
+        sb.append("SELECT ?dataset ?label ?creator ?subjects\n");
         sb.append("WHERE {\n");
-        sb.append("  ?dataset a void:Dataset .\n");
-        sb.append("  ?dataset dcterms:title ?label.\n");
-        sb.append("  ?dataset dcterms:creator ?ucreator .\n");
-        sb.append("  ?ucreator rdfs:label ?creator.\n");
+        sb.append(" {\n");
+        sb.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects)\n");
+        sb.append("  WHERE {\n");
+        sb.append("   ?dataset a void:Dataset .\n");
+        sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+        sb.append("   ?dataset dcterms:creator ?ucreator .\n");
+        sb.append("   ?ucreator rdfs:label ?creator.\n");
 
         if (subjects != null && !subjects.isEmpty()) {
             sb.append("  ?dataset dcterms:subject ?usubject .\n");
-            sb.append("  ?usubject rdfs:label ?subject.\n");
+            sb.append("  ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en',''))\n");
         }
-
-        sb.append("  FILTER (LANG(?label) IN ('en','')).\n");
 
         if (creators != null && !creators.isEmpty()) {
             sb.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
@@ -81,9 +83,11 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             }
         } else {
             sb.append("  OPTIONAL {?dataset dcterms:subject ?usubject .\n");
-            sb.append("           ?usubject rdfs:label ?subject }\n");
+            sb.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
         }
-        sb.append("}\n");
+        sb.append("  }\n");
+        sb.append(" }\n");
+        sb.append("} GROUP BY ?dataset ?label ?creator\n");
 
         List<VoidDatasetsResultRow> datasets = executeSPARQL(sb.toString(), bindings, new VoidDatasetsReader());
         return datasets;
@@ -97,7 +101,6 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
     public List<String> findCreators(List<String> subjects) throws DAOException {
 
         Bindings bindings = new Bindings();
-
         StringBuilder sb = new StringBuilder();
         sb.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
