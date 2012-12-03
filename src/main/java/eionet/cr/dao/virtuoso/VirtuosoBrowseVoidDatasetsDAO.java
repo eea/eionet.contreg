@@ -62,12 +62,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("   ?dataset a void:Dataset .\n");
         sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
         sb.append("   ?dataset dcterms:creator ?ucreator .\n");
-        sb.append("   ?ucreator rdfs:label ?creator.\n");
-
-        if (subjects != null && !subjects.isEmpty()) {
-            sb.append("  ?dataset dcterms:subject ?usubject .\n");
-            sb.append("  ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en',''))\n");
-        }
+        sb.append("   ?ucreator rdfs:label ?creator .\n");
 
         if (creators != null && !creators.isEmpty()) {
             sb.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
@@ -76,8 +71,11 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             }
         }
 
+        // Virtuoso behaves differently when there is only one subject in the set. Then the language code matters.
         if (subjects != null && !subjects.isEmpty()) {
-            sb.append("  FILTER (?subject IN (").append(variablesCSV("sbj", subjects.size())).append("))\n");
+            sb.append("  ?dataset dcterms:subject ?usubject .\n");
+            sb.append("  ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en',''))\n");
+            sb.append("  FILTER (STR(?subject) IN (").append(variablesCSV("sbj", subjects.size())).append("))\n");
             for (int i = 0; i < subjects.size(); i++) {
                 bindings.setString("sbj" + (i + 1), subjects.get(i));
             }
