@@ -207,7 +207,8 @@ public final class Util {
     /**
      * Converts milliseconds to seconds.
      *
-     * @param milliSeconds milliseconds
+     * @param milliSeconds
+     *            milliseconds
      * @return seconds
      */
     public static long getSeconds(final long milliSeconds) {
@@ -217,7 +218,8 @@ public final class Util {
     /**
      * Returns true if given String is null or empty.
      *
-     * @param str String
+     * @param str
+     *            String
      * @return boolean if String is empty or null.
      */
     public static boolean isNullOrEmpty(final String str) {
@@ -440,7 +442,8 @@ public final class Util {
      * Create a comma-separated list of tag enclosed URIs. The result can be used in sparql queries. eg.: [uri1,uri2,uri3] is
      * transformed to <uri1>,<uri2>,<uri3>.
      *
-     * @param uriList list of URIs
+     * @param uriList
+     *            list of URIs
      * @return comma separated list of tag enclosed URIs
      */
     public static String sparqlUrisToCsv(final Collection<String> uriList) {
@@ -463,7 +466,8 @@ public final class Util {
     /**
      * Converts string to double.
      *
-     * @param s String to convert.
+     * @param s
+     *            String to convert.
      * @return Double
      */
     public static Double toDouble(final String s) {
@@ -701,7 +705,8 @@ public final class Util {
      * "true" returns true - "false" return false - "yes" and "y" return true - "no" and "n" return false - "0", "-1", "-2", etc
      * return false - "1", "2", "3", etc return true - any other string, including an empty one, returns false
      *
-     * @param s String to represent boolean.
+     * @param s
+     *            String to represent boolean.
      * @return boolean
      */
     public static boolean toBooolean(final String s) {
@@ -728,7 +733,8 @@ public final class Util {
     /**
      * Returns true if the given integer is >0, otherwise returns false.
      *
-     * @param i int
+     * @param i
+     *            int
      * @return boolean
      */
     public static boolean toBooolean(final int i) {
@@ -739,7 +745,8 @@ public final class Util {
     /**
      * Removes surrounding quotes of the given String.
      *
-     * @param s String to remove quotes from
+     * @param s
+     *            String to remove quotes from
      * @return Given String without surrounding quotes. If the method parameter is not surrounded with quotes the original String is
      *         returned.
      */
@@ -755,7 +762,8 @@ public final class Util {
      * number.
      *
      * @param element
-     * @param elements elements
+     * @param elements
+     *            elements
      * @return
      */
     public static String getUniqueElementName(String element, Collection<String> elements) {
@@ -868,5 +876,35 @@ public final class Util {
         } else {
             return actionBeanClass.getAnnotation(UrlBinding.class).value();
         }
+    }
+
+    /**
+     * Returns true if the given text matches the given wildcard (i.e. '*') pattern.
+     * Code borrowed from http://www.adarshr.com/papers/wildcard.
+     *
+     * @param text as indicated above
+     * @param pattern as indicated above
+     * @return as indicated above
+     */
+    public static boolean wildCardMatch(String text, String pattern) {
+
+        // Create the cards by splitting using a RegEx. If more speed
+        // is desired, a simpler character based splitting can be done.
+        String[] cards = pattern.split("\\*");
+
+        // Iterate over the cards.
+        for (String card : cards) {
+            int idx = text.indexOf(card);
+
+            // Card not detected in the text.
+            if (idx == -1) {
+                return false;
+            }
+
+            // Move ahead, towards the right of the text.
+            text = text.substring(idx + card.length());
+        }
+
+        return true;
     }
 }

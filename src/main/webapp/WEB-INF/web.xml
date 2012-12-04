@@ -216,6 +216,10 @@
         <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/void.rdf</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StripesDispatcher</servlet-name>
+        <url-pattern>/ping</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>rpcrouter</servlet-name>

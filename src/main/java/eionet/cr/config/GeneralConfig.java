@@ -114,6 +114,9 @@ public final class GeneralConfig {
     public static final String ENABLE_EEA_FUNCTIONALITY = "enableEEAFunctionality";
 
     /** */
+    public static final String PING_WHITELIST = "pingWhitelist";
+
+    /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
     public static final int SEVERITY_WARNING = 3;

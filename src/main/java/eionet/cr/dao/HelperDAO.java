@@ -417,4 +417,13 @@ public interface HelperDAO extends DAO {
      * @return
      */
     String getLiteralObjectValue(String subjectUri, String predicateUri, String objectMD5, String graphUri);
+
+    /**
+     * Returns true if a graph by the given URI exists in the triple store. Otherwise returns false.
+     *
+     * @param grpahUri The graph in question.
+     * @return The boolean as described above.
+     * @throws DAOException When an error happens.
+     */
+    boolean isGraphExists(String grpahUri) throws DAOException;
 }
