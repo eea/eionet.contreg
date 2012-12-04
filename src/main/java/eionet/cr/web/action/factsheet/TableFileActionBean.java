@@ -119,7 +119,7 @@ public class TableFileActionBean extends AbstractActionBean {
             predicatePageNumbers.put(Predicates.CR_SPARQL_QUERY, 1);
 
             SubjectDTO subject = helperDAO.getFactsheet(uri, null, predicatePageNumbers);
-            spqrqlQuery = subject.getObject(Predicates.CR_SPARQL_QUERY).getValue();
+            spqrqlQuery = subject.getObjectValue(Predicates.CR_SPARQL_QUERY);
 
             FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.TABLE_FILE_CONTENTS);

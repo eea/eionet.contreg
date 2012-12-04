@@ -160,6 +160,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (overwrite) {
+
+            // If doing overwrite, load wizard inputs from previous upload
+            loadWizardInputsFromPreviousUpload();
+
             if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
                 String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
                 // Delete existing data
@@ -193,8 +197,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Add metadata about user folder update
             helper.linkFileToFolder(folderUri, getUserName());
 
-            // Pre-load wizard input values if this has been uploaded already before (so a re-upload now)
-            preloadWizardInputs();
+            // Prepare data linkins scripts dropdown
+            dataLinkingScripts = new ArrayList<DataLinkingScript>();
+            dataLinkingScripts.add(new DataLinkingScript());
+
+            // If not given, the file's label equals the file's name
+            if (StringUtils.isEmpty(fileLabel)) {
+                fileLabel = fileName;
+            }
 
             // Tell the JSP page that it should display the wizard.
             resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
@@ -381,18 +391,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
      *
      * @throws DAOException
      */
-    private void preloadWizardInputs() throws DAOException {
+    private void loadWizardInputsFromPreviousUpload() throws DAOException {
 
         // If, for some reason, all inputs already have a value, do nothing and return
         if (!StringUtils.isBlank(labelColumn) && !StringUtils.isBlank(objectsType) && !uniqueColumns.isEmpty()) {
             return;
         }
 
-        dataLinkingScripts = new ArrayList<DataLinkingScript>();
-        dataLinkingScripts.add(new DataLinkingScript());
-
         SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
         if (fileSubject != null) {
+
+            if (StringUtils.isBlank(fileLabel)) {
+                fileLabel = fileSubject.getObjectValue(Predicates.RDFS_LABEL);
+            }
 
             if (StringUtils.isBlank(labelColumn)) {
                 labelColumn = fileSubject.getObjectValue(Predicates.CR_OBJECTS_LABEL_COLUMN);
@@ -409,10 +420,25 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     uniqueColumns.addAll(coll);
                 }
             }
-        }
 
-        if (StringUtils.isEmpty(fileLabel)) {
-            fileLabel = fileName;
+            if (StringUtils.isBlank(publisher)) {
+                publisher = fileSubject.getObjectValue(Predicates.DCTERMS_PUBLISHER);
+            }
+
+            if (StringUtils.isBlank(license)) {
+                license = fileSubject.getObjectValue(Predicates.DCTERMS_LICENSE);
+                if (StringUtils.isBlank(license)) {
+                    license = fileSubject.getObjectValue(Predicates.DCTERMS_RIGHTS);
+                }
+            }
+
+            if (StringUtils.isBlank(attribution)) {
+                attribution = fileSubject.getObjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
+            }
+
+            if (StringUtils.isBlank(source)) {
+                source = fileSubject.getObjectValue(Predicates.DCTERMS_SOURCE);
+            }
         }
     }
 
