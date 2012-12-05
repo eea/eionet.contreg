@@ -88,17 +88,19 @@ public class TableFileActionBean extends AbstractActionBean {
         // Get query result - CSV/TSV contents
         TupleQueryResult result = null;
         RepositoryConnection con = null;
-        try {
-            con = SesameConnectionProvider.getRepositoryConnection();
-            Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, spqrqlQuery);
-            result = ((TupleQuery) queryObject).evaluate();
+        if (StringUtils.isNotEmpty(spqrqlQuery)) {
+            try {
+                con = SesameConnectionProvider.getRepositoryConnection();
+                Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, spqrqlQuery);
+                result = ((TupleQuery) queryObject).evaluate();
 
-            if (result != null) {
-                queryResult = new QueryResult(result, true);
+                if (result != null) {
+                    queryResult = new QueryResult(result, true);
+                }
+            } finally {
+                SesameUtil.close(result);
+                SesameUtil.close(con);
             }
-        } finally {
-            SesameUtil.close(result);
-            SesameUtil.close(con);
         }
 
         return new ForwardResolution("/pages/factsheet/tableFile.jsp");
