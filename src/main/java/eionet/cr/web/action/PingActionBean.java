@@ -70,8 +70,8 @@ public class PingActionBean extends AbstractActionBean {
     /** The URI to ping. Required. */
     private String uri;
 
-    /** If true, the source must only be harvested if it already exists in the triple store. Optional. */
-    private boolean mustExist;
+    /** If true, the source must be created if not existing yet. */
+    private boolean create;
 
     /**
      * The default handler of this API's calls.
@@ -108,17 +108,19 @@ public class PingActionBean extends AbstractActionBean {
             // Helper flag that will be raised of a harvest is indeed needed.
             boolean doHarvest = true;
 
+            // Check if a graph by this URI exists.
             boolean exists = DAOFactory.get().getDao(HelperDAO.class).isGraphExists(uri);
-            if (mustExist && !exists) {
-                // Graph must exist as requested, yet it doesn't, hence no harvest will be done, response will be simply 200.
-                doHarvest = false;
-                message = "Harvest skipped, as no such graph exists in triple store: " + uri;
-                LOGGER.debug(message);
-            } else if (!exists) {
+            if (!exists && create) {
+
+                // Graph does not exist, but must be created as indicated in request parameters
                 HarvestSourceDTO source = new HarvestSourceDTO();
                 source.setUrl(uri);
                 source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
                 DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+            } else if (!exists) {
+                doHarvest = false;
+                message = "Harvest skipped, as no such graph exists in triple store: " + uri;
+                LOGGER.debug(message);
             }
 
             if (doHarvest) {
@@ -168,14 +170,6 @@ public class PingActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param mustExist
-     *            the mustExist to set
-     */
-    public void setMustExist(boolean mustExist) {
-        this.mustExist = mustExist;
-    }
-
-    /**
      * Utility method for obtaining the set of ping whitelist (i.e. hosts allowed to call CR's ping API) from configuration.
      *
      * @return The ping whitelist as a hash-set
@@ -200,5 +194,12 @@ public class PingActionBean extends AbstractActionBean {
         }
 
         return result;
+    }
+
+    /**
+     * @param create the create to set
+     */
+    public void setCreate(boolean create) {
+        this.create = create;
     }
 }
