@@ -106,7 +106,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private String objectsType;
 
     /** The column (i.e. column title) representing the contained objects' labels. */
-    private String labelColumn;
+    // private String labelColumn;
 
     /** The columns (i.e. column titles) forming the contained objects' unique identifiers. */
     private List<String> uniqueColumns;
@@ -188,8 +188,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
             CsvImportHelper helper =
-                    new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
-                            attribution, source);
+                    new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
+                            source);
 
             // Store file as new source, but don't harvest it
             helper.insertFileMetadataAndSource(fileSize, getUserName());
@@ -225,8 +225,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         CSVReader csvReader = null;
         CsvImportHelper helper =
-                new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
-                        attribution, source);
+                new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
+                        source);
         try {
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
             helper.extractObjects(csvReader);
@@ -394,7 +394,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     private void loadWizardInputsFromPreviousUpload() throws DAOException {
 
         // If, for some reason, all inputs already have a value, do nothing and return
-        if (!StringUtils.isBlank(labelColumn) && !StringUtils.isBlank(objectsType) && !uniqueColumns.isEmpty()) {
+        if (!StringUtils.isBlank(objectsType) && !uniqueColumns.isEmpty()) {
             return;
         }
 
@@ -403,10 +403,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             if (StringUtils.isBlank(fileLabel)) {
                 fileLabel = fileSubject.getObjectValue(Predicates.RDFS_LABEL);
-            }
-
-            if (StringUtils.isBlank(labelColumn)) {
-                labelColumn = fileSubject.getObjectValue(Predicates.CR_OBJECTS_LABEL_COLUMN);
             }
 
             if (StringUtils.isBlank(objectsType)) {
@@ -494,20 +490,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public void setObjectsType(String objectType) {
         this.objectsType = objectType;
-    }
-
-    /**
-     * @return
-     */
-    public String getLabelColumn() {
-        return labelColumn;
-    }
-
-    /**
-     * @param labelColumn
-     */
-    public void setLabelColumn(String labelColumn) {
-        this.labelColumn = labelColumn;
     }
 
     /**

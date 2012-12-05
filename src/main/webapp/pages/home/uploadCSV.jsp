@@ -119,6 +119,7 @@
                                     </td>
                                     <td><stripes:text name="objectsType" id="objectsTypeInput" size="34" /></td>
                                 </tr>
+                                <%--
                                 <tr>
                                     <td><label class="question" for="labelSelect" title="Column whose value will be used as the row's label whereever other objects link to the row.">Label column</label></td>
                                     <td>
@@ -130,6 +131,7 @@
                                         </stripes:select>
                                     </td>
                                 </tr>
+                                --%>
                                 <tr>
                                     <td valign="top"><label class="question" for="uniqueColumnsSelect" title="Column(s) constituting a unique key.">Column(s) constituting a unique key</label></td>
                                     <td>

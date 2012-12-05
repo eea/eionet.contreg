@@ -73,7 +73,6 @@ public final class CsvImportUtil {
 
         List<String> warningMessages = new ArrayList<String>();
 
-        String labelColumn = getObjectValue(subject, Predicates.CR_OBJECTS_LABEL_COLUMN);
         String fileUri = uri;
         String fileLabel = getObjectValue(subject, Predicates.RDFS_LABEL);
         FileType fileType = FileType.valueOf(getObjectValue(subject, Predicates.CR_MEDIA_TYPE));
@@ -98,7 +97,7 @@ public final class CsvImportUtil {
         DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri));
 
         CsvImportHelper helper =
-                new CsvImportHelper(labelColumn, uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
+                new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
                         attribution, source);
 
         // Store file as new source, but don't harvest it

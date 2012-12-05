@@ -82,9 +82,6 @@ public class CsvImportHelper {
     /** Column labels detected in the uploaded file (titles without type and language code). */
     private List<String> columnLabels;
 
-    /** The column (i.e. column title) representing the contained objects' labels. */
-    private String labelColumn;
-
     /** The columns (i.e. column titles) forming the contained objects' unique identifiers. */
     private List<String> uniqueColumns;
 
@@ -121,7 +118,6 @@ public class CsvImportHelper {
     /**
      * Class constructor.
      *
-     * @param labelColumn
      * @param uniqueColumns
      * @param fileUri
      * @param fileLabel
@@ -132,14 +128,13 @@ public class CsvImportHelper {
      * @param attribution
      * @param source
      */
-    public CsvImportHelper(String labelColumn, List<String> uniqueColumns, String fileUri, String fileLabel, FileType fileType,
+    public CsvImportHelper(List<String> uniqueColumns, String fileUri, String fileLabel, FileType fileType,
             String objectsType, String publisher, String license, String attribution, String source) {
 
         if (uniqueColumns == null) {
             uniqueColumns = new ArrayList<String>();
         }
 
-        this.labelColumn = labelColumn;
         this.uniqueColumns = uniqueColumns;
         this.fileUri = fileUri;
         this.fileLabel = fileLabel;
@@ -158,7 +153,7 @@ public class CsvImportHelper {
     public static List<String> extractColumnLabels(String folderUri, String relativeFilePath, String userName, FileType fileType)
             throws Exception {
 
-        CsvImportHelper helper = new CsvImportHelper(null, null, null, null, fileType, null, null, null, null, null);
+        CsvImportHelper helper = new CsvImportHelper(null, null, null, fileType, null, null, null, null, null);
         CSVReader csvReader = null;
         try {
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, userName, true);
@@ -323,9 +318,6 @@ public class CsvImportHelper {
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_TYPE, ObjectDTO.createLiteral(objectsType));
-        if (StringUtils.isNotEmpty(labelColumn)) {
-            dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_OBJECTS_LABEL_COLUMN, ObjectDTO.createLiteral(labelColumn));
-        }
         if (StringUtils.isNotEmpty(fileLabel)) {
             dao.insertUpdateSourceMetadata(fileUri, Predicates.RDFS_LABEL, ObjectDTO.createLiteral(fileLabel));
         }
@@ -573,10 +565,6 @@ public class CsvImportHelper {
             String predicateUri = fileUri + "#" + column;
             subject.addObject(predicateUri, objectDTO);
 
-            // If marked as label column, add label property as well
-            if (column.equals(labelColumn)) {
-                subject.addObject(Predicates.RDFS_LABEL, objectDTO);
-            }
         }
 
         return subject;
