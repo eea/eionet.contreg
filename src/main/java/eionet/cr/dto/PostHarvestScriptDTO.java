@@ -170,4 +170,11 @@ public class PostHarvestScriptDTO {
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
+
+    @Override
+    public String toString() {
+        return title;
+    }
+
+
 }

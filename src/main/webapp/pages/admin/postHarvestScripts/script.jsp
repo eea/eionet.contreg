@@ -30,6 +30,12 @@
         </ul>
     </div>
 
+    <c:if test="${actionBean.pastePossible}">
+        <div class="advice-msg" style="font-size:0.8em">
+            There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the buffer.
+        </div>
+    </c:if>
+
         <crfn:form action="${actionBean.urlBinding}" focus="first" method="post" style="padding-top:0.8em" onsubmit="formSubmit()">
 
             <table>
@@ -148,10 +154,13 @@ while (l--) {
                         <stripes:submit name="save" value="Save & close"/>
                         <stripes:submit name="test" value="Test"/>
                         <stripes:submit name="cancel" value="Cancel"/>
+                        <c:if test="${actionBean.pastePossible}">
+                            <stripes:submit name="paste" value="Paste" title="Paste selected script(s): ${actionBean.clipBoardScripts}" />
+                        </c:if>
                     </td>
                 </tr>
             </table>
-
+        <div>
             <stripes:hidden name="id"/>
             <c:if test="${not empty actionBean.targetType}">
                 <stripes:hidden name="targetType"/>
@@ -166,7 +175,7 @@ while (l--) {
                 <stripes:hidden name="cancelUrl"/>
             </c:if>
             <input type="hidden" name="ignoreMalformedSparql" value="${actionBean.ignoreMalformedSparql}"/>
-
+        </div>
         </crfn:form>
 
         <c:if test="${not empty param.test && not empty actionBean.executedTestQuery}">

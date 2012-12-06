@@ -148,6 +148,7 @@ public class LoginActionBean extends AbstractActionBean {
     @HandlesEvent(LOGOUT_EVENT)
     public Resolution logout() {
         getContext().setSessionAttribute(USER_SESSION_ATTR, null);
+        getSession().invalidate();
         if (GeneralConfig.isUseCentralAuthenticationService()) {
             return new RedirectResolution(getContext().getCASLogoutURL(), false);
         } else {

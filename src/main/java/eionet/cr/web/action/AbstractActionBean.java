@@ -62,6 +62,14 @@ public abstract class AbstractActionBean implements ActionBean {
     private static final String CAUTION_MESSAGES = "cautionMessages";
     private static final String WARNING_MESSAGES = "warningMessages";
 
+    /** session attribute name for scripts in clipboard. */
+    protected static final String SCRIPTS_CLIPBOARD = AbstractActionBean.class.getName() + ".clipboardScripts";
+    /** session attribute name for last action in clipboard. */
+    protected static final String SCRIPTS_CLIPBOARD_ACTION = AbstractActionBean.class.getName() + ".clipboardAction";
+
+    /** session attribute name for scripts type in clipboard. */
+    protected static final String SCRIPTS_CLIPBOARD_TYPE = AbstractActionBean.class.getName() + ".clipboardType";
+
     /** */
     protected static final Logger logger = Logger.getLogger(AbstractActionBean.class);
 
@@ -221,6 +229,16 @@ public abstract class AbstractActionBean implements ActionBean {
     public void addGlobalValidationError(ValidationError error) {
         context.getValidationErrors().addGlobalError(error);
     }
+
+   /**
+    * Adds all given validation errors to the context.
+    * @param errors List of error texts
+    */
+   public void addGlobalValidationErrors(List<String> errors) {
+       for (String error : errors) {
+           addGlobalValidationError(error);
+       }
+   }
 
     /**
      *

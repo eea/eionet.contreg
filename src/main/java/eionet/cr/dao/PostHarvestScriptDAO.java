@@ -176,4 +176,23 @@ public interface PostHarvestScriptDAO extends DAO {
      * @throws DAOException
      */
     boolean isScriptsModified(Date lastHarvestDate, String harvestSource) throws DAOException;
+
+    /**
+     * Returns scripts for given IDs.
+     * @param ids IDs array
+     * @return Array of PostHarvestScriptDTO objets
+     * @throws DAOException if query fails
+     */
+    List<PostHarvestScriptDTO> getScriptsByIds(List<Integer> ids) throws DAOException;
+
+   /**
+    * Adds scripts to the end of the given source or type.
+    * @param targetType type shows if scripts are added to source or RDF type
+    * @param targetUrl source or RDF type uri
+    * @param scripts set of scripts
+    * @throws DAOException if insert fails
+    */
+   void addScripts(TargetType targetType, String targetUrl, List<PostHarvestScriptDTO> scripts)
+           throws DAOException;
+
 }

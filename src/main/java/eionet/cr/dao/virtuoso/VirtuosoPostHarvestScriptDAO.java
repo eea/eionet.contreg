@@ -102,6 +102,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     private static final String EXISTS_SQL = "select count(*) from POST_HARVEST_SCRIPT where "
             + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
 
+
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
      */
@@ -501,4 +502,26 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
         Object result = executeUniqueResultSQL(sql, values, new SingleObjectReader<Object>());
         return result != null && NumberUtils.toInt(result.toString()) > 0;
     }
+
+    @Override
+    public List<PostHarvestScriptDTO> getScriptsByIds(List<Integer> ids) throws DAOException {
+        ArrayList<PostHarvestScriptDTO> result = new ArrayList<PostHarvestScriptDTO>();
+
+        for (int id : ids) {
+            result.add(fetch(id));
+        }
+
+        return result.isEmpty() ? null : result;
+
+    }
+
+    @Override
+    public void addScripts(TargetType targetType, String targetUrl, List<PostHarvestScriptDTO> scripts) throws DAOException {
+        for (PostHarvestScriptDTO script : scripts) {
+            insert(targetType, targetUrl, script.getTitle(), script.getScript(), script.isActive(), script.isRunOnce());
+        }
+
+    }
+
+
 }

@@ -12,6 +12,11 @@
 
     <c:choose>
         <c:when test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
+        <c:if test="${actionBean.pastePossible}">
+            <div class="tip-msg">
+                There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the clipboard.
+            </div>
+        </c:if>
 
             <div id="tabbedmenu">
                 <ul>
@@ -23,7 +28,7 @@
                 </ul>
             </div>
 
-			<stripes:layout-render name="${actionBean.pageToRender}"/>
+      <stripes:layout-render name="${actionBean.pageToRender}"/>
 
         </c:when>
         <c:otherwise>

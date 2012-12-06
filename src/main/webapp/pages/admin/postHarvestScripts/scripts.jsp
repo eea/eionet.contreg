@@ -49,7 +49,8 @@
         <c:if test="${not empty actionBean.targets}">
             <div style="margin-top:3em">
                 <crfn:form id="targetsForm" action="/admin/postHarvestScripts" method="get">
-                 <span>Displaying scripts of:</span><br/>
+                 <div>Displaying scripts of:</div>
+         <div>
                  <stripes:select name="targetUrl" id="targetSelect" value="${actionBean.targetUrl}" onchange="this.form.submit();" size="10">
 <!--
                       <c:if test="${empty actionBean.targetUrl}">
@@ -60,7 +61,8 @@
                          <stripes:option value="${target.left}" label="${target.left}"/>
                      </c:forEach>
                  </stripes:select>
-                    <stripes:hidden name="targetType"/>
+                  <stripes:hidden name="targetType"/>
+          </div>
                 </crfn:form>
             </div>
         </c:if>
@@ -85,7 +87,7 @@
 
                     <display:setProperty name="paging.banner.item_name" value="script"/>
                     <display:setProperty name="paging.banner.items_name" value="scripts"/>
-                    <display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
+                    <display:setProperty name="paging.banner.all_items_found" value='<div class="pagebanner">{0} {1} found.</div>'/>
                     <display:setProperty name="paging.banner.onepage" value=""/>
 
                      <display:column style="width:2em;text-align:center">
@@ -108,23 +110,28 @@
 
                 <c:if test="${not empty actionBean.scripts && fn:length(actionBean.scripts)>0}">
                     <div>
-                           <stripes:submit name="delete" value="Delete" title="Delete selected scripts"/>
+                         <stripes:submit name="delete" value="Delete" title="Delete selected scripts"/>
                          <stripes:submit name="activateDeactivate" value="Activate/deactivate" title="Activate/deactivate (i.e. turn on/off) selected scripts"/>
                          <c:if test="${not empty actionBean.scripts && fn:length(actionBean.scripts)>1}">
                             <stripes:submit name="moveUp" value="Move up" title="Move selected scripts up"/>
                             <stripes:submit name="moveDown" value="Move down" title="Move selected scripts down"/>
                          </c:if>
-                            <input type="button" onclick="toggleSelectAll('scriptsForm');return false" value="Select all" name="selectAll">
+                         <input type="button" onclick="toggleSelectAll('scriptsForm');return false" value="Select all" name="selectAll"/>
+                         <stripes:submit name="cut" value="Cut" title="Cut selected scripts"/>
+                         <stripes:submit name="copy" value="Copy" title="Copy selected scripts"/>
+                         <c:if test="${actionBean.pastePossible}">
+                            <stripes:submit name="paste" value="Paste" title="Paste selected ${fn:length(actionBean.clipBoardScripts)} script(s): ${actionBean.clipBoardScripts}"/>
+                        </c:if>
                     </div>
                 </c:if>
-
+        <div>
                 <c:if test="${not empty actionBean.targetType}">
                     <stripes:hidden name="targetType"/>
                 </c:if>
                 <c:if test="${not empty actionBean.targetUrl}">
                     <stripes:hidden name="targetUrl"/>
                 </c:if>
-
+        </div>
             </crfn:form>
         </div>
     </c:if>
