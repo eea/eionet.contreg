@@ -1,7 +1,7 @@
 package eionet.cr.harvest.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,24 +42,10 @@ public final class CsvImportUtil {
      */
     public static boolean isSourceTableFile(SubjectDTO subject) {
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
-            return Subjects.CR_TABLE_FILE.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+            return Subjects.CR_TABLE_FILE.equals(subject.getObjectValue(Predicates.RDF_TYPE));
         }
         return false;
     }
-
-    /**
-     * Returns object Value.
-     * @param subject Subject data object
-     * @param predicate predicate value
-     * @return Object value, null if no object for this predicate
-     */
-    private static String getObjectValue(SubjectDTO subject, String predicate) {
-        if (subject.getObject(predicate) != null) {
-            return subject.getObject(predicate).getValue();
-        }
-        return null;
-    }
-
 
     /**
      * Harvests CSV/TSV file.
@@ -74,21 +60,15 @@ public final class CsvImportUtil {
         List<String> warningMessages = new ArrayList<String>();
 
         String fileUri = uri;
-        String fileLabel = getObjectValue(subject, Predicates.RDFS_LABEL);
-        FileType fileType = FileType.valueOf(getObjectValue(subject, Predicates.CR_MEDIA_TYPE));
-        String objectsType = getObjectValue(subject, Predicates.CR_OBJECTS_TYPE);
-        String publisher = getObjectValue(subject, Predicates.DCTERMS_PUBLISHER);
-        String license = getObjectValue(subject, Predicates.DCTERMS_RIGHTS);
-        String attribution = getObjectValue(subject, Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
-        String source = getObjectValue(subject, Predicates.DCTERMS_SOURCE);
-        long fileSize = Long.parseLong(getObjectValue(subject, Predicates.CR_BYTE_SIZE));
-
-        List<String> uniqueColumns = new ArrayList<String>();
-        String uniqueColumnsString = getObjectValue(subject, Predicates.CR_OBJECTS_UNIQUE_COLUMN);
-        if (StringUtils.isNotEmpty(uniqueColumnsString)) {
-            String[] uniqueColumnsArr = subject.getObject(Predicates.CR_OBJECTS_UNIQUE_COLUMN).getValue().split(",");
-            uniqueColumns = Arrays.asList(uniqueColumnsArr);
-        }
+        String fileLabel = subject.getObjectValue(Predicates.RDFS_LABEL);
+        FileType fileType = FileType.valueOf(subject.getObjectValue(Predicates.CR_MEDIA_TYPE));
+        String objectsType = subject.getObjectValue(Predicates.CR_OBJECTS_TYPE);
+        String publisher = subject.getObjectValue(Predicates.DCTERMS_PUBLISHER);
+        String license = subject.getObjectValue(Predicates.DCTERMS_RIGHTS);
+        String attribution = subject.getObjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
+        String source = subject.getObjectValue(Predicates.DCTERMS_SOURCE);
+        long fileSize = Long.parseLong(subject.getObjectValue(Predicates.CR_BYTE_SIZE));
+        Collection<String> uniqueColumns = subject.getObjectValues(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
 
         String folderUri = StringUtils.substringBeforeLast(uri, "/");
         String relativeFilePath = FolderUtil.extractPathInUserHome(fileUri);
@@ -97,7 +77,7 @@ public final class CsvImportUtil {
         DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri));
 
         CsvImportHelper helper =
-                new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license,
+                new CsvImportHelper(new ArrayList<String>(uniqueColumns), fileUri, fileLabel, fileType, objectsType, publisher, license,
                         attribution, source);
 
         // Store file as new source, but don't harvest it

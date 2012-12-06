@@ -120,7 +120,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
         harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-        SubjectDTO subject = helperDAO.getFactsheet(uri, null, null);
+        SubjectDTO subject = helperDAO.getSubject(uri);
 
         if (subject != null && CsvImportUtil.isSourceTableFile(subject)) {
             try {

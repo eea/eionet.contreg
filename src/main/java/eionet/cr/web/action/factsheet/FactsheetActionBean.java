@@ -202,13 +202,13 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public Resolution harvest() throws HarvestException, DAOException {
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-        subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
+        SubjectDTO subjectDto = helperDAO.getSubject(uri);
 
-        if (subject != null && CsvImportUtil.isSourceTableFile(subject)) {
+        if (subjectDto != null && CsvImportUtil.isSourceTableFile(subjectDto)) {
             // Harvest table file
             try {
                 //harvestTableFile();
-                List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDto, uri, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }
