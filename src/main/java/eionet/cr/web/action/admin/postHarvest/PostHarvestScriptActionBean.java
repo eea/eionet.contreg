@@ -59,10 +59,10 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
 
     /** */
-    private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n"
-            + "    INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " { ?s cr:tag `bif:lower(?o)` }\n"
-            + "    FROM ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + "\n"
-            + "    WHERE { ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o }";
+    private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n\n"
+            + "INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n    ?s cr:tag `bif:lower(?o)`\n}\n"
+            + "FROM ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + "\n"
+            + "WHERE {\n    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n}";
 
     /** */
     private int id;
