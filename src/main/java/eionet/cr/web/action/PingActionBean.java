@@ -22,9 +22,10 @@
 package eionet.cr.web.action;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashSet;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,19 +82,21 @@ public class PingActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution defaultHandler() {
 
+        // Get client host/IP, ensure that it's in the whitelist.
         HttpServletRequest request = getContext().getRequest();
         String ip = request.getRemoteAddr();
-        String host = request.getRemoteHost();
-
+        String host = processClientHostName(request.getRemoteHost(), ip);
         if (!isTrustedRequester(host, ip)) {
             LOGGER.debug("Client denied: host = " + host + ", IP = " + ip);
             return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN);
         }
 
+        // Ensure that URI to ping has been given.
         if (StringUtils.isBlank(uri)) {
             return new ErrorResolution(HttpURLConnection.HTTP_BAD_REQUEST, "URI must not be blank!");
         }
 
+        // The result-message that will be printed into XML response.
         String message = "";
         try {
             // Ensure we have a legal and non-broken URL.
@@ -105,7 +108,7 @@ public class PingActionBean extends AbstractActionBean {
                 return new ErrorResolution(HttpURLConnection.HTTP_BAD_REQUEST, "URL seems to be broken!");
             }
 
-            // Helper flag that will be raised of a harvest is indeed needed.
+            // Helper flag that will be raised if a harvest is indeed needed.
             boolean doHarvest = true;
 
             // Check if a graph by this URI exists.
@@ -162,6 +165,37 @@ public class PingActionBean extends AbstractActionBean {
     }
 
     /**
+     * If the given hostName differs from the given IP address then this method returns the hostName as it is. Otherwise it uses
+     * {@link InetAddress} to detect the given IP address's true host name. If that still fails, the method returns the IP address
+     * as given.
+     *
+     * @param hostName As indicated above.
+     * @param ip As indicated above.
+     * @return As indicated above.
+     */
+    private String processClientHostName(String hostName, String ip){
+
+        // If the IP address is blank we can only return the host name as it is.
+        if (StringUtils.isBlank(ip)){
+            return hostName;
+        }
+
+        // If the hostName is blank or it equals with the IP, then try to obtain proper host name from java.net.InetAddress.
+        if (StringUtils.isBlank(hostName) || hostName.equals(ip)){
+            try {
+                return InetAddress.getByName(ip).getCanonicalHostName();
+            } catch (UnknownHostException e) {
+                // Fallback to IP address.
+                return ip;
+            }
+        }
+        else{
+            // The host name was not blank and it differs from IP, so return it as it is.
+            return hostName;
+        }
+    }
+
+    /**
      * @param uri
      *            the uri to set
      */
@@ -184,11 +218,10 @@ public class PingActionBean extends AbstractActionBean {
 
         String property = GeneralConfig.getProperty(GeneralConfig.PING_WHITELIST);
         if (!StringUtils.isBlank(property)){
-            StringTokenizer st = new StringTokenizer(property, ",");
-            while (st.hasMoreTokens()){
-                String token = st.nextToken().trim();
-                if (!token.isEmpty()){
-                    result.add(token.toLowerCase());
+            String[] split = property.split("\\s*,\\s*");
+            for (int i = 0; i < split.length; i++) {
+                if (StringUtils.isNotBlank(split[i])){
+                    result.add(split[i].trim().toLowerCase());
                 }
             }
         }
