@@ -61,6 +61,12 @@ public class PingActionBean extends AbstractActionBean {
     /** */
     private static final Logger LOGGER = Logger.getLogger(PingActionBean.class);
 
+    /** */
+    private static final int ERR_BLANK_URI = 1;
+    private static final int ERR_INVALID_URL = 2;
+    private static final int ERR_FRAGMENT_URL = 3;
+    private static final int ERR_BROKEN_URL = 4;
+
     /** Template for the XML-messages to be sent as response to this API. */
     private static final String RESPONSE_XML = "<?xml version=\"1.0\"?>\r\n" + "<response>\r\n"
             + "    <message>@message@</message>\r\n" + "    <flerror>@errorCode@</flerror>\r\n" + "</response>";
@@ -91,45 +97,51 @@ public class PingActionBean extends AbstractActionBean {
             return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN);
         }
 
-        // Ensure that URI to ping has been given.
-        if (StringUtils.isBlank(uri)) {
-            return new ErrorResolution(HttpURLConnection.HTTP_BAD_REQUEST, "URI must not be blank!");
-        }
-
-        // The result-message that will be printed into XML response.
+        // The result-message and error code that will be printed into XML response.
+        int errorCode = 0;
         String message = "";
         try {
-            // Ensure we have a legal and non-broken URL.
-            URL url = new URL(uri);
-            if (url.getRef() != null) {
-                return new ErrorResolution(HttpURLConnection.HTTP_BAD_REQUEST, "URL with a fragment part not allowed!");
+            // Ensure that the pinged URI is not blank, is legal URI, does not have a fragment part and is not broken.
+            if (StringUtils.isBlank(uri)) {
+                errorCode = ERR_BLANK_URI;
+                message = "No URI given, no action taken.";
+            }
+            else if (!URLUtil.isURL(uri)){
+                errorCode = ERR_INVALID_URL;
+                message = "Not a valid URL, no action taken.";
+            }
+            else if (new URL(uri).getRef() != null) {
+                errorCode = ERR_FRAGMENT_URL;
+                message = "URL with a fragment part not allowed, no action taken.";
             }
             else if (URLUtil.isNotExisting(uri)){
-                return new ErrorResolution(HttpURLConnection.HTTP_BAD_REQUEST, "URL seems to be broken!");
+                errorCode = ERR_BROKEN_URL;
+                message = "URL seems to be broken, no action taken.";
             }
+            else{
+                // Helper flag that will be raised if a harvest is indeed needed.
+                boolean doHarvest = true;
 
-            // Helper flag that will be raised if a harvest is indeed needed.
-            boolean doHarvest = true;
+                // Check if a graph by this URI exists.
+                boolean exists = DAOFactory.get().getDao(HelperDAO.class).isGraphExists(uri);
+                if (!exists && create) {
 
-            // Check if a graph by this URI exists.
-            boolean exists = DAOFactory.get().getDao(HelperDAO.class).isGraphExists(uri);
-            if (!exists && create) {
+                    // Graph does not exist, but must be created as indicated in request parameters
+                    HarvestSourceDTO source = new HarvestSourceDTO();
+                    source.setUrl(uri);
+                    source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+                } else if (!exists) {
+                    doHarvest = false;
+                    message = "Harvest skipped, as no such graph exists in triple store: " + uri;
+                    LOGGER.debug(message);
+                }
 
-                // Graph does not exist, but must be created as indicated in request parameters
-                HarvestSourceDTO source = new HarvestSourceDTO();
-                source.setUrl(uri);
-                source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
-                DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
-            } else if (!exists) {
-                doHarvest = false;
-                message = "Harvest skipped, as no such graph exists in triple store: " + uri;
-                LOGGER.debug(message);
-            }
-
-            if (doHarvest) {
-                UrgentHarvestQueue.addPullHarvest(uri);
-                message = "URI added to the urgent harvest queue: " + uri;
-                LOGGER.debug(message);
+                if (doHarvest) {
+                    UrgentHarvestQueue.addPullHarvest(uri);
+                    message = "URI added to the urgent harvest queue: " + uri;
+                    LOGGER.debug(message);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("PING request failed: " + e.toString(), e);
@@ -137,7 +149,7 @@ public class PingActionBean extends AbstractActionBean {
         }
 
         String response = RESPONSE_XML.replace("@message@", message);
-        response = response.replace("@errorCode@", "0");
+        response = response.replace("@errorCode@", String.valueOf(errorCode));
         return new StreamingResolution("text/xml", response);
     }
 
