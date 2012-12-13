@@ -364,9 +364,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      *
      * @return Resolution
-     * @throws OpenRDFException
      */
-    public Resolution execute() throws OpenRDFException {
+    public Resolution execute() {
         setGraphUri();
         // if query is blank and there's also no such request parameter as query at all,
         // then assume user clicked the SPARQL client menu choice, and forward to the form page
@@ -607,7 +606,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     SesameUtil.close(queryResult);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 addWarningMessage("Encountered exception: " + e.toString());
 
                 //Syntax error in query: http code - 400 - check query syntax with sesame parser
