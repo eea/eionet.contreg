@@ -24,7 +24,11 @@
                 username="${virtuoso.db.rousr}"
                 password="${virtuoso.db.ropwd}"
                 driverClassName="${virtuoso.db.drv}"
-                url="${virtuoso.db.url}">
+                url="${virtuoso.db.url}"
+                removeAbandoned="true"
+                removeAbandonedTimeout="60"
+                logAbandoned="true"
+                >
     </Resource>
 
 </Context>
