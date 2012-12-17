@@ -1,6 +1,5 @@
 package eionet.cr.web.action;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -612,15 +612,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 handleVirtuosoError(e, query);
 
             } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    SesameUtil.close(con);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // Close DB connection and output stream quietly.
+                SesameUtil.close(con);
+                IOUtils.closeQuietly(out);
             }
         }
     }
@@ -633,8 +627,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             int maxRowsCount = GeneralConfig.getIntProperty(GeneralConfig.SPARQLENDPOINT_MAX_ROWS_COUNT, 2000);
 
             nrOfTriples =
-                DAOFactory.get().getDao(HelperDAO.class)
-                .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                    DAOFactory.get().getDao(HelperDAO.class)
+                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
