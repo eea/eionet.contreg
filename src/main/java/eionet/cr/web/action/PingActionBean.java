@@ -97,7 +97,7 @@ public class PingActionBean extends AbstractActionBean {
             return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN);
         }
 
-        // The result-message and error code that will be printed into XML response.
+        // The default result-message and error code that will be printed into XML response.
         int errorCode = 0;
         String message = "";
         try {
@@ -105,42 +105,42 @@ public class PingActionBean extends AbstractActionBean {
             if (StringUtils.isBlank(uri)) {
                 errorCode = ERR_BLANK_URI;
                 message = "No URI given, no action taken.";
-            }
-            else if (!URLUtil.isURL(uri)){
-                errorCode = ERR_INVALID_URL;
-                message = "Not a valid URL, no action taken.";
-            }
-            else if (new URL(uri).getRef() != null) {
+            } else if (!URLUtil.isURL(uri)) {
+                if (create) {
+                    errorCode = ERR_INVALID_URL;
+                    message = "Not a valid URL, source cannot be created.";
+                } else {
+                    message = "URL not in catalogue of sources, no action taken.";
+                }
+            } else if (create && new URL(uri).getRef() != null) {
                 errorCode = ERR_FRAGMENT_URL;
-                message = "URL with a fragment part not allowed, no action taken.";
-            }
-            else if (URLUtil.isNotExisting(uri)){
+                message = "URL with a fragment part not allowed, source cannot be created.";
+            } else if (create && URLUtil.isNotExisting(uri)) {
                 errorCode = ERR_BROKEN_URL;
-                message = "URL seems to be broken, no action taken.";
-            }
-            else{
+                message = "Could not make a connection to this URL, source cannot be created.";
+            } else {
                 // Helper flag that will be raised if a harvest is indeed needed.
-                boolean doHarvest = true;
+                boolean doHarvest = false;
 
                 // Check if a graph by this URI exists.
                 boolean exists = DAOFactory.get().getDao(HelperDAO.class).isGraphExists(uri);
-                if (!exists && create) {
+                if (exists) {
+                    doHarvest = true;
+                } else if (create) {
 
                     // Graph does not exist, but must be created as indicated in request parameters
                     HarvestSourceDTO source = new HarvestSourceDTO();
                     source.setUrl(uri);
                     source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
                     DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
-                } else if (!exists) {
-                    doHarvest = false;
-                    message = "Harvest skipped, as no such graph exists in triple store: " + uri;
-                    LOGGER.debug(message);
+                    doHarvest = true;
+                } else {
+                    message = "URL not in catalogue of sources, no action taken.";
                 }
 
                 if (doHarvest) {
                     UrgentHarvestQueue.addPullHarvest(uri);
-                    message = "URI added to the urgent harvest queue: " + uri;
-                    LOGGER.debug(message);
+                    message = "URL added to the urgent harvest queue: " + uri;
                 }
             }
         } catch (Exception e) {
@@ -148,6 +148,7 @@ public class PingActionBean extends AbstractActionBean {
             return new ErrorResolution(HttpURLConnection.HTTP_INTERNAL_ERROR);
         }
 
+        LOGGER.debug(message);
         String response = RESPONSE_XML.replace("@message@", message);
         response = response.replace("@errorCode@", String.valueOf(errorCode));
         return new StreamingResolution("text/xml", response);
@@ -156,19 +157,21 @@ public class PingActionBean extends AbstractActionBean {
     /**
      * Returns true if the requester identified by the given host and/or IP address is trusted. Otherwise returns false.
      *
-     * @param host The requester's host.
-     * @param ip The requester's IP address.
+     * @param host
+     *            The requester's host.
+     * @param ip
+     *            The requester's IP address.
      * @return The boolean as indicated.
      */
     private boolean isTrustedRequester(String host, String ip) {
 
-        for (String pattern : PING_WHITELIST){
+        for (String pattern : PING_WHITELIST) {
 
-            if (StringUtils.isNotBlank(host) && Util.wildCardMatch(host.toLowerCase(), pattern)){
+            if (StringUtils.isNotBlank(host) && Util.wildCardMatch(host.toLowerCase(), pattern)) {
                 return true;
             }
 
-            if (StringUtils.isNotBlank(ip) && Util.wildCardMatch(ip, pattern)){
+            if (StringUtils.isNotBlank(ip) && Util.wildCardMatch(ip, pattern)) {
                 return true;
             }
         }
@@ -181,27 +184,28 @@ public class PingActionBean extends AbstractActionBean {
      * {@link InetAddress} to detect the given IP address's true host name. If that still fails, the method returns the IP address
      * as given.
      *
-     * @param hostName As indicated above.
-     * @param ip As indicated above.
+     * @param hostName
+     *            As indicated above.
+     * @param ip
+     *            As indicated above.
      * @return As indicated above.
      */
-    private String processClientHostName(String hostName, String ip){
+    private String processClientHostName(String hostName, String ip) {
 
         // If the IP address is blank we can only return the host name as it is.
-        if (StringUtils.isBlank(ip)){
+        if (StringUtils.isBlank(ip)) {
             return hostName;
         }
 
         // If the hostName is blank or it equals with the IP, then try to obtain proper host name from java.net.InetAddress.
-        if (StringUtils.isBlank(hostName) || hostName.equals(ip)){
+        if (StringUtils.isBlank(hostName) || hostName.equals(ip)) {
             try {
                 return InetAddress.getByName(ip).getCanonicalHostName();
             } catch (UnknownHostException e) {
                 // Fallback to IP address.
                 return ip;
             }
-        }
-        else{
+        } else {
             // The host name was not blank and it differs from IP, so return it as it is.
             return hostName;
         }
@@ -220,7 +224,7 @@ public class PingActionBean extends AbstractActionBean {
      *
      * @return The ping whitelist as a hash-set
      */
-    private static HashSet<String> getPingWhiteList(){
+    private static HashSet<String> getPingWhiteList() {
 
         HashSet<String> result = new HashSet<String>();
         result.add("localhost");
@@ -229,10 +233,10 @@ public class PingActionBean extends AbstractActionBean {
         result.add("::1");
 
         String property = GeneralConfig.getProperty(GeneralConfig.PING_WHITELIST);
-        if (!StringUtils.isBlank(property)){
+        if (!StringUtils.isBlank(property)) {
             String[] split = property.split("\\s*,\\s*");
             for (int i = 0; i < split.length; i++) {
-                if (StringUtils.isNotBlank(split[i])){
+                if (StringUtils.isNotBlank(split[i])) {
                     result.add(split[i].trim().toLowerCase());
                 }
             }
@@ -242,7 +246,8 @@ public class PingActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param create the create to set
+     * @param create
+     *            the create to set
      */
     public void setCreate(boolean create) {
         this.create = create;
