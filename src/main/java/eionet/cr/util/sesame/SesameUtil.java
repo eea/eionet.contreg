@@ -44,7 +44,7 @@ import eionet.cr.util.Util;
  */
 public final class SesameUtil {
 
-    /** Logger. */
+    /** Static logger. */
     protected static final Logger LOGGER = Logger.getLogger(SesameUtil.class);
 
     /**
@@ -258,14 +258,14 @@ public final class SesameUtil {
      * @param queryResult
      *            Query Result
      */
-    public static void close(final TupleQueryResult queryResult) {
+    public static void close(TupleQueryResult queryResult) {
 
         if (queryResult != null) {
             try {
                 queryResult.close();
             } catch (Exception e) {
                 // Ignore closing exceptions.
-                LOGGER.warn("Exception when closing connection.", e);
+                LOGGER.warn("Exception when closing TupleQueryResult.", e);
             }
         }
     }
@@ -281,7 +281,7 @@ public final class SesameUtil {
                 queryResult.close();
             } catch (Exception e) {
                 // Ignore closing exceptions.
-                LOGGER.warn("Exception when closing connection.", e);
+                LOGGER.warn("Exception when closing GraphQueryResult.", e);
             }
         }
     }
@@ -297,7 +297,7 @@ public final class SesameUtil {
                 repo.shutDown();
             } catch (Exception e) {
                 // Ignore shutdown exceptions.
-                LOGGER.warn("Exception when closing connection.", e);
+                LOGGER.warn("Exception when shutting down the repository.", e);
             }
         }
     }
@@ -312,9 +312,8 @@ public final class SesameUtil {
             try {
                 conn.close();
             } catch (Exception e) {
-                // ignoring repository closing exceptions
-                LOGGER.warn("Exception when closing connection.", e);
-
+                // Ignoring closing exceptions.
+                LOGGER.warn("Exception when closing connection", e);
             }
         }
     }
@@ -330,6 +329,7 @@ public final class SesameUtil {
                 conn.rollback();
             } catch (RepositoryException e) {
                 // Ignore rollback exceptions.
+                LOGGER.warn("Exception when rollbacking connection", e);
             }
         }
     }
