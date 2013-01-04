@@ -457,12 +457,24 @@ public class PullHarvest extends BaseHarvest {
         Date now = new Date();
         Date lastHarvest = isPermanentError(responseCode) ? now : temporaryErrorLastHarvest(now);
 
-        boolean prioritySource = getContextSourceDTO().isPrioritySource();
+        // if permanent error, clean previously harvested metadata of this source,
+        // and if not a priority source, clean all previously harvested content of this source too
+        int noOfStatements = getContextSourceDTO().getStatements();
+        if (isPermanentError(responseCode)) {
+
+            setCleanAllPreviousSourceMetadata(true);
+            if (!getContextSourceDTO().isPrioritySource()){
+                try {
+                    getHarvestSourceDAO().clearGraph(getContextUrl());
+                    noOfStatements = 0;
+                } catch (DAOException e) {
+                    LOGGER.error("Failed to delete previous content after permanent error", e);
+                }
+            }
+        }
 
         // update context source DTO with the results of this harvest
-        if (!prioritySource){
-            getContextSourceDTO().setStatements(0);
-        }
+        getContextSourceDTO().setStatements(noOfStatements);
         getContextSourceDTO().setLastHarvest(lastHarvest);
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
@@ -491,19 +503,6 @@ public class PullHarvest extends BaseHarvest {
 
         // add source metadata resulting from this harvest
         addSourceMetadata(null, responseCode, responseMessage, exception);
-
-        // if permanent error, clean previously harvested metadata of this source,
-        // and if not a priority source, clean all previously harvested content of this source too
-        if (isPermanentError(responseCode)) {
-            setCleanAllPreviousSourceMetadata(true);
-            if (!prioritySource){
-                try {
-                    getHarvestSourceDAO().clearGraph(getContextUrl());
-                } catch (DAOException e) {
-                    LOGGER.error("Failed to delete previous content after permanent error", e);
-                }
-            }
-        }
     }
 
     /**
