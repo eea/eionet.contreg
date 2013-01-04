@@ -1428,7 +1428,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 sqlConn.setAutoCommit(true);
             } catch (Exception e) {
 
-                // Looks like Virtuoso's Sesame and/or JDBC driver ignores rollback, but we do it just in case.
+                // These two rollbacks are ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
                 SesameUtil.rollback(repoConn);
                 SQLUtil.rollback(sqlConn);
 

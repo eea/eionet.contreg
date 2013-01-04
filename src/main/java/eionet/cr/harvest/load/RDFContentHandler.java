@@ -156,12 +156,7 @@ public class RDFContentHandler implements RDFHandler {
             }
 
         } catch (RepositoryException e) {
-            String message = e.getMessage();
-            if (message != null && message.contains("VirtuosoException: SR491: Too many open statements")) {
-                LOGGER.debug("Exception happend at triple #" + triplesSaved + ": <" + rdfStatement.getSubject().stringValue()
-                        + "> <" + rdfStatement.getPredicate().stringValue() + "> <" + rdfStatement.getObject().stringValue() + ">");
-            }
-            throw new RDFHandlerException(message, e);
+            throw new RDFHandlerException(e.getMessage(), e);
         }
     }
 

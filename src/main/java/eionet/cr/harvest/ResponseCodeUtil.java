@@ -57,17 +57,8 @@ public final class ResponseCodeUtil {
      * @param code
      * @return
      */
-    public static boolean isTemporaryError(int code) {
-        return code == 401 || code == 408 || code == 500 || (code >= 502 && code <= 504);
-    }
-
-    /**
-     *
-     * @param code
-     * @return
-     */
     public static boolean isError(int code) {
-        return isTemporaryError(code) || isPermanentError(code);
+        return code >= 400 && code <= 599;
     }
 
     /**

@@ -147,7 +147,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFParseException if error in RDF parsing
      */
     private int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
-            RDFHandlerException, RDFParseException {
+    RDFHandlerException, RDFParseException {
 
         // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
         // Otherwise try to process the file into RDF format and *then* proceed to loading.
@@ -457,8 +457,12 @@ public class PullHarvest extends BaseHarvest {
         Date now = new Date();
         Date lastHarvest = isPermanentError(responseCode) ? now : temporaryErrorLastHarvest(now);
 
+        boolean prioritySource = getContextSourceDTO().isPrioritySource();
+
         // update context source DTO with the results of this harvest
-        getContextSourceDTO().setStatements(0);
+        if (!prioritySource){
+            getContextSourceDTO().setStatements(0);
+        }
         getContextSourceDTO().setLastHarvest(lastHarvest);
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
@@ -489,13 +493,15 @@ public class PullHarvest extends BaseHarvest {
         addSourceMetadata(null, responseCode, responseMessage, exception);
 
         // if permanent error, clean previously harvested metadata of this source,
-        // and also clean all previously harvested content of this source
+        // and if not a priority source, clean all previously harvested content of this source too
         if (isPermanentError(responseCode)) {
             setCleanAllPreviousSourceMetadata(true);
-            try {
-                getHarvestSourceDAO().clearGraph(getContextUrl());
-            } catch (DAOException e) {
-                LOGGER.error("Failed to delete previous content after permanent error", e);
+            if (!prioritySource){
+                try {
+                    getHarvestSourceDAO().clearGraph(getContextUrl());
+                } catch (DAOException e) {
+                    LOGGER.error("Failed to delete previous content after permanent error", e);
+                }
             }
         }
     }
@@ -650,7 +656,7 @@ public class PullHarvest extends BaseHarvest {
      *             if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-            RDFHandlerException, RDFParseException {
+    RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -839,7 +845,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException
      */
     private HttpURLConnection openUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -871,7 +877,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -916,27 +922,6 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      *
-     * @param url
-     * @return long
-     * @throws DAOException
-     */
-//    private long getLastHarvestTimestamp(String url) throws DAOException {
-//
-//        long result = 0;
-//
-//        HarvestSourceDTO dto = getHarvestSource(url);
-//        if (dto != null) {
-//            Date lastHarvestDate = dto.getLastHarvest();
-//            if (lastHarvestDate != null) {
-//                result = lastHarvestDate.getTime();
-//            }
-//        }
-//
-//        return result;
-//    }
-
-    /**
-     *
      * @param harvestSourceUrl
      * @return
      * @throws DAOException
@@ -945,7 +930,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         String result = null;
 
