@@ -148,7 +148,13 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     private void handleBatchQueue() throws DAOException {
 
-        LOGGER.trace("Handling batch queue...");
+        // Even if it is not currently a batch harvesting hour, we shall proceed to getting the list of next scheduled sources, and
+        // looping over them, as there are specific sources for which the batch-harvesting hours should be ignored. Currently these
+        // are sources whose harvest interval is less than 8 hours.
+
+        if (isBatchHarvestingHour()){
+            LOGGER.trace("Handling batch queue...");
+        }
 
         // Initialize batch queue collection.
         batchQueue = Collections.synchronizedList(new ArrayList<HarvestSourceDTO>());
@@ -161,7 +167,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         // Get next scheduled sources.
         List<HarvestSourceDTO> nextScheduledSources = getNextScheduledSources();
-        LOGGER.trace(nextScheduledSources.size() + " next scheduled sources found");
+        if (isBatchHarvestingHour()){
+            LOGGER.trace(nextScheduledSources.size() + " next scheduled sources found");
+        }
 
         // Loop over next scheduled sources.
         for (HarvestSourceDTO sourceDTO : nextScheduledSources) {
@@ -494,18 +502,15 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     private boolean isBatchHarvestingHour() {
 
-        boolean result = false;
-
         int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         List<HourSpan> activeHours = getBatchHarvestingHours();
         for (HourSpan hourSpan : activeHours) {
             if (hourSpan.includes(currentHour)) {
-                result = true;
-                break;
+                return true;
             }
         }
 
-        return result;
+        return false;
     }
 
     /**

@@ -60,7 +60,8 @@ class HourSpan {
      * @return
      */
     public int length() {
-        return to - from; // we assume the creator has made sure that to>=from
+        // Creator responsible for ensuring that to >= from
+        return to - from;
     }
 
     /**
@@ -69,7 +70,7 @@ class HourSpan {
      * @return
      */
     public boolean includes(int hour) {
-        return hour >= from && hour <= to;
+        return hour >= from && hour < to;
     }
 
     /*
@@ -77,6 +78,7 @@ class HourSpan {
      *
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return new StringBuffer().append(from).append("-").append(to).toString();
     }
