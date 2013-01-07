@@ -542,38 +542,36 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     * Calculate last harvest date when there is a temporary error with the source. The LAST_HARVEST is not set to current time.
-     * Instead it is increased with 10% of the harvesting period but minimum two hours. If the source was never harvested before
-     * then the base date is current time minus the harvesting period (as if the source was successfully harvested one period ago).
+     * Returns the {@link Date} to which the source's last harvest time should be set in case of temporary harvest error. It should
+     * be set to "now - harvest_interval + max(harvest_interval*0,1, 120 min)". The "now" is given as method input.
      *
-     * If no last harvest date can be calculated by this algorithm for whichever reason, or the calculated last harvest happens to
-     * be after the given timestamp of now, then the latter is returned.
-     *
-     * @param now
-     *            The current harvest timestamp.
-     *
-     * @return the last harvest date + 10%
+     * @param now As indicated above.
+     * @return The calculated last harvest date as indicated above.
      */
     private Date temporaryErrorLastHarvest(Date now) {
 
-        Date lastHarvest = getContextSourceDTO().getLastHarvest();
-        if (lastHarvest == null) {
-            // The last harvest date is now - intervalMinutes (for example: today - 6 weeks)
-            Calendar c = Calendar.getInstance();
-            c.add(Calendar.MINUTE, -getContextSourceDTO().getIntervalMinutes());
-            lastHarvest = c.getTime();
-        }
-
+        // The source's harvesting interval in minutes.
         int intervalMinutes = getContextSourceDTO().getIntervalMinutes();
-        int increaseMillis = Math.max((intervalMinutes * 10) / 100, 120) * 60 * 1000;
-        lastHarvest = new Date(lastHarvest.getTime() + increaseMillis);
 
-        // Ensure the new last harvest date won't be in the future.
-        if (lastHarvest.after(now)) {
-            lastHarvest = now;
+        // The new last harvest will be "now - interval + interval*0,1", but at least two hours (i.e. 120 minutes).
+        // So here we calculate the value that we shall add to the "now - interval".
+        int increaseMinutes = Math.max((intervalMinutes * 10) / 100, 120);
+
+        // Get calendar instance, set it to now.
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+
+        // Subtract interval and add the above-calculated increase.
+        cal.add(Calendar.MINUTE, -1 * intervalMinutes);
+        cal.add(Calendar.MINUTE, increaseMinutes);
+
+        // Just make it 100% sure that the calculated time will not be after now, though the business logic should exclude it.
+        Date resultingTime = cal.getTime();
+        if (resultingTime.after(now)){
+            resultingTime = now;
         }
 
-        return lastHarvest;
+        return resultingTime;
     }
 
     /**
