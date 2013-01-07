@@ -55,11 +55,4 @@ public interface Harvest {
      * @return boolean
      */
     boolean isBeingHarvested(String url);
-
-    /**
-     * Returns last harvest duration in milliseconds.
-     *
-     * @return time in milliseconds, null if no last (successful) harvest
-     */
-    Long getLastHarvestDuration();
 }

@@ -70,26 +70,20 @@ public abstract class BaseHarvest implements Harvest {
     /** */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
 
-    protected static final int PRESERVED_HARVEST_COUNT = 10;
+    /** No of latest harvests whose history is kept in the database. Used in houskeeping. */
+    protected static final int NO_OF_LAST_HARVESTS_PRESERVED = 10;
 
-    /**
-     * Default harvesting timeout if no last harvest. (36hr)
-     */
+    /** Default harvesting timeout (36 hours = 129600000 ms) if no last harvest duration could be detected. */
     protected static final int DEFAULT_HARVEST_TIMEOUT = 129600000;
 
-    /**
-     * Minimal possible harvest timeout. (10min)
-     */
-    protected static final int MINIMAL_HARVEST_TIMEOUT = 600000;
+    /** Minimum possible harvest timeout (10 min = 600000 ms). */
+    protected static final int MINIMUM_HARVEST_TIMEOUT = 600000;
 
-    /**
-     * harvesting cancelled if harvesting takes more than last harvest duration multiplied with this constant.
-     */
+    /** A harvest is expected to take no more than the duration of last harvest multiplied by this constnat. */
     protected static final double HARVEST_TIMEOUT_MULTIPLIER = 1.2;
 
     /** container for redirected source DTOs. */
     protected final List<HarvestSourceDTO> redirectedHarvestSources = new ArrayList<HarvestSourceDTO>();
-
 
     /** */
     private final HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
@@ -97,52 +91,44 @@ public abstract class BaseHarvest implements Harvest {
     private final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
     private final HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
 
-    /** */
+    /** The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled. */
     private String contextUrl;
+
+    /** The harvest source DTO object mnatching the {@link #contextUrl}. */
     private HarvestSourceDTO contextSourceDTO;
 
-    /** */
-    private int harvestId;
-    private List<HarvestMessageDTO> harvestMessages = new ArrayList<HarvestMessageDTO>();
-
-    /** */
+    /** The metadata of the currently harvest source as in triple store. */
     private SubjectDTO sourceMetadata;
 
-    /** */
-    private int storedTriplesCount;
+    /** The current harvest's ID, assigned at the harvest's start. */
+    private int harvestId;
 
-    /** */
+    /** List of messages collected during tha harvest and saved into the DB. */
+    private List<HarvestMessageDTO> harvestMessages = new ArrayList<HarvestMessageDTO>();
+
+    /** If true, all previously present harvest source metadata should be purged from the triple store. */
     private boolean cleanAllPreviousSourceMetadata;
 
-    /** Shows if the harvest was initiated by the user. */
+    /** The number of triples stored during this harvest. This does NOT include the generated harvest source metadata! */
+    private int storedTriplesCount;
+
+    /** True if the current harvest was initiated by the user (as opposed to batch harvester in the background) . */
     protected boolean isOnDemandHarvest;
 
-    /** */
+    /** The user who initiated the current harvest (if this is is an on-edmand harvest). */
     private String harvestUser;
 
-    /**
-     * Last harvest duration in millis.
-     */
-    private Long lastHarvestDuration;
+    /** Last harvest duration in milliseconds. */
+    private long lastHarvestDuration;
 
-    /**
-     * Indicates if a fatal error is occured during harvesting.
-     * In case of fatal error sysadmin must be notified for all sources (incl. non-priority)
-     */
+    /** True if a fatal error occurred during this harvest, otherwise false. */
     protected boolean isFatalErrorOccured = false;
 
-    /**
-     * HTTP response code returned from the harvest source.
-     */
+    /** HTTP response code returned from the harvest source. */
     protected int httpResponseCode;
 
-    /**
-     * @param isOnDemandHarvest the isOnDemandHarvest parameter to set
-     */
-    public void setOnDemandHarvest(boolean isOnDemandHarvest) {
-        this.isOnDemandHarvest = isOnDemandHarvest;
-    }
-
+    /** The timeout value of this harvest. Initialized at first access to the getter. */
+    private Integer timeout;
 
     /**
      *
@@ -173,6 +159,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#execute()
      */
     @Override
@@ -265,7 +252,7 @@ public abstract class BaseHarvest implements Harvest {
             // add source into inference if it is schema source
             addIntoInferenceRule();
 
-            //delete sources in permanent error state
+            // delete sources in permanent error state
             deleteErroneousSources();
 
         } catch (DAOException e) {
@@ -410,7 +397,7 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void housekeepOldHarvests() throws DAOException {
         LOGGER.debug(loggerMsg("Deleting old harvests history"));
-        getHarvestDAO().deleteOldHarvests(harvestId, PRESERVED_HARVEST_COUNT);
+        getHarvestDAO().deleteOldHarvests(harvestId, NO_OF_LAST_HARVESTS_PRESERVED);
     }
 
     /**
@@ -425,9 +412,12 @@ public abstract class BaseHarvest implements Harvest {
             getHarvestSourceDAO().addSourceIntoInferenceRule(getContextUrl());
         }
     }
+
     /**
      * Deletes sources with permanent errors after batch harvesting.
-     * @throws DAOException if deleting fails
+     *
+     * @throws DAOException
+     *             if deleting fails
      */
     private void deleteErroneousSources() throws DAOException {
         LOGGER.debug(loggerMsg("Checking sources that need removal"));
@@ -435,10 +425,10 @@ public abstract class BaseHarvest implements Harvest {
 
         boolean sourceInError = false;
 
-        //if the source or redirected sources are in erroneous state, delete them while batch harvesting
+        // if the source or redirected sources are in erroneous state, delete them while batch harvesting
         if (!isOnDemandHarvest) {
-            //check only the current (last redirected) source if there were redirections.
-            //If it was failed delete redirected sources as well
+            // check only the current (last redirected) source if there were redirections.
+            // If it was failed delete redirected sources as well
             if (getContextSourceDTO().isPermanentError()) {
                 if (!getContextSourceDTO().isPrioritySource()) {
                     LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
@@ -457,7 +447,7 @@ public abstract class BaseHarvest implements Harvest {
             }
             if (sourceInError) {
                 for (HarvestSourceDTO dto : redirectedHarvestSources) {
-                    //delete redirected source  if not in queue and not priority source
+                    // delete redirected source if not in queue and not priority source
                     LOGGER.debug(dto.getUrl() + "  is a redirected source will be deleted.");
                     if (!dto.isPrioritySource()) {
                         sourcesToDelete.add(dto.getUrl());
@@ -524,7 +514,7 @@ public abstract class BaseHarvest implements Harvest {
         getContextSourceDTO().setLastHarvestId(harvestId);
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
-        //update redirected sources
+        // update redirected sources
         for (HarvestSourceDTO dto : redirectedHarvestSources) {
             LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
             dto.setLastHarvestId(harvestId);
@@ -561,12 +551,13 @@ public abstract class BaseHarvest implements Harvest {
      * @param contextGraphUri
      * @return
      */
-    public static String loggerMsg(Object messageObject, String contextGraphUri){
+    public static String loggerMsg(Object messageObject, String contextGraphUri) {
         return messageObject + " [" + contextGraphUri + "]";
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#getContextUrl()
      */
     @Override
@@ -685,15 +676,6 @@ public abstract class BaseHarvest implements Harvest {
         addHarvestMessage(message, messageType, null);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see eionet.cr.harvest.Harvest#getLastHarvestDuration()
-     */
-    @Override
-    public Long getLastHarvestDuration() {
-        return lastHarvestDuration;
-    }
-
     /**
      *
      * @param message
@@ -732,6 +714,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#getStoredTriplesCount()
      */
     @Override
@@ -740,7 +723,8 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * @param cleanAllPreviousSourceMetadata the cleanAllPreviousSourceMetadata to set
+     * @param cleanAllPreviousSourceMetadata
+     *            the cleanAllPreviousSourceMetadata to set
      */
     protected void setCleanAllPreviousSourceMetadata(boolean cleanAllPreviousSourceMetadata) {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
@@ -748,6 +732,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.harvest.Harvest#setHarvestUser(java.lang.String)
      */
     @Override
@@ -841,11 +826,9 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * Returns true if harvest errors should be sent as notifications to selected addresses.
-     * Otherwise returns false.
+     * Returns true if harvest errors should be sent as notifications to selected addresses. Otherwise returns false.
      *
-     * {@link BaseHarvest} always returns false for this method, as default behavior.
-     * Extending classes can override it.
+     * {@link BaseHarvest} always returns false for this method, as default behavior. Extending classes can override it.
      *
      * @return
      */
@@ -854,7 +837,8 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * @param storedTriplesCount the storedTriplesCount to set
+     * @param storedTriplesCount
+     *            the storedTriplesCount to set
      */
     protected void setStoredTriplesCount(int storedTriplesCount) {
         this.storedTriplesCount = storedTriplesCount;
@@ -872,36 +856,36 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * calculates last harvest duration.
-     * if no result returns 0
-     * if last harvest failed returns DEFAULT (24h)
-     * @param harvestSource harvesting source DTO
-     * @return time in millis, 0 if cannot be calculated
+     * Calculates the duration of the given source's last harvest. If the last harvest failed, the default harvest timeout is
+     * returned as the result of this method. Otherwise, if the last harvest duration cannot be detected due to some reason, the
+     * method returns 0.
+     *
+     * @param harvestSource
+     *            The source in question.
+     * @return The duration of the given source's last harvest.
      */
-    private Long calculateLastHarvestDuration(HarvestSourceDTO harvestSource) {
+    private long calculateLastHarvestDuration(HarvestSourceDTO harvestSource) {
 
-        //if last harvest failed - return default
+        // If last harvest failed, returns the default harvest timeout.
         if (harvestSource.isLastHarvestFailed()) {
-            return (long) DEFAULT_HARVEST_TIMEOUT;
+            return DEFAULT_HARVEST_TIMEOUT;
         }
 
-        HarvestDTO lastHarvest = null;
-        Long result = null;
-
+        long result = 0;
         try {
-            lastHarvest = harvestDAO.getLastRealHarvestBySourceId(harvestSource.getSourceId());
-        } catch (DAOException e) {
-            LOGGER.error(loggerMsg("Error getting last harvest time, returning null " + e));
-        }
-        if (lastHarvest != null) {
-            Date startTime = lastHarvest.getDatetimeStarted();
-            Date endTime = lastHarvest.getDatetimeFinished();
-            if (startTime != null && endTime != null) {
-                result = endTime.getTime() - startTime.getTime();
+            HarvestDTO lastHarvest = harvestDAO.getLastRealHarvestBySourceId(harvestSource.getSourceId());
+            if (lastHarvest != null) {
+                Date startTime = lastHarvest.getDatetimeStarted();
+                Date endTime = lastHarvest.getDatetimeFinished();
+                if (startTime != null && endTime != null) {
+                    result = endTime.getTime() - startTime.getTime();
+                }
             }
+        } catch (DAOException e) {
+            LOGGER.error(loggerMsg("Failed getting the last harvest, last harvest duration fallback to 0 ms. " + e));
         }
 
-        return  ((result != null && result > 0)  ? result : 0);
+        return result;
 
     }
 
@@ -913,32 +897,52 @@ public abstract class BaseHarvest implements Harvest {
      */
     protected int getTimeout() {
 
-        Long durationOfLastHarvest = getLastHarvestDuration();
+        if (timeout == null) {
 
-        // no last harvest, use default timeout
-        int timeout = DEFAULT_HARVEST_TIMEOUT;
+            String msg = "";
 
-        if (durationOfLastHarvest != null && durationOfLastHarvest > 0) {
-            // big sources - last harvest * 1.2
-            timeout = (int) (durationOfLastHarvest * HARVEST_TIMEOUT_MULTIPLIER);
+            // Start with default timeout, attempt to calculate a proper one.
+            timeout = Integer.valueOf(DEFAULT_HARVEST_TIMEOUT);
+
+            // Assuming lastHarvestDuration was properly set at construction-time.
+            if (lastHarvestDuration > 0) {
+                timeout = Integer.valueOf((int) (lastHarvestDuration * HARVEST_TIMEOUT_MULTIPLIER));
+                msg = "Timeout set to " + timeout + " ms (last harvest duration * " + HARVEST_TIMEOUT_MULTIPLIER + ")";
+            } else {
+                msg = "Timeout set to the maximum " + DEFAULT_HARVEST_TIMEOUT + " ms, last harvest duration could not be detected";
+            }
+
+            // Use minimal if last harvest went very quickly.
+            if (timeout.intValue() < MINIMUM_HARVEST_TIMEOUT) {
+                timeout = Integer.valueOf(MINIMUM_HARVEST_TIMEOUT);
+                msg = "Timeout set to the minimum " + MINIMUM_HARVEST_TIMEOUT + " ms, last harvest duration was "
+                        + lastHarvestDuration + " ms";
+            }
+
+            LOGGER.debug(loggerMsg(msg));
         }
-        // use minimal if last harvest went very quickly
-        if (timeout < MINIMAL_HARVEST_TIMEOUT) {
-            timeout = MINIMAL_HARVEST_TIMEOUT;
-        }
-        LOGGER.debug(loggerMsg("Timeout=" + timeout));
+
         return timeout;
     }
 
     /**
-     * Determines if the given Throwable is fatal exception that occured during harvesting.
-     * Sets isFatal flag to true if exception is fatal
-     * Sysadmins are notified about fatal erros not depending on source priority
-     * @param t Throwable
+     * Determines if the given throwable is fatal exception that occured during harvesting. If so, raises the fatal error flag. The
+     * method is null-safe.
+     *
+     * @param t
+     *            Throwable
      */
     protected void checkAndSetFatalExceptionFlag(Throwable t) {
         if (t != null && t instanceof TimeoutException) {
             isFatalErrorOccured = true;
         }
+    }
+
+    /**
+     * @param isOnDemandHarvest
+     *            the isOnDemandHarvest parameter to set
+     */
+    public void setOnDemandHarvest(boolean isOnDemandHarvest) {
+        this.isOnDemandHarvest = isOnDemandHarvest;
     }
 }

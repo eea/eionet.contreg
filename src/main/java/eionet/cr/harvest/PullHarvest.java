@@ -747,7 +747,7 @@ public class PullHarvest extends BaseHarvest {
 
         // delete old harvests history
         LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
-        getHarvestDAO().deleteOldHarvests(getHarvestId(), PRESERVED_HARVEST_COUNT);
+        getHarvestDAO().deleteOldHarvests(getHarvestId(), NO_OF_LAST_HARVESTS_PRESERVED);
     }
 
     /**
@@ -854,7 +854,7 @@ public class PullHarvest extends BaseHarvest {
         connection.setInstanceFollowRedirects(false);
 
         // Set the timeout both for establishing the connection, and reading from it once established.
-        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, DEFAULT_HARVEST_TIMEOUT);
+        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
 
@@ -1122,8 +1122,8 @@ public class PullHarvest extends BaseHarvest {
     @Override
     protected boolean isSendNotifications() {
 
-        // notifications sent only when this is not an on-demand harvest
-        // or if fatal error (eg Timeout) has occured
+        // Send notification only when this is not an on-demand harvest and the source is priority or a fatal error occurred.
+        // P.S. The harvest's timeout is also considered a fatal error.
         return !isOnDemandHarvest && (getContextSourceDTO().isPrioritySource() || isFatalErrorOccured);
     }
 
