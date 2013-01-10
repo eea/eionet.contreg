@@ -68,6 +68,19 @@
                             width: 600
                         });
 
+
+                        // Open project bookmarked queries dialog
+                        $("#projectBookmarksLink").click(function() {
+                            $('#projectBookmarksDialog').dialog('open');
+                            return false;
+                        });
+
+                        // Project bookmarked queries dialog setup
+                        $('#projectBookmarksDialog').dialog({
+                            autoOpen: false,
+                            width: 600
+                        });
+
                         // Close dialog
                         $("#deleteSahredBookmarked").click(function() {
                             $('#sharedBookmarksDialog').dialog("close");
@@ -248,9 +261,14 @@
                         <a href="#" id="sharedBookmarksLink">Shared bookmarked queries</a>
                     </li>
                     <c:if test="${actionBean.user != null}">
-                    <li>
-                        <a href="#" id="bookmarksLink">My bookmarked queries</a>
-                    </li>
+                        <li>
+                            <a href="#" id="bookmarksLink">My bookmarked queries</a>
+                        </li>
+                        <c:if test="${not empty(actionBean.projectBookmarkedQueries)}">
+                        <li>
+                            <a href="#" id="projectBookmarksLink">Bookmarks in projects</a>
+                        </li>
+                        </c:if>
                     </c:if>
                     <li>
                         <a href="#" id="prefixesLink">Useful namespaces</a>
@@ -269,7 +287,9 @@
                 <a href="documentation/sparqlfunctions" title="Press Ctrl and click to open help on SPARQL Functions in a new window">SPARQL Functions</a>
             </div>
             <crfn:form name="mainForm" action="/sparql" method="get">
+                <div>
                 <stripes:hidden name="selectedBookmarkName" />
+                </div>
                 <c:if test="${not empty actionBean.defaultGraphUris}">
                     <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
                         <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
@@ -283,6 +303,7 @@
                 <div>
                     <label for="queryText" class="question">Query:</label>
                     <div>
+                        <c:if test="${not empty actionBean.defaultGraphUris or not empty actionBean.namedGraphUris}">
                         <ul>
                         <c:if test="${not empty actionBean.defaultGraphUris}">
                             <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
@@ -295,6 +316,7 @@
                             </c:forEach>
                         </c:if>
                         </ul>
+                        </c:if>
                     </div>
                     <div class="expandingArea">
                     <pre><span></span><br /></pre>
@@ -422,11 +444,13 @@ while (l--) {
             <c:if test="${actionBean.userLoggedIn}">
                 <div id="constructDialog" title="Save result to ">
                     <crfn:form name="constructForm" action="/sparql" method="get">
+                        <div>
                         <stripes:hidden name="query" id="constructQuery"/>
                         <stripes:hidden name="format" id="constructFormat"/>
+                        </div>
                         <table class="formtable">
                             <tr>
-                                <td width="120"><stripes:label for="toFile">To file</stripes:label></td>
+                                <td style="width:120px"><stripes:label for="toFile">To file</stripes:label></td>
                                 <td>
                                     <stripes:radio name="exportType" value="FILE" checked="FILE" title="To file" id="toFile"/>
                                 </td>
@@ -441,7 +465,7 @@ while (l--) {
                         <div id="homespace_data">
                             <table class="formtable">
                                 <tr>
-                                    <td width="120"><label for="datasetName">Dataset name</label></td>
+                                    <td style="width:120px"><label for="datasetName">Dataset name</label></td>
                                     <td>
                                         <stripes:text name="datasetName" id="datasetName" style="width: 350px;"/>
                                     </td>
@@ -495,8 +519,8 @@ while (l--) {
                     <table>
                         <c:forEach items="${actionBean.bookmarkedQueries}" var="bookmarkedQuery">
                         <tr>
-                            <td width="1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
-                            <td width="99%">
+                            <td style="width:1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
+                            <td style="width:99%">
                                 <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
                                     <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
                                     <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
@@ -550,9 +574,9 @@ while (l--) {
                         <c:forEach items="${actionBean.sharedBookmarkedQueries}" var="bookmarkedQuery">
                         <tr>
                             <c:if test="${actionBean.sharedBookmarkPrivilege}">
-                            <td width="1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
+                            <td style="width:1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td>
                             </c:if>
-                            <td width="99%">
+                            <td style="width:99%">
                                 <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
                                     <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
                                     <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
@@ -587,6 +611,66 @@ while (l--) {
                 </c:otherwise>
             </c:choose>
             </div>
+
+           <%-- project Bookmarked queries dialog --%>
+            <div id="projectBookmarksDialog" title="Project queries">
+            <h1>Bookmarked SPARQL queries in project folders</h1>
+            <c:choose>
+                <c:when test="${not empty actionBean.projectBookmarkedQueries}">
+                    <crfn:form id="projectBookmarkedQueriesForm" action="/sparql" method="post">
+                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                            <input type="hidden" name="default-graph-uri" value="${defaultGraphUri}" />
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${not empty actionBean.namedGraphUris}">
+                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                            <input type="hidden" name="named-graph-uri" value="${namedGraphUri}" />
+                        </c:forEach>
+                    </c:if>
+                    <table>
+            <tr>
+               <th>Project</th>
+               <th>Bookmark</th>
+            </tr>
+                        <c:forEach items="${actionBean.projectBookmarkedQueries}" var="bookmarkedQuery">
+                        <tr>
+                            <!-- td width="1%"><stripes:checkbox value="${bookmarkedQuery.subj}" name="deleteQueries"/></td-->
+                            <td style="width:40%"><c:out value="${bookmarkedQuery.proj}"/></td>
+                            <td style="width:60%">
+                                <stripes:link href="/sparql" title="${bookmarkedQuery.queryString}">
+                                    <stripes:param name="fillfrom" value="${bookmarkedQuery.subj}" />
+                                    <stripes:param name="selectedBookmarkName" value="${bookmarkedQuery.label}" />
+                                    <c:if test="${not empty actionBean.defaultGraphUris}">
+                                        <c:forEach var="defaultGraphUri" items="${actionBean.defaultGraphUris}">
+                                            <stripes:param name="default-graph-uri" value="${defaultGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:if test="${not empty actionBean.namedGraphUris}">
+                                        <c:forEach var="namedGraphUri" items="${actionBean.namedGraphUris}">
+                                            <stripes:param name="named-graph-uri" value="${namedGraphUri}" />
+                                        </c:forEach>
+                                    </c:if>
+                                    <c:out value="${bookmarkedQuery.label}"/>
+                                </stripes:link>
+                            </td>
+                        </tr>
+                        </c:forEach>
+                        <!-- tr>
+                            <td colspan="2" align="right" style="padding-top: 5px">
+                                <stripes:submit name="deletePersonalBookmark" id="deletePersonalBookmark" value="Delete" title="Delete the bookmarked queries that you have selected below"/>
+                                <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAll('bookmarkedQueriesForm');return false"/>
+                            </td>
+                        </tr-->
+                    </table>
+                    </crfn:form>
+                </c:when>
+                <c:otherwise>
+                    No bookmarked queries found.
+                </c:otherwise>
+            </c:choose>
+            </div>
+
 
             <div id="prefixesDialog" title="Useful namespaces">
                 <ul>

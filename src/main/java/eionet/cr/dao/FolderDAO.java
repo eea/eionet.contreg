@@ -112,4 +112,12 @@ public interface FolderDAO extends DAO {
      * @throws DAOException
      */
     Pair<FolderItemDTO, List<FolderItemDTO>> getFolderContents(String uri) throws DAOException;
+
+    /**
+     * Create a bookmarks folder for the project.
+     * @param projectName project name
+     * @throws DAOException if creating fails
+     */
+    void createProjectBookmarksFolder(String projectName) throws DAOException;
+
 }

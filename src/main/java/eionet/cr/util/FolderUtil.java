@@ -20,6 +20,7 @@
  */
 package eionet.cr.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -173,6 +174,11 @@ public final class FolderUtil {
         return result;
     }
 
+    /**
+     * Extracts path in the uri.
+     * @param uri Full uri
+     * @return Path after the special folder path (project, user etc)
+     */
     public static String extractPathInFolder(String uri) {
 
         if (uri == null) {
@@ -192,8 +198,9 @@ public final class FolderUtil {
     /**
      * Return all folders where user can store data.
      *
-     * @param user
-     * @return String
+     * @param user current user
+     * @return List of folder names
+     * @throws DAOException if query does not succees
      */
     public static List<String> getUserAccessibleFolders(CRUser user) throws DAOException {
 
@@ -210,6 +217,35 @@ public final class FolderUtil {
                         String aclPath = FolderUtil.extractPathInSpecialFolder(furi, "project");
                         if (!StringUtils.isBlank(aclPath) && CRUser.hasPermission(user.getUserName(), aclPath, "i")) {
                             folders.add(furi);
+                        }
+                    }
+                }
+            }
+        }
+        return folders;
+    }
+
+    /**
+     * Returns list of project folders where the user can insert items.
+     * @param user current session user
+     * @param permission - permission to check
+     * @return list of folder names
+     * @throws DAOException if query fails
+     */
+    public static List<String> getUserAccessibleProjectFolderNames(CRUser user, String permission) throws DAOException {
+        List<String> folders = null;
+        if (user != null) {
+            // Get project folders where user can insert content
+            if (CRUser.hasPermission(user.getUserName(), "/project", permission)) {
+                List<String> projectFolders =
+                    DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
+                if (projectFolders != null && projectFolders.size() > 0) {
+                    folders = new ArrayList<String>();
+                    for (String furi : projectFolders) {
+                        String projectName = FolderUtil.extractPathInSpecialFolder(furi, "project");
+                        if (!StringUtils.isBlank(projectName)
+                                && CRUser.hasPermission(user.getUserName(), "/project/" + projectName, permission)) {
+                            folders.add(projectName);
                         }
                     }
                 }
@@ -255,9 +291,9 @@ public final class FolderUtil {
     }
 
     /**
-     * True, if the folder uri is project root folder.
+     * True, if the folder uri is a project folder.
      *
-     * @return
+     * @return boolean
      */
     public static boolean isProjectFolder(String uri) {
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -270,7 +306,7 @@ public final class FolderUtil {
     /**
      * True, if the folder uri is project root folder.
      *
-     * @return
+     * @return boolean
      */
     public static boolean isProjectRootFolder(String uri) {
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -278,6 +314,16 @@ public final class FolderUtil {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns full url of the project.
+     * @param projectName project name
+     * @return full url
+     */
+    public static String getProjectFolder(String projectName) {
+        String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
+        return appHome + "/project/" + projectName;
     }
 
     /**

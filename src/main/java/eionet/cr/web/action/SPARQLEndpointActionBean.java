@@ -165,8 +165,25 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     private List<Map<String, String>> sharedBookmarkedQueries;
 
+    /**
+     * List of project bookmarked queries, each represented by a Map.
+     * Relevant only if the user is known and has View permission to some project.
+     */
+    private List<Map<String, String>> projectBookmarkedQueries;
+
+
     /** */
     private List<String> deleteQueries;
+
+    /**
+     * projects for the user with insert permission.
+     */
+    private List<String> userProjects;
+
+    /**
+     * Selected project for the bookmark.
+     */
+    private String project;
 
     /**
      *
@@ -231,6 +248,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         CRUser user = getUser();
         String requestMethod = getContext().getRequest().getMethod();
 
+        userProjects = FolderUtil.getUserAccessibleProjectFolderNames(user, "i");
+
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
         } else if (StringUtils.isBlank(query)) {
@@ -246,6 +265,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     return new ForwardResolution(FORM_PAGE);
                 }
                 storeSharedBookmark();
+            //store to project folder
+            } else if (StringUtils.isNotBlank(project)) {
+                if (!hasProjectPrivilege(project)) {
+                    addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
+                    return new ForwardResolution(FORM_PAGE);
+                }
+                storeProjectBookmark();
             } else {
                 storePersonalBookmark();
             }
@@ -257,15 +283,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return new ForwardResolution(FORM_PAGE);
     }
 
+
     /**
-     * Stores user's SPARQL bookmark.
-     *
-     * @throws DAOException
+     * common method for user and project bookmark.
+     * @param bookmarksUri full url for the parent bookmark folder
+     * @throws DAOException if db operation fails
      */
-    private void storePersonalBookmark() throws DAOException {
-        CRUser user = getUser();
-        // prepare bookmark subject
-        String bookmarksUri = user.getBookmarksUri();
+    private void storeBookmark(String bookmarksUri) throws DAOException {
         String bookmarkUri = buildBookmarkUri(bookmarksUri, bookmarkName);
 
         SubjectDTO subjectDTO = new SubjectDTO(bookmarkUri, false);
@@ -307,6 +331,37 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // now save the bookmark subject
         dao.addTriples(subjectDTO);
         logger.debug("Query bookmarked with URI: " + bookmarksUri);
+
+    }
+
+    /**
+     * Stores project bookmark.
+     *
+     * @throws DAOException if query fails
+     */
+    private void storeProjectBookmark() throws DAOException {
+        String bookmarksUri = FolderUtil.getProjectFolder(getProject()) + "/bookmarks";
+
+        //create bookmarks folder for the project if it does not exist
+        FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
+        if (!dao.fileOrFolderExists("bookmarks", FolderUtil.getProjectFolder(getProject()))) {
+                //dao.createFolder(parentFolderUri, folderName, folderLabel, homeUri);
+            dao.createProjectBookmarksFolder(getProject());
+        }
+
+        storeBookmark(bookmarksUri);
+    }
+    /**
+     * Stores user's SPARQL bookmark.
+     *
+     * @throws DAOException
+     */
+    private void storePersonalBookmark() throws DAOException {
+        CRUser user = getUser();
+        // prepare bookmark subject
+        String bookmarksUri = user.getBookmarksUri();
+        storeBookmark(bookmarksUri);
+
     }
 
     /**
@@ -402,7 +457,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // then add inferencing command to the query
         Resolution resolution = null;
         if (useInferencing && !StringUtils.isBlank(query)) {
-            String infCommand =SPARQLQueryUtil.getCrInferenceDefinitionStr();
+            String infCommand = SPARQLQueryUtil.getCrInferenceDefinitionStr();
 
             // if inference command not yet present in the query, add it
             if (query.indexOf(infCommand) == -1) {
@@ -491,6 +546,20 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         return false;
     }
+
+    /**
+     * Checks if user has insert right to the project ACL.
+     * @param project name
+     * @return true, if user can add resources to the project.
+     */
+    public boolean hasProjectPrivilege(String projectName) {
+        if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/project/" + projectName, "i")) {
+            return true;
+        }
+
+        return false;
+    }
+
 
     /**
      *
@@ -925,6 +994,24 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return sharedBookmarkedQueries;
     }
 
+
+    /**
+     * Returns project bookmarked queries.
+     *
+     * @return project bookmarked queries for the user.
+     * @throws DAOException if query fails
+     */
+    public List<Map<String, String>> getProjectBookmarkedQueries() throws DAOException {
+
+        if (getUser() != null) {
+            projectBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getProjectSparqlBookmarks(getUser());
+            return projectBookmarkedQueries;
+        }
+
+        return null;
+
+    }
+
     /**
      * Returns bookmark's uri.
      *
@@ -1075,5 +1162,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 }
             }
         }
+    }
+
+    public List<String> getUserProjects() {
+        return userProjects;
+    }
+
+    public void setUserProjects(List<String> userProjects) {
+        this.userProjects = userProjects;
+    }
+
+    public String getProject() {
+        return this.project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 }

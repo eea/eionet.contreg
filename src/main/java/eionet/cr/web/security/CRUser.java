@@ -487,4 +487,15 @@ public class CRUser {
             logger.error("Error creating ACL's " + e.toString());
         }
     }
+
+    /**
+     * Checks if user has the given privilege to the project.
+     * @param session current HTTP session
+     * @param projectName project which ACL is checked
+     * @param privilege privilege to check
+     * @return true, if user can add/delete shared SPARQL bookmars.
+     */
+    public boolean hasProjectPrivilege(HttpSession session, String projectName, String privilege) {
+        return CRUser.hasPermission(session, "/project/" + projectName, privilege);
+    }
 }

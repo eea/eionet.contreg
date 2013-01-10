@@ -171,7 +171,14 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             }
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, homeFolder));
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, homeFolder));
+
+
             repoConn.add(statements);
+
+            //if a new project is created add subfolders
+            if (FolderUtil.isProjectRootFolder(parentFolderUri)) {
+                repoConn.add( getProjectFolderCreationStatements(folderName, vf));
+            }
 
             createNeverHarvestedSources(sqlConn, statements);
 
@@ -423,6 +430,35 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
     }
 
+
+    private List<Statement> getProjectFolderCreationStatements(String projectName, ValueFactory vf) {
+
+        String projectRootFolder = FolderUtil.getProjectsFolder();
+
+        String projectFolder = FolderUtil.getProjectFolder(projectName);
+        String bookmarksFolder = projectFolder + "/bookmarks";
+
+        URI projectsRootURI = vf.createURI(projectRootFolder);
+        URI projectHomeUri = vf.createURI(projectFolder);
+        URI rdfType = vf.createURI(Predicates.RDF_TYPE);
+        URI rdfsLabel = vf.createURI(Predicates.RDFS_LABEL);
+
+        URI hasFile = vf.createURI(Predicates.CR_HAS_FILE);
+        URI bookmarksFile = vf.createURI(Subjects.CR_BOOKMARKS_FILE);
+
+        URI bookmarksUri = vf.createURI(bookmarksFolder);
+
+        Literal bookmarksLabel = vf.createLiteral(projectName + "'s bookmarks");
+
+        ArrayList<Statement> result = new ArrayList<Statement>();
+        result.add(new ContextStatementImpl(projectHomeUri, hasFile, bookmarksUri, projectsRootURI));
+        result.add(new ContextStatementImpl(bookmarksUri, rdfType, bookmarksFile, projectsRootURI));
+        result.add(new ContextStatementImpl(bookmarksUri, rdfsLabel, bookmarksLabel, projectsRootURI));
+
+
+        return result;
+
+    }
     /**
      *
      * @param user
@@ -519,6 +555,37 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
                 SQLUtil.executeUpdate(INSERT_NEVER_HARVESTED_SOURCE_SQL, values, sqlConn);
                 sourcesDone.add(sourceUrl);
             }
+        }
+    }
+
+
+    public void createProjectBookmarksFolder(String projectName) throws DAOException {
+
+        Connection sqlConn = null;
+        RepositoryConnection repoConn = null;
+        try {
+            sqlConn = SesameUtil.getSQLConnection();
+            sqlConn.setAutoCommit(false);
+
+            repoConn = SesameUtil.getRepositoryConnection();
+            repoConn.setAutoCommit(false);
+            ValueFactory vf = repoConn.getValueFactory();
+
+            List<Statement> statements = getProjectFolderCreationStatements(projectName, vf);
+            repoConn.add(statements);
+
+            repoConn.commit();
+            sqlConn.commit();
+
+        } catch (OpenRDFException e) {
+            SesameUtil.rollback(repoConn);
+            throw new DAOException(e.getMessage(), e);
+        } catch (SQLException e) {
+            SQLUtil.rollback(sqlConn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(sqlConn);
+            SesameUtil.close(repoConn);
         }
     }
 

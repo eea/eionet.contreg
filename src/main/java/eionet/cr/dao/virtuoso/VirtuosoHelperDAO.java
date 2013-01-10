@@ -67,6 +67,7 @@ import eionet.cr.dto.UploadDTO;
 import eionet.cr.dto.UserBookmarkDTO;
 import eionet.cr.dto.UserHistoryDTO;
 import eionet.cr.util.Bindings;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.ObjectLabelPair;
 import eionet.cr.util.Pair;
@@ -91,9 +92,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * SPARQL for last harvested files cache.
      */
-    private static final String LATEST_FILES_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr() + "SELECT DISTINCT ?s ?l ?d WHERE {?s a <"
-            + Predicates.CR_FILE + "> " + ". OPTIONAL { ?s <" + Predicates.CR_FIRST_SEEN + "> ?d } . OPTIONAL { ?s <"
-            + Predicates.RDFS_LABEL + "> ?l } } " + "ORDER BY DESC(?d) LIMIT ?filesCount";
+    private static final String LATEST_FILES_SPARQL = SPARQLQueryUtil.getCrInferenceDefinitionStr()
+            + "SELECT DISTINCT ?s ?l ?d WHERE {?s a <" + Predicates.CR_FILE + "> " + ". OPTIONAL { ?s <"
+            + Predicates.CR_FIRST_SEEN + "> ?d } . OPTIONAL { ?s <" + Predicates.RDFS_LABEL + "> ?l } } "
+            + "ORDER BY DESC(?d) LIMIT ?filesCount";
 
     /**
      * Returns latest harvested files (type=cr:File) in descending order (cr:firstSeen).
@@ -165,12 +167,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
                 String[] neededPredicatesObl =
-                    {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
+                        {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
                 String[] neededPredicatesDeliveries =
-                    {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
+                        {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
                 neededPredicates = neededPredicatesDeliveries;
             }
 
@@ -416,11 +418,10 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /**
      * SPARQL for getting predicates used for type.
      */
-    private static final String PREDICATES_FOR_TYPE_SPARQL =
-            "SELECT ?p as ?" + PairReader.LEFTCOL + " bif:min(?label) as ?" + PairReader.RIGHTCOL
+    private static final String PREDICATES_FOR_TYPE_SPARQL = "SELECT ?p as ?" + PairReader.LEFTCOL + " bif:min(?label) as ?"
+            + PairReader.RIGHTCOL
             + " WHERE {?s a ?rdfType. ?s ?p ?o OPTIONAL {?p <http://www.w3.org/2000/01/rdf-schema#label> ?label}}"
-            + " GROUP BY ?p ORDER BY ?"
-            + PairReader.RIGHTCOL;
+            + " GROUP BY ?p ORDER BY ?" + PairReader.RIGHTCOL;
 
     /*
      * (non-Javadoc)
@@ -434,7 +435,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         bindings.setURI("rdfType", typeUri);
 
         // Execute the query, with the given bindings.
-        List<Pair<String, String>> result = executeSPARQL(PREDICATES_FOR_TYPE_SPARQL, bindings, new PairReader<String,String>());
+        List<Pair<String, String>> result = executeSPARQL(PREDICATES_FOR_TYPE_SPARQL, bindings, new PairReader<String, String>());
         return result;
     }
 
@@ -635,7 +636,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
 
     }
 
@@ -971,11 +972,13 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     }
 
     /**
+     * Deletes the triple from the store.
      *
-     *
-     * @param triple
+     * @param triple Triple object to be deleted
      * @param conn
+     *            current Virtuoso connextion
      * @throws RepositoryException
+     *             if delete fails
      */
     private void deleteTriple(TripleDTO triple, RepositoryConnection conn) throws RepositoryException {
 
@@ -1337,6 +1340,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException {
+        String bookmarksUri = user.getBookmarksUri();
 
         Bindings bindings = new Bindings();
         bindings.setURI("bookmarksHome", user.getBookmarksUri());
@@ -1348,11 +1352,43 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         return executeSPARQL(SPARQL_BOOKMARKS_SPARQL, bindings, new MapReader());
     }
 
+
+    /**
+     * Query returns project bookmarks and calculates project name from the bookmarks uri.
+     */
+    private static final String PROJECT_BOOKMARKS_SPARQL =
+            "select fn:substring-before(fn:substring-after(?subj, ?projFolder), '/') as ?proj ?subj ?label ?queryString "
+                    + "from ?bookmarksHome " + "where {" + "?subj ?rdfType ?sparqlBookmark" + ". ?subj ?rdfsLabel ?label"
+                    + ". ?subj ?sparqlQuery ?queryString" + "} order by xsd:string(?label)";
+
+    @Override
+    public List<Map<String, String>> getProjectSparqlBookmarks(CRUser user) throws DAOException {
+
+        List<String> userAccessibleProjects = FolderUtil.getUserAccessibleProjectFolderNames(user, "v");
+
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+
+        Bindings bindings = new Bindings();
+        bindings.setURI("rdfType", Predicates.RDF_TYPE);
+        bindings.setURI("sparqlBookmark", Subjects.CR_SPARQL_BOOKMARK);
+        bindings.setURI("rdfsLabel", Predicates.RDFS_LABEL);
+        bindings.setURI("sparqlQuery", Predicates.CR_SPARQL_QUERY);
+        bindings.setString("projFolder", FolderUtil.getProjectsFolder() + "/");
+
+        for (String projectName : userAccessibleProjects) {
+
+            bindings.setURI("bookmarksHome", FolderUtil.getProjectFolder(projectName) + "/bookmarks");
+
+            result.addAll(executeSPARQL(PROJECT_BOOKMARKS_SPARQL, bindings, new MapReader()));
+        }
+
+        return result;
+
+    }
+
     /**
      * Returns shared SPARQL bookmarks.
      *
-     * @param user
-     *            CR user whose bookmarks are returned
      * @return List<Map<String, String>>
      * @throws DAOException
      *             if query fails.
@@ -1383,8 +1419,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         StringBuilder query = new StringBuilder();
         query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (")
-        .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
-        .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
+                .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
+                .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
 
         HashMap<String, Date> result = new HashMap<String, Date>();
         MapReader reader = new MapReader();
@@ -1565,7 +1601,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HelperDAO#isGraphExists(java.lang.String)
      */
     @Override
@@ -1582,6 +1620,14 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         } finally {
             SesameUtil.close(conn);
         }
+    }
+
+    @Override
+    public void deleteProjectBookmark(String uri) throws DAOException {
+        TripleDTO triple = new TripleDTO(uri, null, null);
+        triple.setSourceUri(StringUtils.substringBeforeLast(uri, "/"));
+        deleteTriples(Collections.singletonList(triple));
+
     }
 
 }

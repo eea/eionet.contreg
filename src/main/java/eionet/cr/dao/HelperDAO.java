@@ -90,7 +90,7 @@ public interface HelperDAO extends DAO {
     void addTriples(RepositoryConnection conn, SubjectDTO subjectDTO) throws DAOException, RepositoryException;
 
     /**
-     * Store CONSTRUCT query result into given context
+     * Store CONSTRUCT query result into given context.
      *
      * @param constructQuery
      * @param context
@@ -330,6 +330,14 @@ public interface HelperDAO extends DAO {
     List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException;
 
     /**
+     * Returns bookmarks of the projects where the user has View permission.
+     * @param user current user
+     * @return list of bookmark objects
+     * @throws DAOException if query fails
+     */
+    List<Map<String, String>> getProjectSparqlBookmarks(CRUser user) throws DAOException;
+
+    /**
      * Returns shared SPARQL bookmark queries.
      *
      * @return List<Map<String, String>>
@@ -426,4 +434,11 @@ public interface HelperDAO extends DAO {
      * @throws DAOException When an error happens.
      */
     boolean isGraphExists(String grpahUri) throws DAOException;
+
+    /**
+     * deletes project bookmark.
+     * @param uri full bookmark uri
+     * @throws DAOException if deleting fails
+     */
+    void deleteProjectBookmark(String uri) throws DAOException;
 }

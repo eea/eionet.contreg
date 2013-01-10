@@ -67,7 +67,7 @@ public class BookmarksActionBean extends AbstractActionBean {
      * View action.
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if DAO call fails
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -81,10 +81,10 @@ public class BookmarksActionBean extends AbstractActionBean {
      * Delete action.
      *
      * @return
-     * @throws DAOException
+     * @throws DAOException if DAO call fails
      */
     public Resolution delete() throws DAOException {
-        if (!isUsersBookmarks()) {
+        if (!isDeletePermission()) {
             return new RedirectResolution(BookmarksActionBean.class).addParameter("uri", uri);
         }
         if (selectedBookmarks == null || selectedBookmarks.isEmpty()) {
@@ -94,16 +94,20 @@ public class BookmarksActionBean extends AbstractActionBean {
 
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         for (String bookmark : selectedBookmarks) {
-            helperDAO.deleteUserBookmark(getUser(), bookmark);
+            if (isProjectBookmarks()) {
+                helperDAO.deleteProjectBookmark(bookmark);
+            } else {
+                helperDAO.deleteUserBookmark(getUser(), bookmark);
+            }
         }
-        addSystemMessage("Selected bookmarks were deleted from your personal bookmark list.");
+        addSystemMessage("Selected bookmarks were deleted from the bookmark list.");
         return new RedirectResolution(BookmarksActionBean.class).addParameter("uri", uri);
     }
 
     /**
      * Initializes tabs.
      *
-     * @throws DAOException
+     * @throws DAOException if DAO call fails
      */
     private void initTabs() throws DAOException {
         if (StringUtils.isEmpty(uri)) {
@@ -117,6 +121,10 @@ public class BookmarksActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * Checks if the bookmarks reside in a user home folder.
+     * @return true if the folder is in users home
+     */
     public boolean isUsersBookmarks() {
         if (isUserLoggedIn()) {
             String homeUri = CRUser.homeUri(getUserName());
@@ -127,8 +135,17 @@ public class BookmarksActionBean extends AbstractActionBean {
         return false;
     }
 
+    /**
+     * Returns user or project name of the bookmarks file.
+     * @return owner name
+     */
     public String getOwnerName() {
-        return FolderUtil.extractUserName(uri);
+        // if project bookmarks extract project name:
+        if (isProjectBookmarks()) {
+            return FolderUtil.extractPathInSpecialFolder(uri, "project");
+        } else {
+            return FolderUtil.extractUserName(uri);
+        }
     }
 
     /**
@@ -139,7 +156,8 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -153,7 +171,8 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param tabs the tabs to set
+     * @param tabs
+     *            the tabs to set
      */
     public void setTabs(List<TabElement> tabs) {
         this.tabs = tabs;
@@ -167,7 +186,8 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedBookmarks the selectedBookmarks to set
+     * @param selectedBookmarks
+     *            the selectedBookmarks to set
      */
     public void setSelectedBookmarks(List<String> selectedBookmarks) {
         this.selectedBookmarks = selectedBookmarks;
@@ -181,10 +201,40 @@ public class BookmarksActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param bookmarks the bookmarks to set
+     * @param bookmarks
+     *            the bookmarks to set
      */
     public void setBookmarks(List<UserBookmarkDTO> bookmarks) {
         this.bookmarks = bookmarks;
     }
 
+    /**
+     * Check from ACL if user has permission to delete bookmarks.
+     *
+     * @return boolean
+     */
+    public boolean isDeletePermission() {
+        String aclPath = FolderUtil.extractAclPath(uri);
+        return CRUser.hasPermission(aclPath, getUser(), "d", false);
+    }
+
+    /**
+     * True if project bookmarks file.
+     * @return boolean
+     */
+    public boolean isProjectBookmarks() {
+        return FolderUtil.isProjectFolder(uri);
+    }
+
+    /**
+     * Returns selected projet name where the user wants to add the bookmark.
+     * @return project dropdown value
+     */
+    public String getProjectName() {
+        if (isProjectBookmarks()) {
+            return StringUtils.substringBeforeLast(FolderUtil.extractPathInFolder(uri), "/");
+        }
+
+        return "";
+    }
 }
