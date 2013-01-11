@@ -816,12 +816,43 @@ public abstract class BaseHarvest implements Harvest {
      */
     private void sendErrorMessage(String messageBody) {
 
+        String subject = "Error(s) when harvesting " + contextUrl;
+
+        // Send to to those listed in this source's e-mails list.
         try {
-            EMailSender.sendToSysAdmin("Error(s) when harvesting " + contextUrl, messageBody);
+            String[] emailReceivers = getContextSourceEmailReceivers();
+            if (emailReceivers != null && emailReceivers.length > 0) {
+                EMailSender.send(emailReceivers, subject, messageBody, false);
+            }
         } catch (AddressException e) {
             LOGGER.error("E-mail address formatting error: " + e.getMessage());
         } catch (MessagingException e) {
             LOGGER.error("E-mail sending error", e);
+        }
+
+        // Send to sys-admins.
+        try {
+            EMailSender.sendToSysAdmin(subject, messageBody);
+        } catch (AddressException e) {
+            LOGGER.error("E-mail address formatting error: " + e.getMessage());
+        } catch (MessagingException e) {
+            LOGGER.error("E-mail sending error", e);
+        }
+    }
+
+    /**
+     * Returns the list of e-mail addresses to which the error notifications of this harvest source should be sent. Does *NOT*
+     * include the "default" list provided in system configuration.
+     *
+     * @return As indicated above.
+     */
+    private String[] getContextSourceEmailReceivers() {
+
+        String emailsStr = getContextSourceDTO().getEmails();
+        if (StringUtils.isNotBlank(emailsStr)) {
+            return StringUtils.split(emailsStr, ";,\t\n\r ");
+        } else {
+            return null;
         }
     }
 
@@ -915,8 +946,9 @@ public abstract class BaseHarvest implements Harvest {
             // Use minimal if last harvest went very quickly.
             if (timeout.intValue() < MINIMUM_HARVEST_TIMEOUT) {
                 timeout = Integer.valueOf(MINIMUM_HARVEST_TIMEOUT);
-                msg = "Timeout set to the minimum " + MINIMUM_HARVEST_TIMEOUT + " ms, last harvest duration was "
-                        + lastHarvestDuration + " ms";
+                msg =
+                        "Timeout set to the minimum " + MINIMUM_HARVEST_TIMEOUT + " ms, last harvest duration was "
+                                + lastHarvestDuration + " ms";
             }
 
             LOGGER.debug(loggerMsg(msg));
