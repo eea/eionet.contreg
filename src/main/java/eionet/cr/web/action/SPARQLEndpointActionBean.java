@@ -82,6 +82,15 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
     private static final String BOOKMARK_PAGE = "/pages/bookmarkQuery.jsp";
 
+    /**
+     * Option value in the folder dropdown for Shared bookmarks.
+     */
+    private final static String SHARED_BOOKMARKS_FOLDER = "_shared_bookmarks";
+
+    /**
+     * Option value in the folder dropdown for my bookmarks.
+     */
+    private final static String MY_BOOKMARKS_FOLDER = "_my_bookmarks";
     /** */
     private static List<String> xmlFormats = new ArrayList<String>();
 
@@ -152,9 +161,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Selected query bookmark name. */
     private String selectedBookmarkName;
 
-    /** True, if the query to bookmark will be shared. */
-    private boolean sharedBookmark;
-
     /**
      * List of bookmarked queries, each represented by a Map. Relevant only when user is known.
      */
@@ -183,7 +189,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Selected project for the bookmark.
      */
-    private String project;
+    private String bookmarkFolder;
 
     /**
      *
@@ -259,15 +265,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else if (StringUtils.isBlank(bookmarkName)) {
             addGlobalValidationError("Bookmark name is missing!");
         } else {
-            if (sharedBookmark) {
+            if (bookmarkFolder != null && bookmarkFolder.equals(SHARED_BOOKMARKS_FOLDER)) {
                 if (!isSharedBookmarkPrivilege()) {
                     addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
                     return new ForwardResolution(FORM_PAGE);
                 }
                 storeSharedBookmark();
             //store to project folder
-            } else if (StringUtils.isNotBlank(project)) {
-                if (!hasProjectPrivilege(project)) {
+            } else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER) ) {
+                //bookmarkFolder = project name
+                if (!hasProjectPrivilege(bookmarkFolder)) {
                     addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
                     return new ForwardResolution(FORM_PAGE);
                 }
@@ -340,13 +347,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException if query fails
      */
     private void storeProjectBookmark() throws DAOException {
-        String bookmarksUri = FolderUtil.getProjectFolder(getProject()) + "/bookmarks";
+        String bookmarksUri = FolderUtil.getProjectFolder(getBookmarkFolder()) + "/bookmarks";
 
         //create bookmarks folder for the project if it does not exist
         FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
-        if (!dao.fileOrFolderExists("bookmarks", FolderUtil.getProjectFolder(getProject()))) {
+        if (!dao.fileOrFolderExists("bookmarks", FolderUtil.getProjectFolder(getBookmarkFolder()))) {
                 //dao.createFolder(parentFolderUri, folderName, folderLabel, homeUri);
-            dao.createProjectBookmarksFolder(getProject());
+            dao.createProjectBookmarksFolder(getBookmarkFolder());
         }
 
         storeBookmark(bookmarksUri);
@@ -1107,20 +1114,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the sharedBookmark
-     */
-    public boolean isSharedBookmark() {
-        return sharedBookmark;
-    }
-
-    /**
-     * @param sharedBookmark the sharedBookmark to set
-     */
-    public void setSharedBookmark(boolean sharedBookmark) {
-        this.sharedBookmark = sharedBookmark;
-    }
-
-    /**
      * @return the selectedBookmarkName
      */
     public String getSelectedBookmarkName() {
@@ -1172,11 +1165,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         this.userProjects = userProjects;
     }
 
-    public String getProject() {
-        return this.project;
+    public String getBookmarkFolder() {
+        return this.bookmarkFolder;
     }
 
-    public void setProject(String project) {
-        this.project = project;
+    public void setBookmarkFolder(String folder) {
+        this.bookmarkFolder = folder;
     }
 }

@@ -3,27 +3,6 @@
 
 <stripes:layout-render name="/pages/common/template.jsp"  pageTitle="Add SPARQL bookmark">
 
-  <stripes:layout-component name="head">
-     <script type="text/javascript">
-     //<![CDATA[
-        function toggleSharedBookmark(){
-
-            var sharedChkbox = document.getElementById("sharedBookmarkCheck");
-            var projSelect  = document.getElementById("projectSelect");
-            var selectedProjValue;
-
-            if (projSelect !=null) {
-                projSelect.disabled = sharedChkbox.checked;
-
-                selectedProjValue = projSelect.options[projSelect.selectedIndex].value;
-                sharedChkbox.disabled = (selectedProjValue != "");
-            }
-        }
-
-    //]]>
-    </script>
-  </stripes:layout-component>
-
   <stripes:layout-component name="contents">
 
     <h1>Bookmark this query:</h1>
@@ -52,19 +31,18 @@
         <stripes:text name="bookmarkName" id="bookmarkNameText" size="100" />
         <br />
 
-        <c:if test="${actionBean.sharedBookmarkPrivilege}">
-          <label for="sharedBookmarkCheck" class="question">Shared bookmark:</label>
-          <stripes:checkbox name="sharedBookmark" id="sharedBookmarkCheck"  onchange="toggleSharedBookmark();"/>
-          <br />
-        </c:if>
-
-        <c:if test="${not empty(actionBean.userProjects)}">
-          <label for="projectSelect" class="question">Project:</label>
-          <stripes:select name="project" id="projectSelect" onchange="toggleSharedBookmark();">
-            <stripes:option value="" label="" />
-            <c:forEach var="proj" items="${actionBean.userProjects}">
-              <stripes:option value="${proj}" label="${proj}" />
-            </c:forEach>
+        <c:if test="${actionBean.sharedBookmarkPrivilege or not empty(actionBean.userProjects)}">
+          <label for="folderSelect" class="question">Bookmark folder:</label>
+          <stripes:select name="bookmarkFolder" id="folderSelect">
+            <stripes:option value="_my_bookmarks" label="My Bookmarked queries" />
+            <c:if test="${actionBean.sharedBookmarkPrivilege}">
+                <stripes:option value="_shared_bookmarks" label="Shared SPARQL Bookmarks" />
+            </c:if>
+            <c:if test="${not empty(actionBean.userProjects)}">
+                <c:forEach var="proj" items="${actionBean.userProjects}">
+                    <stripes:option value="${proj}" label="${proj}" />
+                </c:forEach>
+            </c:if>
           </stripes:select>
           <br />
         </c:if>
