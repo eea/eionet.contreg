@@ -203,9 +203,10 @@ public class CRUser {
             if (acl != null) {
 
                 result = acl.checkPermission(userName, permission);
-                if (!result) {
-                    logger.debug("User " + userName + " does not have permission " + permission + " in ACL \"" + aclPath + "\"");
-                }
+                //No, we do not log a very common and normal event.
+                //if (!result) {
+                //    logger.debug("User " + userName + " does not have permission " + permission + " in ACL \"" + aclPath + "\"");
+                //}
             } else {
                 logger.warn("ACL \"" + aclPath + "\" not found!");
             }
