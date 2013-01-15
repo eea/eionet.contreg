@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,14 +17,11 @@ import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
-import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -177,87 +173,62 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * @param subjectUris subject URIs
-     * @param predicateUris array of needed predicate URIs
-     * @param reader subject reader
-     * @return List<SubjectDTO> list of Subject data objects
-     * @throws DAOException Default call of getSubjectsData() - SubjectDTO are created if not existing
-     */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader)
-            throws DAOException {
-
-        boolean createMissingDTOs = true;
-        return getSubjectsData(subjectUris, predicateUris, reader, createMissingDTOs);
-    }
-
-    /**
-     * Returns list of Data objects of given subjects for given predicates.
+     * Finds any triples for the given subject, and if at least one found, forms {@link SubjectDTO} and returns it. Otherwise
+     * returns null.
      *
-     * @param subjectUris list of subject URIs
-     * @param predicateUris array of predicates which data is requested
-     * @param reader bindingset reader
-     * @param createMissingDTOs indicates if to create a SubjectDTO object if it does not exist
-     * @return List<SubjectDTO> list of Subject data objects
-     * @throws DAOException if query fails
+     * @param subjectUri The URI of the subject to look for.
+     * @return The subject's {@link SubjectDTO} as described above.
+     * @throws DAOException If any sort of data access error occurs.
      */
-    protected List<SubjectDTO> getSubjectsData(Collection<String> subjectUris, String[] predicateUris, SubjectDataReader reader,
-            boolean createMissingDTOs) throws DAOException {
-
-        if (subjectUris == null || subjectUris.isEmpty()) {
-            throw new IllegalArgumentException("Subjects collection must not be null or empty!");
-        }
+    protected SubjectDTO findSubject(String subjectUri) throws DAOException {
 
         Bindings bindings = new Bindings();
-        String query = getSubjectsDataQuery(subjectUris, predicateUris, bindings);
+        SubjectDataReader reader = SubjectDataReader.getInstance(Collections.singletonList(subjectUri), null);
+        String query = reader.getQuery(bindings);
         executeSPARQL(query, bindings, reader);
 
-        Map<Long, SubjectDTO> subjectsMap = reader.getSubjectsMap();
-        if (subjectsMap != null && !subjectsMap.isEmpty()) {
-            for (String subjectUri : subjectUris) {
-
-                Long subjectHash = Long.valueOf(Hashes.spoHash(subjectUri));
-                if (subjectsMap.get(subjectHash) == null && createMissingDTOs) {
-
-                    // TODO: don't hardcode isAnonymous to false
-                    SubjectDTO subjectDTO = new SubjectDTO(subjectUri, false);
-                    subjectsMap.put(subjectHash, subjectDTO);
-                }
-            }
-        }
-
-        return reader.getResultList();
+        List<SubjectDTO> resultList = reader.getResultList();
+        return resultList != null && !resultList.isEmpty() ? resultList.get(0) : null;
     }
 
     /**
-     * Returns a SPARQL query that will retrieve the given subjects' given predicates. Predicates and graphs are optional.
+     * Returns list of {@link SubjectDTO} objects representing the given subject URIs. The second input of the method is the array
+     * of URIs of predicates to query for. i.e. the returned {@link SubjectDTO} objects will contain predicates only from this
+     * array. If none of these predicates was found for these subjects, the returned {@link SubjectDTO} objects will simply contain
+     * no predicates. If the predicates array is null or empty, the method queries for all predicates!
      *
-     * For very long objects, only first 2000 characters will be returned, to prevent VirtuosoException: SR319: Max row length
-     * exceeded exception (temp col)
+     * NB! This method assumes that the given subjects have already been found by the caller of this method, i.e. at least one
+     * triple for each exists. This means that if the method will not find the specific predicates queried for, {@link SubjectDTO}
+     * objects will still be returned for every such subject. Therefore this method should not be used to determine if a subject
+     * exists, because it returns an "empty" {@link SubjectDTO} even if the repository contains no triples for this subject.
      *
-     * @param subjectUris - collection of subjects whose data is being queried
-     * @param predicateUris - array of predicates that are queried (if null or empty, no predicate filter is applied)
-     * @param bindings - SPARQL variable bindings to fill when building the returned query
-     * @return String the SPARQL query
+     * @param subjectUris The list of URIs of subjects to query for.
+     * @param predicateUris The list of URIs of predicates to query for.
+     * @return List where there is a {@link SubjectDTO} for every queried subject.
+     * @throws DAOException If any sort of data access error occurs.
      */
-    private String getSubjectsDataQuery(Collection<String> subjectUris, String[] predicateUris, Bindings bindings) {
+    protected List<SubjectDTO> getFoundSubjectsData(List<String> subjectUris, String[] predicateUris) throws DAOException {
 
-        if (subjectUris == null || subjectUris.isEmpty()) {
-            throw new IllegalArgumentException("Subjects collection must not be null or empty!");
+        SubjectDataReader reader = SubjectDataReader.getInstance(subjectUris, predicateUris);
+        Bindings bindings = new Bindings();
+        String query = reader.getQuery(bindings);
+        executeSPARQL(query, bindings, reader);
+        List<SubjectDTO> resultList = reader.getResultList();
+
+        // The point of the next loop is to ensure that none of the elements in the result list will be null,
+        // because we are getting the data of already FOUND subjects, as indicated by the method signature and JavaDoc.
+        // Null elements are possible when a subject doesn't have any of the predicates that the reader was told to retrieve,
+        // yet it has some other predicates.
+        int i = 0;
+        for (SubjectDTO subjectDTO : resultList) {
+            if (subjectDTO == null) {
+                subjectDTO = new SubjectDTO(subjectUris.get(i), false);
+                resultList.set(i, subjectDTO);
+            }
+            i++;
         }
 
-        String commaSeparatedSubjects = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectValue", bindings);
-        String query =
-                "select ?g ?s ?p bif:either(isLiteral(?obj), bif:substring(str(?obj), 1, " + WebConstants.MAX_OBJECT_LENGTH
-                + "), ?obj) as ?o where {graph ?g {?s ?p ?obj. filter (?s IN (" + commaSeparatedSubjects + ")) ";
-
-        // if only certain predicates needed, add relevant filter
-        if (predicateUris != null && predicateUris.length > 0) {
-            String commaSeparatedPredicates = SPARQLQueryUtil.urisToCSV(Arrays.asList(predicateUris), "predicateValue", bindings);
-            query += "filter (?p IN (" + commaSeparatedPredicates + ")) ";
-        }
-
-        query += "}} ORDER BY ?s ?p";
-        return query;
+        return resultList;
     }
 
     /**
@@ -381,7 +352,7 @@ public abstract class VirtuosoBaseDAO {
      * @param times
      * @return
      */
-    protected String variablesCSV(String varName, int times){
+    protected String variablesCSV(String varName, int times) {
         return SesameUtil.createSPARQLVariablesCSV(varName, times);
     }
 }

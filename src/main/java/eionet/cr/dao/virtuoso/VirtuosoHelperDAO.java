@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +49,6 @@ import eionet.cr.dao.readers.RecentUploadsReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SPOReader;
 import eionet.cr.dao.readers.SubPropertiesReader;
-import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.readers.TriplesReader;
 import eionet.cr.dao.readers.UploadDTOReader;
 import eionet.cr.dao.util.PredicateLabels;
@@ -158,10 +156,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
             logger.trace("Recent uploads search, getting the data of the found subjects");
 
-            // get the data of all found subjects
-            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
-            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-
             // only these predicates will be queried for
             String[] neededPredicates = null;
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
@@ -177,7 +171,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             }
 
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
+            resultList = getFoundSubjectsData(subjectUris, neededPredicates);
 
             // set dublin core date of found subjects
             if (pairMap != null) {
@@ -457,20 +451,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public SubjectDTO getSubject(String subjectUri) throws DAOException {
-
-        if (StringUtils.isBlank(subjectUri)) {
-            return null;
-        }
-
-        Map<Long, SubjectDTO> map = new LinkedHashMap<Long, SubjectDTO>();
-        map.put(Long.valueOf(Hashes.spoHash(subjectUri)), null);
-
-        SubjectDataReader reader = new SubjectDataReader(map);
-        reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-
-        List<String> subjectUris = Collections.singletonList(subjectUri);
-        List<SubjectDTO> subjects = getSubjectsData(subjectUris, null, reader, false);
-        return subjects == null || subjects.isEmpty() ? null : subjects.get(0);
+        return StringUtils.isBlank(subjectUri) ? null : findSubject(subjectUri);
     }
 
     /*

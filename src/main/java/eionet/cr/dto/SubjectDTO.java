@@ -337,13 +337,16 @@ public class SubjectDTO implements Serializable {
      *
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object other) {
 
-        if (this == other)
+        if (this == other) {
             return true;
+        }
 
-        if (!(other instanceof SubjectDTO))
+        if (!(other instanceof SubjectDTO)) {
             return false;
+        }
 
         String otherUri = ((SubjectDTO) other).getUri();
         return getUri() == null ? otherUri == null : getUri().equals(otherUri);
@@ -354,6 +357,7 @@ public class SubjectDTO implements Serializable {
      *
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
 
         return getUri() == null ? 0 : getUri().hashCode();
@@ -365,9 +369,9 @@ public class SubjectDTO implements Serializable {
      */
     public String getUrl() {
 
-        if (uri != null && URLUtil.isURL(uri))
+        if (uri != null && URLUtil.isURL(uri)) {
             return uri;
-        else {
+        } else {
             ObjectDTO o = getObject(Predicates.DC_IDENTIFIER);
             return o == null || !URLUtil.isURL(o.getValue()) ? null : o.getValue();
         }
@@ -477,12 +481,13 @@ public class SubjectDTO implements Serializable {
 
         ObjectDTO object = getObject(Predicates.RDFS_LABEL, ObjectDTO.Type.LITERAL);
         String label = object != null ? object.getValue() : null;
-        if (label != null && label.trim().length() > 0)
+        if (label != null && label.trim().length() > 0) {
             return label;
-        else if (isAnonymous())
+        } else if (isAnonymous()) {
             return "Anonymous resource";
-        else
+        } else {
             return URIUtil.extractURILabel(getUri(), NO_LABEL);
+        }
     }
 
     /**

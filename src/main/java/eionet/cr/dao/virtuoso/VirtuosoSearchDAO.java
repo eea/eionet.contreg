@@ -27,6 +27,7 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.helpers.QueryHelper;
 import eionet.cr.dao.readers.DeliverySearchReader;
 import eionet.cr.dao.readers.FreeTextSearchReader;
+import eionet.cr.dao.readers.GenericSubjectDataReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubjectDataReader;
 import eionet.cr.dao.util.BBOX;
@@ -70,11 +71,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * @see eionet.cr.dao.SearchDAO#searchByFreeText(eionet.cr.dao.util.SearchExpression,
      *      eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest)
-     * @param exactMatch
-     *            indicates if only exact amtch of String is searched
+     * @param exactMatch indicates if only exact amtch of String is searched
      * @return
-     * @throws DAOException
-     *             if query fails.
+     * @throws DAOException if query fails.
      */
     @Override
     public SearchResultDTO<SubjectDTO> searchByFreeText(final SearchExpression expression, final FilterType filterType,
@@ -103,7 +102,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // create query helper
         VirtuosoFreeTextSearchHelper helper =
-            new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
+                new VirtuosoFreeTextSearchHelper(expression, virtQuery, exactMatch, pagingRequest, sortingRequest);
 
         // Set Filter
         helper.setFilter(filterType);
@@ -131,17 +130,12 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // if result list not empty, do the necessary processing and get total match count
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
-            // get the data of all found subjects, provide hit-sources to the reader
-            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
-            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-
             // only these predicates will be queried for
             String[] neededPredicates = {Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
 
-            logger.trace("Free-text search, getting the data of the found subjects");
-
             // get the subjects data
-            resultList = getSubjectsData(subjectUris, neededPredicates, dataReader);
+            logger.trace("Free-text search, getting the data of the found subjects");
+            resultList = getFoundSubjectsData(subjectUris, neededPredicates);
 
             // if paging required, get distinct subjects total match count
             if (pagingRequest != null) {
@@ -158,10 +152,14 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     }
 
     /**
-     * Faster version of "searchByFilters" that is currently work in progress. In future it should replace searchByFilters method,
-     * but at the moment it is only used in "searchByTypeAndFilters". Currently sorting is not working yet because of strange
-     * behavior in Virtuoso triplestore. Because of Sesame driver, the query gets executed in Java output mode (sparql define
-     * output:format '_JAVA_') and because of that, sorting is not working. For more info, see task #3584.
+     * Alternative version of "searchByFilters" that does it all in one query. i.e. as opposed to the currently used
+     * {@link #searchByFilters(Map, boolean, PagingRequest, SortingRequest, List, boolean)}, which is a so-called "two-step"
+     * approach where the first query gets the URIs of the matching subjects in the requested order, and the second query gets the
+     * requested predicates of these subjects.
+     *
+     * This version was tried as faster alternative to the "two-step" approach. However, after a performance bug was fixed in the
+     * latter, this version was again dropped, as it is much more complicated and harder to follow. However, we keep it here in case
+     * we need to bring it back for whichever reason after all.
      *
      * @param filters
      * @param checkFiltersRange
@@ -172,9 +170,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      * @return
      * @throws DAOException
      */
-    private SearchResultDTO<SubjectDTO> searchByFilters2(Map<String, String> filters, boolean checkFiltersRange,
+    private SearchResultDTO<SubjectDTO> searchByFilters_alternative(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
         Bindings bindings = new Bindings();
@@ -218,8 +216,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
                 query.append(" bif:subseq(?" + sortPredicate + ",");
                 query.append(" bif:strrchr(bif:replace(?" + sortPredicate + ", '/', '#'), '#')), ?" + sortPredicate + "),");
                 query.append(" ', ') AS ?" + SORT_OBJECT_VALUE_VARIABLE);
-                query.append("  WHERE { {SELECT DISTINCT ?s (bif:lcase(STR(?" + sortPredicate + ")) AS ?" + sortPredicate + ") { ?s <"
-                        + sortPredicateUri + "> ?" + sortPredicate + ".} ORDER BY ASC(?" + sortPredicate + ") }");
+                query.append("  WHERE { {SELECT DISTINCT ?s (bif:lcase(STR(?" + sortPredicate + ")) AS ?" + sortPredicate
+                        + ") { ?s <" + sortPredicateUri + "> ?" + sortPredicate + ".} ORDER BY ASC(?" + sortPredicate + ") }");
                 query.append("  } GROUP BY ?s");
                 query.append(" }");
                 query.append("}");
@@ -359,7 +357,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Override
     public SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
@@ -369,7 +367,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             literalRangeFilters = DAOFactory.get().getDao(HelperDAO.class).getLiteralRangeSubjects(filters.keySet());
         }
         VirtuosoFilteredSearchHelper helper =
-            new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
+                new VirtuosoFilteredSearchHelper(filters, literalRangeFilters, pagingRequest, sortingRequest, useInference);
 
         // create the list of IN parameters of the query
 
@@ -397,13 +395,13 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
             // only these predicates will be queried for
             String[] neededPredicates = new String[] {};
-
             if (selectPredicates != null && selectPredicates.size() > 0) {
                 neededPredicates = selectPredicates.toArray(neededPredicates);
             }
+
             // get the data of all found subjects
             logger.trace("Search by filters, getting the data of the found subjects");
-            resultList = getSubjectsData(subjectUris, neededPredicates, new SubjectDataReader(subjectUris));
+            resultList = getFoundSubjectsData(subjectUris, neededPredicates);
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {
@@ -432,7 +430,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         CustomPaginatedList<DeliveryDTO> ret = new CustomPaginatedList<DeliveryDTO>();
 
         VirtuosoDeliveriesSearchHelper helper =
-            new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
+                new VirtuosoDeliveriesSearchHelper(obligation, locality, year, pagingRequest, sortingRequest);
 
         // let the helper create the query and fill IN parameters
         ArrayList<Object> inParams = new ArrayList<Object>();
@@ -550,7 +548,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     public SearchResultDTO<SubjectDTO> searchByTypeAndFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException {
 
-        return searchByFilters2(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);
+        return searchByFilters(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates, true);
     }
 
     /*
@@ -575,7 +573,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         String query = helper.getQuery(null);
 
         long startTime = System.currentTimeMillis();
-        logger.trace("Search subjects in source, executing subject finder query: " + query);
+        logger.trace("Searching subjects in source, executing finder query: " + query);
 
         // execute the query
         SingleObjectReader<String> matchReader = new SingleObjectReader<String>();
@@ -588,12 +586,9 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         // if result list not null and not empty, then get the subjects data and total rowcount
         if (subjectUris != null && !subjectUris.isEmpty()) {
 
-            logger.trace("Search subjects in sources, getting the data of the found subjects");
-
             // get the data of all found subjects
-            SubjectDataReader dataReader = new SubjectDataReader(subjectUris);
-            dataReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
-            resultList = getSubjectsData(subjectUris, null, dataReader);
+            logger.trace("Searching subjects in sources, getting the data of the found subjects");
+            resultList = getFoundSubjectsData(subjectUris, null);
 
             // if paging required, get the total number of found subjects too
             if (pagingRequest != null) {
@@ -648,20 +643,15 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      *
      * @see eionet.cr.dao.SearchDAO#searchByTags(java.util.List, eionet.cr.util.pagination.PagingRequest,
      *      eionet.cr.util.SortingRequest, java.util.List)
-     * @param tags
-     *            List<String> - tag names
-     * @param selectedPredicates
-     *            List<String> - predicates to be shown
-     * @param pagingRequest
-     *            sortingRequest PagingRequest
-     * @param sortingRequest
-     *            pagingRequest SortingRequest
+     * @param tags List<String> - tag names
+     * @param selectedPredicates List<String> - predicates to be shown
+     * @param pagingRequest sortingRequest PagingRequest
+     * @param sortingRequest pagingRequest SortingRequest
      * @return Pair <Integer, List<SubjectDTO>>
-     * @throws DAOException
-     *             if query fails
+     * @throws DAOException if query fails
      */
-    @Deprecated
-    public SearchResultDTO<SubjectDTO> searchByTagsOld(final List<String> tags, final PagingRequest pagingRequest,
+    @Override
+    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
             final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
@@ -695,8 +685,8 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             // only these predicates will be queried for
             String[] neededPredicates = new String[] {Predicates.CR_TAG, Predicates.RDF_TYPE, Predicates.RDFS_LABEL};
 
-            SubjectDataReader subjectDataReader = new SubjectDataReader(subjectUris);
-            resultList = getSubjectsData(subjectUris, neededPredicates, subjectDataReader, false);
+            // get the subjects data
+            resultList = getFoundSubjectsData(subjectUris, neededPredicates);
         }
         // if paging required, get the total number of found subjects too
         if (pagingRequest != null) {
@@ -714,23 +704,23 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     }
 
     /**
-     * Search by tags implementation in Virtuoso.
+     * Alternative version of "searchByTags" that does it all in one query. i.e. as opposed to the currently used
+     * {@link #searchByTags(List, PagingRequest, SortingRequest, List)}, which is a so-called "two-step" approach where the first
+     * query gets the URIs of the matching subjects in the requested order, and the second query gets the requested predicates of
+     * these subjects.
+     *
+     * This version was tried as faster alternative to the "two-step" approach. However, after a performance bug was fixed in the
+     * latter, this version was again dropped, as it is much more complicated and harder to follow. However, we keep it here in case
+     * we need to bring it back for whichever reason after all.
      *
      * @param tags
-     *            List<String> - tag names
-     * @param selectedPredicates
-     *            List<String> - predicates to be shown
      * @param pagingRequest
-     *            sortingRequest PagingRequest
      * @param sortingRequest
-     *            pagingRequest SortingRequest
-     *
-     * @return search result
+     * @param selectedPredicates
+     * @return
      * @throws DAOException
-     *             if query fails
      */
-    @Override
-    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
+    private SearchResultDTO<SubjectDTO> searchByTags_alternative(final List<String> tags, final PagingRequest pagingRequest,
             final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 
@@ -882,8 +872,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     /**
      * Helper method to convert array of tag to a map required by search method.
      *
-     * @param tags
-     *            List<String> tag names
+     * @param tags List<String> tag names
      * @return Map<String, String> in format [tag predicate: tag name]
      */
     private Map<String, String> buildTagsInputParameter(final List<String> tags) {
@@ -941,7 +930,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
             // get the data of all found subjects
             String predicateQuery = helper.getSubjectsDataQuery(subjectUris, subjectUri);
-            SubjectDataReader sdReader = new SubjectDataReader(subjectUris);
+            SubjectDataReader sdReader = new GenericSubjectDataReader(subjectUris);
             sdReader.setBlankNodeUriPrefix(BNODE_URI_PREFIX);
             logger.debug("Predicate query: " + predicateQuery);
             // separate bindings for subject data
@@ -967,13 +956,18 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      */
     private static final String TYPES_CACHE_SPARQL = "SELECT DISTINCT ?o WHERE {?s a ?o . filter isURI(?o)} ORDER BY ?o ";
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.SearchDAO#getTypes()
+     */
     @Override
     public List<SubjectDTO> getTypes() throws DAOException {
 
         List<String> typeUris = executeSPARQL(TYPES_CACHE_SPARQL, new SingleObjectReader<String>());
         String[] neededPredicates = {Predicates.RDFS_LABEL};
 
-        List<SubjectDTO> resultList = getSubjectsData(typeUris, neededPredicates, new SubjectDataReader(typeUris));
+        List<SubjectDTO> resultList = getFoundSubjectsData(typeUris, neededPredicates);
         return resultList;
     }
 }

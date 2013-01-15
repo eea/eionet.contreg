@@ -21,12 +21,10 @@
 
 package eionet.cr.dao.virtuoso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.readers.VoidDatasetsReader;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.util.Bindings;
@@ -166,31 +164,4 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         List<String> result = executeSPARQL(sb.toString(), bindings, new SingleObjectReader<String>());
         return result;
     }
-
-    /**
-     *
-     * @param args
-     * @throws DAOException
-     */
-    public static void main(String[] args) throws DAOException {
-
-        ArrayList<String> creators = new ArrayList<String>();
-        creators.add("Eurostat");
-        //creators.add("European Environment Agency");
-
-        ArrayList<String> subjects = new ArrayList<String>();
-        //subjects.add("Population and social conditions");
-        subjects.add("Business surveys - NACE Rev. 1.1");
-
-        BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
-        List<VoidDatasetsResultRow> searchVoidDatasets = dao.findDatasets(creators, subjects);
-        System.out.println(searchVoidDatasets.size());
-
-        List<String> distinctCreators = dao.findCreators(subjects);
-        System.out.println(distinctCreators);
-
-        List<String> distinctSubjects = dao.findSubjects(creators);
-        System.out.println(distinctSubjects.size());
-    }
-
 }

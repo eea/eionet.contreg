@@ -57,6 +57,7 @@ import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.PredicateObjectsReader;
 import eionet.cr.dataset.CurrentLoadedDatasets;
 import eionet.cr.dto.DatasetDTO;
+import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -97,7 +98,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     private long uriHash;
 
     /** The subject data object found by the requestd URI or URI hash. */
-    private SubjectDTO subject;
+    private FactsheetDTO subject;
 
     /** Used in factsheet edit mode only, where it indicates if the subject is anonymous. */
     private boolean anonymous;
@@ -439,7 +440,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      * @return the resource
      */
-    public SubjectDTO getSubject() {
+    public FactsheetDTO getSubject() {
         return subject;
     }
 
@@ -496,14 +497,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public void setAnonymous(final boolean anonymous) {
         this.anonymous = anonymous;
-    }
-
-    /**
-     * @param subject
-     *            the subject to set
-     */
-    public void setSubject(final SubjectDTO subject) {
-        this.subject = subject;
     }
 
     /**
