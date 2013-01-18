@@ -19,7 +19,7 @@
  *        jaanus
  */
 
-package eionet.cr.web.action.admin;
+package eionet.cr.web.action.admin.staging;
 
 import java.util.List;
 
@@ -37,6 +37,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
 /**
  * An action bean for listing the currently available "staging databases" and performing bulk operations with them (e.g. delete).
@@ -52,7 +53,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(StagingDatabasesActionBean.class);
 
     /** Location of the JSP that lists the databases. */
-    public static final String STAGING_DATABASES_JSP = "/pages/admin/stagingDb/stagingDatabases.jsp";
+    public static final String STAGING_DATABASES_JSP = "/pages/admin/staging/databases.jsp";
 
     /** The list of currently available staging databases. */
     private List<StagingDatabaseDTO> databases;

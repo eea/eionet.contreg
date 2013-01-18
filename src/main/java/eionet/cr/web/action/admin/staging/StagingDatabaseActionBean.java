@@ -19,7 +19,7 @@
  *        jaanus
  */
 
-package eionet.cr.web.action.admin;
+package eionet.cr.web.action.admin.staging;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
@@ -38,6 +38,7 @@ import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.staging.StagingDatabaseCreator;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
 /**
  * Action bean for operations with a single staging database.
@@ -48,10 +49,10 @@ import eionet.cr.web.action.AbstractActionBean;
 public class StagingDatabaseActionBean extends AbstractActionBean {
 
     /** */
-    private static final String STAGING_DATABASE_JSP = "/pages/admin/stagingDb/stagingDatabase.jsp";
+    private static final String STAGING_DATABASE_JSP = "/pages/admin/staging/database.jsp";
 
     /** */
-    private static final String ADD_STAGING_DATABASE_JSP = "/pages/admin/stagingDb/addStagingDatabase.jsp";
+    private static final String ADD_STAGING_DATABASE_JSP = "/pages/admin/staging/addDatabase.jsp";
 
     /** Static logger. */
     private static final Logger LOGGER = Logger.getLogger(StagingDatabaseActionBean.class);
