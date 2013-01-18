@@ -161,12 +161,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
                 String[] neededPredicatesObl =
-                        {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
+                    {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
                 String[] neededPredicatesDeliveries =
-                        {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
+                    {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
                 neededPredicates = neededPredicatesDeliveries;
             }
 
@@ -617,7 +617,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
+        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
 
     }
 
@@ -1321,7 +1321,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      */
     @Override
     public List<Map<String, String>> getSparqlBookmarks(CRUser user) throws DAOException {
-        String bookmarksUri = user.getBookmarksUri();
 
         Bindings bindings = new Bindings();
         bindings.setURI("bookmarksHome", user.getBookmarksUri());
@@ -1400,8 +1399,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         StringBuilder query = new StringBuilder();
         query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (")
-                .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
-                .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
+        .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
+        .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
 
         HashMap<String, Date> result = new HashMap<String, Date>();
         MapReader reader = new MapReader();
