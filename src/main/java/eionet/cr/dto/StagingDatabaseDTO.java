@@ -33,10 +33,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class StagingDatabaseDTO {
 
     /** */
+    private int id;
     private String name;
     private String creator;
     private Date created;
     private String description;
+    private String importStatus;
+    private String importLog;
 
     /**
      * @return the name
@@ -102,5 +105,47 @@ public class StagingDatabaseDTO {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("name", name).toString();
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the importStatus
+     */
+    public String getImportStatus() {
+        return importStatus;
+    }
+
+    /**
+     * @param importStatus the importStatus to set
+     */
+    public void setImportStatus(String importStatus) {
+        this.importStatus = importStatus;
+    }
+
+    /**
+     * @return the importLog
+     */
+    public String getImportLog() {
+        return importLog;
+    }
+
+    /**
+     * @param importLog the importLog to set
+     */
+    public void setImportLog(String importLog) {
+        this.importLog = importLog;
     }
 }

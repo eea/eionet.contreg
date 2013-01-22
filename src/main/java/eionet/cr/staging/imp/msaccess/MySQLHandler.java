@@ -1,4 +1,4 @@
-package eionet.cr.staging.msaccess;
+package eionet.cr.staging.imp.msaccess;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.healthmarketscience.jackcess.Table;
 
+import eionet.cr.staging.imp.ImportException;
 import eionet.cr.staging.util.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -19,10 +20,10 @@ import eionet.cr.util.sql.SQLUtil;
  * @author jaanus
  *
  */
-public class MySQLCreator implements ConversionHandlerIF {
+public class MySQLHandler implements MSAccessImportHandlerIF {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(MySQLCreator.class);
+    private static final Logger LOGGER = Logger.getLogger(MySQLHandler.class);
 
     /** */
     private static final int INSERT_BATCH_SIZE = 10000;
@@ -46,38 +47,34 @@ public class MySQLCreator implements ConversionHandlerIF {
      *
      * @param conn
      */
-    public MySQLCreator(Connection conn) {
+    public MySQLHandler(Connection conn) {
         this.conn = conn;
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * das.conv.msaccess.ConversionHandlerIF#newTable(com.healthmarketscience
-     * .jackcess.Table)
+     * @see das.conv.msaccess.ConversionHandlerIF#newTable(com.healthmarketscience .jackcess.Table)
      */
     @Override
-    public void newTable(Table table) throws ConversionException {
+    public void newTable(Table table) throws ImportException {
 
         String sql = MySQLUtil.createTableStatement(table);
         try {
             LOGGER.debug(sql);
             SQLUtil.executeUpdate(sql, conn);
         } catch (SQLException e) {
-            throw new ConversionException("Failed to create table " + table.getName(), e);
+            throw new ImportException("Failed to create table " + table.getName(), e);
         }
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * das.conv.msaccess.ConversionHandlerIF#processRow(com.healthmarketscience
-     * .jackcess.Table, java.util.Map)
+     * @see das.conv.msaccess.ConversionHandlerIF#processRow(com.healthmarketscience .jackcess.Table, java.util.Map)
      */
     @Override
-    public void processRow(Table table, Map<String, Object> row) throws ConversionException {
+    public void processRow(Table table, Map<String, Object> row) throws ImportException {
 
         String tableName = table.getName();
         try {
@@ -103,7 +100,7 @@ public class MySQLCreator implements ConversionHandlerIF {
                 currRowInsertStmt.executeBatch();
             }
         } catch (SQLException e) {
-            throw new ConversionException(e);
+            throw new ImportException(e);
         }
     }
 
@@ -113,13 +110,13 @@ public class MySQLCreator implements ConversionHandlerIF {
      * @see das.conv.msaccess.ConversionHandlerIF#endOfFile()
      */
     @Override
-    public void endOfFile() throws ConversionException {
+    public void endOfFile() throws ImportException {
 
         if (stmtCounter > 0) {
             try {
                 currRowInsertStmt.executeBatch();
             } catch (SQLException e) {
-                throw new ConversionException(e);
+                throw new ImportException(e);
             }
         }
     }

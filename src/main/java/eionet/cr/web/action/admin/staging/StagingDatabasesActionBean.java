@@ -21,21 +21,27 @@
 
 package eionet.cr.web.action.admin.staging;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.imp.ImportLogLevel;
+import eionet.cr.staging.imp.ImportStatus;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
@@ -49,6 +55,9 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 @UrlBinding("/admin/stagingDbs.action")
 public class StagingDatabasesActionBean extends AbstractActionBean {
 
+    /** */
+    public static final Map<String, String> IMPORT_STATUSES = createImportStatuses();
+
     /** The static logger. */
     private static final Logger LOGGER = Logger.getLogger(StagingDatabasesActionBean.class);
 
@@ -57,6 +66,12 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
 
     /** The list of currently available staging databases. */
     private List<StagingDatabaseDTO> databases;
+
+    /** */
+    private List<String> dbNames;
+
+    /** */
+    private int databaseId;
 
     /**
      * The bean's default event handler method.
@@ -68,6 +83,47 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     public Resolution defaultHandler() throws DAOException {
         databases = DAOFactory.get().getDao(StagingDatabaseDAO.class).listAll();
         return new ForwardResolution(STAGING_DATABASES_JSP);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Resolution delete() {
+
+        if (dbNames != null && !dbNames.isEmpty()) {
+            try {
+                DAOFactory.get().getDao(StagingDatabaseDAO.class).delete(dbNames);
+                addSystemMessage("Selected database(s) successfully selected!");
+            } catch (DAOException e) {
+                LOGGER.error("Failed to delete selected databases", e);
+                addWarningMessage("Deletion of the selected database(s) failed with technical error: " + e.getMessage());
+            }
+        } else {
+            addCautionMessage("No databases selected!");
+        }
+
+        return new RedirectResolution(this.getClass());
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution openLog() throws DAOException {
+
+        logger.trace("Retrieving import log for this database id: " + databaseId);
+        String log = DAOFactory.get().getDao(StagingDatabaseDAO.class).getImportLog(databaseId);
+        if (log == null) {
+            log = "Found no import log for this database!";
+        } else if (log.trim().length() == 0) {
+            log = "Import log for this database is empty!";
+        } else {
+            log = formatImportLog(log);
+        }
+
+        return new StreamingResolution("text/html", log);
     }
 
     /**
@@ -86,9 +142,17 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     }
 
     /**
-     * Validates the the user is authorised for any operations on this action bean.
-     * If user not authorised, redirects to the {@link AdminWelcomeActionBean} which displays a proper error message.
-     * Will be run on any events, since no specific events specified in the {@link ValidationMethod} annotation.
+     *
+     * @return
+     */
+    public Class getAvailableFilesActionBeanClass() {
+        return AvailableFilesActionBean.class;
+    }
+
+    /**
+     * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
+     * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events, since no specific events
+     * specified in the {@link ValidationMethod} annotation.
      */
     @ValidationMethod(priority = 1)
     public void validateUserAuthorised() {
@@ -97,5 +161,76 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
             addGlobalValidationError("You are not authorized for this operation!");
             getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
         }
+    }
+
+    /**
+     * @param dbNames the dbNames to set
+     */
+    public void setDbNames(List<String> dbNames) {
+        this.dbNames = dbNames;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Map<String, String> getImportStatuses() {
+        return IMPORT_STATUSES;
+    }
+
+    /**
+     * Creates and returns a map of database import statuses. The keys are the status names, the values are their friendly names.
+     */
+    private static final Map<String, String> createImportStatuses() {
+
+        HashMap<String, String> result = new HashMap<String, String>();
+        ImportStatus[] importStatuses = ImportStatus.values();
+        for (int i = 0; i < importStatuses.length; i++) {
+            ImportStatus importStatus = importStatuses[i];
+            result.put(importStatus.name(), importStatus.toString());
+        }
+        return result;
+    }
+
+    /**
+     * @param databaseId the databaseId to set
+     */
+    public void setDatabaseId(int databaseId) {
+        this.databaseId = databaseId;
+    }
+
+    /**
+     *
+     * @param log
+     * @return
+     */
+    private String formatImportLog(String log) {
+
+        StringBuilder sb = new StringBuilder("<div>");
+        String[] lines = log.split("\\n");
+        if (lines != null) {
+            for (int i = 0; i < lines.length; i++) {
+                sb.append(formatImportLogLine(lines[i])).append("<br/>");
+            }
+        }
+        return sb.append("</div>").toString();
+    }
+
+    /**
+     * @param line
+     * @return
+     */
+    private String formatImportLogLine(String line) {
+
+        String start = ImportLogLevel.WARNING.name() + ":";
+        if (line.startsWith(start)) {
+            StringUtils.replaceOnce(line, start, "<span style=\"color:#F5B800\">" + start + "</span>");
+        }
+        start = ImportLogLevel.ERROR.name() + ":";
+        if (line.startsWith(start)) {
+            StringUtils.replaceOnce(line, start, "<span style=\"color:#FF0000\">" + start + "</span>");
+        }
+
+        return StringUtils.replace(line, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
     }
 }

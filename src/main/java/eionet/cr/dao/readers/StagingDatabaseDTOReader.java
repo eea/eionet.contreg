@@ -41,10 +41,13 @@ public class StagingDatabaseDTOReader extends SQLResultSetBaseReader<StagingData
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         StagingDatabaseDTO databaseDTO = new StagingDatabaseDTO();
+        databaseDTO.setId(rs.getInt("DATABASE_ID"));
         databaseDTO.setName(rs.getString("NAME"));
         databaseDTO.setCreator(rs.getString("CREATOR"));
         databaseDTO.setCreated(rs.getTimestamp("CREATED"));
         databaseDTO.setDescription(rs.getString("DESCRIPTION"));
+        databaseDTO.setImportStatus(rs.getString("IMPORT_STATUS"));
+        databaseDTO.setImportLog(rs.getString("IMPORT_LOG"));
 
         resultList.add(databaseDTO);
     }

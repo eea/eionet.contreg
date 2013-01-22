@@ -24,6 +24,7 @@ package eionet.cr.dao;
 import java.util.List;
 
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.imp.ImportStatus;
 
 /**
  * DAO interface for operations with staging databases.
@@ -52,10 +53,53 @@ public interface StagingDatabaseDAO extends DAO {
     int createRecord(StagingDatabaseDTO databaseDTO, String userName) throws DAOException;
 
     /**
+     *
+     * @param databaseId
+     * @param importStatus
+     * @throws DAOException
+     */
+    void updateImportStatus(int databaseId, ImportStatus importStatus) throws DAOException;
+
+    /**
+     *
+     * @param databaseId
+     * @param message
+     * @throws DAOException
+     */
+    void addImportLogMessage(int databaseId, String message) throws DAOException;
+
+    /**
      * Lists all staging databases in the database, ordered by name ascending.
      *
      * @return
      * @throws DAOException
      */
     public List<StagingDatabaseDTO> listAll() throws DAOException;
+
+    /**
+     * Deletes the given staging databases.
+     *
+     * @param dbNames
+     * @throws DAOException
+     */
+    public void delete(List<String> dbNames) throws DAOException;
+
+    /**
+     * Returns true if there is at least one table under the given Virtuoso database (i.e. qualifier). Otherwise returns false.
+     * The database is looked only within the current SQL connection's user space.
+     *
+     * @param dbName
+     * @return
+     * @throws DAOException
+     */
+    public boolean exists(String dbName) throws DAOException;
+
+    /**
+     * Returns the import log of the staging database by the given integer id.
+     *
+     * @param databaseId
+     * @return
+     * @throws DAOException
+     */
+    public String getImportLog(int databaseId) throws DAOException;
 }

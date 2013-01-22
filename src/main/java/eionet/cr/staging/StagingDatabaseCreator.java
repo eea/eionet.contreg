@@ -22,21 +22,19 @@
 package eionet.cr.staging;
 
 import java.io.File;
-import java.io.IOException;
-
-import net.sourceforge.stripes.action.FileBean;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
-import eionet.cr.staging.msaccess.ConversionException;
-import eionet.cr.staging.msaccess.Converter;
-import eionet.cr.staging.msaccess.VirtuosoCreator;
-import eionet.cr.util.FileDeletionJob;
+import eionet.cr.staging.imp.ImportException;
+import eionet.cr.staging.imp.ImportLoggerImpl;
+import eionet.cr.staging.imp.ImportStatus;
+import eionet.cr.staging.imp.ImporterIF;
+import eionet.cr.staging.imp.msaccess.MSAccessImporter;
 
 /**
  * A runnable that creates a given staging database and populates it from a given DB file.
@@ -46,65 +44,121 @@ import eionet.cr.util.FileDeletionJob;
 public class StagingDatabaseCreator extends Thread {
 
     /** */
+    private static final HashMap<String, StagingDatabaseCreator> CURRENT_RUNS = new HashMap<String, StagingDatabaseCreator>();
+
+    /** */
     private static final Logger LOGGER = Logger.getLogger(StagingDatabaseCreator.class);
 
     /** */
-    private StagingDatabaseDTO databaseDTO;
-    private FileBean databaseFileBean;
+    private StagingDatabaseDTO dbDTO;
+    private File dbFile;
+
+    /** */
+    private StagingDatabaseDAO dao;
 
     /**
      * Constructs a {@link StagingDatabaseCreator} for the given database DTO and DB file.
      *
-     * @param databaseDTO
-     * @param databaseFileBean
+     * @param dbDTO
+     * @param dbFile
      */
-    public StagingDatabaseCreator(StagingDatabaseDTO databaseDTO, FileBean databaseFileBean){
+    private StagingDatabaseCreator(StagingDatabaseDTO dbDTO, File dbFile) {
 
-        this.databaseDTO = databaseDTO;
-        this.databaseFileBean = databaseFileBean;
+        this.dbDTO = dbDTO;
+        this.dbFile = dbFile;
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Thread#run()
      */
     @Override
     public void run() {
 
-        LOGGER.debug("Staging DB creator started for " + databaseDTO + ", using file " + databaseFileBean.getFileName());
+        LOGGER.debug("Staging DB creator started for " + dbDTO + ", using file " + dbFile.getName());
 
+        ImportLoggerImpl importLogger = new ImportLoggerImpl(dbDTO.getId());
         try {
-            execute();
-            LOGGER.debug("Staging DB creator finished for " + databaseDTO + ", using file " + databaseFileBean.getFileName());
+            execute(importLogger);
+            LOGGER.debug("Staging DB creator finished for " + dbDTO + ", using file " + dbFile.getName());
         } catch (Exception e) {
-            LOGGER.error("Staging database creation failed with error", e);
+            updateImportStatus(ImportStatus.ERROR);
+            String message = "Staging database creation failed with error";
+            importLogger.error(message, e);
+            LOGGER.error(message, e);
         }
     }
 
     /**
-     * @throws DAOException
-     * @throws IOException
-     * @throws ConversionException
      *
+     * @param importLogger
+     * @throws DAOException
+     * @throws ImportException
      */
-    private void execute() throws DAOException, IOException, ConversionException {
+    private void execute(ImportLoggerImpl importLogger) throws DAOException, ImportException {
 
-        // Save FileBean to a "proper" temporary file location.
-        File file = TempFilePathGenerator.generate();
-        databaseFileBean.save(file);
+        updateImportStatus(ImportStatus.STARTED);
 
         // Create the database.
-        DAOFactory.get().getDao(StagingDatabaseDAO.class).createDatabase(null);
+        DAOFactory.get().getDao(StagingDatabaseDAO.class).createDatabase(dbDTO.getName());
 
         // Populate the database from the given file.
-        VirtuosoCreator virtuosoCreator = new VirtuosoCreator(databaseDTO.getName());
-        try {
-            Converter converter = new Converter(virtuosoCreator, false, false);
-            converter.convert(file);
-            LOGGER.debug("All done!");
-        } finally {
-            virtuosoCreator.close();
-            FileDeletionJob.register(file);
+        // TODO Use a factory mechanism to obtain a particular ImporterIF implementation.
+        ImporterIF importer = new MSAccessImporter(importLogger);
+        importer.doImport(dbFile, dbDTO.getName());
+
+        updateImportStatus(ImportStatus.COMPLETED);
+        String message = "All done!";
+        importLogger.info(message);
+        LOGGER.debug(message);
+    }
+
+    /**
+     *
+     * @param dbDTO
+     * @param dbFile
+     * @return
+     */
+    public static synchronized StagingDatabaseCreator start(StagingDatabaseDTO dbDTO, File dbFile) {
+
+        String dbName = dbDTO.getName();
+        StagingDatabaseCreator currentRun = CURRENT_RUNS.get(dbName);
+        if (currentRun != null) {
+            if (currentRun.isAlive()) {
+                throw new IllegalStateException("A creator is already running for this staging database: " + dbName);
+            } else {
+                CURRENT_RUNS.remove(dbName);
+            }
         }
+
+        StagingDatabaseCreator creator = new StagingDatabaseCreator(dbDTO, dbFile);
+        creator.start();
+        CURRENT_RUNS.put(dbName, creator);
+        return creator;
+    }
+
+    /**
+     * @param importStatus
+     * @throws DAOException
+     *
+     */
+    private void updateImportStatus(ImportStatus importStatus) {
+        try {
+            getDao().updateImportStatus(dbDTO.getId(), importStatus);
+        } catch (DAOException e) {
+            LOGGER.error("Failed to update import status of database " + dbDTO.getName(), e);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    private StagingDatabaseDAO getDao() {
+        if (dao == null) {
+            dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
+        }
+        return dao;
     }
 }

@@ -1,11 +1,11 @@
-package eionet.cr.staging.msaccess;
+package eionet.cr.staging.imp;
 
 /**
  *
  * @author jaanus
  *
  */
-public class ConversionException extends Exception {
+public class ImportException extends Exception {
 
     /**
      *
@@ -15,7 +15,7 @@ public class ConversionException extends Exception {
     /**
      *
      */
-    public ConversionException(){
+    public ImportException(){
         super();
     }
 
@@ -23,7 +23,7 @@ public class ConversionException extends Exception {
      *
      * @param message
      */
-    public ConversionException(String message){
+    public ImportException(String message){
         super(message);
     }
 
@@ -31,7 +31,7 @@ public class ConversionException extends Exception {
      *
      * @param throwable
      */
-    public ConversionException(Throwable throwable){
+    public ImportException(Throwable throwable){
         super(throwable);
     }
 
@@ -40,7 +40,7 @@ public class ConversionException extends Exception {
      * @param message
      * @param throwable
      */
-    public ConversionException(String message, Throwable throwable){
+    public ImportException(String message, Throwable throwable){
         super(message, throwable);
     }
 }

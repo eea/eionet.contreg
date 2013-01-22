@@ -21,8 +21,9 @@
 
 package eionet.cr.web.action.admin.staging;
 
+import java.io.File;
+
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -36,6 +37,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.FileDownloader;
 import eionet.cr.staging.StagingDatabaseCreator;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
@@ -61,11 +63,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     private StagingDatabaseDTO database;
 
     /** */
+    private String fileName;
     private String dbName;
     private String dbDescription;
-
-    /** */
-    private FileBean dbFile;
+    private File file;
 
     /**
      * The bean's default event handler method.
@@ -84,26 +85,27 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      */
     public Resolution add() throws DAOException {
 
-        if (getContext().getRequest().getMethod().equalsIgnoreCase("GET")){
+        LOGGER.debug("file: " + file);
+
+        if (getContext().getRequest().getMethod().equalsIgnoreCase("GET")) {
             return new ForwardResolution(ADD_STAGING_DATABASE_JSP);
         }
 
         LOGGER.debug("dbName: " + dbName);
         LOGGER.debug("dbDescription: " + dbDescription);
-        LOGGER.debug("dbFile: " + (dbFile == null ? null : dbFile.getFileName()));
 
         // Create the database record.
         StagingDatabaseDTO dto = new StagingDatabaseDTO();
         dto.setName(dbName);
         dto.setDescription(dbDescription);
         int id = DAOFactory.get().getDao(StagingDatabaseDAO.class).createRecord(dto, getUserName());
+        dto.setId(id);
         LOGGER.debug("New staging database record created, id = " + id);
 
         // Create the database in DBMS and populate it from the uploaded file.
-        StagingDatabaseCreator creator = new StagingDatabaseCreator(dto, dbFile);
-        creator.start();
+        StagingDatabaseCreator.start(dto, file);
 
-        addSystemMessage("Database created and import started in the background! Go to monitoring from operations menu.");
+        addSystemMessage("Database created and import started in the background!");
         return new RedirectResolution(StagingDatabasesActionBean.class);
     }
 
@@ -151,45 +153,39 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the dbFile
-     */
-    public FileBean getDbFile() {
-        return dbFile;
-    }
-
-    /**
-     * @param dbFile the dbFile to set
-     */
-    public void setDbFile(FileBean dbFile) {
-        this.dbFile = dbFile;
-    }
-
-    /**
-     * Validate POST request on "add" event.
+     * Validate request on "add" event.
+     *
+     * @throws DAOException
      */
     @ValidationMethod(on = {"add"})
-    public void validateAdd() {
+    public void validateAdd() throws DAOException {
 
-        // If no POST request, nothing to validate.
-        if (getContext().getRequest().getMethod().equalsIgnoreCase("GET")) {
-            return;
+        if (StringUtils.isBlank(fileName)) {
+            addGlobalValidationError("No file name supplied!");
+        } else {
+            file = new File(FileDownloader.FILES_DIR, fileName);
+            if (!file.exists()) {
+                addGlobalValidationError("No such file found in available files: " + fileName);
+            }
         }
 
-        if (dbFile == null) {
-            addGlobalValidationError("No file supplied!");
-        }
+        // Validations for POST method only.
+        if (getContext().getRequest().getMethod().equalsIgnoreCase("POST")) {
 
-        if (StringUtils.isBlank(dbName)) {
-            addGlobalValidationError("Name must not be blank!");
+            if (StringUtils.isBlank(dbName)) {
+                addGlobalValidationError("Database name must not be blank!");
+            } else if (DAOFactory.get().getDao(StagingDatabaseDAO.class).exists(dbName)) {
+                addGlobalValidationError("A database with this name already exists: " + dbName);
+            }
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(ADD_STAGING_DATABASE_JSP));
     }
 
     /**
-     * Validates the the user is authorised for any operations on this action bean.
-     * If user not authorised, redirects to the {@link AdminWelcomeActionBean} which displays a proper error message.
-     * Will be run on any events, since no specific events specified in the {@link ValidationMethod} annotation.
+     * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
+     * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events, since no specific events
+     * specified in the {@link ValidationMethod} annotation.
      */
     @ValidationMethod(priority = 1)
     public void validateUserAuthorised() {
@@ -198,5 +194,35 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
             addGlobalValidationError("You are not authorized for this operation!");
             getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
         }
+    }
+
+    /**
+     * @param fileName the fileName to set
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    /**
+     * @return the fileName
+     */
+    public String getFileName() {
+        return fileName;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public long getFileSize() {
+        return file == null ? 0L : file.length();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getSuggestedDbName() {
+        return StringUtils.isBlank(fileName) ? "" : StringUtils.substringBefore(fileName, ".");
     }
 }
