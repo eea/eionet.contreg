@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.imp.ImportStatus;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
@@ -46,7 +47,7 @@ public class StagingDatabaseDTOReader extends SQLResultSetBaseReader<StagingData
         databaseDTO.setCreator(rs.getString("CREATOR"));
         databaseDTO.setCreated(rs.getTimestamp("CREATED"));
         databaseDTO.setDescription(rs.getString("DESCRIPTION"));
-        databaseDTO.setImportStatus(rs.getString("IMPORT_STATUS"));
+        databaseDTO.setImportStatus(Enum.valueOf(ImportStatus.class, rs.getString("IMPORT_STATUS")));
         databaseDTO.setImportLog(rs.getString("IMPORT_LOG"));
 
         resultList.add(databaseDTO);

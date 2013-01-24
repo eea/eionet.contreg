@@ -65,6 +65,12 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
             "insert into STAGING_DB (NAME,CREATOR,CREATED,DESCRIPTION,IMPORT_STATUS,IMPORT_LOG) values (?,?,?,?,?,?)";
 
     /** */
+    private static final String GET_DATABASE_BY_ID_SQL = "select * from STAGING_DB where DATABASE_ID=?";
+
+    /** */
+    private static final String GET_DATABASE_BY_NAME_SQL = "select * from STAGING_DB where NAME=?";
+
+    /** */
     private static final String UPDATE_IMPORT_STATUS_SQL = "update STAGING_DB set IMPORT_STATUS=? where DATABASE_ID=?";
 
     /** */
@@ -123,6 +129,34 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         } finally {
             SQLUtil.close(conn);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getDatabaseById(int)
+     */
+    @Override
+    public StagingDatabaseDTO getDatabaseById(int id) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(id);
+        List<StagingDatabaseDTO> list = executeSQL(GET_DATABASE_BY_ID_SQL, params, new StagingDatabaseDTOReader());
+        return list == null || list.isEmpty() ? null : list.iterator().next();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getDatabaseByName(java.lang.String)
+     */
+    @Override
+    public StagingDatabaseDTO getDatabaseByName(String name) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(name);
+        List<StagingDatabaseDTO> list = executeSQL(GET_DATABASE_BY_NAME_SQL, params, new StagingDatabaseDTOReader());
+        return list == null || list.isEmpty() ? null : list.iterator().next();
     }
 
     /*
@@ -322,8 +356,7 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
                 } else {
                     return null;
                 }
-            }
-            else{
+            } else {
                 return null;
             }
 

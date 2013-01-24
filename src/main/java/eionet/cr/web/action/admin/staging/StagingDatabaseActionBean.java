@@ -28,6 +28,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
@@ -51,7 +52,7 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 public class StagingDatabaseActionBean extends AbstractActionBean {
 
     /** */
-    private static final String STAGING_DATABASE_JSP = "/pages/admin/staging/database.jsp";
+    private static final String VIEW_STAGING_DATABASE_JSP = "/pages/admin/staging/viewDatabase.jsp";
 
     /** */
     private static final String ADD_STAGING_DATABASE_JSP = "/pages/admin/staging/addDatabase.jsp";
@@ -63,19 +64,35 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     private StagingDatabaseDTO database;
 
     /** */
+    private int dbId;
     private String fileName;
     private String dbName;
     private String dbDescription;
     private File file;
 
+    /** */
+    private StagingDatabaseDTO dbDTO;
+
     /**
      * The bean's default event handler method.
      *
      * @return Resolution to go to.
+     * @throws DAOException
      */
     @DefaultHandler
-    public Resolution defaultHandler() {
-        return new ForwardResolution(STAGING_DATABASE_JSP);
+    public Resolution view() throws DAOException {
+
+        if (dbId > 0) {
+            dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseById(dbId);
+        } else if (!StringUtils.isBlank(dbName)) {
+            dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
+        }
+        else{
+            dbDTO = null;
+            addWarningMessage("Found no database by the given id or name!");
+        }
+
+        return new ForwardResolution(VIEW_STAGING_DATABASE_JSP);
     }
 
     /**
@@ -225,4 +242,28 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     public String getSuggestedDbName() {
         return StringUtils.isBlank(fileName) ? "" : StringUtils.substringBefore(fileName, ".");
     }
+
+    /**
+     * @return the dbDTO
+     */
+    public StagingDatabaseDTO getDbDTO() {
+        return dbDTO;
+    }
+
+    /**
+     * @param dbId the dbId to set
+     */
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getStagingDatabasesActionBeanUrlBinding() {
+        AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
+        return resolver.getUrlBinding(StagingDatabasesActionBean.class);
+    }
+
 }

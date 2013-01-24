@@ -53,6 +53,24 @@ public interface StagingDatabaseDAO extends DAO {
     int createRecord(StagingDatabaseDTO databaseDTO, String userName) throws DAOException;
 
     /**
+     * Gets a staging database by the given id.
+     *
+     * @param id
+     * @return
+     * @throws DAOException
+     */
+    StagingDatabaseDTO getDatabaseById(int id) throws DAOException;
+
+    /**
+     * Gets a staging database by the given name.
+     *
+     * @param name
+     * @return
+     * @throws DAOException
+     */
+    StagingDatabaseDTO getDatabaseByName(String name) throws DAOException;
+
+    /**
      *
      * @param databaseId
      * @param importStatus

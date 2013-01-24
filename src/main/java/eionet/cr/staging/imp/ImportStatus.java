@@ -55,4 +55,12 @@ public enum ImportStatus {
     public String toString() {
         return friendlyName;
     }
+
+    /**
+     *
+     * @return
+     */
+    public String getName() {
+        return name();
+    }
 }

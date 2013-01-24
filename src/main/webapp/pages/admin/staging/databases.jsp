@@ -11,7 +11,7 @@
                 $(document).ready(
                     function(){
 
-                    	// onClick handler for links that open database import log popups
+                        // onClick handler for links that open database import log popups
                         $("[id^=importLogLink]").click(function() {
                             $('#importLogDialog').dialog('open');
                             $('#importLogDialog').append('<img src="${pageContext.request.contextPath}/images/wait.gif" alt="Wait clock"/>');
@@ -59,7 +59,8 @@
                     <c:if test="${not empty actionBean.databases}">
                         <br/>
                         If a database's import has been started, the "Import status" column is clickable and opens the import log.<br/>
-                        Refresh this page to monitor progress.
+                        Refresh this page to monitor the import progress of listed databases.<br/>
+                        Once a database's import is complete, it becomes clickable and leads to a detailed view page with further operations available.
                     </c:if>
                 </p>
         </div>
@@ -75,16 +76,28 @@
                         <display:column style="width:5%">
                             <stripes:checkbox name="dbNames" value="${database.name}" />
                         </display:column>
-                        <display:column property="name" title="Name" sortable="true" style="width:30%"/>
+                        <display:column title="Name" sortable="true" sortProperty="name" style="width:30%">
+                            <c:choose>
+                                <c:when test="${database.importStatus.name == 'COMPLETED' || database.importStatus.name == 'COMPLETED_WARNINGS'}">
+                                    <stripes:link beanclass="${actionBean.databaseActionBeanClass}">
+                                        <c:out value="${database.name}"/>
+                                        <stripes:param name="dbName" value="${database.name}"/>
+                                    </stripes:link>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:out value="${database.name}"/>
+                                </c:otherwise>
+                            </c:choose>
+                        </display:column>
                         <display:column property="creator" title="Creator" sortable="true" style="width:20%"/>
                         <display:column title="Import status" sortable="true" sortProperty="importStatus" style="width:25%">
                             <c:choose>
-                                <c:when test="${database.importStatus == 'NOT_STARTED'}">
+                                <c:when test="${database.importStatus.name == 'NOT_STARTED'}">
                                    <c:out value="${actionBean.importStatuses[database.importStatus]}"/>
                                 </c:when>
                                 <c:otherwise>
                                     <stripes:link id="importLogLink_${database.id}" href="${actionBean.urlBinding}" event="openLog" title="View the import log">
-                                        <c:out value="${actionBean.importStatuses[database.importStatus]}"/>
+                                        <c:out value="${database.importStatus}"/>
                                         <stripes:param name="databaseId" value="${database.id}"/>
                                     </stripes:link>
                                 </c:otherwise>
@@ -100,6 +113,8 @@
 
                 </stripes:form>
             </div>
+
+            <%-- The div that is invisible by default, but will be displayed and filled once the "open import log" operation is invoked. --%>
             <div id="importLogDialog" title="Import log"></div>
         </c:if>
 

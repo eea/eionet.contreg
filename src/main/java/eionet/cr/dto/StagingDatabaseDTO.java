@@ -25,6 +25,8 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import eionet.cr.staging.imp.ImportStatus;
+
 /**
  * The DTO object representing a staging database.
  *
@@ -38,7 +40,7 @@ public class StagingDatabaseDTO {
     private String creator;
     private Date created;
     private String description;
-    private String importStatus;
+    private ImportStatus importStatus;
     private String importLog;
 
     /**
@@ -124,14 +126,14 @@ public class StagingDatabaseDTO {
     /**
      * @return the importStatus
      */
-    public String getImportStatus() {
+    public ImportStatus getImportStatus() {
         return importStatus;
     }
 
     /**
      * @param importStatus the importStatus to set
      */
-    public void setImportStatus(String importStatus) {
+    public void setImportStatus(ImportStatus importStatus) {
         this.importStatus = importStatus;
     }
 
