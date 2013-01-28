@@ -21,10 +21,11 @@
 
 package eionet.cr.staging.exp;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * Type definition ...
+ * A bean that represents an RDF export query's configuration (in the context of staging databases).
  *
  * @author jaanus
  */
@@ -37,7 +38,7 @@ public class QueryConfiguration {
     /**  */
     private String objectIdTemplate;
     /**  */
-    private HashMap<String, PropertyConfiguration> fieldMappings = new HashMap<String, PropertyConfiguration>();
+    private LinkedHashMap<String, PropertyConfiguration> columnMappings = new LinkedHashMap<String, PropertyConfiguration>();
     /**  */
     private String targetGraph;
 
@@ -84,17 +85,10 @@ public class QueryConfiguration {
     }
 
     /**
-     * @return the fieldMappings
+     * @return the columnMappings
      */
-    public HashMap<String, PropertyConfiguration> getFieldMappings() {
-        return fieldMappings;
-    }
-
-    /**
-     * @param fieldMappings the fieldMappings to set
-     */
-    public void setFieldMappings(HashMap<String, PropertyConfiguration> fieldMappings) {
-        this.fieldMappings = fieldMappings;
+    public Map<String, PropertyConfiguration> getColumnMappings() {
+        return columnMappings;
     }
 
     /**
@@ -109,5 +103,25 @@ public class QueryConfiguration {
      */
     public void setTargetGraph(String targetGraph) {
         this.targetGraph = targetGraph;
+    }
+
+    /**
+     *
+     * @param columnName
+     * @param propertyConf
+     */
+    public void addColumnMapping(String columnName, PropertyConfiguration propertyConf) {
+        columnMappings.put(columnName, propertyConf);
+    }
+
+    /**
+     *
+     * @param columnNames
+     */
+    public void addColumnNames(Iterable<String> columnNames) {
+
+        for (String colName : columnNames) {
+            columnMappings.put(colName, null);
+        }
     }
 }

@@ -120,4 +120,14 @@ public interface StagingDatabaseDAO extends DAO {
      * @throws DAOException
      */
     public String getImportLog(int databaseId) throws DAOException;
+
+    /**
+     * Prepares the given SQL statement, and if it's a query statement, returns the list of selected column names. Otherwise the
+     * list is empty.
+     *
+     * @param sql The given SQL statement.
+     * @return List of selected columns. It is empty if the statement is not a select query.
+     * @throws DAOException In case any sort of database access error happens.
+     */
+    public List<String> prepareStatement(String sql) throws DAOException;
 }

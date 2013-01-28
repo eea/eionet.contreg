@@ -261,16 +261,20 @@ public final class SQLUtil {
     public static PreparedStatement prepareStatement(String parameterizedSQL, List<?> values, Connection conn) throws SQLException {
 
         PreparedStatement pstmt = conn.prepareStatement(parameterizedSQL);
-        for (int i = 0; values != null && i < values.size(); i++) {
-            Object val = values.get(i);
-            if (val == null) {
-                pstmt.setNull(i + 1, Types.NULL);
-            } else if (val instanceof String) {
-                pstmt.setString(i + 1, (String) val);
-            } else {
-                pstmt.setObject(i + 1, val);
+        if (values != null && !values.isEmpty()) {
+            int valueCount = values.size();
+            for (int i = 0; i < valueCount; i++) {
+                Object val = values.get(i);
+                if (val == null) {
+                    pstmt.setNull(i + 1, Types.NULL);
+                } else if (val instanceof String) {
+                    pstmt.setString(i + 1, (String) val);
+                } else {
+                    pstmt.setObject(i + 1, val);
+                }
             }
         }
+
         return pstmt;
     }
 

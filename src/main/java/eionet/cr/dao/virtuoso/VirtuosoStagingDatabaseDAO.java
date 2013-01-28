@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -365,5 +367,39 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         } finally {
             SQLUtil.close(conn);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#prepareStatement(java.lang.String)
+     */
+    @Override
+    public List<String> prepareStatement(String sql) throws DAOException {
+
+        if (StringUtils.isBlank(sql)){
+            throw new IllegalArgumentException("The given SQL statement must not be blank!");
+        }
+
+        ArrayList<String> result = new ArrayList<String>();
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = SQLUtil.prepareStatement(sql, null, conn);
+            ResultSetMetaData metaData = pstmt.getMetaData();
+            int colCount = metaData.getColumnCount();
+            for (int i = 1; i <= colCount; i++) {
+                String colName = metaData.getColumnName(i);
+                result.add(colName);
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(pstmt);
+            SQLUtil.close(conn);
+        }
+
+        return result;
     }
 }

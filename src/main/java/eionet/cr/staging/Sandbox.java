@@ -171,9 +171,11 @@ public class Sandbox {
         PreparedStatement pstmt = null;
         try {
             conn = getConnection();
-            pstmt = conn.prepareStatement("select top(50) concat(IdYear,IdCountry,IdVariable) as id, DataWithAggregates.IdBrkDwn, IdUnit as Unit from ENT2.cr3user.DataWithAggregates");
+            //pstmt = conn.prepareStatement("select top(50) concat(IdYear,IdCountry,IdVariable) as id, DataWithAggregates.IdBrkDwn, IdUnit as Unit from ENT2.cr3user.DataWithAggregates");
+            pstmt = conn.prepareStatement("update ENT2.cr3user.DataWithAggregates set IdBrkDwn=IdBrkDwn where IdBrkDwn < 0");
             ResultSetMetaData metaData = pstmt.getMetaData();
             int colCount = metaData.getColumnCount();
+            System.out.println("colCount = " + colCount);
             for (int i = 1; i <= colCount; i++) {
                 String label = metaData.getColumnLabel(i);
                 String name = metaData.getColumnName(i);
