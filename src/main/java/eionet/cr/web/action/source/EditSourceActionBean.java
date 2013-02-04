@@ -237,7 +237,7 @@ public class EditSourceActionBean extends AbstractActionBean {
      */
     private void manageRuleset(String url) throws DAOException {
 
-        if (GeneralConfig.isUseInferencing()){
+        if (GeneralConfig.isUseInferencing()) {
             boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
             if (schemaSource && !isAlreadyInRuleset) {
                 factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);

@@ -32,15 +32,13 @@ public enum ImportStatus {
     NOT_STARTED("Started"), STARTED("Started"), ERROR("Error"), COMPLETED("Completed"), COMPLETED_WARNINGS(
             "Completed with warnings");
 
-    /**
-     *
-     */
+    /** */
     private String friendlyName;
 
     /**
      * The constructor that takes friendly name as the input.
      *
-     * @param friendlyName
+     * @param friendlyName the friendly name
      */
     private ImportStatus(String friendlyName) {
         this.friendlyName = friendlyName;
@@ -57,8 +55,9 @@ public enum ImportStatus {
     }
 
     /**
+     * Gets the name.
      *
-     * @return
+     * @return the name
      */
     public String getName() {
         return name();

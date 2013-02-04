@@ -41,7 +41,7 @@
                            <stripes:label for="txtDescription" class="question">Description:</stripes:label>
                         </td>
                         <td>
-                           <stripes:textarea name="dbDescription" cols="80" rows="5"/>
+                           <stripes:textarea id="txtDescription" name="dbDescription" cols="80" rows="5"/>
                         </td>
                     </tr>
                     <tr>

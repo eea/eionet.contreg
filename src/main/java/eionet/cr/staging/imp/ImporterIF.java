@@ -34,8 +34,9 @@ public interface ImporterIF {
     /**
      * Imports a staging database from the given file into a real DBMS database by the given name.
      *
-     * @param file
-     * @param dbName
+     * @param file the file
+     * @param dbName the db name
+     * @throws ImportException the import exception
      */
     void doImport(File file, String dbName) throws ImportException;
 }

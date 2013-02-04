@@ -47,8 +47,9 @@
                 <li><a href="#">Operations</a>
                     <ul>
                         <li>
-                            <stripes:link beanclass="${actionBean.class.name}" title="Run RDF export from this database">
+                            <stripes:link beanclass="${actionBean.exportRDFActionBeanClass.name}" title="Run RDF export from this database">
                                 <c:out value="Export RDF"/>
+                                <stripes:param name="dbName" value="${actionBean.dbDTO.name}"/>
                             </stripes:link>
                         </li>
                         <li>

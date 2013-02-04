@@ -209,10 +209,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
             // Update source last modified date
             DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                            ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+            .get()
+            .getDao(HarvestSourceDAO.class)
+            .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                    ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
             success = true;
         } catch (Exception e) {
@@ -285,10 +285,10 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
 
         // Update source last modified date
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .insertUpdateSourceMetadata(uri, Predicates.CR_LAST_MODIFIED,
+                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
         // Update HARVESTED STATEMENTS
         DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(uri);

@@ -41,7 +41,7 @@ import eionet.cr.staging.imp.msaccess.MSAccessImporter;
  *
  * @author jaanus
  */
-public class StagingDatabaseCreator extends Thread {
+public final class StagingDatabaseCreator extends Thread {
 
     /** */
     private static final HashMap<String, StagingDatabaseCreator> CURRENT_RUNS = new HashMap<String, StagingDatabaseCreator>();
@@ -51,6 +51,8 @@ public class StagingDatabaseCreator extends Thread {
 
     /** */
     private StagingDatabaseDTO dbDTO;
+
+    /** */
     private File dbFile;
 
     /** */
@@ -59,8 +61,8 @@ public class StagingDatabaseCreator extends Thread {
     /**
      * Constructs a {@link StagingDatabaseCreator} for the given database DTO and DB file.
      *
-     * @param dbDTO
-     * @param dbFile
+     * @param dbDTO The given database DTO.
+     * @param dbFile The given file from where the database should be cerated.
      */
     private StagingDatabaseCreator(StagingDatabaseDTO dbDTO, File dbFile) {
 
@@ -91,10 +93,11 @@ public class StagingDatabaseCreator extends Thread {
     }
 
     /**
+     * The thread's execution body called by {@link #run()}.
      *
-     * @param importLogger
-     * @throws DAOException
-     * @throws ImportException
+     * @param importLogger Logger that should be used by this database creation (i.e. import) thread.
+     * @throws DAOException Thrown if database access error happens.
+     * @throws ImportException If any other import error happens.
      */
     private void execute(ImportLoggerImpl importLogger) throws DAOException, ImportException {
 
@@ -115,10 +118,11 @@ public class StagingDatabaseCreator extends Thread {
     }
 
     /**
-     *
-     * @param dbDTO
-     * @param dbFile
-     * @return
+     * Convenience method that creates an instance of {@link StagingDatabaseCreator} for the given database from given file, and
+     * then starts it.
+     * @param dbDTO Will be passed into the private constructor.
+     * @param dbFile Will be passed into the private constructor
+     * @return The created and started thread.
      */
     public static synchronized StagingDatabaseCreator start(StagingDatabaseDTO dbDTO, File dbFile) {
 
@@ -139,8 +143,9 @@ public class StagingDatabaseCreator extends Thread {
     }
 
     /**
-     * @param importStatus
-     * @throws DAOException
+     * Updates this import's status in the database.
+     * @param importStatus The status to update to.
+     * @throws DAOException If a database access error happens.
      *
      */
     private void updateImportStatus(ImportStatus importStatus) {
@@ -152,8 +157,8 @@ public class StagingDatabaseCreator extends Thread {
     }
 
     /**
-     *
-     * @return
+     * Lazy getter for the {@link StagingDatabaseDAO} that this thread should use.
+     * @return The DAO.
      */
     private StagingDatabaseDAO getDao() {
         if (dao == null) {

@@ -68,6 +68,7 @@ public class XmlRpcServices implements Services {
      *
      * @see eionet.cr.api.xmlrpc.Services#getResourcesSinceTimestamp(java.util.Date)
      */
+    @Override
     public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 
         if (logger.isInfoEnabled()) {
@@ -111,10 +112,11 @@ public class XmlRpcServices implements Services {
                     }
                 } catch (Throwable t) {
                     t.printStackTrace();
-                    if (t instanceof CRException)
+                    if (t instanceof CRException) {
                         throw (CRException) t;
-                    else
+                    } else {
                         throw new CRException(t.toString(), t);
+                    }
                 }
 
             }
@@ -128,23 +130,26 @@ public class XmlRpcServices implements Services {
      *
      * @see eionet.cr.api.xmlrpc.Services#dataflowSearch(java.util.Map)
      */
+    @Override
     public List dataflowSearch(Map<String, String> criteria) throws CRException {
 
         if (logger.isInfoEnabled()) {
             logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
-        if (criteria == null)
+        if (criteria == null) {
             criteria = new HashMap<String, String>();
+        }
 
-        if (!criteria.containsKey(Predicates.RDF_TYPE))
+        if (!criteria.containsKey(Predicates.RDF_TYPE)) {
             criteria.put(Predicates.RDF_TYPE, Subjects.ROD_DELIVERY_CLASS);
+        }
 
         List<DataflowResultDto> result = new ArrayList<DataflowResultDto>();
         try {
             SearchResultDTO<SubjectDTO> searchResult =
                     DAOFactory.get().getDao(SearchDAO.class)
-                            .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, false);
+                    .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, false);
 
             String[] strArray = {};
             Collection<SubjectDTO> subjects = searchResult.getItems();
@@ -167,10 +172,11 @@ public class XmlRpcServices implements Services {
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            if (t instanceof CRException)
+            if (t instanceof CRException) {
                 throw (CRException) t;
-            else
+            } else {
                 throw new CRException(t.toString(), t);
+            }
         }
 
         return result;
@@ -181,6 +187,7 @@ public class XmlRpcServices implements Services {
      *
      * @see eionet.cr.api.xmlrpc.Services#pushContent(java.lang.String)
      */
+    @Override
     public String pushContent(String content, String sourceUrl) throws CRException {
 
         if (logger.isInfoEnabled()) {
@@ -188,14 +195,15 @@ public class XmlRpcServices implements Services {
         }
 
         if (content != null && content.trim().length() > 0) {
-            if (StringUtils.isBlank(sourceUrl))
+            if (StringUtils.isBlank(sourceUrl)) {
                 throw new CRException("Missing source URL!");
-            else if (!URLUtil.isURL(sourceUrl))
+            } else if (!URLUtil.isURL(sourceUrl)) {
                 throw new CRException("Invalid source URL!");
-            else if (sourceUrl.indexOf("#") >= 0)
+            } else if (sourceUrl.indexOf("#") >= 0) {
                 throw new CRException("Source URL must not contain a fragment part!");
-            else
+            } else {
                 UrgentHarvestQueue.addPushHarvest(content, sourceUrl);
+            }
         }
 
         return OK_RETURN_STRING;
@@ -219,6 +227,7 @@ public class XmlRpcServices implements Services {
      * <code>java.util.Vector</code>. They keys represent URIs of the resource's attributes and the value-vectors represent values
      * of attributes. These values are of type <code>java.lang.String</code>.
      */
+    @Override
     public Vector getEntries(Hashtable criteria) throws CRException {
 
         if (logger.isInfoEnabled()) {
@@ -229,7 +238,7 @@ public class XmlRpcServices implements Services {
         try {
             SearchResultDTO<SubjectDTO> searchResult =
                     DAOFactory.get().getDao(SearchDAO.class)
-                            .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, true);
+                    .searchByFilters(criteria, false, PagingRequest.create(1, MAX_RESULTS), null, null, true);
             Collection<SubjectDTO> subjects = searchResult.getItems();
             if (subjects != null) {
                 for (Iterator<SubjectDTO> iter = subjects.iterator(); iter.hasNext();) {
@@ -252,10 +261,11 @@ public class XmlRpcServices implements Services {
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            if (t instanceof CRException)
+            if (t instanceof CRException) {
                 throw (CRException) t;
-            else
+            } else {
                 throw new CRException(t.toString(), t);
+            }
         }
 
         return result;
@@ -266,6 +276,7 @@ public class XmlRpcServices implements Services {
      *
      * @see eionet.cr.api.xmlrpc.Services#getDeliveries(java.lang.Integer, java.lang.Integer, java.lang.Integer)
      */
+    @Override
     public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException {
 
         if (logger.isInfoEnabled()) {
@@ -282,10 +293,11 @@ public class XmlRpcServices implements Services {
             result = DAOFactory.get().getDao(SearchDAO.class).searchDeliveriesForROD(PagingRequest.create(pageNum, pageSize));
         } catch (Throwable t) {
             t.printStackTrace();
-            if (t instanceof CRException)
+            if (t instanceof CRException) {
                 throw (CRException) t;
-            else
+            } else {
                 throw new CRException(t.toString(), t);
+            }
         }
 
         return result;
@@ -330,8 +342,9 @@ public class XmlRpcServices implements Services {
      */
     private static String[] toStringArray(Collection<ObjectDTO> objects) {
 
-        if (objects == null)
+        if (objects == null) {
             return new String[0];
+        }
 
         int i = 0;
         String[] result = new String[objects.size()];
@@ -347,6 +360,7 @@ public class XmlRpcServices implements Services {
      *
      * @see eionet.cr.api.xmlrpc.Services#getXmlFilesBySchema(java.lang.String)
      */
+    @Override
     public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
 
         if (logger.isInfoEnabled()) {
@@ -355,7 +369,6 @@ public class XmlRpcServices implements Services {
 
         Vector result = new Vector();
         try {
-            List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
             if (!StringUtils.isBlank(schemaIdentifier)) {
 
                 SearchDAO searchDao = DAOFactory.get().getDao(SearchDAO.class);
@@ -369,9 +382,8 @@ public class XmlRpcServices implements Services {
                 logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema(" + schemaIdentifier + "), " + subjectCount
                         + " subjects found in total");
 
-                subjects = searchResult.getItems();
-
-                if (subjects != null) {
+                List<SubjectDTO>  subjects = searchResult.getItems();
+                if (subjects != null && !subjects.isEmpty()) {
                     for (SubjectDTO subjectDTO : subjects) {
 
                         String lastModif = subjectDTO.getObjectValue(Predicates.CR_LAST_MODIFIED);
@@ -384,10 +396,11 @@ public class XmlRpcServices implements Services {
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            if (t instanceof CRException)
+            if (t instanceof CRException) {
                 throw (CRException) t;
-            else
+            } else {
                 throw new CRException(t.toString(), t);
+            }
         }
 
         return result;

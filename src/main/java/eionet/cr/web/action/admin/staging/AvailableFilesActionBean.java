@@ -42,13 +42,16 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.staging.AvailableFile;
 import eionet.cr.staging.FileDownloader;
+import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
+// TODO: Auto-generated Javadoc
 /**
  * Action bean that lists files available for the creation of staging databases, and provides other actions on these files as well.
  *
@@ -56,6 +59,9 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
  */
 @UrlBinding("/admin/availFiles.action")
 public class AvailableFilesActionBean extends AbstractActionBean {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(AvailableFilesActionBean.class);
 
     /** */
     private static final String LIST_JSP = "/pages/admin/staging/availableFiles.jsp";
@@ -79,8 +85,9 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     private List<String> fileNames;
 
     /**
+     * List.
      *
-     * @return
+     * @return the resolution
      */
     @DefaultHandler
     public Resolution list() {
@@ -95,9 +102,10 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Upload.
      *
-     * @return
-     * @throws IOException
+     * @return the resolution
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public Resolution upload() throws IOException {
 
@@ -109,8 +117,9 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Download.
      *
-     * @return
+     * @return the resolution
      */
     public Resolution download() {
 
@@ -121,8 +130,9 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Delete.
      *
-     * @return
+     * @return the resolution
      */
     public Resolution delete() {
 
@@ -130,17 +140,19 @@ public class AvailableFilesActionBean extends AbstractActionBean {
 
             int noOfFilesBefore = FileDownloader.FILES_DIR.listFiles().length;
             for (String fileName : fileNames) {
-                new File(FileDownloader.FILES_DIR, fileName).delete();
+                File file = new File(FileDownloader.FILES_DIR, fileName);
+                boolean success = file.delete();
+                if (success == false) {
+                    FileDeletionJob.register(file);
+                }
             }
 
             if (FileDownloader.FILES_DIR.listFiles().length != noOfFilesBefore - fileNames.size()) {
                 addWarningMessage("Failed to delete some of the files!");
-            }
-            else{
+            } else {
                 addSystemMessage("Files successfully deleted!");
             }
-        }
-        else{
+        } else {
             addCautionMessage("No files selected!");
         }
 
@@ -151,7 +163,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      * Validate "upload" event.
      */
     @ValidationMethod(on = {"upload"})
-    public void validateUpload(){
+    public void validateUpload() {
 
         // Check the user-supplied new file name is valid.
         if (StringUtils.isNotBlank(newFileName)) {
@@ -168,10 +180,10 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      * Validate "download" event.
      */
     @ValidationMethod(on = {"download"})
-    public void validateDownload(){
+    public void validateDownload() {
 
         // Check the URL is valid.
-        if (!URLUtil.isURL(downloadUrl)){
+        if (!URLUtil.isURL(downloadUrl)) {
             addGlobalValidationError("You supplied an invalid URL!");
         }
 
@@ -198,7 +210,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public String getDownloadingSuffix(){
+    public String getDownloadingSuffix() {
         return FileDownloader.FILE_SUFFIX;
     }
 
@@ -206,7 +218,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getStagingDatabaseActionBeanClass(){
+    public Class getStagingDatabaseActionBeanClass() {
         return StagingDatabaseActionBean.class;
     }
 
@@ -214,7 +226,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getStagingDatabasesActionBeanClass(){
+    public Class getStagingDatabasesActionBeanClass() {
         return StagingDatabasesActionBean.class;
     }
 
@@ -247,9 +259,9 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
-     * Validates the the user is authorised for any operations on this action bean.
-     * If user not authorised, redirects to the {@link AdminWelcomeActionBean} which displays a proper error message.
-     * Will be run on any events, since no specific events specified in the {@link ValidationMethod} annotation.
+     * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
+     * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events, since no specific events
+     * specified in the {@link ValidationMethod} annotation.
      */
     @ValidationMethod(priority = 1)
     public void validateUserAuthorised() {
@@ -264,7 +276,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
      * Initializations and other pre-actions that should be invoked prior to {@link LifecycleStage.BindingAndValidation}.
      */
     @Before(stages = {LifecycleStage.BindingAndValidation})
-    public void beforeBindingAndValidation(){
+    public void beforeBindingAndValidation() {
 
         FilterConfig stripesFilterConfig = StripesFilter.getConfiguration().getBootstrapPropertyResolver().getFilterConfig();
         maxFilePostSize = NumberUtils.toInt(stripesFilterConfig.getInitParameter("FileUpload.MaximumPostSize"));

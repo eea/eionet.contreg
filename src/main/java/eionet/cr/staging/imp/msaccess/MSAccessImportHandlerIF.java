@@ -17,17 +17,17 @@ public interface MSAccessImportHandlerIF extends ImportHandlerIF {
     /**
      * Handle start of new table.
      *
-     * @param table
-     * @throws ImportException
+     * @param table the table
+     * @throws ImportException the import exception
      */
     void newTable(Table table) throws ImportException;
 
     /**
      * Handle new row from the given table.
      *
-     * @param table
-     * @param row
-     * @throws ImportException
+     * @param table the table
+     * @param row the row
+     * @throws ImportException the import exception
      */
-    void processRow(Table table, Map<String,Object> row) throws ImportException;
+    void processRow(Table table, Map<String, Object> row) throws ImportException;
 }

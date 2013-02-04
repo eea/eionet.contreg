@@ -21,26 +21,38 @@
 
 package eionet.cr.staging.exp;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A bean that represents an RDF export query's configuration (in the context of staging databases).
  *
  * @author jaanus
  */
-public class QueryConfiguration {
+public class QueryConfiguration implements Serializable {
 
-    /**  */
+    /** The query. */
     private String query;
-    /**  */
-    private String objectsClass;
-    /**  */
+
+    /** The object type uri. */
+    private String objectTypeUri;
+
+    /** The column mappings. */
+    private LinkedHashMap<String, ObjectProperty> columnMappings = new LinkedHashMap<String, ObjectProperty>();
+
+    /** The object id template. */
     private String objectIdTemplate;
-    /**  */
-    private LinkedHashMap<String, PropertyConfiguration> columnMappings = new LinkedHashMap<String, PropertyConfiguration>();
-    /**  */
-    private String targetGraph;
+
+    /** The object id namespace. */
+    private String objectIdNamespace;
+
+    /** The dataset column. */
+    private String datasetColumn;
+
+    /** The dataset namespace. */
+    private String datasetNamespace;
 
     /**
      * @return the query
@@ -57,17 +69,17 @@ public class QueryConfiguration {
     }
 
     /**
-     * @return the objectsClass
+     * @return the objectTypeUri
      */
-    public String getObjectsClass() {
-        return objectsClass;
+    public String getObjectTypeUri() {
+        return objectTypeUri;
     }
 
     /**
-     * @param objectsClass the objectsClass to set
+     * @param objectTypeUri the objectTypeUri to set
      */
-    public void setObjectsClass(String objectsClass) {
-        this.objectsClass = objectsClass;
+    public void setObjectTypeUri(String objectTypeUri) {
+        this.objectTypeUri = objectTypeUri;
     }
 
     /**
@@ -87,41 +99,104 @@ public class QueryConfiguration {
     /**
      * @return the columnMappings
      */
-    public Map<String, PropertyConfiguration> getColumnMappings() {
+    public Map<String, ObjectProperty> getColumnMappings() {
         return columnMappings;
     }
 
     /**
-     * @return the targetGraph
-     */
-    public String getTargetGraph() {
-        return targetGraph;
-    }
-
-    /**
-     * @param targetGraph the targetGraph to set
-     */
-    public void setTargetGraph(String targetGraph) {
-        this.targetGraph = targetGraph;
-    }
-
-    /**
+     * Put column mapping.
      *
-     * @param columnName
-     * @param propertyConf
+     * @param columnName the column name
+     * @param propertyConf the property conf
      */
-    public void addColumnMapping(String columnName, PropertyConfiguration propertyConf) {
+    public void putColumnMapping(String columnName, ObjectProperty propertyConf) {
         columnMappings.put(columnName, propertyConf);
     }
 
     /**
+     * Put column names.
      *
-     * @param columnNames
+     * @param columnNames the column names
      */
-    public void addColumnNames(Iterable<String> columnNames) {
+    public void putColumnNames(Iterable<String> columnNames) {
 
         for (String colName : columnNames) {
             columnMappings.put(colName, null);
+        }
+    }
+
+    /**
+     * @return the datasetColumn
+     */
+    public String getDatasetColumn() {
+        return datasetColumn;
+    }
+
+    /**
+     * @param datasetColumn the datasetColumn to set
+     */
+    public void setDatasetColumn(String datasetColumn) {
+        this.datasetColumn = datasetColumn;
+    }
+
+    /**
+     * Clear column mappings.
+     */
+    public void clearColumnMappings() {
+        this.columnMappings.clear();
+    }
+
+    /**
+     * @return the objectIdNamespace
+     */
+    public String getObjectIdNamespace() {
+        return objectIdNamespace;
+    }
+
+    /**
+     * @param objectIdNamespace the objectIdNamespace to set
+     */
+    public void setObjectIdNamespace(String objectIdNamespace) {
+        this.objectIdNamespace = objectIdNamespace;
+    }
+
+    /**
+     * @return the datasetNamespace
+     */
+    public String getDatasetNamespace() {
+        return datasetNamespace;
+    }
+
+    /**
+     * @param datasetNamespace the datasetNamespace to set
+     */
+    public void setDatasetNamespace(String datasetNamespace) {
+        this.datasetNamespace = datasetNamespace;
+    }
+
+    /**
+     * Sets the defaults.
+     */
+    public void setDefaults() {
+
+        if (objectTypeUri == null || objectTypeUri.isEmpty()) {
+            return;
+        }
+
+        ObjectType objectType = ObjectTypes.getByUri(objectTypeUri);
+        if (objectType != null) {
+
+            for (Entry<String, ObjectProperty> entry : columnMappings.entrySet()) {
+                String column = entry.getKey();
+                ObjectProperty defaultProperty = objectType.getDefaultProperty(column);
+                entry.setValue(defaultProperty);
+            }
+
+            objectIdTemplate = objectType.getIdTemplate();
+            datasetColumn = objectType.getDatasetColumn();
+
+            objectIdNamespace = objectType.getIdNamespace();
+            datasetNamespace = objectType.getDatasetNamespace();
         }
     }
 }

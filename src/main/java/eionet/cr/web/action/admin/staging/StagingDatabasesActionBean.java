@@ -181,7 +181,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     /**
      * Creates and returns a map of database import statuses. The keys are the status names, the values are their friendly names.
      */
-    private static final Map<String, String> createImportStatuses() {
+    private static Map<String, String> createImportStatuses() {
 
         HashMap<String, String> result = new HashMap<String, String>();
         ImportStatus[] importStatuses = ImportStatus.values();

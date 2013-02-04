@@ -19,10 +19,11 @@ import eionet.cr.staging.util.VirtuosoUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class VirtuosoHandler.
  *
  * @author jaanus
- *
  */
 public class VirtuosoHandler implements MSAccessImportHandlerIF {
 
@@ -57,7 +58,10 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
     private ImportLoggerImpl importLogger;
 
     /**
-     * @param dbName
+     * Instantiates a new virtuoso handler.
+     *
+     * @param dbName the db name
+     * @param importLogger the import logger
      */
     public VirtuosoHandler(String dbName, ImportLoggerImpl importLogger) {
 

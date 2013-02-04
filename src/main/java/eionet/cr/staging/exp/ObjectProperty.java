@@ -21,21 +21,46 @@
 
 package eionet.cr.staging.exp;
 
+import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+
+
 /**
- * Type definition ...
+ * An RDF property's metadata bean. Will be mapped to selected SQL columns at SQL-result-set-to-RDF export-
  *
  * @author jaanus
  */
-public class PropertyConfiguration {
+public class ObjectProperty {
+
+    /** */
+    private String label;
 
     /**  */
     private String predicate;
-    /**  */
-    private ValueType valueType;
-    /**  */
+
+    /** */
+    private Range range;
+
+    /** */
     private String valueTemplate;
-    /**  */
+
+    /** */
     private String dataType;
+
+    /** */
+    private URI predicateURI;
+
+    /**
+     * Class constructor.
+     * @param predicate The property's underlying predicate.
+     * @param label The property's label as it should be displayed to the users of staging databases functionality.
+     * @param range Indicates whether the property's values should be literals or resources.
+     */
+    public ObjectProperty(String predicate, String label, Range range) {
+        this.predicate = predicate;
+        this.label = label;
+        this.range = range;
+    }
 
     /**
      * @return the predicate
@@ -45,24 +70,10 @@ public class PropertyConfiguration {
     }
 
     /**
-     * @param predicate the predicate to set
+     * @return the range
      */
-    public void setPredicate(String predicate) {
-        this.predicate = predicate;
-    }
-
-    /**
-     * @return the valueType
-     */
-    public ValueType getValueType() {
-        return valueType;
-    }
-
-    /**
-     * @param valueType the valueType to set
-     */
-    public void setValueType(ValueType valueType) {
-        this.valueType = valueType;
+    public Range getRange() {
+        return range;
     }
 
     /**
@@ -94,25 +105,54 @@ public class PropertyConfiguration {
     }
 
     /**
+     * Returns true if the property's values are resources.
      *
-     * @return
+     * @return As said above.
      */
-    public boolean isResourceValueType() {
-        return ValueType.RESOURCE.equals(valueType);
+    public boolean isResourceRange() {
+        return Range.RESOURCE.equals(range);
     }
 
     /**
+     * Returns true if the property's values are literals.
      *
-     * @return
+     * @return As said above.
      */
-    public boolean isLiteralValueType() {
-        return ValueType.LITERAL.equals(valueType);
+    public boolean isLiteralRange() {
+        return Range.LITERAL.equals(range);
     }
 
     /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * Getter for {@link #predicateURI}.
+     *
+     * @return {@link #predicateURI}
+     */
+    protected URI getPredicateURI() {
+        return predicateURI;
+    }
+
+    /**
+     * Sets {@link #predicateURI} for the {@link #predicate}, using the given {@link ValueFactory}.
+     *
+     * @param The given {@link ValueFactory}.
+     */
+    protected void setPredicateURI(ValueFactory vf) {
+        this.predicateURI = vf.createURI(predicate);
+    }
+
+    /**
+     * Enumeration for indicating the value range of a given RDF property.
+     *
      * @author jaanus
      */
-    public static enum ValueType {
+    public static enum Range {
 
         /** */
         RESOURCE("Resource"), LITERAL("Literal");
@@ -121,9 +161,10 @@ public class PropertyConfiguration {
         private String friendlyName;
 
         /**
-         * @param friendlyName
+         * Constructor, allowing a friendly name.
+         * @param friendlyName The friendly name.
          */
-        private ValueType(String friendlyName) {
+        private Range(String friendlyName) {
             this.friendlyName = friendlyName;
         }
 

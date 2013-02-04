@@ -30,7 +30,7 @@ import eionet.cr.dao.util.VoidDatasetsResultRow;
  *
  * @author jaanus
  */
-public interface BrowseVoidDatasetsDAO extends DAO{
+public interface BrowseVoidDatasetsDAO extends DAO {
 
     /**
      * Returns a list of VoID datasets matching the given creators (http://purl.org/dc/terms/creator) and subjects

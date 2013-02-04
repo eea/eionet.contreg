@@ -15,10 +15,11 @@ import eionet.cr.staging.imp.ImportException;
 import eionet.cr.staging.util.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class MySQLHandler.
  *
  * @author jaanus
- *
  */
 public class MySQLHandler implements MSAccessImportHandlerIF {
 
@@ -44,8 +45,9 @@ public class MySQLHandler implements MSAccessImportHandlerIF {
     private int stmtCounter;
 
     /**
+     * Instantiates a new my sql handler.
      *
-     * @param conn
+     * @param conn the conn
      */
     public MySQLHandler(Connection conn) {
         this.conn = conn;

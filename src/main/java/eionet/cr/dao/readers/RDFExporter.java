@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.query.BindingSet;
@@ -26,6 +27,7 @@ import eionet.cr.util.YesNoBoolean;
 /**
  * @deprecated
  */
+@Deprecated
 public class RDFExporter extends ResultSetMixedReader {
 
     /** */
@@ -83,6 +85,7 @@ public class RDFExporter extends ResultSetMixedReader {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         long subjectHash = rs.getLong("subjecthash");
@@ -136,11 +139,7 @@ public class RDFExporter extends ResultSetMixedReader {
             outputString("\n</rdf:Description>");
         }
         outputString("\n\n</rdf:RDF>\n");
-        try {
-            output.close();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        IOUtils.closeQuietly(output);
     }
 
     /**

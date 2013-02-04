@@ -76,6 +76,17 @@ public final class SesameUtil {
 
     /**
      *
+     * @param dbName
+     * @return
+     * @throws SQLException
+     */
+    public static Connection getSQLConnection(String dbName) throws SQLException {
+
+        return SesameConnectionProvider.getSQLConnection(dbName);
+    }
+
+    /**
+     *
      * @param <T>
      * @param sparql
      * @param bindings

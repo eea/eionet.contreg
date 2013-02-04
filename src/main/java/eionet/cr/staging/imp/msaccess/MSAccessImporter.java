@@ -35,6 +35,7 @@ import eionet.cr.staging.imp.ImportException;
 import eionet.cr.staging.imp.ImportLoggerImpl;
 import eionet.cr.staging.imp.ImporterIF;
 
+// TODO: Auto-generated Javadoc
 /**
  * An implementation of {@link ImporterIF} that is capable of importing MS Access files.
  *
@@ -57,7 +58,7 @@ public class MSAccessImporter implements ImporterIF {
     /**
      * Constructs a new instance with the given {@link ImportLoggerImpl}.
      *
-     * @param importLogger
+     * @param importLogger the import logger
      */
     public MSAccessImporter(ImportLoggerImpl importLogger) {
 
@@ -126,11 +127,12 @@ public class MSAccessImporter implements ImporterIF {
     }
 
     /**
+     * Gets the table.
      *
-     * @param database
-     * @param tableName
-     * @return
-     * @throws ImportException
+     * @param database the database
+     * @param tableName the table name
+     * @return the table
+     * @throws ImportException the import exception
      */
     private Table getTable(Database database, String tableName) throws ImportException {
         try {
@@ -141,10 +143,11 @@ public class MSAccessImporter implements ImporterIF {
     }
 
     /**
+     * Gets the table names.
      *
-     * @param database
-     * @return
-     * @throws ImportException
+     * @param database the database
+     * @return the table names
+     * @throws ImportException the import exception
      */
     private Set<String> getTableNames(Database database) throws ImportException {
 
@@ -156,10 +159,11 @@ public class MSAccessImporter implements ImporterIF {
     }
 
     /**
+     * Open database.
      *
-     * @param file
-     * @return
-     * @throws ImportException
+     * @param file the file
+     * @return the database
+     * @throws ImportException the import exception
      */
     private Database openDatabase(File file) throws ImportException {
         try {
@@ -174,8 +178,9 @@ public class MSAccessImporter implements ImporterIF {
     }
 
     /**
+     * Close.
      *
-     * @param database
+     * @param database the database
      */
     private void close(Database database) {
         if (database != null) {

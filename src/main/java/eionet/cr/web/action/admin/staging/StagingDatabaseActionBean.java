@@ -86,8 +86,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
             dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseById(dbId);
         } else if (!StringUtils.isBlank(dbName)) {
             dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
-        }
-        else{
+        } else {
             dbDTO = null;
             addWarningMessage("Found no database by the given id or name!");
         }
@@ -266,4 +265,11 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
         return resolver.getUrlBinding(StagingDatabasesActionBean.class);
     }
 
+    /**
+     *
+     * @return
+     */
+    public Class getExportRDFActionBeanClass() {
+        return ExportRDFActionBean.class;
+    }
 }

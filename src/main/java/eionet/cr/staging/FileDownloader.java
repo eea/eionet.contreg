@@ -61,12 +61,12 @@ public class FileDownloader extends Thread {
     private String newFileName;
 
     /**
-     * Constructs a new instance of this class, that will be used to download from the given URL.
-     * The downloaded file will be renamed to the one given in the method's second input, unless it is null or blank.
-     * The file will be saved into {@link #FILES_DIR}.
+     * Constructs a new instance of this class, that will be used to download from the given URL. The downloaded file will be
+     * renamed to the one given in the method's second input, unless it is null or blank. The file will be saved into
+     * {@link #FILES_DIR}.
      *
-     * @param url
-     * @param newFileName
+     * @param url The given URL.
+     * @param newFileName The name that the file will be renamed to.
      */
     public FileDownloader(String url, String newFileName) {
         super();
@@ -76,6 +76,7 @@ public class FileDownloader extends Thread {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Thread#run()
      */
     @Override
@@ -90,8 +91,10 @@ public class FileDownloader extends Thread {
     }
 
     /**
-     * @return
-     * @throws IOException
+     * The thread's execution body called by {@link #run()}.
+     *
+     * @return The downloaded file's location.
+     * @throws IOException In case any sort of IO error happened.
      *
      */
     private File execute() throws IOException {
@@ -115,14 +118,15 @@ public class FileDownloader extends Thread {
     }
 
     /**
+     * Derives a name for the file to be downloaded from the given {@link URLConnection}.
      *
-     * @param connection
-     * @return
+     * @param connection The given {@link URLConnection}.
+     * @return The derived file name.
      */
     private String getFileName(URLConnection connection) {
 
         // If file name already given, just return it.
-        if (StringUtils.isNotBlank(newFileName)){
+        if (StringUtils.isNotBlank(newFileName)) {
             return newFileName;
         }
 
@@ -170,9 +174,10 @@ public class FileDownloader extends Thread {
     }
 
     /**
+     * Returns a form of the given file name that will surely be unique in the folder where the files are downloaded to.
      *
-     * @param fileName
-     * @return
+     * @param fileName The file name for which the unique form is returned.
+     * @return The unique file name.
      */
     public static String ensureUniqueFileName(String fileName) {
 
@@ -191,11 +196,13 @@ public class FileDownloader extends Thread {
     }
 
     /**
+     * Returns true if the given file already exists in the folder where the files are downloaded to. Takes into account the file
+     * suffixes added for uniqueness!
      *
-     * @param fileName
-     * @return
+     * @param fileName The file name to check.
+     * @return As indicated above.
      */
-    private static boolean fileExists(String fileName){
+    private static boolean fileExists(String fileName) {
         return new File(FILES_DIR, fileName).exists() || new File(FILES_DIR, fileName + FILE_SUFFIX).exists();
     }
 }

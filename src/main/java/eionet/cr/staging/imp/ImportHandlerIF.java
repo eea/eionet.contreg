@@ -11,7 +11,7 @@ public interface ImportHandlerIF {
     /**
      * Handle end of file.
      *
-     * @throws ImportException
+     * @throws ImportException the import exception
      */
     void endOfFile() throws ImportException;
 

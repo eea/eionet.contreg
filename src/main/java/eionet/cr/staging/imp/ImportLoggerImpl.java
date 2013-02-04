@@ -35,7 +35,7 @@ import eionet.cr.util.Util;
  */
 public class ImportLoggerImpl {
 
-    /** */
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(ImportLoggerImpl.class);
 
     /** The id of the staging database that is being imported. */
@@ -55,7 +55,8 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message on "info" level.
-     * @param message
+     *
+     * @param message the message
      */
     public void info(Object message) {
         log(message, ImportLogLevel.INFO);
@@ -63,8 +64,9 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message and throwable on "info" level.
-     * @param message
-     * @param throwable
+     *
+     * @param message the message
+     * @param throwable the throwable
      */
     public void info(Object message, Throwable throwable) {
         log(message, throwable, ImportLogLevel.INFO);
@@ -72,7 +74,8 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message on "warn" level.
-     * @param message
+     *
+     * @param message the message
      */
     public void warn(Object message) {
         log(message, ImportLogLevel.WARNING);
@@ -80,8 +83,9 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message and throwable on "warn" level.
-     * @param message
-     * @param throwable
+     *
+     * @param message the message
+     * @param throwable the throwable
      */
     public void warn(Object message, Throwable throwable) {
         log(message, throwable, ImportLogLevel.WARNING);
@@ -89,7 +93,8 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message on "error" level.
-     * @param message
+     *
+     * @param message the message
      */
     public void error(Object message) {
         log(message, ImportLogLevel.ERROR);
@@ -97,8 +102,9 @@ public class ImportLoggerImpl {
 
     /**
      * Logs the given message and throwable on "error" level.
-     * @param message
-     * @param throwable
+     *
+     * @param message the message
+     * @param throwable the throwable
      */
     public void error(Object message, Throwable throwable) {
         log(message, throwable, ImportLogLevel.ERROR);
@@ -107,8 +113,8 @@ public class ImportLoggerImpl {
     /**
      * Convenience method that marks the given log message with the given log level, and forwards it to the DAO.
      *
-     * @param message
-     * @param level
+     * @param message the message
+     * @param level the level
      */
     private void log(Object message, ImportLogLevel level) {
         try {
@@ -122,9 +128,9 @@ public class ImportLoggerImpl {
      * Convenience method that marks the given log message with the given log level, appends with the the given throwable's stack
      * trace and forwards the result to the DAO.
      *
-     * @param message
-     * @param throwable
-     * @param level
+     * @param message the message
+     * @param throwable the throwable
+     * @param level the level
      */
     private void log(Object message, Throwable throwable, ImportLogLevel level) {
         try {

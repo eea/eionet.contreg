@@ -28,5 +28,6 @@ package eionet.cr.staging.imp;
  */
 public enum ImportLogLevel {
 
+    /** */
     INFO, WARNING, ERROR;
 }

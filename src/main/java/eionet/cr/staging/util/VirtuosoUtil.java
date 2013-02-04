@@ -32,12 +32,13 @@ import com.healthmarketscience.jackcess.Index;
 import com.healthmarketscience.jackcess.IndexData.ColumnDescriptor;
 import com.healthmarketscience.jackcess.Table;
 
+// TODO: Auto-generated Javadoc
 /**
  *
  * @author jaanus
  *
  */
-public class VirtuosoUtil {
+public final class VirtuosoUtil {
 
     /** */
     public static final Map<DataType, String> JACKCESS_TO_VIRTUOSO_DATATYPES = new HashMap<DataType, String>();
@@ -59,11 +60,19 @@ public class VirtuosoUtil {
     }
 
     /**
+     * Private constructor: do not allow instantiation of utility classes.
+     */
+    private VirtuosoUtil() {
+        // Do nothing here.
+    }
+
+    /**
+     * Creates the table statement.
      *
-     * @param table
-     * @param dbName
-     * @param dbUser
-     * @return
+     * @param table the table
+     * @param dbName the db name
+     * @param dbUser the db user
+     * @return the string
      */
     public static String createTableStatement(Table table, String dbName, String dbUser) {
 
@@ -113,12 +122,13 @@ public class VirtuosoUtil {
     }
 
     /**
+     * Parameterized insert statement.
      *
-     * @param tableName
-     * @param columnNames
-     * @param dbName
-     * @param dbUser
-     * @return
+     * @param tableName the table name
+     * @param columnNames the column names
+     * @param dbName the db name
+     * @param dbUser the db user
+     * @return the string
      */
     public static String parameterizedInsertStatement(String tableName, List<String> columnNames, String dbName, String dbUser) {
 
@@ -141,33 +151,37 @@ public class VirtuosoUtil {
     }
 
     /**
+     * Sanitize column name.
      *
-     * @param name
-     * @return
+     * @param name the name
+     * @return the string
      */
     private static String sanitizeColumnName(String name) {
         return new StringBuilder("\"").append(name.trim().replaceAll("\\s+", "_")).append("\"").toString();
-        //return new StringBuilder(name.trim().replaceAll("\\s+", "_")).toString();
+        // return new StringBuilder(name.trim().replaceAll("\\s+", "_")).toString();
     }
 
     /**
+     * Fully qualified sanitized table name.
      *
-     * @param tableName
-     * @param dbName
-     * @param dbUser
-     * @return
+     * @param tableName the table name
+     * @param dbName the db name
+     * @param dbUser the db user
+     * @return the string
      */
     private static String fullyQualifiedSanitizedTableName(String tableName, String dbName, String dbUser) {
 
         String sanitizedTableName = tableName.trim().replaceAll("\\s+", "_");
-        //return new StringBuilder(dbName).append(".").append(dbUser).append(".\"").append(sanitizedTableName).append("\"").toString();
+        // return new
+        // StringBuilder(dbName).append(".").append(dbUser).append(".\"").append(sanitizedTableName).append("\"").toString();
         return new StringBuilder(dbName).append(".").append(dbUser).append(".").append(sanitizedTableName).toString();
     }
 
     /**
+     * Jackcess to virtuoso data type.
      *
-     * @param column
-     * @return
+     * @param column the column
+     * @return the string
      */
     public static String jackcessToVirtuosoDataType(Column column) {
 

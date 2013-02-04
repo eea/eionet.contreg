@@ -365,6 +365,8 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
             SQLUtil.close(conn);
         }
     }
@@ -372,12 +374,12 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.StagingDatabaseDAO#prepareStatement(java.lang.String)
+     * @see eionet.cr.dao.StagingDatabaseDAO#prepareStatement(java.lang.String, java.lang.String)
      */
     @Override
-    public List<String> prepareStatement(String sql) throws DAOException {
+    public List<String> prepareStatement(String sql, String dbName) throws DAOException {
 
-        if (StringUtils.isBlank(sql)){
+        if (StringUtils.isBlank(sql)) {
             throw new IllegalArgumentException("The given SQL statement must not be blank!");
         }
 
@@ -386,6 +388,7 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
+            conn = getSQLConnection(dbName);
             pstmt = SQLUtil.prepareStatement(sql, null, conn);
             ResultSetMetaData metaData = pstmt.getMetaData();
             int colCount = metaData.getColumnCount();

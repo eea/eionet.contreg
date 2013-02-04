@@ -39,13 +39,13 @@ import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
- * Action bean that provides functions for browsing VoID (Vocabulary of Interlinked Datasets) datasets.
- * Browsing done by two facets: dct:creator and dct:subject, where "dct" stands for DublinCore Terms (http://purl.org/dc/terms/).
+ * Action bean that provides functions for browsing VoID (Vocabulary of Interlinked Datasets) datasets. Browsing done by two facets:
+ * dct:creator and dct:subject, where "dct" stands for DublinCore Terms (http://purl.org/dc/terms/).
  *
  * @author jaanus
  */
 @UrlBinding("/browseDatasets.action")
-public class BrowseDatasetsActionBean extends AbstractActionBean{
+public class BrowseDatasetsActionBean extends AbstractActionBean {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(BrowseDatasetsActionBean.class);
@@ -75,10 +75,10 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     private int prevSbjSize;
 
     /** A dummy hash-map that is easy to access in JSP in order to determine whether a creator has been selected. */
-    private HashMap<String,String> selectedCreators = new HashMap<String, String>();
+    private HashMap<String, String> selectedCreators = new HashMap<String, String>();
 
     /** A dummy hash-map that is easy to access in JSP in order to determine whether a subject has been selected. */
-    private HashMap<String,String> selectedSubjects = new HashMap<String, String>();
+    private HashMap<String, String> selectedSubjects = new HashMap<String, String>();
 
     /**
      *
@@ -86,7 +86,7 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
      * @throws DAOException
      */
     @DefaultHandler
-    public Resolution defaultEvent() throws DAOException{
+    public Resolution defaultEvent() throws DAOException {
 
         LOGGER.trace(" - ");
         LOGGER.trace("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
@@ -97,19 +97,17 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
         LOGGER.trace(datasets.size() + " datasets found!");
         LOGGER.trace("Populating available creators and subjects");
 
-        if (isCreatorsChanged()){
+        if (isCreatorsChanged()) {
             LOGGER.trace("Creators changed");
             availableSubjects = dao.findSubjects(creator);
-            //availableCreators = dao.findCreators(availableSubjects);
+            // availableCreators = dao.findCreators(availableSubjects);
             availableCreators = dao.findCreators(null);
-        }
-        else if (isSubjectsChanged()){
+        } else if (isSubjectsChanged()) {
             LOGGER.trace("Subjects changed");
             availableCreators = dao.findCreators(subject);
-            //availableSubjects = dao.findSubjects(availableCreators);
+            // availableSubjects = dao.findSubjects(availableCreators);
             availableSubjects = dao.findSubjects(null);
-        }
-        else{
+        } else {
             availableCreators = dao.findCreators(subject);
             availableSubjects = dao.findSubjects(creator);
         }
@@ -121,16 +119,16 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     /**
      * Assign and prepare some necessary fields for the JSP render.
      */
-    private void beforeRender(){
+    private void beforeRender() {
 
-        if (creator != null){
-            for (String crt : creator){
+        if (creator != null) {
+            for (String crt : creator) {
                 selectedCreators.put(crt, crt);
             }
         }
 
-        if (subject != null){
-            for (String sbj : subject){
+        if (subject != null) {
+            for (String sbj : subject) {
                 selectedSubjects.put(sbj, sbj);
             }
         }
@@ -147,8 +145,8 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
      *
      * @return the boolean as described
      */
-    private boolean isCreatorsChanged(){
-        int crtSize = creator==null ? 0 : creator.size();
+    private boolean isCreatorsChanged() {
+        int crtSize = creator == null ? 0 : creator.size();
         return crtSize != prevCrtSize;
     }
 
@@ -157,8 +155,8 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
      *
      * @return the boolean as described
      */
-    private boolean isSubjectsChanged(){
-        int sbjSize = subject==null ? 0 : subject.size();
+    private boolean isSubjectsChanged() {
+        int sbjSize = subject == null ? 0 : subject.size();
         return sbjSize != prevSbjSize;
     }
 
@@ -170,12 +168,12 @@ public class BrowseDatasetsActionBean extends AbstractActionBean{
     }
 
     /**
-     * Returns the Java class object of the {@link FactsheetActionBean}.
-     * Used for building refactoring-safe links to that bean in JSP page(s).
+     * Returns the Java class object of the {@link FactsheetActionBean}. Used for building refactoring-safe links to that bean in
+     * JSP page(s).
      *
      * @return
      */
-    public Class getFactsheetActionBeanClass(){
+    public Class getFactsheetActionBeanClass() {
         return FactsheetActionBean.class;
     }
 

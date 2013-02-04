@@ -48,6 +48,16 @@ public abstract class VirtuosoBaseDAO {
 
     /**
      *
+     * @param dbName
+     * @return
+     * @throws SQLException
+     */
+    protected Connection getSQLConnection(String dbName) throws SQLException {
+        return SesameUtil.getSQLConnection(dbName);
+    }
+
+    /**
+     *
      * @param graphUri
      * @throws DAOException
      */

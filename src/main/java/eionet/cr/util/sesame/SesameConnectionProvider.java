@@ -65,8 +65,8 @@ public final class SesameConnectionProvider {
             String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
 
             readWriteRepository =
-                createRepository(GeneralConfig.getRequiredProperty(urlProperty),
-                        GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
+                    createRepository(GeneralConfig.getRequiredProperty(urlProperty),
+                            GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
         }
         return readWriteRepository;
     }
@@ -78,9 +78,9 @@ public final class SesameConnectionProvider {
 
         if (readOnlyRepository == null) {
             readOnlyRepository =
-                createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
-                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
-                        GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
+                    createRepository(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL),
+                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROUSR),
+                            GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_ROPWD));
         }
         return readOnlyRepository;
     }
@@ -207,16 +207,26 @@ public final class SesameConnectionProvider {
      * @throws SQLException
      */
     public static Connection getSQLConnection() throws SQLException {
+        return getSQLConnection(null);
+    }
 
-        // first try to create connection through data source
+    /**
+     * @param dbName
+     * @return
+     */
+    public static Connection getSQLConnection(String dbName) throws SQLException {
+
+        // first try to create connection through data source (but not when connection is requested to specific DB)
         DataSource dataSource = getReadWriteDataSource();
-        if (dataSource != null) {
-            return dataSource.getConnection();
-        } else if (!isReadWriteDataSourceMissingLogged()) {
-            LOGGER.debug(MessageFormat.format(
-                    "Found no data source with name {0}, going to create a connection through DriverManager",
-                    READWRITE_DATASOURCE_NAME));
-            SesameConnectionProvider.readWriteDataSourceMissingLogged = true;
+        if (dbName == null || dbName.trim().length() == 0) {
+            if (dataSource != null) {
+                return dataSource.getConnection();
+            } else if (!isReadWriteDataSourceMissingLogged()) {
+                LOGGER.debug(MessageFormat.format(
+                        "Found no data source with name {0}, going to create a connection through DriverManager",
+                        READWRITE_DATASOURCE_NAME));
+                SesameConnectionProvider.readWriteDataSourceMissingLogged = true;
+            }
         }
 
         // no data source was found above, so create the connection through DriverManager
@@ -246,6 +256,14 @@ public final class SesameConnectionProvider {
             throw new SQLException("Failed to get connection, missing property: " + GeneralConfig.VIRTUOSO_DB_PWD);
         }
 
+        if (dbName != null && dbName.trim().length() > 0) {
+            url = url.trim();
+            if (!url.endsWith("/")) {
+                url = url + "/";
+            }
+            url = url + "DATABASE=" + dbName;
+        }
+
         try {
             Class.forName(drv);
             return DriverManager.getConnection(url, usr, pwd);
@@ -253,6 +271,7 @@ public final class SesameConnectionProvider {
             throw new CRRuntimeException("Failed to get connection, driver class not found: " + drv, e);
         }
     }
+
 
     /**
      * @return the readWriteDataSourceMissingLogged

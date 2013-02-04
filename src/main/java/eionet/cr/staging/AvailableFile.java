@@ -42,9 +42,10 @@ public class AvailableFile {
     private Date lastModified;
 
     /**
+     * Convenience method that creates a new instance of {@link AvailableFile} on the basis of the given {@link File}.
      *
-     * @param file
-     * @return
+     * @param file The given file.
+     * @return The new instance of {@link AvailableFile}.
      */
     public static AvailableFile create(File file) {
 
@@ -56,10 +57,11 @@ public class AvailableFile {
     }
 
     /**
-     * @param name the name to set
+     * Setter for the file's name.
+     * @param name The name.
      */
-    public void setName(String fileName) {
-        this.name = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

@@ -32,12 +32,13 @@ import com.healthmarketscience.jackcess.Index;
 import com.healthmarketscience.jackcess.IndexData.ColumnDescriptor;
 import com.healthmarketscience.jackcess.Table;
 
+// TODO: Auto-generated Javadoc
 /**
  *
  * @author jaanus
  *
  */
-public class MySQLUtil {
+public final class MySQLUtil {
 
     /** */
     public static final Map<DataType, String> JACKCESS_TO_MYSQL_DATATYPES = new HashMap<DataType, String>();
@@ -59,9 +60,17 @@ public class MySQLUtil {
     }
 
     /**
+     * Private constructor: do not allow instantiation of utility classes.
+     */
+    private MySQLUtil() {
+        // Just a private constructor.
+    }
+
+    /**
+     * Creates the table statement.
      *
-     * @param table
-     * @return
+     * @param table the table
+     * @return the string
      */
     public static String createTableStatement(Table table) {
 
@@ -111,12 +120,13 @@ public class MySQLUtil {
     }
 
     /**
+     * Parameterized insert statement.
      *
-     * @param tableName
-     * @param columnNames
-     * @return
+     * @param tableName the table name
+     * @param columnNames the column names
+     * @return the string
      */
-    public static String parameterizedInsertStatement(String tableName, List<String> columnNames){
+    public static String parameterizedInsertStatement(String tableName, List<String> columnNames) {
 
         StringBuilder columnsStr = new StringBuilder();
         StringBuilder valuesStr = new StringBuilder();
@@ -124,7 +134,7 @@ public class MySQLUtil {
         int i = 0;
         for (String column : columnNames) {
 
-            if (i++ > 0){
+            if (i++ > 0) {
                 columnsStr.append(", ");
                 valuesStr.append(", ");
             }
@@ -132,22 +142,25 @@ public class MySQLUtil {
             valuesStr.append("?");
         }
 
-        return "INSERT INTO \u0060" + sanitizeTableOrColumnName(tableName) + "\u0060 (" + columnsStr + ") values (" + valuesStr + ")";
+        return "INSERT INTO \u0060" + sanitizeTableOrColumnName(tableName) + "\u0060 (" + columnsStr + ") values (" + valuesStr
+                + ")";
     }
 
     /**
+     * Sanitize table or column name.
      *
-     * @param name
-     * @return
+     * @param name the name
+     * @return the string
      */
     private static String sanitizeTableOrColumnName(String name) {
         return name.trim().replaceAll("\\s+", "_");
     }
 
     /**
+     * Jackcess to my sql data type.
      *
-     * @param column
-     * @return
+     * @param column the column
+     * @return the string
      */
     public static String jackcessToMySQLDataType(Column column) {
 
