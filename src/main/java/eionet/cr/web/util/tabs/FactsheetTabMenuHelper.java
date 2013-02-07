@@ -75,12 +75,15 @@ public final class FactsheetTabMenuHelper {
         HarvestSourceDTO dto = harvesterSourceDao.getHarvestSourceByUrl(subject.getUri());
         uriIsHarvestSource = dto != null;
 
+        //TODO: mapDisplayable = Subjects.WGS_SPATIAL_THING.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         mapDisplayable = subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null;
         if (mapDisplayable) {
             latitude = subject.getObject(Predicates.WGS_LAT).getValue();
             longitude = subject.getObject(Predicates.WGS_LONG).getValue();
         }
 
+        // TODO: Is there some point to calling subject.getObject(Predicates.RDF_TYPE) over and over
+        // to check if it is null?
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             sparqlBookmarkType = Subjects.CR_SPARQL_BOOKMARK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
