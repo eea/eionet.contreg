@@ -47,13 +47,19 @@
                 <li><a href="#">Operations</a>
                     <ul>
                         <li>
-                            <stripes:link beanclass="${actionBean.exportRDFActionBeanClass.name}" title="Run RDF export from this database">
+                            <stripes:link beanclass="${actionBean.rdfExportWizardActionBeanClass.name}" title="Run RDF export from this database">
                                 <c:out value="Export RDF"/>
                                 <stripes:param name="dbName" value="${actionBean.dbDTO.name}"/>
                             </stripes:link>
                         </li>
                         <li>
-                            <stripes:link id="importLogLink_1" href="${actionBean.stagingDatabasesActionBeanUrlBinding}" event="openLog" title="View the import log">
+                            <stripes:link beanclass="${actionBean.rdfExportsActionBeanClass.name}" title="List RDF exports from this database">
+                                <c:out value="List RDF exports"/>
+                                <stripes:param name="databaseId" value="${actionBean.dbDTO.id}"/>
+                            </stripes:link>
+                        </li>
+                        <li>
+                            <stripes:link id="importLogLink_1" href="${actionBean.stagingDatabasesActionBeanUrlBinding}" event="openLog" title="View the database's import log">
                                 <c:out value="View import log"/>
                                 <stripes:param name="databaseId" value="${actionBean.dbDTO.id}"/>
                             </stripes:link>
@@ -104,8 +110,11 @@
                         <td><c:out value="${actionBean.dbDTO.description}"/></td>
                     </tr>
                 </table>
-                <div style="width:75%;padding-top:20px;background-color:#F0F0F0;vertical-align:middle;align:center">
-                    Here will probably be the list of tables in this database, and their columns.
+                <div style="width:100%;height:300px;padding-top:20px;background-color:#F0F0F0">
+                    <div style="padding-top:10%;padding-left:20%;width:50%;height:100px">
+                        <p>To be implemented:</p>
+                        here the tables and columns of this database can be explored.
+                    </div>
                 </div>
             </div>
 

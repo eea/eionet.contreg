@@ -39,10 +39,11 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.staging.FileDownloader;
-import eionet.cr.staging.StagingDatabaseCreator;
+import eionet.cr.staging.imp.ImportRunner;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
+// TODO: Auto-generated Javadoc
 /**
  * Action bean for operations with a single staging database.
  *
@@ -77,7 +78,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      * The bean's default event handler method.
      *
      * @return Resolution to go to.
-     * @throws DAOException
+     * @throws DAOException the dAO exception
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
@@ -86,8 +87,9 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
             dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseById(dbId);
         } else if (!StringUtils.isBlank(dbName)) {
             dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
-        } else {
-            dbDTO = null;
+        }
+
+        if (dbDTO == null) {
             addWarningMessage("Found no database by the given id or name!");
         }
 
@@ -95,9 +97,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Adds the.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException the dAO exception
      */
     public Resolution add() throws DAOException {
 
@@ -119,15 +122,16 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
         LOGGER.debug("New staging database record created, id = " + id);
 
         // Create the database in DBMS and populate it from the uploaded file.
-        StagingDatabaseCreator.start(dto, file);
+        ImportRunner.start(dto, file);
 
         addSystemMessage("Database created and import started in the background!");
         return new RedirectResolution(StagingDatabasesActionBean.class);
     }
 
     /**
+     * Back to db list.
      *
-     * @return
+     * @return the resolution
      */
     public Resolution backToDbList() {
         return new RedirectResolution(StagingDatabasesActionBean.class);
@@ -171,7 +175,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     /**
      * Validate request on "add" event.
      *
-     * @throws DAOException
+     * @throws DAOException the dAO exception
      */
     @ValidationMethod(on = {"add"})
     public void validateAdd() throws DAOException {
@@ -269,7 +273,15 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getExportRDFActionBeanClass() {
-        return ExportRDFActionBean.class;
+    public Class getRdfExportWizardActionBeanClass() {
+        return RDFExportWizardActionBean.class;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Class getRdfExportsActionBeanClass() {
+        return RDFExportsActionBean.class;
     }
 }

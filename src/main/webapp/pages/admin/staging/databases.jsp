@@ -45,6 +45,9 @@
                     <li>
                         <stripes:link beanclass="${actionBean.availableFilesActionBeanClass.name}">Available files</stripes:link>
                     </li>
+                    <li>
+                        <stripes:link beanclass="${actionBean.rdfExportsActionBeanClass.name}">List RDF exports</stripes:link>
+                    </li>
                 </ul>
             </li>
         </ul>

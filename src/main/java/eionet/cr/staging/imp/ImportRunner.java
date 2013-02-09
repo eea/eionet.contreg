@@ -19,55 +19,71 @@
  *        jaanus
  */
 
-package eionet.cr.staging;
+package eionet.cr.staging.imp;
 
 import java.io.File;
 import java.util.HashMap;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
-import eionet.cr.staging.imp.ImportException;
-import eionet.cr.staging.imp.ImportLoggerImpl;
-import eionet.cr.staging.imp.ImportStatus;
-import eionet.cr.staging.imp.ImporterIF;
 import eionet.cr.staging.imp.msaccess.MSAccessImporter;
+import eionet.cr.util.LogUtil;
 
 /**
  * A runnable that creates a given staging database and populates it from a given DB file.
  *
  * @author jaanus
  */
-public final class StagingDatabaseCreator extends Thread {
+public final class ImportRunner extends Thread {
 
-    /** */
-    private static final HashMap<String, StagingDatabaseCreator> CURRENT_RUNS = new HashMap<String, StagingDatabaseCreator>();
+    /** A hash-map of current runs of {@link ImportRunner}. Keys match to db names, values match to threads. */
+    private static final HashMap<String, ImportRunner> CURRENT_RUNS = new HashMap<String, ImportRunner>();
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(StagingDatabaseCreator.class);
+    /** Static logger for this class, entirely configured by Log4j properties. */
+    private static final Logger LOGGER = Logger.getLogger(ImportRunner.class);
 
-    /** */
+    /** Dynamic logger for the particular import run by this thread for the given database. */
+    private Logger importLogger;
+
+    /** Staging database DTO. */
     private StagingDatabaseDTO dbDTO;
 
-    /** */
+    /** File from which the database is created. */
     private File dbFile;
 
-    /** */
+    /** The {@link StagingDatabaseDAO} used by this thread to access the database. */
     private StagingDatabaseDAO dao;
 
     /**
-     * Constructs a {@link StagingDatabaseCreator} for the given database DTO and DB file.
+     * Constructs a {@link ImportRunner} for the given database DTO and DB file.
      *
      * @param dbDTO The given database DTO.
-     * @param dbFile The given file from where the database should be cerated.
+     * @param dbFile The given file from where the database should be created.
      */
-    private StagingDatabaseCreator(StagingDatabaseDTO dbDTO, File dbFile) {
+    private ImportRunner(StagingDatabaseDTO dbDTO, File dbFile) {
 
         this.dbDTO = dbDTO;
         this.dbFile = dbFile;
+        importLogger = createLogger(dbDTO);
+    }
+
+    /**
+     *
+     * @param dbDTO
+     * @return
+     */
+    private ImportLogger createLogger(StagingDatabaseDTO dbDTO) {
+
+        String loggerName = dbDTO.getName() + "_" + ImportLogger.class.getSimpleName();
+        ImportLogger logger = (ImportLogger) Logger.getLogger(loggerName, ImportLoggerFactory.INSTANCE);
+        logger.setDbDTO(dbDTO);
+        logger.setLevel(Level.TRACE);
+        return logger;
     }
 
     /*
@@ -78,17 +94,16 @@ public final class StagingDatabaseCreator extends Thread {
     @Override
     public void run() {
 
-        LOGGER.debug("Staging DB creator started for " + dbDTO + ", using file " + dbFile.getName());
+        LogUtil.debug("Import for database " + dbDTO.getName() + " started from file " + dbFile.getName(), importLogger, LOGGER);
 
-        ImportLoggerImpl importLogger = new ImportLoggerImpl(dbDTO.getId());
         try {
             execute(importLogger);
-            LOGGER.debug("Staging DB creator finished for " + dbDTO + ", using file " + dbFile.getName());
+            updateImportStatus(ImportStatus.COMPLETED);
+            LogUtil.debug("Import for database " + dbDTO.getName() + " finished from file " + dbFile.getName(), importLogger,
+                    LOGGER);
         } catch (Exception e) {
             updateImportStatus(ImportStatus.ERROR);
-            String message = "Staging database creation failed with error";
-            importLogger.error(message, e);
-            LOGGER.error(message, e);
+            LogUtil.error("Staging database creation failed with error", e, importLogger, LOGGER);
         }
     }
 
@@ -99,7 +114,7 @@ public final class StagingDatabaseCreator extends Thread {
      * @throws DAOException Thrown if database access error happens.
      * @throws ImportException If any other import error happens.
      */
-    private void execute(ImportLoggerImpl importLogger) throws DAOException, ImportException {
+    private void execute(Logger importLogger) throws DAOException, ImportException {
 
         updateImportStatus(ImportStatus.STARTED);
 
@@ -110,24 +125,24 @@ public final class StagingDatabaseCreator extends Thread {
         // TODO Use a factory mechanism to obtain a particular ImporterIF implementation.
         ImporterIF importer = new MSAccessImporter(importLogger);
         importer.doImport(dbFile, dbDTO.getName());
-
-        updateImportStatus(ImportStatus.COMPLETED);
-        String message = "All done!";
-        importLogger.info(message);
-        LOGGER.debug(message);
     }
 
     /**
-     * Convenience method that creates an instance of {@link StagingDatabaseCreator} for the given database from given file, and
-     * then starts it.
+     * Convenience method that creates an instance of {@link ImportRunner} for the given database from given file, and then starts
+     * it.
+     *
      * @param dbDTO Will be passed into the private constructor.
      * @param dbFile Will be passed into the private constructor
      * @return The created and started thread.
      */
-    public static synchronized StagingDatabaseCreator start(StagingDatabaseDTO dbDTO, File dbFile) {
+    public static synchronized ImportRunner start(StagingDatabaseDTO dbDTO, File dbFile) {
+
+        if (dbDTO == null || dbFile == null || !dbFile.exists() || !dbFile.isFile()) {
+            throw new IllegalArgumentException("The database DTO and file must be given!");
+        }
 
         String dbName = dbDTO.getName();
-        StagingDatabaseCreator currentRun = CURRENT_RUNS.get(dbName);
+        ImportRunner currentRun = CURRENT_RUNS.get(dbName);
         if (currentRun != null) {
             if (currentRun.isAlive()) {
                 throw new IllegalStateException("A creator is already running for this staging database: " + dbName);
@@ -136,7 +151,7 @@ public final class StagingDatabaseCreator extends Thread {
             }
         }
 
-        StagingDatabaseCreator creator = new StagingDatabaseCreator(dbDTO, dbFile);
+        ImportRunner creator = new ImportRunner(dbDTO, dbFile);
         creator.start();
         CURRENT_RUNS.put(dbName, creator);
         return creator;
@@ -144,6 +159,7 @@ public final class StagingDatabaseCreator extends Thread {
 
     /**
      * Updates this import's status in the database.
+     *
      * @param importStatus The status to update to.
      * @throws DAOException If a database access error happens.
      *
@@ -158,6 +174,7 @@ public final class StagingDatabaseCreator extends Thread {
 
     /**
      * Lazy getter for the {@link StagingDatabaseDAO} that this thread should use.
+     *
      * @return The DAO.
      */
     private StagingDatabaseDAO getDao() {

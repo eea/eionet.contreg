@@ -23,8 +23,11 @@ package eionet.cr.staging.exp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+// TODO: Auto-generated Javadoc
 /**
  * Type definition ...
  *
@@ -39,43 +42,55 @@ public class ObjectType {
     private String label;
 
     /** */
-    private ArrayList<ObjectProperty> properties;
+    private ArrayList<ObjectProperty> properties = new ArrayList<ObjectProperty>();
 
     /** */
-    private String datasetColumn;
+    private String objectIdTemplate;
 
     /** */
-    private String datasetNamespace;
+    private String objectIdNamespace;
 
     /** */
-    private String idTemplate;
+    private String datasetIdTemplate;
 
     /** */
-    private String idNamespace;
+    private String datasetIdNamespace;
 
     /** */
-    private HashMap<String, ObjectProperty> columnToDefaultProperty;
+    private HashMap<String, ObjectProperty> columnToDefaultProperty = new HashMap<String, ObjectProperty>();
 
     /** */
-    private HashMap<String, ObjectProperty> predicateToProperty;
+    private HashMap<String, ObjectProperty> predicateToProperty = new HashMap<String, ObjectProperty>();
+
+    /** */
+    private HashSet<ObjectHiddenProperty> hiddenProperties = new HashSet<ObjectHiddenProperty>();
 
     /**
-     * Class constructor.
-     * @param uri
-     * @param label
+     * Gets the hidden properties.
+     *
+     * @return the hiddenProperties
      */
-    public ObjectType(String uri, String label) {
-        super();
-        this.uri = uri;
-        this.label = label;
-        properties = new ArrayList<ObjectProperty>();
-        columnToDefaultProperty = new HashMap<String, ObjectProperty>();
-        predicateToProperty = new HashMap<String, ObjectProperty>();
+    public Set<ObjectHiddenProperty> getHiddenProperties() {
+        return hiddenProperties;
     }
 
     /**
+     * Class constructor.
      *
-     * @param property
+     * @param uri the uri
+     * @param label the label
+     */
+    public ObjectType(String uri, String label) {
+
+        super();
+        this.uri = uri;
+        this.label = label;
+    }
+
+    /**
+     * Adds the property.
+     *
+     * @param property the property
      */
     public void addProperty(ObjectProperty property) {
         properties.add(property);
@@ -83,79 +98,80 @@ public class ObjectType {
     }
 
     /**
+     * Adds the property.
      *
-     * @param property
-     * @param defaultForColumn
+     * @param property the property
+     * @param defaultForColumn the default for column
      */
-    public void addProperty(ObjectProperty property, String defaultForColumn) {
+    public void addProperty(ObjectProperty property, String... defaultForColumn) {
         addProperty(property);
-        setDefaultProperty(defaultForColumn, property);
+
+        if (defaultForColumn != null && defaultForColumn.length > 0) {
+            for (String column : defaultForColumn) {
+                columnToDefaultProperty.put(column.toUpperCase(), property);
+            }
+        }
     }
 
     /**
+     * Adds the hidden property.
      *
-     * @param column
-     * @return
+     * @param property the property
+     */
+    public void addHiddenProperty(ObjectHiddenProperty property) {
+        hiddenProperties.add(property);
+    }
+
+    /**
+     * Gets the default property.
+     *
+     * @param column the column
+     * @return the default property
      */
     public ObjectProperty getDefaultProperty(String column) {
         return columnToDefaultProperty.get(column.toUpperCase());
     }
 
     /**
+     * Gets the properties.
      *
-     * @param column
-     * @param property
-     */
-    public void setDefaultProperty(String column, ObjectProperty property) {
-        columnToDefaultProperty.put(column.toUpperCase(), property);
-    }
-
-    /**
-     *
-     * @return
+     * @return the properties
      */
     public List<ObjectProperty> getProperties() {
         return properties;
     }
 
     /**
+     * Gets the property by predicate.
      *
-     * @param predicateUri
-     * @return
+     * @param predicateUri the predicate uri
+     * @return the property by predicate
      */
     public ObjectProperty getPropertyByPredicate(String predicateUri) {
         return predicateToProperty.get(predicateUri);
     }
 
     /**
-     * @return the datasetColumn
+     * Gets the object id template.
+     *
+     * @return the objectIdTemplate
      */
-    public String getDatasetColumn() {
-        return datasetColumn;
+    public String getObjectIdTemplate() {
+        return objectIdTemplate;
     }
 
     /**
-     * @param datasetColumn the datasetColumn to set
+     * Sets the object id template.
+     *
+     * @param objectIdTemplate the objectIdTemplate to set
      */
-    public void setDatasetColumn(String datasetColumn) {
-        this.datasetColumn = datasetColumn;
+    public void setObjectIdTemplate(String objectIdTemplate) {
+        this.objectIdTemplate = objectIdTemplate;
     }
 
     /**
-     * @return the idTemplate
-     */
-    public String getIdTemplate() {
-        return idTemplate;
-    }
-
-    /**
-     * @param idTemplate the idTemplate to set
-     */
-    public void setIdTemplate(String idTemplate) {
-        this.idTemplate = idTemplate;
-    }
-
-    /**
+     * Gets the uri.
+     *
      * @return the uri
      */
     public String getUri() {
@@ -163,6 +179,8 @@ public class ObjectType {
     }
 
     /**
+     * Gets the label.
+     *
      * @return the label
      */
     public String getLabel() {
@@ -170,30 +188,56 @@ public class ObjectType {
     }
 
     /**
-     * @return the datasetNamespace
+     * Gets the object id namespace.
+     *
+     * @return the objectIdNamespace
      */
-    public String getDatasetNamespace() {
-        return datasetNamespace;
+    public String getObjectIdNamespace() {
+        return objectIdNamespace;
     }
 
     /**
-     * @param datasetNamespace the datasetNamespace to set
+     * Sets the object id namespace.
+     *
+     * @param objectIdNamespace the new object id namespace
      */
-    public void setDatasetNamespace(String datasetNamespace) {
-        this.datasetNamespace = datasetNamespace;
+    public void setObjectIdNamespace(String objectIdNamespace) {
+        this.objectIdNamespace = objectIdNamespace;
     }
 
     /**
-     * @return the idNamespace
+     * Gets the dataset id template.
+     *
+     * @return the datasetIdTemplate
      */
-    public String getIdNamespace() {
-        return idNamespace;
+    public String getDatasetIdTemplate() {
+        return datasetIdTemplate;
     }
 
     /**
-     * @param idNamespace the idNamespace to set
+     * Sets the dataset id template.
+     *
+     * @param datasetIdTemplate the datasetIdTemplate to set
      */
-    public void setIdNamespace(String idNamespace) {
-        this.idNamespace = idNamespace;
+    public void setDatasetIdTemplate(String datasetIdTemplate) {
+        this.datasetIdTemplate = datasetIdTemplate;
+    }
+
+    /**
+     * Gets the dataset id namespace.
+     *
+     * @return the datasetIdNamespace
+     */
+    public String getDatasetIdNamespace() {
+        return datasetIdNamespace;
+    }
+
+    /**
+     * Sets the dataset id namespace.
+     *
+     * @param datasetIdNamespace the datasetIdNamespace to set
+     */
+    public void setDatasetIdNamespace(String datasetIdNamespace) {
+        this.datasetIdNamespace = datasetIdNamespace;
     }
 }

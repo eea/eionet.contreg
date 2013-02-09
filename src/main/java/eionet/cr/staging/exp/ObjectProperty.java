@@ -25,6 +25,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * An RDF property's metadata bean. Will be mapped to selected SQL columns at SQL-result-set-to-RDF export-
  *
@@ -50,6 +51,9 @@ public class ObjectProperty {
     /** */
     private URI predicateURI;
 
+    /** */
+    private String hint;
+
     /**
      * Class constructor.
      * @param predicate The property's underlying predicate.
@@ -63,6 +67,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Gets the predicate.
+     *
      * @return the predicate
      */
     public String getPredicate() {
@@ -70,6 +76,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Gets the range.
+     *
      * @return the range
      */
     public Range getRange() {
@@ -77,6 +85,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Gets the value template.
+     *
      * @return the valueTemplate
      */
     public String getValueTemplate() {
@@ -84,6 +94,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Sets the value template.
+     *
      * @param valueTemplate the valueTemplate to set
      */
     public void setValueTemplate(String valueTemplate) {
@@ -91,6 +103,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Gets the data type.
+     *
      * @return the dataType
      */
     public String getDataType() {
@@ -98,6 +112,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Sets the data type.
+     *
      * @param dataType the dataType to set
      */
     public void setDataType(String dataType) {
@@ -123,6 +139,8 @@ public class ObjectProperty {
     }
 
     /**
+     * Gets the label.
+     *
      * @return the label
      */
     public String getLabel() {
@@ -141,7 +159,7 @@ public class ObjectProperty {
     /**
      * Sets {@link #predicateURI} for the {@link #predicate}, using the given {@link ValueFactory}.
      *
-     * @param The given {@link ValueFactory}.
+     * @param vf the new predicate uri
      */
     protected void setPredicateURI(ValueFactory vf) {
         this.predicateURI = vf.createURI(predicate);
@@ -177,5 +195,23 @@ public class ObjectProperty {
         public String toString() {
             return friendlyName;
         }
+    }
+
+    /**
+     * Gets the hint.
+     *
+     * @return the hint
+     */
+    public String getHint() {
+        return hint;
+    }
+
+    /**
+     * Sets the hint.
+     *
+     * @param hint the hint to set
+     */
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 }

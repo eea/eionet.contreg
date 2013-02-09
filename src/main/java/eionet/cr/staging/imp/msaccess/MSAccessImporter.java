@@ -32,8 +32,8 @@ import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.Table;
 
 import eionet.cr.staging.imp.ImportException;
-import eionet.cr.staging.imp.ImportLoggerImpl;
 import eionet.cr.staging.imp.ImporterIF;
+import eionet.cr.util.LogUtil;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -47,7 +47,7 @@ public class MSAccessImporter implements ImporterIF {
     private static final Logger LOGGER = Logger.getLogger(MSAccessImporter.class);
 
     /** For logging the import log messages. */
-    private ImportLoggerImpl importLogger;
+    private Logger importLogger;
 
     /** If true, only the staging database's structure should be imported and no data. */
     private boolean structOnly;
@@ -60,11 +60,7 @@ public class MSAccessImporter implements ImporterIF {
      *
      * @param importLogger the import logger
      */
-    public MSAccessImporter(ImportLoggerImpl importLogger) {
-
-        if (importLogger == null) {
-            throw new IllegalArgumentException("The given import logger must not be null!");
-        }
+    public MSAccessImporter(Logger importLogger) {
 
         this.importLogger = importLogger;
     }
@@ -86,9 +82,7 @@ public class MSAccessImporter implements ImporterIF {
 
             Set<String> tableNames = getTableNames(database);
             if (tableNames == null || tableNames.isEmpty()) {
-                String message = "Found no tables in the database";
-                importLogger.info(message);
-                LOGGER.info(message);
+                LogUtil.info("Found no tables in the database", LOGGER, importLogger);
                 return;
             }
 
@@ -101,18 +95,15 @@ public class MSAccessImporter implements ImporterIF {
 
                 if (!structOnly) {
 
-                    String message = "Going to process the " + table.getRowCount() + " rows of table " + tableName;
-                    importLogger.info(message);
-                    LOGGER.info(message);
+                    LogUtil.info("Going to process the " + table.getRowCount() + " rows of table " + tableName, LOGGER, importLogger);
+
                     int rowNum = 0;
                     for (Map<String, Object> row : table) {
                         try {
                             rowNum++;
                             handler.processRow(table, row);
                         } catch (ImportException e) {
-                            message = e.getClass().getSimpleName() + " at row #" + rowNum;
-                            importLogger.error(message);
-                            LOGGER.error(message);
+                            LogUtil.error(e.getClass().getSimpleName() + " at row #" + rowNum, LOGGER, importLogger);
                             throw e;
                         }
                     }

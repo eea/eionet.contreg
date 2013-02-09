@@ -19,14 +19,15 @@
  *        jaanus
  */
 
-package eionet.cr.staging.imp;
+package eionet.cr.staging.exp;
 
+// TODO: Auto-generated Javadoc
 /**
- * Enumeration for the import statuses of staging databases.
+ * Enumeration for the RDF export statuses of staging databases.
  *
  * @author jaanus
  */
-public enum ImportStatus {
+public enum ExportStatus {
 
     /** */
     NOT_STARTED("Not started"), STARTED("Started"), ERROR("Error"), COMPLETED("Completed"), COMPLETED_WARNINGS(
@@ -40,7 +41,7 @@ public enum ImportStatus {
      *
      * @param friendlyName the friendly name
      */
-    private ImportStatus(String friendlyName) {
+    private ExportStatus(String friendlyName) {
         this.friendlyName = friendlyName;
     }
 
@@ -62,4 +63,15 @@ public enum ImportStatus {
     public String getName() {
         return name();
     }
+
+    /**
+     * Checks if is finished.
+     *
+     * @return true, if is finished
+     */
+    public boolean isFinished() {
+        return this.equals(ExportStatus.COMPLETED) || this.equals(ExportStatus.COMPLETED_WARNINGS)
+                || this.equals(ExportStatus.ERROR);
+    }
+
 }

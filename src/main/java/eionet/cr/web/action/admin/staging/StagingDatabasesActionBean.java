@@ -33,18 +33,18 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
-import eionet.cr.staging.imp.ImportLogLevel;
 import eionet.cr.staging.imp.ImportStatus;
+import eionet.cr.staging.util.ImportExportLogUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
+// TODO: Auto-generated Javadoc
 /**
  * An action bean for listing the currently available "staging databases" and performing bulk operations with them (e.g. delete).
  * The feature of "staging databases" has been developed specifically for the European Commission's "Digital Agenda Scoreboard"
@@ -77,7 +77,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
      * The bean's default event handler method.
      *
      * @return Resolution to go to.
-     * @throws DAOException
+     * @throws DAOException the dAO exception
      */
     @DefaultHandler
     public Resolution defaultHandler() throws DAOException {
@@ -86,8 +86,9 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Delete.
      *
-     * @return
+     * @return the resolution
      */
     public Resolution delete() {
 
@@ -107,9 +108,10 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Open log.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException the dAO exception
      */
     public Resolution openLog() throws DAOException {
 
@@ -120,7 +122,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
         } else if (log.trim().length() == 0) {
             log = "Import log for this database is empty!";
         } else {
-            log = formatImportLog(log);
+            log = ImportExportLogUtil.formatLogForDisplay(log);
         }
 
         return new StreamingResolution("text/html", log);
@@ -147,6 +149,14 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
      */
     public Class getAvailableFilesActionBeanClass() {
         return AvailableFilesActionBean.class;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Class getRdfExportsActionBeanClass() {
+        return RDFExportsActionBean.class;
     }
 
     /**
@@ -180,6 +190,8 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
 
     /**
      * Creates and returns a map of database import statuses. The keys are the status names, the values are their friendly names.
+     *
+     * @return the map
      */
     private static Map<String, String> createImportStatuses() {
 
@@ -197,40 +209,5 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
      */
     public void setDatabaseId(int databaseId) {
         this.databaseId = databaseId;
-    }
-
-    /**
-     *
-     * @param log
-     * @return
-     */
-    private String formatImportLog(String log) {
-
-        StringBuilder sb = new StringBuilder("<div>");
-        String[] lines = log.split("\\n");
-        if (lines != null) {
-            for (int i = 0; i < lines.length; i++) {
-                sb.append(formatImportLogLine(lines[i])).append("<br/>");
-            }
-        }
-        return sb.append("</div>").toString();
-    }
-
-    /**
-     * @param line
-     * @return
-     */
-    private String formatImportLogLine(String line) {
-
-        String start = ImportLogLevel.WARNING.name() + ":";
-        if (line.startsWith(start)) {
-            StringUtils.replaceOnce(line, start, "<span style=\"color:#F5B800\">" + start + "</span>");
-        }
-        start = ImportLogLevel.ERROR.name() + ":";
-        if (line.startsWith(start)) {
-            StringUtils.replaceOnce(line, start, "<span style=\"color:#FF0000\">" + start + "</span>");
-        }
-
-        return StringUtils.replace(line, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
     }
 }

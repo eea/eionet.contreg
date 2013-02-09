@@ -21,45 +21,34 @@
 
 package eionet.cr.staging.imp;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
+
 /**
- * Enumeration for the import statuses of staging databases.
+ * An implementation of {@link LoggerFactory} that returns instances of {@link ImportLogger}.
  *
  * @author jaanus
  */
-public enum ImportStatus {
+public class ImportLoggerFactory implements LoggerFactory {
 
     /** */
-    NOT_STARTED("Not started"), STARTED("Started"), ERROR("Error"), COMPLETED("Completed"), COMPLETED_WARNINGS(
-            "Completed with warnings");
-
-    /** */
-    private String friendlyName;
+    public static final ImportLoggerFactory INSTANCE = new ImportLoggerFactory();
 
     /**
-     * The constructor that takes friendly name as the input.
-     *
-     * @param friendlyName the friendly name
+     * Hide constructor.
      */
-    private ImportStatus(String friendlyName) {
-        this.friendlyName = friendlyName;
+    private ImportLoggerFactory() {
+        // Just hiding the constructor.
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see java.lang.Enum#toString()
+     * @see org.apache.log4j.spi.LoggerFactory#makeNewLoggerInstance(java.lang.String)
      */
     @Override
-    public String toString() {
-        return friendlyName;
+    public Logger makeNewLoggerInstance(String name) {
+        return new ImportLogger(name);
     }
 
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name();
-    }
 }

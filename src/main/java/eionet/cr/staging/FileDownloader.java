@@ -49,7 +49,7 @@ public class FileDownloader extends Thread {
     private static final Logger LOGGER = Logger.getLogger(FileDownloader.class);
 
     /** */
-    public static final File FILES_DIR = new File(GeneralConfig.getRequiredProperty(GeneralConfig.STAGING_FILES_DIR));
+    public static final File FILES_DIR = getFilesDir();
 
     /** */
     public static final String FILE_SUFFIX = ".downloading";
@@ -204,5 +204,25 @@ public class FileDownloader extends Thread {
      */
     private static boolean fileExists(String fileName) {
         return new File(FILES_DIR, fileName).exists() || new File(FILES_DIR, fileName + FILE_SUFFIX).exists();
+    }
+
+    /**
+     * Returns java.io.File pointing to the directory where the available files should be kept in.
+     * @return The java.io.File.
+     */
+    private static final File getFilesDir() {
+
+        File file = new File(GeneralConfig.getRequiredProperty(GeneralConfig.STAGING_FILES_DIR));
+        if (!file.exists() || !file.isDirectory()) {
+            String userHome = System.getProperty("user.home");
+            if (StringUtils.isNotBlank(userHome)) {
+                file = new File(userHome);
+                if (!file.exists() || !file.isDirectory()) {
+                    file = new File(".");
+                }
+            }
+        }
+
+        return file;
     }
 }

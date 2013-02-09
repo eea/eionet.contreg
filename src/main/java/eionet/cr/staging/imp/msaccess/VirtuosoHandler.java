@@ -14,8 +14,8 @@ import org.apache.log4j.Logger;
 import com.healthmarketscience.jackcess.Table;
 
 import eionet.cr.staging.imp.ImportException;
-import eionet.cr.staging.imp.ImportLoggerImpl;
 import eionet.cr.staging.util.VirtuosoUtil;
+import eionet.cr.util.LogUtil;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -55,7 +55,7 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
     private String dbUser;
 
     /** */
-    private ImportLoggerImpl importLogger;
+    private Logger importLogger;
 
     /**
      * Instantiates a new virtuoso handler.
@@ -63,14 +63,10 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
      * @param dbName the db name
      * @param importLogger the import logger
      */
-    public VirtuosoHandler(String dbName, ImportLoggerImpl importLogger) {
+    public VirtuosoHandler(String dbName, Logger importLogger) {
 
         if (StringUtils.isBlank(dbName)) {
             throw new IllegalArgumentException("Database name must not be blank!");
-        }
-
-        if (importLogger == null) {
-            throw new IllegalArgumentException("Import logger must not be null!");
         }
 
         this.dbName = dbName;
@@ -87,11 +83,7 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
 
         try {
             String sql = VirtuosoUtil.createTableStatement(table, dbName, getDbUser());
-
-            String message = "Creating table:\n" + sql;
-            importLogger.info(message);
-            LOGGER.debug(message);
-
+            LogUtil.debug("Creating table:\n" + sql, LOGGER, importLogger);
             SQLUtil.executeUpdate(sql, conn);
         } catch (SQLException e) {
             throw new ImportException("Failed to create table " + table.getName(), e);

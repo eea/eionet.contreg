@@ -11,19 +11,19 @@
                 $(document).ready(
                     function(){
 
-                        // Open delete bookmarked queries dialog
+                        // Open folder creation dialog
                         $("#createFolderLink").click(function() {
                             $('#createFolderDialog').dialog('open');
                             return false;
                         });
 
-                        // Delete bookmarked queries dialog setup
+                        // Folder creation dialog setup.
                         $('#createFolderDialog').dialog({
                             autoOpen: false,
                             width: 500
                         });
 
-                        // Close dialog
+                        // Close folder creation dialog
                         $("#closeFolderDialog").click(function() {
                             $('#createFolderDialog').dialog("close");
                             return true;

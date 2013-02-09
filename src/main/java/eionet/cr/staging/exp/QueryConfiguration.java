@@ -33,6 +33,9 @@ import java.util.Map.Entry;
  */
 public class QueryConfiguration implements Serializable {
 
+    /** */
+    private static final String LINE_BREAK = "\n";
+
     /** The query. */
     private String query;
 
@@ -48,11 +51,25 @@ public class QueryConfiguration implements Serializable {
     /** The object id namespace. */
     private String objectIdNamespace;
 
-    /** The dataset column. */
-    private String datasetColumn;
+    /** Template for the dataset ID. */
+    private String datasetIdTemplate;
 
     /** The dataset namespace. */
-    private String datasetNamespace;
+    private String datasetIdNamespace;
+
+    /**
+     * @return the datasetIdTemplate
+     */
+    public String getDatasetIdTemplate() {
+        return datasetIdTemplate;
+    }
+
+    /**
+     * @param datasetIdTemplate the datasetIdTemplate to set
+     */
+    public void setDatasetIdTemplate(String datasetIdTemplate) {
+        this.datasetIdTemplate = datasetIdTemplate;
+    }
 
     /**
      * @return the query
@@ -126,20 +143,6 @@ public class QueryConfiguration implements Serializable {
     }
 
     /**
-     * @return the datasetColumn
-     */
-    public String getDatasetColumn() {
-        return datasetColumn;
-    }
-
-    /**
-     * @param datasetColumn the datasetColumn to set
-     */
-    public void setDatasetColumn(String datasetColumn) {
-        this.datasetColumn = datasetColumn;
-    }
-
-    /**
      * Clear column mappings.
      */
     public void clearColumnMappings() {
@@ -161,17 +164,17 @@ public class QueryConfiguration implements Serializable {
     }
 
     /**
-     * @return the datasetNamespace
+     * @return the datasetIdNamespace
      */
-    public String getDatasetNamespace() {
-        return datasetNamespace;
+    public String getDatasetIdNamespace() {
+        return datasetIdNamespace;
     }
 
     /**
-     * @param datasetNamespace the datasetNamespace to set
+     * @param datasetIdNamespace the datasetIdNamespace to set
      */
-    public void setDatasetNamespace(String datasetNamespace) {
-        this.datasetNamespace = datasetNamespace;
+    public void setDatasetIdNamespace(String datasetIdNamespace) {
+        this.datasetIdNamespace = datasetIdNamespace;
     }
 
     /**
@@ -192,11 +195,36 @@ public class QueryConfiguration implements Serializable {
                 entry.setValue(defaultProperty);
             }
 
-            objectIdTemplate = objectType.getIdTemplate();
-            datasetColumn = objectType.getDatasetColumn();
+            objectIdTemplate = objectType.getObjectIdTemplate();
+            datasetIdTemplate = objectType.getDatasetIdTemplate();
 
-            objectIdNamespace = objectType.getIdNamespace();
-            datasetNamespace = objectType.getDatasetNamespace();
+            objectIdNamespace = objectType.getObjectIdNamespace();
+            datasetIdNamespace = objectType.getDatasetIdNamespace();
         }
     }
+
+    /**
+     * Returns a string "dump" of this {@link QueryConfiguration} that is suitable for storage into the RDF export table in the
+     * database.
+     * @return The string "dump".
+     */
+    public String toLongString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Query]").append(LINE_BREAK);
+        sb.append(query).append(LINE_BREAK);
+        sb.append(LINE_BREAK);
+        sb.append("[Column mappings]").append(LINE_BREAK);
+        for (Entry<String, ObjectProperty> entry : columnMappings.entrySet()) {
+            sb.append(entry.getKey()).append(" = ").append(entry.getValue().getLabel()).append(LINE_BREAK);
+        }
+        sb.append(LINE_BREAK);
+        sb.append("[Other settings]").append(LINE_BREAK);
+        sb.append("Dataset identifier template: ").append(datasetIdTemplate).append(LINE_BREAK);
+        sb.append("Objects identifier template: ").append(objectIdTemplate);
+        sb.append(LINE_BREAK);
+
+        return sb.toString();
+    }
+
 }

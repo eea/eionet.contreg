@@ -19,15 +19,36 @@
  *        jaanus
  */
 
-package eionet.cr.staging.imp;
+package eionet.cr.staging.exp;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
 
 /**
- * Enumeration for the categories of staging database import log messages.
+ * An implementation of {@link LoggerFactory} that returns instances of {@link ExportLogger}.
  *
  * @author jaanus
  */
-public enum ImportLogLevel {
+public class ExportLoggerFactory implements LoggerFactory {
 
     /** */
-    INFO, WARNING, ERROR;
+    public static final ExportLoggerFactory INSTANCE = new ExportLoggerFactory();
+
+    /**
+     * Hide the constructor.
+     */
+    private ExportLoggerFactory() {
+        // Hide the constructor.
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.apache.log4j.spi.LoggerFactory#makeNewLoggerInstance(java.lang.String)
+     */
+    @Override
+    public Logger makeNewLoggerInstance(String name) {
+        return new ExportLogger(name);
+    }
+
 }

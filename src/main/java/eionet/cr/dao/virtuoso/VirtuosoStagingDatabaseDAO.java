@@ -49,8 +49,14 @@ import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.StagingDatabaseDTOReader;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.exp.ExportDTO;
+import eionet.cr.staging.exp.ExportDTOReader;
+import eionet.cr.staging.exp.ExportRunner;
+import eionet.cr.staging.exp.ExportStatus;
+import eionet.cr.staging.exp.QueryConfiguration;
 import eionet.cr.staging.imp.ImportStatus;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * Virtuoso-specific implementation of {@link StagingDatabaseDAO}.
@@ -76,8 +82,23 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     private static final String UPDATE_IMPORT_STATUS_SQL = "update STAGING_DB set IMPORT_STATUS=? where DATABASE_ID=?";
 
     /** */
+    private static final String UPDATE_EXPORT_STATUS_SQL = "update STAGING_DB_RDF_EXPORT set STATUS=? where EXPORT_ID=?";
+
+    /** */
     private static final String ADD_IMPORT_LOG_MESSAGE_SQL =
             "update STAGING_DB set IMPORT_LOG=concat(IMPORT_LOG, ?) where DATABASE_ID=?";
+
+    /** */
+    private static final String START_RDF_EXPORT_SQL =
+            "insert into STAGING_DB_RDF_EXPORT (DATABASE_ID,EXPORT_NAME,USER_NAME,QUERY_CONF,STARTED,STATUS) values (?,?,?,?,?,?)";
+
+    /** */
+    private static final String FINISH_RDF_EXPORT_SQL =
+            "update STAGING_DB_RDF_EXPORT set FINISHED=?,STATUS=?,NOOF_SUBJECTS=?,NOOF_TRIPLES=?,GRAPHS=? where EXPORT_ID=?";
+
+    /** */
+    private static final String ADD_EXPORT_LOG_MESSAGE_SQL =
+            "update STAGING_DB_RDF_EXPORT set EXPORT_LOG=concat(EXPORT_LOG, ?) where EXPORT_ID=?";
 
     /** */
     private static final String LIST_ALL_SQL = "select * from STAGING_DB order by NAME asc";
@@ -90,6 +111,25 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
 
     /** */
     private static final String GET_IMPORT_LOG_SQL = "select IMPORT_LOG from STAGING_DB where DATABASE_ID=?";
+
+    /** */
+    private static final String GET_EXPORT_LOG_SQL = "select EXPORT_LOG from STAGING_DB_RDF_EXPORT where EXPORT_ID=?";
+
+    /** */
+    private static final String LIST_RDF_EXPORTS_SQL = "select STAGING_DB_RDF_EXPORT.*, STAGING_DB.NAME as DATABASE_NAME"
+            + " from STAGING_DB_RDF_EXPORT, STAGING_DB"
+            + " where STAGING_DB_RDF_EXPORT.DATABASE_ID=coalesce(?, STAGING_DB_RDF_EXPORT.DATABASE_ID)"
+            + " and STAGING_DB_RDF_EXPORT.DATABASE_ID=STAGING_DB.DATABASE_ID"
+            + " order by STAGING_DB_RDF_EXPORT.DATABASE_ID, STARTED desc";
+
+    /** */
+    private static final String GET_RDF_EXPORT_SQL = "select STAGING_DB_RDF_EXPORT.*, STAGING_DB.NAME as DATABASE_NAME"
+            + " from STAGING_DB_RDF_EXPORT, STAGING_DB"
+            + " where EXPORT_ID=? and STAGING_DB_RDF_EXPORT.DATABASE_ID=STAGING_DB.DATABASE_ID";
+
+    /** */
+    private static final String EXISTS_RDF_EXPORT_SQL =
+            "select count(*) from STAGING_DB_RDF_EXPORT where DATABASE_ID=? and EXPORT_NAME=?";
 
     /*
      * (non-Javadoc)
@@ -128,6 +168,64 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
             throw new DAOException(e.getMessage(), e);
         } catch (CRException e) {
             throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#startRDEExport(int, java.lang.String, eionet.cr.staging.exp.QueryConfiguration)
+     */
+    @Override
+    public int startRDEExport(int databaseId, String exportName, String userName, QueryConfiguration queryConf)
+            throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(databaseId);
+        params.add(exportName);
+        params.add(userName);
+        params.add(queryConf.toLongString());
+        params.add(new Date());
+        params.add(ExportStatus.STARTED.name());
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            return SQLUtil.executeUpdateReturnAutoID(START_RDF_EXPORT_SQL, params, conn);
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } catch (CRException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#finishRDFExport(int, eionet.cr.staging.exp.ExportRunner,
+     * eionet.cr.staging.exp.ExportStatus)
+     */
+    @Override
+    public void finishRDFExport(int exportId, ExportRunner exportRunner, ExportStatus status) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(new Date());
+        params.add(status.name());
+        params.add(exportRunner.getSubjectCount());
+        params.add(exportRunner.getTripleCount());
+        params.add(StringUtils.join(exportRunner.getDistinctGraphs(), '\n'));
+        params.add(exportId);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeUpdate(FINISH_RDF_EXPORT_SQL, params, conn);
+        } catch (SQLException e) {
+            throw new DAOException("Finishing RDF export record failed with " + e.getClass().getSimpleName(), e);
         } finally {
             SQLUtil.close(conn);
         }
@@ -187,10 +285,33 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     /*
      * (non-Javadoc)
      *
+     * @see eionet.cr.dao.StagingDatabaseDAO#updateExportStatus(int, eionet.cr.staging.exp.ExportStatus)
+     */
+    @Override
+    public void updateExportStatus(int exportId, ExportStatus status) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(status.name());
+        params.add(exportId);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeUpdate(UPDATE_EXPORT_STATUS_SQL, params, conn);
+        } catch (SQLException e) {
+            throw new DAOException("Updating database RDF export status failed with " + e.getClass().getSimpleName(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.StagingDatabaseDAO#addImportLogMessage(java.lang.String, eionet.cr.staging.ImportLogLevel)
      */
     @Override
-    public void addImportLogMessage(int databaseId, String message) throws DAOException {
+    public void appendToImportLog(int databaseId, String message) throws DAOException {
 
         ArrayList<Object> params = new ArrayList<Object>();
         params.add(message);
@@ -202,6 +323,29 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
             SQLUtil.executeUpdate(ADD_IMPORT_LOG_MESSAGE_SQL, params, conn);
         } catch (SQLException e) {
             throw new DAOException("Adding database import log message failed with " + e.getClass().getSimpleName(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#appendToExportLog(int, java.lang.String)
+     */
+    @Override
+    public void appendToExportLog(int exportId, String message) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(message);
+        params.add(exportId);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeUpdate(ADD_EXPORT_LOG_MESSAGE_SQL, params, conn);
+        } catch (SQLException e) {
+            throw new DAOException("Adding database RDF export log message failed with " + e.getClass().getSimpleName(), e);
         } finally {
             SQLUtil.close(conn);
         }
@@ -374,6 +518,49 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     /*
      * (non-Javadoc)
      *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getExportLog(int)
+     */
+    @Override
+    public String getExportLog(int exportId) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(Integer.valueOf(exportId));
+
+        ResultSet rs = null;
+        Statement stmt = null;
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(GET_EXPORT_LOG_SQL.replace("?", String.valueOf(exportId)));
+            if (rs.next()) {
+                Blob blob = rs.getBlob(1);
+                if (blob != null) {
+                    try {
+                        return blob.length() == 0 ? "" : IOUtils.toString(blob.getBinaryStream());
+                    } catch (IOException e) {
+                        LOGGER.warn("Could not retreive log of the RDF export with id = " + exportId + ": " + e);
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.StagingDatabaseDAO#prepareStatement(java.lang.String, java.lang.String)
      */
     @Override
@@ -404,5 +591,48 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         }
 
         return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#listRDFExports(int)
+     */
+    @Override
+    public List<ExportDTO> listRDFExports(int databaseId) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(databaseId <= 0 ? (Integer) null : Integer.valueOf(databaseId));
+        return executeSQL(LIST_RDF_EXPORTS_SQL, params, new ExportDTOReader());
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getRDFExport(int)
+     */
+    @Override
+    public ExportDTO getRDFExport(int exportId) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(exportId);
+        List<ExportDTO> list = executeSQL(GET_RDF_EXPORT_SQL, params, new ExportDTOReader());
+        return list == null || list.isEmpty() ? null : list.iterator().next();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#existsRDFExport(int, java.lang.String)
+     */
+    @Override
+    public boolean existsRDFExport(int databaseId, String exportName) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(databaseId);
+        params.add(exportName);
+
+        Object o = executeUniqueResultSQL(EXISTS_RDF_EXPORT_SQL, params, new SingleObjectReader<Object>());
+        return o == null ? false : Integer.parseInt(o.toString()) > 0;
     }
 }

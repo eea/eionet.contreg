@@ -85,7 +85,7 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     private List<String> fileNames;
 
     /**
-     * List.
+     * List all available files.
      *
      * @return the resolution
      */

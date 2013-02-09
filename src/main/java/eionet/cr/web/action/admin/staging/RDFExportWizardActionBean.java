@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,12 +44,13 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.staging.exp.ExportRunner;
 import eionet.cr.staging.exp.ObjectProperty;
 import eionet.cr.staging.exp.ObjectType;
 import eionet.cr.staging.exp.ObjectTypes;
 import eionet.cr.staging.exp.QueryConfiguration;
-import eionet.cr.staging.exp.QueryRunner;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -59,7 +61,7 @@ import eionet.cr.web.action.AbstractActionBean;
  */
 @SessionScope
 @UrlBinding("/admin/exportRDF.action")
-public class ExportRDFActionBean extends AbstractActionBean {
+public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /**  */
     private static final String COLUMN_PROPERTY_PARAM_SUFFIX = ".property";
@@ -75,6 +77,9 @@ public class ExportRDFActionBean extends AbstractActionBean {
 
     /** */
     private QueryConfiguration queryConf;
+
+    /** */
+    private String exportName;
 
     /** */
     private String prevDbName;
@@ -113,7 +118,7 @@ public class ExportRDFActionBean extends AbstractActionBean {
         if (!queryConf.getObjectTypeUri().equals(prevObjectTypeUri)) {
 
             queryConf.clearColumnMappings();
-            queryConf.setDatasetColumn(null);
+            queryConf.setDatasetIdTemplate(null);
             queryConf.setObjectIdTemplate(null);
             objectTypeChanged = true;
             prevObjectTypeUri = queryConf.getObjectTypeUri();
@@ -165,10 +170,9 @@ public class ExportRDFActionBean extends AbstractActionBean {
         }
 
         StagingDatabaseDTO dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
-        QueryRunner queryRunner = new QueryRunner(dbDTO, queryConf);
-        queryRunner.start();
+        ExportRunner.start(dbDTO, exportName, getUserName(), queryConf);
 
-        addSystemMessage("RDF export successfully started! Use operations menu to monitor progress.");
+        addSystemMessage("RDF export successfully started! Use operations menu to list ongoing and finished RDF exports from this database.");
         return new RedirectResolution(StagingDatabaseActionBean.class).addParameter("dbName", dbName);
     }
 
@@ -202,15 +206,16 @@ public class ExportRDFActionBean extends AbstractActionBean {
     /**
      * Validate step2.
      */
-    @ValidationMethod(on = {"step2", "backToStep1"})
+    @ValidationMethod(on = {"step2"})
     public void validateStep2() {
 
         HttpServletRequest request = getContext().getRequest();
         ObjectType objectType = getObjectType();
 
+        Map<String, ObjectProperty> colMappings = null;
         if (objectType != null) {
 
-            Map<String, ObjectProperty> colMappings = queryConf == null ? null : queryConf.getColumnMappings();
+            colMappings = queryConf == null ? null : queryConf.getColumnMappings();
             if (colMappings != null && !colMappings.isEmpty()) {
 
                 for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
@@ -226,14 +231,20 @@ public class ExportRDFActionBean extends AbstractActionBean {
             }
         }
 
-        String datasetColumn = request.getParameter("queryConf.datasetColumn");
+        String datasetIdTemplate = request.getParameter("queryConf.datasetIdTemplate");
         String objectIdTemplate = request.getParameter("queryConf.objectIdTemplate");
 
-        if (StringUtils.isBlank(datasetColumn)) {
-            addGlobalValidationError("You must specify the dataset column!");
+        if (StringUtils.isBlank(datasetIdTemplate)) {
+            addGlobalValidationError("You must specify the dataset identifier template!");
         }
         if (StringUtils.isBlank(objectIdTemplate)) {
-            addGlobalValidationError("You must specify the identifier template!");
+            addGlobalValidationError("You must specify the objects identifier template!");
+        }
+        if (!validateColumnPlaceHolders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+            addGlobalValidationError("Dataset identifier template has placeholder(s) not matching any of the selected columns!");
+        }
+        if (!validateColumnPlaceHolders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+            addGlobalValidationError("Objects identifier template has placeholder(s) not matching any of the selected columns!");
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(STEP2_JSP));
@@ -247,28 +258,56 @@ public class ExportRDFActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"step1"})
     public void validateStep1() throws DAOException {
 
+        StagingDatabaseDAO dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
+        StagingDatabaseDTO dbDTO = null;
+
         // Validate the database name.
         if (StringUtils.isBlank(dbName)) {
             addGlobalValidationError("Database name must be given!");
-        } else if (!DAOFactory.get().getDao(StagingDatabaseDAO.class).exists(dbName)) {
-            addGlobalValidationError("Found no staging database by this name: " + dbName);
+        } else {
+            dbDTO = dao.getDatabaseByName(dbName);
+            if (dbDTO == null) {
+                addGlobalValidationError("Found no staging database by this name: " + dbName);
+            }
         }
 
-        // More validations if POST method.
-        if (getContext().getRequest().getMethod().equalsIgnoreCase("POST")) {
-            String query = queryConf == null ? null : queryConf.getQuery();
-            if (StringUtils.isBlank(query)) {
-                addGlobalValidationError("The query must not be blank!");
-            }
+        if (getContext().getValidationErrors().isEmpty()) {
 
-            String objectTypeUri = queryConf == null ? null : queryConf.getObjectTypeUri();
-            if (StringUtils.isBlank(objectTypeUri)) {
-                addGlobalValidationError("The type of objects must not be blank!");
+            // More validations if POST method.
+            if (getContext().getRequest().getMethod().equalsIgnoreCase("POST")) {
+
+                String query = queryConf == null ? null : queryConf.getQuery();
+                if (StringUtils.isBlank(query)) {
+                    addGlobalValidationError("The query must not be blank!");
+                }
+
+                String objectTypeUri = queryConf == null ? null : queryConf.getObjectTypeUri();
+                if (StringUtils.isBlank(objectTypeUri)) {
+                    addGlobalValidationError("The type of objects must not be blank!");
+                }
+
+                if (StringUtils.isBlank(exportName)) {
+                    addGlobalValidationError("The name must not be blank!");
+                } else if (dbDTO != null && dao.existsRDFExport(dbDTO.getId(), exportName)) {
+                    addGlobalValidationError("An RDF export by this name for this database has already been run!");
+                }
             }
         }
 
         // Set source page resolution to which the user will be returned.
         getContext().setSourcePageResolution(new ForwardResolution(STEP1_JSP));
+    }
+
+    /**
+     *
+     */
+    @ValidationMethod(priority = 1)
+    public void validateUserAuthorised() {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
+        }
     }
 
     /**
@@ -341,5 +380,49 @@ public class ExportRDFActionBean extends AbstractActionBean {
         }
 
         return null;
+    }
+
+    /**
+     * @return the exportName
+     */
+    public String getExportName() {
+        return exportName;
+    }
+
+    /**
+     * @param exportName the exportName to set
+     */
+    public void setExportName(String exportName) {
+        this.exportName = exportName;
+    }
+
+    /**
+     *
+     * @param template
+     * @param colNames
+     * @return
+     */
+    private boolean validateColumnPlaceHolders(String template, Set<String> colNames) {
+
+        if (colNames == null || colNames.isEmpty()) {
+            return true;
+        }
+
+        int length = template.length();
+        for (int i = 0; i < length; i++) {
+
+            char c = template.charAt(i);
+            if (c == '<') {
+                int j = template.indexOf('>', i);
+                if (j != -1) {
+                    String colName = template.substring(i + 1, j);
+                    if (!colNames.contains(colName)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }
