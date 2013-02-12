@@ -35,8 +35,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -49,6 +51,7 @@ import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.StagingDatabaseDTOReader;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.dto.StagingDatabaseTableColumnDTO;
 import eionet.cr.staging.exp.ExportDTO;
 import eionet.cr.staging.exp.ExportDTOReader;
 import eionet.cr.staging.exp.ExportRunner;
@@ -71,6 +74,9 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     /** */
     private static final String ADD_NEW_DB_SQL =
             "insert into STAGING_DB (NAME,CREATOR,CREATED,DESCRIPTION,IMPORT_STATUS,IMPORT_LOG) values (?,?,?,?,?,?)";
+
+    /** */
+    private static final String UPDATE_DB_METADATA_SQL = "update STAGING_DB set DESCRIPTION=?, DEFAULT_QUERY=? where DATABASE_ID=?";
 
     /** */
     private static final String GET_DATABASE_BY_ID_SQL = "select * from STAGING_DB where DATABASE_ID=?";
@@ -173,6 +179,29 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         }
     }
 
+
+    /* (non-Javadoc)
+     * @see eionet.cr.dao.StagingDatabaseDAO#updateDatabaseMetadata(int, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void updateDatabaseMetadata(int id, String description, String defaultQuery) throws DAOException {
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(description);
+        params.add(defaultQuery);
+        params.add(id);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            SQLUtil.executeUpdate(UPDATE_DB_METADATA_SQL, params, conn);
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -257,6 +286,39 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         params.add(name);
         List<StagingDatabaseDTO> list = executeSQL(GET_DATABASE_BY_NAME_SQL, params, new StagingDatabaseDTOReader());
         return list == null || list.isEmpty() ? null : list.iterator().next();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getTablesColumns(java.lang.String)
+     */
+    @Override
+    public List<StagingDatabaseTableColumnDTO> getTablesColumns(String dbName) throws DAOException {
+
+        ArrayList<StagingDatabaseTableColumnDTO> result = new ArrayList<StagingDatabaseTableColumnDTO>();
+
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            DatabaseMetaData metaData = conn.getMetaData();
+            rs = metaData.getColumns(dbName, null, null, null);
+            while (rs.next()) {
+                String table = rs.getString("TABLE_NAME");
+                String column = rs.getString("COLUMN_NAME");
+                String dataType = rs.getString("TYPE_NAME");
+                StagingDatabaseTableColumnDTO dto = new StagingDatabaseTableColumnDTO(table, column, dataType);
+                result.add(dto);
+            }
+        } catch (SQLException e) {
+            throw new DAOException("Failure getting the tables and columns of database: " + dbName, e);
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(conn);
+        }
+
+        return result;
     }
 
     /*
@@ -564,13 +626,13 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
      * @see eionet.cr.dao.StagingDatabaseDAO#prepareStatement(java.lang.String, java.lang.String)
      */
     @Override
-    public List<String> prepareStatement(String sql, String dbName) throws DAOException {
+    public Set<String> prepareStatement(String sql, String dbName) throws DAOException {
 
         if (StringUtils.isBlank(sql)) {
             throw new IllegalArgumentException("The given SQL statement must not be blank!");
         }
 
-        ArrayList<String> result = new ArrayList<String>();
+        LinkedHashSet<String> result = new LinkedHashSet<String>();
 
         Connection conn = null;
         PreparedStatement pstmt = null;

@@ -27,9 +27,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import eionet.cr.util.LinkedCaseInsensitiveMap;
+
 // TODO: Auto-generated Javadoc
 /**
- * Type definition ...
+ * Describes a possible type (as in RDF) of objects returned by an RDF export query on a staging database.
  *
  * @author jaanus
  */
@@ -57,7 +59,7 @@ public class ObjectType {
     private String datasetIdNamespace;
 
     /** */
-    private HashMap<String, ObjectProperty> columnToDefaultProperty = new HashMap<String, ObjectProperty>();
+    private LinkedCaseInsensitiveMap<ObjectProperty> columnToDefaultProperty = new LinkedCaseInsensitiveMap<ObjectProperty>();
 
     /** */
     private HashMap<String, ObjectProperty> predicateToProperty = new HashMap<String, ObjectProperty>();
@@ -108,7 +110,7 @@ public class ObjectType {
 
         if (defaultForColumn != null && defaultForColumn.length > 0) {
             for (String column : defaultForColumn) {
-                columnToDefaultProperty.put(column.toUpperCase(), property);
+                columnToDefaultProperty.put(column, property);
             }
         }
     }
@@ -129,7 +131,7 @@ public class ObjectType {
      * @return the default property
      */
     public ObjectProperty getDefaultProperty(String column) {
-        return columnToDefaultProperty.get(column.toUpperCase());
+        return columnToDefaultProperty.get(column);
     }
 
     /**
@@ -239,5 +241,21 @@ public class ObjectType {
      */
     public void setDatasetIdNamespace(String datasetIdNamespace) {
         this.datasetIdNamespace = datasetIdNamespace;
+    }
+
+    /**
+     *
+     * @param property
+     * @return
+     */
+    public boolean hasThisProperty(ObjectProperty property) {
+
+        for (ObjectProperty prop : properties) {
+            if (prop == property) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

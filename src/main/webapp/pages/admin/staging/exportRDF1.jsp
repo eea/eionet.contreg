@@ -20,8 +20,8 @@
                         // Setup the tables and columns popup
                         $('#tableAndColumnsPopup').dialog({
                             autoOpen: false,
-                            height: 500,
-                            width: 700,
+                            height: 400,
+                            width: 800,
                             maxHeight: 800,
                             maxWidth: 800
                         });
@@ -61,7 +61,7 @@
                             <stripes:label for="txtName" class="question required">Name:</stripes:label>
                         </td>
                         <td>
-                            <stripes:text id="txtName" name="exportName" size="80"/>&nbsp;&nbsp;<a href="#" id="openTableAndColumnsPopup">View tables and columns &#187;</a>
+                            <stripes:text id="txtName" name="exportName" size="80" value="${actionBean.defaultExportName}"/>&nbsp;&nbsp;<a href="#" id="openTableAndColumnsPopup">View tables and columns &#187;</a>
                         </td>
                     </tr>
                     <tr>
@@ -69,7 +69,7 @@
                              <stripes:label for="txtQuery" class="question required">Query:</stripes:label>
                          </td>
                          <td>
-                             <stripes:textarea id="txtQuery" name="queryConf.query" cols="80" rows="15"/>
+                             <stripes:textarea id="txtQuery" name="queryConf.query" cols="80" rows="15" value="${actionBean.dbDTO.defaultQuery}"/>
                          </td>
                      </tr>
                     <tr>
@@ -96,12 +96,23 @@
         </div>
 
         <div id="tableAndColumnsPopup" title="Tables and columns in this database">
-            <div style="height:90%;width:90%;background-color:#F0F0F0;">
-                <div style="padding-top:10%;padding-left:20%;width:50%;height:100px">
-                    <p>To be implemented:</p>
-                    here the tables and columns of this database can be explored.
+
+            <c:if test="${not empty actionBean.tablesColumns}">
+                <display:table name="${actionBean.tablesColumns}" id="tableColumn" class="datatable" style="width:100%;margin-top:30px">
+                   <display:caption style="text-align:left;margin-bottom:10px;">Tables and columns in this database:</display:caption>
+                   <display:column property="table" title="Table" style="width:34%"/>
+                   <display:column property="column" title="Column" style="width:33%"/>
+                   <display:column property="dataType" title="Data type" style="width:33%"/>
+                </display:table>
+            </c:if>
+
+            <c:if test="${empty actionBean.tablesColumns}">
+                <div class="note-msg" style="width:75%;margin-top:30px">
+                    <strong>Note</strong>
+                    <p>Found no tables in this database!</p>
                 </div>
-            </div>
+            </c:if>
+
         </div>
 
     </stripes:layout-component>

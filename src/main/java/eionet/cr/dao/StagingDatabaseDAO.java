@@ -22,8 +22,10 @@
 package eionet.cr.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.dto.StagingDatabaseTableColumnDTO;
 import eionet.cr.staging.exp.ExportDTO;
 import eionet.cr.staging.exp.ExportRunner;
 import eionet.cr.staging.exp.ExportStatus;
@@ -57,6 +59,16 @@ public interface StagingDatabaseDAO extends DAO {
     int createRecord(StagingDatabaseDTO databaseDTO, String userName) throws DAOException;
 
     /**
+     * Updates the description and defaultQuery of the database by the given id.
+     *
+     * @param id
+     * @param description
+     * @param defaultQuery
+     * @throws DAOException
+     */
+    void updateDatabaseMetadata(int id, String description, String defaultQuery) throws DAOException;
+
+    /**
      * Gets a staging database by the given id.
      *
      * @param id
@@ -73,6 +85,16 @@ public interface StagingDatabaseDAO extends DAO {
      * @throws DAOException
      */
     StagingDatabaseDTO getDatabaseByName(String name) throws DAOException;
+
+    /**
+     * Returns a list of {@link StagingDatabaseTableColumnDTO} for the given staging database. The returned list is ordered
+     * by table name and the oridnal position of columns in the table.
+     *
+     * @param dbName
+     * @return
+     * @throws DAOException
+     */
+    List<StagingDatabaseTableColumnDTO> getTablesColumns(String dbName) throws DAOException;
 
     /**
      *
@@ -151,7 +173,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return List of selected columns. It is empty if the statement is not a select query.
      * @throws DAOException In case any sort of database access error happens.
      */
-    public List<String> prepareStatement(String sql, String dbName) throws DAOException;
+    public Set<String> prepareStatement(String sql, String dbName) throws DAOException;
 
     /**
      * Creates a new staging database RDF export record in the database, using the given inputs. The newly created export's status

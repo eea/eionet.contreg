@@ -2,7 +2,7 @@
 
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Staging databases">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Staging database detailed view">
 
     <c:if test="${actionBean.dbDTO != null}">
         <stripes:layout-component name="head">
@@ -64,6 +64,17 @@
                                 <stripes:param name="databaseId" value="${actionBean.dbDTO.id}"/>
                             </stripes:link>
                         </li>
+                        <li>
+                            <stripes:link beanclass="${actionBean.class.name}" event="edit" title="Edit database metadata">
+                                <c:out value="Edit metadata"/>
+                                <stripes:param name="dbName" value="${actionBean.dbDTO.name}"/>
+                            </stripes:link>
+                        </li>
+                        <li>
+                            <stripes:link beanclass="${actionBean.stagingDatabasesActionBeanClass.name}" title="Go to list of available staging databases">
+                                <c:out value="Go to list of databases"/>
+                            </stripes:link>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -79,10 +90,10 @@
             <%-- The table with the database's details. --%>
 
             <div style="padding-top:20px">
-                <table class="datatable" style="width:75%">
+                <table class="datatable" style="width:85%">
                     <colgroup>
-                        <col width="20%">
-                        <col width="80%">
+                        <col width="30%">
+                        <col width="70%">
                     </colgroup>
                     <tr>
                         <th class="question" style="text-align:right" title="Name of the database">Name:</th>
@@ -109,13 +120,35 @@
                         <th class="question" style="text-align:right" title="Description of the database's purpose and meaning">Description:</th>
                         <td><c:out value="${actionBean.dbDTO.description}"/></td>
                     </tr>
+                    <tr>
+                        <th class="question" style="text-align:right" title="This database's default query for the RDF export wizard">Default export query:</th>
+                        <td>
+                            <c:if test="${empty actionBean.dbDTO.defaultQuery}">
+                                &nbsp;
+                            </c:if>
+                            <c:if test="${not empty actionBean.dbDTO.defaultQuery}">
+                                <pre style="font-size:0.75em;max-height:130px;overflow:auto"><c:out value="${actionBean.dbDTO.defaultQuery}" /></pre>
+                            </c:if>
+                        </td>
+                    </tr>
                 </table>
-                <div style="width:100%;height:300px;padding-top:20px;background-color:#F0F0F0">
-                    <div style="padding-top:10%;padding-left:20%;width:50%;height:100px">
-                        <p>To be implemented:</p>
-                        here the tables and columns of this database can be explored.
+
+                <c:if test="${not empty actionBean.tablesColumns}">
+                    <display:table name="${actionBean.tablesColumns}" id="tableColumn" class="datatable" style="width:100%;margin-top:30px">
+                       <display:caption style="text-align:left;margin-bottom:10px;">Tables and columns in this database:</display:caption>
+                       <display:column property="table" title="Table" style="width:34%"/>
+                       <display:column property="column" title="Column" style="width:33%"/>
+                       <display:column property="dataType" title="Data type" style="width:33%"/>
+                    </display:table>
+                </c:if>
+
+                <c:if test="${empty actionBean.tablesColumns}">
+                    <div class="note-msg" style="width:75%;margin-top:30px">
+                        <strong>Note</strong>
+                        <p>Found no tables in this database!</p>
                     </div>
-                </div>
+                </c:if>
+
             </div>
 
             <%-- The div that is invisible by default, but will be displayed and filled once the "open import log" operation is invoked. --%>

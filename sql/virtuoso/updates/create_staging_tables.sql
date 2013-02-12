@@ -7,6 +7,7 @@ create table CR.cr3user.staging_db
     description long varchar DEFAULT NULL,
     import_status varchar(30) DEFAULT NULL,
     import_log long varchar DEFAULT NULL,
+    default_query long varchar DEFAULT NULL,
     PRIMARY KEY (database_id),
     UNIQUE (name)
 );

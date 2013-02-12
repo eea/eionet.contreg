@@ -54,7 +54,7 @@
                                     <label for="${colMapping.key}.propertySelect" class="required"><c:out value="${colMapping.key}"/>:</label>
                                 </td>
                                 <td>
-                                    <stripes:select id="${colMapping.key}.propertySelect" name="${colMapping.key}.property" value="${colMapping.value.predicate}" title="${colMapping.value.hint}">
+                                    <stripes:select name="${colMapping.key}.property" value="${colMapping.value.predicate}" title="${colMapping.value.hint}" id="${colMapping.key}.propertySelect">
                                         <stripes:option value="" label=""/>
                                         <c:forEach items="${actionBean.typeProperties}" var="typeProperty">
                                             <stripes:option value="${typeProperty.predicate}" label="${typeProperty.label}" title="${typeProperty.hint}"/>

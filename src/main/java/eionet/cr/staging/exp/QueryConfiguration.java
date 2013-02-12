@@ -22,9 +22,10 @@
 package eionet.cr.staging.exp;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import eionet.cr.util.LinkedCaseInsensitiveMap;
 
 /**
  * A bean that represents an RDF export query's configuration (in the context of staging databases).
@@ -43,7 +44,7 @@ public class QueryConfiguration implements Serializable {
     private String objectTypeUri;
 
     /** The column mappings. */
-    private LinkedHashMap<String, ObjectProperty> columnMappings = new LinkedHashMap<String, ObjectProperty>();
+    private LinkedCaseInsensitiveMap<ObjectProperty> columnMappings = new LinkedCaseInsensitiveMap<ObjectProperty>();
 
     /** The object id template. */
     private String objectIdTemplate;
@@ -177,31 +178,31 @@ public class QueryConfiguration implements Serializable {
         this.datasetIdNamespace = datasetIdNamespace;
     }
 
-    /**
-     * Sets the defaults.
-     */
-    public void setDefaults() {
-
-        if (objectTypeUri == null || objectTypeUri.isEmpty()) {
-            return;
-        }
-
-        ObjectType objectType = ObjectTypes.getByUri(objectTypeUri);
-        if (objectType != null) {
-
-            for (Entry<String, ObjectProperty> entry : columnMappings.entrySet()) {
-                String column = entry.getKey();
-                ObjectProperty defaultProperty = objectType.getDefaultProperty(column);
-                entry.setValue(defaultProperty);
-            }
-
-            objectIdTemplate = objectType.getObjectIdTemplate();
-            datasetIdTemplate = objectType.getDatasetIdTemplate();
-
-            objectIdNamespace = objectType.getObjectIdNamespace();
-            datasetIdNamespace = objectType.getDatasetIdNamespace();
-        }
-    }
+    //    /**
+    //     * Sets the defaults.
+    //     */
+    //    public void setDefaults() {
+    //
+    //        if (objectTypeUri == null || objectTypeUri.isEmpty()) {
+    //            return;
+    //        }
+    //
+    //        ObjectType objectType = ObjectTypes.getByUri(objectTypeUri);
+    //        if (objectType != null) {
+    //
+    //            for (Entry<String, ObjectProperty> entry : columnMappings.entrySet()) {
+    //                String column = entry.getKey();
+    //                ObjectProperty defaultProperty = objectType.getDefaultProperty(column);
+    //                entry.setValue(defaultProperty);
+    //            }
+    //
+    //            objectIdTemplate = objectType.getObjectIdTemplate();
+    //            datasetIdTemplate = objectType.getDatasetIdTemplate();
+    //
+    //            objectIdNamespace = objectType.getObjectIdNamespace();
+    //            datasetIdNamespace = objectType.getDatasetIdNamespace();
+    //        }
+    //    }
 
     /**
      * Returns a string "dump" of this {@link QueryConfiguration} that is suitable for storage into the RDF export table in the
@@ -227,4 +228,10 @@ public class QueryConfiguration implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * @param columnMappings the columnMappings to set
+     */
+    public void setColumnMappings(LinkedCaseInsensitiveMap<ObjectProperty> columnMappings) {
+        this.columnMappings = columnMappings;
+    }
 }

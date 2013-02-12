@@ -21,7 +21,10 @@
 
 package eionet.cr.web.action.admin.staging;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,12 +32,14 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,11 +49,13 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.dto.StagingDatabaseTableColumnDTO;
 import eionet.cr.staging.exp.ExportRunner;
 import eionet.cr.staging.exp.ObjectProperty;
 import eionet.cr.staging.exp.ObjectType;
 import eionet.cr.staging.exp.ObjectTypes;
 import eionet.cr.staging.exp.QueryConfiguration;
+import eionet.cr.util.LinkedCaseInsensitiveMap;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
@@ -62,6 +69,9 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 @SessionScope
 @UrlBinding("/admin/exportRDF.action")
 public class RDFExportWizardActionBean extends AbstractActionBean {
+
+    /** */
+    private static final SimpleDateFormat DEFAULT_EXPORT_NAME_DATE_FORMAT = new SimpleDateFormat("yyMMdd_mmss");
 
     /**  */
     private static final String COLUMN_PROPERTY_PARAM_SUFFIX = ".property";
@@ -88,7 +98,13 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     private String prevObjectTypeUri;
 
     /** */
-    private List<String> prevColumnNames;
+    private Set<String> prevColumnNames;
+
+    /** */
+    private List<StagingDatabaseTableColumnDTO> tablesColumns;
+
+    /** */
+    private StagingDatabaseDTO dbDTO;
 
     /**
      * Event handler for the wizard's first step.
@@ -102,43 +118,35 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         // Handle GET request, just forward to the JSP and that's all.
         if (getContext().getRequest().getMethod().equalsIgnoreCase("GET")) {
 
-            // If this event is GET-requested with new database name, nullify the query configuration.
+            // If this event is GET-requested with a database name, nullify the query configuration.
             if (!dbName.equals(prevDbName)) {
                 queryConf = null;
-                prevDbName = dbName;
+                tablesColumns = null;
             }
+            prevDbName = dbName;
 
             return new ForwardResolution(STEP1_JSP);
         }
 
         // Handle POST request.
-
-        // If object type changed, reset query configuration.
-        boolean objectTypeChanged = false;
-        if (!queryConf.getObjectTypeUri().equals(prevObjectTypeUri)) {
-
-            queryConf.clearColumnMappings();
-            queryConf.setDatasetIdTemplate(null);
-            queryConf.setObjectIdTemplate(null);
-            objectTypeChanged = true;
-            prevObjectTypeUri = queryConf.getObjectTypeUri();
-        }
-
         try {
             // Compile the query on the database side, get the names of columns selected by the query.
-            List<String> columnNames =
+            Set<String> columnNames =
                     DAOFactory.get().getDao(StagingDatabaseDAO.class).prepareStatement(queryConf.getQuery(), dbName);
 
-            // If column names changed, clear the column mappings in the query configuration.
-            if (!columnNames.equals(prevColumnNames)) {
-                queryConf.clearColumnMappings();
-                queryConf.putColumnNames(columnNames);
-                prevColumnNames = columnNames;
+            // If column names changed, make corrections in the mappings map then too.
+            if (!equalsCaseInsensitive(columnNames, prevColumnNames)) {
+                selectedColumnsChanged(columnNames);
             }
+            prevColumnNames = columnNames;
 
-            if (objectTypeChanged) {
-                queryConf.setDefaults();
+            // If object type changed, change the templates of dataset ID and objects ID
+            if (!queryConf.getObjectTypeUri().equals(prevObjectTypeUri)) {
+                objectTypeChanged();
             }
+            prevObjectTypeUri = queryConf.getObjectTypeUri();
+
+            // Finally, return resolution.
             return new ForwardResolution(STEP2_JSP);
         } catch (DAOException e) {
             Throwable cause = e.getCause();
@@ -209,41 +217,31 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"step2"})
     public void validateStep2() {
 
-        HttpServletRequest request = getContext().getRequest();
-        ObjectType objectType = getObjectType();
+        Map<String, ObjectProperty> colMappings = queryConf == null ? null : queryConf.getColumnMappings();
+        if (colMappings != null && !colMappings.isEmpty()) {
 
-        Map<String, ObjectProperty> colMappings = null;
-        if (objectType != null) {
+            for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
 
-            colMappings = queryConf == null ? null : queryConf.getColumnMappings();
-            if (colMappings != null && !colMappings.isEmpty()) {
-
-                for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
-
-                    String colName = entry.getKey();
-                    String propertyPredicate = request.getParameter(colName + COLUMN_PROPERTY_PARAM_SUFFIX);
-                    if (StringUtils.isBlank(propertyPredicate)) {
-                        addGlobalValidationError("Missing property selection for this column: " + colName);
-                    } else {
-                        entry.setValue(objectType.getPropertyByPredicate(propertyPredicate));
-                    }
+                String colName = entry.getKey();
+                if (entry.getValue() == null) {
+                    addGlobalValidationError("Missing property selection for this column: " + colName);
                 }
             }
+        } else {
+            addGlobalValidationError("Found no column mappings!");
         }
 
-        String datasetIdTemplate = request.getParameter("queryConf.datasetIdTemplate");
-        String objectIdTemplate = request.getParameter("queryConf.objectIdTemplate");
-
+        String datasetIdTemplate = queryConf.getDatasetIdTemplate();
         if (StringUtils.isBlank(datasetIdTemplate)) {
             addGlobalValidationError("You must specify the dataset identifier template!");
-        }
-        if (StringUtils.isBlank(objectIdTemplate)) {
-            addGlobalValidationError("You must specify the objects identifier template!");
-        }
-        if (!validateColumnPlaceHolders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+        } else if (!validateColumnPlaceholders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
             addGlobalValidationError("Dataset identifier template has placeholder(s) not matching any of the selected columns!");
         }
-        if (!validateColumnPlaceHolders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+
+        String objectIdTemplate = queryConf.getObjectIdTemplate();
+        if (StringUtils.isBlank(objectIdTemplate)) {
+            addGlobalValidationError("You must specify the objects identifier template!");
+        } else if (!validateColumnPlaceholders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
             addGlobalValidationError("Objects identifier template has placeholder(s) not matching any of the selected columns!");
         }
 
@@ -259,7 +257,6 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     public void validateStep1() throws DAOException {
 
         StagingDatabaseDAO dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
-        StagingDatabaseDTO dbDTO = null;
 
         // Validate the database name.
         if (StringUtils.isBlank(dbName)) {
@@ -299,6 +296,37 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
+     * Special handling before any binding or validation takes place.
+     */
+    @Before(stages = {LifecycleStage.BindingAndValidation})
+    public void beforeBindingAndValidation() {
+
+        String eventName = getContext().getEventName();
+        if (eventName != null && (eventName.equals("backToStep1") || eventName.equals("step2"))) {
+
+            ObjectType objectType = getObjectType();
+            if (objectType != null) {
+
+                Map<String, ObjectProperty> colMappings = queryConf == null ? null : queryConf.getColumnMappings();
+                if (colMappings != null && !colMappings.isEmpty()) {
+
+                    HttpServletRequest request = getContext().getRequest();
+                    LinkedHashSet<String> keySet = new LinkedHashSet<String>(colMappings.keySet());
+                    for (String colName : keySet) {
+
+                        String propertyPredicate = request.getParameter(colName + COLUMN_PROPERTY_PARAM_SUFFIX);
+                        if (!StringUtils.isBlank(propertyPredicate)) {
+                            colMappings.put(colName, objectType.getPropertyByPredicate(propertyPredicate));
+                        } else {
+                            colMappings.put(colName, null);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      *
      */
     @ValidationMethod(priority = 1)
@@ -307,6 +335,126 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         if (getUser() == null || !getUser().isAdministrator()) {
             addGlobalValidationError("You are not authorized for this operation!");
             getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
+        }
+    }
+
+    /**
+     *
+     */
+    private void objectTypeChanged() {
+
+        ObjectType objectType = getObjectType();
+        if (objectType != null) {
+
+            queryConf.setDatasetIdTemplate(objectType.getDatasetIdTemplate());
+            queryConf.setObjectIdTemplate(objectType.getObjectIdTemplate());
+
+            queryConf.setDatasetIdNamespace(objectType.getDatasetIdNamespace());
+            queryConf.setObjectIdNamespace(objectType.getObjectIdNamespace());
+        }
+    }
+
+    /**
+     *
+     * @param selectedColumns
+     */
+    private void selectedColumnsChanged(Set<String> selectedColumns) {
+
+        if (queryConf == null) {
+            queryConf = new QueryConfiguration();
+        }
+
+        Map<String, ObjectProperty> curMappings = queryConf.getColumnMappings();
+        if (selectedColumns == null || selectedColumns.isEmpty()) {
+            curMappings.clear();
+            return;
+        }
+
+        ObjectType objectType = getObjectType();
+        LinkedCaseInsensitiveMap<ObjectProperty> newMappings = new LinkedCaseInsensitiveMap<ObjectProperty>();
+        for (String column : selectedColumns) {
+            if (curMappings.containsKey(column)) {
+                ObjectProperty curProperty = curMappings.get(column);
+                if (curProperty == null) {
+                    newMappings.put(column, null);
+                }
+                else if (!objectType.hasThisProperty(curProperty)) {
+                    newMappings.put(column, objectType.getDefaultProperty(column));
+                }
+                else{
+                    newMappings.put(column, curProperty);
+                }
+            }
+            else{
+                newMappings.put(column, objectType.getDefaultProperty(column));
+            }
+        }
+
+        queryConf.setColumnMappings(newMappings);
+
+        //        ArrayList<String> toRemove = new ArrayList<String>();
+        //        for (String key : colMappings.keySet()) {
+        //            if (!selectedColumns.contains(key)) {
+        //                toRemove.add(key);
+        //            }
+        //        }
+        //        for (String key : toRemove) {
+        //            colMappings.remove(key);
+        //        }
+        //
+        //        for (String columnName : selectedColumns) {
+        //            if (!colMappings.containsKey(columnName)) {
+        //                colMappings.put(columnName, null);
+        //            }
+        //        }
+        //
+        //        ObjectType objectType = getObjectType();
+        //        if (objectType != null) {
+        //            for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
+        //
+        //                String column = entry.getKey();
+        //                ObjectProperty property = entry.getValue();
+        //                if (!objectType.hasThisProperty(property)) {
+        //                    entry.setValue(objectType.getDefaultProperty(column));
+        //                }
+        //            }
+        //        }
+    }
+
+    /**
+     *
+     * @param set1
+     * @param set2
+     * @return
+     */
+    private boolean equalsCaseInsensitive(Set<String> set1, Set<String> set2) {
+
+        if (set1 == null && set2 == null) {
+            return true;
+        } else if (set1 == null && set2 != null) {
+            return false;
+        } else if (set1 != null && set2 == null) {
+            return false;
+        } else if (set1 == set2) {
+            return true;
+        } else if (set1.size() != set2.size()) {
+            return false;
+        } else {
+            for (String str1 : set1) {
+                boolean hasMatch = false;
+                for (String str2 : set2) {
+                    if (StringUtils.equalsIgnoreCase(str1, str2)) {
+                        hasMatch = true;
+                        break;
+                    }
+                }
+
+                if (hasMatch == false) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
@@ -402,7 +550,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
      * @param colNames
      * @return
      */
-    private boolean validateColumnPlaceHolders(String template, Set<String> colNames) {
+    private boolean validateColumnPlaceholders(String template, Set<String> colNames) {
 
         if (colNames == null || colNames.isEmpty()) {
             return true;
@@ -424,5 +572,33 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         }
 
         return true;
+    }
+
+    /**
+     * @return the tablesColumns
+     * @throws DAOException
+     */
+    public List<StagingDatabaseTableColumnDTO> getTablesColumns() throws DAOException {
+
+        if (tablesColumns == null && StringUtils.isNotBlank(dbName)) {
+            tablesColumns = DAOFactory.get().getDao(StagingDatabaseDAO.class).getTablesColumns(dbName);
+        }
+        return tablesColumns;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getDefaultExportName() {
+
+        return dbName + "_" + getUserName() + "_" + DEFAULT_EXPORT_NAME_DATE_FORMAT.format(new Date());
+    }
+
+    /**
+     * @return the dbDTO
+     */
+    public StagingDatabaseDTO getDbDTO() {
+        return dbDTO;
     }
 }

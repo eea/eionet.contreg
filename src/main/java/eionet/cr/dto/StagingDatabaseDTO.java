@@ -40,6 +40,7 @@ public class StagingDatabaseDTO {
     private String creator;
     private Date created;
     private String description;
+    private String defaultQuery;
     private ImportStatus importStatus;
     private String importLog;
 
@@ -149,5 +150,19 @@ public class StagingDatabaseDTO {
      */
     public void setImportLog(String importLog) {
         this.importLog = importLog;
+    }
+
+    /**
+     * @return the defaultQuery
+     */
+    public String getDefaultQuery() {
+        return defaultQuery;
+    }
+
+    /**
+     * @param defaultQuery the defaultQuery to set
+     */
+    public void setDefaultQuery(String defaultQuery) {
+        this.defaultQuery = defaultQuery;
     }
 }

@@ -21,9 +21,9 @@
 
 package eionet.cr.staging.exp;
 
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-
 
 // TODO: Auto-generated Javadoc
 /**
@@ -56,11 +56,17 @@ public class ObjectProperty {
 
     /**
      * Class constructor.
+     *
      * @param predicate The property's underlying predicate.
      * @param label The property's label as it should be displayed to the users of staging databases functionality.
      * @param range Indicates whether the property's values should be literals or resources.
      */
     public ObjectProperty(String predicate, String label, Range range) {
+
+        if (StringUtils.isBlank(predicate) || StringUtils.isBlank(label) || range == null) {
+            throw new IllegalArgumentException("None of the constrcutor inputs must be null or blank!");
+        }
+
         this.predicate = predicate;
         this.label = label;
         this.range = range;
@@ -166,38 +172,6 @@ public class ObjectProperty {
     }
 
     /**
-     * Enumeration for indicating the value range of a given RDF property.
-     *
-     * @author jaanus
-     */
-    public static enum Range {
-
-        /** */
-        RESOURCE("Resource"), LITERAL("Literal");
-
-        /** */
-        private String friendlyName;
-
-        /**
-         * Constructor, allowing a friendly name.
-         * @param friendlyName The friendly name.
-         */
-        private Range(String friendlyName) {
-            this.friendlyName = friendlyName;
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see java.lang.Enum#toString()
-         */
-        @Override
-        public String toString() {
-            return friendlyName;
-        }
-    }
-
-    /**
      * Gets the hint.
      *
      * @return the hint
@@ -213,5 +187,48 @@ public class ObjectProperty {
      */
     public void setHint(String hint) {
         this.hint = hint;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return new StringBuilder().append(label).append(": ").append(predicate).toString();
+    }
+
+    /**
+     * Enumeration for indicating the value range of a given RDF property.
+     *
+     * @author jaanus
+     */
+    public static enum Range {
+
+        /** */
+        RESOURCE("Resource"), LITERAL("Literal");
+
+        /** */
+        private String friendlyName;
+
+        /**
+         * Constructor, allowing a friendly name.
+         *
+         * @param friendlyName The friendly name.
+         */
+        private Range(String friendlyName) {
+            this.friendlyName = friendlyName;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see java.lang.Enum#toString()
+         */
+        @Override
+        public String toString() {
+            return friendlyName;
+        }
     }
 }

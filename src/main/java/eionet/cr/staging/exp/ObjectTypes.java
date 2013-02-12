@@ -84,9 +84,9 @@ public class ObjectTypes {
     private static ObjectType createObservationType2() {
 
         ObjectType qbObservation = new ObjectType("http://purl.org/linked-data/cube#Observation", "Data Cube observation");
-        qbObservation.setDatasetIdTemplate("<indicator>");
+        qbObservation.setDatasetIdTemplate("<variable>");
         qbObservation.setDatasetIdNamespace("http://semantic.digital-agenda-data.eu/codelist/indicator/");
-        qbObservation.setObjectIdTemplate("<indicator>,<breakdown>,<unit>,<refArea>,<timePeriod>");
+        qbObservation.setObjectIdTemplate("<variable>,<breakdown>,<unit>,<country>,<year>");
         qbObservation.setObjectIdNamespace("http://semantic.digital-agenda-data.eu/data/scoreboard/");
 
         ObjectProperty property =
@@ -143,7 +143,7 @@ public class ObjectTypes {
                         ObjectProperty.Range.RESOURCE);
         property.setValueTemplate("http://eurostat.linked-statistics.org/dic/flags#<value>");
         property.setHint("Expects a flag indicating the obsevration's status as in http://eurostat.linked-statistics.org/dic/flags. e.g. u, n, p. r, etc.");
-        qbObservation.addProperty(property, "flag", "status", "statusFlag", "flagStatus");
+        qbObservation.addProperty(property, "flag", "status", "statusFlag", "flagStatus", "flags");
 
         // hidden properties
 

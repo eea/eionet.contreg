@@ -22,6 +22,7 @@
 package eionet.cr.web.action.admin.staging;
 
 import java.io.File;
+import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -38,6 +39,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
+import eionet.cr.dto.StagingDatabaseTableColumnDTO;
 import eionet.cr.staging.FileDownloader;
 import eionet.cr.staging.imp.ImportRunner;
 import eionet.cr.web.action.AbstractActionBean;
@@ -56,6 +58,9 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     private static final String VIEW_STAGING_DATABASE_JSP = "/pages/admin/staging/viewDatabase.jsp";
 
     /** */
+    private static final String EDIT_STAGING_DATABASE_JSP = "/pages/admin/staging/editDatabase.jsp";
+
+    /** */
     private static final String ADD_STAGING_DATABASE_JSP = "/pages/admin/staging/addDatabase.jsp";
 
     /** Static logger. */
@@ -69,10 +74,14 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     private String fileName;
     private String dbName;
     private String dbDescription;
+    private String defaultQuery;
     private File file;
 
     /** */
     private StagingDatabaseDTO dbDTO;
+
+    /** */
+    private List<StagingDatabaseTableColumnDTO> tablesColumns;
 
     /**
      * The bean's default event handler method.
@@ -83,17 +92,83 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
 
+        StagingDatabaseDAO dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
         if (dbId > 0) {
-            dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseById(dbId);
+            dbDTO = dao.getDatabaseById(dbId);
         } else if (!StringUtils.isBlank(dbName)) {
-            dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
+            dbDTO = dao.getDatabaseByName(dbName);
         }
 
         if (dbDTO == null) {
             addWarningMessage("Found no database by the given id or name!");
         }
+        else{
+            tablesColumns = dao.getTablesColumns(dbDTO.getName());
+        }
 
         return new ForwardResolution(VIEW_STAGING_DATABASE_JSP);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution edit() throws DAOException {
+
+
+        StagingDatabaseDAO dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
+        if (dbId > 0) {
+            dbDTO = dao.getDatabaseById(dbId);
+        } else if (!StringUtils.isBlank(dbName)) {
+            dbDTO = dao.getDatabaseByName(dbName);
+        }
+
+        if (dbDTO == null) {
+            addWarningMessage("Found no database by the given id or name!");
+        }
+        else{
+            dbName = dbDTO.getName();
+            dbDescription = dbDTO.getDescription();
+            defaultQuery = dbDTO.getDefaultQuery();
+            tablesColumns = dao.getTablesColumns(dbDTO.getName());
+        }
+
+        return new ForwardResolution(EDIT_STAGING_DATABASE_JSP);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution save() throws DAOException {
+
+        DAOFactory.get().getDao(StagingDatabaseDAO.class).updateDatabaseMetadata(dbId, dbDescription, defaultQuery);
+        addSystemMessage("Metadata saved successfully!");
+        return new RedirectResolution(this.getClass(), "edit").addParameter("dbId", dbId);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution saveAndClose() throws DAOException {
+
+        DAOFactory.get().getDao(StagingDatabaseDAO.class).updateDatabaseMetadata(dbId, dbDescription, defaultQuery);
+        addSystemMessage("Metadata saved successfully!");
+        return new RedirectResolution(this.getClass(), "view").addParameter("dbId", dbId);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution cancelEdit() throws DAOException {
+
+        return new RedirectResolution(this.getClass(), "view").addParameter("dbId", dbId);
     }
 
     /**
@@ -273,6 +348,14 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      *
      * @return
      */
+    public Class getStagingDatabasesActionBeanClass() {
+        return StagingDatabasesActionBean.class;
+    }
+
+    /**
+     *
+     * @return
+     */
     public Class getRdfExportWizardActionBeanClass() {
         return RDFExportWizardActionBean.class;
     }
@@ -283,5 +366,26 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      */
     public Class getRdfExportsActionBeanClass() {
         return RDFExportsActionBean.class;
+    }
+
+    /**
+     * @return the tablesColumns
+     */
+    public List<StagingDatabaseTableColumnDTO> getTablesColumns() {
+        return tablesColumns;
+    }
+
+    /**
+     * @return the defaultQuery
+     */
+    public String getDefaultQuery() {
+        return defaultQuery;
+    }
+
+    /**
+     * @param defaultQuery the defaultQuery to set
+     */
+    public void setDefaultQuery(String defaultQuery) {
+        this.defaultQuery = defaultQuery;
     }
 }

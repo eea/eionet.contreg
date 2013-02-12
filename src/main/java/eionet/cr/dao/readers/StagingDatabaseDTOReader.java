@@ -21,8 +21,12 @@
 
 package eionet.cr.dao.readers;
 
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.staging.imp.ImportStatus;
@@ -34,6 +38,9 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
  * @author jaanus
  */
 public class StagingDatabaseDTOReader extends SQLResultSetBaseReader<StagingDatabaseDTO> {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(StagingDatabaseDTOReader.class);
 
     /* (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
@@ -49,6 +56,14 @@ public class StagingDatabaseDTOReader extends SQLResultSetBaseReader<StagingData
         databaseDTO.setDescription(rs.getString("DESCRIPTION"));
         databaseDTO.setImportStatus(Enum.valueOf(ImportStatus.class, rs.getString("IMPORT_STATUS")));
         databaseDTO.setImportLog(rs.getString("IMPORT_LOG"));
+
+        try {
+            Blob blob = rs.getBlob("DEFAULT_QUERY");
+            String query = blob == null ? null : blob.length() == 0 ? "" : IOUtils.toString(blob.getBinaryStream());
+            databaseDTO.setDefaultQuery(query);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to read column: DEFAULT_QUERY", e);
+        }
 
         resultList.add(databaseDTO);
     }
