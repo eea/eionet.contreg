@@ -32,6 +32,7 @@ import eionet.cr.staging.exp.ExportStatus;
 import eionet.cr.staging.exp.QueryConfiguration;
 import eionet.cr.staging.imp.ImportStatus;
 
+// TODO: Auto-generated Javadoc
 /**
  * DAO interface for operations with staging databases.
  *
@@ -43,96 +44,99 @@ public interface StagingDatabaseDAO extends DAO {
      * Creates the staging database in the underlying RDBMS. Simply creates the database, does nothing further. i.e. the result of
      * this method will be a new empty staging database.
      *
-     * @param databaseName
-     * @throws DAOException
+     * @param databaseName the database name
+     * @throws DAOException the dAO exception
      */
     void createDatabase(String databaseName) throws DAOException;
 
     /**
      * Creates a record in the staging databases table for the given database DTO. Returns the newly created record's surrogate id.
      *
-     * @param databaseDTO
-     * @param userName
-     * @return
-     * @throws DAOException
+     * @param databaseDTO the database dto
+     * @param userName the user name
+     * @return the int
+     * @throws DAOException the dAO exception
      */
     int createRecord(StagingDatabaseDTO databaseDTO, String userName) throws DAOException;
 
     /**
      * Updates the description and defaultQuery of the database by the given id.
      *
-     * @param id
-     * @param description
-     * @param defaultQuery
-     * @throws DAOException
+     * @param id the id
+     * @param description the description
+     * @param defaultQuery the default query
+     * @throws DAOException the dAO exception
      */
     void updateDatabaseMetadata(int id, String description, String defaultQuery) throws DAOException;
 
     /**
      * Gets a staging database by the given id.
      *
-     * @param id
-     * @return
-     * @throws DAOException
+     * @param id the id
+     * @return the database by id
+     * @throws DAOException the dAO exception
      */
     StagingDatabaseDTO getDatabaseById(int id) throws DAOException;
 
     /**
      * Gets a staging database by the given name.
      *
-     * @param name
-     * @return
-     * @throws DAOException
+     * @param name the name
+     * @return the database by name
+     * @throws DAOException the dAO exception
      */
     StagingDatabaseDTO getDatabaseByName(String name) throws DAOException;
 
     /**
-     * Returns a list of {@link StagingDatabaseTableColumnDTO} for the given staging database. The returned list is ordered
-     * by table name and the oridnal position of columns in the table.
+     * Returns a list of {@link StagingDatabaseTableColumnDTO} for the given staging database. The returned list is ordered by table
+     * name and the oridnal position of columns in the table.
      *
-     * @param dbName
-     * @return
-     * @throws DAOException
+     * @param dbName the db name
+     * @return the tables columns
+     * @throws DAOException the dAO exception
      */
     List<StagingDatabaseTableColumnDTO> getTablesColumns(String dbName) throws DAOException;
 
     /**
+     * Update import status.
      *
-     * @param databaseId
-     * @param importStatus
-     * @throws DAOException
+     * @param databaseId the database id
+     * @param importStatus the import status
+     * @throws DAOException the dAO exception
      */
     void updateImportStatus(int databaseId, ImportStatus importStatus) throws DAOException;
 
     /**
+     * Append to import log.
      *
-     * @param databaseId
-     * @param message
-     * @throws DAOException
+     * @param databaseId the database id
+     * @param message the message
+     * @throws DAOException the dAO exception
      */
     void appendToImportLog(int databaseId, String message) throws DAOException;
 
     /**
+     * Append to export log.
      *
-     * @param exportId
-     * @param message
-     * @throws DAOException
+     * @param exportId the export id
+     * @param message the message
+     * @throws DAOException the dAO exception
      */
     void appendToExportLog(int exportId, String message) throws DAOException;
 
     /**
      * Lists all staging databases in the database, ordered by name ascending.
      *
-     * @return
-     * @throws DAOException
+     * @return the list
+     * @throws DAOException the dAO exception
      */
     public List<StagingDatabaseDTO> listAll() throws DAOException;
 
     /**
      * Deletes the given staging databases.
      *
-     * @param dbNames
-     * @throws DAOException
+     * @param dbNames the db names
+     * @throws DAOException the dAO exception
      */
     public void delete(List<String> dbNames) throws DAOException;
 
@@ -140,18 +144,18 @@ public interface StagingDatabaseDAO extends DAO {
      * Returns true if there is at least one table under the given Virtuoso database (i.e. qualifier). Otherwise returns false. The
      * database is looked only within the current SQL connection's user space.
      *
-     * @param dbName
-     * @return
-     * @throws DAOException
+     * @param dbName the db name
+     * @return true, if successful
+     * @throws DAOException the dAO exception
      */
     public boolean exists(String dbName) throws DAOException;
 
     /**
      * Returns the import log of the staging database by the given integer id.
      *
-     * @param databaseId
-     * @return
-     * @throws DAOException
+     * @param databaseId the database id
+     * @return the import log
+     * @throws DAOException the dAO exception
      */
     public String getImportLog(int databaseId) throws DAOException;
 

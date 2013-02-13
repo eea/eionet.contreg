@@ -45,7 +45,6 @@ import eionet.cr.staging.imp.ImportRunner;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
-// TODO: Auto-generated Javadoc
 /**
  * Action bean for operations with a single staging database.
  *
@@ -110,9 +109,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Handles edit event.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException If database access error happens.
      */
     public Resolution edit() throws DAOException {
 
@@ -138,9 +138,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Handles the save event.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException If database access error happens
      */
     public Resolution save() throws DAOException {
 
@@ -150,9 +151,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Handles the "Save & close" event.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException If database access error happens.
      */
     public Resolution saveAndClose() throws DAOException {
 
@@ -162,9 +164,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Handles the Cancel edit.
      *
-     * @return
-     * @throws DAOException
+     * @return the resolution
+     * @throws DAOException If database access error happens.
      */
     public Resolution cancelEdit() throws DAOException {
 
@@ -172,10 +175,10 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
-     * Adds the.
+     * Handles the "add" event.
      *
      * @return the resolution
-     * @throws DAOException the dAO exception
+     * @throws DAOException If database access error happens.
      */
     public Resolution add() throws DAOException {
 
@@ -204,7 +207,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
-     * Back to db list.
+     * Sends back to db list.
      *
      * @return the resolution
      */
@@ -213,6 +216,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the database.
+     *
      * @return the database
      */
     public StagingDatabaseDTO getDatabase() {
@@ -220,6 +225,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the db name.
+     *
      * @return the dbName
      */
     public String getDbName() {
@@ -227,6 +234,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the db name.
+     *
      * @param dbName the dbName to set
      */
     public void setDbName(String dbName) {
@@ -234,6 +243,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the db description.
+     *
      * @return the dbDescription
      */
     public String getDbDescription() {
@@ -241,6 +252,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the db description.
+     *
      * @param dbDescription the dbDescription to set
      */
     public void setDbDescription(String dbDescription) {
@@ -292,6 +305,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the file name.
+     *
      * @param fileName the fileName to set
      */
     public void setFileName(String fileName) {
@@ -299,6 +314,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the file name.
+     *
      * @return the fileName
      */
     public String getFileName() {
@@ -306,22 +323,26 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the file size.
      *
-     * @return
+     * @return the file size
      */
     public long getFileSize() {
         return file == null ? 0L : file.length();
     }
 
     /**
+     * Gets the suggested db name.
      *
-     * @return
+     * @return the suggested db name
      */
     public String getSuggestedDbName() {
         return StringUtils.isBlank(fileName) ? "" : StringUtils.substringBefore(fileName, ".");
     }
 
     /**
+     * Gets the db dto.
+     *
      * @return the dbDTO
      */
     public StagingDatabaseDTO getDbDTO() {
@@ -329,6 +350,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the db id.
+     *
      * @param dbId the dbId to set
      */
     public void setDbId(int dbId) {
@@ -336,8 +359,9 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the staging databases action bean url binding.
      *
-     * @return
+     * @return the staging databases action bean url binding
      */
     public String getStagingDatabasesActionBeanUrlBinding() {
         AnnotatedClassActionResolver resolver = new AnnotatedClassActionResolver();
@@ -345,30 +369,35 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the staging databases action bean class.
      *
-     * @return
+     * @return the staging databases action bean class
      */
     public Class getStagingDatabasesActionBeanClass() {
         return StagingDatabasesActionBean.class;
     }
 
     /**
+     * Gets the rdf export wizard action bean class.
      *
-     * @return
+     * @return the rdf export wizard action bean class
      */
     public Class getRdfExportWizardActionBeanClass() {
         return RDFExportWizardActionBean.class;
     }
 
     /**
+     * Gets the rdf exports action bean class.
      *
-     * @return
+     * @return the rdf exports action bean class
      */
     public Class getRdfExportsActionBeanClass() {
         return RDFExportsActionBean.class;
     }
 
     /**
+     * Gets the tables columns.
+     *
      * @return the tablesColumns
      */
     public List<StagingDatabaseTableColumnDTO> getTablesColumns() {
@@ -376,6 +405,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the default query.
+     *
      * @return the defaultQuery
      */
     public String getDefaultQuery() {
@@ -383,6 +414,8 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the default query.
+     *
      * @param defaultQuery the defaultQuery to set
      */
     public void setDefaultQuery(String defaultQuery) {

@@ -163,8 +163,8 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
     /**
      * Lazy getter for the underlying SQL connection.
      *
-     * @return
-     * @throws SQLException
+     * @return The connection.
+     * @throws SQLException When SQL error happens.
      */
     private Connection getConnection() throws SQLException {
         if (conn == null) {
@@ -176,8 +176,8 @@ public class VirtuosoHandler implements MSAccessImportHandlerIF {
     /**
      * Lazy getter for the underlying SQL connection's user.
      *
-     * @return
-     * @throws SQLException
+     * @return The connection's user.
+     * @throws SQLException When SQL error happens.
      */
     private String getDbUser() throws SQLException {
 

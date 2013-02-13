@@ -51,7 +51,6 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
-// TODO: Auto-generated Javadoc
 /**
  * Action bean that lists files available for the creation of staging databases, and provides other actions on these files as well.
  *
@@ -199,38 +198,44 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Returns java.io.File referring to the staging files directory in file system.
      *
-     * @return
+     * @return As indicated above.
      */
     public File getStagingFilesDir() {
         return FileDownloader.FILES_DIR;
     }
 
     /**
+     * Suffix to display in UI at file names that are currently being downloaded.
      *
-     * @return
+     * @return As indicated above.
      */
     public String getDownloadingSuffix() {
         return FileDownloader.FILE_SUFFIX;
     }
 
     /**
+     * Gets the staging database action bean class.
      *
-     * @return
+     * @return the staging database action bean class
      */
     public Class getStagingDatabaseActionBeanClass() {
         return StagingDatabaseActionBean.class;
     }
 
     /**
+     * Gets the staging databases action bean class.
      *
-     * @return
+     * @return the staging databases action bean class
      */
     public Class getStagingDatabasesActionBeanClass() {
         return StagingDatabasesActionBean.class;
     }
 
     /**
+     * Sets the upload file.
+     *
      * @param uploadFile the uploadFile to set
      */
     public void setUploadFile(FileBean uploadFile) {
@@ -238,6 +243,8 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the download url.
+     *
      * @param downloadUrl the downloadUrl to set
      */
     public void setDownloadUrl(String downloadUrl) {
@@ -245,6 +252,8 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the new file name.
+     *
      * @param newFileName the newFileName to set
      */
     public void setNewFileName(String newFileName) {
@@ -252,6 +261,8 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the available files.
+     *
      * @return the availableFiles
      */
     public ArrayList<AvailableFile> getAvailableFiles() {
@@ -283,6 +294,8 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the max file post size.
+     *
      * @return the maxFilePostSize
      */
     public int getMaxFilePostSize() {
@@ -290,6 +303,8 @@ public class AvailableFilesActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the file names.
+     *
      * @param fileNames the fileNames to set
      */
     public void setFileNames(List<String> fileNames) {

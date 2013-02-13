@@ -73,9 +73,9 @@ public final class ImportRunner extends Thread {
     }
 
     /**
-     *
-     * @param dbDTO
-     * @return
+     * Creates import logger for the given database-
+     * @param dbDTO The given database, as DTO.
+     * @return The created import logger.
      */
     private ImportLogger createLogger(StagingDatabaseDTO dbDTO) {
 
@@ -161,8 +161,6 @@ public final class ImportRunner extends Thread {
      * Updates this import's status in the database.
      *
      * @param importStatus The status to update to.
-     * @throws DAOException If a database access error happens.
-     *
      */
     private void updateImportStatus(ImportStatus importStatus) {
         try {

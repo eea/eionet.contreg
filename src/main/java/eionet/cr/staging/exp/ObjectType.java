@@ -29,7 +29,6 @@ import java.util.Set;
 
 import eionet.cr.util.LinkedCaseInsensitiveMap;
 
-// TODO: Auto-generated Javadoc
 /**
  * Describes a possible type (as in RDF) of objects returned by an RDF export query on a staging database.
  *
@@ -77,7 +76,7 @@ public class ObjectType {
     }
 
     /**
-     * Class constructor.
+     * Constructs object type with the given uri and label..
      *
      * @param uri the uri
      * @param label the label
@@ -244,9 +243,10 @@ public class ObjectType {
     }
 
     /**
+     * Returns true if this type has this particular object property by plain '==' comparison. Otherwise returns false.
      *
-     * @param property
-     * @return
+     * @param property The property to check.
+     * @return As indicated above.
      */
     public boolean hasThisProperty(ObjectProperty property) {
 

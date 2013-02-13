@@ -82,17 +82,17 @@ public class ImportLogger extends Logger {
     }
 
     /**
-     *
-     * @param level
-     * @return
+     * Converts the given {@link Priority} to its suitable string representation for import log.
+     * @param priority The priority to convert.
+     * @return The string representation.
      */
-    private String toString(Priority level) {
+    private String toString(Priority priority) {
 
-        if (level.isGreaterOrEqual(Level.ERROR)) {
+        if (priority.isGreaterOrEqual(Level.ERROR)) {
             return "ERROR";
-        } else if (level.isGreaterOrEqual(Level.WARN)) {
+        } else if (priority.isGreaterOrEqual(Level.WARN)) {
             return "WARNING";
-        } else if (level.isGreaterOrEqual(Level.TRACE)) {
+        } else if (priority.isGreaterOrEqual(Level.TRACE)) {
             return "INFO";
         } else {
             return "INFO";
@@ -112,7 +112,9 @@ public class ImportLogger extends Logger {
     }
 
     /**
-     * @param dbDTO the dbDTO to set
+     * Sets the database DTO.
+     *
+     * @param dbDTO the new db dto
      */
     public void setDbDTO(StagingDatabaseDTO dbDTO) {
         this.dbDTO = dbDTO;

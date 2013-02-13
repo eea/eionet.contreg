@@ -59,7 +59,6 @@ import eionet.cr.util.LinkedCaseInsensitiveMap;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
-// TODO: Auto-generated Javadoc
 /**
  * Action bean that serves the "wizard" that helps user to run a RDF export query from a selected staging database. <b>Note that
  * because of its "wizardly" nature, this bean is kept in {@link SessionScope}, hence some add patterns below.</b>
@@ -327,7 +326,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * Validate user authorised.
      */
     @ValidationMethod(priority = 1)
     public void validateUserAuthorised() {
@@ -339,7 +338,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * To be called when object type changed.
      */
     private void objectTypeChanged() {
 
@@ -355,8 +354,9 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
+     * To be called when selected columns changed.
      *
-     * @param selectedColumns
+     * @param selectedColumns the selected columns
      */
     private void selectedColumnsChanged(Set<String> selectedColumns) {
 
@@ -391,41 +391,14 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         }
 
         queryConf.setColumnMappings(newMappings);
-
-        //        ArrayList<String> toRemove = new ArrayList<String>();
-        //        for (String key : colMappings.keySet()) {
-        //            if (!selectedColumns.contains(key)) {
-        //                toRemove.add(key);
-        //            }
-        //        }
-        //        for (String key : toRemove) {
-        //            colMappings.remove(key);
-        //        }
-        //
-        //        for (String columnName : selectedColumns) {
-        //            if (!colMappings.containsKey(columnName)) {
-        //                colMappings.put(columnName, null);
-        //            }
-        //        }
-        //
-        //        ObjectType objectType = getObjectType();
-        //        if (objectType != null) {
-        //            for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
-        //
-        //                String column = entry.getKey();
-        //                ObjectProperty property = entry.getValue();
-        //                if (!objectType.hasThisProperty(property)) {
-        //                    entry.setValue(objectType.getDefaultProperty(column));
-        //                }
-        //            }
-        //        }
     }
 
     /**
+     * Return true if the two given string sets are equal case insensitively.
      *
-     * @param set1
-     * @param set2
-     * @return
+     * @param set1 the set1
+     * @param set2 the set2
+     * @return true, if equal, otherwise false
      */
     private boolean equalsCaseInsensitive(Set<String> set1, Set<String> set2) {
 
@@ -487,24 +460,26 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the database action bean class.
      *
-     * @return
+     * @return the database action bean class
      */
     public Class getDatabaseActionBeanClass() {
         return StagingDatabaseActionBean.class;
     }
 
     /**
+     * Gets the possible object types.
      *
-     * @return
+     * @return the object types
      */
     public Collection<ObjectType> getObjectTypes() {
         return ObjectTypes.getMap().values();
     }
 
     /**
-     *
-     * @return
+     * Returns object type for the currently selected object type URI.
+     * @return the object type
      */
     private ObjectType getObjectType() {
 
@@ -517,8 +492,8 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
-     *
-     * @return
+     * Returns properties for the object type of the currently selected object type URI.
+     * @return The properties.
      */
     public List<ObjectProperty> getTypeProperties() {
 
@@ -545,10 +520,11 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
+     * Validate column place-holders in the given template, using the given set of column names.
      *
-     * @param template
-     * @param colNames
-     * @return
+     * @param template the template
+     * @param colNames the col names
+     * @return true, if successful
      */
     private boolean validateColumnPlaceholders(String template, Set<String> colNames) {
 
@@ -575,8 +551,9 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the tablesColumns
-     * @throws DAOException
+     * Returns list of {@link StagingDatabaseTableColumnDTO} for the currently selected database.
+     * @return the list of {@link StagingDatabaseTableColumnDTO}
+     * @throws DAOException when a database error happens
      */
     public List<StagingDatabaseTableColumnDTO> getTablesColumns() throws DAOException {
 
@@ -587,8 +564,9 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
+     * Get default export name if user hasn't supplied one.
      *
-     * @return
+     * @return The default export name
      */
     public String getDefaultExportName() {
 
@@ -596,7 +574,9 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the dbDTO
+     * Gets the DTO for currently selected database.
+     *
+     * @return the DTO
      */
     public StagingDatabaseDTO getDbDTO() {
         return dbDTO;

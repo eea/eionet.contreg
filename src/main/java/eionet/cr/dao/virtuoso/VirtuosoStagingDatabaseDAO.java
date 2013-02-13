@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 import eionet.cr.common.CRException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.StagingDatabaseDAO;
-import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.StagingDatabaseDTOReader;
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.dto.StagingDatabaseTableColumnDTO;
@@ -460,9 +459,6 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
-        } catch (ResultSetReaderException e) {
-            SQLUtil.rollback(conn);
-            throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(conn);
         }
@@ -471,12 +467,11 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     /**
      * Deletes the given databases from Virtuoso.
      *
-     * @param dbNames
-     * @param conn
-     * @throws SQLException
-     * @throws ResultSetReaderException
+     * @param dbNames The database names.
+     * @param conn The SQL connection to use.
+     * @throws SQLException When database access error happens.
      */
-    private void deleteDatabases(List<String> dbNames, Connection conn) throws ResultSetReaderException, SQLException {
+    private void deleteDatabases(List<String> dbNames, Connection conn) throws SQLException {
 
         HashMap<String, HashSet<String>> dbTables = new HashMap<String, HashSet<String>>();
         String userName = conn.getMetaData().getUserName();

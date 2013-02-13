@@ -76,7 +76,9 @@ public class RDFExportActionBean extends AbstractActionBean {
     }
 
     /**
+     * Validate default handler.
      *
+     * @return the resolution
      */
     @ValidationMethod
     public Resolution validateDefaultHandler() {
@@ -89,7 +91,7 @@ public class RDFExportActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     * Validate user authorised.
      */
     @ValidationMethod(priority = 1)
     public void validateUserAuthorised() {
@@ -122,6 +124,8 @@ public class RDFExportActionBean extends AbstractActionBean {
     }
 
     /**
+     * Gets the export id.
+     *
      * @return the exportId
      */
     public int getExportId() {
@@ -129,6 +133,8 @@ public class RDFExportActionBean extends AbstractActionBean {
     }
 
     /**
+     * Sets the export id.
+     *
      * @param exportId the exportId to set
      */
     public void setExportId(int exportId) {
@@ -156,15 +162,18 @@ public class RDFExportActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the exportDTO
+     * Gets the export's DTO.
+     *
+     * @return the export's DTO
      */
     public ExportDTO getExportDTO() {
         return exportDTO;
     }
 
     /**
+     * Gets the query configuration dump.
      *
-     * @return
+     * @return the query configuration dump
      */
     public String getQueryConfigurationDump() {
 
