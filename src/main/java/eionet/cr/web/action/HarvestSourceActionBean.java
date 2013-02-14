@@ -225,7 +225,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     private void manageRuleset(String url) throws DAOException {
 
-        if (GeneralConfig.isUseInferencing()){
+        if (GeneralConfig.isUseInferencing()) {
             boolean isAlreadyInRuleset = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(url);
             if (schemaSource && !isAlreadyInRuleset) {
                 factory.getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(url);
@@ -355,7 +355,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
                     }
 
-                    if (!StringUtils.equals(urlBefore, urlString) && URLUtil.isNotExisting(urlString)) {
+                    if (!StringUtils.equals(urlBefore, urlString)
+                            && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
                         addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                     }
 

@@ -161,6 +161,13 @@
                 </tr>
 
                 <tr>
+                    <th scope="row">Is SPARQL endpoint</th>
+                    <td>
+                        <c:out value="${actionBean.harvestSource.sparqlEndpoint ? 'yes' : 'no'}"/>
+                    </td>
+                </tr>
+
+                <tr>
                     <td colspan="2" style="font-size:0.8em;">
                         <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
                             <c:out value="0 post-harvest scripts available for this source."/>

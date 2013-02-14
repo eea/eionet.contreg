@@ -270,7 +270,7 @@ public class EditSourceActionBean extends AbstractActionBean {
                     addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
                 }
 
-                if (!StringUtils.equals(uri, urlString) && URLUtil.isNotExisting(urlString)) {
+                if (!StringUtils.equals(uri, urlString) && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
                     addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                 }
 

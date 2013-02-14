@@ -106,6 +106,18 @@ public interface HarvestSourceDAO extends DAO {
             SortingRequest sortingRequest) throws DAOException;
 
     /**
+     * Returns harvest sources that are marked as remote SPARQL endpoints.
+     *
+     * @param searchString
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return
+     * @throws DAOException
+     */
+    Pair<Integer, List<HarvestSourceDTO>> getRemoteEndpoints(String searchString, PagingRequest pagingRequest,
+            SortingRequest sortingRequest) throws DAOException;
+
+    /**
      * @param harvestSourceID
      * @return harvesting sources
      * @throws DAOException
@@ -266,7 +278,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-    throws IOException, OpenRDFException;
+            throws IOException, OpenRDFException;
 
     /**
      *
@@ -344,7 +356,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(RepositoryConnection conn, String subject, String predicate, ObjectDTO... object)
-    throws DAOException, RepositoryException, IOException;
+            throws DAOException, RepositoryException, IOException;
 
     /**
      *

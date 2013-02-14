@@ -39,6 +39,7 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         HarvestSourceDTO harvestSourceDTO = new HarvestSourceDTO();
@@ -56,6 +57,7 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
         harvestSourceDTO.setPermanentError(YesNoBoolean.parse(rs.getString("PERMANENT_ERROR")));
         harvestSourceDTO.setMediaType(rs.getString("MEDIA_TYPE"));
+        harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(rs.getString("IS_SPARQL_ENDPOINT")));
 
         resultList.add(harvestSourceDTO);
     }

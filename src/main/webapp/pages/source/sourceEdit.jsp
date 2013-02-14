@@ -46,26 +46,26 @@
             <stripes:hidden name="harvestSource.sourceId"/>
             <stripes:hidden name="harvestSource.owner"/>
             <table>
-                <col style="width:10em"/>
-                <col/>
+                <col style="width:20%"/>
+                <col style="width:80%"/>
                 <tr>
-                    <td>URL:</td>
-                    <td><stripes:text name="harvestSource.url" size="100" style="width:100%"/></td>
+                    <td><label for="txtUrl" class="question">URL:</label></td>
+                    <td><stripes:text name="harvestSource.url" size="100" style="width:100%" id="txtUrl"/></td>
                 </tr>
                 <tr>
-                    <td>E-mails:</td>
-                    <td><stripes:text name="harvestSource.emails" size="100" style="width:100%"/></td>
+                    <td><label for="txtEmails" class="question">E-mails:</label></td>
+                    <td><stripes:text name="harvestSource.emails" size="100" style="width:100%" id="txtEmails"/></td>
                 </tr>
                 <tr>
-                    <td>Owner</td>
+                    <td class="question">Owner:</td>
                     <td>
                         <c:out value="${actionBean.harvestSource.owner}" />
                     </td>
                 </tr>
                 <tr>
-                    <td>Harvest interval:</td>
+                    <td><label for="txtInterval" class="question">Harvest interval:</label></td>
                     <td>
-                        <stripes:text name="harvestSource.intervalMinutes" size="10"/>
+                        <stripes:text name="harvestSource.intervalMinutes" size="10" id="txtInterval"/>
                         <stripes:select name="intervalMultiplier" value="${actionBean.selectedIntervalMultiplier}">
                             <c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier">
                                 <stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>
@@ -74,8 +74,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Media type:</td>
-                    <td><stripes:select name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}">
+                    <td><label for="slctMediaType" class="question">Media type:</label></td>
+                    <td><stripes:select name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}" id="slctMediaType">
                         <c:forEach items="${actionBean.mediaTypes}" var="type">
                             <stripes:option value="${type}" label="${type}"/>
                         </c:forEach>
@@ -95,14 +95,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><label class="question" for="chkEndpoint">Is SPARQL endpoint:</label></td>
+                    <td>
+                        <stripes:checkbox name="harvestSource.sparqlEndpoint" id="chkEndpoint"/>
+                    </td>
+                </tr>
+                <tr>
                     <td colspan="2">
                         <c:if test="${actionBean.userOwner}">
                             <stripes:submit name="save" value="Save"/>
                             <button id="changeOwnerButton">Change owner</button>
                             <c:if test="${!actionBean.harvestSource.prioritySource}">
-                                <div style="display: inline; padding-left: 20px;">
-                                    <stripes:submit name="delete" value="Delete"/>
-                                </div>
+                                <stripes:submit name="delete" value="Delete"/>
                             </c:if>
                          </c:if>
                     </td>

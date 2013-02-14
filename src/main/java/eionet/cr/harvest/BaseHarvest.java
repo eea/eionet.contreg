@@ -169,7 +169,10 @@ public abstract class BaseHarvest implements Harvest {
 
         boolean wasHarvestException = false;
         try {
-            doHarvest();
+            // TODO remove this "if" filter after remote endpoint harvesting has been implemented
+            if (!getContextSourceDTO().isSparqlEndpoint()) {
+                doHarvest();
+            }
         } catch (HarvestException e) {
             wasHarvestException = true;
             throw e;

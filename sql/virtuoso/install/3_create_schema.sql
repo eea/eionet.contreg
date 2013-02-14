@@ -51,6 +51,7 @@ create table CR.cr3user.harvest_source (
     source_owner varchar(20) NOT NULL DEFAULT 'harvester',
     permanent_error character NOT NULL DEFAULT 'N',
     media_type varchar(255) DEFAULT NULL,
+    is_sparql_endpoint character NOT NULL DEFAULT 'N',
     PRIMARY KEY (url_hash)
 );
 

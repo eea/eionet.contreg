@@ -63,6 +63,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     private static final String PRIORITY = "priority";
     private static final String FAILED_HARVESTS = "failed";
     private static final String SCHEMAS = "schemas";
+    private static final String SPARQL_ENDPOINTS = "endpoints";
 
     /** */
     private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
@@ -101,6 +102,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         SOURCE_TYPES.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
         SOURCE_TYPES.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Permanent failures"));
         SOURCE_TYPES.add(new Pair<String, String>(UNAUHTORIZED_HARVESTS, "Unauthorized"));
+        SOURCE_TYPES.add(new Pair<String, String>(SPARQL_ENDPOINTS, "SPARQL endpoints"));
 
         // initialize column objects that will be used as columns in the harvest sources page
 
@@ -157,6 +159,8 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 pair =
                         factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
                                 sourceUris);
+            } else if (SPARQL_ENDPOINTS.equals(type)) {
+                pair = factory.getDao(HarvestSourceDAO.class).getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
             }
 
             if (pair != null) {

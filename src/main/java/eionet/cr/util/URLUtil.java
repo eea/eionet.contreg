@@ -71,8 +71,9 @@ public class URLUtil {
      */
     public static boolean isURL(String s) {
 
-        if (s == null || s.trim().length() == 0)
+        if (s == null || s.trim().length() == 0) {
             return false;
+        }
 
         try {
             URL url = new URL(s);
@@ -140,13 +141,16 @@ public class URLUtil {
     }
 
     /**
-     * Connect to the URL and check if it exists at the remote end. Local ids are removed (the part after the '#') before
-     * connecting.
+     * Connect to the URL and check if it exists at the remote end. Local identifiers are removed (the part after the '#') before
+     * connecting. The method returns true (i.e. URL is considered as "not existing") if the given URL is malformed, or its
+     * connection throws a {@link UnknownHostException} or sends a HTTP code that is 501 or 505 or anything in the range of 400
+     * to 499. The latter range, however, is ignored if the given boolean input is is true (meaning a client error is OK).
      *
      * @param urlStr the URL to check.
-     * @return true is the URL does <b>NOT</b> exist.
+     * @param clientErrorOk If true, then a response code in the range of 400 to 499 is considered OK.
+     * @return As described above.
      */
-    public static boolean isNotExisting(String urlStr) {
+    public static boolean isNotExisting(String urlStr, boolean clientErrorOk) {
 
         int responseCode = -1;
         IOException ioe = null;
@@ -163,8 +167,27 @@ public class URLUtil {
         }
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
-        || (responseCode >= 400 && responseCode <= 499) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-        || responseCode == HttpURLConnection.HTTP_VERSION;
+                || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
+                || responseCode == HttpURLConnection.HTTP_VERSION;
+    }
+
+    /**
+     * Calls {@link #isNotExisting(String, boolean)} with the boolean set to false. See documentation of that method.
+     * @param urlStr As described above.
+     * @return As described above.
+     */
+    public static boolean isNotExisting(String urlStr) {
+        return isNotExisting(urlStr, false);
+    }
+
+    /**
+     * Check if given HTTP response code is a "client error".
+     *
+     * @param httpResponseCode The given HTTP response code.
+     * @return True, if the given HTTP response code is a "client error", otherwise false.
+     */
+    private static boolean isClientError(int httpResponseCode) {
+        return httpResponseCode >= 400 && httpResponseCode <= 499;
     }
 
     /**

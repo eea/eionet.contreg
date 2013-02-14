@@ -49,6 +49,12 @@
                             <stripes:checkbox name="harvestSource.prioritySource" id="priority"/>
                         </td>
                     </tr>
+                    <tr>
+                        <td><label class="question" for="chkSparqlEndpoint">Is SPARQL endpoint</label></td>
+                        <td>
+                            <stripes:checkbox name="harvestSource.sparqlEndpoint" id="chkSparqlEndpoint"/>
+                        </td>
+                    </tr>
                 </c:if>
                 <tr>
                     <td>

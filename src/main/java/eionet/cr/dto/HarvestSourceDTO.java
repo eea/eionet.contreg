@@ -57,6 +57,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     private boolean permanentError;
     private String mediaType;
     private Integer lastHarvestId;
+    private boolean isSparqlEndpoint;
 
     /**
      *
@@ -341,5 +342,19 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Clone not supported");
         }
+    }
+
+    /**
+     * @return the isSparqlEndpoint
+     */
+    public boolean isSparqlEndpoint() {
+        return isSparqlEndpoint;
+    }
+
+    /**
+     * @param isSparqlEndpoint the isSparqlEndpoint to set
+     */
+    public void setSparqlEndpoint(boolean isSparqlEndpoint) {
+        this.isSparqlEndpoint = isSparqlEndpoint;
     }
 }
