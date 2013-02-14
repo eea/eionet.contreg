@@ -4,17 +4,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.helpers.SearchHelper;
 import eionet.cr.dao.readers.SubjectDataReader;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
@@ -186,19 +196,63 @@ public abstract class VirtuosoBaseDAO {
      * Finds any triples for the given subject, and if at least one found, forms {@link SubjectDTO} and returns it. Otherwise
      * returns null.
      *
-     * @param subjectUri The URI of the subject to look for.
+     * @param subjectUri The URI of the subject to look for. Can be null or blank, in which case null is returned,
      * @return The subject's {@link SubjectDTO} as described above.
      * @throws DAOException If any sort of data access error occurs.
      */
     protected SubjectDTO findSubject(String subjectUri) throws DAOException {
 
-        Bindings bindings = new Bindings();
-        SubjectDataReader reader = SubjectDataReader.getInstance(Collections.singletonList(subjectUri), null);
-        String query = reader.getQuery(bindings);
-        executeSPARQL(query, bindings, reader);
+        if (StringUtils.isBlank(subjectUri)) {
+            return null;
+        }
 
-        List<SubjectDTO> resultList = reader.getResultList();
-        return resultList != null && !resultList.isEmpty() ? resultList.get(0) : null;
+        SubjectDTO subjectDTO = null;
+        RepositoryConnection conn = null;
+        RepositoryResult<Statement> statements = null;
+        try {
+            conn = SesameUtil.getRepositoryConnection();
+            ValueFactory vf = conn.getValueFactory();
+            statements = conn.getStatements(vf.createURI(subjectUri), (URI) null, (Value) null, true);
+            if (statements != null) {
+
+                boolean isFirstStatement = true;
+                while (statements.hasNext()) {
+
+                    Statement statement = statements.next();
+                    Resource subject = statement.getSubject();
+
+                    if (isFirstStatement) {
+                        subjectDTO = new SubjectDTO(subject.stringValue(), subject instanceof BNode);
+                        isFirstStatement = false;
+                    }
+
+                    Value object = statement.getObject();
+
+                    boolean isLiteral = object instanceof Literal;
+                    String language = isLiteral ? ((Literal) object).getLanguage() : null;
+                    URI datatype = isLiteral ? ((Literal) object).getDatatype() : null;
+                    boolean isAnonymous = isLiteral ? false : ((Resource) object) instanceof BNode;
+
+                    ObjectDTO objectDTO = new ObjectDTO(object.stringValue(), language, isLiteral, isAnonymous, datatype);
+                    subjectDTO.addObject(statement.getPredicate().stringValue(), objectDTO);
+                }
+            }
+        } catch (RepositoryException e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SesameUtil.close(statements);
+            SesameUtil.close(conn);
+        }
+
+        return subjectDTO;
+
+        //        Bindings bindings = new Bindings();
+        //        SubjectDataReader reader = SubjectDataReader.getInstance(Collections.singletonList(subjectUri), null);
+        //        String query = reader.getQuery(bindings);
+        //        executeSPARQL(query, bindings, reader);
+        //
+        //        List<SubjectDTO> resultList = reader.getResultList();
+        //        return resultList != null && !resultList.isEmpty() ? resultList.get(0) : null;
     }
 
     /**

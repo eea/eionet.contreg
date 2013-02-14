@@ -28,6 +28,7 @@ import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
@@ -277,6 +278,22 @@ public final class SesameUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing TupleQueryResult.", e);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param repositoryResult
+     */
+    public static <T> void close(RepositoryResult<T> repositoryResult) {
+
+        if (repositoryResult != null) {
+            try {
+                repositoryResult.close();
+            } catch (Exception e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Exception when closing RepositoryResult.", e);
             }
         }
     }
