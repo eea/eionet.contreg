@@ -1,3 +1,6 @@
+
+drop table if exists CR.cr3user.staging_db;
+
 create table CR.cr3user.staging_db
 (
     database_id integer NOT NULL IDENTITY,
@@ -11,6 +14,8 @@ create table CR.cr3user.staging_db
     PRIMARY KEY (database_id),
     UNIQUE (name)
 );
+
+drop table if exists CR.cr3user.staging_db_rdf_export;
 
 create table CR.cr3user.staging_db_rdf_export
 (
