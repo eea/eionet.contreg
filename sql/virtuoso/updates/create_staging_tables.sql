@@ -1,5 +1,5 @@
 
-drop table if exists CR.cr3user.staging_db;
+-- drop table CR.cr3user.staging_db;
 
 create table CR.cr3user.staging_db
 (
@@ -15,7 +15,7 @@ create table CR.cr3user.staging_db
     UNIQUE (name)
 );
 
-drop table if exists CR.cr3user.staging_db_rdf_export;
+-- drop table CR.cr3user.staging_db_rdf_export;
 
 create table CR.cr3user.staging_db_rdf_export
 (
