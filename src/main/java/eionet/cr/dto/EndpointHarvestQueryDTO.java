@@ -21,6 +21,8 @@
 
 package eionet.cr.dto;
 
+import java.util.Date;
+
 import eionet.cr.util.Hashes;
 
 /**
@@ -42,6 +44,8 @@ public class EndpointHarvestQueryDTO {
     private int position;
     /**  */
     private boolean active;
+    /**  */
+    private Date lastModified;
 
     /**
      * @return the id
@@ -123,5 +127,17 @@ public class EndpointHarvestQueryDTO {
      */
     public long getEndpointUrlHash() {
         return endpointUrl == null ? 0 : Hashes.spoHash(endpointUrl);
+    }
+    /**
+     * @return the lastModified
+     */
+    public Date getLastModified() {
+        return lastModified;
+    }
+    /**
+     * @param lastModified the lastModified to set
+     */
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 }

@@ -24,21 +24,19 @@
                             </stripes:link>
                         </li>
                         <li>
-                            <stripes:link beanclass="${actionBean.postHarvestScriptActionBeanClass.name}" title="Add a post-harvest script for this source">
-                                <c:out value="Add post-harvest script"/>
+                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="Manage post-harvest scripts of this source">
+                                <c:out value="Manage post-harvest scripts"/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
-                                <stripes:param name="cancelUrl" value="${actionBean.urlBinding}?uri=${actionBean.uri}"/>
                             </stripes:link>
                         </li>
-                        <c:if test="${actionBean.noOfPostHarvestScripts > 0}">
-                            <li>
-	                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View the ${actionBean.noOfPostHarvestScripts} post-harvest script(s) of this source">
-	                                <c:out value="View post-harvest scripts"/>
-	                                <stripes:param name="targetUrl" value="${actionBean.uri}" />
-	                                <stripes:param name="targetType" value="SOURCE"/>
+                        <c:if test="${actionBean.harvestSource.sparqlEndpoint}">
+	                        <li>
+	                            <stripes:link beanclass="${actionBean.endpointQueriesActionBeanClass.name}" title="Manage harvest queries of this SPARQL endpoint">
+	                                <c:out value="Manage endpoint harvest queries"/>
+	                                <stripes:param name="endpointUrl" value="${actionBean.uri}" />
 	                            </stripes:link>
-                            </li>
+	                        </li>
                         </c:if>
                     </ul>
                 </ul>

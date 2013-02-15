@@ -51,6 +51,7 @@ public class EndpointHarvestQueryDTOReader extends SQLResultSetBaseReader<Endpoi
         dto.setEndpointUrl(rs.getString("ENDPOINT_URL"));
         dto.setPosition(rs.getInt("POSITION_NUMBER"));
         dto.setActive(YesNoBoolean.parse(rs.getString("ACTIVE")));
+        dto.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
 
         resultList.add(dto);
     }

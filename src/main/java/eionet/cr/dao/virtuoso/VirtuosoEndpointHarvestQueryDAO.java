@@ -36,6 +36,7 @@ import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * Virtuoso-specific implementation of {@link EndpointHarvestQueryDAO}.
@@ -46,18 +47,25 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
 
     /** */
     private static final String CREATE_SQL = "insert into ENDPOINT_HARVEST_QUERY"
-            + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE) values (?,?,?,?,?,?)";
+            + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE,LAST_MODIFIED) values"
+            + " (?,?,?,?,(select coalesce(max(POSITION_NUMBER), 0)+1 from ENDPOINT_HARVEST_QUERY where ENDPOINT_URL_HASH=?),?,now())";
 
     /** */
     private static final String LIST_BY_URL_HASH_SQL = "select * from ENDPOINT_HARVEST_QUERY"
-            + " where ENDPOINT_URL_HASH=? order by ENDPOINT_URL, POSITION_NUMBER";
+            + " where ENDPOINT_URL_HASH=coalesce(?, ENDPOINT_URL_HASH) order by ENDPOINT_URL, POSITION_NUMBER";
 
     /** */
     private static final String LIST_BY_URL_HASH_ACTIVE_SQL = "select * from ENDPOINT_HARVEST_QUERY"
-            + " where ENDPOINT_URL_HASH=? and ACTIVE=? order by ENDPOINT_URL, POSITION_NUMBER";
+            + " where ENDPOINT_URL_HASH=coalesce(?, ENDPOINT_URL_HASH) and ACTIVE=? order by ENDPOINT_URL, POSITION_NUMBER";
 
     /** */
-    private static final String FETCH_BY_ID_SQL = "select * from ENDPOINT_HARVEST_QUERY"
+    private static final String FETCH_BY_ID_SQL = "select * from ENDPOINT_HARVEST_QUERY" + " where ENDPOINT_HARVEST_QUERY_ID=?";
+
+    /** */
+    private static final String GET_ENDPOINTS_SQL = "select URL from HARVEST_SOURCE where IS_SPARQL_ENDPOINT='Y' order by URL";
+
+    /** */
+    private static final String UPDATE_SQL = "update ENDPOINT_HARVEST_QUERY set TITLE=?, QUERY=?, ACTIVE=?, LAST_MODIFIED=now()"
             + " where ENDPOINT_HARVEST_QUERY_ID=?";
 
     /*
@@ -72,12 +80,13 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
             throw new IllegalArgumentException("The DTO must not be null!");
         }
 
+        long endpointUrlHash = dto.getEndpointUrlHash();
         ArrayList<Object> params = new ArrayList<Object>();
         params.add(dto.getTitle());
         params.add(dto.getQuery());
         params.add(dto.getEndpointUrl());
-        params.add(dto.getEndpointUrlHash());
-        params.add(dto.getPosition());
+        params.add(endpointUrlHash);
+        params.add(endpointUrlHash);
         params.add(YesNoBoolean.format(dto.isActive()));
 
         Connection conn = null;
@@ -101,12 +110,8 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
     @Override
     public List<EndpointHarvestQueryDTO> listByEndpointUrl(String url) throws DAOException {
 
-        if (StringUtils.isBlank(url)) {
-            throw new IllegalArgumentException("The endpoint url must not be blank!");
-        }
-
         ArrayList<Object> values = new ArrayList<Object>();
-        values.add(Hashes.spoHash(url));
+        values.add(StringUtils.isBlank(url) ? (Long) null : Long.valueOf(Hashes.spoHash(url)));
 
         return executeSQL(LIST_BY_URL_HASH_SQL, values, new EndpointHarvestQueryDTOReader());
     }
@@ -119,12 +124,8 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
     @Override
     public List<EndpointHarvestQueryDTO> listByEndpointUrl(String url, boolean active) throws DAOException {
 
-        if (StringUtils.isBlank(url)) {
-            throw new IllegalArgumentException("The endpoint url must not be blank!");
-        }
-
         ArrayList<Object> values = new ArrayList<Object>();
-        values.add(Hashes.spoHash(url));
+        values.add(StringUtils.isBlank(url) ? (Long) null : Long.valueOf(Hashes.spoHash(url)));
         values.add(YesNoBoolean.format(active));
 
         return executeSQL(LIST_BY_URL_HASH_ACTIVE_SQL, values, new EndpointHarvestQueryDTOReader());
@@ -143,5 +144,37 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
 
         List<EndpointHarvestQueryDTO> list = executeSQL(FETCH_BY_ID_SQL, params, new EndpointHarvestQueryDTOReader());
         return list == null || list.isEmpty() ? null : list.iterator().next();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#getEndpoints()
+     */
+    @Override
+    public List<String> getEndpoints() throws DAOException {
+
+        return executeSQL(GET_ENDPOINTS_SQL, null, new SingleObjectReader<String>());
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#update(eionet.cr.dto.EndpointHarvestQueryDTO)
+     */
+    @Override
+    public void update(EndpointHarvestQueryDTO dto) throws DAOException {
+
+        if (dto == null || dto.getId() <= 0) {
+            throw new IllegalArgumentException("The given DTO must not be null, and its id must be > 0");
+        }
+
+        ArrayList<Object> params = new ArrayList<Object>();
+        params.add(dto.getTitle());
+        params.add(dto.getQuery());
+        params.add(YesNoBoolean.format(dto.isActive()));
+        params.add(dto.getId());
+
+        executeSQL(UPDATE_SQL, params);
     }
 }

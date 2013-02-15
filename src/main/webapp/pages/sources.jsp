@@ -10,7 +10,12 @@
                 <div id="operations">
                     <ul>
                         <li>
-                            <stripes:link href="/source.action" event="add">Add new source</stripes:link>
+                            <stripes:link href="/source.action" event="add">
+                                <c:out value="Add new source"/>
+                                <c:if test="${actionBean.type != null && actionBean.type eq 'endpoints'}">
+                                    <stripes:param name="harvestSource.sparqlEndpoint" value="true"/>
+                                </c:if>
+                            </stripes:link>
                         </li>
                     </ul>
                 </div>

@@ -68,4 +68,18 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @throws DAOException If any sort of database access error happens.
      */
     public EndpointHarvestQueryDTO fetchById(int id) throws DAOException;
+
+    /**
+     * Returns a list of SPARQL endpoint URLs currently listed in HARVEST_SOURCE table.
+     * @return The list.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    public List<String> getEndpoints() throws DAOException;
+
+    /**
+     * Updates the given endpoint harvest query in the database.
+     * @param dto The given endpoint harvest query.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    public void update(EndpointHarvestQueryDTO dto) throws DAOException;
 }

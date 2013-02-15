@@ -48,6 +48,7 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.admin.endpointquery.EndpointQueriesActionBean;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptActionBean;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
@@ -278,6 +279,16 @@ public class ViewSourceActionBean extends AbstractActionBean {
      */
     public Class getPostHarvestScriptsActionBeanClass() {
         return PostHarvestScriptsActionBean.class;
+    }
+
+    /**
+     * Returns the Java class object of the endpoint harvest queries action bean class. This method is used in JSP for building
+     * refactoring-safe links.
+     *
+     * @return
+     */
+    public Class getEndpointQueriesActionBeanClass() {
+        return EndpointQueriesActionBean.class;
     }
 
     /**
