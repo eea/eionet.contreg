@@ -340,4 +340,25 @@ public class TripleDTO {
     public void setObjectDerivGenTime(Long objectDerivGenTime) {
         this.objectDerivGenTime = objectDerivGenTime;
     }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<").append(subjectUri).append(">");
+        sb.append(" <").append(predicateUri).append(">");
+
+        if (!isLiteralObject) {
+            sb.append(" <").append(object).append(">");
+        } else {
+            sb.append(" \"").append(object).append("\"");
+        }
+
+        return sb.toString();
+    }
 }

@@ -21,7 +21,10 @@
 
 package eionet.cr.dao;
 
+import java.util.Collection;
 import java.util.List;
+
+import org.openrdf.model.Statement;
 
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 
@@ -82,4 +85,20 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @throws DAOException If any sort of database access error happens.
      */
     public void update(EndpointHarvestQueryDTO dto) throws DAOException;
+
+    /**
+     * Tests the given CONSTRUCT query at the given remote endpoint URL. Neither of the two must be blank!
+     * The query is assumed to be a CONSTRUCT query abd the method assures that a reasonable LIMIT clause is added to the query
+     * before sending it!
+     *
+     * The method returns the statements of the graph that the query returned.
+     *
+     * This method should really not be in a DAO layer, but let it be here until we have no service layer.
+     *
+     * @param query The query.
+     * @param endpointUrl The endpoint URL.
+     * @return The statements.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    public Collection<Statement> testConstructQuery(String query, String endpointUrl) throws DAOException;
 }

@@ -24,9 +24,18 @@ package eionet.cr.dao.virtuoso;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.Statement;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.sparql.SPARQLRepository;
 
 import eionet.cr.common.CRException;
 import eionet.cr.dao.DAOException;
@@ -35,6 +44,7 @@ import eionet.cr.dao.readers.EndpointHarvestQueryDTOReader;
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
@@ -46,9 +56,10 @@ import eionet.cr.util.sql.SingleObjectReader;
 public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements EndpointHarvestQueryDAO {
 
     /** */
-    private static final String CREATE_SQL = "insert into ENDPOINT_HARVEST_QUERY"
-            + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE,LAST_MODIFIED) values"
-            + " (?,?,?,?,(select coalesce(max(POSITION_NUMBER), 0)+1 from ENDPOINT_HARVEST_QUERY where ENDPOINT_URL_HASH=?),?,now())";
+    private static final String CREATE_SQL =
+            "insert into ENDPOINT_HARVEST_QUERY"
+                    + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE,LAST_MODIFIED) values"
+                    + " (?,?,?,?,(select coalesce(max(POSITION_NUMBER), 0)+1 from ENDPOINT_HARVEST_QUERY where ENDPOINT_URL_HASH=?),?,now())";
 
     /** */
     private static final String LIST_BY_URL_HASH_SQL = "select * from ENDPOINT_HARVEST_QUERY"
@@ -176,5 +187,95 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
         params.add(dto.getId());
 
         executeSQL(UPDATE_SQL, params);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#testConstructQuery(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Collection<Statement> testConstructQuery(String query, String endpointUrl) throws DAOException {
+
+        if (StringUtils.isBlank(query) || StringUtils.isBlank(endpointUrl)) {
+            throw new IllegalArgumentException("The query and the endpoint URL must not be blank!");
+        }
+
+        int limit = 100;
+        query = ensureTestConstructLimit(query, limit);
+        ArrayList<Statement> result = new ArrayList<Statement>();
+        SPARQLRepository sparqlRepository = new SPARQLRepository(endpointUrl);
+
+        RepositoryConnection repoConn = null;
+        GraphQueryResult queryResult = null;
+        try {
+            repoConn = sparqlRepository.getConnection();
+            GraphQuery graphQuery = repoConn.prepareGraphQuery(QueryLanguage.SPARQL, query);
+            queryResult = graphQuery.evaluate();
+            if (queryResult != null) {
+                int counter = 0;
+                while (queryResult.hasNext() && counter++ < limit) {
+                    result.add(queryResult.next());
+                }
+            }
+        } catch (OpenRDFException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(queryResult);
+            SesameUtil.close(repoConn);
+        }
+
+        return result;
+    }
+
+    /**
+     * Ensures that the given test CONSTRUCT query has a reasonable limit (i.e. one by the given limits size) included.
+     *
+     * @param query The given query.
+     * @param limitSize The reasonable limit size.
+     * @return The query with the reasonable limit ensured.
+     */
+    private String ensureTestConstructLimit(String query, int limitSize) {
+
+        String upperCaseQuery = query.toUpperCase();
+        String[] tokens = StringUtils.split(upperCaseQuery.trim());
+        int len = tokens.length;
+
+        Integer offset = null;
+        boolean limitOnly = false;
+        boolean limitPlusOffset = false;
+        boolean offsetPlusLimit = false;
+
+        if (len >= 4) {
+            if (tokens[len - 4].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 3]) && tokens[len - 2].equals("OFFSET")
+                    && NumberUtils.isNumber(tokens[len - 1])) {
+                offset = Integer.valueOf(tokens[len - 1]);
+                limitPlusOffset = true;
+            } else if (tokens[len - 4].equals("OFFSET") && NumberUtils.isNumber(tokens[len - 3])
+                    && tokens[len - 2].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 1])) {
+                offset = Integer.valueOf(tokens[len - 3]);
+                offsetPlusLimit = true;
+            }
+        } else if (len >= 2) {
+            if (tokens[len - 2].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 1])) {
+                limitOnly = true;
+            }
+        }
+
+        if (limitOnly) {
+            int i = upperCaseQuery.lastIndexOf("LIMIT");
+            return query.substring(0, i) + " LIMIT " + limitSize;
+        }
+        else if (offsetPlusLimit) {
+            int i = upperCaseQuery.lastIndexOf("OFFSET");
+            return query.substring(0, i) + " OFFSET " + offset.intValue() + " LIMIT " + limitSize;
+        }
+        else if (limitPlusOffset) {
+            int i = upperCaseQuery.lastIndexOf("LIMIT");
+            return query.substring(0, i) + " LIMIT " + limitSize + " OFFSET " + offset.intValue();
+        }
+        else{
+            return query + " LIMIT " + limitSize;
+        }
     }
 }

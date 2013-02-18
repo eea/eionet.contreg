@@ -112,6 +112,46 @@
                     </c:if>
                 </fieldset>
             </crfn:form>
+
+            <c:if test="${actionBean.context.eventName eq 'test'}">
+                <c:if test="${not empty actionBean.testResult}">
+                    <display:table name="${actionBean.testResult}" id="statement" sort="page" class="datatable" style="width:100%">
+                        <display:column title="Subject">
+                            <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
+	                            <c:out value="${statement.subject}"/>
+	                            <stripes:param name="url" value="${statement.subject}"/>
+	                            <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
+	                        </stripes:link>
+                        </display:column>
+                        <display:column title="Predicate">
+                            <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
+                                <c:out value="${statement.predicate}"/>
+                                <stripes:param name="url" value="${statement.predicate}"/>
+                                <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
+                            </stripes:link>
+                        </display:column>
+                        <display:column title="Object">
+                            <c:choose>
+                                <c:when test="${fn:contains(statement.object.class.name, 'Literal')}">
+                                    <c:out value="${statement.object.label}"/>
+                                </c:when>
+                                <c:otherwise>
+                                    <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
+		                                <c:out value="${statement.object}"/>
+		                                <stripes:param name="url" value="${statement.object}"/>
+		                                <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
+		                            </stripes:link>
+                                </c:otherwise>
+                            </c:choose>
+                        </display:column>
+                    </display:table>
+                </c:if>
+                <c:if test="${empty actionBean.testResult}">
+                    <div class="system-msg">
+                        <p>The test returned no results!</p>
+                    </div>
+                </c:if>
+            </c:if>
         </div>
 
     </stripes:layout-component>

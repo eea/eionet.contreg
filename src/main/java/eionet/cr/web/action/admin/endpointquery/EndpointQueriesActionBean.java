@@ -25,14 +25,17 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.HarvestSourceActionBean;
+import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
 /**
  * Action bean for operations with a SPARQL endpoint's harvest queries.
@@ -66,6 +69,50 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
         queries = dao.listByEndpointUrl(endpointUrl);
         endpoints = dao.getEndpoints();
         return new ForwardResolution(QUERIES_JSP);
+    }
+
+    /**
+     * Handler for the "delete" event.
+     * @return
+     * @throws DAOException
+     */
+    public Resolution delete() throws DAOException {
+
+        addSystemMessage("Operation not implemented yet!");
+        return list();
+    }
+
+    /**
+     * Handler for the "activateDeactivate" event.
+     * @return
+     * @throws DAOException
+     */
+    public Resolution activateDeactivate() throws DAOException {
+
+        addSystemMessage("Operation not implemented yet!");
+        return list();
+    }
+
+    /**
+     * Handler for the "moveUp" event.
+     * @return
+     * @throws DAOException
+     */
+    public Resolution moveUp() throws DAOException {
+
+        addSystemMessage("Operation not implemented yet!");
+        return list();
+    }
+
+    /**
+     * Handler for the "moveDown" event.
+     * @return
+     * @throws DAOException
+     */
+    public Resolution moveDown() throws DAOException {
+
+        addSystemMessage("Operation not implemented yet!");
+        return list();
     }
 
     /**
@@ -114,4 +161,17 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
         return HarvestSourceActionBean.class;
     }
 
+    /**
+     * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
+     * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events, since no specific events
+     * specified in the {@link ValidationMethod} annotation.
+     */
+    @ValidationMethod(priority = 1)
+    public void validateUserAuthorised() {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
+        }
+    }
 }

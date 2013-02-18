@@ -96,8 +96,14 @@
                                     <stripes:submit name="moveUp" value="Move up" title="Move selected queries up"/>
                                     <stripes:submit name="moveDown" value="Move down" title="Move selected queries down"/>
                                 </c:if>
-                                <input type="button" onclick="toggleSelectAll('scriptsForm');return false" value="Select all" name="selectAll"/>
+                                <input type="button" onclick="toggleSelectAll('queriesForm');return false" value="Select all" name="selectAll"/>
                             </div>
+
+                            <c:if test="${not empty actionBean.endpointUrl}">
+                                <fieldset style="display:none">
+                                    <stripes:hidden name="endpointUrl"/>
+                                </fieldset>
+                            </c:if>
 
                         </crfn:form>
                     </div>
