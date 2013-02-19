@@ -136,7 +136,28 @@
                 </table>
 
                 <c:if test="${actionBean.exportDTO.status.finished}">
-                    <div style="width:75%;padding-top:10px;">
+                    <div style="width:100%;padding-top:10px;">
+
+                        <p><strong>The following objects were exported:</strong></p>
+                        <c:if test="${not empty actionBean.exportedResources}">
+
+                            <display:table name="${actionBean.exportedResources}" id="exportedResource" class="datatable" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:100%">
+
+                                <display:setProperty name="paging.banner.item_name" value="object"/>
+                                <display:setProperty name="paging.banner.items_name" value="objects"/>
+                                <display:setProperty name="paging.banner.all_items_found" value='<div class="pagebanner">{0} {1} found.</div>'/>
+                                <display:setProperty name="paging.banner.onepage" value=""/>
+
+                                <display:column title="The object's URI">
+                                    <stripes:link beanclass="${actionBean.factsheetActionBeanClass.name}">
+                                        <c:out value="${exportedResource}"/>
+                                        <stripes:param name="uri" value="${exportedResource}"/>
+                                    </stripes:link>
+                               </display:column>
+                            </display:table>
+
+                        </c:if>
+                        <%--
                         <p>The results of this export were stored into the following dataset(s):</p>
                         <c:if test="${not empty actionBean.exportDTO.graphs}">
                             <c:set var="newline" value="\n"/>
@@ -153,6 +174,7 @@
                                 </c:forEach>
                             </ul>
                         </c:if>
+                        --%>
                     </div>
                 </c:if>
             </div>

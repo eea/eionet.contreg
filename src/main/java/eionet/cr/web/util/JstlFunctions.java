@@ -75,8 +75,9 @@ public final class JstlFunctions {
      */
     public static java.lang.String cutAtFirstLongToken(java.lang.String str, int cutAtLength) {
 
-        if (str == null)
+        if (str == null) {
             return "";
+        }
 
         String firstLongToken = null;
         StringTokenizer st = new StringTokenizer(str);
@@ -92,8 +93,9 @@ public final class JstlFunctions {
             int i = str.indexOf(firstLongToken);
             StringBuffer buf = new StringBuffer(str.substring(0, i + cutAtLength));
             return buf.append("...").toString();
-        } else
+        } else {
             return str;
+        }
     }
 
     /**
@@ -105,13 +107,15 @@ public final class JstlFunctions {
      */
     public static java.lang.String addQuotesIfWhitespaceInside(java.lang.String str) {
 
-        if (str == null || str.trim().length() == 0)
+        if (str == null || str.trim().length() == 0) {
             return str;
+        }
 
-        if (!Util.hasWhiteSpace(str.trim()))
+        if (!Util.hasWhiteSpace(str.trim())) {
             return str;
-        else
+        } else {
             return "\"" + str + "\"";
+        }
     }
 
     /**
@@ -161,8 +165,8 @@ public final class JstlFunctions {
         String curValue = request.getParameter("sortP");
         if (curValue != null && buf.indexOf("sortP=") > 0) {
             buf =
-                new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
-                        "sortP=" + Util.urlEncode(sortParamValue)));
+                    new StringBuffer(StringUtils.replace(buf.toString(), "sortP=" + Util.urlEncode(curValue),
+                            "sortP=" + Util.urlEncode(sortParamValue)));
         } else {
             buf.append("&amp;sortP=").append(Util.urlEncode(sortParamValue));
         }
@@ -170,8 +174,8 @@ public final class JstlFunctions {
         curValue = request.getParameter("sortO");
         if (curValue != null && buf.indexOf("sortO=") > 0) {
             buf =
-                new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
-                        "sortO=" + SortOrder.oppositeSortOrder(curValue)));
+                    new StringBuffer(StringUtils.replace(buf.toString(), "sortO=" + curValue,
+                            "sortO=" + SortOrder.oppositeSortOrder(curValue)));
         } else {
             buf.append("&amp;sortO=").append(SortOrder.oppositeSortOrder(curValue));
         }
@@ -214,8 +218,9 @@ public final class JstlFunctions {
 
         boolean result = false;
 
-        if (predicates == null)
+        if (predicates == null) {
             return result;
+        }
 
         for (Iterator i = predicates.iterator(); i.hasNext();) {
             if (subjectDTO.hasPredicateObject(i.next().toString(), object)) {
@@ -297,8 +302,9 @@ public final class JstlFunctions {
      */
     public static String getObjectLiteral(SubjectDTO subject, String predicate) {
 
-        if (subject == null)
+        if (subject == null) {
             return "";
+        }
 
         ObjectDTO object = subject.getObject(predicate, ObjectDTO.Type.LITERAL);
         return object == null ? "" : object.getValue();
@@ -544,5 +550,33 @@ public final class JstlFunctions {
     public static String escapeHtml(String s) {
 
         return StringEscapeUtils.escapeHtml(s);
+    }
+
+    /**
+     *
+     * @param arrayOrCollection
+     * @param object
+     * @return
+     */
+    public static boolean contains(Object arrayOrCollection, Object object) {
+
+        if (arrayOrCollection != null) {
+
+            if (arrayOrCollection instanceof Object[]) {
+                for (Object o : ((Object[]) arrayOrCollection)) {
+                    if (o.equals(object)) {
+                        return true;
+                    }
+                }
+            } else if (arrayOrCollection instanceof Collection) {
+                for (Object o : ((Collection) arrayOrCollection)) {
+                    if (o.equals(object)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

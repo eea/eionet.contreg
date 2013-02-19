@@ -101,6 +101,13 @@ public class ExportRunner extends Thread {
     /** */
     private Set<ObjectHiddenProperty> hiddenProperties;
 
+    /** */
+    private URI graphURI;
+    private URI indicatorPredicateURI;
+    private URI indicatorValueURI;
+    private URI importURI;
+    private URI importedResourceURI;
+
     /**
      * Private class constructor.
      *
@@ -219,11 +226,7 @@ public class ExportRunner extends Thread {
         ResultSet rs = null;
         try {
             ValueFactory valueFactory = repoConn.getValueFactory();
-            setPredicateURIs(valueFactory);
-            setHiddenPropertiesValues(valueFactory);
-
-            objectTypeURI = valueFactory.createURI(queryConf.getObjectTypeUri());
-            rdfTypeURI = valueFactory.createURI(Predicates.RDF_TYPE);
+            prepareValues(valueFactory);
 
             sqlConn = SesameUtil.getSQLConnection(dbDTO.getName());
             pstmt = sqlConn.prepareStatement(queryConf.getQuery());
@@ -241,6 +244,28 @@ public class ExportRunner extends Thread {
             SQLUtil.close(pstmt);
             SQLUtil.close(sqlConn);
         }
+    }
+
+    /**
+     * @param vf
+     */
+    private void prepareValues(ValueFactory vf) {
+
+        setPredicateURIs(vf);
+        setHiddenPropertiesValues(vf);
+
+        objectTypeURI = vf.createURI(queryConf.getObjectTypeUri());
+        rdfTypeURI = vf.createURI(Predicates.RDF_TYPE);
+        graphURI = vf.createURI("http://semantic.digital-agenda-data.eu/dataset/scoreboard");
+        indicatorPredicateURI = vf.createURI("http://semantic.digital-agenda-data.eu/def/property/indicator");
+
+        String indicator = queryConf.getIndicator();
+        if (StringUtils.isNotBlank(indicator)) {
+            indicatorValueURI = vf.createURI("http://semantic.digital-agenda-data.eu/codelist/indicator/" + indicator);
+        }
+
+        importURI = vf.createURI("http://semantic.digital-agenda-data.eu/import/"+ exportId);
+        importedResourceURI = vf.createURI("http://semantic.digital-agenda-data.eu/importedResource");
     }
 
     /**
@@ -277,10 +302,10 @@ public class ExportRunner extends Thread {
         }
 
         // The dataset (i.e. target graph) ID is the value of the columns designated as "dataset column" in query configuration.
-        String datasetId = queryConf.getDatasetIdTemplate();
-        if (StringUtils.isBlank(datasetId)) {
-            datasetId = String.valueOf(exportId);
-        }
+        // String datasetId = queryConf.getDatasetIdTemplate();
+        // if (StringUtils.isBlank(datasetId)) {
+        // datasetId = String.valueOf(exportId);
+        // }
 
         // Prepare the map of ObjectDTO to be added to the subject later.
         LinkedHashMap<URI, ArrayList<Value>> valuesByPredicate = new LinkedHashMap<URI, ArrayList<Value>>();
@@ -295,19 +320,26 @@ public class ExportRunner extends Thread {
             }
         }
 
+        boolean hasIndicatorMapping = false;
+
         // Loop through the query configuration's column mappings, construct ObjectDTO for each.
         for (Entry<String, ObjectProperty> entry : queryConf.getColumnMappings().entrySet()) {
 
             String colName = entry.getKey();
             String colValue = rs.getString(colName);
+            ObjectProperty property = entry.getValue();
+            if (property.getId().equals("indicator")) {
+                hasIndicatorMapping = true;
+            }
 
             if (StringUtils.isNotBlank(colValue)) {
 
                 // Replace this column's place-holder in the subject ID template and dataset (i.e. graph) ID template.
-                subjectId = StringUtils.replace(subjectId, "<" + colName + ">", colValue);
-                datasetId = StringUtils.replace(datasetId, "<" + colName + ">", colValue);
+                // subjectId = StringUtils.replace(subjectId, "<" + colName + ">", colValue);
+                // datasetId = StringUtils.replace(datasetId, "<" + colName + ">", colValue);
 
-                ObjectProperty property = entry.getValue();
+                subjectId = StringUtils.replace(subjectId, "<" + property.getId() + ">", colValue);
+
                 URI predicateURI = property.getPredicateURI();
                 if (predicateURI != null) {
 
@@ -336,11 +368,27 @@ public class ExportRunner extends Thread {
             }
         }
 
+        if (!hasIndicatorMapping && StringUtils.isNotBlank(queryConf.getIndicator())) {
+            addPredicateValue(valuesByPredicate, indicatorPredicateURI, indicatorValueURI);
+        }
+
+        if (subjectId.indexOf("<indicator>") != -1) {
+            String indicator = queryConf.getIndicator();
+            if (StringUtils.isBlank(indicator)) {
+                indicator = "*";
+            }
+            subjectId = StringUtils.replace(subjectId, "<indicator>", indicator);
+        }
+
+        if (subjectId.indexOf("<breakdown>") != -1) {
+            subjectId = StringUtils.replace(subjectId, "<breakdown>", "total");
+        }
+
         if (!valuesByPredicate.isEmpty()) {
 
             int tripleCountBefore = tripleCount;
             URI subjectURI = vf.createURI(queryConf.getObjectIdNamespace() + subjectId);
-            URI graphURI = vf.createURI(queryConf.getDatasetIdNamespace() + datasetId);
+            // URI graphURI = vf.createURI(queryConf.getDatasetIdNamespace() + datasetId);
             for (Entry<URI, ArrayList<Value>> entry : valuesByPredicate.entrySet()) {
 
                 ArrayList<Value> values = entry.getValue();
@@ -352,7 +400,7 @@ public class ExportRunner extends Thread {
                         if (tripleCount % 5000 == 0) {
                             LOGGER.debug(tripleCount + " triples exported so far");
                         }
-                        distinctGraphs.add(graphURI.toString());
+                        //                        distinctGraphs.add(graphURI.toString());
                     }
                 }
             }
@@ -360,6 +408,8 @@ public class ExportRunner extends Thread {
             if (tripleCount > tripleCountBefore) {
                 subjectCount++;
             }
+
+            repoConn.add(importURI, importedResourceURI, subjectURI, importURI);
         }
     }
 

@@ -57,6 +57,8 @@ import eionet.cr.staging.exp.ExportRunner;
 import eionet.cr.staging.exp.ExportStatus;
 import eionet.cr.staging.exp.QueryConfiguration;
 import eionet.cr.staging.imp.ImportStatus;
+import eionet.cr.util.Pair;
+import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 
@@ -71,11 +73,22 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
     private static final Logger LOGGER = Logger.getLogger(VirtuosoStagingDatabaseDAO.class);
 
     /** */
+    private static final String GET_INDICATORS_SPARQL = "select ?s as ?" + PairReader.LEFTCOL + " ?notation as ?"
+            + PairReader.RIGHTCOL + " where {" + " ?s a <http://semantic.digital-agenda-data.eu/def/class/Indicator>."
+            + " ?s <http://www.w3.org/2004/02/skos/core#notation> ?notation}" + " order by ?notation";
+
+    /** */
+    private static final String GET_EXPORTED_RESOURCES_SPARQL = "SELECT distinct ?o WHERE {"
+            + "<http://semantic.digital-agenda-data.eu/import/@id@> <http://semantic.digital-agenda-data.eu/importedResource> ?o}"
+            + " order by ?o";
+
+    /** */
     private static final String ADD_NEW_DB_SQL =
             "insert into STAGING_DB (NAME,CREATOR,CREATED,DESCRIPTION,IMPORT_STATUS,IMPORT_LOG) values (?,?,?,?,?,?)";
 
     /** */
-    private static final String UPDATE_DB_METADATA_SQL = "update STAGING_DB set DESCRIPTION=?, DEFAULT_QUERY=? where DATABASE_ID=?";
+    private static final String UPDATE_DB_METADATA_SQL =
+            "update STAGING_DB set DESCRIPTION=?, DEFAULT_QUERY=? where DATABASE_ID=?";
 
     /** */
     private static final String GET_DATABASE_BY_ID_SQL = "select * from STAGING_DB where DATABASE_ID=?";
@@ -178,8 +191,9 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         }
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.StagingDatabaseDAO#updateDatabaseMetadata(int, java.lang.String, java.lang.String)
      */
     @Override
@@ -229,6 +243,18 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
         } finally {
             SQLUtil.close(conn);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getExportedResourceUris(int)
+     */
+    @Override
+    public List<String> getExportedResourceUris(int exportId) throws DAOException {
+
+        String query = StringUtils.replace(GET_EXPORTED_RESOURCES_SPARQL, "@id@", String.valueOf(exportId));
+        return executeSPARQL(query, null, new SingleObjectReader<String>());
     }
 
     /*
@@ -691,5 +717,16 @@ public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements Stagi
 
         Object o = executeUniqueResultSQL(EXISTS_RDF_EXPORT_SQL, params, new SingleObjectReader<Object>());
         return o == null ? false : Integer.parseInt(o.toString()) > 0;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.StagingDatabaseDAO#getIndicators()
+     */
+    @Override
+    public List<Pair<String, String>> getIndicators() throws DAOException {
+
+        return executeSPARQL(GET_INDICATORS_SPARQL, null, new PairReader<String, String>());
     }
 }

@@ -24,6 +24,7 @@ package eionet.cr.web.action.admin.staging;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ import eionet.cr.staging.exp.ObjectType;
 import eionet.cr.staging.exp.ObjectTypes;
 import eionet.cr.staging.exp.QueryConfiguration;
 import eionet.cr.util.LinkedCaseInsensitiveMap;
+import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 
@@ -104,6 +106,9 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /** */
     private StagingDatabaseDTO dbDTO;
+
+    /** */
+    private List<Pair<String, String>> indicators;
 
     /**
      * Event handler for the wizard's first step.
@@ -216,33 +221,56 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"step2"})
     public void validateStep2() {
 
+        boolean hasIndicatorMapping = false;
+        // Ensure that all selected columns have been mapped to a property.
         Map<String, ObjectProperty> colMappings = queryConf == null ? null : queryConf.getColumnMappings();
         if (colMappings != null && !colMappings.isEmpty()) {
 
             for (Entry<String, ObjectProperty> entry : colMappings.entrySet()) {
 
                 String colName = entry.getKey();
-                if (entry.getValue() == null) {
+                ObjectProperty property = entry.getValue();
+                if (property == null) {
                     addGlobalValidationError("Missing property selection for this column: " + colName);
+                } else {
+                    if (property.getId().equals("indicator")) {
+                        hasIndicatorMapping = true;
+                    }
+                }
+            }
+
+            // Ensure that all required properties have a mapping.
+            Collection<ObjectProperty> mappedProperties = colMappings.values();
+            HashSet<ObjectProperty> requiredProperties = getObjectType().getRequiredProperties();
+            for (ObjectProperty requiredProperty : requiredProperties) {
+                if (!mappedProperties.contains(requiredProperty)) {
+                    addGlobalValidationError("Missing a column mapping for this required property: " + requiredProperty.getLabel());
                 }
             }
         } else {
             addGlobalValidationError("Found no column mappings!");
         }
 
-        String datasetIdTemplate = queryConf.getDatasetIdTemplate();
-        if (StringUtils.isBlank(datasetIdTemplate)) {
-            addGlobalValidationError("You must specify the dataset identifier template!");
-        } else if (!validateColumnPlaceholders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
-            addGlobalValidationError("Dataset identifier template has placeholder(s) not matching any of the selected columns!");
+        // Ensure that indicator is given, either from picklist or column mapping
+        if (!hasIndicatorMapping && StringUtils.isBlank(queryConf.getIndicator())) {
+            addGlobalValidationError("Indciator must be selected from picklist or provided by column mapping!");
         }
 
-        String objectIdTemplate = queryConf.getObjectIdTemplate();
-        if (StringUtils.isBlank(objectIdTemplate)) {
-            addGlobalValidationError("You must specify the objects identifier template!");
-        } else if (!validateColumnPlaceholders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
-            addGlobalValidationError("Objects identifier template has placeholder(s) not matching any of the selected columns!");
-        }
+        // Ensure that the dataset ID template has been provided and is valid.
+        //        String datasetIdTemplate = queryConf.getDatasetIdTemplate();
+        //        if (StringUtils.isBlank(datasetIdTemplate)) {
+        //            addGlobalValidationError("You must specify the dataset identifier template!");
+        //        } else if (!validateColumnPlaceholders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+        //            addGlobalValidationError("A placeholder in dataset identifier template does not match any of the selected columns!");
+        //        }
+        //
+        //        // Ensure that the object ID template has been provided and is valid.
+        //        String objectIdTemplate = queryConf.getObjectIdTemplate();
+        //        if (StringUtils.isBlank(objectIdTemplate)) {
+        //            addGlobalValidationError("You must specify the objects identifier template!");
+        //        } else if (!validateColumnPlaceholders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+        //            addGlobalValidationError("A placeholder in objects identifier template does not match any of the selected columns!");
+        //        }
 
         getContext().setSourcePageResolution(new ForwardResolution(STEP2_JSP));
     }
@@ -377,15 +405,12 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
                 ObjectProperty curProperty = curMappings.get(column);
                 if (curProperty == null) {
                     newMappings.put(column, null);
-                }
-                else if (!objectType.hasThisProperty(curProperty)) {
+                } else if (!objectType.hasThisProperty(curProperty)) {
                     newMappings.put(column, objectType.getDefaultProperty(column));
-                }
-                else{
+                } else {
                     newMappings.put(column, curProperty);
                 }
-            }
-            else{
+            } else {
                 newMappings.put(column, objectType.getDefaultProperty(column));
             }
         }
@@ -479,9 +504,10 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /**
      * Returns object type for the currently selected object type URI.
+     *
      * @return the object type
      */
-    private ObjectType getObjectType() {
+    public ObjectType getObjectType() {
 
         String objTypeUri = queryConf == null ? null : queryConf.getObjectTypeUri();
         if (StringUtils.isNotBlank(objTypeUri)) {
@@ -493,6 +519,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /**
      * Returns properties for the object type of the currently selected object type URI.
+     *
      * @return The properties.
      */
     public List<ObjectProperty> getTypeProperties() {
@@ -552,6 +579,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /**
      * Returns list of {@link StagingDatabaseTableColumnDTO} for the currently selected database.
+     *
      * @return the list of {@link StagingDatabaseTableColumnDTO}
      * @throws DAOException when a database error happens
      */
@@ -580,5 +608,17 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
      */
     public StagingDatabaseDTO getDbDTO() {
         return dbDTO;
+    }
+
+    /**
+     * @return the indicators
+     * @throws DAOException
+     */
+    public List<Pair<String, String>> getIndicators() throws DAOException {
+
+        if (indicators == null) {
+            indicators = DAOFactory.get().getDao(StagingDatabaseDAO.class).getIndicators();
+        }
+        return indicators;
     }
 }

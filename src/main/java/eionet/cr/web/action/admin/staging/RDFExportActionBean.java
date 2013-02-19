@@ -21,6 +21,8 @@
 
 package eionet.cr.web.action.admin.staging;
 
+import java.util.List;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -39,6 +41,7 @@ import eionet.cr.staging.exp.ExportDTO;
 import eionet.cr.staging.util.ImportExportLogUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.action.factsheet.ObjectsInSourceActionBean;
 
 /**
@@ -57,6 +60,9 @@ public class RDFExportActionBean extends AbstractActionBean {
 
     /** The export's DTO matching the given export id. */
     private ExportDTO exportDTO;
+
+    /** */
+    private List<String> exportedResources;
 
     /**
      * Default event handler.
@@ -213,5 +219,24 @@ public class RDFExportActionBean extends AbstractActionBean {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @return the exportedResources
+     * @throws DAOException
+     */
+    public List<String> getExportedResources() throws DAOException {
+        if (exportedResources == null) {
+            exportedResources = DAOFactory.get().getDao(StagingDatabaseDAO.class).getExportedResourceUris(exportId);
+        }
+        return exportedResources;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Class getFactsheetActionBeanClass() {
+        return FactsheetActionBean.class;
     }
 }

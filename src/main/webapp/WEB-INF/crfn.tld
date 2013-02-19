@@ -417,4 +417,16 @@
         </example>
     </function>
 
+    <function>
+        <description>
+            Returns true if the given array or collection (i.e. the first input parameter)
+            contains the given object (i.e. the second input parameter).
+        </description>
+        <name>contains</name>
+        <function-class>eionet.web.util.JstlFunctions</function-class>
+        <function-signature>boolean contains(java.lang.Object, java.lang.Object)</function-signature>
+        <example>
+        </example>
+    </function>
+
 </taglib>

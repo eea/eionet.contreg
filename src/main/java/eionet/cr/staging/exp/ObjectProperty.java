@@ -34,6 +34,9 @@ import org.openrdf.model.ValueFactory;
 public class ObjectProperty {
 
     /** */
+    private String id;
+
+    /** */
     private String label;
 
     /**  */
@@ -58,18 +61,20 @@ public class ObjectProperty {
      * Class constructor.
      *
      * @param predicate The property's underlying predicate.
+     * @param id The property's alpha-numeric ID for internal use.
      * @param label The property's label as it should be displayed to the users of staging databases functionality.
      * @param range Indicates whether the property's values should be literals or resources.
      */
-    public ObjectProperty(String predicate, String label, Range range) {
+    public ObjectProperty(String predicate, String id, String label, Range range) {
 
-        if (StringUtils.isBlank(predicate) || StringUtils.isBlank(label) || range == null) {
+        if (StringUtils.isBlank(predicate) || StringUtils.isBlank(label) || StringUtils.isBlank(id) || range == null) {
             throw new IllegalArgumentException("None of the constrcutor inputs must be null or blank!");
         }
 
         this.predicate = predicate;
         this.label = label;
         this.range = range;
+        this.id = id;
     }
 
     /**
@@ -230,5 +235,12 @@ public class ObjectProperty {
         public String toString() {
             return friendlyName;
         }
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 }

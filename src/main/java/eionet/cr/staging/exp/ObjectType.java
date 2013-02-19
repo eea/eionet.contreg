@@ -66,13 +66,17 @@ public class ObjectType {
     /** */
     private HashSet<ObjectHiddenProperty> hiddenProperties = new HashSet<ObjectHiddenProperty>();
 
+    /** */
+    private HashSet<ObjectProperty> requiredProperties = new HashSet<ObjectProperty>();
+
+    /** */
+    private HashMap<ObjectProperty, String[]> propertyToDefaultColumns = new HashMap<ObjectProperty, String[]>();
+
     /**
-     * Gets the hidden properties.
-     *
-     * @return the hiddenProperties
+     * @return the propertyToDefaultColumns
      */
-    public Set<ObjectHiddenProperty> getHiddenProperties() {
-        return hiddenProperties;
+    public HashMap<ObjectProperty, String[]> getPropertyToDefaultColumns() {
+        return propertyToDefaultColumns;
     }
 
     /**
@@ -92,25 +96,23 @@ public class ObjectType {
      * Adds the property.
      *
      * @param property the property
-     */
-    public void addProperty(ObjectProperty property) {
-        properties.add(property);
-        predicateToProperty.put(property.getPredicate(), property);
-    }
-
-    /**
-     * Adds the property.
-     *
-     * @param property the property
+     * @param isRequired indicates if this is a required property
      * @param defaultForColumn the default for column
      */
-    public void addProperty(ObjectProperty property, String... defaultForColumn) {
-        addProperty(property);
+    public void addProperty(ObjectProperty property, boolean isRequired, String... defaultForColumn) {
+
+        properties.add(property);
+        predicateToProperty.put(property.getPredicate(), property);
+        if (isRequired) {
+            requiredProperties.add(property);
+        }
 
         if (defaultForColumn != null && defaultForColumn.length > 0) {
             for (String column : defaultForColumn) {
                 columnToDefaultProperty.put(column, property);
             }
+
+            propertyToDefaultColumns.put(property, defaultForColumn);
         }
     }
 
@@ -258,4 +260,21 @@ public class ObjectType {
 
         return false;
     }
+
+    /**
+     * @return the requiredProperties
+     */
+    public HashSet<ObjectProperty> getRequiredProperties() {
+        return requiredProperties;
+    }
+
+    /**
+     * Gets the hidden properties.
+     *
+     * @return the hiddenProperties
+     */
+    public Set<ObjectHiddenProperty> getHiddenProperties() {
+        return hiddenProperties;
+    }
+
 }

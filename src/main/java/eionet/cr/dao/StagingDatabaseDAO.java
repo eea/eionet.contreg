@@ -31,6 +31,7 @@ import eionet.cr.staging.exp.ExportRunner;
 import eionet.cr.staging.exp.ExportStatus;
 import eionet.cr.staging.exp.QueryConfiguration;
 import eionet.cr.staging.imp.ImportStatus;
+import eionet.cr.util.Pair;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -193,6 +194,14 @@ public interface StagingDatabaseDAO extends DAO {
     int startRDEExport(int databaseId, String exportName, String userName, QueryConfiguration queryConf) throws DAOException;
 
     /**
+     * Returns the list of URIs of resources exported in the RDF export by the given id.
+     * @param exportId The given RDF export id.
+     * @return The list.
+     * @throws DAOException If a database access error happens.
+     */
+    List<String> getExportedResourceUris(int exportId) throws DAOException;
+
+    /**
      * Updates the status of the staging database RDF export by the given export id.
      *
      * @param exportId the export id
@@ -240,4 +249,12 @@ public interface StagingDatabaseDAO extends DAO {
      * @throws DAOException If a database access error happens.
      */
     boolean existsRDFExport(int databaseId, String exportName) throws DAOException;
+
+    /**
+     * Returns the list of available indicators. Each given by a pair, where the left member is the indicator's URI while the right
+     * member is the indicator's label.
+     * @return The list.
+     * @throws DAOException If a database access error happens.
+     */
+    List<Pair<String, String>> getIndicators() throws DAOException;
 }

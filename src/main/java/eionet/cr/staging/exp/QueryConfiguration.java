@@ -58,6 +58,12 @@ public class QueryConfiguration implements Serializable {
     /** The dataset namespace. */
     private String datasetIdNamespace;
 
+    /** The indicator URI. */
+    private String indicator;
+
+    /** The dataset URI. */
+    private String dataset;
+
     /**
      * @return the datasetIdTemplate
      */
@@ -221,8 +227,10 @@ public class QueryConfiguration implements Serializable {
         }
         sb.append(LINE_BREAK);
         sb.append("[Other settings]").append(LINE_BREAK);
-        sb.append("Dataset identifier template: ").append(datasetIdTemplate).append(LINE_BREAK);
-        sb.append("Objects identifier template: ").append(objectIdTemplate);
+        //        sb.append("Dataset identifier template: ").append(datasetIdTemplate).append(LINE_BREAK);
+        //        sb.append("Objects identifier template: ").append(objectIdTemplate);
+        sb.append("Indicator: ").append(indicator).append(LINE_BREAK);
+        sb.append("Dataset: ").append(dataset);
         sb.append(LINE_BREAK);
 
         return sb.toString();
@@ -233,5 +241,33 @@ public class QueryConfiguration implements Serializable {
      */
     public void setColumnMappings(LinkedCaseInsensitiveMap<ObjectProperty> columnMappings) {
         this.columnMappings = columnMappings;
+    }
+
+    /**
+     * @return the indicator
+     */
+    public String getIndicator() {
+        return indicator;
+    }
+
+    /**
+     * @param indicator the indicator to set
+     */
+    public void setIndicator(String indicator) {
+        this.indicator = indicator;
+    }
+
+    /**
+     * @return the dataset
+     */
+    public String getDataset() {
+        return dataset;
+    }
+
+    /**
+     * @param dataset the dataset to set
+     */
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
     }
 }
