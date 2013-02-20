@@ -16,6 +16,7 @@
                 <li><stripes:link href="/admin/nhus">Next Harvest Urgency Score </stripes:link></li>
                 <li><stripes:link href="/admin/bulkharvest">Bulk Add/Delete Sources</stripes:link></li>
                 <li><stripes:link href="/admin/postHarvestScripts">Post-harvest scripts</stripes:link></li>
+                <li><stripes:link href="/admin/endpointQueries.action">SPARQL endpoint harvest queries</stripes:link></li>
                 <li><stripes:link href="/admin/stagingDbs.action">Staging databases</stripes:link>&nbsp;<span style="color:#FF0000">(work in progress!)</span></li>
             </ul>
         </c:when>

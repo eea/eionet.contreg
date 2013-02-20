@@ -22,10 +22,15 @@
 package eionet.cr.dao.virtuoso;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -78,6 +83,25 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
     /** */
     private static final String UPDATE_SQL = "update ENDPOINT_HARVEST_QUERY set TITLE=?, QUERY=?, ACTIVE=?, LAST_MODIFIED=now()"
             + " where ENDPOINT_HARVEST_QUERY_ID=?";
+
+    /** */
+    private static final String INCREASE_POSITIONS_SQL = "update ENDPOINT_HARVEST_QUERY set POSITION_NUMBER=POSITION_NUMBER + ? "
+            + " where ENDPOINT_URL=?";
+
+    /** */
+    private static final String UPDATE_POSITION_SQL =
+            "update ENDPOINT_HARVEST_QUERY set POSITION_NUMBER=? where ENDPOINT_HARVEST_QUERY_ID=?";
+
+    /** */
+    private static final String EXISTS_SQL = "select count(*) from POST_HARVEST_SCRIPT where "
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
+
+    /** */
+    private static final String DELETE_SQL = "delete from ENDPOINT_HARVEST_QUERY where ENDPOINT_HARVEST_QUERY_ID=?";
+
+    /** */
+    private static final String ACTIVATE_DEACTIVATE_SQL =
+            "update ENDPOINT_HARVEST_QUERY set ACTIVE=either(starts_with(ACTIVE,'Y'),'N','Y') where ENDPOINT_HARVEST_QUERY_ID=?";
 
     /*
      * (non-Javadoc)
@@ -265,17 +289,182 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
         if (limitOnly) {
             int i = upperCaseQuery.lastIndexOf("LIMIT");
             return query.substring(0, i) + " LIMIT " + limitSize;
-        }
-        else if (offsetPlusLimit) {
+        } else if (offsetPlusLimit) {
             int i = upperCaseQuery.lastIndexOf("OFFSET");
             return query.substring(0, i) + " OFFSET " + offset.intValue() + " LIMIT " + limitSize;
-        }
-        else if (limitPlusOffset) {
+        } else if (limitPlusOffset) {
             int i = upperCaseQuery.lastIndexOf("LIMIT");
             return query.substring(0, i) + " LIMIT " + limitSize + " OFFSET " + offset.intValue();
-        }
-        else{
+        } else {
             return query + " LIMIT " + limitSize;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#move(java.util.Set, int)
+     */
+    @Override
+    public void move(String endpointUrl, Set<Integer> ids, int direction) throws DAOException {
+
+        if (StringUtils.isBlank(endpointUrl) || ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        if (direction == 0) {
+            throw new IllegalArgumentException("Direction must not be 0!");
+        }
+
+        // Prepare map where we can get queries by position, also find the max and min positions.
+        LinkedHashMap<Integer, EndpointHarvestQueryDTO> queriesByPos = getQueriesByPosition(endpointUrl);
+        if (queriesByPos.isEmpty()) {
+            return;
+        }
+        Set<Integer> positions = queriesByPos.keySet();
+        int maxPos = Collections.max(positions);
+        int minPos = Collections.min(positions);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            conn.setAutoCommit(false);
+
+            // If even one query is already at position 1 then moving up is not considered possible.
+            // And conversely, if even one query is already at the last position, then moving down
+            // is not considered possible either.
+
+            boolean isMovingPossible = true;
+            List<Integer> selectedPositions = new ArrayList<Integer>();
+            List<EndpointHarvestQueryDTO> queries = new ArrayList<EndpointHarvestQueryDTO>(queriesByPos.values());
+            for (EndpointHarvestQueryDTO query : queries) {
+
+                if (ids.contains(query.getId())) {
+
+                    int pos = query.getPosition();
+                    if ((direction < 0 && pos == minPos) || (direction > 0 && pos == maxPos)) {
+                        isMovingPossible = false;
+                    } else {
+                        selectedPositions.add(pos);
+                    }
+                }
+            }
+
+            if (isMovingPossible) {
+
+                if (direction < 0) {
+                    for (Integer selectedPosition : selectedPositions) {
+
+                        EndpointHarvestQueryDTO queryToMove = queriesByPos.get(selectedPosition);
+                        int i = queries.indexOf(queryToMove);
+                        queries.set(i, queries.get(i - 1));
+                        queries.set(i - 1, queryToMove);
+                    }
+                } else {
+                    for (int j = selectedPositions.size() - 1; j >= 0; j--) {
+
+                        EndpointHarvestQueryDTO queryToMove = queriesByPos.get(selectedPositions.get(j));
+                        int i = queries.indexOf(queryToMove);
+                        queries.set(i, queries.get(i + 1));
+                        queries.set(i + 1, queryToMove);
+                    }
+                }
+            }
+
+            SQLUtil.executeUpdate(INCREASE_POSITIONS_SQL, Arrays.asList(maxPos, endpointUrl), conn);
+            for (int i = 0; i < queries.size(); i++) {
+                SQLUtil.executeUpdate(UPDATE_POSITION_SQL, Arrays.asList(i + 1, queries.get(i).getId()), conn);
+            }
+            conn.commit();
+
+        } catch (Exception e) {
+            SQLUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /**
+     *
+     * @param endpointUrl
+     * @return
+     * @throws DAOException
+     */
+    private LinkedHashMap<Integer, EndpointHarvestQueryDTO> getQueriesByPosition(String endpointUrl) throws DAOException {
+
+        LinkedHashMap<Integer, EndpointHarvestQueryDTO> map = new LinkedHashMap<Integer, EndpointHarvestQueryDTO>();
+        List<EndpointHarvestQueryDTO> queries = listByEndpointUrl(endpointUrl);
+        for (EndpointHarvestQueryDTO dto : queries) {
+            map.put(dto.getPosition(), dto);
+        }
+
+        return map;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#delete(java.util.List)
+     */
+    @Override
+    public void delete(List<Integer> ids) throws DAOException {
+
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = getSQLConnection();
+            conn.setAutoCommit(false);
+            stmt = conn.prepareStatement(DELETE_SQL);
+            for (Integer id : ids) {
+                stmt.setInt(1, id);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            SQLUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.EndpointHarvestQueryDAO#activateDeactivate(java.util.List)
+     */
+    @Override
+    public void activateDeactivate(List<Integer> ids) throws DAOException {
+
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = getSQLConnection();
+            conn.setAutoCommit(false);
+            stmt = conn.prepareStatement(ACTIVATE_DEACTIVATE_SQL);
+            for (Integer id : ids) {
+                stmt.setInt(1, id);
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            SQLUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
         }
     }
 }

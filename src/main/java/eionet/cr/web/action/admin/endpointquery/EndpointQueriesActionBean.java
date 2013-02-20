@@ -21,6 +21,7 @@
 
 package eionet.cr.web.action.admin.endpointquery;
 
+import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -57,6 +58,9 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
     /** */
     private List<String> endpoints;
 
+    /** */
+    private List<Integer> selectedIds;
+
     /**
      *
      * @return
@@ -78,7 +82,11 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
      */
     public Resolution delete() throws DAOException {
 
-        addSystemMessage("Operation not implemented yet!");
+        if (selectedIds != null && !selectedIds.isEmpty()) {
+            DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).delete(selectedIds);
+            addSystemMessage("Selected queries successfully deleted!");
+        }
+
         return list();
     }
 
@@ -89,7 +97,11 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
      */
     public Resolution activateDeactivate() throws DAOException {
 
-        addSystemMessage("Operation not implemented yet!");
+        if (selectedIds != null && !selectedIds.isEmpty()) {
+            DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).activateDeactivate(selectedIds);
+            addSystemMessage("Selected queries successfully activated/deactivated!");
+        }
+
         return list();
     }
 
@@ -100,7 +112,8 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
      */
     public Resolution moveUp() throws DAOException {
 
-        addSystemMessage("Operation not implemented yet!");
+        DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).move(endpointUrl, new HashSet(selectedIds), -1);
+        addSystemMessage("Moving up completed!!");
         return list();
     }
 
@@ -111,7 +124,8 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
      */
     public Resolution moveDown() throws DAOException {
 
-        addSystemMessage("Operation not implemented yet!");
+        DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).move(endpointUrl, new HashSet(selectedIds), 1);
+        addSystemMessage("Moving down completed!!");
         return list();
     }
 
@@ -173,5 +187,12 @@ public class EndpointQueriesActionBean extends AbstractActionBean {
             addGlobalValidationError("You are not authorized for this operation!");
             getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
         }
+    }
+
+    /**
+     * @param selectedIds the selectedIds to set
+     */
+    public void setSelectedIds(List<Integer> selectedIds) {
+        this.selectedIds = selectedIds;
     }
 }

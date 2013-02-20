@@ -23,6 +23,7 @@ package eionet.cr.dao;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.model.Statement;
 
@@ -101,4 +102,28 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @throws DAOException If any sort of database access error happens.
      */
     public Collection<Statement> testConstructQuery(String query, String endpointUrl) throws DAOException;
+
+    /**
+     * Moves the given queries up/down in terms of their position in the queries of the given endpoint.
+     * @param endpointUrl Given endpoint URL.
+     * @param ids IDs of the queries to move.
+     * @param direction The moving direction: -1 == move down, 1 == move up.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    void move(String endpointUrl, Set<Integer> ids, int direction) throws DAOException;
+
+    /**
+     * Deletes endpoint harvest queries by the given ids.
+     *
+     * @param selectedIds Given query ids.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    public void delete(List<Integer> selectedIds) throws DAOException;
+
+    /**
+     * Activates/deactivates the given queries (i.e. sets their ACTIVE field in the database accordingly).
+     * @param ids Given query ids.
+     * @throws DAOException If any sort of database access error happens.
+     */
+    void activateDeactivate(List<Integer> ids) throws DAOException;
 }
