@@ -21,6 +21,7 @@
 
 package eionet.cr.web.action.factsheet;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -580,10 +581,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(
-                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+            .get()
+            .getDao(HarvestSourceDAO.class)
+            .addSourceIgnoreDuplicate(
+                    HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -591,8 +592,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         // save the file's content into database
+        File file = null;
         try {
-            saveContent();
+            file = saveContent();
             contentSaved = true;
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -603,7 +605,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         // attempt to harvest the uploaded file
-        harvestUploadedFile(getUploadedFileSubjectUri(), uploadedFile, null, getUserNameOrAnonymous());
+        harvestUploadedFile(getUploadedFileSubjectUri(), file, null, getUserNameOrAnonymous(),uploadedFile.getContentType());
     }
 
     /**
@@ -612,9 +614,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @throws DAOException
      * @throws IOException
      */
-    private void saveContent() throws DAOException, IOException {
+    private File saveContent() throws DAOException, IOException {
 
         logger.debug("Going to save the uploaded file's content into database");
+
+        File file = null;
 
         SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(getUploadedFileSubjectUri()));
         dto.setContentType(uploadedFile.getContentType());
@@ -631,11 +635,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             } else {
                 filePath = uploadedFile.getFileName();
             }
-            FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
+            file = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
                     contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }
+        return file;
     }
 
     /**
@@ -645,7 +650,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @param uploadedFile
      * @param dcTitle
      */
-    protected void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName) {
+    protected void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType) {
 
         // create and store harvest source for the above source url,
         // don't throw exceptions, as an uploaded file does not have to be
@@ -670,7 +675,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // harvestable
         try {
             if (harvestSourceDTO != null) {
-                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, uploadedFile, dcTitle, userName);
+                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, file, dcTitle, contentType);
                 CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
                 try {
                     uploadHarvest.execute();

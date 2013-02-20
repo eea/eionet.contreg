@@ -26,9 +26,7 @@ import static eionet.cr.harvest.ResponseCodeUtil.isNotModified;
 import static eionet.cr.harvest.ResponseCodeUtil.isPermanentError;
 import static eionet.cr.harvest.ResponseCodeUtil.isRedirect;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +36,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,15 +99,6 @@ public class PullHarvest extends BaseHarvest {
     /** */
     private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
-    /** Text/plain content type. */
-    private static final String CONTENT_TYPE_TEXT = "text/plain";
-
-    /** Turtle file extension. */
-    private static final String EXT_TTL = "ttl";
-
-    /** N3 file extension. */
-    private static final String EXT_N3 = "n3";
-
     /** */
     private boolean isSourceAvailable;
 
@@ -134,54 +122,7 @@ public class PullHarvest extends BaseHarvest {
         super(contextSourceDTO);
     }
 
-    /**
-     * Harvests file in a local filestore.
-     * Does not load it through /home servlet but takes it directly from the file system
-     * @param file Given file
-     * @param contentType content type saved in earlier harvest
-     * @return number of triples
-     * @throws IOException if error in I/O
-     * @throws DAOException if DAO call fails.
-     * @throws SAXException if parsing fails
-     * @throws RDFHandlerException if error in RDF handler
-     * @throws RDFParseException if error in RDF parsing
-     */
-    private int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
 
-        // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
-        // Otherwise try to process the file into RDF format and *then* proceed to loading.
-
-        ContentLoader contentLoader = getLocalFileContentloader(file, contentType);
-
-        if (contentLoader != null) {
-            contentLoader.setTimeout(getTimeout());
-            LOGGER.debug(loggerMsg("Filestore file is in RDF or web feed format"));
-            return loadFile(file, contentLoader);
-        } else {
-            LOGGER.debug(loggerMsg("Filestore file is not in RDF or web feed format, processing the file further"));
-            File processedFile = null;
-            try {
-                // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
-                // that simply wasn't declared in the server-returned content type.
-                FileToRdfProcessor fileProcessor = new FileToRdfProcessor(file, getContextUrl());
-                processedFile = fileProcessor.process();
-                if (processedFile != null && fileProcessor.getRdfFormat() != null) {
-                    LOGGER.debug(loggerMsg("File processed into RDF format"));
-                    ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
-                    rdfLoader.setTimeout(getTimeout());
-                    return loadFile(processedFile, rdfLoader);
-                } else {
-                    LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
-                    return 0;
-                }
-            } finally {
-                if (processedFile != null &&  !file.getPath().equals(processedFile.getPath())) {
-                    FileDeletionJob.register(processedFile);
-                }
-            }
-        }
-    }
 
     /**
      * Harvests file already uploaded to a CR folder and residing in the filestore.
@@ -780,19 +721,6 @@ public class PullHarvest extends BaseHarvest {
         return subjectDTO;
     }
 
-    /**
-     *
-     * @param file
-     * @param contentLoader
-     * @return
-     * @throws DAOException
-     */
-    private int loadFile(File file, ContentLoader contentLoader) throws DAOException {
-
-        LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
-        int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl());
-        return tripleCount;
-    }
 
     /**
      * Download file from remote source to a temporary file locally. Side effect: adds the file size to the metadata to save in the
@@ -873,8 +801,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -977,71 +905,6 @@ public class PullHarvest extends BaseHarvest {
         return RDFMediaTypes.toRdfFormat(contentType);
     }
 
-    /**
-     * Returns content loader for local files.
-     * @param file File to re-harvest
-     * @param contentType content type originally stored
-     * @return ContentLoader
-     */
-
-    private ContentLoader getLocalFileContentloader(File file, String contentType) {
-
-        ContentLoader contentLoader = null;
-
-        if (contentType == null) {
-            contentType = getContextSourceDTO().getMediaType();
-        }
-
-        // try to guess contentType
-        if (contentType == null) {
-            InputStream is = null;
-            try {
-                is = new BufferedInputStream(new FileInputStream(file));
-                contentType = URLConnection.guessContentTypeFromStream(is);
-            } catch (Exception e) {
-                LOGGER.warn(loggerMsg("Error getting content type for " + file.getPath()));
-
-            } finally {
-                IOUtils.closeQuietly(is);
-            }
-
-        }
-
-        if (contentType == null) {
-            return null;
-        }
-
-        //content type is not null
-        if (contentType.startsWith("application/rss+xml") || contentType.startsWith("application/atom+xml")) {
-            contentLoader = new FeedFormatLoader();
-        } else {
-            //TODO refactor?
-            RDFFormat rdfFormat = null;
-            if (contentType.equals(CONTENT_TYPE_TEXT)) {
-                String fileName = file.getName();
-                String[] arr = fileName.split("\\.");
-                if (arr.length > 0) {
-                    String ext = arr[arr.length - 1];
-                    if (StringUtils.isNotEmpty(ext)) {
-                        if (ext.equalsIgnoreCase(EXT_TTL)) {
-                            rdfFormat = RDFFormat.TURTLE;
-                        }
-                        if (ext.equalsIgnoreCase(EXT_N3)) {
-                            rdfFormat = RDFFormat.N3;
-                        }
-                    }
-                }
-            } else {
-                rdfFormat = RDFMediaTypes.toRdfFormat(contentType);
-            }
-
-            if (rdfFormat != null) {
-                contentLoader = new RDFFormatLoader(rdfFormat);
-            }
-        }
-
-        return contentLoader;
-    }
 
     /**
      *

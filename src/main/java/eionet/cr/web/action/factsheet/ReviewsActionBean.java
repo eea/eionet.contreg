@@ -102,8 +102,8 @@ public class ReviewsActionBean extends AbstractActionBean {
 
                 // Check if review is obsolete
                 obsolete =
-                        DAOFactory.get().getDao(ReviewsDAO.class)
-                                .isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
+                    DAOFactory.get().getDao(ReviewsDAO.class)
+                    .isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
 
                 // Load review content from file.
                 try {
@@ -264,14 +264,17 @@ public class ReviewsActionBean extends AbstractActionBean {
             logger.debug("Storing uploaded review attachment, file bean = " + attachment);
 
             if (attachment != null) {
+
+                String fileName = StringUtils.replace(attachment.getFileName(), " ", "%20");
                 // construct attachment uri
-                String attachmentUri = getUser().getReviewAttachmentUri(reviewId, attachment.getFileName());
+                String attachmentUri = getUser().getReviewAttachmentUri(reviewId, fileName);
 
                 InputStream attachmentContentStream = null;
                 try {
                     // save attachment into filesystem under user folder
-                    String filePath = "reviews/" + reviewId + "/" + attachment.getFileName();
-                    FileStore.getInstance(getUserName()).add(filePath, true, attachment.getInputStream());
+                    String filePath = "reviews/" + reviewId + "/" + fileName;
+                    attachmentContentStream = attachment.getInputStream();
+                    File file = FileStore.getInstance(getUserName()).add(filePath, true, attachmentContentStream);
 
                     // construct review uri
                     String reviewUri = getUser().getReviewUri(reviewId);
@@ -292,10 +295,10 @@ public class ReviewsActionBean extends AbstractActionBean {
                     // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
                     // (but set interval minutes to 0, to avoid it being background-harvested)
                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
                     // finally, attempt to harvest the uploaded file's contents
-                    harvestUploadedFile(attachmentUri, attachment, null, getUserName());
+                    harvestUploadedFile(attachmentUri, file, null, getUser().getUserName(), attachment.getContentType());
 
                 } catch (DAOException daoe) {
                     logger.error("Error when storing attachment", daoe);
@@ -319,7 +322,7 @@ public class ReviewsActionBean extends AbstractActionBean {
      * @param uploadedFile
      * @param dcTitle
      */
-    private void harvestUploadedFile(String sourceUrl, FileBean uploadedFile, String dcTitle, String userName) {
+    private void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType) {
 
         // create and store harvest source for the above source url,
         // don't throw exceptions, as an uploaded file does not have to be
@@ -344,7 +347,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         // harvestable
         try {
             if (harvestSourceDTO != null) {
-                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, uploadedFile, dcTitle, userName);
+                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, file, dcTitle, contentType);
                 CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
                 try {
                     uploadHarvest.execute();
@@ -418,7 +421,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
-                    .replace("\n", "<br/>");
+            .replace("\n", "<br/>");
         } else {
             return "";
         }

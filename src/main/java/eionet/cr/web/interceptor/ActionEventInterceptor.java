@@ -43,9 +43,7 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 
 import org.apache.log4j.Logger;
 
-import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Util;
-import eionet.cr.web.action.home.AbstractHomeActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 
 /**
@@ -67,6 +65,7 @@ public class ActionEventInterceptor implements Interceptor {
      *
      * @see net.sourceforge.stripes.controller.Interceptor#intercept(net.sourceforge.stripes.controller.ExecutionContext)
      */
+    @Override
     public Resolution intercept(ExecutionContext context) throws Exception {
         Resolution resolution = null;
 
@@ -80,18 +79,13 @@ public class ActionEventInterceptor implements Interceptor {
             HttpServletRequest request = context.getActionBean().getContext().getRequest();
             String actionEventURL = null;
 
-            if (actionBean instanceof AbstractHomeActionBean) {
-                String userName = FolderUtil.extractUserName(request.getRequestURI());
-                actionEventURL = "/home/" + userName;
-            } else {
-                actionEventURL =
-                        getActionName(actionBean.getClass()) + "?"
-                                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
-                                + getRequestParameters(request);
+            actionEventURL =
+                getActionName(actionBean.getClass()) + "?"
+                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
+                + getRequestParameters(request);
 
-                // this will handle pretty url integration
-                actionEventURL = postProcess(actionEventURL);
-            }
+            // this will handle pretty url integration
+            actionEventURL = postProcess(actionEventURL);
             request.getSession().setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
         }
 
