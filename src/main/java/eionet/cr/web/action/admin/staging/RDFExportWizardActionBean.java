@@ -122,10 +122,11 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         // Handle GET request, just forward to the JSP and that's all.
         if (getContext().getRequest().getMethod().equalsIgnoreCase("GET")) {
 
+            indicators = null;
+
             // If this event is GET-requested with a database name, nullify the query configuration.
             if (!dbName.equals(prevDbName)) {
-                queryConf = null;
-                tablesColumns = null;
+                dbNameChanged();
             }
             prevDbName = dbName;
 
@@ -288,11 +289,6 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         // Validate the database name.
         if (StringUtils.isBlank(dbName)) {
             addGlobalValidationError("Database name must be given!");
-        } else {
-            dbDTO = dao.getDatabaseByName(dbName);
-            if (dbDTO == null) {
-                addGlobalValidationError("Found no staging database by this name: " + dbName);
-            }
         }
 
         if (getContext().getValidationErrors().isEmpty()) {
@@ -363,6 +359,24 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
             addGlobalValidationError("You are not authorized for this operation!");
             getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
         }
+    }
+
+    /**
+     * To be called when database name has changed.
+     * @throws DAOException
+     */
+    private void dbNameChanged() throws DAOException {
+
+        dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
+        if (dbDTO == null) {
+            addGlobalValidationError("Found no staging database by this name: " + dbName);
+        }
+
+        this.queryConf = null;
+        this.exportName = null;
+        this.tablesColumns = null;
+        this.prevColumnNames = null;
+        this.prevObjectTypeUri = null;
     }
 
     /**

@@ -130,7 +130,6 @@ public class DimensionMetadataImporter extends Thread {
         long started = System.currentTimeMillis();
         LOGGER.debug("Started");
 
-        boolean failed = false;
         RepositoryConnection repoConn = null;
         try {
             repoConn = SesameUtil.getRepositoryConnection();
@@ -142,7 +141,6 @@ public class DimensionMetadataImporter extends Thread {
             long millis = System.currentTimeMillis() - started;
             LOGGER.debug("Finished in " + millis + " ms");
         } catch (Exception e) {
-            failed = true;
             SesameUtil.rollback(repoConn);
             LOGGER.error(e.toString(), e);
         } finally {
