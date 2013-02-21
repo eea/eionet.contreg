@@ -60,6 +60,9 @@ import eionet.cr.util.sql.SingleObjectReader;
  */
 public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements EndpointHarvestQueryDAO {
 
+    /**  */
+    private static final int TEST_QUERY_LIMIT = 500;
+
     /** */
     private static final String CREATE_SQL =
             "insert into ENDPOINT_HARVEST_QUERY"
@@ -225,8 +228,7 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
             throw new IllegalArgumentException("The query and the endpoint URL must not be blank!");
         }
 
-        int limit = 100;
-        query = ensureTestConstructLimit(query, limit);
+        query = ensureTestConstructLimit(query, TEST_QUERY_LIMIT);
         ArrayList<Statement> result = new ArrayList<Statement>();
         SPARQLRepository sparqlRepository = new SPARQLRepository(endpointUrl);
 
@@ -238,7 +240,7 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
             queryResult = graphQuery.evaluate();
             if (queryResult != null) {
                 int counter = 0;
-                while (queryResult.hasNext() && counter++ < limit) {
+                while (queryResult.hasNext() && counter++ < TEST_QUERY_LIMIT) {
                     result.add(queryResult.next());
                 }
             }
