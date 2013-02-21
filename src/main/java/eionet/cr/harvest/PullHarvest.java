@@ -265,6 +265,11 @@ public class PullHarvest extends BaseHarvest {
                 queryResult = graphQuery.evaluate();
                 if (queryResult != null) {
                     while (queryResult.hasNext()) {
+
+                        // Clear the graph just before first insert.
+                        if (numberOfTriples == 0) {
+                            localConn.clear(graphURI);
+                        }
                         localConn.add(queryResult.next(), graphURI);
                         numberOfTriples++;
                     }
