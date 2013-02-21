@@ -18,6 +18,12 @@
                                <stripes:param name="query.endpointUrl" value="${actionBean.endpointUrl}"/>
                             </stripes:link>
                         </li>
+                        <li>
+	                        <stripes:link beanclass="${actionBean.harvestSourceActionBeanClass.name}">
+	                            <c:out value="Source details"/>
+	                            <stripes:param name="harvestSource.url" value="${actionBean.endpointUrl}"/>
+	                        </stripes:link>
+	                    </li>
                     </c:if>
                     <li>
                         <stripes:link beanclass="${actionBean.harvestSourceActionBeanClass.name}" event="add">

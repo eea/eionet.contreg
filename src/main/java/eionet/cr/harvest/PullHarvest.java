@@ -39,15 +39,27 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.GraphQueryResult;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.sparql.SPARQLConnection;
+import org.openrdf.repository.sparql.SPARQLRepository;
+import org.openrdf.repository.sparql.query.SPARQLGraphQuery;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -58,9 +70,11 @@ import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.EndpointHarvestQueryDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -69,6 +83,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
+import eionet.cr.harvest.util.EndpointHttpClient;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
 import eionet.cr.harvest.util.RDFMediaTypes;
@@ -76,6 +91,7 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
@@ -199,6 +215,118 @@ public class PullHarvest extends BaseHarvest {
 
         }
 
+    }
+
+    /**
+     *
+     * @throws HarvestException
+     */
+    private void doEndpointHarvest() throws HarvestException {
+
+        int numberOfTriples = 0;
+        EndpointHttpClient httpClient = prepareEndpointHttpClient();
+
+        GraphQueryResult queryResult = null;
+        RepositoryConnection localConn = null;
+        RepositoryConnection endpointConn = null;
+        try {
+            // First see if this particular endpoint has any active harvest queries mapped to it at all.
+            String endpointUrl = getContextUrl();
+            List<EndpointHarvestQueryDTO> queries =
+                    DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).listByEndpointUrl(endpointUrl, true);
+            if (queries == null || queries.isEmpty()) {
+                LOGGER.warn(loggerMsg("Found no active harvest queries for this endpoint"));
+                return;
+            }
+
+            // Prepare remote repository connection
+            SPARQLRepository sparqlRepository = new SPARQLRepository(endpointUrl);
+            endpointConn = sparqlRepository.getConnection();
+
+            // Prepare local repository connection
+            localConn = SesameUtil.getRepositoryConnection();
+            localConn.setAutoCommit(false);
+
+            // Prepare local repository value factory
+            ValueFactory vf = localConn.getValueFactory();
+            org.openrdf.model.URI graphURI = vf.createURI(endpointUrl);
+
+            // Loop through the harvest queries, execute each one of them on the remote repository,
+            // write the returned statements straight into local repository.
+            for (EndpointHarvestQueryDTO queryDTO : queries) {
+
+                LOGGER.debug(loggerMsg("Executing endpoint harvest query with id = " + queryDTO.getId()));
+                GraphQuery graphQuery = new SPARQLGraphQuery(httpClient, endpointUrl, endpointUrl, queryDTO.getQuery());
+
+                // Note that the returned GraphQueryResult is always a org.openrdf.repository.sparql.query.BackgroundGraphResult
+                // for remote endpoints, and it's a result that returns its statements (i.e. triples) AS THEY ARE PARSED.
+                // i.e. the statements ARE NOT written to the memory first and then passed back. So no memory problems here, and
+                // safe to use it this way.
+                queryResult = graphQuery.evaluate();
+                if (queryResult != null) {
+                    while (queryResult.hasNext()) {
+                        localConn.add(queryResult.next(), graphURI);
+                        numberOfTriples++;
+                    }
+                }
+            }
+
+            localConn.commit();
+
+            setStoredTriplesCount(numberOfTriples);
+            LOGGER.debug(loggerMsg("All queries executed, total of " + numberOfTriples + " triples loaded"));
+            finishWithOK(null, numberOfTriples);
+
+        } catch (Exception e) {
+
+            SesameUtil.rollback(localConn);
+            LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
+
+            checkAndSetFatalExceptionFlag(e.getCause());
+            try {
+                finishWithError(httpClient.getLastExecutionResponseCode(), httpClient.getLastExecutionResponseText(), e);
+            } catch (RuntimeException finishingException) {
+                LOGGER.error("Error when finishing up: ", finishingException);
+            }
+
+            if (e instanceof HarvestException) {
+                throw (HarvestException) e;
+            } else {
+                throw new HarvestException(e.getMessage(), e);
+            }
+        } finally {
+            SesameUtil.close(queryResult);
+            SesameUtil.close(localConn);
+            SesameUtil.close(endpointConn);
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    private EndpointHttpClient prepareEndpointHttpClient() {
+
+        HttpConnectionManagerParams managerParams = new HttpConnectionManagerParams();
+        managerParams.setDefaultMaxConnectionsPerHost(20);
+        managerParams.setStaleCheckingEnabled(false);
+
+        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
+        managerParams.setConnectionTimeout(httpTimeout);
+        managerParams.setSoTimeout(httpTimeout);
+
+        HttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
+        manager.setParams(managerParams);
+
+        HttpClientParams clientParams = new HttpClientParams();
+        clientParams.setParameter("http.useragent", URLUtil.userAgentHeader());
+        clientParams.setParameter("http.protocol.max-redirects", MAX_REDIRECTIONS);
+
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put("Connection", "close");
+        clientParams.setParameter(SPARQLConnection.ADDITIONAL_HEADER_NAME, headers);
+
+        return new EndpointHttpClient(clientParams, manager);
     }
 
     /**
@@ -331,10 +459,11 @@ public class PullHarvest extends BaseHarvest {
 
         if (isLocalFile) {
             doLocalFileHarvest();
+        } else if (getContextSourceDTO().isSparqlEndpoint()) {
+            doEndpointHarvest();
         } else {
             doUrlHarvest();
         }
-
     }
 
     /**
@@ -801,8 +930,8 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                    DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last

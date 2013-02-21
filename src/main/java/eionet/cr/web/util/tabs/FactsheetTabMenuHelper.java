@@ -56,6 +56,9 @@ public final class FactsheetTabMenuHelper {
     private String latitude;
     private String longitude;
 
+    /** */
+    private HarvestSourceDTO harvestSourceDTO;
+
     /**
      *
      * Class constructor.
@@ -72,8 +75,8 @@ public final class FactsheetTabMenuHelper {
 
         this.subject = subject;
 
-        HarvestSourceDTO dto = harvesterSourceDao.getHarvestSourceByUrl(subject.getUri());
-        uriIsHarvestSource = dto != null;
+        harvestSourceDTO = harvesterSourceDao.getHarvestSourceByUrl(subject.getUri());
+        uriIsHarvestSource = harvestSourceDTO != null;
 
         //TODO: mapDisplayable = Subjects.WGS_SPATIAL_THING.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         mapDisplayable = subject.getObject(Predicates.WGS_LAT) != null && subject.getObject(Predicates.WGS_LONG) != null;
@@ -99,7 +102,7 @@ public final class FactsheetTabMenuHelper {
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             reviewType =
                     Subjects.CR_REVIEW_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                            || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                    || Subjects.CR_FEEDBACK.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
@@ -117,7 +120,7 @@ public final class FactsheetTabMenuHelper {
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             folderType =
                     Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue())
-                            || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
+                    || Subjects.CR_USER_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
 
     }
@@ -270,5 +273,12 @@ public final class FactsheetTabMenuHelper {
         private TabTitle() {
             // Just an empty private constructor to avoid instantiating this utility class.
         }
+    }
+
+    /**
+     * @return the harvestSourceDTO
+     */
+    public HarvestSourceDTO getHarvestSourceDTO() {
+        return harvestSourceDTO;
     }
 }

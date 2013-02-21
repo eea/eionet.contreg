@@ -133,6 +133,14 @@
                                                 <stripes:link class="link-plain" href="/admin/postHarvestScripts?targetType=${actionBean.subjectIsType ? 'TYPE' : 'SOURCE'}&targetUrl=${subjectUrl}">Post-harvest scripts</stripes:link>
                                             </li>
                                         </c:if>
+                                        <c:if test="${sourceReadActionsAllowed && actionBean.adminLoggedIn && actionBean.harvestSourceDTO != null && actionBean.harvestSourceDTO.sparqlEndpoint == true}">
+                                            <li>
+                                                <stripes:link class="link-plain" href="/admin/endpointQueries.action">
+                                                    <c:out value="Endpoint harvest scripts"/>
+                                                    <stripes:param name="endpointUrl" value="${actionBean.harvestSourceDTO.url}"/>
+                                                </stripes:link>
+                                            </li>
+                                        </c:if>
                                         <c:if test="${downloadAllowed}">
                                             <li>
                                                 <stripes:link class="link-plain" href="/download?uri=${subjectUri}">Download</stripes:link>

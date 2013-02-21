@@ -194,10 +194,7 @@ public abstract class BaseHarvest implements Harvest {
 
         boolean wasHarvestException = false;
         try {
-            // TODO remove this "if" filter after remote endpoint harvesting has been implemented
-            if (!getContextSourceDTO().isSparqlEndpoint()) {
-                doHarvest();
-            }
+            doHarvest();
         } catch (HarvestException e) {
             wasHarvestException = true;
             throw e;
@@ -312,7 +309,7 @@ public abstract class BaseHarvest implements Harvest {
     private void runPostHarvestScripts() {
 
         if (getStoredTriplesCount() <= 0) {
-            LOGGER.debug(loggerMsg("Ignoring post-harvest scripts - no triples added from"));
+            LOGGER.debug(loggerMsg("Ignoring post-harvest scripts, as no triples were harvested!"));
             return;
         }
 

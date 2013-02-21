@@ -14,6 +14,9 @@
                     <li>
                         <stripes:link beanclass="${actionBean.endpointQueriesActionBeanClass.name}">
                            <c:out value="Back to queries"/>
+                           <c:if test="${not empty actionBean.query.endpointUrl}">
+                               <stripes:param name="endpointUrl" value="${actionBean.query.endpointUrl}"/>
+                           </c:if>
                         </stripes:link>
                     </li>
                 </ul>
@@ -118,10 +121,10 @@
                     <display:table name="${actionBean.testResult}" id="statement" sort="page" class="datatable" style="width:100%">
                         <display:column title="Subject">
                             <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
-	                            <c:out value="${statement.subject}"/>
-	                            <stripes:param name="url" value="${statement.subject}"/>
-	                            <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
-	                        </stripes:link>
+                                <c:out value="${statement.subject}"/>
+                                <stripes:param name="url" value="${statement.subject}"/>
+                                <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
+                            </stripes:link>
                         </display:column>
                         <display:column title="Predicate">
                             <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
@@ -137,10 +140,10 @@
                                 </c:when>
                                 <c:otherwise>
                                     <stripes:link beanclass="${actionBean.endpointResourceActionBeanClass.name}">
-		                                <c:out value="${statement.object}"/>
-		                                <stripes:param name="url" value="${statement.object}"/>
-		                                <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
-		                            </stripes:link>
+                                        <c:out value="${statement.object}"/>
+                                        <stripes:param name="url" value="${statement.object}"/>
+                                        <stripes:param name="endpoint" value="${actionBean.query.endpointUrl}"/>
+                                    </stripes:link>
                                 </c:otherwise>
                             </c:choose>
                         </display:column>

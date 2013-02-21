@@ -61,7 +61,12 @@
                         <stripes:submit name="add" value="Add"/>
                     </td>
                     <td>
-                        <input type="checkbox" name="dontHarvest" id="chkDontHarvest"/><label for="chkDontHarvest">Don't schedule urgent harvest</label>
+                        <c:choose>
+                            <c:when test="${empty actionBean.harvestSource || actionBean.harvestSource.sparqlEndpoint == false}">
+                                <input type="checkbox" name="dontHarvest" id="chkDontHarvest"/><label for="chkDontHarvest">Don't schedule urgent harvest</label>
+                            </c:when>
+                            <c:otherwise>&nbsp;</c:otherwise>
+                        </c:choose>
                     </td>
                 </tr>
             </table>

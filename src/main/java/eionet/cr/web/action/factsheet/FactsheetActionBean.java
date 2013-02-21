@@ -147,6 +147,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     /** */
     private List<DatasetDTO> userCompiledDatasets;
 
+    /** */
+    private HarvestSourceDTO harvestSourceDTO;
+
     /**
      *
      * @return Resolution
@@ -170,7 +173,7 @@ public class FactsheetActionBean extends AbstractActionBean {
             tabs = tabsHelper.getTabs(FactsheetTabMenuHelper.TabTitle.RESOURCE_PROPERTIES);
             uriIsHarvestSource = tabsHelper.isUriIsHarvestSource();
             uriIsFolder = tabsHelper.isUriFolder();
-
+            harvestSourceDTO = tabsHelper.getHarvestSourceDTO();
         }
 
         return new ForwardResolution("/pages/factsheet/factsheet.jsp");
@@ -817,12 +820,28 @@ public class FactsheetActionBean extends AbstractActionBean {
         return ViewSourceActionBean.class;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isUriIsFolder() {
         return uriIsFolder;
     }
 
+    /**
+     *
+     * @param uriIsFolder
+     */
     public void setUriIsFolder(boolean uriIsFolder) {
         this.uriIsFolder = uriIsFolder;
 
     }
+
+    /**
+     * @return the harvestSourceDTO
+     */
+    public HarvestSourceDTO getHarvestSourceDTO() {
+        return harvestSourceDTO;
+    }
+
 }
