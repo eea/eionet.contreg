@@ -5,12 +5,14 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -18,7 +20,6 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -58,6 +59,7 @@ import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.util.ServletOutputLazyStream;
 
 /**
  *
@@ -69,6 +71,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
+
+    /** */
+    private static final String DEFAULT_STREAMING_RESPONSE_MIME_TYPE = "application/sparql-results+xml";
 
     /** */
     private static final String FORMAT_XML = "xml";
@@ -91,31 +96,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * Option value in the folder dropdown for my bookmarks.
      */
     private final static String MY_BOOKMARKS_FOLDER = "_my_bookmarks";
-    /** */
-    private static List<String> xmlFormats = new ArrayList<String>();
+
+    /** Supported mime-types mapped to the corresponding internal format names. */
+    private static final Map<String, String> STREAMING_MIME_TYPES_TO_FORMATS = createMimeTypesToFormats();
+
+    /** The request parameter name for the default graph URI. */
+    private static final String DEFAULT_GRAPH_URI = "default-graph-uri";
+
+    /** The request parameter name for the names graph URI. */
+    private static final String NAMED_GRAPH_URI = "named-graph-uri";
 
     /** Internal variable for HTTP error code. */
     private int errorCode;
 
-    /** Error message to be returned to external client. */
+    /** HTTP status error message to be returned to external client. */
     private String errorMessage;
-
-    /**
-     *
-     */
-    static {
-        xmlFormats.add("application/sparql-results+xml");
-        xmlFormats.add("application/rdf+xml");
-        xmlFormats.add("application/xml");
-        xmlFormats.add("application/csv");
-        xmlFormats.add("text/xml");
-        xmlFormats.add("application/x-binary-rdf-results-table");
-        xmlFormats.add("text/boolean"); // For ASK query
-    }
-
-    private static final String DEFAULT_GRAPH_URI = "default-graph-uri";
-
-    private static final String NAMED_GRAPH_URI = "named-graph-uri";
 
     /** */
     private String query;
@@ -172,11 +167,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private List<Map<String, String>> sharedBookmarkedQueries;
 
     /**
-     * List of project bookmarked queries, each represented by a Map.
-     * Relevant only if the user is known and has View permission to some project.
+     * List of project bookmarked queries, each represented by a Map. Relevant only if the user is known and has View permission to
+     * some project.
      */
     private List<Map<String, String>> projectBookmarkedQueries;
-
 
     /** */
     private List<String> deleteQueries;
@@ -199,22 +193,17 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
-        // If fillfrom is specified then fill the bean's properties from the
-        // bookmarked query and forward to form page without executing the
-        // query.
-        // If queryfrom is specified then fill the bean's properties from the
-        // bookmarked query and execute the query.
-        // In other cases just execute the query.
+
+        // If "fillfrom" is specified then fill the bean from bookmarked query and send to form page without executing the query.
+        // If "queryfrom" is specified then fill the bean from bookmarked query and execute the query.
+        // In all other cases just execute the query.
 
         if (!StringUtils.isBlank(fillfrom)) {
-            setGraphUri();
 
+            setDefaultAndNamedGraphs();
             fillFromBookmark(fillfrom);
-            // addSystemMessage("Query filled from " + fillfrom);
             return new ForwardResolution(FORM_PAGE);
-
         } else {
-
             if (!StringUtils.isBlank(queryfrom)) {
                 fillFromBookmark(queryfrom);
             }
@@ -249,7 +238,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public Resolution bookmark() throws DAOException {
 
-        setGraphUri();
+        setDefaultAndNamedGraphs();
 
         CRUser user = getUser();
         String requestMethod = getContext().getRequest().getMethod();
@@ -271,9 +260,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     return new ForwardResolution(FORM_PAGE);
                 }
                 storeSharedBookmark();
-            //store to project folder
-            } else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER) ) {
-                //bookmarkFolder = project name
+                // store to project folder
+            } else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
+                // bookmarkFolder = project name
                 if (!hasProjectPrivilege(bookmarkFolder)) {
                     addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
                     return new ForwardResolution(FORM_PAGE);
@@ -290,9 +279,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return new ForwardResolution(FORM_PAGE);
     }
 
-
     /**
      * common method for user and project bookmark.
+     *
      * @param bookmarksUri full url for the parent bookmark folder
      * @throws DAOException if db operation fails
      */
@@ -349,15 +338,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private void storeProjectBookmark() throws DAOException {
         String bookmarksUri = FolderUtil.getProjectFolder(getBookmarkFolder()) + "/bookmarks";
 
-        //create bookmarks folder for the project if it does not exist
+        // create bookmarks folder for the project if it does not exist
         FolderDAO dao = DAOFactory.get().getDao(FolderDAO.class);
         if (!dao.fileOrFolderExists("bookmarks", FolderUtil.getProjectFolder(getBookmarkFolder()))) {
-                //dao.createFolder(parentFolderUri, folderName, folderLabel, homeUri);
+            // dao.createFolder(parentFolderUri, folderName, folderLabel, homeUri);
             dao.createProjectBookmarksFolder(getBookmarkFolder());
         }
 
         storeBookmark(bookmarksUri);
     }
+
     /**
      * Stores user's SPARQL bookmark.
      *
@@ -428,115 +418,73 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return Resolution
      */
     public Resolution execute() {
-        setGraphUri();
-        // if query is blank and there's also no such request parameter as query at all,
-        // then assume user clicked the SPARQL client menu choice, and forward to the form page
+
+        // If query is blank then send HTTP 400 if not a browser, otherwise take the browser to the SPARQL endpoint form page.
         if (StringUtils.isBlank(query)) {
-
-            Map paramsMap = getContext().getRequest().getParameterMap();
-            boolean paramExists = paramsMap != null && paramsMap.containsKey("query");
-            if (!paramExists) {
-                if (isWebBrowser()) {
-                    return new ForwardResolution(FORM_PAGE);
-                } else {
-
-                    return new ErrorStreamingResolution(HttpServletResponse.SC_BAD_REQUEST, "Parameter 'query'"
-                            + "is missing in the request");
-
-                }
-            }
-        }
-
-        String acceptHeader = getContext().getRequest().getHeader("accept");
-        String[] accept = {""};
-        if (acceptHeader != null && acceptHeader.length() > 0) {
-            accept = acceptHeader.split(",");
-            if (accept != null && accept.length > 0) {
-                accept = accept[0].split(";");
-            }
-        }
-
-        if (!StringUtils.isBlank(format)) {
-            accept[0] = format;
-        }
-
-        // If user has marked CR Inferencing checkbox,
-        // then add inferencing command to the query
-        Resolution resolution = null;
-        if (useInferencing && !StringUtils.isBlank(query)) {
-            String infCommand = SPARQLQueryUtil.getCrInferenceDefinitionStr();
-
-            // if inference command not yet present in the query, add it
-            if (query.indexOf(infCommand) == -1) {
-                query = infCommand + "\n" + query;
-            }
-        }
-
-        if (xmlFormats.contains(accept[0])) {
-            if (exportType != null && exportType.equals("HOMESPACE")) {
-                // Export result to user homespace
-                String dataset = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
-                int nrOfTriples = exportToHomespace(dataset);
-                if (nrOfTriples > 0) {
-                    resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
-                } else {
-                    resolution = new ForwardResolution(FORM_PAGE);
-                }
-            } else if (accept[0].equals("application/csv")) {
-                resolution = new StreamingResolution("application/csv") {
-                    @Override
-                    public void stream(HttpServletResponse response) throws Exception {
-                        runQuery(query, FORMAT_CSV, response.getOutputStream());
-                    }
-                };
-                ((StreamingResolution) resolution).setFilename("sparql-result.csv");
+            if (isWebBrowser()) {
+                return new ForwardResolution(FORM_PAGE);
             } else {
-                resolution = new StreamingResolution("application/sparql-results+xml") {
-                    @Override
-                    public void stream(HttpServletResponse response) throws Exception {
-                        response.setHeader("filename", "sparql-result.xml");
-                        runQuery(query, FORMAT_XML, response.getOutputStream());
-                    }
-                };
-                ((StreamingResolution) resolution).setFilename("sparql-result.xml");
+                return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Query missing or blank in request parameters");
             }
-        } else if (accept[0].equals("application/x-ms-access-export+xml")) {
-            resolution = new StreamingResolution("application/x-ms-access-export+xml") {
-                @Override
-                public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(query, FORMAT_XML_SCHEMA, response.getOutputStream());
-                }
-            };
-            ((StreamingResolution) resolution).setFilename("sparql-result.xml");
-        } else if (accept[0].equals("application/sparql-results+json")) {
-            resolution = new StreamingResolution("application/sparql-results+json") {
-                @Override
-                public void stream(HttpServletResponse response) throws Exception {
-                    runQuery(query, FORMAT_JSON, response.getOutputStream());
-                }
-            };
-            ((StreamingResolution) resolution).setFilename("sparql-result.json");
-        } else {
-            if (!StringUtils.isBlank(query)) {
-                if (accept[0].equals("text/html+")) {
-                    runQuery(query, FORMAT_HTML_PLUS, null);
-                } else {
-                    runQuery(query, FORMAT_HTML, null);
-                }
-            }
-            resolution = new ForwardResolution(FORM_PAGE);
         }
 
-        if (!isWebBrowser() && errorCode != 0) {
-            return new ErrorStreamingResolution(errorCode, errorMessage);
+        // Set the default-graph-uri and named-graph-uri (see SPARQL protocol specifications).
+        setDefaultAndNamedGraphs();
+
+        // If user has requested use of inferencing, then ensure that the relevant command is present in the query.
+        if (useInferencing) {
+            String inferenceCommand = SPARQLQueryUtil.getCrInferenceDefinitionStr();
+            if (query.indexOf(inferenceCommand) == -1) {
+                query = inferenceCommand + "\n" + query;
+            }
         }
+
+        // Content negotiation: prefer the value of "format" request parameter. If it's blank fall back to the request's "Accept"
+        // header. If that one is blank too, fall back to the default.
+        // TODO Currently only the header's first mime type is looked at. For a true content negotiation, the whole "Accept" header
+        // should be parsed in its whole complexity.
+
+        String mimeType = format;
+        if (StringUtils.isBlank(mimeType)) {
+            String acceptHeader = getContext().getRequest().getHeader("Accept");
+            if (StringUtils.isNotBlank(acceptHeader)) {
+                mimeType = StringUtils.substringBefore(StringUtils.substringBefore(acceptHeader, ","), ";").trim();
+            }
+        }
+        if (StringUtils.isBlank(mimeType)) {
+            mimeType = DEFAULT_STREAMING_RESPONSE_MIME_TYPE;
+        }
+
+        // If export to home space requested, then do so, otherwise run the query and either stream results into requested mime
+        // type, or send back normal SPARQL endpoint HTML form page. The default resolution is the one to the form page.
+
+        Resolution resolution = new ForwardResolution(FORM_PAGE);
+        if ("HOMESPACE".equalsIgnoreCase(exportType)) {
+
+            String dataset = folder + "/" + StringUtils.replace(datasetName, " ", "%20");
+            int nrOfTriples = exportToHomespace(dataset);
+            if (nrOfTriples > 0) {
+                resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
+            }
+        } else if (STREAMING_MIME_TYPES_TO_FORMATS.containsKey(mimeType)) {
+            resolution = executeStreamingQuery(mimeType);
+        } else {
+            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null);
+        }
+
+        // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
+        if (errorCode != 0 && !isWebBrowser()) {
+            resolution = new ErrorResolution(errorCode, errorMessage);
+        }
+
         return resolution;
     }
 
     /**
-     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties.
+     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties. See SPARQL
+     * protocol specifications for more.
      */
-    private void setGraphUri() {
+    private void setDefaultAndNamedGraphs() {
         defaultGraphUris = getContext().getRequest().getParameterValues(DEFAULT_GRAPH_URI);
         namedGraphUris = getContext().getRequest().getParameterValues(NAMED_GRAPH_URI);
     }
@@ -556,6 +504,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Checks if user has insert right to the project ACL.
+     *
      * @param project name
      * @return true, if user can add resources to the project.
      */
@@ -567,135 +516,195 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return false;
     }
 
-
     /**
+     * Execute the {@link #query} and streams the result into the servlet's output stream, using the given MIME type.
      *
-     * @param query
-     * @param format
-     * @param out
+     * @param mimeType The given MIME type.
+     * @return The {@link StreamingResolution}.
      */
-    private void runQuery(String query, String format, OutputStream out) {
+    private Resolution executeStreamingQuery(String mimeType) {
 
-        if (!StringUtils.isBlank(query)) {
-            RepositoryConnection con = null;
-            try {
-                con = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+        final String internalFormat = STREAMING_MIME_TYPES_TO_FORMATS.get(mimeType);
+        StreamingResolution resolution = new StreamingResolution(mimeType) {
+            @Override
+            public void stream(HttpServletResponse response) throws Exception {
 
-                Query queryObject = con.prepareQuery(QueryLanguage.SPARQL, query);
-                SesameUtil.setDatasetParameters(queryObject, con, defaultGraphUris, namedGraphUris);
-
-                TupleQueryResult queryResult = null;
+                ServletOutputLazyStream outputStream = null;
                 try {
-                    // Evaluate ASK query
-                    // if (isAskQuery) {
-                    if (queryObject instanceof BooleanQuery) {
-
-                        isAskQuery = true;
-                        Boolean rslt = ((BooleanQuery) queryObject).evaluate();
-
-                        // ASK query in XML format
-                        if (format != null && format.equals(FORMAT_XML)) {
-                            OutputStreamWriter writer = new OutputStreamWriter(out);
-                            writer.write("<?xml version=\"1.0\"?>");
-                            writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
-                            writer.write("<head></head>");
-                            writer.write("<boolean>");
-                            writer.write(rslt.toString());
-                            writer.write("</boolean>");
-                            writer.write("</sparql>");
-                            writer.flush();
-                        } else if (format != null && format.equals(FORMAT_XML_SCHEMA)) {
-                            OutputStreamWriter writer = new OutputStreamWriter(out);
-                            writer.write("<?xml version=\"1.0\"?>");
-                            writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
-                            writer.write("<head></head>");
-                            writer.write("<boolean>");
-                            writer.write(rslt.toString());
-                            writer.write("</boolean>");
-                            writer.write("</sparql>");
-                            writer.flush();
-                            // ASK query in JSON format
-                        } else if (format != null && format.equals(FORMAT_JSON)) {
-                            OutputStreamWriter writer = new OutputStreamWriter(out);
-                            writer.write("{  \"head\": { \"link\": [] }, \"boolean\": ");
-                            writer.write(rslt.toString());
-                            writer.write("}");
-                            writer.flush();
-                            // ASK query in HTML format
-                        } else if (format != null && format.equals(FORMAT_HTML)) {
-                            resultAsk = rslt.toString();
-                        }
-                        // Evaluate CONSTRUCT query. Returns XML format
-                        // } else if (isConstructQuery && !format.equals(FORMAT_HTML)) {
-                    } else if (queryObject instanceof GraphQuery) {
-                        if (!format.equals(FORMAT_HTML)) {
-                            RDFXMLWriter writer = new RDFXMLWriter(out);
-                            ((GraphQuery) queryObject).evaluate(writer);
+                    // Look at ServletOutputLazyStream JavaDoc for why use it here.
+                    outputStream = new ServletOutputLazyStream(response);
+                    executeQuery(internalFormat == null ? FORMAT_XML : internalFormat, outputStream);
+                    if (errorCode > 0) {
+                        if (StringUtils.isBlank(errorMessage)) {
+                            response.sendError(errorCode);
                         } else {
-                            long startTime = System.currentTimeMillis();
-                            TupleQuery resultsTable = con.prepareTupleQuery(QueryLanguage.SPARQL, query);
-                            TupleQueryResult bindings = resultsTable.evaluate();
-                            executionTime = System.currentTimeMillis() - startTime;
-                            if (bindings != null) {
-                                result = new QueryResult(bindings, false);
-                            }
+                            response.sendError(errorCode, errorMessage);
                         }
-                        // Evaluate SELECT query
                     } else {
-                        // Returns XML format
-                        if (format != null && format.equals(FORMAT_XML)) {
-                            CRXmlWriter sparqlWriter = new CRXmlWriter(out);
-                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
-                            // Returns XML format
-                        } else if (format != null && format.equals(FORMAT_XML_SCHEMA)) {
-                            CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(out);
-                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
-                            // Returns JSON format
-                        } else if (format != null && format.equals(FORMAT_JSON)) {
-                            CRJsonWriter sparqlWriter = new CRJsonWriter(out);
-                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
-                            // Returns HTML format
-                        } else if (format != null && format.equals(FORMAT_HTML)) {
-                            long startTime = System.currentTimeMillis();
-                            queryResult = ((TupleQuery) queryObject).evaluate();
-
-                            executionTime = System.currentTimeMillis() - startTime;
-                            if (queryResult != null) {
-                                result = new QueryResult(queryResult, false);
-                            }
-                            // Returns HTML+ format
-                        } else if (format != null && format.equals(FORMAT_HTML_PLUS)) {
-                            long startTime = System.currentTimeMillis();
-
-                            queryResult = ((TupleQuery) queryObject).evaluate();
-
-                            executionTime = System.currentTimeMillis() - startTime;
-                            if (queryResult != null) {
-                                result = new QueryResult(queryResult, true);
-                            }
-                        } else if (format != null && format.equals(FORMAT_CSV)) {
-                            SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(out);
-                            ((TupleQuery) queryObject).evaluate(sparqlWriter);
-                        }
+                        String fileName = "sparql-result." + StringUtils.substringBefore(internalFormat, "_");
+                        this.setFilename(fileName);
                     }
                 } finally {
-                    SesameUtil.close(queryResult);
+                    if (outputStream != null) {
+                        try {
+                            outputStream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-            } catch (Exception e) {
-                addWarningMessage("Encountered exception: " + e.toString());
-
-                //Syntax error in query: http code - 400 - check query syntax with sesame parser
-                handleVirtuosoError(e, query);
-
-            } finally {
-                // Close DB connection and output stream quietly.
-                SesameUtil.close(con);
-                IOUtils.closeQuietly(out);
             }
+        };
+
+        return resolution;
+    }
+
+    /**
+     * TODO: this method should really not be in controller, but rather in a service.
+     *
+     * @param outputFormat
+     * @param outputStream
+     */
+    private void executeQuery(String outputFormat, OutputStream outputStream) {
+
+        // If outputFormat is blank, fall back to "XML".
+        if (StringUtils.isBlank(outputFormat)) {
+            outputFormat = FORMAT_XML;
+        }
+
+        RepositoryConnection conn = null;
+        try {
+            conn = SesameConnectionProvider.getReadOnlyRepositoryConnection();
+
+            Query queryObject = conn.prepareQuery(QueryLanguage.SPARQL, query);
+            SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
+
+            TupleQueryResult queryResult = null;
+            try {
+                if (queryObject instanceof BooleanQuery) {
+
+                    // Evaluate ASK query.
+
+                    isAskQuery = true;
+                    Boolean askResult = ((BooleanQuery) queryObject).evaluate();
+                    if (outputFormat.equals(FORMAT_XML)) {
+
+                        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+                        writer.write("<?xml version=\"1.0\"?>");
+                        writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
+                        writer.write("<head></head>");
+                        writer.write("<boolean>");
+                        writer.write(askResult.toString());
+                        writer.write("</boolean>");
+                        writer.write("</sparql>");
+                        writer.flush();
+
+                    } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
+
+                        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+                        writer.write("<?xml version=\"1.0\"?>");
+                        writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
+                        writer.write("<head></head>");
+                        writer.write("<boolean>");
+                        writer.write(askResult.toString());
+                        writer.write("</boolean>");
+                        writer.write("</sparql>");
+                        writer.flush();
+
+                    } else if (outputFormat.equals(FORMAT_JSON)) {
+
+                        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+                        writer.write("{  \"head\": { \"link\": [] }, \"boolean\": ");
+                        writer.write(askResult.toString());
+                        writer.write("}");
+                        writer.flush();
+
+                    } else if (outputFormat.equals(FORMAT_HTML)) {
+
+                        resultAsk = askResult.toString();
+                    }
+                } else if (queryObject instanceof GraphQuery) {
+
+                    // Evaluate CONSTRUCT query.
+
+                    if (!outputFormat.equals(FORMAT_HTML)) {
+                        RDFXMLWriter writer = new RDFXMLWriter(outputStream);
+                        ((GraphQuery) queryObject).evaluate(writer);
+                    } else {
+                        long startTime = System.currentTimeMillis();
+                        TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+                        TupleQueryResult bindings = resultsTable.evaluate();
+                        executionTime = System.currentTimeMillis() - startTime;
+                        if (bindings != null) {
+                            result = new QueryResult(bindings, false);
+                        }
+                    }
+                } else {
+
+                    // Evaluate SELECT query.
+
+                    if (outputFormat != null && outputFormat.equals(FORMAT_XML)) {
+
+                        CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
+                        ((TupleQuery) queryObject).evaluate(sparqlWriter);
+
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_XML_SCHEMA)) {
+
+                        CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
+                        ((TupleQuery) queryObject).evaluate(sparqlWriter);
+
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_JSON)) {
+
+                        CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
+                        ((TupleQuery) queryObject).evaluate(sparqlWriter);
+
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_HTML)) {
+
+                        long startTime = System.currentTimeMillis();
+                        queryResult = ((TupleQuery) queryObject).evaluate();
+                        executionTime = System.currentTimeMillis() - startTime;
+                        if (queryResult != null) {
+                            result = new QueryResult(queryResult, false);
+                        }
+
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_HTML_PLUS)) {
+
+                        long startTime = System.currentTimeMillis();
+                        queryResult = ((TupleQuery) queryObject).evaluate();
+                        executionTime = System.currentTimeMillis() - startTime;
+                        if (queryResult != null) {
+                            result = new QueryResult(queryResult, true);
+                        }
+
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
+
+                        SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(outputStream);
+                        ((TupleQuery) queryObject).evaluate(sparqlWriter);
+                    }
+                }
+            } finally {
+                SesameUtil.close(queryResult);
+            }
+        } catch (Exception e) {
+
+            // Add feedback message to user (ignored when client is not a browser)
+            addWarningMessage("Failure when executing the query: " + e);
+
+            // Syntax error in query: http code - 400 - check query syntax with sesame parser
+            handleQueryExecutionException(e);
+
+        } finally {
+            SesameUtil.close(conn);
         }
     }
 
-    // Export CONSTRUCT query result to user homespace
+    /**
+     * Exports CONSTRUCT query results into user's home space.
+     *
+     * @param dataset The user's home space identifier.
+     *
+     * @return Number of triples exported.
+     */
     public int exportToHomespace(String dataset) {
         int nrOfTriples = 0;
         try {
@@ -810,7 +819,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     private Resolution deleteBookmarked(boolean deleteSharedBookmark) throws DAOException {
 
-        setGraphUri();
+        setDefaultAndNamedGraphs();
 
         CRUser user = getUser();
         if (user == null) {
@@ -1001,7 +1010,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return sharedBookmarkedQueries;
     }
 
-
     /**
      * Returns project bookmarked queries.
      *
@@ -1126,50 +1134,96 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public void setSelectedBookmarkName(String selectedBookmarkName) {
         this.selectedBookmarkName = selectedBookmarkName;
     }
+
     /**
-     * checks the exception returned by Virtuoso and sets error code and message.
-     * @param virtuosoException Virtuoso JDBC exception
-     * @param sparql SPARQL query
+     * Handles the given exception that was thrown while trying to execute the {@link #query}. Sets a proper values to
+     * {@link #errorCode} and {@link #errorMessage}.
+     *
+     * @param exception The given exception.
      */
-    private void handleVirtuosoError(Exception virtuosoException, String sparql) {
+    private void handleQueryExecutionException(Exception exception) {
+
         errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-        errorMessage = virtuosoException.getMessage();
+        errorMessage = exception.getMessage();
+
+        // Detect if the exception resulted from bad query, by parsing the query here. If that throws an exception, the query must
+        // be bad, and necessary actions are taken.
 
         try {
-            //RepositoryConnection.prepareQuery() does not throw MalformedQueryException for some reason
-            //query is parsed to throw malformedQueryException and return correct HTTP code
-            parser.parseQuery(sparql, GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparql");
-
+            parser.parseQuery(query, GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL) + "/sparql");
         } catch (Exception e) {
-            //check also with Sesame parser if SPARQL was invalid and Virtuosos has failed because of invalid query
-            //then parse error message
-            //if SPARQL dos not include any SPARQL keywords "SELECT", "ASK" etc ClassCastException is thrown
-            if (virtuosoException instanceof ClassCastException
-                    || (e instanceof MalformedQueryException && virtuosoException.getMessage().indexOf("syntax error") != -1)) {
-                addWarningMessage("Invalid SPARQL: " + e.getMessage());
-                errorCode = HttpServletResponse.SC_BAD_REQUEST;
 
-                //if sparql does not contain any keywords: SELECT, ASK etc throws ClassCastExcpetion without explanation
-                if (virtuosoException instanceof ClassCastException) {
-                    errorMessage += " Invalid SPARQL: " + sparql;
-                }
+            // Query is definitely bad if the exception is MalformedQueryException, and message contains "syntax error".
+            boolean isBadQuery = e instanceof MalformedQueryException && exception.getMessage().indexOf("syntax error") != -1;
+
+            // A ClassCastException means bad query too, because that's what is thrown when the query dos not start with
+            // "SELECT", "CONSTRUCT" or "ASK".
+            if (isBadQuery == false) {
+                isBadQuery = exception instanceof ClassCastException;
+            }
+
+            // If recognized as bad query, add warning message to user (ignored when the client is not a browser) and set proper
+            // HTTP status code and message.
+            if (isBadQuery) {
+
+                errorCode = HttpServletResponse.SC_BAD_REQUEST;
+                String msg = "Invalid SPARQL: " + e.getMessage();
+                errorMessage = " Invalid SPARQL: " + query;
+                addWarningMessage(msg);
             }
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> getUserProjects() {
         return userProjects;
     }
 
+    /**
+     *
+     * @param userProjects
+     */
     public void setUserProjects(List<String> userProjects) {
         this.userProjects = userProjects;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getBookmarkFolder() {
         return this.bookmarkFolder;
     }
 
+    /**
+     *
+     * @param folder
+     */
     public void setBookmarkFolder(String folder) {
         this.bookmarkFolder = folder;
+    }
+
+    /**
+     * @return
+     */
+    private static Map<String, String> createMimeTypesToFormats() {
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("application/sparql-results+xml", FORMAT_XML);
+        map.put("application/rdf+xml", FORMAT_XML);
+        map.put("application/xml", FORMAT_XML);
+        map.put("text/xml", FORMAT_XML);
+        map.put("application/x-binary-rdf-results-table", FORMAT_XML);
+        map.put("text/csv", FORMAT_CSV);
+        map.put("application/csv", FORMAT_CSV);
+        map.put("text/comma-separated-values", FORMAT_CSV);
+        map.put("text/boolean", FORMAT_XML);
+        map.put("application/x-ms-access-export+xml", FORMAT_XML_SCHEMA);
+        map.put("application/sparql-results+json", FORMAT_JSON);
+        map.put("application/json", FORMAT_JSON);
+        return Collections.unmodifiableMap(map);
     }
 }

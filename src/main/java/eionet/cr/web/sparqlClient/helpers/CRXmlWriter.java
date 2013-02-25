@@ -62,6 +62,11 @@ public class CRXmlWriter implements TupleQueryResultWriter {
      * Methods *
      *---------*/
 
+    /*
+     * (non-Javadoc)
+     * @see org.openrdf.query.resultio.TupleQueryResultWriter#getTupleQueryResultFormat()
+     */
+    @Override
     public final TupleQueryResultFormat getTupleQueryResultFormat() {
         return TupleQueryResultFormat.SPARQL;
     }
@@ -75,6 +80,11 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         xmlWriter.setPrettyPrint(prettyPrint);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.openrdf.query.TupleQueryResultHandler#startQueryResult(java.util.List)
+     */
+    @Override
     public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {
         try {
             xmlWriter.startDocument();
@@ -97,6 +107,11 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.openrdf.query.TupleQueryResultHandler#endQueryResult()
+     */
+    @Override
     public void endQueryResult() throws TupleQueryResultHandlerException {
         try {
             xmlWriter.endTag(RESULT_SET_TAG);
@@ -108,6 +123,11 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.openrdf.query.TupleQueryResultHandler#handleSolution(org.openrdf.query.BindingSet)
+     */
+    @Override
     public void handleSolution(BindingSet bindingSet) throws TupleQueryResultHandlerException {
         try {
             xmlWriter.startTag(RESULT_TAG);
@@ -129,6 +149,11 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
+    /**
+     * Utility method for writing the given {@link Value}.
+     * @param value The given {@link Value}.
+     * @throws IOException
+     */
     private void writeValue(Value value) throws IOException {
         if (value instanceof URI) {
             writeURI((URI) value);
@@ -139,14 +164,29 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
+    /**
+     * Utility method for writing the given {@link URI}.
+     * @param value The given {@link URI}.
+     * @throws IOException
+     */
     private void writeURI(URI uri) throws IOException {
         xmlWriter.textElement(URI_TAG, uri.toString());
     }
 
+    /**
+     * Utility method for writing the given {@link BNode}.
+     * @param bNode The given {@link BNode}.
+     * @throws IOException
+     */
     private void writeBNode(BNode bNode) throws IOException {
         xmlWriter.textElement(BNODE_TAG, bNode.getID());
     }
 
+    /**
+     * Utility method for writing the given {@link Literal}.
+     * @param bNode The given {@link Literal}.
+     * @throws IOException
+     */
     private void writeLiteral(Literal literal) throws IOException {
         if (literal.getLanguage() != null) {
             xmlWriter.setAttribute(LITERAL_LANG_ATT, literal.getLanguage());
