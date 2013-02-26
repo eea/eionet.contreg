@@ -39,6 +39,7 @@ import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Pair;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.security.CRUser;
 
 /**
  *
@@ -53,9 +54,9 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     };
 
     /** */
+    private static final String SEARCH_JSP = "/pages/admin/postHarvestScripts/searchScripts.jsp";
     private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
     public static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
-
 
     /** */
     private TargetType targetType;
@@ -136,6 +137,34 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
+     * Handler for the "search" event.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution search() throws DAOException {
+
+        CRUser user = getUser();
+        if (user != null && user.isAdministrator()) {
+            String searchText = getContext().getRequestParameter("search");
+            if (searchText != null) {
+                searchText = searchText.trim();
+                if (!searchText.isEmpty()) {
+                    if (searchText.length() >= 3) {
+                        scripts = DAOFactory.get().getDao(PostHarvestScriptDAO.class).search(searchText);
+                    } else {
+                        addCautionMessage("Search text must be at least 3 characters long!");
+                    }
+                }
+            }
+        } else {
+            addGlobalValidationError("User not an administrator!");
+        }
+
+        return new ForwardResolution(SEARCH_JSP);
+    }
+
+    /**
      *
      * @return
      * @throws DAOException
@@ -168,8 +197,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     /**
      * Validates if paste is legal. Checks if the names are unique and admin has permissions
      *
-     * @throws DAOException
-     *             if DB operation fails
+     * @throws DAOException if DB operation fails
      */
     @ValidationMethod(on = {"paste"})
     public void validatePaste() throws DAOException {
@@ -179,9 +207,9 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
             return;
         }
 
-        //PostHarvestScriptUtil.validateScripts(this, this.getSession(), targetType, targetUrl);
+        // PostHarvestScriptUtil.validateScripts(this, this.getSession(), targetType, targetUrl);
 
-        TargetType clipboardTargetType =  (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
+        TargetType clipboardTargetType = (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
         List<String> validationErros =
                 PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType, targetUrl);
         addGlobalValidationErrors(validationErros);
@@ -197,8 +225,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetType
-     *            the targetType to set
+     * @param targetType the targetType to set
      */
     public void setTargetType(TargetType targetType) {
         this.targetType = targetType;
@@ -239,16 +266,14 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param targetUrl
-     *            the targetUrl to set
+     * @param targetUrl the targetUrl to set
      */
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
     /**
-     * @param selectedIds
-     *            the selectedIds to set
+     * @param selectedIds the selectedIds to set
      */
     public void setSelectedIds(List<Integer> selectedIds) {
         this.selectedIds = selectedIds;
@@ -285,8 +310,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * Action for Cutting the scripts.
      *
      * @return Original page
-     * @throws DAOException
-     *             if action fails.
+     * @throws DAOException if action fails.
      */
     public Resolution cut() throws DAOException {
         getSession().setAttribute(PostHarvestScriptActionBean.SCRIPTS_CLIPBOARD_ACTION, ActionType.CUT);
@@ -298,11 +322,10 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * Action for Copying the scripts.
      *
      * @return Original page
-     * @throws DAOException
-     *             if action fails.
+     * @throws DAOException if action fails.
      */
     public Resolution copy() throws DAOException {
-        getSession().setAttribute(PostHarvestScriptActionBean.SCRIPTS_CLIPBOARD_ACTION,  ActionType.COPY);
+        getSession().setAttribute(PostHarvestScriptActionBean.SCRIPTS_CLIPBOARD_ACTION, ActionType.COPY);
         reInitClipBoard();
         return list();
     }
@@ -311,11 +334,10 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      * Action for pasting the scripts.
      *
      * @return Original page
-     * @throws DAOException
-     *             if action fails.
+     * @throws DAOException if action fails.
      */
     public Resolution paste() throws DAOException {
-        //PostHarvestScriptUtil.pasteScripts(getSession(), targetType, targetUrl);
+        // PostHarvestScriptUtil.pasteScripts(getSession(), targetType, targetUrl);
         ActionType actionType = (ActionType) getSession().getAttribute(SCRIPTS_CLIPBOARD_ACTION);
         PostHarvestScriptUtil.pasteScripts(getClipBoardScripts(), actionType, targetType, targetUrl);
 
@@ -324,6 +346,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
     /**
      * Scripts selected to clipboard.
+     *
      * @return Lsit of Script data objects
      */
 
@@ -334,8 +357,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     /**
      * Reinitializes the selected scripts buffer.
      *
-     * @throws DAOException
-     *             if DB operation fails
+     * @throws DAOException if DB operation fails
      */
     private void reInitClipBoard() throws DAOException {
         List<PostHarvestScriptDTO> selectedScripts =
@@ -353,12 +375,10 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
     public boolean isPastePossible() {
 
         List<PostHarvestScriptDTO> clipboardScripts = getClipBoardScripts();
-        TargetType clipboardTargetType =  (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
+        TargetType clipboardTargetType = (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
 
         return PostHarvestScriptUtil.isPastePossible(clipboardScripts, clipboardTargetType, targetType);
 
-
     }
-
 
 }

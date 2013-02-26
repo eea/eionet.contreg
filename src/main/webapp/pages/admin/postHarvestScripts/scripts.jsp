@@ -4,12 +4,17 @@
     <ul id="dropdown-operations">
         <li><a href="#">Operations</a>
             <ul>
+            <li>
+	            <stripes:link href="/admin/postHarvestScripts" event="search" title="Search scripts">
+	                <c:out value="Search scripts"/>
+	            </stripes:link>
+            </li>
             <c:if test="${empty actionBean.targetType}">
                 <li>
                      <stripes:link href="/admin/postHarvestScript" title="Create all-source script">
                          <c:out value="Create script"/>
                      </stripes:link>
-                 </li>
+                </li>
              </c:if>
              <c:if test="${not empty actionBean.targetType}">
                  <c:if test="${empty actionBean.targetUrl}">

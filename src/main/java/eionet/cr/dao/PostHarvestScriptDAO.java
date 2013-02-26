@@ -185,14 +185,21 @@ public interface PostHarvestScriptDAO extends DAO {
      */
     List<PostHarvestScriptDTO> getScriptsByIds(List<Integer> ids) throws DAOException;
 
-   /**
-    * Adds scripts to the end of the given source or type.
-    * @param targetType type shows if scripts are added to source or RDF type
-    * @param targetUrl source or RDF type uri
-    * @param scripts set of scripts
-    * @throws DAOException if insert fails
-    */
-   void addScripts(TargetType targetType, String targetUrl, List<PostHarvestScriptDTO> scripts)
-           throws DAOException;
+    /**
+     * Adds scripts to the end of the given source or type.
+     * @param targetType type shows if scripts are added to source or RDF type
+     * @param targetUrl source or RDF type uri
+     * @param scripts set of scripts
+     * @throws DAOException if insert fails
+     */
+    void addScripts(TargetType targetType, String targetUrl, List<PostHarvestScriptDTO> scripts)
+            throws DAOException;
 
+    /**
+     * Returns a list of scripts matching the given search text either in title or script content.
+     * @param searchText Search text.
+     * @return Matching scripts.
+     * @throws DAOException in case any database error happens.
+     */
+    List<PostHarvestScriptDTO> search(String searchText) throws DAOException;
 }

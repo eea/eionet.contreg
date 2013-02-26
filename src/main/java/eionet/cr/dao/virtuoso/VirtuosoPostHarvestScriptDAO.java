@@ -102,6 +102,9 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     private static final String EXISTS_SQL = "select count(*) from POST_HARVEST_SCRIPT where "
             + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and TITLE=?";
 
+    /** */
+    private static final String SEARCH_SQL =
+            "select * from POST_HARVEST_SCRIPT where strcasestr(TITLE,?) >= 0 or strcasestr(SCRIPT,?) >= 0 order by TITLE";
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#list(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String)
@@ -333,7 +336,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             SQLUtil.executeQuery(LIST_SQL, values, reader, conn);
             List<PostHarvestScriptDTO> scripts = reader.getResultList();
 
-            //helper object for handling min, max positions and real count of scripts
+            // helper object for handling min, max positions and real count of scripts
             PostHarvestScriptSet scriptSet = new PostHarvestScriptSet(scripts);
 
             // If even one script is already at position 1 then moving up is not considered possible.
@@ -346,7 +349,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
                 // we do this check only for scripts that have been selected
                 if (ids.contains(script.getId())) {
                     int position = script.getPosition();
-                    if ((direction < 0 && position == scriptSet.getMinPosition()) || (direction > 0 && position == scriptSet.getMaxPosition())) {
+                    if ((direction < 0 && position == scriptSet.getMinPosition())
+                            || (direction > 0 && position == scriptSet.getMaxPosition())) {
                         isMovingPossible = false;
                     } else {
                         selectedPositions.add(position);
@@ -491,8 +495,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     public boolean isScriptsModified(Date lastHarvestDate, String harvestSource) throws DAOException {
 
         String sql =
-                "SELECT count(*) FROM post_harvest_script WHERE "
-                        + "(target_source_url = ? OR target_source_url IS NULL) AND "
+                "SELECT count(*) FROM post_harvest_script WHERE " + "(target_source_url = ? OR target_source_url IS NULL) AND "
                         + "last_modified > ? AND active = 'Y' AND target_type_url IS  NULL";
 
         ArrayList<Object> values = new ArrayList<Object>();
@@ -523,5 +526,17 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.PostHarvestScriptDAO#search(java.lang.String)
+     */
+    @Override
+    public List<PostHarvestScriptDTO> search(String searchText) throws DAOException {
 
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(searchText);
+        values.add(searchText);
+        return executeSQL(SEARCH_SQL, values, new PostHarvestScriptDTOReader());
+    }
 }
