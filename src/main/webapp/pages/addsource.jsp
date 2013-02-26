@@ -65,7 +65,7 @@
                             <c:when test="${empty actionBean.harvestSource || actionBean.harvestSource.sparqlEndpoint == false}">
                                 <input type="checkbox" name="dontHarvest" id="chkDontHarvest"/><label for="chkDontHarvest">Don't schedule urgent harvest</label>
                             </c:when>
-                            <c:otherwise>&nbsp;</c:otherwise>
+                            <c:otherwise>&nbsp;<input type="hidden" name="dontHarvest" value="true"/></c:otherwise>
                         </c:choose>
                     </td>
                 </tr>

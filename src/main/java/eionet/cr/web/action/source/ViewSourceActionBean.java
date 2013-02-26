@@ -21,6 +21,7 @@
 
 package eionet.cr.web.action.source;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -30,6 +31,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -62,6 +64,9 @@ import eionet.cr.web.util.tabs.TabElement;
  */
 @UrlBinding("/sourceView.action")
 public class ViewSourceActionBean extends AbstractActionBean {
+
+    /** */
+    private static final Logger LOGGER = Logger.getLogger(ViewSourceActionBean.class);
 
     /** URI of the source. */
     private String uri;
@@ -118,29 +123,39 @@ public class ViewSourceActionBean extends AbstractActionBean {
      */
     public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException {
 
+        // Populate the bean's harvest source.
         harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
-        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-        SubjectDTO subject = helperDAO.getSubject(uri);
+        // Get the subject data of this harvest source. It might be null!
+        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(uri);
 
-        if (subject != null && CsvImportUtil.isSourceTableFile(subject)) {
+        // Set some flags indicating the subject's type.
+        boolean isTableFile = subject != null && CsvImportUtil.isSourceTableFile(subject);
+        boolean isFolder =
+                subject != null
+                && Arrays.asList(Subjects.CR_FOLDER, Subjects.CR_USER_FOLDER).contains(
+                        subject.getObjectValue(Predicates.RDF_TYPE));
+
+        // Different action depending on the subject's type.
+        if (isTableFile) {
             try {
                 List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }
             } catch (Exception e) {
-                addCautionMessage("Harvesting CSV/TSV file failed " + e);
+                String msg = "Harvesting CSV/TSV file failed";
+                LOGGER.error(msg, e);
+                addWarningMessage(msg + ": " + e);
             }
-        } else if (subject.getObject(Predicates.RDF_TYPE) != null
-                && (Subjects.CR_FOLDER.equals(subject.getObject(Predicates.RDF_TYPE).getValue()) || Subjects.CR_USER_FOLDER
-                        .equals(subject.getObject(Predicates.RDF_TYPE).getValue()))) {
-            addSystemMessage("Folder cannot be harvested!");
+        } else if (isFolder) {
+            addWarningMessage("A folder cannot be harvested!");
         } else {
-            // schedule the harvest
             UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
             addSystemMessage("Successfully scheduled for urgent harvest!");
         }
+
+        // Redirect back to view message.
         return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", uri);
     }
 
@@ -226,8 +241,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param uri
-     *            the uri to set
+     * @param uri the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;

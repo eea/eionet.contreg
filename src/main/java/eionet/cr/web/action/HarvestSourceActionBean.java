@@ -180,8 +180,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 if (validateAddEdit()) {
 
                     // create new harvest source
+                    boolean isSparqlEndpoint = false;
                     HarvestSourceDTO hSourceDTO = getHarvestSource();
                     if (hSourceDTO != null) {
+
+                        isSparqlEndpoint = hSourceDTO.isSparqlEndpoint();
+
                         // escape spaces in URLs
                         if (hSourceDTO.getUrl() != null) {
                             hSourceDTO.setUrl(URLUtil.escapeIRI(hSourceDTO.getUrl()));
@@ -200,9 +204,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     // set up the resolution
                     resolution = new ForwardResolution(HarvestSourcesActionBean.class);
 
-                    // schedule urgent harvest, unless explicitly requested not
-                    // to
-                    if (getContext().getRequestParameter("dontHarvest") == null) {
+                    // schedule urgent harvest, unless explicitly requested not to
+                    if (!isSparqlEndpoint && getContext().getRequestParameter("dontHarvest") == null) {
 
                         UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
                         addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
