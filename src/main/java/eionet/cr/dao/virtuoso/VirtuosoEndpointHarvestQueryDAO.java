@@ -255,18 +255,19 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
     }
 
     /**
-     * Ensures that the given test CONSTRUCT query has a reasonable limit (i.e. one by the given limits size) included.
+     * Ensures that the given test CONSTRUCT query has a limit included, and it does not exceed the given allowed maximum.
      *
      * @param query The given query.
-     * @param limitSize The reasonable limit size.
+     * @param maxLimit The maximum allowed limit size.
      * @return The query with the reasonable limit ensured.
      */
-    private String ensureTestConstructLimit(String query, int limitSize) {
+    private String ensureTestConstructLimit(String query, int maxLimit) {
 
         String upperCaseQuery = query.toUpperCase();
         String[] tokens = StringUtils.split(upperCaseQuery.trim());
         int len = tokens.length;
 
+        Integer limit = null;
         Integer offset = null;
         boolean limitOnly = false;
         boolean limitPlusOffset = false;
@@ -275,30 +276,36 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
         if (len >= 4) {
             if (tokens[len - 4].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 3]) && tokens[len - 2].equals("OFFSET")
                     && NumberUtils.isNumber(tokens[len - 1])) {
+                limit = Integer.valueOf(tokens[len - 3]);
                 offset = Integer.valueOf(tokens[len - 1]);
                 limitPlusOffset = true;
             } else if (tokens[len - 4].equals("OFFSET") && NumberUtils.isNumber(tokens[len - 3])
                     && tokens[len - 2].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 1])) {
+                limit = Integer.valueOf(tokens[len - 1]);
                 offset = Integer.valueOf(tokens[len - 3]);
                 offsetPlusLimit = true;
+            } else if (tokens[len - 2].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 1])) {
+                limit = Integer.valueOf(tokens[len - 1]);
+                limitOnly = true;
             }
         } else if (len >= 2) {
             if (tokens[len - 2].equals("LIMIT") && NumberUtils.isNumber(tokens[len - 1])) {
+                limit = Integer.valueOf(tokens[len - 1]);
                 limitOnly = true;
             }
         }
 
         if (limitOnly) {
             int i = upperCaseQuery.lastIndexOf("LIMIT");
-            return query.substring(0, i) + " LIMIT " + limitSize;
+            return query.substring(0, i) + " LIMIT " + Math.min(limit.intValue(), maxLimit);
         } else if (offsetPlusLimit) {
             int i = upperCaseQuery.lastIndexOf("OFFSET");
-            return query.substring(0, i) + " OFFSET " + offset.intValue() + " LIMIT " + limitSize;
+            return query.substring(0, i) + " OFFSET " + offset.intValue() + " LIMIT " + Math.min(limit.intValue(), maxLimit);
         } else if (limitPlusOffset) {
             int i = upperCaseQuery.lastIndexOf("LIMIT");
-            return query.substring(0, i) + " LIMIT " + limitSize + " OFFSET " + offset.intValue();
+            return query.substring(0, i) + " LIMIT " + Math.min(limit.intValue(), maxLimit) + " OFFSET " + offset.intValue();
         } else {
-            return query + " LIMIT " + limitSize;
+            return query + " LIMIT " + maxLimit;
         }
     }
 

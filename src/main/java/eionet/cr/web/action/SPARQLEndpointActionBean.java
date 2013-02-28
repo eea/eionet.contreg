@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -70,18 +72,27 @@ import eionet.cr.web.util.ServletOutputLazyStream;
 public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
+    private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
+
+    /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
 
     /** */
     private static final String DEFAULT_STREAMING_RESPONSE_MIME_TYPE = "application/sparql-results+xml";
 
-    /** */
+    /** The endpoint's internal conventional output formats. */
     private static final String FORMAT_XML = "xml";
     private static final String FORMAT_XML_SCHEMA = "xml_schema";
     private static final String FORMAT_JSON = "json";
     private static final String FORMAT_CSV = "csv";
     private static final String FORMAT_HTML = "html";
     private static final String FORMAT_HTML_PLUS = "html+";
+
+    /** A set of all supported MIME types requested in "Accept" header. */
+    private static final HashSet<String> SUPPORTED_MIME_TYPES = createSupportedMimeTypes();
+
+    /** Supported MIME types mapped to the corresponding internal format names. */
+    private static final Map<String, String> STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS = createMimeTypesToInternalFormats();
 
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
@@ -96,9 +107,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * Option value in the folder dropdown for my bookmarks.
      */
     private final static String MY_BOOKMARKS_FOLDER = "_my_bookmarks";
-
-    /** Supported mime-types mapped to the corresponding internal format names. */
-    private static final Map<String, String> STREAMING_MIME_TYPES_TO_FORMATS = createMimeTypesToFormats();
 
     /** The request parameter name for the default graph URI. */
     private static final String DEFAULT_GRAPH_URI = "default-graph-uri";
@@ -134,6 +142,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private QueryResult result;
     private String resultAsk;
 
+    /** */
     private SPARQLParser parser = new SPARQLParser();
 
     /**
@@ -175,14 +184,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private List<String> deleteQueries;
 
-    /**
-     * projects for the user with insert permission.
-     */
+    /** Projects for the user with insert permission. */
     private List<String> userProjects;
 
-    /**
-     * Selected project for the bookmark.
-     */
+    /** Selected project for the bookmark. */
     private String bookmarkFolder;
 
     /**
@@ -441,14 +446,26 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // Content negotiation: prefer the value of "format" request parameter. If it's blank fall back to the request's "Accept"
         // header. If that one is blank too, fall back to the default.
-        // TODO Currently only the header's first mime type is looked at. For a true content negotiation, the whole "Accept" header
-        // should be parsed in its whole complexity.
+        // TODO Currently the header's parsing does not parse quality weights as stated in the HTTP standard. Instead, the quality
+        // weights (separated by ';') are ignored, and the very first MIME type supported is the one used.
 
         String mimeType = format;
         if (StringUtils.isBlank(mimeType)) {
+
             String acceptHeader = getContext().getRequest().getHeader("Accept");
+            LOGGER.trace("Accept header: " + acceptHeader);
             if (StringUtils.isNotBlank(acceptHeader)) {
-                mimeType = StringUtils.substringBefore(StringUtils.substringBefore(acceptHeader, ","), ";").trim();
+
+                String[] split = StringUtils.split(acceptHeader, ',');
+                for (int i = 0; i < split.length; i++) {
+
+                    String s = StringUtils.substringBefore(split[i], ";").trim();
+                    if (SUPPORTED_MIME_TYPES.contains(s)) {
+                        mimeType = s;
+                        LOGGER.trace("Going for this MIME type (from Accept header): " + mimeType);
+                        break;
+                    }
+                }
             }
         }
         if (StringUtils.isBlank(mimeType)) {
@@ -466,10 +483,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             if (nrOfTriples > 0) {
                 resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
             }
-        } else if (STREAMING_MIME_TYPES_TO_FORMATS.containsKey(mimeType)) {
+        } else if (STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.containsKey(mimeType)) {
             resolution = executeStreamingQuery(mimeType);
         } else {
-            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null);
+            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse());
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -524,7 +541,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     private Resolution executeStreamingQuery(String mimeType) {
 
-        final String internalFormat = STREAMING_MIME_TYPES_TO_FORMATS.get(mimeType);
+        final String internalFormat = STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.get(mimeType);
         StreamingResolution resolution = new StreamingResolution(mimeType) {
             @Override
             public void stream(HttpServletResponse response) throws Exception {
@@ -533,7 +550,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 try {
                     // Look at ServletOutputLazyStream JavaDoc for why use it here.
                     outputStream = new ServletOutputLazyStream(response);
-                    executeQuery(internalFormat == null ? FORMAT_XML : internalFormat, outputStream);
+                    executeQuery(internalFormat == null ? FORMAT_XML : internalFormat, outputStream, response);
                     if (errorCode > 0) {
                         if (StringUtils.isBlank(errorMessage)) {
                             response.sendError(errorCode);
@@ -560,12 +577,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * TODO: this method should really not be in controller, but rather in a service.
+     * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers of the given servlet
+     * response.
      *
-     * @param outputFormat
-     * @param outputStream
+     * TODO: the execution of the query and communication with Sesame should really not be in controller.
+     *
+     * @param outputFormat Output format to generate.
+     * @param outputStream Output stream to use, may be null, in which the bean simply sets the {@link #result}.
+     * @param response Servlet response.
      */
-    private void executeQuery(String outputFormat, OutputStream outputStream) {
+    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response) {
 
         // If outputFormat is blank, fall back to "XML".
         if (StringUtils.isBlank(outputFormat)) {
@@ -589,6 +610,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     Boolean askResult = ((BooleanQuery) queryObject).evaluate();
                     if (outputFormat.equals(FORMAT_XML)) {
 
+                        response.setContentType("text/xml");
+
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("<?xml version=\"1.0\"?>");
                         writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
@@ -600,6 +623,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         writer.flush();
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
+
+                        response.setContentType("text/xml");
 
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("<?xml version=\"1.0\"?>");
@@ -613,6 +638,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
 
+                        response.setContentType("application/json");
+
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("{  \"head\": { \"link\": [] }, \"boolean\": ");
                         writer.write(askResult.toString());
@@ -621,16 +648,23 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     } else if (outputFormat.equals(FORMAT_HTML)) {
 
+                        response.setContentType("text/html");
+
                         resultAsk = askResult.toString();
                     }
                 } else if (queryObject instanceof GraphQuery) {
 
                     // Evaluate CONSTRUCT query.
 
-                    if (!outputFormat.equals(FORMAT_HTML)) {
+                    if (outputFormat.equals(FORMAT_HTML) == false) {
+
+                        response.setContentType("application/rdf+xml");
                         RDFXMLWriter writer = new RDFXMLWriter(outputStream);
                         ((GraphQuery) queryObject).evaluate(writer);
+
                     } else {
+                        response.setContentType("text/html");
+
                         long startTime = System.currentTimeMillis();
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
                         TupleQueryResult bindings = resultsTable.evaluate();
@@ -643,43 +677,39 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     // Evaluate SELECT query.
 
-                    if (outputFormat != null && outputFormat.equals(FORMAT_XML)) {
+                    if (outputFormat.equals(FORMAT_XML)) {
 
+                        response.setContentType("text/xml");
                         CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
-                    } else if (outputFormat != null && outputFormat.equals(FORMAT_XML_SCHEMA)) {
+                    } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
 
+                        response.setContentType("text/xml");
                         CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
-                    } else if (outputFormat != null && outputFormat.equals(FORMAT_JSON)) {
+                    } else if (outputFormat.equals(FORMAT_JSON)) {
 
+                        response.setContentType("application/json");
                         CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
-                    } else if (outputFormat != null && outputFormat.equals(FORMAT_HTML)) {
-
-                        long startTime = System.currentTimeMillis();
-                        queryResult = ((TupleQuery) queryObject).evaluate();
-                        executionTime = System.currentTimeMillis() - startTime;
-                        if (queryResult != null) {
-                            result = new QueryResult(queryResult, false);
-                        }
-
-                    } else if (outputFormat != null && outputFormat.equals(FORMAT_HTML_PLUS)) {
-
-                        long startTime = System.currentTimeMillis();
-                        queryResult = ((TupleQuery) queryObject).evaluate();
-                        executionTime = System.currentTimeMillis() - startTime;
-                        if (queryResult != null) {
-                            result = new QueryResult(queryResult, true);
-                        }
-
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
 
+                        response.setContentType("text/csv");
                         SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
+
+                    } else if (outputFormat.equals(FORMAT_HTML) || outputFormat.equals(FORMAT_HTML_PLUS)) {
+
+                        response.setContentType("text/html");
+                        long startTime = System.currentTimeMillis();
+                        queryResult = ((TupleQuery) queryObject).evaluate();
+                        executionTime = System.currentTimeMillis() - startTime;
+                        if (queryResult != null) {
+                            result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS));
+                        }
                     }
                 }
             } finally {
@@ -1209,7 +1239,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * @return
      */
-    private static Map<String, String> createMimeTypesToFormats() {
+    private static Map<String, String> createMimeTypesToInternalFormats() {
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("application/sparql-results+xml", FORMAT_XML);
@@ -1226,4 +1256,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         map.put("application/json", FORMAT_JSON);
         return Collections.unmodifiableMap(map);
     }
+
+    /**
+     * @return
+     */
+    private static HashSet<String> createSupportedMimeTypes() {
+
+        HashSet<String> set = new HashSet<String>();
+        set.addAll(createMimeTypesToInternalFormats().keySet());
+        set.add("text/html");
+        return set;
+    }
+
 }
