@@ -72,7 +72,7 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /** */
-    private static final SimpleDateFormat DEFAULT_EXPORT_NAME_DATE_FORMAT = new SimpleDateFormat("yyMMdd_mmss");
+    private static final SimpleDateFormat DEFAULT_EXPORT_NAME_DATE_FORMAT = new SimpleDateFormat("yyMMdd_HHmmss");
 
     /**  */
     private static final String COLUMN_PROPERTY_PARAM_SUFFIX = ".property";
