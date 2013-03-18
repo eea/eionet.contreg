@@ -192,7 +192,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults =
                     DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                    .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -272,16 +272,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             addGlobalValidationError("Title must not be blank!");
         } else if (title.length() > 255) {
             addGlobalValidationError("Title must be no longer than 255 characters!");
-        }
-
-        if (id <= 0 && title != null) {
-            if (DAOFactory.get().getDao(PostHarvestScriptDAO.class).exists(targetType, targetUrl, title)) {
-                String msg = "A script with this title already exists";
-                if (targetType != null) {
-                    msg = msg + " for this " + targetType.toString().toLowerCase();
-                }
-                addGlobalValidationError(msg + "!");
-            }
         }
 
         if (StringUtils.isBlank(script)) {

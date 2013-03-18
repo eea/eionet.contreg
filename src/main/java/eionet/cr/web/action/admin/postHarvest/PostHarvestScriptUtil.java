@@ -47,7 +47,7 @@ public final class PostHarvestScriptUtil {
      */
     public static List<String> getValidateScriptErrors(List<PostHarvestScriptDTO> scriptsInClipBoard,
             PostHarvestScriptDTO.TargetType targetTypeClipBoard, PostHarvestScriptDTO.TargetType targetType, String targetUrl)
-            throws DAOException {
+                    throws DAOException {
 
         List<String> errors = new ArrayList<String>();
 
@@ -63,17 +63,6 @@ public final class PostHarvestScriptUtil {
             HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
             if (dto == null) {
                 errors.add("No source by this URL was found: " + targetUrl);
-            }
-        }
-
-        for (PostHarvestScriptDTO script : scriptsInClipBoard) {
-            String title = script.getTitle();
-            if (DAOFactory.get().getDao(PostHarvestScriptDAO.class).exists(targetType, targetUrl, title)) {
-                String msg = "A script with title \"" + title + "\" already exists";
-                if (targetType != null) {
-                    msg = msg + " for this " + targetType.toString().toLowerCase();
-                }
-                errors.add(msg + "!");
             }
         }
 
@@ -145,7 +134,7 @@ public final class PostHarvestScriptUtil {
         return !((targetType == null && (targetTypeClipBoard != null && !targetTypeClipBoard
                 .equals(PostHarvestScriptDTO.TargetType.SOURCE)))
                 || (targetTypeClipBoard == null && (targetType != null && !targetType
-                        .equals(PostHarvestScriptDTO.TargetType.SOURCE))) || (targetTypeClipBoard != null && targetType != null && !targetType
+                .equals(PostHarvestScriptDTO.TargetType.SOURCE))) || (targetTypeClipBoard != null && targetType != null && !targetType
                 .equals(targetTypeClipBoard)));
     }
 }
