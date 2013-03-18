@@ -76,7 +76,7 @@ public class HarvestActionBean extends AbstractActionBean {
     private void loadMessages() throws DAOException {
 
         List<HarvestMessageDTO> messageDTOs =
-            DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
+                DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(harvestDTO.getHarvestId());
         if (messageDTOs != null) {
 
             fatals = new ArrayList<HarvestMessageDTO>();
@@ -153,5 +153,14 @@ public class HarvestActionBean extends AbstractActionBean {
      */
     public List<HarvestMessageDTO> getInfos() {
         return infos;
+    }
+
+    /**
+     * A getter for the class of {@link HarvestSourceActionBean}.
+     * This is used in JSP.
+     * @return The class.
+     */
+    public Class getHarvestSourceActionBeanClass() {
+        return HarvestSourceActionBean.class;
     }
 }

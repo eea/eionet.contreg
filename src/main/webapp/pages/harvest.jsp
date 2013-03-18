@@ -12,9 +12,9 @@
             <tr>
                 <td>Harvest source:</td>
                 <td>
-                    <stripes:link href="/source.action" event="preViewHarvestSource">
+                    <stripes:link beanclass="${actionBean.harvestSourceActionBeanClass.name}" event="view">
                         <c:out value="${actionBean.harvestSourceDTO.url}"/>
-                        <stripes:param name="harvestSource.sourceId" value="${actionBean.harvestSourceDTO.sourceId}"/>
+                        <stripes:param name="harvestSource.url" value="${actionBean.harvestSourceDTO.url}"/>
                     </stripes:link>
                 </td>
             </tr>
