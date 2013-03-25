@@ -236,6 +236,7 @@ public class PullHarvest extends BaseHarvest {
                     DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).listByEndpointUrl(endpointUrl, true);
             if (queries == null || queries.isEmpty()) {
                 LOGGER.warn(loggerMsg("Found no active harvest queries for this endpoint"));
+                finishWithOK(null, numberOfTriples);
                 return;
             }
 
