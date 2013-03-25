@@ -56,9 +56,13 @@
 
         <h1>Browse VoID datasets</h1>
 
-        <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post">
+        <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post" style="margin-top:20px">
 
-            <fieldset>
+            <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
+            <stripes:text name="titleFilter" size="60" id="txtTitle" onclick="this.value='';"/>&nbsp;
+            <stripes:submit name="filter" value="Filter"/>
+
+            <fieldset style="margin-top:10px">
                 <legend>Filters</legend>
                 <div style="float:left;width:49%">
                     <div style="width:100%;">

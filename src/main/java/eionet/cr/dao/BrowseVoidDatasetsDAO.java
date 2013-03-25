@@ -36,21 +36,22 @@ public interface BrowseVoidDatasetsDAO extends DAO {
      * Returns a list of VoID datasets matching the given creators (http://purl.org/dc/terms/creator) and subjects
      * (http://purl.org/dc/terms/subject).
      *
-     * @param creators
-     * @param subjects
-     * @return
-     * @throws DAOException
+     * @param creators The given creators.
+     * @param subjects The given subjects.
+     * @param titleSubstr Substring of dcterms:title to search by.
+     * @return Matching datasets.
+     * @throws DAOException If database error happens.
      */
-    List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects) throws DAOException;
+    List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects, String titleSubstr) throws DAOException;
 
     /**
      * Finds all distinct creators (http://purl.org/dc/terms/creator) of VoID datasets whose subjects
      * (http://purl.org/dc/terms/subject) are in the range of given subjects list. If the latter is null or empty, all distinct
      * creators of all VoID datasets are returned.
      *
-     * @param subjects
-     * @return
-     * @throws DAOException
+     * @param subjects The given subjects
+     * @return Matching creators.
+     * @throws DAOException If database error happens
      */
     List<String> findCreators(List<String> subjects) throws DAOException;
 
@@ -59,9 +60,9 @@ public interface BrowseVoidDatasetsDAO extends DAO {
      * (http://purl.org/dc/terms/creator) are in the range of given creators list. If the latter is null or empty, all distinct
      * subjects of all VoID datasets are returned.
      *
-     * @param creators
-     * @return
-     * @throws DAOException
+     * @param creators The given creators
+     * @return Matching subjects.
+     * @throws DAOException If database error happens
      */
     List<String> findSubjects(List<String> creators) throws DAOException;
 }

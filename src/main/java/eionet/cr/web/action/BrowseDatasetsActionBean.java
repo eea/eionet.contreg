@@ -80,6 +80,9 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
     /** A dummy hash-map that is easy to access in JSP in order to determine whether a subject has been selected. */
     private HashMap<String, String> selectedSubjects = new HashMap<String, String>();
 
+    /** The substring that dcterms:title should contain if specified by user. */
+    private String titleFilter;
+
     /**
      *
      * @return
@@ -92,7 +95,7 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
         LOGGER.trace("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
 
         BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
-        datasets = dao.findDatasets(creator, subject);
+        datasets = dao.findDatasets(creator, subject, titleFilter);
 
         LOGGER.trace(datasets.size() + " datasets found!");
         LOGGER.trace("Populating available creators and subjects");
@@ -259,5 +262,19 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
      */
     public HashMap<String, String> getSelectedSubjects() {
         return selectedSubjects;
+    }
+
+    /**
+     * @return the titleFilter
+     */
+    public String getTitleFilter() {
+        return titleFilter;
+    }
+
+    /**
+     * @param titleFilter the titleFilter to set
+     */
+    public void setTitleFilter(String titleFilter) {
+        this.titleFilter = titleFilter;
     }
 }

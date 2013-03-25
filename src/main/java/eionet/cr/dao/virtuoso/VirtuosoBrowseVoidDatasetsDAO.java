@@ -23,6 +23,8 @@ package eionet.cr.dao.virtuoso;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.VoidDatasetsReader;
@@ -39,10 +41,12 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findDatasets(java.util.List, java.util.List)
+     *
+     * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findDatasets(java.util.List, java.util.List, java.lang.String)
      */
     @Override
-    public List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects) throws DAOException {
+    public List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects, String titleSubstr)
+            throws DAOException {
 
         Bindings bindings = new Bindings();
 
@@ -58,7 +62,12 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects)\n");
         sb.append("  WHERE {\n");
         sb.append("   ?dataset a void:Dataset .\n");
-        sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+        if (StringUtils.isBlank(titleSubstr)) {
+            sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+        } else {
+            sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
+            bindings.setString("titleF", titleSubstr);
+        }
         sb.append("   ?dataset dcterms:creator ?ucreator .\n");
         sb.append("   ?ucreator rdfs:label ?creator .\n");
 
@@ -91,6 +100,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findCreators(java.util.List)
      */
     @Override
@@ -129,6 +139,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findSubjects(java.util.List)
      */
     @Override
