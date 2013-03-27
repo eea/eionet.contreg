@@ -230,7 +230,13 @@ public final class SesameUtil {
         if (bindings != null) {
             bindings.applyTo(query, conn.getValueFactory());
         }
+        long startTime = System.currentTimeMillis();
+
         query.evaluate();
+
+        if (LOGGER.isTraceEnabled()){
+            LOGGER.trace("SPARUL execution took " + Util.durationSince(startTime)+ "; sparul=" + sparul);
+        }
     }
 
     /**

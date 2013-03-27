@@ -50,6 +50,7 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
@@ -95,7 +96,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
     /** */
     private static final String SEARCH_REMOTE_ENDPOINTS_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE IS_SPARQL_ENDPOINT='Y' AND URL LIKE (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE IS_SPARQL_ENDPOINT='Y' AND URL LIKE (?) AND URL NOT IN "
+                    + "(SELECT URL FROM REMOVE_SOURCE_QUEUE)";
 
     /** */
     private static final String GET_PRIORITY_SOURCES_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE "
@@ -202,7 +204,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         return getSources(
                 StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
-                        searchString, pagingRequest, sortingRequest);
+                searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -215,9 +217,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public Pair<Integer, List<HarvestSourceDTO>> getRemoteEndpoints(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest) throws DAOException {
 
-        return getSources(
-                StringUtils.isBlank(searchString) ? GET_REMOTE_ENDPOINTS_SQL : SEARCH_REMOTE_ENDPOINTS_SQL,
-                        searchString, pagingRequest, sortingRequest);
+        return getSources(StringUtils.isBlank(searchString) ? GET_REMOTE_ENDPOINTS_SQL : SEARCH_REMOTE_ENDPOINTS_SQL,
+                searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -339,8 +340,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * exists then don't insert (like MySQL INSERT IGNORE)
      */
     private static final String ADD_SOURCE_SQL =
-            "insert soft HARVEST_SOURCE (URL,URL_HASH,EMAILS,TIME_CREATED,INTERVAL_MINUTES,PRIORITY_SOURCE,SOURCE_OWNER,MEDIA_TYPE,IS_SPARQL_ENDPOINT) "
-                    + "VALUES (?,?,?,NOW(),?,?,?,?,?)";
+            "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
+                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT) VALUES (?,?,?,NOW(),?,?,?,?,?)";
 
     /*
      * (non-Javadoc)
@@ -515,7 +516,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException,
-    DAOException {
+            DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -672,9 +673,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         StringBuffer buf =
                 new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+                        .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+                        .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+                        .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -774,7 +775,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String UPDATE_SOURCE_HARVEST_FINISHED_SQL =
             "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?,"
-                    + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? where URL_HASH=?";
+                    + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? "
+                    + "where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -1052,8 +1054,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int
-    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
+            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+                    throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1103,7 +1105,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-    IOException {
+            IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -1200,7 +1202,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-    RepositoryException, IOException {
+            RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -1446,13 +1448,19 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             LOGGER.error("Creating SQL connection failed : " + e.toString());
         }
 
-        // Prepare URI objects of the graph and backup copy.
+        // Prepare URI objects of the original graph, backup graph and temporary graph.
         URI graphResource = repoConn.getValueFactory().createURI(graphUri);
+
+        String tempGraphUri = buildTemporaryGraphUri(graphUri);
+        URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
+
         String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
         URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
 
         int triplesLoaded = 0;
+        boolean backupCreated = false;
         try {
+
             // Ensure there is no backup graph left from previous harvests.
             // Note that Virtuoso's Sesame driver clears graphs in auto-commit by force, even if you set auto-commit to false.
             try {
@@ -1462,16 +1470,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 throw new DAOException("Failed clearing potential leftover of previous backup graph" + backupGraphUri, e);
             }
 
-            // Rename "original" graph to its backup copy.
-            // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
-            try {
-                LOGGER.debug(BaseHarvest.loggerMsg("Renaming original graph to", backupGraphUri));
-                renameGraph(sqlConn, graphResource, backupGraphResource);
-            } catch (Exception e) {
-                throw new DAOException("Failed to rename original graph to " + backupGraphUri, e);
-            }
-
-            // Load triples into the "original" graph.
+            // Load the content into the temporary graph, but be sure to use the "original" graph URI
+            // as the base URI for resolving any relative identifiers in the content.
             try {
                 // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause "Too many open statements".
                 // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
@@ -1479,11 +1479,28 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 repoConn.setAutoCommit(false);
                 sqlConn.setAutoCommit(false);
-                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into", graphUri));
-                triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, graphUri);
+                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into", tempGraphUri));
+                triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+
                 repoConn.commit();
-                sqlConn.commit();
                 repoConn.setAutoCommit(true);
+                // Rename original graph to backup.
+                try {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Renaming original graph to backup ", backupGraphUri));
+                    renameGraph(sqlConn, graphResource, backupGraphResource);
+                    backupCreated = true;
+                } catch (Exception e) {
+                    throw new DAOException("Failed to rename original graph to backup " + backupGraphUri, e);
+                }
+                // Rename temporary graph to "original".
+                // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
+                try {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Renaming temporary graph to original ", graphUri));
+                    renameGraph(sqlConn, tempGraphResource, graphResource);
+                } catch (Exception e) {
+                    throw new DAOException("Failed to rename temporary graph back to original " + graphUri, e);
+                }
+                sqlConn.commit();
                 sqlConn.setAutoCommit(true);
             } catch (Exception e) {
 
@@ -1493,14 +1510,23 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 // Clean-up attempt
                 boolean cleanupSuccess = false;
+                if (backupCreated) {
+                    // restore original graph from backup
+                    try {
+                        // Drop original graph.
+                        SesameUtil.executeSPARUL("clear graph <" + graphUri + ">", null, repoConn);
+                        // Rename backup graph back to the original.
+                        renameGraph(sqlConn, backupGraphResource, graphResource);
+                    } catch (Exception ee) {
+                        LOGGER.warn(BaseHarvest.loggerMsg("Failed clean-up after failed content loading into", graphUri));
+                    }
+                }
                 try {
-                    // Drop original graph.
-                    SesameUtil.executeSPARUL("clear graph <" + graphUri + ">", null, repoConn);
-                    // Rename backup graph back to the original.
-                    renameGraph(sqlConn, backupGraphResource, graphResource);
+                    // Drop temporary graph.
+                    SesameUtil.executeSPARUL("clear graph <" + tempGraphUri + ">", null, repoConn);
                     cleanupSuccess = true;
                 } catch (Exception ee) {
-                    LOGGER.warn(BaseHarvest.loggerMsg("Failed clean-up after failed content loading into", graphUri));
+                    LOGGER.warn(BaseHarvest.loggerMsg("Failed clean-up after failed content loading into", tempGraphUri));
                 }
 
                 // Throw the reason why content loading failed.
@@ -1510,13 +1536,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 }
                 throw new DAOException(msg + "of " + graphUri, e);
             }
-
             // Content successfully loaded, clear the backup graph created two steps ago.
-            try {
-                LOGGER.debug(BaseHarvest.loggerMsg("Clearing backup graph", backupGraphUri));
-                SesameUtil.executeSPARUL("clear graph <" + backupGraphResource.stringValue() + ">", null, repoConn);
-            } catch (Exception e) {
-                throw new DAOException("Failed clearing backup graph" + backupGraphUri, e);
+            if (backupCreated) {
+                try {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Clearing backup graph", backupGraphUri));
+                    SesameUtil.executeSPARUL("clear graph <" + backupGraphResource.stringValue() + ">", null, repoConn);
+                } catch (Exception e) {
+                    throw new DAOException("Failed clearing backup graph" + backupGraphUri, e);
+                }
             }
         } finally {
             // Ensure connections will be closed regardless of success or exceptions.
@@ -1531,10 +1558,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Replace graph URI with new one.
      *
-     * @param sqlConn Connection.
-     * @param oldGraph Existing graph URI.
-     * @param newGraph The new URI of the graph.
-     * @throws SQLException Database error.
+     * @param sqlConn
+     *            Connection.
+     * @param oldGraph
+     *            Existing graph URI.
+     * @param newGraph
+     *            The new URI of the graph.
+     * @throws SQLException
+     *             Database error.
      */
     private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph) throws SQLException {
 
@@ -1542,10 +1573,27 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String sql = RENAME_GRAPH_SQL.replace("old", oldGraph.stringValue()).replace("new", newGraph.stringValue());
         Statement stmt = null;
         try {
+            long startTime = System.currentTimeMillis();
+
             stmt = sqlConn.createStatement();
             stmt.execute(sql);
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Renaming graph took " + Util.durationSince(startTime) + "; sql=" + sql);
+            }
         } finally {
             SQLUtil.close(stmt);
         }
+    }
+
+    /**
+     * Builds a temporary graph URI for the given "original" graph URI.
+     *
+     * @param originalGraphUri
+     *            The "original" graph URI.
+     * @return The temporary graph URI.
+     */
+    private String buildTemporaryGraphUri(String originalGraphUri) {
+        return originalGraphUri + "_tempharvest_" + System.currentTimeMillis();
     }
 }
