@@ -61,8 +61,7 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
         if (StringUtils.isEmpty(uri)) {
             addCautionMessage("No request criteria specified!");
         } else {
-            HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-            subject = helperDAO.getFactsheet(uri, null, null);
+            subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(uri);
 
             FactsheetTabMenuHelper helper = new FactsheetTabMenuHelper(uri, subject, factory.getDao(HarvestSourceDAO.class));
             tabs = helper.getTabs(FactsheetTabMenuHelper.TabTitle.BOOKMARKED_SPARQL);
@@ -71,6 +70,8 @@ public class SparqlBookmarkActionBean extends AbstractActionBean {
     }
 
     public String getSpqrqlQuery() {
+
+
         return subject.getObject(Predicates.CR_SPARQL_QUERY).getValue();
     }
 
