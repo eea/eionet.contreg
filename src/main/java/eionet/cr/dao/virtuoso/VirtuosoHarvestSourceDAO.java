@@ -1439,17 +1439,20 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         // Prepare connections (repository and SQL).
         RepositoryConnection repoConn = null;
         Connection sqlConn = null;
+        boolean noExceptions = false;
         try {
             repoConn = SesameUtil.getRepositoryConnection();
             sqlConn = SesameUtil.getSQLConnection();
+            noExceptions = true;
         } catch (RepositoryException e) {
             throw new DAOException("Creating repository connection failed", e);
         } catch (SQLException e) {
             throw new DAOException("Creating SQL connection failed", e);
-        }
-        finally{
-            SesameUtil.close(repoConn);
-            SQLUtil.close(sqlConn);
+        } finally {
+            if (!noExceptions) {
+                SesameUtil.close(repoConn);
+                SQLUtil.close(sqlConn);
+            }
         }
 
         // Prepare URI objects of the original graph, backup graph and temporary graph.
@@ -1562,14 +1565,10 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Replace graph URI with new one.
      *
-     * @param sqlConn
-     *            Connection.
-     * @param oldGraph
-     *            Existing graph URI.
-     * @param newGraph
-     *            The new URI of the graph.
-     * @throws SQLException
-     *             Database error.
+     * @param sqlConn Connection.
+     * @param oldGraph Existing graph URI.
+     * @param newGraph The new URI of the graph.
+     * @throws SQLException Database error.
      */
     private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph) throws SQLException {
 
@@ -1593,8 +1592,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Builds a temporary graph URI for the given "original" graph URI.
      *
-     * @param originalGraphUri
-     *            The "original" graph URI.
+     * @param originalGraphUri The "original" graph URI.
      * @return The temporary graph URI.
      */
     private String buildTemporaryGraphUri(String originalGraphUri) {
