@@ -65,8 +65,11 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
 
-    /**  */
+    /** Suffix used in backup graph Uris. */
     private static final String BACKUP_GRAPH_SUFFIX = "_backup";
+
+    /** Suffix used in temporary graph Uris. */
+    private static final String TEMP_GRAPH_SUFFIX = "_tempharvest";
     /** */
     private static final String GET_SOURCES_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
@@ -108,7 +111,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
     private static final String RENAME_GRAPH_SQL =
-            "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('%new_graph%') WHERE g = iri_to_id ('%old_graph%',0)";
+            "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('%new_graph%') "
+                    + "WHERE g = iri_to_id ('%old_graph%',0)";
 
     /** class logger. */
     private static final Logger LOGGER = Logger.getLogger(VirtuosoHarvestSourceDAO.class);
@@ -441,7 +445,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String DELETE_FROM_RULESET = "DB.DBA.rdfs_rule_set (?, ?, 1)";
 
-    /** delete post harvest scripts of the source */
+    /** delete post harvest scripts of the source. */
     private static final String DELETE_POST_HARVES_SCRIPTS = "DELETE FROM post_harvest_script WHERE target_source_url = ?";
 
     /**
@@ -1458,7 +1462,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         // Prepare URI objects of the original graph, backup graph and temporary graph.
         URI graphResource = repoConn.getValueFactory().createURI(graphUri);
 
-        String tempGraphUri = buildTemporaryGraphUri(graphUri);
+        String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
         URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
 
         String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
@@ -1468,14 +1472,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         boolean backupCreated = false;
         try {
 
-            // Ensure there is no backup graph left from previous harvests.
-            // Note that Virtuoso's Sesame driver clears graphs in auto-commit by force, even if you set auto-commit to false.
-            try {
-                LOGGER.debug(BaseHarvest.loggerMsg("Clearing potential leftover of previous backup graph", backupGraphUri));
-                SQLUtil.executeUpdate("sparql clear graph <" + backupGraphUri + ">", sqlConn);
-            } catch (Exception e) {
-                throw new DAOException("Failed clearing potential leftover of previous backup graph" + backupGraphUri, e);
-            }
+            // Clear potential leftover from previous harvest
+            clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
+            clearGraph(sqlConn, backupGraphUri, "Clearing potential leftover of previous BACKUP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
@@ -1485,68 +1484,54 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
 
                 repoConn.setAutoCommit(false);
-                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into", tempGraphUri));
+                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
                 triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
 
                 repoConn.commit();
                 repoConn.setAutoCommit(true);
-                // Rename original graph to backup.
-                try {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Renaming original graph to backup ", backupGraphUri));
-                    renameGraph(sqlConn, graphResource, backupGraphResource);
-                    backupCreated = true;
-                } catch (Exception e) {
-                    throw new DAOException("Failed to rename original graph to backup " + backupGraphUri, e);
-                }
-                // Rename temporary graph to "original".
+
                 // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
-                try {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Renaming temporary graph to original ", graphUri));
-                    renameGraph(sqlConn, tempGraphResource, graphResource);
-                } catch (Exception e) {
-                    throw new DAOException("Failed to rename temporary graph back to original " + graphUri, e);
-                }
+                renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
+                backupCreated = true;
+
+                renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+
             } catch (Exception e) {
 
                 // The repository connection rollback is ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
                 SesameUtil.rollback(repoConn);
 
-                // Clean-up attempt
-                boolean cleanupSuccess = false;
+                // Restore attempt
+                boolean restoredFromBackupSuccess = false;
                 if (backupCreated) {
-                    // restore original graph from backup
                     try {
-                        // Drop original graph.
-                        SQLUtil.executeUpdate("sparql clear graph <" + graphUri + ">", sqlConn);
-                        // Rename backup graph back to the original.
-                        renameGraph(sqlConn, backupGraphResource, graphResource);
+                        clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", false);
+                        renameGraph(sqlConn, backupGraphResource, graphResource, "Renaming BACKUP graph back to ORIGINAL");
+                        restoredFromBackupSuccess = true;
                     } catch (Exception ee) {
-                        LOGGER.warn(BaseHarvest.loggerMsg("Failed clean-up after failed content loading into", graphUri));
+                        LOGGER.warn(BaseHarvest
+                                .loggerMsg("Failed restoring ORIGINAL graph after failed content loading", graphUri));
                     }
                 }
-                try {
-                    // Drop temporary graph.
-                    SQLUtil.executeUpdate("sparql clear graph <" + tempGraphUri + ">", sqlConn);
-                    cleanupSuccess = true;
-                } catch (Exception ee) {
-                    LOGGER.warn(BaseHarvest.loggerMsg("Failed clean-up after failed content loading into", tempGraphUri));
-                }
+
+                // Clean-up attempt
+                boolean cleanupSuccess = false;
+                cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
 
                 // Throw the reason why content loading failed.
                 String msg = "Failed content loading ";
+                if (backupCreated && !restoredFromBackupSuccess) {
+                    msg = msg + "(and the subsequent restore from backup) ";
+                }
                 if (!cleanupSuccess) {
-                    msg = msg + "(and the subsequent cleanup) ";
+                    msg = msg + "(and the subsequent cleanup of temporary graph) ";
                 }
                 throw new DAOException(msg + "of " + graphUri, e);
             }
-            // Content successfully loaded, clear the backup graph created two steps ago.
+            // Content successfully loaded, clear the backup and temp graphs created two steps ago.
+            clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
             if (backupCreated) {
-                try {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Clearing backup graph", backupGraphUri));
-                    SQLUtil.executeUpdate("sparql clear graph <" + backupGraphUri + ">", sqlConn);
-                } catch (Exception e) {
-                    throw new DAOException("Failed clearing backup graph" + backupGraphUri, e);
-                }
+                clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
             }
         } finally {
             // Ensure connections will be closed regardless of success or exceptions.
@@ -1561,44 +1546,67 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Replace graph URI with new one.
      *
-     * @param sqlConn
-     *            Connection.
-     * @param oldGraph
-     *            Existing graph URI.
-     * @param newGraph
-     *            The new URI of the graph.
-     * @throws SQLException
-     *             Database error.
+     * @param sqlConn Connection.
+     * @param oldGraph Existing graph URI.
+     * @param newGraph The new URI of the graph.
+     * @param message Log message written into log file.
+     * @throws DAOException Database error.
      */
-    private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph) throws SQLException {
+    private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph, String message) throws DAOException {
 
-        // We're not using prepared statement here, because its imply does not with graph rename query for some reason.
-        String sql =
-                RENAME_GRAPH_SQL.replace("%old_graph%", oldGraph.stringValue())
-                        .replaceFirst("%new_graph%", newGraph.stringValue());
-        Statement stmt = null;
+        String logMessage = BaseHarvest.loggerMsg(message, newGraph.stringValue());
         try {
-            long startTime = System.currentTimeMillis();
+            LOGGER.debug(logMessage);
 
-            stmt = sqlConn.createStatement();
-            stmt.execute(sql);
+            // We're not using prepared statement here, because its imply does not with graph rename query for some reason.
+            String sql =
+                    RENAME_GRAPH_SQL.replace("%old_graph%", oldGraph.stringValue()).replaceFirst("%new_graph%",
+                            newGraph.stringValue());
+            Statement stmt = null;
+            try {
+                long startTime = System.currentTimeMillis();
 
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Renaming graph took " + Util.durationSince(startTime) + "; sql=" + sql);
+                stmt = sqlConn.createStatement();
+                stmt.execute(sql);
+
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Renaming graph took " + Util.durationSince(startTime) + "; sql=" + sql);
+                }
+            } finally {
+                SQLUtil.close(stmt);
             }
-        } finally {
-            SQLUtil.close(stmt);
+        } catch (Exception e) {
+            throw new DAOException("Failed to rename graph. " + logMessage, e);
         }
     }
 
     /**
-     * Builds a temporary graph URI for the given "original" graph URI.
+     * Deletes the given graph from repository by executing SPARQL "clear graph" statement.
      *
-     * @param originalGraphUri
-     *            The "original" graph URI.
-     * @return The temporary graph URI.
+     * @param sqlConn SQL Connection to be used when deleting the graph.
+     * @param graphUri Graph Uri to be deleted.
+     * @param message Log message written into log file.
+     * @param failSafely if true, then the Exception will not be thrown and it is only logged on warning level.
+     * @return true if the graph was successfully deleted from repository.
+     * @throws DAOException if clear graph failed and the method don't have to fail safely.
      */
-    private String buildTemporaryGraphUri(String originalGraphUri) {
-        return originalGraphUri + "_tempharvest_" + System.currentTimeMillis();
+    private boolean clearGraph(Connection sqlConn, String graphUri, String message, boolean failSafely) throws DAOException {
+
+        boolean graphCleared = false;
+        String logMessage = BaseHarvest.loggerMsg(message, graphUri);
+
+        try {
+            LOGGER.debug(logMessage);
+            SQLUtil.executeUpdate("sparql clear graph <" + graphUri + ">", sqlConn);
+            graphCleared = true;
+        } catch (Exception e) {
+            if (failSafely) {
+                LOGGER.warn("Failed to clear graph. " + logMessage);
+            } else {
+                throw new DAOException("Failed to clear graph. " + logMessage, e);
+            }
+        }
+
+        return graphCleared;
     }
 }
