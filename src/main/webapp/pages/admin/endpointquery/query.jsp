@@ -46,7 +46,7 @@
                             <label for="txtTitle" class="question required">Title:</label>
                         </td>
                         <td>
-                            <stripes:text id="txtTitle" name="query.title"/>
+                            <stripes:text id="txtTitle" size="70" name="query.title"/>
                         </td>
                     </tr>
                     <tr>
@@ -56,7 +56,7 @@
                         <td>
                             <div class="expandingArea">
                                 <pre><span></span><br /></pre>
-                                <stripes:textarea id="txtQuery" name="query.query" cols="80" rows="5"/>
+                                <stripes:textarea id="txtQuery" name="query.query" cols="80" rows="8" style="clear:right; display: block; width: 100%"/>
                             </div>
                             <script type="text/javascript">
                                 // <![CDATA[
