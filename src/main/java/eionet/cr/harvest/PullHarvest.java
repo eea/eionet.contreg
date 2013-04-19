@@ -138,13 +138,10 @@ public class PullHarvest extends BaseHarvest {
         super(contextSourceDTO);
     }
 
-
-
     /**
      * Harvests file already uploaded to a CR folder and residing in the filestore.
      *
-     * @throws HarvestException
-     *             if harvest fails
+     * @throws HarvestException if harvest fails
      */
     private void doLocalFileHarvest() throws HarvestException {
         String initialContextUrl = getContextUrl();
@@ -338,8 +335,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Harvests external source.
      *
-     * @throws HarvestException
-     *             if harvest fails
+     * @throws HarvestException if harvest fails
      */
     private void doUrlHarvest() throws HarvestException {
 
@@ -399,16 +395,20 @@ public class PullHarvest extends BaseHarvest {
                     // are not essentially the same
                     if (URLUtil.equalUrls(getContextUrl(), redirectedToUrl) == false) {
 
-                        finishRedirectedHarvest(redirectedToUrl, httpResponseCode);
-
+                        boolean startWithNew = finishRedirectedHarvest(redirectedToUrl, httpResponseCode);
                         LOGGER.debug(loggerMsg("Redirection details saved"));
-                        startWithNewContext(redirectedToUrl);
+
+                        if (startWithNew) {
+                            startWithNewContext(redirectedToUrl);
+                        } else {
+                            return;
+                        }
                     } else {
                         LOGGER.debug(loggerMsg("Ignoring this redirection, as it is essentially to the same URL"));
                     }
 
                     connectUrl = redirectedToUrl;
-                    //Close redirected URL connection
+                    // Close redirected URL connection
                     URLUtil.disconnect(urlConn);
                 }
             } while (isRedirect(httpResponseCode));
@@ -539,7 +539,7 @@ public class PullHarvest extends BaseHarvest {
         if (isPermanentError(responseCode)) {
 
             setCleanAllPreviousSourceMetadata(true);
-            if (!getContextSourceDTO().isPrioritySource()){
+            if (!getContextSourceDTO().isPrioritySource()) {
                 try {
                     getHarvestSourceDAO().clearGraph(getContextUrl());
                     noOfStatements = 0;
@@ -584,12 +584,9 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Marks redirected sources with error markers.
      *
-     * @param lastHarvest
-     *            last harvest time
-     * @param responseCode
-     *            http response code
-     * @param sourceNotAvailable
-     *            shows if source was available
+     * @param lastHarvest last harvest time
+     * @param responseCode http response code
+     * @param sourceNotAvailable shows if source was available
      */
     private void handleRedirectedHarvestDTOs(Date lastHarvest, int responseCode, boolean sourceNotAvailable) {
         for (HarvestSourceDTO harvestSourceDTO : redirectedHarvestSources) {
@@ -600,8 +597,7 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Stores error in HarvestSource DTO.
      *
-     * @param harvestSourceDTO
-     *            / source DTO object
+     * @param harvestSourceDTO / source DTO object
      */
     private void setErrorsToRedirectedHarvestDTO(HarvestSourceDTO harvestSourceDTO, Date lastHarvest, int responseCode,
             boolean sourceNotAvailable) {
@@ -643,7 +639,7 @@ public class PullHarvest extends BaseHarvest {
 
         // Just make it 100% sure that the calculated time will not be after now, though the business logic should exclude it.
         Date resultingTime = cal.getTime();
-        if (resultingTime.after(now)){
+        if (resultingTime.after(now)) {
             resultingTime = now;
         }
 
@@ -716,17 +712,14 @@ public class PullHarvest extends BaseHarvest {
      * Download and process content. If response content type is one of RDF, then proceed straight to loading. Otherwise process the
      * file to see if it's zipped, it's an XML with RDF conversion, or actually an RDF file.
      *
-     * @param urlConn
-     *            - connection to the remote source.
+     * @param urlConn - connection to the remote source.
      * @return number of triples harvested.
      *
      * @throws IOException
      * @throws DAOException
      * @throws SAXException
-     * @throws RDFParseException
-     *             if RDF parsing fails while analyzing file with unknown format
-     * @throws RDFHandlerException
-     *             if RDF parsing fails while analyzing file with unknown format
+     * @throws RDFParseException if RDF parsing fails while analyzing file with unknown format
+     * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
     RDFHandlerException, RDFParseException {
@@ -772,12 +765,12 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      *
-     * @param redirectedToUrl
-     * @param responseCode
-     *            HTTP Code from the redirected URL
-     * @throws DAOException
+     * @param redirectedToUrl The URL which the currently harvested context URL is redirecting to.
+     * @param responseCode HTTP Code from the redirected URL
+     * @return true if the redirected-to-URL should also be harvested, false otherwise.
+     * @throws DAOException if database eror happens
      */
-    private void finishRedirectedHarvest(String redirectedToUrl, int responseCode) throws DAOException {
+    private boolean finishRedirectedHarvest(String redirectedToUrl, int responseCode) throws DAOException {
 
         Date redirectionSeen = new Date();
 
@@ -802,10 +795,12 @@ public class PullHarvest extends BaseHarvest {
         SubjectDTO subjectDTO = createRedirectionMetadata(getContextSourceDTO(), redirectionSeen, redirectedToUrl);
         getHelperDAO().addTriples(subjectDTO);
 
+        boolean result = false;
         // if redirected-to source not existing, create it by copying the context source
         HarvestSourceDTO redirectedToSourceDTO = getHarvestSource(redirectedToUrl);
         if (redirectedToSourceDTO == null) {
 
+            result = true;
             LOGGER.debug(loggerMsg("Creating harvest source for " + redirectedToUrl));
 
             // clone the redirected-to source from the context source
@@ -824,6 +819,8 @@ public class PullHarvest extends BaseHarvest {
         // delete old harvests history
         LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
         getHarvestDAO().deleteOldHarvests(getHarvestId(), NO_OF_LAST_HARVESTS_PRESERVED);
+
+        return result;
     }
 
     /**
@@ -856,16 +853,13 @@ public class PullHarvest extends BaseHarvest {
         return subjectDTO;
     }
 
-
     /**
      * Download file from remote source to a temporary file locally. Side effect: adds the file size to the metadata to save in the
      * harvester context.
      *
-     * @param urlConn
-     *            - connection to the remote source.
+     * @param urlConn - connection to the remote source.
      * @return object representing the temporary file.
-     * @throws IOException
-     *             if the file is not downloadable.
+     * @throws IOException if the file is not downloadable.
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
@@ -921,8 +915,11 @@ public class PullHarvest extends BaseHarvest {
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
 
-        // Use "If-Modified-Since" header, if this is not an on-demand harvest
-        if (!isOnDemandHarvest) {
+        // The purpose of the following if-block is to use "If-Modified-Since" header, if all conditions are met.
+        // The first condition is that this is a batch harvest (i.e. not an on-demand harvest) and the last harvest did not fail
+        // (because if it failed then we want to re-harvest regardless of whether the source has been modified in the meantime).
+
+        if (isOnDemandHarvest == false && getContextSourceDTO().isLastHarvestFailed() == false) {
 
             // "If-Modified-Since" will be compared to this URL's last harvest
             Date lastHarvestDate = getContextSourceDTO().getLastHarvest();
@@ -1039,7 +1036,6 @@ public class PullHarvest extends BaseHarvest {
 
         return RDFMediaTypes.toRdfFormat(contentType);
     }
-
 
     /**
      *
