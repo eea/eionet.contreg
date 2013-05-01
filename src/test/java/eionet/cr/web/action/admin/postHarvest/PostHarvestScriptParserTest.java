@@ -21,13 +21,16 @@
 
 package eionet.cr.web.action.admin.postHarvest;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.junit.Ignore;
+
 
 /**
  *
  * @author Jaanus Heinlaid
  */
-public class PostHarvestScriptParserTest extends TestCase {
+public class PostHarvestScriptParserTest {
 
     /** */
     private int limit = PostHarvestScriptParser.TEST_RESULTS_LIMIT;
@@ -37,6 +40,7 @@ public class PostHarvestScriptParserTest extends TestCase {
      *
      * @throws ScriptParseException
      */
+    @Test
     public void testDeriveConstructFromModify() throws ScriptParseException {
 
         // test MODIFY with one FROM
@@ -71,9 +75,76 @@ public class PostHarvestScriptParserTest extends TestCase {
     }
 
     /**
+     * Derive a CONSTRUCT statement from a MODIFY with a FROM and a SUB-SELECT.
+     */
+    @Ignore("This combination is not yet supported")
+    @Test
+    public void testConstructFromSubselect() throws ScriptParseException {
+        String input = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + "MODIFY GRAPH ?harvestedSource "
+            + "DELETE { ?record skos:exactMatch ?url } "
+            + "INSERT { ?record skos:narrowMatch ?url } "
+            + "WHERE { "
+            + "{ SELECT ?record count(?eunisurl) AS ?c "
+            + "FROM <http://dbpedia.org/sparql> "
+            + "WHERE { ?record skos:exactMatch ?eunisurl FILTER(REGEX(?eunisurl,'http://eunis.eea.europa.eu/species/')) } "
+            + "GROUP BY ?record ORDER BY DESC(?c) LIMIT 200 "
+            + "} "
+            + "FILTER(?c > 1) "
+            + "?record skos:exactMatch ?url FILTER(REGEX(?url,'http://eunis.eea.europa.eu/species/')) "
+            + "} "
+            + "} ";
+
+        String exptd = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + "CONSTRUCT { ?record skos:narrowMatch ?url } "
+            + "WHERE { "
+            + "{ SELECT ?record count(?eunisurl) AS ?c "
+            + "FROM <http://dbpedia.org/sparql> "
+            + "WHERE { ?record skos:exactMatch ?eunisurl FILTER(REGEX(?eunisurl,'http://eunis.eea.europa.eu/species/')) } "
+            + "GROUP BY ?record ORDER BY DESC(?c) LIMIT 200 "
+            + "} "
+            + "FILTER(?c > 1) "
+            + "?record skos:exactMatch ?url FILTER(REGEX(?url,'http://eunis.eea.europa.eu/species/')) "
+            + "} "
+            + "} LIMIT " + limit;
+        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, "http://", null));
+    }
+
+    /**
+     * Derive a CONSTRUCT statement from a MODIFY with a GRAPH and a SUB-SELECT.
+     */
+    @Test
+    public void testConstructFromSubselectGraph() throws ScriptParseException {
+        String input = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + "MODIFY GRAPH ?harvestedSource "
+            + "DELETE { ?record skos:exactMatch ?url } "
+            + "INSERT { ?record skos:narrowMatch ?url } "
+            + "WHERE { "
+            + "{ SELECT ?record count(?eunisurl) AS ?c "
+            + "WHERE { GRAPH ?harvestedSource {?record skos:exactMatch ?eunisurl FILTER(REGEX(?eunisurl,'http://eunis.eea.europa.eu/species/')) }}"
+            + "GROUP BY ?record ORDER BY DESC(?c) LIMIT 200 "
+            + "} "
+            + "FILTER(?c > 1) "
+            + "?record skos:exactMatch ?url FILTER(REGEX(?url,'http://eunis.eea.europa.eu/species/')) "
+            + "} ";
+
+        String exptd = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
+            + "CONSTRUCT { ?record skos:narrowMatch ?url } "
+            + "WHERE { "
+            + "{ SELECT ?record count(?eunisurl) AS ?c "
+            + "WHERE { GRAPH <http://> {?record skos:exactMatch ?eunisurl FILTER(REGEX(?eunisurl,'http://eunis.eea.europa.eu/species/')) }}"
+            + "GROUP BY ?record ORDER BY DESC(?c) LIMIT 200 "
+            + "} "
+            + "FILTER(?c > 1) "
+            + "?record skos:exactMatch ?url FILTER(REGEX(?url,'http://eunis.eea.europa.eu/species/')) "
+            + "} LIMIT " + limit;
+        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, "http://", null));
+    }
+    /**
      *
      * @throws ScriptParseException
      */
+    @Test
     public void testDeriveConstructFromInsert() throws ScriptParseException {
 
         // test INSERT with one FROM
@@ -111,6 +182,7 @@ public class PostHarvestScriptParserTest extends TestCase {
      *
      * @throws ScriptParseException
      */
+    @Test
     public void testDeriveConstructFromDelete() throws ScriptParseException {
 
         // test DELETE with one selection dataset
