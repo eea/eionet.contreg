@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -261,20 +260,10 @@ public class XmlAnalysis {
             for (int i = 0; i < attrCount; i++) {
 
                 String attrName = attrs.getLocalName(i);
-                if (attrName.equalsIgnoreCase("noNamespaceSchemaLocation"))
-                    this.schemaLocation = attrs.getValue(i);
-                else if (attrName.equalsIgnoreCase("schemaLocation")) {
-
-                    String attrValue = attrs.getValue(i);
-                    if (attrValue != null && attrValue.length() > 0) {
-
-                        StringTokenizer tokens = new StringTokenizer(attrValue);
-                        if (tokens.countTokens() >= 2) {
-                            this.schemaNamespace = tokens.nextToken();
-                            this.schemaLocation = tokens.nextToken();
-                        } else
-                            this.schemaLocation = attrValue;
-                    }
+                if (attrName.equalsIgnoreCase("noNamespaceSchemaLocation")) {
+                    this.schemaLocation = parseNoNamespaceSchemaLocation(attrs.getValue(i));
+                } else if (attrName.equalsIgnoreCase("schemaLocation")) {
+                    this.schemaLocation = parseSchemaLocation(attrs.getValue(i));
                 }
 
                 String attrQName = attrs.getLocalName(i);
@@ -339,17 +328,39 @@ public class XmlAnalysis {
         public String getSchemaNamespace() {
             return schemaNamespace;
         }
-    }
 
-//    public static void main(String[] args) {
-//
-//        XmlAnalysis info = new XmlAnalysis();
-//        try {
-//            info.parse(new File("D:/temp/kala.xml"));
-//            System.out.println(info.getStartElemLocalName());
-//            System.out.println(info.getStartElemNamespace());
-//        } catch (Throwable t) {
-//            t.printStackTrace();
-//        }
-//    }
+        /**
+         * @param noNamespaceSchemaLocation
+         * @return
+         */
+        private String parseNoNamespaceSchemaLocation(String noNamespaceSchemaLocation) {
+
+            if (StringUtils.isBlank(noNamespaceSchemaLocation)) {
+                return noNamespaceSchemaLocation;
+            }
+
+            String[] split = StringUtils.split(noNamespaceSchemaLocation);
+            return StringUtils.join(split, ' ');
+        }
+
+        /**
+         * @param schemaLocation
+         * @return
+         */
+        private String parseSchemaLocation(String schemaLocation) {
+
+            if (StringUtils.isBlank(schemaLocation)) {
+                return schemaLocation;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            String[] split = StringUtils.split(schemaLocation);
+            for (int i = 0; i < split.length; i++) {
+                if (i % 2 != 0) {
+                    sb.append(" ").append(split[i]);
+                }
+            }
+            return sb.toString().trim();
+        }
+    }
 }
