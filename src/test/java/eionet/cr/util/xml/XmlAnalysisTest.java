@@ -21,40 +21,61 @@
 package eionet.cr.util.xml;
 
 import java.io.File;
+import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertNull;
+import org.junit.Test;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-public class XmlAnalysisTest extends TestCase {
+public class XmlAnalysisTest {
 
     /**
-     *
+     * Parsing from a file with xsi:noNamespaceSchemaLocation.
      */
-    public void testXmlAnalysis() {
+    @Test
+    public void simpleXmlAnalysis() throws Exception {
 
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
-        try {
-            xmlAnalysis.parse(new File(getClass().getClassLoader().getResource("test-xml.xml").getFile()));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            fail("Was not expecting this exception: " + t.toString());
-        }
+        xmlAnalysis.parse(new File(getClass().getClassLoader().getResource("test-xml.xml").getFile()));
 
-        assertNotNull(xmlAnalysis.getSchemaLocation() != null);
-        assertEquals(xmlAnalysis.getSchemaLocation(), "http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd");
+        assertEquals("http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd", xmlAnalysis.getSchemaLocation());
 
         assertTrue(xmlAnalysis.getSchemaNamespace() == null || xmlAnalysis.getSchemaNamespace().length() == 0);
 
-        assertNotNull(xmlAnalysis.getStartElemLocalName());
-        assertEquals(xmlAnalysis.getStartElemLocalName(), "habitat");
+        assertEquals("habitat", xmlAnalysis.getStartElemLocalName());
 
         assertTrue(xmlAnalysis.getStartElemNamespace() == null || xmlAnalysis.getStartElemNamespace().length() == 0);
 
         assertNull(xmlAnalysis.getSystemDtd());
         assertNull(xmlAnalysis.getPublicDtd());
+    }
+ 
+    /**
+     * Parsing from an inputstream. The xsi:schemaLocation has extra whitespace.
+     */
+    @Test
+    public void nsXmlAnalysis() throws Exception {
+        String inlineXml = "<gml:FeatureCollection "
+            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+            + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" "
+            + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
+            + "xmlns:swe=\"http://www.opengis.net/swe/2.0\" "
+            + "xsi:schemaLocation=\"http://aqd.ec.europa.eu/aqd/0.3.6b "
+            + "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd \n\n"
+            + "http://www.opengis.net/swe/2.0  http://schemas.opengis.net/sweCommon/2.0/swe.xsd\">\n"
+            + "</gml:FeatureCollection>\n";
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
+        XmlAnalysis xmlAnalysis = new XmlAnalysis();
+        xmlAnalysis.parse(inputStream);
+        String expected = "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd "
+                        + "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
+        assertEquals(expected, xmlAnalysis.getSchemaLocation());
     }
 }
