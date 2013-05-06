@@ -160,3 +160,16 @@ create table CR.cr3user.acl_rows (
     "status" integer NOT NULL default '0',
     PRIMARY KEY  ("acl_id","type","entry_type","principal","status")
 );
+
+create table "CR"."cr3user"."endpoint_harvest_query"
+(
+  "endpoint_harvest_query_id" INTEGER IDENTITY,
+  "title" VARCHAR(255),
+  "query" LONG VARCHAR,
+  "endpoint_url" VARCHAR(1024),
+  "endpoint_url_hash" BIGINT,
+  "position_number" INTEGER,
+  "active" VARCHAR(1),
+  "last_modified" DATETIME,
+  PRIMARY KEY ("endpoint_harvest_query_id")
+);
