@@ -287,8 +287,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * common method for user and project bookmark.
      *
-     * @param bookmarksUri full url for the parent bookmark folder
-     * @throws DAOException if db operation fails
+     * @param bookmarksUri
+     *            full url for the parent bookmark folder
+     * @throws DAOException
+     *             if db operation fails
      */
     private void storeBookmark(String bookmarksUri) throws DAOException {
         String bookmarkUri = buildBookmarkUri(bookmarksUri, bookmarkName);
@@ -338,7 +340,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Stores project bookmark.
      *
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     private void storeProjectBookmark() throws DAOException {
         String bookmarksUri = FolderUtil.getProjectFolder(getBookmarkFolder()) + "/bookmarks";
@@ -522,7 +525,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Checks if user has insert right to the project ACL.
      *
-     * @param project name
+     * @param project
+     *            name
      * @return true, if user can add resources to the project.
      */
     public boolean hasProjectPrivilege(String projectName) {
@@ -536,7 +540,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Execute the {@link #query} and streams the result into the servlet's output stream, using the given MIME type.
      *
-     * @param mimeType The given MIME type.
+     * @param mimeType
+     *            The given MIME type.
      * @return The {@link StreamingResolution}.
      */
     private Resolution executeStreamingQuery(String mimeType) {
@@ -582,9 +587,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      *
      * TODO: the execution of the query and communication with Sesame should really not be in controller.
      *
-     * @param outputFormat Output format to generate.
-     * @param outputStream Output stream to use, may be null, in which the bean simply sets the {@link #result}.
-     * @param response Servlet response.
+     * @param outputFormat
+     *            Output format to generate.
+     * @param outputStream
+     *            Output stream to use, may be null, in which the bean simply sets the {@link #result}.
+     * @param response
+     *            Servlet response.
      */
     private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response) {
 
@@ -731,7 +739,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Exports CONSTRUCT query results into user's home space.
      *
-     * @param dataset The user's home space identifier.
+     * @param dataset
+     *            The user's home space identifier.
      *
      * @return Number of triples exported.
      */
@@ -743,7 +752,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -755,21 +764,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -843,7 +852,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Deletes SPARQL bookmarked query from triplestore.
      *
-     * @param deleteSharedBookmark true, if shared bookmark will be deleted, otherwise personal bookmark
+     * @param deleteSharedBookmark
+     *            true, if shared bookmark will be deleted, otherwise personal bookmark
      * @return
      * @throws DAOException
      */
@@ -894,7 +904,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param query the query to set
+     * @param query
+     *            the query to set
      */
     public void setQuery(String query) {
         this.query = query;
@@ -990,21 +1001,24 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param fillfrom the fillfrom to set
+     * @param fillfrom
+     *            the fillfrom to set
      */
     public void setFillfrom(String fillfrom) {
         this.fillfrom = fillfrom;
     }
 
     /**
-     * @param queryfrom the queryfrom to set
+     * @param queryfrom
+     *            the queryfrom to set
      */
     public void setQueryfrom(String queryfrom) {
         this.queryfrom = queryfrom;
     }
 
     /**
-     * @param bookmarkName the bookmarkName to set
+     * @param bookmarkName
+     *            the bookmarkName to set
      */
     public void setBookmarkName(String bookmarkName) {
         this.bookmarkName = bookmarkName;
@@ -1044,16 +1058,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * Returns project bookmarked queries.
      *
      * @return project bookmarked queries for the user.
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public List<Map<String, String>> getProjectBookmarkedQueries() throws DAOException {
 
-        if (getUser() != null) {
-            projectBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getProjectSparqlBookmarks(getUser());
-            return projectBookmarkedQueries;
-        }
-
-        return null;
+        projectBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getProjectSparqlBookmarks(getUser());
+        return projectBookmarkedQueries;
 
     }
 
@@ -1070,7 +1081,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param deleteQueries the deleteQueries to set
+     * @param deleteQueries
+     *            the deleteQueries to set
      */
     public void setDeleteQueries(List<String> deleteQueries) {
         this.deleteQueries = deleteQueries;
@@ -1159,7 +1171,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedBookmarkName the selectedBookmarkName to set
+     * @param selectedBookmarkName
+     *            the selectedBookmarkName to set
      */
     public void setSelectedBookmarkName(String selectedBookmarkName) {
         this.selectedBookmarkName = selectedBookmarkName;
@@ -1169,7 +1182,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * Handles the given exception that was thrown while trying to execute the {@link #query}. Sets a proper values to
      * {@link #errorCode} and {@link #errorMessage}.
      *
-     * @param exception The given exception.
+     * @param exception
+     *            The given exception.
      */
     private void handleQueryExecutionException(Exception exception) {
 

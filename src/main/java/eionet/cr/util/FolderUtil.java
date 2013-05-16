@@ -48,8 +48,10 @@ public final class FolderUtil {
     /**
      * Extract ACL path for special folders: projects and home. Until DDC not done, main project/home folder ACL is used
      *
-     * @param uri uri of the folder
-     * @param specialFolderName - special folder prefix in the name
+     * @param uri
+     *            uri of the folder
+     * @param specialFolderName
+     *            - special folder prefix in the name
      * @return String acl path of th given folder
      */
     public static String extractSpecialAclPath(String uri, String specialFolderName) {
@@ -82,7 +84,8 @@ public final class FolderUtil {
     /**
      * Detects if the given URI starts with a CR user home.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See description above..
      */
     public static boolean startsWithUserHome(String uri) {
@@ -105,7 +108,8 @@ public final class FolderUtil {
      * Returns true if {@link URIUtil#startsWithUserHome(String)} true and it is a reserved URI. For resreved URIs, see
      * {@link CRUser#getReservedFolderAndFileUris(String)}. Otherwise returns false.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See method description.
      */
     public static boolean isUserReservedUri(String uri) {
@@ -118,7 +122,8 @@ public final class FolderUtil {
      * Extracts user name from the given URI. A user name is returned only if the given URI returns true for
      * {@link URIUtil#startsWithUserHome(String)}. Otherwise null is returned.
      *
-     * @param uri The given URI.
+     * @param uri
+     *            The given URI.
      * @return See method description.
      */
     public static String extractUserName(String uri) {
@@ -128,7 +133,7 @@ public final class FolderUtil {
         }
 
         String str =
-            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/");
         return StringUtils.substringBefore(str, "/");
     }
 
@@ -151,8 +156,8 @@ public final class FolderUtil {
         String userName = extractUserName(uri);
 
         String result =
-            StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
-                    + userName + "/");
+                StringUtils.substringAfter(uri, GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL) + "/home/"
+                        + userName + "/");
         return result;
     }
 
@@ -161,7 +166,8 @@ public final class FolderUtil {
      * result is "newFolder/newFile.txt".
      *
      * @param uri
-     * @param mainFolder special main folder name
+     * @param mainFolder
+     *            special main folder name
      * @return String
      */
     public static String extractPathInSpecialFolder(String uri, String mainFolder) {
@@ -176,7 +182,9 @@ public final class FolderUtil {
 
     /**
      * Extracts path in the uri.
-     * @param uri Full uri
+     *
+     * @param uri
+     *            Full uri
      * @return Path after the special folder path (project, user etc)
      */
     public static String extractPathInFolder(String uri) {
@@ -198,9 +206,11 @@ public final class FolderUtil {
     /**
      * Return all folders where user can store data.
      *
-     * @param user current user
+     * @param user
+     *            current user
      * @return List of folder names
-     * @throws DAOException if query does not succees
+     * @throws DAOException
+     *             if query does not succees
      */
     public static List<String> getUserAccessibleFolders(CRUser user) throws DAOException {
 
@@ -211,7 +221,7 @@ public final class FolderUtil {
             // Get project folders where user can insert content
             if (CRUser.hasPermission(user.getUserName(), "/project", "i")) {
                 List<String> projectFolders =
-                    DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
+                        DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
                 if (projectFolders != null && projectFolders.size() > 0) {
                     for (String furi : projectFolders) {
                         String aclPath = FolderUtil.extractPathInSpecialFolder(furi, "project");
@@ -227,26 +237,28 @@ public final class FolderUtil {
 
     /**
      * Returns list of project folders where the user can insert items.
-     * @param user current session user
-     * @param permission - permission to check
+     *
+     * @param user
+     *            current session user
+     * @param permission
+     *            - permission to check
      * @return list of folder names
-     * @throws DAOException if query fails
+     * @throws DAOException
+     *             if query fails
      */
     public static List<String> getUserAccessibleProjectFolderNames(CRUser user, String permission) throws DAOException {
         List<String> folders = null;
-        if (user != null) {
-            // Get project folders where user can insert content
-            if (CRUser.hasPermission(user.getUserName(), "/project", permission)) {
-                List<String> projectFolders =
-                    DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
-                if (projectFolders != null && projectFolders.size() > 0) {
-                    folders = new ArrayList<String>();
-                    for (String furi : projectFolders) {
-                        String projectName = FolderUtil.extractPathInSpecialFolder(furi, "project");
-                        if (!StringUtils.isBlank(projectName)
-                                && CRUser.hasPermission(user.getUserName(), "/project/" + projectName, permission)) {
-                            folders.add(projectName);
-                        }
+        // Get project folders where user can insert content
+        String userName = user != null ? user.getUserName() : null;
+        if (CRUser.hasPermission(userName, "/project", permission)) {
+            List<String> projectFolders = DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
+            if (projectFolders != null && projectFolders.size() > 0) {
+                folders = new ArrayList<String>();
+                for (String furi : projectFolders) {
+                    String projectName = FolderUtil.extractPathInSpecialFolder(furi, "project");
+                    if (!StringUtils.isBlank(projectName)
+                            && CRUser.hasPermission(userName, "/project/" + projectName, permission)) {
+                        folders.add(projectName);
                     }
                 }
             }
@@ -318,7 +330,9 @@ public final class FolderUtil {
 
     /**
      * Returns full url of the project.
-     * @param projectName project name
+     *
+     * @param projectName
+     *            project name
      * @return full url
      */
     public static String getProjectFolder(String projectName) {
@@ -347,7 +361,8 @@ public final class FolderUtil {
     /**
      * Calculates folder context (graph) of the triples of file/folder object.
      *
-     * @param uri URI of the file
+     * @param uri
+     *            URI of the file
      * @return folder context
      */
     public static String folderContext(String uri) {

@@ -25,9 +25,6 @@
         <li><a href="${pageContext.request.contextPath}/sources.action">Harvesting sources</a></li>
         <li><a href="${pageContext.request.contextPath}/harvestQueue.action">Harvest queue</a></li>
         <li><a href="${pageContext.request.contextPath}/home">User homes</a></li>
-        <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/sparqlclient", "v")}'>
-            <li><a href="${pageContext.request.contextPath}/sparqlclient">Other SPARQL systems</a></li>
-        </c:if>
         <c:if test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
             <li><a href="${pageContext.request.contextPath}/admin" title="Administrative activities">Admin actions</a></li>
         </c:if>

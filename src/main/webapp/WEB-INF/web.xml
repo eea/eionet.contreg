@@ -202,10 +202,6 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>
-        <url-pattern>/sparqlclient</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>StripesDispatcher</servlet-name>
         <url-pattern>/documentation/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

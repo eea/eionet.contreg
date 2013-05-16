@@ -264,11 +264,11 @@
                         <li>
                             <a href="#" id="bookmarksLink">My bookmarked queries</a>
                         </li>
-                        <c:if test="${not empty(actionBean.projectBookmarkedQueries)}">
+                    </c:if>
+                    <c:if test="${not empty(actionBean.projectBookmarkedQueries)}">
                         <li>
                             <a href="#" id="projectBookmarksLink">Bookmarks in projects</a>
                         </li>
-                        </c:if>
                     </c:if>
                     <li>
                         <a href="#" id="prefixesLink">Useful namespaces</a>
