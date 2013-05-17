@@ -1337,7 +1337,9 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
      * Query returns project bookmarks and calculates project name from the bookmarks uri.
      */
     private static final String PROJECT_BOOKMARKS_SPARQL =
-            "select fn:substring-before(fn:substring-after(?subj, ?projFolder), '/') as ?proj ?subj ?label ?queryString "
+            "select bif:substring(?subj, bif:number(bif:length(?projFolder) + 1), "
+                + "bif:number(bif:strstr(?subj, '/bookmarks') - bif:length(?projFolder))) as ?proj "
+                    + "?subj ?label ?queryString "
                     + "from ?bookmarksHome " + "where {" + "?subj ?rdfType ?sparqlBookmark" + ". ?subj ?rdfsLabel ?label"
                     + ". ?subj ?sparqlQuery ?queryString" + "} order by xsd:string(?label)";
 
