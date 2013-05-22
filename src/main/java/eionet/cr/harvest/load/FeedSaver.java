@@ -72,8 +72,9 @@ public class FeedSaver {
     /** */
     private static final Logger LOGGER = Logger.getLogger(FeedSaver.class);
 
-    /** Connections to the repository and SQL database where the content is persisted into. */
+    /** Connection to the repository where the content is persisted into. */
     private RepositoryConnection repoConn;
+    /** Connection to SQL database where the content is persisted into. */
     private Connection sqlConn;
 
     /** The graph where the triples will be loaded into. */
@@ -234,12 +235,12 @@ public class FeedSaver {
      * @param feed
      * @throws RepositoryException
      */
-    private void saveFeedImageMetadata(String feedUri, SyndFeed feed) throws RepositoryException{
+    private void saveFeedImageMetadata(String feedUri, SyndFeed feed) throws RepositoryException {
 
         SyndImage feedImage = feed.getImage();
 
         // The image object must not be null, and its URL must not be blank.
-        if (feedImage == null || StringUtils.isBlank(feedImage.getUrl())){
+        if (feedImage == null || StringUtils.isBlank(feedImage.getUrl())) {
             return;
         }
 
@@ -272,7 +273,7 @@ public class FeedSaver {
      * @param feed
      * @throws RepositoryException
      */
-    private void saveTextInputMetadata(String feedUri, SyndFeed feed) throws RepositoryException{
+    private void saveTextInputMetadata(String feedUri, SyndFeed feed) throws RepositoryException {
 
         // SyndFeed itself does not return textInput metadata, because it is a normalization of teh various RSS/Atom formats,
         // and not all of them have a TextInput. So we get the original WireFeed object that this SyndFeed was created from,
@@ -280,13 +281,13 @@ public class FeedSaver {
         // earlier on, so that the original WireFeed is preserved indeed.
 
         WireFeed originalWireFeed = feed.originalWireFeed();
-        if (originalWireFeed == null || !(originalWireFeed instanceof Channel)){
+        if (originalWireFeed == null || !(originalWireFeed instanceof Channel)) {
             return;
         }
 
         TextInput textInput = ((Channel) originalWireFeed).getTextInput();
         // The input must not be null and its link must not be blank.
-        if (textInput == null || StringUtils.isBlank(textInput.getLink())){
+        if (textInput == null || StringUtils.isBlank(textInput.getLink())) {
             return;
         }
 
@@ -351,6 +352,10 @@ public class FeedSaver {
         // Both published-date and updated-date mapped into dcterms:date
         saveLiteralTriple(itemUri, Predicates.DCTERMS_DATE, item.getPublishedDate());
         saveLiteralTriple(itemUri, Predicates.DCTERMS_DATE, item.getUpdatedDate());
+
+        //published should be put to dcterms:issued and updated to dcterms:modified
+        saveLiteralTriple(itemUri, Predicates.DCTERMS_ISSUED, item.getPublishedDate());
+        saveLiteralTriple(itemUri, Predicates.DCTERMS_MODIFIED, item.getUpdatedDate());
 
         // The feed-item's 3rd party source mapped into dcterms:source.
         SyndFeed itemSource = item.getSource();

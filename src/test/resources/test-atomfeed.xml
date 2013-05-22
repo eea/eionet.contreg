@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>announcements</title>
+    <link rel="alternate" href="http://localhost:8080/"/>
+    <link rel="self"
+          href="http://www.eionet.europa.eu/news/Announcements/feed_atom"/>
+    <id>http://www.eionet.europa.eu/news/Announcements</id>
+    <updated>2013-02-04T11:59:05Z</updated>
+
+    <entry>
+        <title>CDDA data collection 2013</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/cdda2013"/>
+        <author><name>Marek Staron</name></author>
+        <published>2012-12-14T00:00:00Z</published>
+        <updated>2013-01-22T11:34:09Z</updated>
+        <id>http://www.eionet.europa.eu/news/cdda2013</id>
+        <summary type="html">EIONET Priority Data Flows 2013 - Nationally designated areas for the Common Database on Designated Areas (CDDA)</summary>
+    </entry>
+
+
+    <entry>
+        <title>User Workshop on GMES Atmospheric Services</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/gmesatmosphericworkshop"/>
+        <author><name></name></author>
+        <published>2008-01-03T00:00:00Z</published>
+        <updated>2008-11-21T17:19:57Z</updated>
+        <id>http://www.eionet.europa.eu/news/gmesatmosphericworkshop</id>
+        <summary type="html">EEA, Copenhagen, 12-13 June 2008
+
+</summary>
+    </entry>
+
+
+    <entry>
+        <title>Reportnet within SEIS Workshop</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/reportnet_seis_workshop"/>
+        <author><name></name></author>
+        <published>2007-10-09T00:00:00Z</published>
+        <updated>2008-11-21T17:19:57Z</updated>
+        <id>http://www.eionet.europa.eu/news/reportnet_seis_workshop</id>
+        <summary type="html">EEA/Eionet workshop today and tomorrow</summary>
+    </entry>
+
+
+    <entry>
+        <title>COMMON FORUM meeting in Stockholm on 10-12 September</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/commonforum"/>
+        <author><name></name></author>
+        <published>2007-08-30T00:00:00Z</published>
+        <updated>2008-11-21T17:19:57Z</updated>
+        <id>http://www.eionet.europa.eu/news/commonforum</id>
+        <summary type="html">Announcement: Next meeting of the COMMON FORUM network on contaminated land in the EU and call for national representatives from the following countries: Bulgaria, Estonia, Lithuania, Malta, Portugal, Romania, Slovakia and Slovenia
+</summary>
+    </entry>
+
+
+    <entry>
+        <title>CFT: Inspire monitoring facilities</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/cft-inspire-topics"/>
+        <author><name></name></author>
+        <published>2007-07-22T00:00:00Z</published>
+        <updated>2008-11-21T17:19:57Z</updated>
+        <id>http://www.eionet.europa.eu/news/cft-inspire-topics</id>
+        <summary type="html">Call for tender for development and prototyping of Inspire technical specifications for air, water, waste and biodiversity environmental monitoring facilities</summary>
+    </entry>
+
+
+    <entry>
+        <title>CFT: IT solutions linking INSPIRE to CAFE</title>
+        <link rel="alternate"
+              href="http://www.eionet.europa.eu/news/cft-inspire-cafe"/>
+        <author><name></name></author>
+        <published>2007-07-17T00:00:00Z</published>
+        <updated>2008-11-21T17:19:57Z</updated>
+        <id>http://www.eionet.europa.eu/news/cft-inspire-cafe</id>
+        <summary type="html">Prior information notice: Development and demonstration of technical IT solutions linking INSPIRE services to the reporting and data exchange requirements of the proposed CAFE directive
+</summary>
+    </entry>
+
+</feed>
