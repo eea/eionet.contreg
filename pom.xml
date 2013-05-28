@@ -365,9 +365,9 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>eionet</groupId>
-            <artifactId>uit-security</artifactId>
-            <version>1.2c</version>
+            <groupId>eionet.acl</groupId>
+            <artifactId>acl</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
