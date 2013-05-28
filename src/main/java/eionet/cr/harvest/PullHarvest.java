@@ -752,6 +752,9 @@ public class PullHarvest extends BaseHarvest {
                         return loadFile(processedFile, rdfLoader);
                     } else {
                         LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
+                        //if no conversion found but triples exist from previous harvests, clear content
+                        getHarvestSourceDAO().clearGraph(getContextUrl());
+
                         return 0;
                     }
                 } finally {
