@@ -1439,7 +1439,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     private static final String GET_FACTSHEET_ROWS =
             "select ?pred min(xsd:int(isBlank(?s))) as ?anonSubj "
                     + "min(bif:either(isLiteral(?o),"
-                    + "bif:concat(fn:substring(str(?o),1,LEN),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g),'<|>',str(bif:length(str(?o))),'<|>',bif:md5(str(?o))),"
+                    + "bif:concat(bif:substring(str(?o),1,LEN),'<|>',lang(?o),'<|>',str(datatype(?o)),'<|><|>0<|>',str(?g),'<|>',str(bif:length(str(?o))),'<|>',bif:md5(str(?o))),"
                     + "bif:concat(bif:coalesce(str(?oLabel),bif:left(str(?o),LEN)),'<|>',lang(?oLabel),'<|>',str(datatype(?oLabel)),'<|>',bif:left(str(?o),LEN),'<|>',str(isBlank(?o)),'<|>',str(?g),'<|><|>')"
                     + ")) as ?objData " + "count(distinct ?o) as ?objCount " + "where {" + "graph ?g {"
                     + "?s ?pred ?o. filter(?s=iri(?subjectUri))}" + ". optional {?o <" + Predicates.RDFS_LABEL + "> ?oLabel}"
