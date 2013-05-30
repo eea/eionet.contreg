@@ -1,5 +1,6 @@
 package eionet.cr.web.action;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -704,8 +705,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
-
-                        response.setContentType("text/csv");
+                        response.setContentType("text/csv; charset=UTF-8");
+                        addBOM(outputStream);
                         SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
@@ -1280,6 +1281,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         set.addAll(createMimeTypesToInternalFormats().keySet());
         set.add("text/html");
         return set;
+    }
+
+    /**
+     * adds BOM at the beginning of the outputStream.
+     * @param os current outputstream
+     * @throws IOException if connection fails
+     */
+    private static void addBOM(OutputStream os) throws IOException {
+        os.write(239);
+        os.write(187);
+        os.write(191);
+
     }
 
 }
