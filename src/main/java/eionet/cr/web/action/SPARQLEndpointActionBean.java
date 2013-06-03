@@ -34,7 +34,6 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 
@@ -62,6 +61,7 @@ import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
 
@@ -708,13 +708,13 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
                         response.setContentType("text/csv; charset=UTF-8");
-                        addBOM(outputStream);
-                        SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(outputStream);
+                        addBOM(outputStream, "UTF-8");
+                        //as main consumer of the result is Excel use ";" because otherwise Excel does not handle CSV correctly
+                        CRSPARQLCSVWriter sparqlWriter = new CRSPARQLCSVWriter(outputStream, ';');
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
                         response.setContentType("text/tab-separated-values; charset=utf-16le");
-                        addBOM16LE(outputStream);
-                        //SPARQLResultsTSVWriter sparqlWriter = new SPARQLResultsTSVWriter(outputStream);
+                        addBOM(outputStream, "utf-16le");
                         CRSPARQLTSVWriter sparqlWriter = new CRSPARQLTSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
@@ -1297,15 +1297,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @param os current outputstream
      * @throws IOException if connection fails
      */
-    private static void addBOM(OutputStream os) throws IOException {
-        os.write(239);
-        os.write(187);
-        os.write(191);
-    }
-    private static void addBOM16LE(OutputStream os) throws IOException {
-        os.write(255);
-        os.write(254);
-    }
+    private static void addBOM(OutputStream os, String encoding) throws IOException {
+        int[] bytes = Util.getBOM(encoding);
 
+        for (int b : bytes) {
+            os.write(b);
+        }
 
+    }
 }

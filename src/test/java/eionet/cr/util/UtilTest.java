@@ -123,4 +123,11 @@ public class UtilTest extends TestCase {
         assertEquals(Util.removeSurroundingQuotes(s), "Dataflow");
 
     }
+
+    @Test
+    public void testGetBOM() {
+        assertNotNull(Util.getBOM("UTF-8"));
+        assertNotNull(Util.getBOM("utf-16le"));
+
+    }
 }
