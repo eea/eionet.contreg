@@ -62,6 +62,7 @@ import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
 
 /**
@@ -86,6 +87,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String FORMAT_XML_SCHEMA = "xml_schema";
     private static final String FORMAT_JSON = "json";
     private static final String FORMAT_CSV = "csv";
+    private static final String FORMAT_TSV = "tsv";
     private static final String FORMAT_HTML = "html";
     private static final String FORMAT_HTML_PLUS = "html+";
 
@@ -709,6 +711,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         addBOM(outputStream);
                         SPARQLResultsCSVWriter sparqlWriter = new SPARQLResultsCSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
+                    } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
+                        response.setContentType("text/tab-separated-values; charset=utf-16le");
+                        addBOM16LE(outputStream);
+                        //SPARQLResultsTSVWriter sparqlWriter = new SPARQLResultsTSVWriter(outputStream);
+                        CRSPARQLTSVWriter sparqlWriter = new CRSPARQLTSVWriter(outputStream);
+                        ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_HTML) || outputFormat.equals(FORMAT_HTML_PLUS)) {
 
@@ -1264,6 +1272,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         map.put("application/x-binary-rdf-results-table", FORMAT_XML);
         map.put("text/csv", FORMAT_CSV);
         map.put("application/csv", FORMAT_CSV);
+        map.put("application/tsv", FORMAT_TSV);
         map.put("text/comma-separated-values", FORMAT_CSV);
         map.put("text/boolean", FORMAT_XML);
         map.put("application/x-ms-access-export+xml", FORMAT_XML_SCHEMA);
@@ -1292,7 +1301,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         os.write(239);
         os.write(187);
         os.write(191);
-
     }
+    private static void addBOM16LE(OutputStream os) throws IOException {
+        os.write(255);
+        os.write(254);
+    }
+
 
 }
