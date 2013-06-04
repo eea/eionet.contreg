@@ -163,7 +163,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         query.append("JOIN HARVEST H ON H.HARVEST_ID = HS.LAST_HARVEST_ID ");
         query.append("WHERE H.HTTP_CODE = 401 ");
         if (StringUtils.isNotEmpty(searchString)) {
-            query.append("AND HS.URL= LIKE(?) ");
+            query.append("AND HS.URL LIKE(?) ");
             params.add(searchString);
         }
         query.append("AND HS.URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ");
@@ -184,7 +184,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             countQuery.append("JOIN HARVEST H ON H.HARVEST_ID = HS.LAST_HARVEST_ID ");
             countQuery.append("WHERE H.HTTP_CODE = 401 ");
             if (StringUtils.isNotEmpty(searchString)) {
-                countQuery.append("AND HS.URL= LIKE(?) ");
+                countQuery.append("AND HS.URL LIKE(?) ");
             }
             countQuery.append("AND HS.URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ");
 

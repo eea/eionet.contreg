@@ -104,4 +104,39 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
         // get the source by new URL, it must not be null
         assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
     }
+
+
+    /**
+     * tests unauthorized sources query.
+     * @throws Exception if fails
+     */
+    @Test
+    public void testGetUnauthorizedSources() throws Exception {
+
+        Pair<Integer, List<HarvestSourceDTO>> dto =
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized("", null, null);
+
+        assertNotNull(dto);
+        assertEquals(2, (int) dto.getLeft());
+
+    }
+
+    /**
+     * tests unauthorized query filter.
+     * @throws Exception if fails
+     */
+    @Test
+    public void testGetUnauthorizedSourcesFilter() throws Exception {
+
+        Pair<Integer, List<HarvestSourceDTO>> dto =
+                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized("%countries%", null, null);
+
+        assertNotNull(dto);
+        assertEquals(1, (int) dto.getLeft());
+
+        HarvestSourceDTO source = dto.getRight().get(0);
+        assertEquals("http://rod.eionet.europa.eu/countries", source.getUrl());
+
+
+    }
 }
