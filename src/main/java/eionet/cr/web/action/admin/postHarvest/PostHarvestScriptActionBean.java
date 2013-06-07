@@ -594,34 +594,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @return List of script data objects
      */
 
+    @SuppressWarnings("unchecked")
     public List<PostHarvestScriptDTO> getClipBoardScripts() {
         return (List<PostHarvestScriptDTO>) getSession().getAttribute(SCRIPTS_CLIPBOARD);
     }
-
-    //
-    // /**
-    // * @return the runOnce
-    // */
-    // public boolean isRunOnce() {
-    // return runOnce;
-    // }
-    //
-    // /**
-    // * @param runOnce the runOnce to set
-    // */
-    // public void setRunOnce(boolean runOnce) {
-    // this.runOnce = runOnce;
-    // }
-    //
-    // /**
-    // *
-    // */
-    // @Before(stages = {LifecycleStage.BindingAndValidation})
-    // public void beforeBindingAndValidation(){
-    //
-    // HttpServletRequest request = getContext().getRequest();
-    // if (request.getMethod().equalsIgnoreCase("POST") && request.getParameter("runOnce")==null){
-    // runOnce = false;
-    // }
-    // }
 }

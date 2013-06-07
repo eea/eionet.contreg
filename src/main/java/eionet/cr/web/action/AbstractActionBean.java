@@ -45,6 +45,7 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Util;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.UsefulNamespace;
 
 /**
  * Root class for all CR ActionBeans.
@@ -230,15 +231,15 @@ public abstract class AbstractActionBean implements ActionBean {
         context.getValidationErrors().addGlobalError(error);
     }
 
-   /**
-    * Adds all given validation errors to the context.
-    * @param errors List of error texts
-    */
-   public void addGlobalValidationErrors(List<String> errors) {
-       for (String error : errors) {
-           addGlobalValidationError(error);
-       }
-   }
+    /**
+     * Adds all given validation errors to the context.
+     * @param errors List of error texts
+     */
+    public void addGlobalValidationErrors(List<String> errors) {
+        for (String error : errors) {
+            addGlobalValidationError(error);
+        }
+    }
 
     /**
      *
@@ -371,5 +372,14 @@ public abstract class AbstractActionBean implements ActionBean {
         }
 
         return isWebBrowser;
+    }
+
+    /**
+     * See {@link UsefulNamespace} .
+     * 
+     * @return The array of {@link UsefulNamespace} values.
+     */
+    public UsefulNamespace[] getUsefulNamespaces() {
+        return UsefulNamespace.values();
     }
 }

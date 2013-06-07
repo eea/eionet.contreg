@@ -5,6 +5,9 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint" bodyAttribute="onLoad=\"format_select()\"">
 
     <stripes:layout-component name="head">
+    
+        <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
+        
         <script type="text/javascript">
         // <![CDATA[
             var last_format = 1;
@@ -105,60 +108,15 @@
                             return true;
                         });
                         
+                        // The handling of useful namespaces
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
-                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
+                                return handlePrefixClick("PREFIX ${usefulNamespace.prefix}: <${fn:escapeXml(usefulNamespace.uri)}>");
                             });
                         </c:forEach>
 
                     });
             } ) ( jQuery );
-
-            function handlePrefixClick(prefix) {
-                var query = document.getElementById('queryText').value;
-                document.getElementById('queryText').value = addOrRemove(query, prefix);
-
-                var areas = document.querySelectorAll('.expandingArea');
-                var l = areas.length;
-                while (l--) {
-                    makeExpandingArea(areas[l]);
-                }
-
-                return false;
-            }
-
-            function addOrRemove(original, prefix) {
-                if (stringExists(original, prefix)) {
-                    return removeString(original, prefix);
-                } else {
-                    return addString(original, prefix);
-                }
-            }
-
-            function stringExists(string, subString) {
-                if (string.length < 1) {
-                    return false;
-                }
-                if (subString.length < 1) {
-                    return false;
-                }
-                if (string.indexOf(subString) == -1) {
-                    return false;
-                }
-                return true;
-            }
-
-            function addString(string, addable) {
-                return addable + "\n" + string;
-            }
-
-            function removeString(string, removable) {
-                if (stringExists(string, removable + "\n")) {
-                    return string.replace(removable + "\n", "");
-                } else {
-                    return string.replace(removable, "");
-                }
-            }
             // ]]>
         </script>
         <c:if test="${actionBean.userLoggedIn}">
@@ -210,6 +168,7 @@
                 // ]]>
             </script>
         </c:if>
+        
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
@@ -642,7 +601,7 @@ while (l--) {
                 <c:if test="${not empty actionBean.usefulNamespaces}">
                     <ul>
 	                    <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
-	                       <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
+	                       <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.prefix}"/>: &lt;<c:out value="${usefulNamespace.uri}"/>&gt;</span></li>
 	                    </c:forEach>
                     </ul>
                 </c:if>

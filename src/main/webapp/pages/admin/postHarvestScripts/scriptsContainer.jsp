@@ -6,6 +6,47 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Post-harvest scripts">
 
+    <stripes:layout-component name="head">
+    
+        <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
+        
+        <script type="text/javascript">
+        // <![CDATA[
+            ( function($) {
+                $(document).ready(
+                    function(){
+                    	
+                    	// Open prefixes dialog
+                        $("#prefixesLink").click(function() {
+                            $('#prefixesDialog').dialog('open');
+                            return false;
+                        });
+
+                        // Prefixes dialog setup
+                        $('#prefixesDialog').dialog({
+                            autoOpen: false,
+                            width: 600
+                        });
+
+                        // Close prefixes dialog
+                        $("#closePrefixesDialog").click(function() {
+                            $('#prefixesDialog').dialog("close");
+                            return true;
+                        });
+                        
+                    	// The handling of useful namespace clicks
+                        <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                            $("#prefix${usefulNamespacesLoop.index}").click(function() {
+                                return handlePrefixClick("PREFIX ${usefulNamespace.prefix}: <${fn:escapeXml(usefulNamespace.uri)}>");
+                            });
+                        </c:forEach>
+
+                    });
+            } ) ( jQuery );
+            // ]]>
+        </script>
+    </stripes:layout-component>
+
     <stripes:layout-component name="contents">
 
     <h1 style="padding-bottom:10px">Post-harvest scripts</h1>

@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,9 +75,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
-
-    /** */
-    public static final Map<String,String> USEFUL_NAMESPACES = createUsefulNamespaces();
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
@@ -1308,35 +1304,5 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             os.write(b);
         }
 
-    }
-    /**
-     * 
-     * @return
-     */
-    public Map<String, String> getUsefulNamespaces() {
-        return USEFUL_NAMESPACES;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    private static final Map<String, String> createUsefulNamespaces() {
-
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-
-        map.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        map.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        map.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        map.put("owl", "http://www.w3.org/2002/07/owl#");
-        map.put("dc", "http://purl.org/dc/elements/1.1/");
-        map.put("dcterms", "http://purl.org/dc/terms/");
-        map.put("foaf", "http://xmlns.com/foaf/0.1/");
-        map.put("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
-        map.put("cr", "http://cr.eionet.europa.eu/ontologies/contreg.rdf#");
-        map.put("rod", "http://rod.eionet.europa.eu/schema.rdf#");
-        map.put("skos", "http://www.w3.org/2004/02/skos/core#");
-
-        return map;
     }
 }

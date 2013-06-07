@@ -1,6 +1,16 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 <stripes:layout-definition>
 
+    <ul id="dropdown-operations">
+        <li><a href="#">Operations</a>
+            <ul>
+                <li>
+                    <a href="#" id="prefixesLink">Useful namespaces</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
     <br/>
     <c:choose>
         <c:when test="${actionBean.id>0}">
@@ -81,12 +91,12 @@
                 </tr>
                 <tr>
                     <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                        <label for="scriptText" class="required question">Script:</label>
+                        <label for="queryText" class="required question">Script:</label>
                     </td>
                     <td>
                         <div class="expandingArea">
                            <pre><span></span><br /></pre>
-                           <stripes:textarea name="script" cols="80" rows="5"/>
+                           <stripes:textarea name="script" id="queryText" cols="80" rows="5"/>
                         </div>
                         <script type="text/javascript">
 // <![CDATA[
@@ -221,5 +231,23 @@ while (l--) {
                 <div>No test results found!</div>
             </c:if>
         </c:if>
+        
+    <%-- The "Useful namesoaces" dialog, hidden by default --%>
+            
+    <div id="prefixesDialog" title="Useful namespaces">
+        
+        <c:if test="${empty actionBean.usefulNamespaces}">
+            <p>None found!</p>
+        </c:if>
+        <c:if test="${not empty actionBean.usefulNamespaces}">
+            <ul>
+                <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                   <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.prefix}"/>: &lt;<c:out value="${usefulNamespace.uri}"/>&gt;</span></li>
+                </c:forEach>
+            </ul>
+        </c:if>
+        <button id="closePrefixesDialog">Close</button>
+        
+    </div>
 
 </stripes:layout-definition>
