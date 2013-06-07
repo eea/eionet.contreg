@@ -247,7 +247,7 @@ public final class FolderUtil {
      *             if query fails
      */
     public static List<String> getUserAccessibleProjectFolderNames(CRUser user, String permission) throws DAOException {
-        List<String> folders = null;
+        List<String> folders = new ArrayList<String>();
         // Get project folders where user can insert content
         String userName = user != null ? user.getUserName() : null;
         if (CRUser.hasPermission(userName, "/project", permission)) {

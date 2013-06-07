@@ -104,52 +104,12 @@
                             $('#prefixesDialog').dialog("close");
                             return true;
                         });
-
-                        // Add query prefix #1
-                        $("#prefix1").click(function() {
-                            alert("test");
-                            return handlePrefixClick("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>");
-                        });
-                        // Add query prefix #2
-                        $("#prefix2").click(function() {
-                            return handlePrefixClick("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>");
-                        });
-                        // Add query prefix #3
-                        $("#prefix3").click(function() {
-                            return handlePrefixClick("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>");
-                        });
-                        // Add query prefix #4
-                        $("#prefix4").click(function() {
-                            return handlePrefixClick("PREFIX owl: <http://www.w3.org/2002/07/owl#>");
-                        });
-                        // Add query prefix #5
-                        $("#prefix5").click(function() {
-                            return handlePrefixClick("PREFIX dc: <http://purl.org/dc/elements/1.1/>");
-                        });
-                        // Add query prefix #6
-                        $("#prefix6").click(function() {
-                            return handlePrefixClick("PREFIX dcterms: <http://purl.org/dc/terms/>");
-                        });
-                        // Add query prefix #7
-                        $("#prefix7").click(function() {
-                            return handlePrefixClick("PREFIX foaf: <http://xmlns.com/foaf/0.1/>");
-                        });
-                        // Add query prefix #8
-                        $("#prefix8").click(function() {
-                            return handlePrefixClick("PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>");
-                        });
-                        // Add query prefix #9
-                        $("#prefix9").click(function() {
-                            return handlePrefixClick("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>");
-                        });
-                        // Add query prefix #10
-                        $("#prefix10").click(function() {
-                            return handlePrefixClick("PREFIX rod: <http://rod.eionet.europa.eu/schema.rdf#>");
-                        });
-                        // Add query prefix #11
-                        $("#prefix11").click(function() {
-                            return handlePrefixClick("PREFIX skos: <http://www.w3.org/2004/02/skos/core#>");
-                        });
+                        
+                        <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                            $("#prefix${usefulNamespacesLoop.index}").click(function() {
+                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
+                            });
+                        </c:forEach>
 
                     });
             } ) ( jQuery );
@@ -671,23 +631,23 @@ while (l--) {
                 </c:otherwise>
             </c:choose>
             </div>
-
-
+            
+            <%-- The "Useful namesoaces" dialog, hidden by default --%>
+            
             <div id="prefixesDialog" title="Useful namespaces">
-                <ul>
-                    <li><span id="prefix1" class="shadowHover">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span></li>
-                    <li><span id="prefix2" class="shadowHover">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span></li>
-                    <li><span id="prefix3" class="shadowHover">PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;</span></li>
-                    <li><span id="prefix4" class="shadowHover">PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;</span></li>
-                    <li><span id="prefix5" class="shadowHover">PREFIX dc: &lt;http://purl.org/dc/elements/1.1/&gt;</span></li>
-                    <li><span id="prefix6" class="shadowHover">PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;</span></li>
-                    <li><span id="prefix7" class="shadowHover">PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span></li>
-                    <li><span id="prefix8" class="shadowHover">PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;</span></li>
-                    <li><span id="prefix9" class="shadowHover">PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;</span></li>
-                    <li><span id="prefix10" class="shadowHover">PREFIX rod: &lt;http://rod.eionet.europa.eu/schema.rdf#&gt;</span></li>
-                    <li><span id="prefix11" class="shadowHover">PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;</span></li>
-                </ul>
+                
+                <c:if test="${empty actionBean.usefulNamespaces}">
+                    <p>None found!</p>
+                </c:if>
+                <c:if test="${not empty actionBean.usefulNamespaces}">
+                    <ul>
+	                    <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+	                       <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
+	                    </c:forEach>
+                    </ul>
+                </c:if>
                 <button id="closePrefixesDialog">Close</button>
+                
             </div>
 
     </stripes:layout-component>
