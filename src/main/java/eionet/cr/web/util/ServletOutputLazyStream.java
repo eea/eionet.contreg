@@ -78,7 +78,7 @@ public class ServletOutputLazyStream extends OutputStream {
      */
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        getServletOutputStream().write(b, off , len);
+        getServletOutputStream().write(b, off, len);
     }
 
     /*
@@ -111,4 +111,14 @@ public class ServletOutputLazyStream extends OutputStream {
         }
         return servletOutputStream;
     }
+
+    /**
+     * Setter of http response content type.
+     *
+     * @param type MIME type
+     */
+    public void setContentType(String type) {
+        servletResponse.setContentType(type);
+    }
+
 }

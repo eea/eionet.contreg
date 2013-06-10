@@ -287,8 +287,8 @@ while (l--) {
                             <stripes:option value="application/sparql-results+json" label="JSON" />
                             <stripes:option value="application/sparql-results+xml" label="XML" />
                             <stripes:option value="application/x-ms-access-export+xml" label="XML with Schema" />
-                            <stripes:option value="application/csv" label="CSV" title="data in the CSV is separated by semicolons"/>
-                            <stripes:option value="application/tsv" label="TSV" />
+                            <stripes:option value="text/csv" label="CSV" title="data in the CSV is separated by semicolons"/>
+                            <stripes:option value="text/tab-separated-values" label="TSV" />
                         </stripes:select>
                     </div>
                     <div style="position: absolute; top: 5px; left: 250px;">

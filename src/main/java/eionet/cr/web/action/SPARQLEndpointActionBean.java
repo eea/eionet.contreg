@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -435,7 +434,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             if (isWebBrowser()) {
                 return new ForwardResolution(FORM_PAGE);
             } else {
-                return new ErrorResolution(HttpServletResponse.SC_BAD_REQUEST, "Query missing or blank in request parameters");
+                return new ErrorStreamingResolution(HttpServletResponse.SC_BAD_REQUEST, "Query missing or blank in request parameters");
             }
         }
 
@@ -497,7 +496,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
         if (errorCode != 0 && !isWebBrowser()) {
-            resolution = new ErrorResolution(errorCode, errorMessage);
+            resolution = new ErrorStreamingResolution(errorCode, errorMessage);
         }
 
         return resolution;
@@ -559,11 +558,22 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     // Look at ServletOutputLazyStream JavaDoc for why use it here.
                     outputStream = new ServletOutputLazyStream(response);
                     executeQuery(internalFormat == null ? FORMAT_XML : internalFormat, outputStream, response);
+
                     if (errorCode > 0) {
-                        if (StringUtils.isBlank(errorMessage)) {
-                            response.sendError(errorCode);
+                        if (!isWebBrowser()) {
+                            // send plain text errors to external clients
+                            outputStream.setContentType("text/plain");
+                            response.setStatus(errorCode);
+                            if (!StringUtils.isBlank(errorMessage)) {
+                                outputStream.write(errorMessage.getBytes());
+                            }
                         } else {
-                            response.sendError(errorCode, errorMessage);
+                            if (StringUtils.isBlank(errorMessage)) {
+                                response.sendError(errorCode);
+                            } else {
+                                response.sendError(errorCode, errorMessage);
+                            }
+
                         }
                     } else {
                         String fileName = "sparql-result." + StringUtils.substringBefore(internalFormat, "_");
@@ -621,8 +631,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     Boolean askResult = ((BooleanQuery) queryObject).evaluate();
                     if (outputFormat.equals(FORMAT_XML)) {
 
-                        response.setContentType("text/xml");
-
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("<?xml version=\"1.0\"?>");
                         writer.write("<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">");
@@ -634,8 +642,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         writer.flush();
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
-
-                        response.setContentType("text/xml");
 
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("<?xml version=\"1.0\"?>");
@@ -649,8 +655,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
 
-                        response.setContentType("application/json");
-
                         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
                         writer.write("{  \"head\": { \"link\": [] }, \"boolean\": ");
                         writer.write(askResult.toString());
@@ -658,23 +662,17 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         writer.flush();
 
                     } else if (outputFormat.equals(FORMAT_HTML)) {
-
-                        response.setContentType("text/html");
-
                         resultAsk = askResult.toString();
                     }
                 } else if (queryObject instanceof GraphQuery) {
 
                     // Evaluate CONSTRUCT query.
-
                     if (outputFormat.equals(FORMAT_HTML) == false) {
 
-                        response.setContentType("application/rdf+xml");
                         RDFXMLWriter writer = new RDFXMLWriter(outputStream);
                         ((GraphQuery) queryObject).evaluate(writer);
 
                     } else {
-                        response.setContentType("text/html");
 
                         long startTime = System.currentTimeMillis();
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
@@ -687,39 +685,31 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 } else {
 
                     // Evaluate SELECT query.
-
                     if (outputFormat.equals(FORMAT_XML)) {
-
-                        response.setContentType("text/xml");
                         CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
-
-                        response.setContentType("text/xml");
                         CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
-
-                        response.setContentType("application/json");
                         CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
-                        response.setContentType("text/csv; charset=UTF-8");
                         addBOM(outputStream, "UTF-8");
-                        //as main consumer of the result is Excel use ";" because otherwise Excel does not handle CSV correctly
+                        // as main consumer of the result is Excel use ";" because otherwise Excel does not handle CSV correctly
                         CRSPARQLCSVWriter sparqlWriter = new CRSPARQLCSVWriter(outputStream, ';');
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
-                        response.setContentType("text/tab-separated-values; charset=utf-16le");
+                        // MS Excel expects TSV to be UTF-16Little Endian
+                        response.setCharacterEncoding("UTF-16LE");
                         addBOM(outputStream, "utf-16le");
                         CRSPARQLTSVWriter sparqlWriter = new CRSPARQLTSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_HTML) || outputFormat.equals(FORMAT_HTML_PLUS)) {
-
                         response.setContentType("text/html");
                         long startTime = System.currentTimeMillis();
                         queryResult = ((TupleQuery) queryObject).evaluate();
@@ -761,7 +751,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -773,21 +763,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1273,10 +1263,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         map.put("text/csv", FORMAT_CSV);
         map.put("application/csv", FORMAT_CSV);
         map.put("application/tsv", FORMAT_TSV);
+        map.put("text/tab-separated-values", FORMAT_TSV);
         map.put("text/comma-separated-values", FORMAT_CSV);
         map.put("text/boolean", FORMAT_XML);
         map.put("application/x-ms-access-export+xml", FORMAT_XML_SCHEMA);
-        map.put("application/sparql-results+json", FORMAT_JSON);
+        map.put("application/xec", FORMAT_JSON);
         map.put("application/json", FORMAT_JSON);
         return Collections.unmodifiableMap(map);
     }
@@ -1294,8 +1285,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * adds BOM at the beginning of the outputStream.
-     * @param os current outputstream
-     * @throws IOException if connection fails
+     *
+     * @param os
+     *            current outputstream
+     * @throws IOException
+     *             if connection fails
      */
     private static void addBOM(OutputStream os, String encoding) throws IOException {
         int[] bytes = Util.getBOM(encoding);
