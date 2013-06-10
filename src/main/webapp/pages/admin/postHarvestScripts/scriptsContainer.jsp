@@ -37,7 +37,7 @@
                     	// The handling of useful namespace clicks
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
-                                return handlePrefixClick("PREFIX ${usefulNamespace.prefix}: <${fn:escapeXml(usefulNamespace.uri)}>");
+                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
                             });
                         </c:forEach>
 

@@ -45,7 +45,7 @@ import eionet.cr.harvest.Harvest;
 import eionet.cr.util.Util;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.util.UsefulNamespace;
+import eionet.cr.web.util.UsefulNamespaces;
 
 /**
  * Root class for all CR ActionBeans.
@@ -375,11 +375,11 @@ public abstract class AbstractActionBean implements ActionBean {
     }
 
     /**
-     * See {@link UsefulNamespace} .
+     * See {@link UsefulNamespaces}.
      * 
-     * @return The array of {@link UsefulNamespace} values.
+     * @return The {@link UsefulNamespaces} singleton.
      */
-    public UsefulNamespace[] getUsefulNamespaces() {
-        return UsefulNamespace.values();
+    public UsefulNamespaces getUsefulNamespaces() {
+        return UsefulNamespaces.getInstance();
     }
 }

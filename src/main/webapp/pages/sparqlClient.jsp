@@ -111,7 +111,7 @@
                         // The handling of useful namespaces
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
-                                return handlePrefixClick("PREFIX ${usefulNamespace.prefix}: <${fn:escapeXml(usefulNamespace.uri)}>");
+                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
                             });
                         </c:forEach>
 
@@ -601,7 +601,7 @@ while (l--) {
                 <c:if test="${not empty actionBean.usefulNamespaces}">
                     <ul>
 	                    <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
-	                       <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.prefix}"/>: &lt;<c:out value="${usefulNamespace.uri}"/>&gt;</span></li>
+	                       <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
 	                    </c:forEach>
                     </ul>
                 </c:if>
