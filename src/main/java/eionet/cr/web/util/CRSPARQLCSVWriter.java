@@ -144,6 +144,8 @@ public class CRSPARQLCSVWriter implements TupleQueryResultWriter {
      * @throws IOException if writing fails
      */
     protected void writeBNode(BNode bNode) throws IOException {
+
+        // Note that "_:" is the standard N3 namespace prefix for blank nodes.
         writer.write("_:");
         writer.write(bNode.getID());
     }

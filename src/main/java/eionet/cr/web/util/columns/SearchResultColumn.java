@@ -22,7 +22,15 @@ package eionet.cr.web.util.columns;
 
 import java.text.SimpleDateFormat;
 
+import net.sourceforge.stripes.action.UrlBinding;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+
+import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
  *
@@ -136,5 +144,46 @@ public abstract class SearchResultColumn {
      */
     public void setActionBean(AbstractActionBean actionBean) {
         this.actionBean = actionBean;
+    }
+
+    /**
+     * Builds a factsheet HTML link (relative to the webapp root) for the given URI.
+     * Returns full
+     * 
+     * <pre>
+     * <a href="..." title="...">...</a>
+     * </pre>
+     * 
+     * tag.
+     * URL encodings and XML escapings also preformed.
+     * 
+     * @param uri The given URI.
+     * @param isAnonymous True if the given URI is an anonymous resource.
+     * @param label The link's displayed label.
+     * @param showTitle If true then the given URI will be put into title="...", otherwise no title attribute rendered.
+     * @return As indicated above.
+     */
+    String buildFactsheetLink(String uri, boolean isAnonymous, String label, boolean showTitle) {
+
+        String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
+        int i = factsheetUrlBinding.lastIndexOf("/");
+
+        String uriParam = uri;
+        if (isAnonymous) {
+            if (uriParam.startsWith(VirtuosoBaseDAO.N3_BNODE_PREFIX)) {
+                uriParam = StringUtils.replaceOnce(uriParam, VirtuosoBaseDAO.N3_BNODE_PREFIX, VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX);
+            }
+            else if (!uriParam.startsWith(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX)) {
+                uriParam = VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX + uriParam;
+            }
+        }
+
+        StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
+        href.append("uri=").append(Util.urlEncode(uriParam));
+
+        StringBuilder result = new StringBuilder("<a href=\"").append(href).append("\"");
+        result.append(showTitle ? "title=\"" + StringEscapeUtils.escapeXml(uri) + "\">" : ">");
+        result.append(StringEscapeUtils.escapeXml(label)).append("</a>");
+        return result.toString();
     }
 }

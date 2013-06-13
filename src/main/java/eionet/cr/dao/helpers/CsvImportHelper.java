@@ -295,6 +295,7 @@ public class CsvImportHelper {
         for (String column : columnLabels) {
             column = column.replace(" ", "_");
             String columnUri = "tableFile:" + column;
+            // Note that "_:" is the standard N3 namespace prefix for blank nodes.
             query.append(" OPTIONAL { _:rec ").append(columnUri).append(" ?").append(column).append(" } .\n");
         }
         query.append("}");

@@ -111,7 +111,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         bindings.setInt("filesCount", limit);
 
         RecentFilesReader reader = new RecentFilesReader();
-        reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+        reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.N3_BNODE_PREFIX);
 
         return executeSPARQL(LATEST_FILES_SPARQL, bindings, reader);
 
@@ -139,7 +139,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             throw new IllegalArgumentException("limit must be greater than 0!");
         }
         RecentUploadsReader<String> matchReader = new RecentUploadsReader<String>();
-        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.N3_BNODE_PREFIX);
         Bindings bindings = new Bindings();
         bindings.setURI("rdfType", rdfType);
         bindings.setInt("queryLimit", limit);

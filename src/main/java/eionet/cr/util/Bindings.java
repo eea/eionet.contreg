@@ -136,7 +136,7 @@ public class Bindings {
      */
     public void setURI(String name, String value) {
 
-        if (!value.startsWith(VirtuosoBaseDAO.BNODE_URI_PREFIX)) {
+        if (!value.startsWith(VirtuosoBaseDAO.N3_BNODE_PREFIX)) {
             try {
                 bindings.put(name, new URI(value));
             } catch (URISyntaxException e) {
@@ -193,7 +193,9 @@ public class Bindings {
                 calendar.setTime((Date) value);
                 query.setBinding(name, valueFactory.createLiteral(datatypeFactory.newXMLGregorianCalendar(calendar)));
             } else if (value instanceof BlankNode) {
-                query.setBinding(name, valueFactory.createBNode(((BlankNode) value).getId()));
+                String bnodeId = ((BlankNode) value).getId();
+                // Have to use Virtuoso-specific blank node prefix in bindings.
+                query.setBinding(name, valueFactory.createURI(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX + bnodeId));
             } else {
                 throw new IllegalArgumentException("Unsupported type is bound to name " + name);
             }
@@ -230,7 +232,7 @@ public class Bindings {
          * @param id Bode ID (with blank node prefix)
          */
         BlankNode(String id) {
-            this.id = id.substring(VirtuosoBaseDAO.BNODE_URI_PREFIX.length());
+            this.id = id.substring(VirtuosoBaseDAO.N3_BNODE_PREFIX.length());
         }
 
         public String getId() {

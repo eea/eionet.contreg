@@ -23,9 +23,6 @@ package eionet.cr.web.util.columns;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -33,13 +30,11 @@ import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URIUtil;
-import eionet.cr.util.Util;
-import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class SubjectPredicateColumn extends SearchResultColumn {
 
@@ -72,7 +67,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
 
     /**
      * Constructor.
-     *
+     * 
      * @param title
      * @param isSortable
      * @param predicateUri
@@ -100,10 +95,11 @@ public class SubjectPredicateColumn extends SearchResultColumn {
 
     /**
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-     *
-     * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
-     * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
-     * factsheet links will be created.
+     * 
+     *      Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
+     *      comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects,
+     *      clickable
+     *      factsheet links will be created.
      */
     @Override
     public String format(Object object) {
@@ -122,7 +118,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
                     result = objectValuesToCSV(objects);
                 }
                 logger.debug(result);
-                result = buildFactsheetLink(subjectDTO.getUri(), StringEscapeUtils.escapeXml(result), false);
+                result = buildFactsheetLink(subjectDTO.getUri(), subjectDTO.isAnonymous(), result, false);
 
             } else if (!objects.isEmpty()) {
 
@@ -140,7 +136,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
                         if (label == null) {
                             label = URIUtil.extractURILabel(o.getValue(), SubjectDTO.NO_LABEL);
                         }
-                        buf.append(buildFactsheetLink(o.getValue(), StringEscapeUtils.escapeXml(label), true));
+                        buf.append(buildFactsheetLink(o.getValue(), o.isAnonymous(), label, true));
                     }
                 }
                 result = buf.toString();
@@ -151,7 +147,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     }
 
     /**
-     *
+     * 
      * @param objects
      * @return
      */
@@ -164,30 +160,9 @@ public class SubjectPredicateColumn extends SearchResultColumn {
         return buf.toString();
     }
 
-    /**
-     *
-     * @param uri
-     * @param label
-     * @param showTitle true if to show the given object value (typically resource) in the factsheet link
-     * @return formatted HTML code for factsheet link
-     */
-    private String buildFactsheetLink(String uri, String label, boolean showTitle) {
-
-        String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
-        int i = factsheetUrlBinding.lastIndexOf("/");
-
-        StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
-        href.append("uri=").append(Util.urlEncode(uri));
-
-        StringBuffer result = new StringBuffer("<a href=\"").append(href).append("\"");
-        result.append(showTitle ? "title=\"" + uri + "\">" : ">");
-        result.append(label).append("</a>");
-        return result.toString();
-    }
-
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
     @Override
@@ -196,7 +171,7 @@ public class SubjectPredicateColumn extends SearchResultColumn {
     }
 
     /**
-     *
+     * 
      * @return
      */
     private List<String> getLanguages() {
@@ -208,5 +183,9 @@ public class SubjectPredicateColumn extends SearchResultColumn {
         }
 
         return languages;
+    }
+
+    protected int getInt() {
+        return 8;
     }
 }

@@ -62,7 +62,7 @@ public abstract class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>
             subjectsMap.put(subjectHash, null);
         }
 
-        this.blankNodeUriPrefix = VirtuosoSearchDAO.BNODE_URI_PREFIX;
+        this.blankNodeUriPrefix = VirtuosoSearchDAO.N3_BNODE_PREFIX;
     }
 
     /**

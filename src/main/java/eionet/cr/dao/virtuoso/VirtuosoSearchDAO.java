@@ -116,7 +116,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // execute the query, using dedicated reader
         FreeTextSearchReader<String> matchReader = new FreeTextSearchReader<String>();
-        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.N3_BNODE_PREFIX);
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), matchReader);
 
         result.setQuery(QueryHelper.getFormatedQuery(query, helper.getQueryBindings()));
@@ -258,7 +258,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
                 boolean anonymousSubject = subjectValue instanceof BNode;
                 if (anonymousSubject) {
-                    subjectUri = BNODE_URI_PREFIX + subjectUri;
+                    subjectUri = N3_BNODE_PREFIX + subjectUri;
                 }
                 SubjectDTO subject = new SubjectDTO(subjectUri, anonymousSubject);
 
@@ -577,7 +577,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // execute the query
         SingleObjectReader<String> matchReader = new SingleObjectReader<String>();
-        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+        matchReader.setBlankNodeUriPrefix(VirtuosoBaseDAO.N3_BNODE_PREFIX);
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), matchReader);
 
         Integer totalMatchCount = Integer.valueOf(0);
@@ -817,7 +817,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
                 boolean anonymousSubject = subjectValue instanceof BNode;
                 if (anonymousSubject) {
-                    subjectUri = BNODE_URI_PREFIX + subjectUri;
+                    subjectUri = N3_BNODE_PREFIX + subjectUri;
                 }
 
                 SubjectDTO subject = new SubjectDTO(subjectUri, anonymousSubject);
@@ -916,7 +916,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
 
         // execute the query
         SingleObjectReader<String> reader = new SingleObjectReader<String>();
-        reader.setBlankNodeUriPrefix(BNODE_URI_PREFIX);
+        reader.setBlankNodeUriPrefix(N3_BNODE_PREFIX);
 
         List<String> subjectUris = executeSPARQL(query, helper.getQueryBindings(), reader);
 
@@ -931,7 +931,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
             // get the data of all found subjects
             String predicateQuery = helper.getSubjectsDataQuery(subjectUris, subjectUri);
             SubjectDataReader sdReader = new GenericSubjectDataReader(subjectUris);
-            sdReader.setBlankNodeUriPrefix(BNODE_URI_PREFIX);
+            sdReader.setBlankNodeUriPrefix(N3_BNODE_PREFIX);
             logger.debug("Predicate query: " + predicateQuery);
             // separate bindings for subject data
             resultList = executeSPARQL(predicateQuery, helper.getSubjectDataBindings(), sdReader);

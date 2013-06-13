@@ -1332,7 +1332,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             sqlConn.setAutoCommit(false);
 
             reader = new NewSourcesReaderWriter(sqlConn);
-            reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.BNODE_URI_PREFIX);
+            reader.setBlankNodeUriPrefix(VirtuosoBaseDAO.N3_BNODE_PREFIX);
             SesameUtil.executeQuery(NEW_SOURCES_SPARQL, bindings, reader, sparqlConn);
             reader.finish();
 

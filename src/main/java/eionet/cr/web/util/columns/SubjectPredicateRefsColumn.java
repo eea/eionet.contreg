@@ -23,23 +23,19 @@ package eionet.cr.web.util.columns;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.stripes.action.UrlBinding;
-
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URIUtil;
-import eionet.cr.util.Util;
-import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 //same as SubjectPredicateColumn class exept Title is shown as combination of Uri ending + actual label.
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
@@ -69,7 +65,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /**
      * Constructor.
-     *
+     * 
      * @param title
      * @param isSortable
      * @param predicateUri
@@ -97,13 +93,14 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.columns.SearchResultColumn#format(java.lang.Object)
-     *
+     * 
      * Gets the collection of objects matching to the given predicate in the given subject. Formats the given collection to
      * comma-separated string. For literal objects, simply the value of the literal will be used. For resource objects, clickable
      * factsheet links will be created.
      */
+    @Override
     public String format(Object object) {
 
         String result = null;
@@ -121,7 +118,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
                 }
                 String uriLabel = URIUtil.extractURILabel(subjectDTO.getUri(), SubjectDTO.NO_LABEL);
                 result = uriLabel + " (" + result + ")";
-                result = buildFactsheetLink(subjectDTO.getUri(), result);
+                result = buildFactsheetLink(subjectDTO.getUri(), subjectDTO.isAnonymous(), result, false);
             } else if (!objects.isEmpty()) {
 
                 StringBuffer buf = new StringBuffer();
@@ -138,7 +135,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
                         if (label == null) {
                             label = URIUtil.extractURILabel(o.getValue(), SubjectDTO.NO_LABEL);
                         }
-                        buf.append(buildFactsheetLink(o.getValue(), label));
+                        buf.append(buildFactsheetLink(o.getValue(), o.isAnonymous(), label, false));
                     }
                 }
                 result = buf.toString();
@@ -149,7 +146,7 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
     }
 
     /**
-     *
+     * 
      * @param objects
      * @return
      */
@@ -162,34 +159,18 @@ public class SubjectPredicateRefsColumn extends SearchResultColumn {
         return buf.toString();
     }
 
-    /**
-     *
-     * @param uri
-     * @param label
-     * @return
-     */
-    private String buildFactsheetLink(String uri, String label) {
-
-        String factsheetUrlBinding = FactsheetActionBean.class.getAnnotation(UrlBinding.class).value();
-        int i = factsheetUrlBinding.lastIndexOf("/");
-
-        StringBuffer href = new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append("?");
-        href.append("uri=").append(Util.urlEncode(uri));
-
-        return new StringBuffer("<a href=\"").append(href).append("\">").append(label).append("</a>").toString();
-    }
-
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
+    @Override
     public String getSortParamValue() {
         return predicateUri;
     }
 
     /**
-     *
+     * 
      * @return
      */
     private List<String> getLanguages() {
