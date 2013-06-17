@@ -1267,7 +1267,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         map.put("text/comma-separated-values", FORMAT_CSV);
         map.put("text/boolean", FORMAT_XML);
         map.put("application/x-ms-access-export+xml", FORMAT_XML_SCHEMA);
-        map.put("application/xec", FORMAT_JSON);
+        map.put("application/sparql-results+json", FORMAT_JSON);
         map.put("application/json", FORMAT_JSON);
         return Collections.unmodifiableMap(map);
     }
