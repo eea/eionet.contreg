@@ -303,7 +303,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
         if (isUserLoggedIn()) {
             if (sourceUrl != null && !sourceUrl.isEmpty()) {
-                UrgentHarvestQueue.addPullHarvests(sourceUrl);
+                UrgentHarvestQueue.addPullHarvests(sourceUrl, getUserName());
                 if (sourceUrl.size() == 1) {
                     addSystemMessage("The source has been scheduled for urgent harvest!");
                 } else {

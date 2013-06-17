@@ -123,6 +123,11 @@ public class ViewSourceActionBean extends AbstractActionBean {
      */
     public Resolution scheduleUrgentHarvest() throws DAOException, HarvestException {
 
+        if (!isUserLoggedIn()) {
+            addWarningMessage("Not authorized for this operation!");
+            return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", uri);
+        }
+
         // Populate the bean's harvest source.
         harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
 
@@ -151,7 +156,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
         } else if (isFolder) {
             addWarningMessage("A folder cannot be harvested!");
         } else {
-            UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+            UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl(), getUserName());
             addSystemMessage("Successfully scheduled for urgent harvest!");
         }
 

@@ -25,41 +25,60 @@ import java.util.List;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public interface UrgentHarvestQueueDAO extends DAO {
 
     /**
-     *
-     * @throws DAOException
+     * Adds the given items to the urgent harvest queue table.
+     * @param queueItems Items to add.
+     * @param userName User who is adding. Might be null or blank.
+     * 
+     * @throws DAOException Wraps any sort of excpetion that happens.
      */
-    void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException;
+    void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems, String userName) throws DAOException;
 
     /**
-     *
+     * 
      * @param queueItem
      * @throws DAOException
      */
     void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException;
 
     /**
-     *
+     * 
      * @return
      */
     List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
 
     /**
-     *
+     * 
      * @return
      * @throws DAOException
      */
     UrgentHarvestQueueItemDTO poll() throws DAOException;
 
     /**
-     *
+     * 
      * @param url
      */
     boolean isInQueue(String url);
+
+    /**
+     * Removes all urgent harvest queue entries where the URL is the one given in the method input.
+     * 
+     * @param url The URL to remove.
+     * @throws DAOException Any exception that happens within this method is wrapped into this one.
+     */
+    void removeUrl(String url) throws DAOException;
+
+    /**
+     * Removes urgent harvest queue items of the given ids.
+     * 
+     * @param itemIds The given ids.
+     * @throws DAOException Any exception that happens within this method is wrapped into this one.
+     */
+    void removeItems(List<Integer> itemIds) throws DAOException;
 }

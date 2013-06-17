@@ -67,7 +67,9 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
         if (getUser() != null) {
 
-            bulkAddSources();
+            bulkAddSources(getUserName());
+
+            // TODO to investigate why this is here (i.e. why a user's presence automatically means the user is an administrator?)
             setAdminLoggedIn(true);
         }
 
@@ -150,8 +152,9 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database and schedule them for harvest.
+     * @param userName The user who is adding.
      */
-    private void bulkAddSources() {
+    private void bulkAddSources(String userName) {
 
         int counter = 0;
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
@@ -168,7 +171,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             }
 
             try {
-                UrgentHarvestQueue.addPullHarvest(sourceUrl);
+                UrgentHarvestQueue.addPullHarvest(sourceUrl, userName);
             } catch (HarvestException e) {
                 success = false;
                 addSystemMessage("Queueing " + sourceUrl + " for harvest failed with " + e.toString());

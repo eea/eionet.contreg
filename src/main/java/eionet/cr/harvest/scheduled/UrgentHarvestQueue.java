@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
@@ -32,11 +34,12 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public final class UrgentHarvestQueue {
 
@@ -51,22 +54,33 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     * Adds a pull-harvest to the urgent queue.
-     *
-     * @param url URL to put on the queue
-     * @throws HarvestException
+     * Calls {@link #addPullHarvests(List, String)} with a singleton-list from the given URL and the given user name.
+     * @param url The URL.
+     * @param userName The user name.
+     * @throws HarvestException HarvestException Wraps any sort of exception that happens.
      */
-    public static synchronized void addPullHarvest(String url) throws HarvestException {
+    public static synchronized void addPullHarvest(String url, String userName) throws HarvestException {
 
-        addPullHarvests(Collections.singletonList(url));
+        addPullHarvests(Collections.singletonList(url), userName);
     }
 
     /**
-     *
-     * @param urls
-     * @throws HarvestException
+     * Adds a pull-harvest to the urgent harvest queue.
+     * 
+     * @param urls The URL to harvest.
+     * @param userName User who is adding. Might be null or blank, in which case {@link CRUser#APPLICATION} is used as default.
+     * 
+     * @throws HarvestException Wraps any sort of exception that happens.
      */
-    public static synchronized void addPullHarvests(List<String> urls) throws HarvestException {
+    public static synchronized void addPullHarvests(List<String> urls, String userName) throws HarvestException {
+
+        if (CollectionUtils.isEmpty(urls)) {
+            return;
+        }
+
+        if (StringUtils.isBlank(userName)) {
+            userName = CRUser.APPLICATION.getUserName();
+        }
 
         try {
             List<UrgentHarvestQueueItemDTO> dtos = new ArrayList<UrgentHarvestQueueItemDTO>();
@@ -76,7 +90,7 @@ public final class UrgentHarvestQueue {
                 dtos.add(dto);
             }
 
-            DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos);
+            DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos, userName);
 
             for (Iterator<String> i = urls.iterator(); i.hasNext();) {
                 LOGGER.debug("Pull harvest added to the urgent queue, url = " + i.next());
@@ -88,7 +102,7 @@ public final class UrgentHarvestQueue {
 
     /**
      * Adds a push-harvest to the urgent queue. Since it is pushed, the content is already provided.
-     *
+     * 
      * @param pushContent
      * @param url URL to register it on
      * @throws HarvestException
@@ -108,7 +122,7 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     *
+     * 
      * @return UrgentHarvestQueueItemDTO
      * @throws DAOException
      */
@@ -118,7 +132,7 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     *
+     * 
      * @return boolean
      * @throws DAOException
      */

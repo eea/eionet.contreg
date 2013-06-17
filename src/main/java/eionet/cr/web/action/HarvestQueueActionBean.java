@@ -30,12 +30,12 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
@@ -49,6 +49,9 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
 @UrlBinding("/harvestQueue.action")
 public class HarvestQueueActionBean extends AbstractActionBean {
 
+    /** The JSP that displays the urgent harvest queue. */
+    private static final String HARVEST_QUEUE_JSP = "/pages/harvestQueue.jsp";
+
     /**
      * Name of the batch queue
      */
@@ -57,9 +60,6 @@ public class HarvestQueueActionBean extends AbstractActionBean {
      * Name of the urgent queue
      */
     private static final String TYPE_URGENT = "urgent";
-
-    /** */
-    private static Log logger = LogFactory.getLog(HarvestQueueActionBean.class);
 
     /** */
     private static List<Map<String, String>> queueTypes;
@@ -73,6 +73,9 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /** */
     private static String batchHarvestingHours;
+
+    /** */
+    private List<Integer> selectedItems;
 
     /**
      *
@@ -98,7 +101,24 @@ public class HarvestQueueActionBean extends AbstractActionBean {
             urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
         }
 
-        return new ForwardResolution("/pages/harvestQueue.jsp");
+        return new ForwardResolution(HARVEST_QUEUE_JSP);
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DAOException
+     */
+    public Resolution remove() throws DAOException {
+
+        if (CollectionUtils.isEmpty(selectedItems)) {
+            addWarningMessage("No items selected!");
+            return view();
+        }
+
+        DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).removeItems(selectedItems);
+        addSystemMessage(selectedItems.size() + " items successfully removed!");
+        return view();
     }
 
     /**
@@ -194,5 +214,12 @@ public class HarvestQueueActionBean extends AbstractActionBean {
         }
 
         return batchHarvestingHours;
+    }
+
+    /**
+     * @param selectedItems the selectedItems to set
+     */
+    public void setSelectedItems(List<Integer> selectedItems) {
+        this.selectedItems = selectedItems;
     }
 }

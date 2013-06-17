@@ -207,7 +207,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     // schedule urgent harvest, unless explicitly requested not to
                     if (!isSparqlEndpoint && getContext().getRequestParameter("dontHarvest") == null) {
 
-                        UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl());
+                        UrgentHarvestQueue.addPullHarvest(getHarvestSource().getUrl(), getUserName());
                         addSystemMessage("Harvest source successfully created and scheduled for urgent harvest!");
                     } else {
                         addSystemMessage("Harvest source successfully created!");

@@ -68,21 +68,42 @@
             <c:if test="${actionBean.typeUrgent}">
                 <c:choose>
                     <c:when test="${not empty actionBean.urgentQueue}">
+                    
+                        <c:forEach items="${actionBean.urgentQueue}" var="queueItem">
+                            <c:if test="${actionBean.user.administrator || (not empty actionBean.user.userName && actionBean.user.userName eq queueItem.userName)}">
+                                <c:set var="isRemovables" value="true"/>
+                            </c:if>
+                        </c:forEach>
 
-                        <display:table name="${actionBean.urgentQueue}" class="sortable" pagesize="20" sort="list" id="queueItem" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
-
-                            <display:setProperty name="paging.banner.items_name" value="queue items"/>
-
-                            <display:column property="url" title="URL" sortable="true"/>
-                            <display:column property="timeAdded" title="Time added" sortable="true"/>
-                            <display:column title="Harvest type" sortable="true">
-                                <c:choose>
-                                    <c:when test="${queueItem.pushHarvest}">push</c:when>
-                                    <c:otherwise>pull</c:otherwise>
-                                </c:choose>
-                            </display:column>
-
-                        </display:table>
+                        <crfn:form id="resultSetForm" beanclass="${actionBean.class.name}" method="post">
+                        
+                            <display:table name="${actionBean.urgentQueue}" class="sortable" pagesize="20" sort="list" id="queueItem" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
+    
+                                <display:setProperty name="paging.banner.items_name" value="queue items"/>
+                                
+                                <c:if test="${isRemovables}">
+                                    <display:column style="width:10px">
+                                        <c:choose>
+                                            <c:when test="${actionBean.user.administrator || (not empty actionBean.user.userName && actionBean.user.userName eq queueItem.userName)}">
+                                                <stripes:checkbox name="selectedItems" value="${queueItem.itemId}" />
+                                            </c:when>
+                                            <c:otherwise>&nbsp;</c:otherwise>
+                                        </c:choose>
+                                    </display:column>
+                                </c:if>
+                                <display:column property="url" sortable="true" style="width:60%" title='<span title="URL to be harvested">URL</span>'/>
+                                <display:column property="timeAdded" sortable="true" style="max-width:20%" title='<span title="Time when the item was added to the queue">Time added</span>'/>
+                                <display:column property="userName" sortable="true" style="max-width:20%" title='<span title="The user who added the item to the queue">User</span>'/>
+    
+                            </display:table>
+                            <c:if test="${isRemovables}">
+                                <div>
+                                    <stripes:submit name="remove" value="Remove" title="Remove selected URLs"/>
+                                    <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAllForField('resultSetForm', 'selectedItems');return false;"/>
+                                </div>
+                            </c:if>
+                            
+                        </crfn:form>
                     </c:when>
                     <c:otherwise>
                         <p>No items found in this queue.</p>

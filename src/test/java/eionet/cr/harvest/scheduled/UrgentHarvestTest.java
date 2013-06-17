@@ -37,7 +37,7 @@ public class UrgentHarvestTest extends TestCase {
     @Test
     public void testUrgentHarvestUnicodeUrls() throws HarvestException, DAOException {
         String url = "http://www.google.com/öö";
-        UrgentHarvestQueue.addPullHarvest(url);
+        UrgentHarvestQueue.addPullHarvest(url, "enriko");
 
         assertTrue(UrgentHarvestQueue.isInQueue(url));
         UrgentHarvestQueue.poll();

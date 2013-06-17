@@ -46,8 +46,8 @@ public final class RegisterUrl {
 
         String urlWithoutFragment = StringUtils.substringBefore(url, "#");
         Integer intervalMinutes =
-            Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);
@@ -57,6 +57,6 @@ public final class RegisterUrl {
 
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(source);
         // schedule urgent harvest of this URL
-        UrgentHarvestQueue.addPullHarvest(urlWithoutFragment);
+        UrgentHarvestQueue.addPullHarvest(urlWithoutFragment, user.getUserName());
     }
 }

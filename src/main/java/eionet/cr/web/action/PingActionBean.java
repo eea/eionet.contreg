@@ -46,6 +46,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.web.security.CRUser;
 
 /**
  * An action bean that implements the CR's "ping" API. It is a RESTful API that enables other application to force an urgent harvest
@@ -139,7 +140,7 @@ public class PingActionBean extends AbstractActionBean {
                 }
 
                 if (doHarvest) {
-                    UrgentHarvestQueue.addPullHarvest(uri);
+                    UrgentHarvestQueue.addPullHarvest(uri, CRUser.APPLICATION.getUserName());
                     message = "URL added to the urgent harvest queue: " + uri;
                 }
             }

@@ -25,8 +25,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dao.DAOException;
@@ -34,17 +36,21 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.web.security.CRUser;
 
 /**
- *
+ * 
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * 
  */
 public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
     /** */
-    private static final String ADD_PISH_HARVEST_SQL =
-            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT) VALUES (?,NOW(),?)";
+    private static final String ADD_PULL_HARVEST_SQL =
+            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\", USERNAME) VALUES (?,NOW(),?)";
+    /** */
+    private static final String ADD_PUSH_HARVEST_SQL =
+            "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT, USERNAME) VALUES (?,NOW(),?,?)";
     /** */
     private static final String GET_URGENT_HARVEST_QUEUE_SQL = "select * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
     /** */
@@ -52,30 +58,50 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     /** */
     private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE where URL=? and \"TIMESTAMP\"=?";
 
+    /** SQL for removing occurrences of a given URL from urgent harvest queue table. */
+    private static final String REMOVE_URL_SQL = "delete from URGENT_HARVEST_QUEUE where URL=?";
+
+    /** SQL for removing a harvest queue item with the given id. */
+    private static final String REMOVE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE where ITEM_ID=?";
+
     /*
      * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestQueueDAO#addQueueItem(eionet.cr.dto.HarvestQueueItemDTO)
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#addPullHarvests(java.util.List, java.lang.String)
      */
     @Override
-    public void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems) throws DAOException {
+    public void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems, String userName) throws DAOException {
 
-        String sql = "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\") VALUES (?,NOW())";
+        if (CollectionUtils.isEmpty(queueItems)) {
+            return;
+        }
+
+        if (userName != null && userName.trim().length() == 0) {
+            userName = null;
+        }
+
         PreparedStatement ps = null;
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement(sql);
+            ps = conn.prepareStatement(ADD_PULL_HARVEST_SQL);
+
+            boolean atLeastOneAdded = false;
             for (int i = 0; i < queueItems.size(); i++) {
+
                 UrgentHarvestQueueItemDTO dto = queueItems.get(i);
                 String url = dto.getUrl();
-                if (url != null) {
+                if (StringUtils.isNotBlank(url)) {
                     url = StringUtils.substringBefore(url, "#");
+                    ps.setString(1, url);
+                    ps.setString(2, userName);
+                    ps.addBatch();
+                    atLeastOneAdded = true;
                 }
-                ps.setString(1, url);
-                ps.addBatch();
             }
-            ps.executeBatch();
+
+            if (atLeastOneAdded) {
+                ps.executeBatch();
+            }
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -86,7 +112,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
      */
     @Override
@@ -100,11 +126,12 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         }
         values.add(url);
         values.add(queueItem.getPushedContent());
+        values.add(CRUser.APPLICATION.getUserName());
 
         Connection conn = null;
         try {
             conn = getSQLConnection();
-            SQLUtil.executeUpdate(ADD_PISH_HARVEST_SQL, values, conn);
+            SQLUtil.executeUpdate(ADD_PUSH_HARVEST_SQL, values, conn);
         } catch (Exception e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
@@ -114,7 +141,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
      */
     @Override
@@ -124,7 +151,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#poll()
      */
     @Override
@@ -147,7 +174,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
-     *
+     * 
      * @param conn
      * @return
      * @throws SQLException
@@ -164,7 +191,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
-     *
+     * 
      * @param queueItem
      * @throws SQLException
      */
@@ -179,6 +206,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
+     * 
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String)
      */
     @Override
@@ -205,5 +233,53 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
             SQLUtil.close(conn);
         }
         return ret;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#removeUrl(java.lang.String)
+     */
+    @Override
+    public void removeUrl(String url) throws DAOException {
+
+        if (StringUtils.isBlank(url)) {
+            throw new IllegalArgumentException("The given URL must not be blank!");
+        }
+
+        executeSQL(REMOVE_URL_SQL, Arrays.asList(url));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#removeItems(java.util.List)
+     */
+    @Override
+    public void removeItems(List<Integer> itemIds) throws DAOException {
+
+        if (CollectionUtils.isEmpty(itemIds)) {
+            throw new IllegalArgumentException("The given list of itemd ids must not be empty!");
+        }
+
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = getSQLConnection();
+            conn.setAutoCommit(false);
+            statement = conn.prepareStatement(REMOVE_ITEM_SQL);
+            for (Integer itemId : itemIds) {
+                statement.setInt(1, itemId);
+                statement.addBatch();
+            }
+            statement.executeBatch();
+            conn.commit();
+        } catch (Exception e) {
+            SQLUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(statement);
+            SQLUtil.close(conn);
+        }
     }
 }

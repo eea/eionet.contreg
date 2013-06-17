@@ -38,12 +38,15 @@ public class HarvestQueueItemDTOReader extends SQLResultSetBaseReader<UrgentHarv
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
+        dto.setItemId(rs.getInt("ITEM_ID"));
         dto.setUrl(rs.getString("URL"));
         dto.setTimeAdded(rs.getTimestamp("TIMESTAMP"));
         dto.setPushedContent(rs.getString("PUSHED_CONTENT"));
+        dto.setUserName(rs.getString("USERNAME"));
 
         resultList.add(dto);
     }
