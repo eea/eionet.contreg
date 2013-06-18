@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -126,6 +127,9 @@ public final class GeneralConfig {
 
     /** */
     public static final String HARVESTER_URI = getRequiredProperty(APPLICATION_HOME_URL) + "/harvester";
+
+    /** Servlet response buffer size to be used for requests that go via Stripes. The unit is number of bytes. */
+    public static final int SERVLET_RESPONSE_BUFFER_SIZE = NumberUtils.toInt(getProperty("servletResponseBufferSize"), 32768);
 
     /** */
     private static Log logger = LogFactory.getLog(GeneralConfig.class);

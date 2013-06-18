@@ -43,12 +43,15 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 
 import org.apache.log4j.Logger;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Util;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 
 /**
- * Interceptor that saves to the session last action except login action.
- * <p>
+ * An implementation of {@link Interceptor} that intercepts {@link LifecycleStage#EventHandling}.
+ * Current purposes:
+ * - send user back to last action event after login
+ * - set servlet response buffer size for every reuqest/response that goes via Stripes.
  *
  * @author gerasvad
  *
@@ -80,14 +83,20 @@ public class ActionEventInterceptor implements Interceptor {
             String actionEventURL = null;
 
             actionEventURL =
-                getActionName(actionBean.getClass()) + "?"
-                + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
-                + getRequestParameters(request);
+                    getActionName(actionBean.getClass()) + "?"
+                            + ((getEventName(eventMethod) != null) ? getEventName(eventMethod) + "=&" : "")
+                            + getRequestParameters(request);
 
             // this will handle pretty url integration
             actionEventURL = postProcess(actionEventURL);
             request.getSession().setAttribute(LAST_ACTION_URL_SESSION_ATTR, actionEventURL);
         }
+
+        // Set the servlet response buffer size. The smaller it is, the sooner the servlet response writing starts, meaning that
+        // any exceptions that happen after that, cannot be gracefully communicated to the client. On the other hand, the higher
+        // it is, the later the client starts seeing any response and the higher the server's memory footprint at a particular
+        // split second in time. Tomcat's default is 8192 bytes.
+        context.getActionBeanContext().getResponse().setBufferSize(GeneralConfig.SERVLET_RESPONSE_BUFFER_SIZE);
 
         resolution = context.proceed();
         return resolution;

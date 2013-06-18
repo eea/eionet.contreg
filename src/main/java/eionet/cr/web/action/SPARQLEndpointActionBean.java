@@ -617,7 +617,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         RepositoryConnection conn = null;
         try {
             conn = SesameConnectionProvider.getReadOnlyRepositoryConnection();
-
             Query queryObject = conn.prepareQuery(QueryLanguage.SPARQL, query);
             SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
 
@@ -751,7 +750,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -763,21 +762,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1040,7 +1039,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Returns shared bookmarked queries.
+     * Lazy getter that returns the shared bookmarked queries.
      *
      * @return
      * @throws DAOException
@@ -1054,7 +1053,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Returns project bookmarked queries.
+     * Lazy getter that returns the project bookmarked queries.
      *
      * @return project bookmarked queries for the user.
      * @throws DAOException
@@ -1062,7 +1061,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public List<Map<String, String>> getProjectBookmarkedQueries() throws DAOException {
 
-        projectBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getProjectSparqlBookmarks(getUser());
+        if (projectBookmarkedQueries == null) {
+            projectBookmarkedQueries = DAOFactory.get().getDao(HelperDAO.class).getProjectSparqlBookmarks(getUser());
+        }
         return projectBookmarkedQueries;
 
     }

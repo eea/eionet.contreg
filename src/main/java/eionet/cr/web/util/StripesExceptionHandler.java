@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.exception.ExceptionHandler;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,49 +39,46 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StripesExceptionHandler implements ExceptionHandler {
 
-    /** */
-    public static final String ERROR_PAGE = "/pages/error.jsp";
-    public static final String EXCEPTION_ATTR = "exception";
+    /** Static logger for this class. */
+    private static final Log LOGGER = LogFactory.getLog(StripesExceptionHandler.class);
 
     /** */
-    private static Log logger = LogFactory.getLog(StripesExceptionHandler.class);
+    public static final String ERROR_PAGE = "/pages/common/error.jsp";
+    public static final String EXCEPTION_ATTR = "exception";
 
     /*
      * (non-Javadoc)
      *
      * @see net.sourceforge.stripes.config.ConfigurableComponent#init(net.sourceforge.stripes.config.Configuration)
      */
+    @Override
     public void init(Configuration configuration) throws Exception {
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sourceforge.stripes.exception.ExceptionHandler#handle(java.lang.Throwable, javax.servlet.http.HttpServletRequest,
-     * javax.servlet.http.HttpServletResponse)
-     */
-    public void handle(Throwable t, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        Throwable newThrowable = (t instanceof ServletException) ? getRootCause((ServletException) t) : t;
-        if (newThrowable == null)
-            newThrowable = t;
-
-        logger.error(newThrowable.getMessage(), newThrowable);
-        request.setAttribute(EXCEPTION_ATTR, newThrowable);
-        request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
+        // No init actions.
     }
 
     /**
-     *
-     * @param servletException
-     * @return
+     * An implementation of {@link ExceptionHandler#handle(Throwable, HttpServletRequest, HttpServletResponse)} whose purpose is
+     * to forward the request to a user-friendly error page that displays the unexpected exception that got us here.
      */
-    private Throwable getRootCause(ServletException servletException) {
+    @Override
+    public void handle(Throwable t, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Throwable rootCause = servletException.getRootCause();
-        if (rootCause instanceof ServletException)
-            return getRootCause((ServletException) rootCause);
-        else
-            return rootCause;
+        // If response already committed, then we can neither forward nor redirect anywhere, so we might just as well leave.
+        if (response.isCommitted()) {
+            return;
+        }
+
+        // Showing root cause only should be enough.
+        Throwable rootCause = ExceptionUtils.getRootCause(t);
+        if (rootCause == null) {
+            rootCause = t;
+        }
+
+        // Log the exception with Log4j
+        LOGGER.error(rootCause.getMessage(), rootCause);
+
+        // Forward the request to the error page.
+        request.setAttribute(EXCEPTION_ATTR, rootCause);
+        request.getRequestDispatcher(ERROR_PAGE).forward(request, response);
     }
 }
