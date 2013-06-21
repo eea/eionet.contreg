@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
@@ -111,7 +110,7 @@ public class PingActionBean extends AbstractActionBean {
                     errorCode = ERR_INVALID_URL;
                     message = "Not a valid URL, source cannot be created.";
                 } else {
-                    message = "URL not in catalogue of sources, no action taken.";
+                    message = "Not a valid URL, no action taken.";
                 }
             } else if (create && new URL(uri).getRef() != null) {
                 errorCode = ERR_FRAGMENT_URL;
@@ -123,14 +122,14 @@ public class PingActionBean extends AbstractActionBean {
                 // Helper flag that will be raised if a harvest is indeed needed.
                 boolean doHarvest = false;
 
-                // Check if a graph by this URI exists.
-                boolean exists = DAOFactory.get().getDao(HelperDAO.class).isGraphExists(uri);
-                if (exists) {
+                // Check if a source by this URI exists.
+                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+                if (source != null) {
                     doHarvest = true;
                 } else if (create) {
 
                     // Graph does not exist, but must be created as indicated in request parameters
-                    HarvestSourceDTO source = new HarvestSourceDTO();
+                    source = new HarvestSourceDTO();
                     source.setUrl(uri);
                     source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
                     DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
