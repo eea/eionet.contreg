@@ -104,8 +104,7 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>xsd:gYear( <em>Expn</em>)</td>
     <td> Converts expression to a year (Gregorian). Support: Can convert plain strings like "2011-05-05", but <em>not</em> expressions that are already xsd:dateTime or xsd:date types </td>
-    <td> Partly 
-</td>
+    <td> Partly </td>
   </tr>
   <tr>
     <td>xsd:gYearMonth( <em>Expn</em>)</td>
@@ -130,22 +129,22 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>DATATYPE( <em>Expn</em>)</td>
     <td>Returns the datatype IRI of <em>Expn</em>; returns xsd:string if the parameter is a simple literal</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>IRI( <em>Expn</em>)</td>
     <td>The IRI function constructs an IRI by resolving the string argument</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>isIRI( <em>Expn</em>)</td>
     <td>Returns true if term is an IRI. Returns false otherwise</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>isURI( <em>Expn</em>)</td>
-    <td style="text-align: right"> isURI is an alternate spelling for the isIRI operator</td>
-    <td>Supported </td>
+    <td> isURI is an alternate spelling for the isIRI operator</td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>isBLANK( <em>Expn</em>)</td>
@@ -155,7 +154,7 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>isLITERAL( <em>Expn</em>)</td>
     <td>Returns true if term is a literal</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>isNUMERIC( <em>Expn</em>)</td>
@@ -165,7 +164,7 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>LANG( <em>Expn</em>)</td>
     <td>Returns the language tag of <em>Expn</em>, if it has one</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>LANGMATCHES( <em>Expn1, Expn2</em>)</td>
@@ -175,7 +174,7 @@ These functions cast a value from one data type to another. See also <a href="ht
   <tr>
     <td>STR( <em>Expn</em>)</td>
     <td>If <em>Expn</em> is a literal, returns the string without datatype and language code. If <em>Expn</em> is an IRI, then the IRI is returned as a string</td>
-    <td>Supported </td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>STRLANG( <em>Expn1, Expn2</em>)</td>
@@ -199,12 +198,27 @@ These functions cast a value from one data type to another. See also <a href="ht
 <a href="http://www.w3.org/TR/sparql11-query/#SparqlOps">SPARQL 1.1</a> defines additional functions.
 </p>
 <p>
-Actual support is unknown.
+Actual support is mostly unknown.
 </p>
 <table class="datatable">
   <tr>
-    <td>fn:not(value)</td>
-    <td>Logical negation of the boolean effective value of value.</td>
+    <td>abs(v)</td>
+    <td>Return the absolute value.</td>
+    <td> ??  </td>
+  </tr>
+  <tr>
+    <td>CEIL(v)</td>
+    <td>Return the smallest integer value than the argument (as a double).</td>
+    <td> ?? </td>
+  </tr>
+  <tr>
+    <td>COALESCE(expression, ....)</td>
+    <td>The COALESCE function form returns the RDF term value of the first expression that evaluates without error. In SPARQL, evaluating an unbound variable raises an error.</td>
+    <td> Supported </td>
+  </tr>
+  <tr>
+    <td>concat(string, ...)</td>
+    <td>Return the concatenation of strings. See also bif:concat()</td>
     <td> ??  </td>
   </tr>
   <tr>
@@ -213,9 +227,14 @@ Actual support is unknown.
     <td> ??  </td>
   </tr>
   <tr>
-    <td>strstarts(string, match)</td>
-    <td>Test whether string starts with substr.</td>
-    <td> ??  </td>
+    <td>IF (expression1, expression2, expression3)</td>
+    <td>The IF function form evaluates the first argument, interprets it as a effective boolean value, then returns the value of expression2 if the EBV is true, otherwise it returns the value of expression3. Only one of expression2 and expression3 is evaluated. If evaluating the first argument raises an error, then an error is raised for the evaluation of the IF expression.</td>
+    <td> Supported </td>
+  </tr>
+  <tr>
+    <td>LCASE(string)</td>
+    <td>Return a string which is the lower case equivalent of the argument. See also bif:lower()</td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>strends(string, match)</td>
@@ -228,24 +247,19 @@ Actual support is unknown.
     <td> ??  </td>
   </tr>
   <tr>
-    <td>lcase(string)</td>
-    <td>Return a string which is the lower case equivalent of the argument.</td>
+    <td>strstarts(string, match)</td>
+    <td>Test whether string starts with substr.</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>ucase(string)</td>
-    <td>Return a string which is the upper case equivalent of the argument.</td>
-    <td> ??  </td>
+    <td>UCASE(string)</td>
+    <td>Return a string which is the upper case equivalent of the argument. See also bif:upper()</td>
+    <td> Supported </td>
   </tr>
   <tr>
     <td>regex(string, pattern [, flags])</td>
     <td>Regular expression match.</td>
     <td> Supported  </td>
-  </tr>
-  <tr>
-    <td>concat(string, ...)</td>
-    <td>Return the concatenation of strings.</td>
-    <td> ??  </td>
   </tr>
   <tr>
     <td>substr(string, begin [,length])</td>
@@ -259,19 +273,14 @@ Actual support is unknown.
     <td> ??  </td>
   </tr>
   <tr>
-    <td>abs(v)</td>
-    <td>Return the absolute value.</td>
-    <td> ??  </td>
-  </tr>
-  <tr>
     <td>floor(v)</td>
     <td>Return the greatest integer value less than the argument (as a double).</td>
     <td> ??  </td>
   </tr>
   <tr>
-    <td>ceil(v)</td>
-    <td>Return the smallest integer value than the argument (as a double).</td>
-    <td> ?? </td>
+    <td>YEAR(d)</td>
+    <td>Return the year as an integer. Argument must be an xsd:date or xsd:dateTime type</td>
+    <td> Supported </td>
   </tr>
 </table>
 <h2 id="Virtuosobuilt-infunctions">Virtuoso built-in functions</h2>

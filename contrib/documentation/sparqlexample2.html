@@ -1,0 +1,58 @@
+<p>
+The following example shows a way to run three queries consecutively.
+The bottom query returns one row containing the string "World" in the variable ?country
+The middle query finds all distinct regions in the dataset and puts them in the variable ?country
+All variables not mentioned in the sub-selects are unbound.
+The top query is the main query and returns the observations for each country.
+The <code>GRAPH</code> is not necessary for the query. It is only there to speed up the
+query as the database can then use the graph-index.
+</p>
+<pre>
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX dimension: &lt;http://purl.org/linked-data/sdmx/2009/dimension#&gt;
+PREFIX measure: &lt;http://purl.org/linked-data/sdmx/2009/measure#&gt;
+PREFIX xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX skos: &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX qb: &lt;http://purl.org/linked-data/cube#&gt;
+PREFIX year: &lt;http://reference.data.gov.uk/id/year/&gt;
+PREFIX bank: &lt;http://rdfdata.eionet.europa.eu/worldbank/property/&gt;
+PREFIX en-atm-co2e-kt: &lt;http://rdfdata.eionet.europa.eu/worldbank/dataset/wdi/EN.ATM.CO2E.KT&gt;
+PREFIX dataset: &lt;http://rdfdata.eionet.europa.eu/eurostat/data/&gt;
+
+SELECT DISTINCT
+ ?country
+ ?region
+ ?co2kt
+WHERE {
+  GRAPH &lt;http://rdfdata.eionet.europa.eu/worldbank/data/EN.ATM.CO2E.KT.rdf.gz&gt; {
+    ?spc qb:dataSet en-atm-co2e-kt: .
+    ?spc a qb:Observation.
+    ?spc dimension:timePeriod "2009-01-01"^^xsd:date .
+  }
+
+  {
+    ?spc measure:obsValue ?co2kt.
+    ?spc dimension:refArea  ?area.
+    ?area skos:prefLabel ?country .
+    ?area bank:region ?uregion .
+    ?uregion skos:prefLabel ?region
+  } UNION {
+    { SELECT DISTINCT "World" AS ?region ?country
+       WHERE {
+         GRAPH &lt;http://rdfdata.eionet.europa.eu/worldbank/data/EN.ATM.CO2E.KT.rdf.gz&gt; {
+           ?spc qb:dataSet en-atm-co2e-kt: .
+           ?spc a qb:Observation.
+           ?spc dimension:timePeriod "2009-01-01"^^xsd:date .
+           ?spc dimension:refArea  ?x.
+         }
+         ?x bank:region ?uregion .
+         ?uregion skos:prefLabel ?country .
+       }
+    }
+  } UNION {
+    { SELECT "World" AS ?country
+       WHERE {}
+    }
+  }
+} ORDER BY ?country
+</pre>

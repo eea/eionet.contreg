@@ -1,0 +1,38 @@
+<p>
+The following example shows how to combine two datasets. It works by using different
+<em>subject</em>-variables in the datasets and then forcing the matches on the ?date and _:geo.
+Note how those two variables are used.
+</p>
+<pre>
+PREFIX qb: &lt;http://purl.org/linked-data/cube#&gt;
+PREFIX sdmx-measure: &lt;http://purl.org/linked-data/sdmx/2009/measure#&gt;
+PREFIX sdmx-dimension: &lt;http://purl.org/linked-data/sdmx/2009/dimension#&gt;
+PREFIX sdmx-attribute: &lt;http://purl.org/linked-data/sdmx/2009/attribute#&gt;
+PREFIX property: &lt;http://rdfdata.eionet.europa.eu/eurostat/property#&gt;
+PREFIX data: &lt;http://rdfdata.eionet.europa.eu/eurostat/data/&gt;
+
+SELECT ?date ?geo (?gasprice * 100 / ?index AS ?relindex)
+WHERE {
+# Gas prices by type of user - MSHH = Medium sized households
+  GRAPH data:ten00118.rdf.gz {
+    _:ten00118 qb:dataSet data:ten00118 .
+    _:ten00118 sdmx-dimension:freq &lt;http://purl.org/linked-data/sdmx/2009/code#freq-A&gt; .
+    _:ten00118 sdmx-dimension:timePeriod ?date .
+    _:ten00118 property:indic_en &lt;http://rdfdata.eionet.europa.eu/eurostat/dic/indic_en#MSHH&gt; .
+    _:ten00118 property:geo _:geo .
+    _:ten00118 property:unit &lt;http://rdfdata.eionet.europa.eu/eurostat/dic/unit#GJ_GCV&gt; .
+    _:ten00118 sdmx-measure:obsValue ?gasprice .
+  }
+# Harmonised indexes of consumer prices - CP00 = all items
+  GRAPH data:prc_hicp_aind.rdf.gz {
+    _:prc_hicp_aind qb:dataSet data:prc_hicp_aind.
+    _:prc_hicp_aind sdmx-dimension:freq &lt;http://purl.org/linked-data/sdmx/2009/code#freq-A&gt;.
+    _:prc_hicp_aind sdmx-dimension:timePeriod ?date.
+    _:prc_hicp_aind property:infotype &lt;http://rdfdata.eionet.europa.eu/eurostat/dic/infotype#AVX&gt; .
+    _:prc_hicp_aind property:geo _:geo .
+    _:prc_hicp_aind property:coicop &lt;http://rdfdata.eionet.europa.eu/eurostat/dic/coicop#CP00&gt; .
+    _:prc_hicp_aind sdmx-measure:obsValue ?index .
+  }
+  _:geo skos:notation ?geo .
+}
+</pre>
