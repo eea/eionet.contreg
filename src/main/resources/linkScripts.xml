@@ -126,7 +126,7 @@ INSERT {
 }
 WHERE {
     GRAPH ?harvestedSource {
-        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && !bif:isnull(xsd:decimal(?value)))
+        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && bif:length(bif:trim(str(?value))) > 0 && !bif:isnull(xsd:decimal(?value)))
     }
 }
 ]]></entry>
@@ -145,7 +145,7 @@ INSERT {
 }
 WHERE {
     GRAPH ?harvestedSource {
-        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && !bif:isnull(xsd:integer(?value)))
+        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && bif:length(bif:trim(str(?value))) > 0 && !bif:isnull(xsd:integer(?value)))
     }
 }
 ]]></entry>
@@ -232,7 +232,7 @@ INSERT {
 }
 WHERE {
     GRAPH ?harvestedSource {
-        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && !bif:isnull(xsd:date(?value)))
+        ?record [TABLECOLUMN] ?value FILTER(DATATYPE(?value) = xsd:string && bif:length(bif:trim(str(?value))) > 0 && !bif:isnull(xsd:date(?value)))
     }
 }
 ]]></entry>

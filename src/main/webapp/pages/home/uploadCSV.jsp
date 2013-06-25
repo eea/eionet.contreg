@@ -186,7 +186,7 @@
                                      <tr>
                                         <td><label class="question required" for="linkedColumnSelect${loop.index}" title="Column to link data with.">Column</label></td>
                                         <td>
-                                            <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="width: 230px;">
+                                            <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="max-width:100%;">
                                                 <stripes:options-collection collection="${actionBean.columnLabels}" />
                                             </stripes:select>
                                         </td>
@@ -194,7 +194,7 @@
                                      <tr>
                                         <td><label class="question required" for="scriptTemplateSelect${loop.index}" title="Linking script.">Linking script</label></td>
                                         <td>
-                                            <stripes:select name="dataLinkingScripts[${loop.index}].scriptId" id="scriptTemplateSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].scriptId}" style="width: 230px;">
+                                            <stripes:select name="dataLinkingScripts[${loop.index}].scriptId" id="scriptTemplateSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].scriptId}" style="max-width:100%;">
                                                 <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
                                             </stripes:select>
                                         </td>
