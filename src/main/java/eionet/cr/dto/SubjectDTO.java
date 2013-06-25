@@ -434,8 +434,10 @@ public class SubjectDTO implements Serializable {
         Collection<ObjectDTO> objects = getObjects(predicate);
         if (objects != null && !objects.isEmpty()) {
             for (ObjectDTO objectDTO : objects) {
-                if (objectDTO.getValue().equals(objectValue)) {
-                    if (objectDTO.getSourceUri().equals(sourceUri)) {
+                String thisValue = objectDTO.getValue();
+                if (thisValue != null && thisValue.equals(objectValue)) {
+                    String thisSourceUri = objectDTO.getSourceUri();
+                    if (thisSourceUri != null && thisSourceUri.equals(sourceUri)) {
                         return true;
                     }
                 }

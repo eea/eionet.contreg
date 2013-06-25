@@ -58,7 +58,7 @@ public final class ResponseCodeUtil {
      * @return
      */
     public static boolean isError(int code) {
-        return code >= 400 && code <= 599;
+        return code == 400 || (code >= 402 && code <= 599);
     }
 
     /**
@@ -70,4 +70,13 @@ public final class ResponseCodeUtil {
         return code == 304;
     }
 
+    /**
+     * Returns true if the given code equals 401, i.e. HTTP response code known as "Unauthorized".
+     * Otherwise returns false.
+     * @param code The given code.
+     * @return As indicated above.
+     */
+    public static boolean isUnauthorized(int code) {
+        return code == 401;
+    }
 }

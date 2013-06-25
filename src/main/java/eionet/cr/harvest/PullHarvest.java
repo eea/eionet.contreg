@@ -25,6 +25,7 @@ import static eionet.cr.harvest.ResponseCodeUtil.isError;
 import static eionet.cr.harvest.ResponseCodeUtil.isNotModified;
 import static eionet.cr.harvest.ResponseCodeUtil.isPermanentError;
 import static eionet.cr.harvest.ResponseCodeUtil.isRedirect;
+import static eionet.cr.harvest.ResponseCodeUtil.isUnauthorized;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -415,7 +416,7 @@ public class PullHarvest extends BaseHarvest {
 
             // if URL connection returned no errors and its content has been modified since last harvest,
             // proceed to downloading
-            if (!isError(httpResponseCode) && !isNotModified(httpResponseCode)) {
+            if (!isError(httpResponseCode) && !isNotModified(httpResponseCode) && !isUnauthorized(httpResponseCode)) {
 
                 int noOfTriples = downloadAndProcessContent(urlConn);
                 setStoredTriplesCount(noOfTriples);
@@ -424,7 +425,11 @@ public class PullHarvest extends BaseHarvest {
 
             } else if (isNotModified(httpResponseCode)) {
                 LOGGER.debug(loggerMsg("Source not modified since last harvest"));
-                finishWithNotModified(urlConn, 0);
+                finishWithNotModified();
+
+            } else if (isUnauthorized(httpResponseCode)) {
+                LOGGER.debug(loggerMsg("Source unauthorized!"));
+                finishWithUnauthorized();
 
             } else if (isError(httpResponseCode)) {
                 LOGGER.debug(loggerMsg("Server returned error code " + httpResponseCode));
@@ -494,13 +499,32 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
-     * @param urlConn
-     * @param noOfTriples
+     * Helper method for taking actions in case of "not-modified" response from source.
      */
-    private void finishWithNotModified(HttpURLConnection urlConn, int noOfTriples) {
+    private void finishWithNotModified() {
 
         addHarvestMessage("Source not modified since last harvest", HarvestMessageType.INFO);
+        isSourceAvailable = true;
+
+        // update context source DTO (since the server returned source-not-modified,
+        // the number of harvested statements stays as it already is, i.e. we're not setting it)
+        getContextSourceDTO().setLastHarvest(new Date());
+        getContextSourceDTO().setLastHarvestFailed(false);
+        getContextSourceDTO().setPermanentError(false);
+        getContextSourceDTO().setCountUnavail(0);
+
+        // since the server returned source-not-modified, we're keeping the old metadata,
+        // but still updating the cr:lastRefreshed
+        setCleanAllPreviousSourceMetadata(false);
+        addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
+    }
+
+    /**
+     * Helper method for taking actions in case of "unauthorized" response from source.
+     */
+    private void finishWithUnauthorized() {
+
+        addHarvestMessage("Source unauthorized", HarvestMessageType.INFO);
         isSourceAvailable = true;
 
         // update context source DTO (since the server returned source-not-modified,
@@ -722,7 +746,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -752,7 +776,7 @@ public class PullHarvest extends BaseHarvest {
                         return loadFile(processedFile, rdfLoader);
                     } else {
                         LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
-                        //if no conversion found but triples exist from previous harvests, clear content
+                        // if no conversion found but triples exist from previous harvests, clear content
                         getHarvestSourceDAO().clearGraph(getContextUrl());
 
                         return 0;
@@ -902,7 +926,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException
      */
     private HttpURLConnection openUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -937,7 +961,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -990,7 +1014,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String result = null;
 
