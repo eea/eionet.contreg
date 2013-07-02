@@ -223,7 +223,7 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
      * @return HTTP Response Code String representation
      */
     public String getResponseCodeString() {
-        return (responseCode == 0 ? "N/A" : String.valueOf(responseCode));
+        return (responseCode <= 0 ? "N/A" : String.valueOf(responseCode));
     }
 
     public int getResponseCode() {

@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,22 +46,11 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpClientParams;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sparql.SPARQLConnection;
-import org.openrdf.repository.sparql.SPARQLRepository;
-import org.openrdf.repository.sparql.query.SPARQLGraphQuery;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -84,7 +74,6 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
-import eionet.cr.harvest.util.EndpointHttpClient;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.MediaTypeToDcmiTypeConverter;
 import eionet.cr.harvest.util.RDFMediaTypes;
@@ -92,7 +81,6 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
-import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
@@ -216,79 +204,107 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * Called when the source to be harvested is a SPARQL endpoint. It's the core method that does the remote endpoint harvest.
      *
-     * @throws HarvestException
+     * @throws HarvestException All exception wrapped into this one.
      */
     private void doEndpointHarvest() throws HarvestException {
 
-        int numberOfTriples = 0;
-        EndpointHttpClient httpClient = prepareEndpointHttpClient();
+        httpResponseCode = NO_RESPONSE;
+        String responseMessage = null;
+        File downloadedFile = null;
+        HashMap<File, ContentLoader> filesAndLoaders = new HashMap<File, ContentLoader>();
 
-        GraphQueryResult queryResult = null;
-        RepositoryConnection localConn = null;
-        RepositoryConnection endpointConn = null;
         try {
             // First see if this particular endpoint has any active harvest queries mapped to it at all.
             String endpointUrl = getContextUrl();
             List<EndpointHarvestQueryDTO> queries =
                     DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).listByEndpointUrl(endpointUrl, true);
             if (queries == null || queries.isEmpty()) {
-                LOGGER.warn(loggerMsg("Found no active harvest queries for this endpoint"));
-                finishWithOK(null, numberOfTriples);
+                String msg = "Found no active harvest queries for this endpoint";
+                LOGGER.warn(loggerMsg(msg));
+                finishWithOK(null, getContextSourceDTO().getStatements(), msg);
                 return;
             }
 
-            // Prepare remote repository connection
-            SPARQLRepository sparqlRepository = new SPARQLRepository(endpointUrl);
-            endpointConn = sparqlRepository.getConnection();
+            // Loop through the harvest queries, execute each one of them on the remote repository, save each response to a local
+            // temporary file. Then load all these files, and delete them afterwards.
+            // If any of the submitted queries fails, then so does the whole harvest of this remote endpoint.
 
-            // Prepare local repository connection
-            localConn = SesameUtil.getRepositoryConnection();
-            localConn.setAutoCommit(false);
-
-            // Prepare local repository value factory
-            ValueFactory vf = localConn.getValueFactory();
-            org.openrdf.model.URI graphURI = vf.createURI(endpointUrl);
-
-            // Loop through the harvest queries, execute each one of them on the remote repository,
-            // write the returned statements straight into local repository.
+            HttpURLConnection endpointConn = null;
             for (EndpointHarvestQueryDTO queryDTO : queries) {
 
-                LOGGER.debug(loggerMsg("Executing endpoint harvest query with id = " + queryDTO.getId()));
-                GraphQuery graphQuery = new SPARQLGraphQuery(httpClient, endpointUrl, endpointUrl, queryDTO.getQuery());
+                int queryId = queryDTO.getId();
+                LOGGER.debug(loggerMsg("Executing endpoint harvest query with id = " + queryId));
 
-                // Note that the returned GraphQueryResult is always a org.openrdf.repository.sparql.query.BackgroundGraphResult
-                // for remote endpoints, and it's a result that returns its statements (i.e. triples) AS THEY ARE PARSED.
-                // i.e. the statements ARE NOT written to the memory first and then passed back. So no memory problems here, and
-                // safe to use it this way.
-                queryResult = graphQuery.evaluate();
-                if (queryResult != null) {
-                    while (queryResult.hasNext()) {
-
-                        // Clear the graph just before first insert.
-                        if (numberOfTriples == 0) {
-                            localConn.clear(graphURI);
-                        }
-                        localConn.add(queryResult.next(), graphURI);
-                        numberOfTriples++;
+                try {
+                    endpointConn = prepareEndpointConnection(endpointUrl, queryDTO.getQuery());
+                    try {
+                        httpResponseCode = endpointConn.getResponseCode();
+                        responseMessage = endpointConn.getResponseMessage();
+                    } catch (IOException ioe) {
+                        // an error when connecting to server is considered a temporary error-
+                        // don't throw it, but log in the database and exit
+                        LOGGER.debug(loggerMsg("Error when connecting to server: " + ioe));
+                        finishWithError(NO_RESPONSE, null, ioe);
+                        return;
                     }
+
+                    // Throws exception when the content-length indicated in HTTP response is more than the maximum allowed.
+                    validateContentLength(endpointConn);
+
+                    if (httpResponseCode == 200) {
+                        LOGGER.debug(loggerMsg("Downloading response of endpoint harvest query with id = " + queryId));
+                        downloadedFile = downloadFile(endpointConn);
+                        ContentLoader contentLoader = createContentLoader(endpointConn);
+                        if (contentLoader != null) {
+                            filesAndLoaders.put(downloadedFile, contentLoader);
+                        } else {
+                            String msg = "Response not in RDF or web feed format, unsupported for SPARQL endpoint harvest";
+                            LOGGER.warn(loggerMsg(msg));
+                            finishWithOK(endpointConn, getContextSourceDTO().getStatements(), msg);
+                            return;
+                        }
+                    }
+                    else if (isUnauthorized(httpResponseCode)) {
+                        LOGGER.debug(loggerMsg("Source unauthorized!"));
+                        finishWithUnauthorized();
+                        return;
+                    }
+                    else if (isError(httpResponseCode)) {
+                        LOGGER.debug(loggerMsg("Server returned error code " + httpResponseCode));
+                        finishWithError(httpResponseCode, responseMessage, null);
+                        return;
+                    }
+                    else {
+                        String msg = "Unsupported response code for SPARQL endpoint harvest: " + httpResponseCode;
+                        LOGGER.warn(loggerMsg(msg));
+                        finishWithOK(endpointConn, getContextSourceDTO().getStatements(), msg);
+                        return;
+                    }
+                } finally {
+                    URLUtil.disconnect(endpointConn);
                 }
             }
 
-            localConn.commit();
-
-            setStoredTriplesCount(numberOfTriples);
-            LOGGER.debug(loggerMsg("All queries executed, total of " + numberOfTriples + " triples loaded"));
-            finishWithOK(null, numberOfTriples);
-
+            if (!filesAndLoaders.isEmpty()) {
+                LOGGER.debug(loggerMsg("Loading downloaded query responses into triple store"));
+                int tripleCount = getHarvestSourceDAO().loadContent(filesAndLoaders, getContextUrl());
+                setStoredTriplesCount(tripleCount);
+                LOGGER.debug(loggerMsg("Total of " + tripleCount + " triples loaded"));
+                finishWithOK(endpointConn, tripleCount);
+            } else {
+                String msg = "No files downladed in this SPARQL endpoint harvest";
+                LOGGER.warn(loggerMsg(msg));
+                finishWithOK(endpointConn, getContextSourceDTO().getStatements(), msg);
+            }
         } catch (Exception e) {
 
-            SesameUtil.rollback(localConn);
             LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
 
             checkAndSetFatalExceptionFlag(e.getCause());
             try {
-                finishWithError(httpClient.getLastExecutionResponseCode(), httpClient.getLastExecutionResponseText(), e);
+                finishWithError(httpResponseCode, responseMessage, e);
             } catch (RuntimeException finishingException) {
                 LOGGER.error("Error when finishing up: ", finishingException);
             }
@@ -299,38 +315,11 @@ public class PullHarvest extends BaseHarvest {
                 throw new HarvestException(e.getMessage(), e);
             }
         } finally {
-            SesameUtil.close(queryResult);
-            SesameUtil.close(localConn);
-            SesameUtil.close(endpointConn);
+            FileDeletionJob.register(downloadedFile);
+            for (File file : filesAndLoaders.keySet()) {
+                FileDeletionJob.register(file);
+            }
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    private EndpointHttpClient prepareEndpointHttpClient() {
-
-        HttpConnectionManagerParams managerParams = new HttpConnectionManagerParams();
-        managerParams.setDefaultMaxConnectionsPerHost(20);
-        managerParams.setStaleCheckingEnabled(false);
-
-        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
-        managerParams.setConnectionTimeout(httpTimeout);
-        managerParams.setSoTimeout(httpTimeout);
-
-        HttpConnectionManager manager = new MultiThreadedHttpConnectionManager();
-        manager.setParams(managerParams);
-
-        HttpClientParams clientParams = new HttpClientParams();
-        clientParams.setParameter("http.useragent", URLUtil.userAgentHeader());
-        clientParams.setParameter("http.protocol.max-redirects", MAX_REDIRECTIONS);
-
-        HashMap<String, String> headers = new HashMap<String, String>();
-        headers.put("Connection", "close");
-        clientParams.setParameter(SPARQLConnection.ADDITIONAL_HEADER_NAME, headers);
-
-        return new EndpointHttpClient(clientParams, manager);
     }
 
     /**
@@ -355,7 +344,7 @@ public class PullHarvest extends BaseHarvest {
                 }
                 LOGGER.debug(loggerMsg(message));
 
-                urlConn = openUrlConnection(connectUrl);
+                urlConn = prepareUrlConnection(connectUrl);
 
                 try {
                     httpResponseCode = urlConn.getResponseCode();
@@ -478,11 +467,27 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * Calls {@link #finishWithOK(HttpURLConnection, int, String)}.
      *
      * @param urlConn
      * @param noOfTriples
      */
     private void finishWithOK(HttpURLConnection urlConn, int noOfTriples) {
+        finishWithOK(urlConn, noOfTriples, null);
+    }
+
+    /**
+     * Finishing actions for a harvest that didn't fail.
+     *
+     * @param urlConn The {@link HttpURLConnection} that was invoked.
+     * @param noOfTriples The number of triples harvested.
+     * @param warnMessage A warning message if encountered.
+     */
+    private void finishWithOK(HttpURLConnection urlConn, int noOfTriples, String warnMessage) {
+
+        if (StringUtils.isNotBlank(warnMessage)) {
+            addHarvestMessage(warnMessage, HarvestMessageType.WARNING);
+        }
 
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
@@ -750,6 +755,7 @@ public class PullHarvest extends BaseHarvest {
 
         File downloadedFile = null;
         try {
+            LOGGER.debug(loggerMsg("Downloading file"));
             downloadedFile = downloadFile(urlConn);
 
             // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
@@ -890,8 +896,6 @@ public class PullHarvest extends BaseHarvest {
      */
     private File downloadFile(HttpURLConnection urlConn) throws IOException {
 
-        LOGGER.debug(loggerMsg("Downloading file"));
-
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File file = TempFilePathGenerator.generate();
@@ -917,15 +921,15 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
-     *
-     * @param connectUrl
-     * @return
-     * @throws IOException
-     * @throws DAOException
-     * @throws SAXException
-     * @throws ParserConfigurationException
+     * Prepares the {@link HttpURLConnection} to be invoked for the given URL's harvest.
+     * @param connectUrl URL to harvest.
+     * @return The prepared {@link HttpURLConnection}.
+     * @throws IOException Several IO exception can happen on the way.
+     * @throws DAOException The method may also connect to the database, this can throw an error.
+     * @throws SAXException When parsing the response from conversion service fails.
+     * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
-    private HttpURLConnection openUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
+    private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
             ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
@@ -972,6 +976,44 @@ public class PullHarvest extends BaseHarvest {
                     connection.setIfModifiedSince(lastHarvest);
                 }
             }
+        }
+
+        return connection;
+    }
+
+    /**
+     * Prepares a {@link HttpURLConnection} to be invoked for the given remote endpoint harvest.
+     *
+     * @param endpointUrl The URL of the remote SPARQL endpoint to be queried.
+     * @param query The SPARQL query to be submitted.
+     * @return The prepared {@link HttpURLConnection}.
+     * @throws IOException Several IO exception can happen on the way.
+     */
+    private HttpURLConnection prepareEndpointConnection(String endpointUrl, String query) throws IOException {
+
+        String charset = "UTF-8";
+        String queryString = String.format("query=%s", URLEncoder.encode(query, charset));
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(endpointUrl).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Accept-Charset", charset);
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
+        connection.setRequestProperty("Accept", ACCEPT_HEADER);
+        connection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
+        connection.setRequestProperty("Connection", "close");
+        connection.setInstanceFollowRedirects(false);
+
+        // Set the timeout both for establishing the connection, and reading from it once established.
+        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
+        connection.setConnectTimeout(httpTimeout);
+        connection.setReadTimeout(httpTimeout);
+
+        OutputStream output = null;
+        try {
+            output = connection.getOutputStream();
+            output.write(queryString.getBytes(charset));
+        } finally {
+            IOUtils.closeQuietly(output);
         }
 
         return connection;

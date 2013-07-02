@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryConnection;
@@ -289,6 +290,15 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException;
+
+    /**
+     * Loads the given files with given loaders into the given target graph. Files and corresponding loaders given as map.
+     * @param filesAndLoaders The given files with given loaders.
+     * @param graphUri The target graph URI.
+     * @return Total number of loaded triples.
+     * @throws DAOException All exceptions are wrapped into this one.
+     */
+    int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
 
     /**
      * Loads structured content from the given input stream into the given graph, using the given content loader object.

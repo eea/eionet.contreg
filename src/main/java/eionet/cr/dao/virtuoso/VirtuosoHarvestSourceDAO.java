@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -208,7 +210,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         return getSources(
                 StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
-                        searchString, pagingRequest, sortingRequest);
+                searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -520,7 +522,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException,
-    DAOException {
+            DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -677,9 +679,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         StringBuffer buf =
                 new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+                        .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+                        .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+                        .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -713,8 +715,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /** */
-    private static final String GET_MOST_URGENT_HARVEST_SOURCES = "select top <limit> * from HARVEST_SOURCE where COUNT_UNAVAIL < 5"
-            + " and INTERVAL_MINUTES > 0 order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+    private static final String GET_MOST_URGENT_HARVEST_SOURCES =
+            "select top <limit> * from HARVEST_SOURCE where COUNT_UNAVAIL < 5"
+                    + " and INTERVAL_MINUTES > 0 order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
 
     /*
      * (non-Javadoc)
@@ -1058,8 +1061,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int
-    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
+            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+                    throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1109,7 +1112,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-    IOException {
+            IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -1206,7 +1209,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-    RepositoryException, IOException {
+            RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -1417,6 +1420,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.File, eionet.cr.harvest.load.ContentLoader, java.lang.String)
+     */
     @Override
     public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {
 
@@ -1435,10 +1443,51 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /*
      * (non-Javadoc)
      *
+     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.util.Map, java.lang.String)
+     */
+    @Override
+    public int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException {
+
+        ArrayList<Pair<InputStream, ContentLoader>> pairs = new ArrayList<Pair<InputStream, ContentLoader>>();
+
+        try {
+            for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
+                File file = entry.getKey();
+                ContentLoader loader = entry.getValue();
+                pairs.add(new Pair<InputStream, ContentLoader>(new FileInputStream(file), loader));
+            }
+            return loadContent(pairs, graphUri);
+        } catch (FileNotFoundException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            for (Pair<InputStream, ContentLoader> pair : pairs) {
+                IOUtils.closeQuietly(pair.getLeft());
+            }
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.InputStream, eionet.cr.harvest.load.ContentLoader, java.lang.String)
      */
     @Override
     public int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri) throws DAOException {
+
+        Pair<InputStream, ContentLoader> pair = new Pair<InputStream, ContentLoader>(inputStream, contentLoader);
+        return loadContent(Collections.singletonList(pair), graphUri);
+    }
+
+    /**
+     * Loads the given input streams into given target graph. Streams are given as a collection of pairs where the left-side is
+     * the stream to load, and the right side is the loader to use.
+     *
+     * @param streams The streams as descibred above.
+     * @param graphUri The target graph URI.
+     * @return Total number of loaded triples.
+     * @throws DAOException All exceptions are wrapped into this one.
+     */
+    private int loadContent(Collection<Pair<InputStream, ContentLoader>> streams, String graphUri) throws DAOException {
 
         // Prepare connections (repository and SQL).
         RepositoryConnection repoConn = null;
@@ -1485,7 +1534,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 repoConn.setAutoCommit(false);
                 LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
-                triplesLoaded = contentLoader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                for (Pair<InputStream, ContentLoader> pair : streams) {
+                    InputStream inputStream = pair.getLeft();
+                    ContentLoader contentLoader = pair.getRight();
+                    triplesLoaded += contentLoader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                }
 
                 repoConn.commit();
                 repoConn.setAutoCommit(true);

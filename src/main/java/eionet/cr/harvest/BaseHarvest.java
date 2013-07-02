@@ -128,7 +128,7 @@ public abstract class BaseHarvest implements Harvest {
     /** The current harvest's ID, assigned at the harvest's start. */
     private int harvestId;
 
-    /** List of messages collected during tha harvest and saved into the DB. */
+    /** List of messages collected during the harvest and saved into the DB. */
     private List<HarvestMessageDTO> harvestMessages = new ArrayList<HarvestMessageDTO>();
 
     /** If true, all previously present harvest source metadata should be purged from the triple store. */
