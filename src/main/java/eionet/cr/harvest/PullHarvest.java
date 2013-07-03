@@ -828,13 +828,18 @@ public class PullHarvest extends BaseHarvest {
         SubjectDTO subjectDTO = createRedirectionMetadata(getContextSourceDTO(), redirectionSeen, redirectedToUrl);
         getHelperDAO().addTriples(subjectDTO);
 
-        boolean result = false;
+        // Indicates if the redirected-to source should be harvested at this run. Should always be true when on-demand harvest.
+        // When batch-harvest, then true only if the redirected-to source does not yet exist.
+        boolean shouldHarvestRedirectedToSource = isOnDemandHarvest;
+
         // if redirected-to source not existing, create it by copying the context source
         HarvestSourceDTO redirectedToSourceDTO = getHarvestSource(redirectedToUrl);
         if (redirectedToSourceDTO == null) {
 
-            result = true;
             LOGGER.debug(loggerMsg("Creating harvest source for " + redirectedToUrl));
+
+            // A not-yet-existing redirected-to source should always be harvested.
+            shouldHarvestRedirectedToSource = true;
 
             // clone the redirected-to source from the context source
             // (no null-checking, i.e. assuming the context source already exists)
@@ -853,7 +858,7 @@ public class PullHarvest extends BaseHarvest {
         LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
         getHarvestDAO().deleteOldHarvests(getHarvestId(), NO_OF_LAST_HARVESTS_PRESERVED);
 
-        return result;
+        return shouldHarvestRedirectedToSource;
     }
 
     /**
