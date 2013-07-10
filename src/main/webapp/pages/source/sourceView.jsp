@@ -157,29 +157,30 @@
                         </c:choose>
                     </td>
                 </tr>
-
                 <tr>
-                    <th scope="row">Is SPARQL endpoint</th>
+                    <th scope="row">Harvest method</th>
                     <td>
-                        <c:out value="${actionBean.harvestSource.sparqlEndpoint ? 'yes' : 'no'}"/>
+                        <c:out value="${actionBean.harvestSource.sparqlEndpoint ? 'SPARQL' : 'File'}"/>
                     </td>
                 </tr>
-
                 <tr>
-                    <td colspan="2" style="font-size:0.8em;">
+                    <th scope="row">Post-harvest scripts</th>
+                    <td>
                         <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
-                            <c:out value="0 post-harvest scripts available for this source."/>
+                            <c:out value="No scripts available for this source."/>
                         </c:if>
-                        <c:if test="${actionBean.noOfPostHarvestScripts > 0}">
+                        <c:if test="${actionBean.noOfPostHarvestScripts == 1}">
+                            <c:out value="1 script available for this source."/>
+                        </c:if>
+                        <c:if test="${actionBean.noOfPostHarvestScripts > 1}">
                             <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View post-harvest scripts of this source">
-                                <c:out value="There is ${actionBean.noOfPostHarvestScripts} post-harvest scripts available for this source."/>
+                                <c:out value="${actionBean.noOfPostHarvestScripts} scripts available for this source."/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
                             </stripes:link>
                         </c:if>
                     </td>
                 </tr>
-
             </table>
 
             <%-- Harvest history --%>
