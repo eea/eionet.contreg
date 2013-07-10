@@ -72,17 +72,6 @@ table#resourcesResultList {
     width: 100%;
 }
 
-span.langcode {
-    min-width: 1.5em;
-    text-align:center;
-    color: #455b6b;
-    text-decoration: none;
-    font-size: 75%;
-    background-color: transparent;
-    padding: 2px;
-    border: 1px solid #0c506f;
-    margin-left: 10px;
-}
 
 /* source.action */
 #sampletriples {
