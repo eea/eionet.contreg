@@ -4,6 +4,47 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint harvest query">
 
+    <stripes:layout-component name="head">
+    
+        <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
+        
+        <script type="text/javascript">
+        // <![CDATA[
+            ( function($) {
+                $(document).ready(
+                    function(){
+                        
+                        // Open prefixes dialog
+                        $("#prefixesLink").click(function() {
+                            $('#prefixesDialog').dialog('open');
+                            return false;
+                        });
+
+                        // Prefixes dialog setup
+                        $('#prefixesDialog').dialog({
+                            autoOpen: false,
+                            width: 600
+                        });
+
+                        // Close prefixes dialog
+                        $("#closePrefixesDialog").click(function() {
+                            $('#prefixesDialog').dialog("close");
+                            return true;
+                        });
+                        
+                        // The handling of useful namespace clicks
+                        <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                            $("#prefix${usefulNamespacesLoop.index}").click(function() {
+                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
+                            });
+                        </c:forEach>
+
+                    });
+            } ) ( jQuery );
+            // ]]>
+        </script>
+    </stripes:layout-component>
+
     <stripes:layout-component name="contents">
 
         <%-- Drop-down operations --%>
@@ -18,6 +59,9 @@
                                <stripes:param name="endpointUrl" value="${actionBean.query.endpointUrl}"/>
                            </c:if>
                         </stripes:link>
+                    </li>
+                    <li>
+                        <a href="#" id="prefixesLink">Useful namespaces</a>
                     </li>
                 </ul>
             </li>
@@ -51,12 +95,12 @@
                     </tr>
                     <tr>
                         <td>
-                            <label for="txtQuery" class="question required">Query:</label>
+                            <label for="queryText" class="question required">Query:</label>
                         </td>
                         <td>
                             <div class="expandingArea">
                                 <pre><span></span><br /></pre>
-                                <stripes:textarea id="txtQuery" name="query.query" cols="80" rows="8" style="clear:right; display: block; width: 100%"/>
+                                <stripes:textarea id="queryText" name="query.query" cols="80" rows="8" style="clear:right; display: block; width: 100%"/>
                             </div>
                             <script type="text/javascript">
                                 // <![CDATA[
@@ -156,6 +200,24 @@
                 </c:if>
             </c:if>
         </div>
+        
+        <%-- The "Useful namesoaces" dialog, hidden by default --%>
+            
+	    <div id="prefixesDialog" title="Useful namespaces">
+	        
+	        <c:if test="${empty actionBean.usefulNamespaces}">
+	            <p>None found!</p>
+	        </c:if>
+	        <c:if test="${not empty actionBean.usefulNamespaces}">
+	            <ul>
+	                <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+	                   <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
+	                </c:forEach>
+	            </ul>
+	        </c:if>
+	        <button id="closePrefixesDialog">Close</button>
+	        
+	    </div>
 
     </stripes:layout-component>
 </stripes:layout-render>
