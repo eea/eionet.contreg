@@ -391,6 +391,7 @@ public class PullHarvest extends BaseHarvest {
                         if (startWithNew) {
                             startWithNewContext(redirectedToUrl);
                         } else {
+                            isSourceAvailable = true;
                             return;
                         }
                     } else {
