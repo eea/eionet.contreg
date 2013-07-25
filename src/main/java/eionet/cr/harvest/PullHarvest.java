@@ -964,7 +964,7 @@ public class PullHarvest extends BaseHarvest {
             if (lastHarvest > 0) {
 
                 // Check if this URL has a conversion stylesheet, and if the latter has been modified since last harvest.
-                String conversionStylesheetUrl = getConversionStylesheetUrl(sanitizedUrl);
+                String conversionStylesheetUrl = getConversionStylesheetUrl(getHelperDAO(), sanitizedUrl);
                 boolean hasConversion = !StringUtils.isBlank(conversionStylesheetUrl);
                 boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
 
@@ -1061,12 +1061,11 @@ public class PullHarvest extends BaseHarvest {
      * @throws SAXException
      * @throws IOException
      */
-    private String getConversionStylesheetUrl(String harvestSourceUrl) throws DAOException, IOException, SAXException,
+    public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException, IOException, SAXException,
             ParserConfigurationException {
 
         String result = null;
-
-        String schemaUri = getHelperDAO().getSubjectSchemaUri(harvestSourceUrl);
+        String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);
         if (!StringUtils.isBlank(schemaUri)) {
 
             // see if schema has RDF conversion

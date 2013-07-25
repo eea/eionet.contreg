@@ -97,21 +97,18 @@ public class URLUtil {
     }
 
     /**
-     * Connect to the URL and check if it is modified since the timestamp argument. Returns null, if it cannot be determined for
-     * sure.
+     * Connect to the URL with "If-Modified-Since" header set to the given timestamp.
+     * If the response is {@link HttpURLConnection#HTTP_NOT_MODIFIED} then returns true, otherwise returns false.
      *
-     * @param urlString
-     * @param timestamp
-     * @return true if it is modified.
+     * @param urlString The URL to check.
+     * @param timestamp The timestamp against which the "If-Modified-Since" must be checked.
+     * @return As indicated above.
+     * @throws IOException If any sort of IO error happens, including malformed URL.
      */
-    public static Boolean isModifiedSince(String urlString, long timestamp) {
-
-        if (!URLUtil.isURL(urlString)) {
-            return Boolean.FALSE;
-        }
+    public static boolean isModifiedSince(String urlString, long timestamp) throws IOException {
 
         if (timestamp == 0) {
-            return Boolean.TRUE;
+            return true;
         }
 
         URLConnection urlConnection = null;
@@ -123,18 +120,11 @@ public class URLUtil {
             urlConnection.setIfModifiedSince(timestamp);
 
             int responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
-            System.out.println(responseCode);
             if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                return Boolean.FALSE;
-            } else if (responseCode == HttpURLConnection.HTTP_OK) {
-                return Boolean.TRUE;
+                return false;
             } else {
-                // Return null to indicate if it's unclear whether the source has
-                // been modified or not.
-                return null;
+                return true;
             }
-        } catch (IOException ioe) {
-            return null;
         } finally {
             URLUtil.disconnect(urlConnection);
         }
