@@ -24,7 +24,7 @@ public class UpToDateCheckerMock extends UpToDateChecker {
     public static final String NEVER_HARVESTED_YET = "http://never.harvested.yet";
     public static final String OUT_OF_DATE = "http://out.of.date";
     public static final String UP_TO_DATE = "http://up.to.date";
-    public static final String CONVERSION_OUT_OF_DATE = "http://conversion.out.of.date";
+    public static final String CONVERSION_MODIFIED = "http://conversion.out.of.date";
     public static final String SCRIPTS_MODIFIED = "http://scripts.modified";
 
     /** Dummy conversion URL. */
@@ -65,7 +65,7 @@ public class UpToDateCheckerMock extends UpToDateChecker {
     @Override
     String getConversionStylesheetUrl(String url) throws DAOException, IOException, SAXException, ParserConfigurationException {
 
-        if (CONVERSION_OUT_OF_DATE.equals(url)) {
+        if (CONVERSION_MODIFIED.equals(url)) {
             return CONVERSION_URL;
         } else {
             return StringUtils.EMPTY;
@@ -94,7 +94,7 @@ public class UpToDateCheckerMock extends UpToDateChecker {
             return true;
         } else if (UP_TO_DATE.equals(urlString)) {
             return false;
-        } else if (CONVERSION_OUT_OF_DATE.equals(urlString)) {
+        } else if (CONVERSION_MODIFIED.equals(urlString)) {
             return false;
         } else if (SCRIPTS_MODIFIED.equals(urlString)) {
             return false;

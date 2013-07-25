@@ -26,11 +26,10 @@ public class UpToDateCheckerTest {
     /**
      * Test various cases.
      *
-     * @throws ParserConfigurationException Thrown by {@link UpToDateChecker#check(String...)}.
-     * @throws SAXException Thrown by {@link UpToDateChecker#check(String...)}.
-     * @throws IOException Thrown by {@link UpToDateChecker#check(String...)}.
-     * @throws DAOException Thrown by {@link UpToDateChecker#check(String...)}.
-     *
+     * @throws ParserConfigurationException Thrown by code under test.
+     * @throws SAXException Thrown by code under test.
+     * @throws IOException Thrown by code under test.
+     * @throws DAOException Thrown by code under test.
      */
     @Test
     public void test() throws DAOException, IOException, SAXException, ParserConfigurationException {
@@ -40,8 +39,8 @@ public class UpToDateCheckerTest {
         expectedResolutions.put(UpToDateCheckerMock.NEVER_HARVESTED_YET, Resolution.OUT_OF_DATE);
         expectedResolutions.put(UpToDateCheckerMock.OUT_OF_DATE, Resolution.OUT_OF_DATE);
         expectedResolutions.put(UpToDateCheckerMock.UP_TO_DATE, Resolution.UP_TO_DATE);
-        expectedResolutions.put(UpToDateCheckerMock.CONVERSION_OUT_OF_DATE, Resolution.OUT_OF_DATE);
-        expectedResolutions.put(UpToDateCheckerMock.SCRIPTS_MODIFIED, Resolution.OUT_OF_DATE);
+        expectedResolutions.put(UpToDateCheckerMock.CONVERSION_MODIFIED, Resolution.CONVERSION_MODIFIED);
+        expectedResolutions.put(UpToDateCheckerMock.SCRIPTS_MODIFIED, Resolution.SCRIPTS_MODIFIED);
 
         UpToDateCheckerMock checkerMock = new UpToDateCheckerMock();
         String[] array = expectedResolutions.keySet().toArray(new String[expectedResolutions.size()]);

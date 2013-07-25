@@ -103,18 +103,16 @@ public class UpToDateChecker {
                     if (StringUtils.isNotBlank(conversionStylesheetUrl)) {
                         isOutOfDate = isUrlModifiedSince(conversionStylesheetUrl, lastHarvest.getTime());
                         if (isOutOfDate) {
-                            LOGGER.trace(url + " has a conversion that is out of date!");
+                            return Resolution.CONVERSION_MODIFIED;
                         }
                     }
 
                     if (!isOutOfDate) {
                         isOutOfDate = hasScriptsModified(url, lastHarvest);
                         if (isOutOfDate) {
-                            LOGGER.trace(url + " has a post-harvest scripts that have been modified since the date checked!");
+                            return Resolution.SCRIPTS_MODIFIED;
                         }
                     }
-                } else {
-                    LOGGER.trace(url + " is out of date!");
                 }
 
                 return isOutOfDate ? Resolution.OUT_OF_DATE : Resolution.UP_TO_DATE;
@@ -182,9 +180,11 @@ public class UpToDateChecker {
      */
     public static enum Resolution {
 
-        NOT_HARVEST_SOURCE("There is not harvest source with this URL yet!"),
-        OUT_OF_DATE("The source was found to be out of date!"),
-        UP_TO_DATE("The source was found to be up to date!");
+        NOT_HARVEST_SOURCE("Not a harvest source."),
+        OUT_OF_DATE("Modified since last harvest."),
+        UP_TO_DATE("Up to date."),
+        CONVERSION_MODIFIED("Has a conversion modified since last harvest."),
+        SCRIPTS_MODIFIED("Has a post-harvest script modified since last harvest.");
 
         /** Explanatory user-friendly message that describes this resolution. */
         private String message;
