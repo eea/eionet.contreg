@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -39,6 +40,9 @@ public class UpToDateChecker {
     /** Initialize DAO already here. */
     private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 
+    /** */
+    UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_2_SLASHES + UrlValidator.ALLOW_LOCAL_URLS);
+
     /**
      * Default constructor.
      */
@@ -66,8 +70,13 @@ public class UpToDateChecker {
 
             for (int i = 0; i < urls.length; i++) {
 
-                String url = StringUtils.substringBefore(URLUtil.escapeIRI(urls[i]), "#");
-                resultMap.put(url, checkUrl(url));
+                String url = urls[i];
+                if (urlValidator.isValid(url)) {
+                    url = StringUtils.substringBefore(URLUtil.escapeIRI(url), "#");
+                    resultMap.put(url, checkUrl(url));
+                } else {
+                    resultMap.put(url, Resolution.INVALID_URL);
+                }
             }
         }
         return resultMap;
@@ -180,11 +189,12 @@ public class UpToDateChecker {
      */
     public static enum Resolution {
 
-        NOT_HARVEST_SOURCE("Not a harvest source."),
-        OUT_OF_DATE("Modified since last harvest."),
+        INVALID_URL("Invalid URL!"),
+        NOT_HARVEST_SOURCE("Not a harvest source yet!"),
+        OUT_OF_DATE("Modified since last harvest!"),
         UP_TO_DATE("Up to date."),
-        CONVERSION_MODIFIED("Has a conversion modified since last harvest."),
-        SCRIPTS_MODIFIED("Has a post-harvest script modified since last harvest.");
+        CONVERSION_MODIFIED("Has a conversion modified since last harvest!"),
+        SCRIPTS_MODIFIED("Has a post-harvest script modified since last harvest!");
 
         /** Explanatory user-friendly message that describes this resolution. */
         private String message;

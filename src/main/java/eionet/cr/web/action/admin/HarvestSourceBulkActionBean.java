@@ -1,17 +1,28 @@
 package eionet.cr.web.action.admin;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -19,76 +30,102 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.UpToDateChecker;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
 
 /**
- * Action bean for bulk add/delete harvest sources page.
+ * Action bean for harvest source bulk actions: add, delete, check.
  *
  * @author kaido
+ * @author jaanus
  */
-@UrlBinding("/admin/bulkharvest")
+@UrlBinding("/admin/sourceBulkActions")
 public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
+    /** Static Log4j logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(HarvestSourceBulkActionBean.class);
+
     /** JSP page. */
-    private static final String BULK_HARVEST_PAGE = "/pages/admin/bulkHarvest.jsp";
+    private static final String BULK_ACTIONS_PAGE = "/pages/admin/harvestSourceBulkActions.jsp";
 
     /** harvest sources entered by user. */
     private String sourceUrlsString;
 
-    /** is admin logged in. */
-    private boolean adminLoggedIn = false;
-
     /** harvest source URLS. */
-    private List<String> sourceUrls;
+    private List<String> sourceUrls = new ArrayList<String>();
+
+    /** Resolutions of all checked URLs. */
+    private Map<String, eionet.cr.harvest.UpToDateChecker.Resolution> checkResolutions;
+
+    /** URL checking resolutions that should be specifically remarked to the user. */
+    private Map<String, eionet.cr.harvest.UpToDateChecker.Resolution> checkRemarks;
 
     /**
      * View sources bulk management page.
      *
-     * @return Resolution
+     * @return Resolution to go to.
      */
     @DefaultHandler
     public Resolution view() {
-
-        if (getUser() != null) {
-            setAdminLoggedIn(true);
-        }
-
-        return new ForwardResolution(BULK_HARVEST_PAGE);
+        return new ForwardResolution(BULK_ACTIONS_PAGE);
     }
 
     /**
      * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database and schedule them for harvest.
      *
-     * @return Resolution
+     * @return Resolution to go to.
      */
     public Resolution add() {
 
-        if (getUser() != null) {
+        // Security checks done by dedicated Stripes validation method.
 
+        if (!sourceUrls.isEmpty()) {
             bulkAddSources(getUserName());
-
-            // TODO to investigate why this is here (i.e. why a user's presence automatically means the user is an administrator?)
-            setAdminLoggedIn(true);
+        } else {
+            addWarningMessage("No URLs provided!");
         }
-
-        return new ForwardResolution(BULK_HARVEST_PAGE);
+        return new ForwardResolution(BULK_ACTIONS_PAGE);
     }
 
     /**
      * Delete parsed (see {@link #parseSourceUrlsString()}) sources from the database.
      *
-     * @return Resolution
+     * @return Resolution to go to.
      */
     public Resolution delete() {
 
-        if (getUser() != null) {
-            bulkDeleteSources();
-            setAdminLoggedIn(true);
-        }
+        // Security checks done by dedicated Stripes validation method.
 
-        return new ForwardResolution(BULK_HARVEST_PAGE);
+        if (!sourceUrls.isEmpty()) {
+            bulkDeleteSources();
+        } else {
+            addWarningMessage("No URLs provided!");
+        }
+        return new ForwardResolution(BULK_ACTIONS_PAGE);
+    }
+
+    /**
+     * Delete parsed (see {@link #parseSourceUrlsString()}) sources to see if they need harvesting.
+     *
+     * @return Resolution to go to.
+     *
+     * @throws ParserConfigurationException See {@link UpToDateChecker#check(String...)}.
+     * @throws SAXException See {@link UpToDateChecker#check(String...)}.
+     * @throws IOException See {@link UpToDateChecker#check(String...)}.
+     * @throws DAOException See {@link UpToDateChecker#check(String...)}.
+     */
+    public Resolution check() throws DAOException, IOException, SAXException, ParserConfigurationException {
+
+        // Security checks done by dedicated Stripes validation method.
+
+        if (!sourceUrls.isEmpty()) {
+            bulkCheckSources();
+        } else {
+            addWarningMessage("No URLs provided!");
+        }
+        return new ForwardResolution(BULK_ACTIONS_PAGE);
     }
 
     /**
@@ -108,22 +145,6 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     }
 
     /**
-     * True if the user is authenticated and is an administrator.
-     *
-     * @return boolean
-     */
-    public boolean isAdminLoggedIn() {
-        return adminLoggedIn;
-    }
-
-    /**
-     * @param adminLoggedIn boolean
-     */
-    public void setAdminLoggedIn(final boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
-    }
-
-    /**
      * Parses new-line-separated source URLs into a list that will be used by {@link #add()} and {@link #delete()}.
      *
      * @param strSources
@@ -135,8 +156,6 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             return;
         }
 
-        sourceUrls = new ArrayList<String>();
-
         // split on both new line and carriage return
         String[] urls = StringUtils.split(sourceUrlsString, "\r\n");
         for (String url : urls) {
@@ -145,16 +164,52 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
             if (URLUtil.isURL(url)) {
                 sourceUrls.add(url);
             } else {
-                addCautionMessage("Not a valid URL: " + url);
+                addWarningMessage("Not a valid URL: " + url);
             }
         }
     }
 
     /**
+     * Validates that the user is authorized for any operations on this action bean. If user not authorized, redirects to the
+     * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events.
+     */
+    @ValidationMethod(priority = 1)
+    public void validateUserAuthorised() {
+
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            getContext().setSourcePageResolution(new RedirectResolution(AdminWelcomeActionBean.class));
+        }
+    }
+
+    /**
+     * @return the checkResolutions
+     */
+    public Map<String, eionet.cr.harvest.UpToDateChecker.Resolution> getCheckResolutions() {
+        return checkResolutions;
+    }
+
+    /**
+     * Returns the entries of the check resolutions map.
+     * @return the entries
+     */
+    public Set<Entry<String, eionet.cr.harvest.UpToDateChecker.Resolution>> getCheckResolutionsEntries() {
+        return checkResolutions == null ? null : checkResolutions.entrySet();
+    }
+
+    /**
+     * @return the checkRemarks
+     */
+    public Map<String, eionet.cr.harvest.UpToDateChecker.Resolution> getCheckRemarks() {
+        return checkRemarks;
+    }
+
+    /**
      * Add parsed (see {@link #parseSourceUrlsString()}) sources to the database and schedule them for harvest.
+     *
      * @param userName The user who is adding.
      */
-    private void bulkAddSources(String userName) {
+    void bulkAddSources(String userName) {
 
         int counter = 0;
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
@@ -190,7 +245,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
     /**
      * Delete parsed (see {@link #parseSourceUrlsString()}) sources from the database.
      */
-    private void bulkDeleteSources() {
+    void bulkDeleteSources() {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         LinkedHashSet<String> sourcesToDelete = new LinkedHashSet<String>();
@@ -221,4 +276,51 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
         }
     }
 
+    /**
+     * Worker method for the {@link #check()} event.
+     *
+     * @throws ParserConfigurationException See {@link UpToDateChecker#check(String...)}.
+     * @throws SAXException See {@link UpToDateChecker#check(String...)}.
+     * @throws IOException See {@link UpToDateChecker#check(String...)}.
+     * @throws DAOException See {@link UpToDateChecker#check(String...)}.
+     */
+    void bulkCheckSources() throws DAOException, IOException, SAXException, ParserConfigurationException {
+
+        String[] sourcesUrlsArray = sourceUrls.toArray(new String[sourceUrls.size()]);
+
+        UpToDateChecker checker = new UpToDateChecker();
+        checkResolutions = checker.check(sourcesUrlsArray);
+        checkRemarks = new HashMap<String, eionet.cr.harvest.UpToDateChecker.Resolution>();
+
+        LOGGER.trace("Harvest sources bulk check resolutions:\n" + checkResolutions);
+
+        StringBuilder outOfDateOrNewUrls = new StringBuilder();
+        for (int i = 0; i < sourcesUrlsArray.length; i++) {
+
+            String sourceUrl = sourcesUrlsArray[i];
+            eionet.cr.harvest.UpToDateChecker.Resolution resolution = checkResolutions.get(sourceUrl);
+            if (eionet.cr.harvest.UpToDateChecker.Resolution.OUT_OF_DATE.equals(resolution)
+                    || eionet.cr.harvest.UpToDateChecker.Resolution.NOT_HARVEST_SOURCE.equals(resolution)
+                    || eionet.cr.harvest.UpToDateChecker.Resolution.CONVERSION_MODIFIED.equals(resolution)
+                    || eionet.cr.harvest.UpToDateChecker.Resolution.SCRIPTS_MODIFIED.equals(resolution)) {
+
+                outOfDateOrNewUrls.append(sourceUrl).append("\n");
+
+                if (!eionet.cr.harvest.UpToDateChecker.Resolution.OUT_OF_DATE.equals(resolution)) {
+                    checkRemarks.put(sourceUrl, resolution);
+                }
+            }
+        }
+
+        sourceUrlsString = outOfDateOrNewUrls.toString();
+
+        if (StringUtils.isNotBlank(sourceUrlsString)) {
+            addSystemMessage("The following sources were found to be out of date or not harvest sources yet!");
+            if (!checkRemarks.isEmpty()) {
+                addSystemMessage("Please also see specific remarks below.");
+            }
+        } else {
+            addSystemMessage("All checked sources were found to be up to date!");
+        }
+    }
 }

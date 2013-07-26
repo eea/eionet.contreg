@@ -291,7 +291,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     }
 
     /**
-     * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
+     * Validates that the user is authorized for any operations on this action bean. If user not authorised, redirects to the
      * {@link AdminWelcomeActionBean} which displays a proper error message. Will be run on any events, since no specific events
      * specified in the {@link ValidationMethod} annotation.
      */
