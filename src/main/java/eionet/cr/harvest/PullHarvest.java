@@ -38,6 +38,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -776,6 +777,12 @@ public class PullHarvest extends BaseHarvest {
                     // that simply wasn't declared in the server-returned content type.
                     FileToRdfProcessor fileProcessor = new FileToRdfProcessor(downloadedFile, getContextUrl());
                     processedFile = fileProcessor.process();
+
+                    String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
+                    if (StringUtils.isNotBlank(conversionSchemaUri)) {
+                        addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
+                    }
+
                     if (processedFile != null && fileProcessor.getRdfFormat() != null) {
                         LOGGER.debug(loggerMsg("File processed into RDF format"));
                         ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
@@ -965,7 +972,7 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if this URL has a conversion stylesheet, and if the latter has been modified since last harvest.
                 String conversionStylesheetUrl = getConversionStylesheetUrl(getHelperDAO(), sanitizedUrl);
-                boolean hasConversion = !StringUtils.isBlank(conversionStylesheetUrl);
+                boolean hasConversion = StringUtils.isNotBlank(conversionStylesheetUrl);
                 boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
 
                 // Check if post-harvest scripts are updated
@@ -1070,9 +1077,14 @@ public class PullHarvest extends BaseHarvest {
 
             // see if schema has RDF conversion
             ConversionsParser convParser = ConversionsParser.parseForSchema(schemaUri);
-            if (!StringUtils.isBlank(convParser.getRdfConversionId())) {
+            if (StringUtils.isNotBlank(convParser.getRdfConversionId())) {
 
-                result = convParser.getRdfConversionXslFileName();
+                String xslFileName = convParser.getRdfConversionXslFileName();
+                if (StringUtils.isNotBlank(xslFileName)) {
+
+                    String xslUrl = GeneralConfig.getRequiredProperty(GeneralConfig.XMLCONV_XSL_URL);
+                    result = MessageFormat.format(xslUrl, Util.toArray(xslFileName));
+                }
             }
         }
 

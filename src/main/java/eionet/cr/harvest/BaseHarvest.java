@@ -1035,6 +1035,12 @@ public abstract class BaseHarvest implements Harvest {
                 // that simply wasn't declared in the server-returned content type.
                 FileToRdfProcessor fileProcessor = new FileToRdfProcessor(file, getContextUrl());
                 processedFile = fileProcessor.process();
+
+                String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
+                if (StringUtils.isNotBlank(conversionSchemaUri)) {
+                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
+                }
+
                 if (processedFile != null && fileProcessor.getRdfFormat() != null) {
                     LOGGER.debug(loggerMsg("File processed into RDF format"));
                     ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());

@@ -58,19 +58,20 @@ import eionet.cr.util.xml.XmlAnalysis;
  */
 public class FileToRdfProcessor {
 
-    /** */
+    /** Static Log4j logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(FileToRdfProcessor.class);
 
-    /** */
+    /** The file to process. */
     private File file;
 
-    /** */
+    /** The context URL where this file was downloaded from (i.e. the harvest source).*/
     private String contextUrl;
 
-    /**
-     * source content type.
-     */
+    /** Source content type. */
     private RDFFormat rdfFormat;
+
+    /** The source file's conversion schema URI if any. */
+    private String conversionSchemaUri;
 
     /**
      *
@@ -121,7 +122,7 @@ public class FileToRdfProcessor {
         File resultFile = null;
         try {
             // See if the unzipped (if it was zipped) file is an XML that can be processed into RDF.
-            XmlAnalysis xmlAnalysis = getXmlAnalysis(unzippedFile);
+            XmlAnalysis xmlAnalysis = createXmlAnalysis(unzippedFile);
             if (xmlAnalysis != null) {
 
                 // File seems to be XML.
@@ -135,8 +136,8 @@ public class FileToRdfProcessor {
                 } else {
                     // The file's start element was not RDF, so try to convert it to RDF.
                     LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
-                    String conversionSchema = xmlAnalysis.getConversionSchema();
-                    resultFile = attemptRdfConversion(unzippedFile, conversionSchema, contextUrl);
+                    conversionSchemaUri = xmlAnalysis.getConversionSchema();
+                    resultFile = attemptRdfConversion(unzippedFile, conversionSchemaUri, contextUrl);
                     if (resultFile != null) {
                         rdfFormat = RDFFormat.RDFXML;
                     }
@@ -213,7 +214,7 @@ public class FileToRdfProcessor {
      * @return
      * @throws IOException
      */
-    private XmlAnalysis getXmlAnalysis(File file) throws IOException {
+    private XmlAnalysis createXmlAnalysis(File file) throws IOException {
 
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         try {
@@ -304,5 +305,12 @@ public class FileToRdfProcessor {
      */
     public RDFFormat getRdfFormat() {
         return rdfFormat;
+    }
+
+    /**
+     * @return the conversionSchemaUri
+     */
+    public String getConversionSchemaUri() {
+        return conversionSchemaUri;
     }
 }
