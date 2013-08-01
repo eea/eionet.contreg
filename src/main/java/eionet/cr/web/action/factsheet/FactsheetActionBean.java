@@ -164,7 +164,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         } else {
             HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
 
-            setAdminLoggedIn(getUser() != null && getUser().isAdministrator());
+            adminLoggedIn = getUser() != null && getUser().isAdministrator();
 
             subject = helperDAO.getFactsheet(uri, null, getPredicatePageNumbers());
 
@@ -563,16 +563,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
-    }
-
-    /**
-     * Setter of admin logged in property.
-     *
-     * @param adminLoggedIn
-     *            boolean
-     */
-    public void setAdminLoggedIn(final boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
     }
 
     /**

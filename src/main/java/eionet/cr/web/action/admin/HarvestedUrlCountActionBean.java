@@ -35,21 +35,22 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
     public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
-                setAdminLoggedIn(true);
+                adminLoggedIn = true;
                 Pair<Integer, List<HarvestedUrlCountDTO>> result =
                         DAOFactory.get().getDao(HarvestSourceDAO.class).getLatestHarvestedURLs(harvestedUrlDays);
                 resultList = result.getRight();
                 matchCount = 0;
                 resultsFound = result.getLeft();
             } else {
-                setAdminLoggedIn(false);
+                adminLoggedIn = false;
             }
         } else {
-            setAdminLoggedIn(false);
+            adminLoggedIn = false;
         }
         return new ForwardResolution("/pages/admin/harvestedUrlCount.jsp");
     }
 
+    @Override
     public Resolution search() throws DAOException {
         return view();
     }
@@ -59,6 +60,7 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
      *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
+    @Override
     public List<SearchResultColumn> getColumns() {
 
         LinkedList<SearchResultColumn> columnList = new LinkedList<SearchResultColumn>();
@@ -92,10 +94,6 @@ public class HarvestedUrlCountActionBean extends AbstractSearchActionBean<Harves
 
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
-    }
-
-    public void setAdminLoggedIn(boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
     }
 
     public int getResultsFound() {

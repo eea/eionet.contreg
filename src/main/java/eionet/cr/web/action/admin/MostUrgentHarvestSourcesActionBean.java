@@ -47,12 +47,12 @@ public class MostUrgentHarvestSourcesActionBean extends AbstractActionBean {
 
         if (getUser() != null && getUser().isAdministrator()) {
 
-            setAdminLoggedIn(true);
+            adminLoggedIn = true;
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
             sources = dao.getMostUrgentHarvestSources(limit);
             noOfSourcesAboveUrgencyThreshold = dao.getNumberOfSourcesAboveUrgencyThreshold(urgencyThreshold);
         } else {
-            setAdminLoggedIn(false);
+            adminLoggedIn = false;
         }
 
         return new ForwardResolution(JSP);
@@ -77,13 +77,6 @@ public class MostUrgentHarvestSourcesActionBean extends AbstractActionBean {
      */
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
-    }
-
-    /**
-     * @param adminLoggedIn
-     */
-    public void setAdminLoggedIn(boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
     }
 
     /**

@@ -77,13 +77,6 @@ public class HarvestStatsActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param adminLoggedIn the adminLoggedIn to set
-     */
-    public void setAdminLoggedIn(boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
-    }
-
-    /**
      * @return the resultList
      */
     public List<HarvestStatDTO> getResultList() {

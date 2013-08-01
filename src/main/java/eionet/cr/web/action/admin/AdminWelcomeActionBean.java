@@ -22,22 +22,18 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
     public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
-                setAdminLoggedIn(true);
+                adminLoggedIn = true;
             } else {
-                setAdminLoggedIn(false);
+                adminLoggedIn = false;
             }
         } else {
-            setAdminLoggedIn(false);
+            adminLoggedIn = false;
         }
         return new ForwardResolution("/pages/admin/adminWelcome.jsp");
     }
 
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
-    }
-
-    public void setAdminLoggedIn(boolean adminLoggedIn) {
-        this.adminLoggedIn = adminLoggedIn;
     }
 
 }
