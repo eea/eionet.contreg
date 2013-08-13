@@ -301,17 +301,6 @@ public interface HarvestSourceDAO extends DAO {
     int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
 
     /**
-     * Loads structured content from the given input stream into the given graph, using the given content loader object.
-     *
-     * @param inputStream
-     * @param contentLoader
-     * @param graphUri
-     * @return
-     * @throws DAOException
-     */
-    int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri) throws DAOException;
-
-    /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
      * not the source. Therefore the meta data is stored in the harvester's named graph (or context).
      *

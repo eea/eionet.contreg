@@ -20,6 +20,9 @@
             <fileset dir="acl" includes="*.prms*"/>
     		<fileset dir="acl" includes="*.permissions*"/>
         </copy>
+    	
+    	<!-- Ensure that the "tmp" directory exists in app-home. -->
+		<mkdir dir="${harvester.tempFileDir}"/>
 
     </target>
 </project>

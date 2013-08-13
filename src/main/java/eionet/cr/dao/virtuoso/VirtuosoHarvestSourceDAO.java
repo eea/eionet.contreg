@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1426,18 +1427,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.File, eionet.cr.harvest.load.ContentLoader, java.lang.String)
      */
     @Override
-    public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {
-
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-            return loadContent(inputStream, contentLoader, graphUri);
-
-        } catch (FileNotFoundException e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
+    public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {        
+        return loadContent(Collections.singletonMap(file, contentLoader), graphUri);
     }
 
     /*
@@ -1464,18 +1455,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 IOUtils.closeQuietly(pair.getLeft());
             }
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.InputStream, eionet.cr.harvest.load.ContentLoader, java.lang.String)
-     */
-    @Override
-    public int loadContent(InputStream inputStream, ContentLoader contentLoader, String graphUri) throws DAOException {
-
-        Pair<InputStream, ContentLoader> pair = new Pair<InputStream, ContentLoader>(inputStream, contentLoader);
-        return loadContent(Collections.singletonList(pair), graphUri);
     }
 
     /**
