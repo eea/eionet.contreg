@@ -290,7 +290,7 @@ public class PullHarvest extends BaseHarvest {
 
             if (!filesAndLoaders.isEmpty()) {
                 LOGGER.debug(loggerMsg("Loading downloaded query responses into triple store"));
-                int tripleCount = getHarvestSourceDAO().loadContent(filesAndLoaders, getContextUrl());
+                int tripleCount = loadFiles(filesAndLoaders);
                 setStoredTriplesCount(tripleCount);
                 LOGGER.debug(loggerMsg("Total of " + tripleCount + " triples loaded"));
                 finishWithOK(endpointConn, tripleCount);
