@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.mail.MessagingException;
@@ -1067,16 +1068,32 @@ public abstract class BaseHarvest implements Harvest {
     protected int loadFile(File file, ContentLoader contentLoader) throws DAOException {
 
         LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
-        int tripleCount = getHarvestSourceDAO().loadContent(file, contentLoader, getContextUrl());
+        return loadFiles(Collections.singletonMap(file, contentLoader));
+    }
+    
+    /**
+     * Loads given files into repository, using the given loaders.
+     * 
+     * @param filesAndLoaders Files and corresponding loaders to use.
+     * @return Total number of triples loaded.
+     * @throws DAOException When repository access error happens.
+     */
+    protected int loadFiles(Map<File, ContentLoader> filesAndLoaders) throws DAOException {
+
+        if (filesAndLoaders == null || filesAndLoaders.isEmpty()) {
+            return 0;
+        }
+        
+        int tripleCount = getHarvestSourceDAO().loadContent(filesAndLoaders, getContextUrl());
         return tripleCount;
     }
+    
     /**
      * Returns content loader for local files.
      * @param file File to re-harvest
      * @param contentType content type originally stored
      * @return ContentLoader
      */
-
     private ContentLoader getLocalFileContentloader(File file, String contentType) {
 
         ContentLoader contentLoader = null;
