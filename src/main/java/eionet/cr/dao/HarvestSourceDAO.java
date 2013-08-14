@@ -299,6 +299,17 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException All exceptions are wrapped into this one.
      */
     int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
+    
+    /**
+     * A prototype of the files loader method that is hopefully significantly faster than {@link #loadContent(Map, String)},
+     * because it uses DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and DB.DBA.TTLP(file_open(f), graph, graph) functions.
+     * 
+     * @param filesAndLoaders The given files with given loaders.
+     * @param graphUri The target graph URI.
+     * @return Total number of loaded triples.
+     * @throws DAOException All exceptions are wrapped into this one.
+     */
+    int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
 
     /**
      * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and

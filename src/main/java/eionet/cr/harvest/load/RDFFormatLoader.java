@@ -90,4 +90,10 @@ public class RDFFormatLoader implements ContentLoader {
         this.timeout = timeout;
     }
 
+    /**
+     * @return the rdfFormat
+     */
+    public RDFFormat getRdfFormat() {
+        return rdfFormat;
+    }
 }

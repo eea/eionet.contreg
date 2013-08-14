@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +32,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.query.parser.sparql.SPARQLUtil;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
@@ -48,6 +50,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.harvest.load.ContentLoader;
+import eionet.cr.harvest.load.RDFFormatLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
@@ -62,7 +65,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 /**
  * Methods operating with harvest sources. Implementation for Virtuoso.
- *
+ * 
  * @author kaido
  */
 
@@ -122,7 +125,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSources(java.lang.String, eionet.cr.util.pagination.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -136,7 +139,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesFailed(java.lang.String, eionet.cr.util.pagination.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -201,7 +204,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourcesUnavailable(java.lang.String, eionet.cr.util.pagination.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -216,7 +219,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getRemoteEndpoints(java.lang.String, eionet.cr.util.pagination.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -230,7 +233,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getPrioritySources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -244,7 +247,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
      */
@@ -270,7 +273,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     *
+     * 
      * @param sql
      * @param searchString
      * @param pagingRequest
@@ -324,7 +327,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getUrgencySourcesCount()
      */
     @Override
@@ -352,7 +355,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSource(HarvestSourceDTO source)
      */
     @Override
@@ -428,7 +431,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIgnoreDuplicate(HarvestSourceDTO source)
      */
     @Override
@@ -452,7 +455,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String DELETE_POST_HARVES_SCRIPTS = "DELETE FROM post_harvest_script WHERE target_source_url = ?";
 
     /**
-     *
+     * 
      * @param sourceUrls
      * @param conn
      * @throws SQLException
@@ -517,7 +520,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     *
+     * 
      * @param sourceUrls
      * @param conn
      * @throws RepositoryException
@@ -542,7 +545,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#editSource(eionet.cr.dto.HarvestSourceDTO)
      */
     @Override
@@ -575,7 +578,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceById(java.lang.Integer)
      */
     @Override
@@ -592,7 +595,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceByUrl(java.lang.String)
      */
     @Override
@@ -619,7 +622,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
      */
     @Override
@@ -637,7 +640,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
      */
     @Override
@@ -652,7 +655,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#increaseUnavailableCount(java.lang.String)
      */
     @Override
@@ -672,7 +675,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HelperDAO#getLatestHarvestedURLs()
      */
     @Override
@@ -722,7 +725,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getMostUrgentHarvestSources(int)
      */
     @Override
@@ -788,7 +791,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#updateSourceHarvestFinished(eionet.cr.dto.HarvestSourceDTO)
      */
     @Override
@@ -826,7 +829,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection)
      */
     @Override
@@ -873,7 +876,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.virtuoso.VirtuosoBaseDAO#clearGraph(java.lang.String)
      */
     @Override
@@ -895,7 +898,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
      */
     @Override
@@ -939,7 +942,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
      */
     @Override
@@ -973,7 +976,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
      */
     @Override
@@ -1005,7 +1008,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
      */
     @Override
@@ -1037,7 +1040,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.File, org.openrdf.rio.RDFFormat, java.lang.String, boolean)
      */
     @Override
@@ -1056,7 +1059,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.InputStream, org.openrdf.rio.RDFFormat, java.lang.String,
      * boolean)
      */
@@ -1108,7 +1111,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
      */
     @Override
@@ -1188,7 +1191,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#getHarvestSourceMetadata(java.lang.String, java.lang.String)
      */
     @Override
@@ -1205,7 +1208,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(java.lang.String, java.lang.String, eionet.cr.dto.ObjectDTO[])
      */
     @Override
@@ -1223,7 +1226,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#insertUpdateSourceMetadata(org.openrdf.repository.RepositoryConnection, java.lang.String,
      * java.lang.String, eionet.cr.dto.ObjectDTO[])
      */
@@ -1249,7 +1252,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#deleteSubjectTriplesInSource(java.lang.String, java.lang.String)
      */
     @Override
@@ -1277,7 +1280,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#filter(java.lang.String, int, int)
      */
     @Override
@@ -1311,7 +1314,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#deriveNewHarvestSources(java.lang.String)
      */
     @Override
@@ -1423,17 +1426,17 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.File, eionet.cr.harvest.load.ContentLoader, java.lang.String)
      */
     @Override
-    public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {        
+    public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {
         return loadContent(Collections.singletonMap(file, contentLoader), graphUri);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.util.Map, java.lang.String)
      */
     @Override
@@ -1457,10 +1460,169 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see eionet.cr.dao.HarvestSourceDAO#loadContentFast(java.util.Map, java.lang.String)
+     */
+    @Override
+    public int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException {
+
+        LOGGER.debug(BaseHarvest.loggerMsg("Attempting FAST load!", graphUri));
+
+        // Prepare connections (repository and SQL).
+
+        RepositoryConnection repoConn = null;
+        Connection sqlConn = null;
+        boolean noExceptions = false;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+            sqlConn = SesameUtil.getSQLConnection();
+            noExceptions = true;
+        } catch (RepositoryException e) {
+            throw new DAOException("Creating repository connection failed", e);
+        } catch (SQLException e) {
+            throw new DAOException("Creating SQL connection failed", e);
+        } finally {
+            if (!noExceptions) {
+                SesameUtil.close(repoConn);
+                SQLUtil.close(sqlConn);
+            }
+        }
+
+        // Prepare URI objects of the original graph, backup graph and temporary graph.
+
+        URI graphResource = repoConn.getValueFactory().createURI(graphUri);
+
+        String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
+        URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
+
+        String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
+        URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
+
+        int triplesLoaded = 0;
+        boolean backupCreated = false;
+        try {
+
+            // Clear potential leftover from previous harvest
+            clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
+            clearGraph(sqlConn, backupGraphUri, "Clearing potential leftover of previous BACKUP graph", false);
+
+            // Load the content into the temporary graph, but be sure to use the "original" graph URI
+            // as the base URI for resolving any relative identifiers in the content.
+            try {
+                // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause "Too many open statements".
+                // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
+                // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
+
+                repoConn.setAutoCommit(false);
+                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+
+                for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
+
+                    File file = entry.getKey();
+                    ContentLoader loader = entry.getValue();
+
+                    if (loader instanceof RDFFormatLoader) {
+                        RDFFormat rdfFormat = ((RDFFormatLoader) loader).getRdfFormat();
+                        loadRdfFile(file, rdfFormat, sqlConn, graphUri, tempGraphUri);
+                    }
+                    else {
+                        InputStream inputStream = null;
+                        try {
+                            inputStream = new FileInputStream(file);
+                            triplesLoaded += loader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                        } finally {
+                            IOUtils.closeQuietly(inputStream);
+                        }
+                    }
+                }
+
+                repoConn.commit();
+                repoConn.setAutoCommit(true);
+
+                // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
+                renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
+                backupCreated = true;
+
+                renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+
+            } catch (Exception e) {
+
+                // The repository connection rollback is ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
+                SesameUtil.rollback(repoConn);
+
+                // Restore attempt
+                boolean restoredFromBackupSuccess = false;
+                if (backupCreated) {
+                    try {
+                        clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", false);
+                        renameGraph(sqlConn, backupGraphResource, graphResource, "Renaming BACKUP graph back to ORIGINAL");
+                        restoredFromBackupSuccess = true;
+                    } catch (Exception ee) {
+                        LOGGER.warn(BaseHarvest
+                                .loggerMsg("Failed restoring ORIGINAL graph after failed content loading", graphUri));
+                    }
+                }
+
+                // Clean-up attempt
+                boolean cleanupSuccess = false;
+                cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+
+                // Throw the reason why content loading failed.
+                String msg = "Failed content loading ";
+                if (backupCreated && !restoredFromBackupSuccess) {
+                    msg = msg + "(and the subsequent restore from backup) ";
+                }
+                if (!cleanupSuccess) {
+                    msg = msg + "(and the subsequent cleanup of temporary graph) ";
+                }
+                throw new DAOException(msg + "of " + graphUri, e);
+            }
+
+            // Content successfully loaded, clear the backup and temp graphs created two steps ago.
+            clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
+            if (backupCreated) {
+                clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+            }
+
+            // Get the total number of triples in the loaded graph
+            triplesLoaded = getGraphTriplesCount(sqlConn, graphResource);
+
+        } finally {
+            // Ensure connections will be closed regardless of success or exceptions.
+            SQLUtil.close(sqlConn);
+            SesameUtil.close(repoConn);
+        }
+
+        // Return the number of triples loaded into the graph.
+
+        return triplesLoaded;
+    }
+
+    /**
+     * 
+     * @param sqlConn
+     * @param graphResource
+     * @return
+     * @throws DAOException
+     */
+    private int getGraphTriplesCount(Connection sqlConn, URI graphResource) throws DAOException {
+
+        try {
+            String sql = "sparql select count(*) from <GRAPH_URI> where {?s ?p ?o}";
+            sql = sql.replace("GRAPH_URI", graphResource.stringValue());
+            Object o = SQLUtil.executeSingleReturnValueQuery(sql, sqlConn);
+            return Integer.parseInt(o.toString());
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        }
+    }
+
     /**
      * Loads the given input streams into given target graph. Streams are given as a collection of pairs where the left-side is
      * the stream to load, and the right side is the loader to use.
-     *
+     * 
      * @param streams The streams as descibred above.
      * @param graphUri The target graph URI.
      * @return Total number of loaded triples.
@@ -1577,7 +1739,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /**
      * Replace graph URI with new one.
-     *
+     * 
      * @param sqlConn Connection.
      * @param oldGraph Existing graph URI.
      * @param newGraph The new URI of the graph.
@@ -1614,7 +1776,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /**
      * Deletes the given graph from repository by executing SPARQL "clear graph" statement.
-     *
+     * 
      * @param sqlConn SQL Connection to be used when deleting the graph.
      * @param graphUri Graph Uri to be deleted.
      * @param message Log message written into log file.
@@ -1640,5 +1802,48 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         return graphCleared;
+    }
+
+    /**
+     * Load given RDF file, using the fast DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and
+     * DB.DBA.TTLP(file_open(f), graph, graph) functions. The file's exact syntax is determined by the given {@link RDFFormat}.
+     * 
+     * @param file File to load.
+     * @param rdfFormat The file's exact RDF format.
+     * @param conn The SQL connection to use.
+     * @param baseUri The base URI to for resolving relative URLs in the file.
+     * @param contextUri The target graph where the the triples must be loaded into.
+     * @throws SQLException In case database access error happens.
+     */
+    private void loadRdfFile(File file, RDFFormat rdfFormat, Connection conn, String baseUri, String contextUri)
+            throws SQLException {
+
+        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open(?), ?, ?)";
+        if (!rdfFormat.equals(RDFFormat.RDFXML)) {
+
+            if (rdfFormat.equals(RDFFormat.TRIG)) {
+                // For TriG format we must raise the flag 256 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
+                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 256)";
+            } else if (rdfFormat.equals(RDFFormat.NQUADS)) {
+                // For N-Quads format we must raise the flag 512 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
+                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 512)";
+            } else {
+                // No flags for other cases.
+                sql = "DB.DBA.TTLP(file_open(?), ?, ?)";
+            }
+        }
+
+        LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql, baseUri));
+
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, file.toString());
+            pstmt.setString(2, baseUri);
+            pstmt.setString(3, contextUri);
+            pstmt.execute();
+        } finally {
+            SQLUtil.close(pstmt);
+        }
     }
 }

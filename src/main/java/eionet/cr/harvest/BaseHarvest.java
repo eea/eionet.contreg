@@ -107,7 +107,10 @@ public abstract class BaseHarvest implements Harvest {
 
     /** N3 file extension. */
     protected static final String EXT_N3 = "n3";
-
+    
+    /** N-Triples file extension. */
+    protected static final String EXT_NTRIPLES = "nt";
+    
     /** container for redirected source DTOs. */
     protected final List<HarvestSourceDTO> redirectedHarvestSources = new ArrayList<HarvestSourceDTO>();
 
@@ -1084,7 +1087,10 @@ public abstract class BaseHarvest implements Harvest {
             return 0;
         }
         
-        int tripleCount = getHarvestSourceDAO().loadContent(filesAndLoaders, getContextUrl());
+        HarvestSourceDAO dao = getHarvestSourceDAO();
+        String url = getContextUrl();
+        //int tripleCount = isOnDemandHarvest ? dao.loadContentFast(filesAndLoaders, url) : dao.loadContent(filesAndLoaders, url);
+        int tripleCount = dao.loadContent(filesAndLoaders, url);
         return tripleCount;
     }
     
@@ -1138,6 +1144,9 @@ public abstract class BaseHarvest implements Harvest {
                         }
                         if (ext.equalsIgnoreCase(EXT_N3)) {
                             rdfFormat = RDFFormat.N3;
+                        }
+                        if (ext.equalsIgnoreCase(EXT_NTRIPLES)) {
+                            rdfFormat = RDFFormat.NTRIPLES;
                         }
                     }
                 }

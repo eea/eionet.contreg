@@ -1116,6 +1116,9 @@ public class PullHarvest extends BaseHarvest {
                     if (ext.equalsIgnoreCase(EXT_N3)) {
                         return RDFFormat.N3;
                     }
+                    if (ext.equalsIgnoreCase(EXT_NTRIPLES)) {
+                        return RDFFormat.NTRIPLES;
+                    }
                 }
             }
         }

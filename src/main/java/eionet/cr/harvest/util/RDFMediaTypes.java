@@ -55,6 +55,8 @@ public final class RDFMediaTypes {
         result.put("text/n3", RDFFormat.N3);
         result.put("application/x-turtle", RDFFormat.TURTLE);
         result.put("text/rdf+n3", RDFFormat.N3);
+        result.put("application/x-trig", RDFFormat.TRIG);
+        result.put("text/x-nquads", RDFFormat.NQUADS);
         return result;
     }
 
