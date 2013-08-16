@@ -1511,11 +1511,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
             try {
-                // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause "Too many open statements".
-                // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
-                // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
-
-                repoConn.setAutoCommit(false);
                 LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
 
                 for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
@@ -1526,29 +1521,35 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     if (loader instanceof RDFFormatLoader) {
                         RDFFormat rdfFormat = ((RDFFormatLoader) loader).getRdfFormat();
                         loadRdfFile(file, rdfFormat, sqlConn, graphUri, tempGraphUri);
-                    }
-                    else {
+                    } else {
                         InputStream inputStream = null;
                         try {
                             inputStream = new FileInputStream(file);
+
+                            // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause
+                            // "Too many open statements".
+                            // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
+                            // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
+                            repoConn.setAutoCommit(false);
                             triplesLoaded += loader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                            repoConn.commit();
+                            repoConn.setAutoCommit(true);
                         } finally {
                             IOUtils.closeQuietly(inputStream);
                         }
                     }
                 }
 
-                repoConn.commit();
-                repoConn.setAutoCommit(true);
-
                 // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
+                forceLogEnable(2, sqlConn, LOGGER);
                 renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
                 backupCreated = true;
 
+                forceLogEnable(2, sqlConn, LOGGER);
                 renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
 
             } catch (Exception e) {
-
+                
                 // The repository connection rollback is ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
                 SesameUtil.rollback(repoConn);
 
@@ -1829,7 +1830,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 sql = "DB.DBA.TTLP(file_open(?), ?, ?, 512)";
             } else {
                 // No flags for other cases.
-                sql = "DB.DBA.TTLP(file_open(?), ?, ?)";
+                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 0)";
             }
         }
 

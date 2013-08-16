@@ -4,9 +4,10 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
 
-    <stripes:layout-component name="contents">
-        <script language="javascript">
-// <![CDATA[
+    <stripes:layout-component name="head">
+    
+        <script type="text/javascript">
+		// <![CDATA[
             ( function($) {
                 $(document).ready(
                     function(){
@@ -66,10 +67,31 @@
                             modal: true,
                             closeOnEscape: true
                         });
+                        
+                        $("#harvestLink").click(function() {
+                            $('#harvestDialog').dialog('option','width', 600);
+                            $('#harvestDialog').dialog('open');
+                            return true;
+                        });
+                        
+                        $('#harvestDialog').dialog({
+                            autoOpen: false,
+                            height: 200,
+                            width: 600,
+                            maxHeight: 800,
+                            maxWidth: 800,
+                            modal: true,
+                            closeOnEscape: true
+                        });
+                        
                     });
             } ) ( jQuery );
 // ]]>
         </script>
+        </stripes:layout-component>
+        
+        <stripes:layout-component name="contents">
+        
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">
 
@@ -109,13 +131,10 @@
                                         </c:if>
                                         <c:if test="${harvestAllowed && !actionBean.compiledDataset}">
                                             <li>
-                                                <stripes:url value="${actionBean.urlBinding}" event="harvestAjax" var="url">
-                                                        <stripes:param name="uri" value="${actionBean.uri}"/>
+                                                <stripes:url beanclass="${actionBean.class.name}" event="harvest" var="harvestUrl">
+                                                    <stripes:param name="uri" value="${actionBean.uri}"/>
                                                 </stripes:url>
-                                                <stripes:url value="${actionBean.urlBinding}" event="harvest" var="oldUrl">
-                                                        <stripes:param name="uri" value="${actionBean.uri}"/>
-                                                </stripes:url>
-                                                <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
+                                                <a id="harvestLink" href="${harvestUrl}">Harvest</a>
                                             </li>
                                         </c:if>
                                         <c:if test="${sourceReadActionsAllowed}">
@@ -178,7 +197,7 @@
                                 </li>
                             </ul>
                         </c:if>
-                        <div style="margin-top:20px" id="wait_container">
+                        <div style="margin-top:20px">
 
                             <c:choose>
                                 <c:when test="${actionBean.subject.anonymous}">
@@ -263,6 +282,7 @@
                             </div>
                         </c:if>
                         <div id="predObjValueDialog" title="Property value"></div>
+                        
                     </c:when>
 
                     <%-- The section that is displayed if the subject does not yet exist in the database, --%>
@@ -279,13 +299,10 @@
                                                 <ul>
                                                     <c:if test="${actionBean.currentlyHarvested==false}">
                                                         <li>
-                                                            <stripes:url value="${actionBean.urlBinding}" event="harvestAjax"  var="url">
-                                                                    <stripes:param name="uri" value="${actionBean.uri}"/>
-                                                            </stripes:url>
-                                                            <stripes:url value="${actionBean.urlBinding}" event="harvest"  var="oldUrl">
-                                                                    <stripes:param name="uri" value="${actionBean.uri}"/>
-                                                            </stripes:url>
-                                                            <a id="wait_link" href="${oldUrl}" onclick="javascript:loadAndWait('The resource is being harvested. Please wait ...', '${url}', '${pageContext.request.contextPath}'); return false;">Harvest</a>
+                                                            <stripes:url beanclass="${actionBean.class.name}" event="harvest" var="harvestUrl">
+                                                    			<stripes:param name="uri" value="${actionBean.uri}"/>
+                                                			</stripes:url>
+                                                			<a id="harvestLink" href="${harvestUrl}">Harvest</a>
                                                         </li>
                                                     </c:if>
                                                 </ul>
@@ -293,7 +310,7 @@
                                         </ul>
                                     </c:if>
                                 </c:if>
-                                <div style="margin-top:20px" class="note-msg" id="wait_container">
+                                <div style="margin-top:20px" class="note-msg">
                                     <strong>Unknown</strong>
                                     <p>The application has no information about
                                         <c:choose>
@@ -321,6 +338,12 @@
                         </c:choose>
                     </c:otherwise>
                 </c:choose>
+                
+                <div id="harvestDialog" title="Attempting harvest">
+                	<p>The harvest is being executed, please wait ...</p>
+                	<img src="${pageContext.request.contextPath}/images/wait.gif" alt="Loading ..."/>
+                </div>
+                
             </c:when>
             <c:otherwise>
                 <div>&nbsp;</div>

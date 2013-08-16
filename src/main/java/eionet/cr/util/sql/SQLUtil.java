@@ -249,7 +249,27 @@ public final class SQLUtil {
             SQLUtil.close(stmt);
         }
     }
+    
+    /**
+     * Executes the given SQL statement by issuing a {@link Statement#execute(String)} command on a statement obtained from the
+     * given SQL statement.
+     * 
+     * @param sql The given SQL statement
+     * @param conn The given SQL connection.
+     * @return Statement execution result as returned by {@link Statement#execute(String)}.
+     * @throws SQLException Any sort of SQL exception thrown.
+     */
+    public static boolean execute(String sql, Connection conn) throws SQLException {
 
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            return stmt.execute(sql);
+        } finally {
+            SQLUtil.close(stmt);
+        }
+    }
+    
     /**
      *
      * @param parameterizedSQL

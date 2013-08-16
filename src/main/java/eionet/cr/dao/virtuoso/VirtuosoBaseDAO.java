@@ -421,4 +421,32 @@ public abstract class VirtuosoBaseDAO {
     protected String variablesCSV(String varName, int times) {
         return SesameUtil.createSPARQLVariablesCSV(varName, times);
     }
+
+    /**
+     * Issues Virtuoso's log_enable(int) statement on the given connection, using the given value for the int.
+     * The method is fail-safe. Any exceptions will be logged on one line on INFO level into the given optional loggers.
+     * @param value Input value for the log_enable(int).
+     * @param conn The connection on which to issue the statement.
+     * @param loggers Loggers to use, not mandatory. 
+     * 
+     * @return The result of the issued statement.
+     */
+    protected boolean forceLogEnable(int value, Connection conn, Logger... loggers) {
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = conn.prepareStatement("log_enable(?)");
+            pstmt.setInt(1, value);
+            return pstmt.execute();
+        } catch (Exception e) {
+            if (loggers != null) {
+                for (int i = 0; i < loggers.length; i++) {
+                    loggers[i].info("Forcing log_enable(" + value + ") failed: " + e);
+                }
+            }
+            return false;
+        } finally {
+            SQLUtil.close(pstmt);
+        }
+    }
 }

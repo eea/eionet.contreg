@@ -4,6 +4,37 @@
 
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
 
+	<stripes:layout-component name="head">
+    
+        <script type="text/javascript">
+			// <![CDATA[
+            ( function($) {
+                $(document).ready(
+                    function(){
+                    	
+                    	$("#submitButton").click(function() {
+                            $('#uploadDialog').dialog('option','width', 600);
+                            $('#uploadDialog').dialog('open');
+                            return true;
+                        });
+                        
+                        $('#uploadDialog').dialog({
+                            autoOpen: false,
+                            height: 200,
+                            width: 600,
+                            maxHeight: 800,
+                            maxWidth: 800,
+                            modal: true,
+                            closeOnEscape: true
+                        });
+                        
+                    });
+            } ) ( jQuery );
+			// ]]>
+        </script>
+        
+    </stripes:layout-component>
+                    }
     <stripes:layout-component name="contents">
 
         <cr:tabMenu tabs="${actionBean.tabs}" />
@@ -12,7 +43,7 @@
 
         <div style="margin-top:20px">
 
-        <div id="wait_container">
+        <div>
             <h1>Upload file</h1>
 
             <crfn:form action="/folder.action" method="post">
@@ -37,13 +68,17 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <stripes:submit name="upload" value="Upload"
-                                onclick="javascript:showWait('The file is being uploaded, and its harvest is attempted. Please wait ...', '${pageContext.request.contextPath}');return true;"/>
+                            <stripes:submit id="submitButton" name="upload" value="Upload"/>
                             <stripes:submit name="view" value="Cancel"/>
                         </td>
                     </tr>
                 </table>
             </crfn:form>
+            
+            <div id="uploadDialog" title="Attempting upload">
+            	<p>The file is being uploaded, and its harvest is attempted. Please wait ...</p>
+            	<img src="${pageContext.request.contextPath}/images/wait.gif" alt="Loading ..."/>
+            </div>
 
         </div>
 
