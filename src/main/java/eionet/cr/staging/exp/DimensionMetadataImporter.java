@@ -122,6 +122,7 @@ public class DimensionMetadataImporter extends Thread {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Thread#run()
      */
     @Override
@@ -153,7 +154,7 @@ public class DimensionMetadataImporter extends Thread {
      * @throws SQLException
      * @throws RepositoryException
      */
-    private void doExecute(RepositoryConnection repoConn) throws SQLException, RepositoryException  {
+    private void doExecute(RepositoryConnection repoConn) throws SQLException, RepositoryException {
 
         int rowIndex = 1;
         Connection sqlConn = null;
@@ -220,7 +221,6 @@ public class DimensionMetadataImporter extends Thread {
         sdmxConceptURI = vf.createURI("http://purl.org/linked-data/sdmx#Concept");
     }
 
-
     /**
      * @param rs
      * @param rowIndex
@@ -229,18 +229,16 @@ public class DimensionMetadataImporter extends Thread {
      * @throws SQLException
      * @throws RepositoryException
      */
-    private void importRow(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory) throws RepositoryException, SQLException {
+    private void importRow(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory)
+            throws RepositoryException, SQLException {
 
         if (dimension == null) {
             return;
-        }
-        else if (dimension.equals(Dimension.INDICATOR)) {
+        } else if (dimension.equals(Dimension.INDICATOR)) {
             importIndicator(rs, rowIndex, repoConn, valueFactory);
-        }
-        else if (dimension.equals(Dimension.BREAKDOWN)) {
+        } else if (dimension.equals(Dimension.BREAKDOWN)) {
             importBreakdown(rs, rowIndex, repoConn, valueFactory);
-        }
-        else if (dimension.equals(Dimension.UNIT)) {
+        } else if (dimension.equals(Dimension.UNIT)) {
             importUnit(rs, rowIndex, repoConn, valueFactory);
         }
     }
@@ -254,7 +252,8 @@ public class DimensionMetadataImporter extends Thread {
      * @throws SQLException
      * @throws RepositoryException
      */
-    private void importIndicator(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory) throws SQLException, RepositoryException {
+    private void importIndicator(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory)
+            throws SQLException, RepositoryException {
 
         String notation = rs.getString("notation");
         String label = rs.getString("label");
@@ -283,7 +282,8 @@ public class DimensionMetadataImporter extends Thread {
      * @throws SQLException
      * @throws RepositoryException
      */
-    private void importBreakdown(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory) throws SQLException, RepositoryException {
+    private void importBreakdown(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory)
+            throws SQLException, RepositoryException {
 
         String notation = rs.getString("notation");
         String label = "";
@@ -318,7 +318,8 @@ public class DimensionMetadataImporter extends Thread {
      * @throws SQLException
      * @throws RepositoryException
      */
-    private void importUnit(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory) throws SQLException, RepositoryException {
+    private void importUnit(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory valueFactory)
+            throws SQLException, RepositoryException {
 
         String notation = rs.getString("notation");
         String label = rs.getString("label");

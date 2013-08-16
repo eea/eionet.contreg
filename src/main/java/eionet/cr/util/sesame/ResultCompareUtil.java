@@ -327,8 +327,7 @@ public class ResultCompareUtil {
 
         if (!hasNext1 && hasNext2) {
             throw new CRException("At row#" + i + " result2 has next, but result1 does not!");
-        }
-        else if (hasNext1 && !hasNext2) {
+        } else if (hasNext1 && !hasNext2) {
             throw new CRException("At row#" + i + " result1 has next, but result2 does not!");
         }
 
@@ -351,15 +350,19 @@ public class ResultCompareUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        //        String query1 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/29> where {?s ?p ?o} order by ?s ?p";
-        //        String query2 =
-        //                "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/manualHH> where {?s ?p ?o} order by ?s ?p";
+        // String query1 =
+        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/29> where {?s ?p ?o} order by ?s ?p";
+        // String query2 =
+        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/manualHH> where {?s ?p ?o} order by ?s ?p";
 
-        //        String query1 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/30> where {?s ?p ?o} order by ?s ?p";
-        //        String query2 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent1_Andrei> where {?s ?p ?o} order by ?s ?p";
+        // String query1 =
+        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/30> where {?s ?p ?o} order by ?s ?p";
+        // String query2 =
+        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent1_Andrei> where {?s ?p ?o} order by ?s ?p";
 
         String query1 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/32> where {?s ?p ?o} order by ?s ?p";
-        String query2 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent2_Andrei> where {?s ?p ?o} order by ?s ?p";
+        String query2 =
+                "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent2_Andrei> where {?s ?p ?o} order by ?s ?p";
 
         TupleQueryResult result1 = null;
         TupleQueryResult result2 = null;

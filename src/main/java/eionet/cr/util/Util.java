@@ -306,7 +306,7 @@ public final class Util {
         }
 
         int[] scopes =
-            {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
+                {PageContext.APPLICATION_SCOPE, PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE};
         for (int i = 0; i < scopes.length; i++) {
             Enumeration attrs = pageContext.getAttributeNamesInScope(scopes[i]);
             while (attrs != null && attrs.hasMoreElements()) {
@@ -910,19 +910,18 @@ public final class Util {
 
     /**
      * retruns BOM of the given encoding.
+     *
      * @param encoding encoding of the stream
      * @return array containing BOM bytes
      */
     public static int[] getBOM(String encoding) {
-        int[] bomUTF8 = {239,187,191};
-        int[] bomUTF16LE = {255,254};
+        int[] bomUTF8 = {239, 187, 191};
+        int[] bomUTF16LE = {255, 254};
         if (encoding.equalsIgnoreCase("utf-8")) {
-            return  bomUTF8;
-        }
-        else if (encoding.equalsIgnoreCase("utf-16le")) {
+            return bomUTF8;
+        } else if (encoding.equalsIgnoreCase("utf-16le")) {
             return bomUTF16LE;
-        }
-        else {
+        } else {
             return null;
         }
     }

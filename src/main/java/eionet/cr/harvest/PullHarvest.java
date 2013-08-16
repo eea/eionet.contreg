@@ -266,18 +266,15 @@ public class PullHarvest extends BaseHarvest {
                             finishWithOK(endpointConn, getContextSourceDTO().getStatements(), msg);
                             return;
                         }
-                    }
-                    else if (isUnauthorized(httpResponseCode)) {
+                    } else if (isUnauthorized(httpResponseCode)) {
                         LOGGER.debug(loggerMsg("Source unauthorized!"));
                         finishWithUnauthorized();
                         return;
-                    }
-                    else if (isError(httpResponseCode)) {
+                    } else if (isError(httpResponseCode)) {
                         LOGGER.debug(loggerMsg("Server returned error code " + httpResponseCode));
                         finishWithError(httpResponseCode, responseMessage, null);
                         return;
-                    }
-                    else {
+                    } else {
                         String msg = "Unsupported response code for SPARQL endpoint harvest: " + httpResponseCode;
                         LOGGER.warn(loggerMsg(msg));
                         finishWithOK(endpointConn, getContextSourceDTO().getStatements(), msg);
@@ -935,6 +932,7 @@ public class PullHarvest extends BaseHarvest {
 
     /**
      * Prepares the {@link HttpURLConnection} to be invoked for the given URL's harvest.
+     *
      * @param connectUrl URL to harvest.
      * @return The prepared {@link HttpURLConnection}.
      * @throws IOException Several IO exception can happen on the way.
@@ -1068,8 +1066,8 @@ public class PullHarvest extends BaseHarvest {
      * @throws SAXException
      * @throws IOException
      */
-    public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException, IOException, SAXException,
-            ParserConfigurationException {
+    public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
+            IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);

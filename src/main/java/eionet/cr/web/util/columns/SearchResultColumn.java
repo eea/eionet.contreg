@@ -171,9 +171,9 @@ public abstract class SearchResultColumn {
         String uriParam = uri;
         if (isAnonymous) {
             if (uriParam.startsWith(VirtuosoBaseDAO.N3_BNODE_PREFIX)) {
-                uriParam = StringUtils.replaceOnce(uriParam, VirtuosoBaseDAO.N3_BNODE_PREFIX, VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX);
-            }
-            else if (!uriParam.startsWith(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX)) {
+                uriParam =
+                        StringUtils.replaceOnce(uriParam, VirtuosoBaseDAO.N3_BNODE_PREFIX, VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX);
+            } else if (!uriParam.startsWith(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX)) {
                 uriParam = VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX + uriParam;
             }
         }
