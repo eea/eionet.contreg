@@ -64,10 +64,10 @@ public class VirtuosoEndpointHarvestQueryDAO extends VirtuosoBaseDAO implements 
     private static final int TEST_QUERY_LIMIT = 500;
 
     /** */
-    private static final String CREATE_SQL =
-            "insert into ENDPOINT_HARVEST_QUERY"
-                    + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE,LAST_MODIFIED) values"
-                    + " (?,?,?,?,(select coalesce(max(POSITION_NUMBER), 0)+1 from ENDPOINT_HARVEST_QUERY where ENDPOINT_URL_HASH=?),?,now())";
+    private static final String CREATE_SQL = "insert into ENDPOINT_HARVEST_QUERY"
+            + " (TITLE,QUERY,ENDPOINT_URL,ENDPOINT_URL_HASH,POSITION_NUMBER,ACTIVE,LAST_MODIFIED) values"
+            + " (?,?,?,?,(select coalesce(max(POSITION_NUMBER), 0)+1 from ENDPOINT_HARVEST_QUERY"
+            + " where ENDPOINT_URL_HASH=?),?,now())";
 
     /** */
     private static final String LIST_BY_URL_HASH_SQL = "select * from ENDPOINT_HARVEST_QUERY"

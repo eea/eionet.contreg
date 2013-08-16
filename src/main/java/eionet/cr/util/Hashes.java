@@ -132,7 +132,7 @@ public final class Hashes {
     /**
      * Just used for getting an spoHash() of a string and printing it in System.out.
      *
-     * @param args
+     * @param args Command line arguments.
      */
     public static void main(String[] args) {
 

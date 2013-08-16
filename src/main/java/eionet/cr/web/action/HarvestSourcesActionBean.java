@@ -140,27 +140,28 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
             SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
 
             Pair<Integer, List<HarvestSourceDTO>> pair = null;
+            HarvestSourceDAO harvestSourceDAO = factory.getDao(HarvestSourceDAO.class);
             if (StringUtils.isBlank(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSources(filterString, pagingRequest, sortingRequest);
+                pair = harvestSourceDAO.getHarvestSources(filterString, pagingRequest, sortingRequest);
             } else if (PRIORITY.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getPrioritySources(filterString, pagingRequest, sortingRequest);
+                pair = harvestSourceDAO.getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
                 pair =
-                        factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnavailable(filterString, pagingRequest,
+                        harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest,
                                 sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
+                pair = harvestSourceDAO.getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (UNAUHTORIZED_HARVESTS.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
+                pair = harvestSourceDAO.getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
             } else if (SCHEMAS.equals(type)) {
                 // Get comma separated sources that are included into
                 // inferencing ruleset
-                String sourceUris = factory.getDao(HarvestSourceDAO.class).getSourcesInInferenceRules();
+                String sourceUris = harvestSourceDAO.getSourcesInInferenceRules();
                 pair =
-                        factory.getDao(HarvestSourceDAO.class).getInferenceSources(filterString, pagingRequest, sortingRequest,
+                        harvestSourceDAO.getInferenceSources(filterString, pagingRequest, sortingRequest,
                                 sourceUris);
             } else if (SPARQL_ENDPOINTS.equals(type)) {
-                pair = factory.getDao(HarvestSourceDAO.class).getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
+                pair = harvestSourceDAO.getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
             }
 
             if (pair != null) {

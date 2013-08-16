@@ -235,45 +235,4 @@ public class LinkedCaseInsensitiveMap<V> implements java.util.Map<String, V> {
     private LinkedHashMap<String, V> getLowerKeysMap() {
         return lowerCaseKeysMap;
     }
-
-    /**
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        LinkedCaseInsensitiveMap<Long> map = new LinkedCaseInsensitiveMap<Long>();
-        map.put("jAAnus", 1L);
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        map.put("jaAnuS", 2L);
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        map.put(null, 1L);
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        map.put("enriko", 3L);
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        map.put("risto", 4L);
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        System.out.println("map.get(\"JAANUS\") = " + map.get("JAANUS"));
-        map.remove("Jaanus");
-
-        System.out.println("map = " + map);
-        System.out.println("getLowerKeysMap() = " + map.getLowerKeysMap().toString());
-
-        System.out.println();
-    }
 }

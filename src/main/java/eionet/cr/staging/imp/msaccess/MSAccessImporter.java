@@ -95,7 +95,8 @@ public class MSAccessImporter implements ImporterIF {
 
                 if (!structOnly) {
 
-                    LogUtil.info("Going to process the " + table.getRowCount() + " rows of table " + tableName, LOGGER, importLogger);
+                    int rowCount = table.getRowCount();
+                    LogUtil.info("Going to process the " + rowCount + " rows of table " + tableName, LOGGER, importLogger);
 
                     int rowNum = 0;
                     for (Map<String, Object> row : table) {

@@ -210,7 +210,7 @@ public class FileDownloader extends Thread {
      * Returns java.io.File pointing to the directory where the available files should be kept in.
      * @return The java.io.File.
      */
-    private static final File getFilesDir() {
+    static final File getFilesDir() {
 
         File file = new File(GeneralConfig.getRequiredProperty(GeneralConfig.STAGING_FILES_DIR));
         if (!file.exists() || !file.isDirectory()) {

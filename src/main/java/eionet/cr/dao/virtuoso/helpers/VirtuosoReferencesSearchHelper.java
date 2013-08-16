@@ -129,10 +129,10 @@ public class VirtuosoReferencesSearchHelper extends AbstractSearchHelper {
         String subjectUrisCSV = SPARQLQueryUtil.urisToCSV(subjectUris, "subjectUriValue", subjectDataBindings);
         String sourceUriBinding = (isValidIRI ? "?sourceUri" : "IRI(?sourceUri)");
         String sparql =
-                "select ?g ?s ?p bif:either(isLiteral(?o), bif:substring(str(?o), 1, " + WebConstants.MAX_OBJECT_LENGTH + "), ?o) as ?o "
-                        + "where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) " + ". filter(?p = <"
-                        + Predicates.RDF_TYPE + "> || <" + Predicates.RDFS_LABEL + "> || (isURI(?o) && ?o=" + sourceUriBinding
-                        + "))}} ORDER BY ?s";
+                "select ?g ?s ?p bif:either(isLiteral(?o), bif:substring(str(?o), 1, " + WebConstants.MAX_OBJECT_LENGTH
+                        + "), ?o) as ?o " + "where {graph ?g {?s ?p ?o. filter (?s IN (" + subjectUrisCSV + ")) "
+                        + ". filter(?p = <" + Predicates.RDF_TYPE + "> || <" + Predicates.RDFS_LABEL + "> || (isURI(?o) && ?o="
+                        + sourceUriBinding + "))}} ORDER BY ?s";
 
         return sparql;
     }

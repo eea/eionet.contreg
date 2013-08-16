@@ -581,10 +581,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory
-            .get()
-            .getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(
-                    HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(
+                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -605,7 +605,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         // attempt to harvest the uploaded file
-        harvestUploadedFile(getUploadedFileSubjectUri(), file, null, getUserNameOrAnonymous(),uploadedFile.getContentType());
+        harvestUploadedFile(getUploadedFileSubjectUri(), file, null, getUserNameOrAnonymous(), uploadedFile.getContentType());
     }
 
     /**
@@ -635,8 +635,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             } else {
                 filePath = uploadedFile.getFileName();
             }
-            file = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
-                    contentStream);
+            file =
+                    FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
+                            contentStream);
         } finally {
             IOUtils.closeQuietly(contentStream);
         }

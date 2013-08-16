@@ -131,7 +131,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return the list
      * @throws DAOException the dAO exception
      */
-    public List<StagingDatabaseDTO> listAll() throws DAOException;
+    List<StagingDatabaseDTO> listAll() throws DAOException;
 
     /**
      * Deletes the given staging databases.
@@ -139,7 +139,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @param dbNames the db names
      * @throws DAOException the dAO exception
      */
-    public void delete(List<String> dbNames) throws DAOException;
+    void delete(List<String> dbNames) throws DAOException;
 
     /**
      * Returns true if there is at least one table under the given Virtuoso database (i.e. qualifier). Otherwise returns false. The
@@ -149,7 +149,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return true, if successful
      * @throws DAOException the dAO exception
      */
-    public boolean exists(String dbName) throws DAOException;
+    boolean exists(String dbName) throws DAOException;
 
     /**
      * Returns the import log of the staging database by the given integer id.
@@ -158,7 +158,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return the import log
      * @throws DAOException the dAO exception
      */
-    public String getImportLog(int databaseId) throws DAOException;
+    String getImportLog(int databaseId) throws DAOException;
 
     /**
      * Returns the log of the RDF export by the given id.
@@ -167,7 +167,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return The export's log.
      * @throws DAOException In case any sort of database access error happens.
      */
-    public String getExportLog(int exportId) throws DAOException;
+    String getExportLog(int exportId) throws DAOException;
 
     /**
      * Prepares the given SQL statement for the given database. The method returns the list of column names selected by the given
@@ -178,7 +178,7 @@ public interface StagingDatabaseDAO extends DAO {
      * @return List of selected columns. It is empty if the statement is not a select query.
      * @throws DAOException In case any sort of database access error happens.
      */
-    public Set<String> prepareStatement(String sql, String dbName) throws DAOException;
+    Set<String> prepareStatement(String sql, String dbName) throws DAOException;
 
     /**
      * Creates a new staging database RDF export record in the database, using the given inputs. The newly created export's status

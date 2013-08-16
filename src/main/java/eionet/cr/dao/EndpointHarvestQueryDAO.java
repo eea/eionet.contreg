@@ -43,7 +43,7 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @return The created record's id.
      * @throws DAOException If any sort of database access error happens.
      */
-    public int create(EndpointHarvestQueryDTO dto) throws DAOException;
+    int create(EndpointHarvestQueryDTO dto) throws DAOException;
 
     /**
      * Returns a list of {@link EndpointHarvestQueryDAO} matching to the given endpoint URL. The latter may be null in which case
@@ -52,7 +52,7 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @return The list of matching objects.
      * @throws DAOException If any sort of database access error happens.
      */
-    public List<EndpointHarvestQueryDTO> listByEndpointUrl(String url) throws DAOException;
+    List<EndpointHarvestQueryDTO> listByEndpointUrl(String url) throws DAOException;
 
     /**
      * Same as {@link #listByEndpointUrl(String)}, but additional boolean input enables to control whether the matching queries
@@ -63,7 +63,7 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @return The list of matching objects.
      * @throws DAOException If any sort of database access error happens.
      */
-    public List<EndpointHarvestQueryDTO> listByEndpointUrl(String url, boolean active) throws DAOException;
+    List<EndpointHarvestQueryDTO> listByEndpointUrl(String url, boolean active) throws DAOException;
 
     /**
      * Fetches a {@link EndpointHarvestQueryDAO} by the given id.
@@ -71,21 +71,21 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @return The matching {@link EndpointHarvestQueryDAO} or null if no match found.
      * @throws DAOException If any sort of database access error happens.
      */
-    public EndpointHarvestQueryDTO fetchById(int id) throws DAOException;
+    EndpointHarvestQueryDTO fetchById(int id) throws DAOException;
 
     /**
      * Returns a list of SPARQL endpoint URLs currently listed in HARVEST_SOURCE table.
      * @return The list.
      * @throws DAOException If any sort of database access error happens.
      */
-    public List<String> getEndpoints() throws DAOException;
+    List<String> getEndpoints() throws DAOException;
 
     /**
      * Updates the given endpoint harvest query in the database.
      * @param dto The given endpoint harvest query.
      * @throws DAOException If any sort of database access error happens.
      */
-    public void update(EndpointHarvestQueryDTO dto) throws DAOException;
+    void update(EndpointHarvestQueryDTO dto) throws DAOException;
 
     /**
      * Tests the given CONSTRUCT query at the given remote endpoint URL. Neither of the two must be blank!
@@ -101,7 +101,7 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @return The statements.
      * @throws DAOException If any sort of database access error happens.
      */
-    public Collection<Statement> testConstructQuery(String query, String endpointUrl) throws DAOException;
+    Collection<Statement> testConstructQuery(String query, String endpointUrl) throws DAOException;
 
     /**
      * Moves the given queries up/down in terms of their position in the queries of the given endpoint.
@@ -118,7 +118,7 @@ public interface EndpointHarvestQueryDAO extends DAO {
      * @param selectedIds Given query ids.
      * @throws DAOException If any sort of database access error happens.
      */
-    public void delete(List<Integer> selectedIds) throws DAOException;
+    void delete(List<Integer> selectedIds) throws DAOException;
 
     /**
      * Activates/deactivates the given queries (i.e. sets their ACTIVE field in the database accordingly).

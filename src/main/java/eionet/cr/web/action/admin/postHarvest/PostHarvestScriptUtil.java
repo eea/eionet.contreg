@@ -47,7 +47,7 @@ public final class PostHarvestScriptUtil {
      */
     public static List<String> getValidateScriptErrors(List<PostHarvestScriptDTO> scriptsInClipBoard,
             PostHarvestScriptDTO.TargetType targetTypeClipBoard, PostHarvestScriptDTO.TargetType targetType, String targetUrl)
-                    throws DAOException {
+            throws DAOException {
 
         List<String> errors = new ArrayList<String>();
 
@@ -134,7 +134,7 @@ public final class PostHarvestScriptUtil {
         return !((targetType == null && (targetTypeClipBoard != null && !targetTypeClipBoard
                 .equals(PostHarvestScriptDTO.TargetType.SOURCE)))
                 || (targetTypeClipBoard == null && (targetType != null && !targetType
-                .equals(PostHarvestScriptDTO.TargetType.SOURCE))) || (targetTypeClipBoard != null && targetType != null && !targetType
+                        .equals(PostHarvestScriptDTO.TargetType.SOURCE))) || (targetTypeClipBoard != null && targetType != null && !targetType
                 .equals(targetTypeClipBoard)));
     }
 }

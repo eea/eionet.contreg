@@ -143,7 +143,8 @@ public class ObjectTypes {
                 new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/flag", "flag", "Flag (status flag)",
                         ObjectProperty.Range.RESOURCE);
         property.setValueTemplate("http://eurostat.linked-statistics.org/dic/flags#<value>");
-        property.setHint("Expects a flag indicating the obsevration's status as in http://eurostat.linked-statistics.org/dic/flags. e.g. u, n, p. r, etc.");
+        property.setHint("Expects a flag indicating the obsevration's status as" +
+        		" in http://eurostat.linked-statistics.org/dic/flags. e.g. u, n, p. r, etc.");
         qbObservation.addProperty(property, false, "flag", "status", "statusFlag", "flagStatus", "flags");
 
         // hidden properties

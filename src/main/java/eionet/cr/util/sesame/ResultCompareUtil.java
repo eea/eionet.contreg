@@ -342,46 +342,4 @@ public class ResultCompareUtil {
     private static boolean isNumber(Value value) {
         return value instanceof DecimalLiteralImpl || value instanceof IntegerLiteralImpl || value instanceof NumericLiteralImpl;
     }
-
-    /**
-     *
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
-        // String query1 =
-        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/29> where {?s ?p ?o} order by ?s ?p";
-        // String query2 =
-        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/manualHH> where {?s ?p ?o} order by ?s ?p";
-
-        // String query1 =
-        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/30> where {?s ?p ?o} order by ?s ?p";
-        // String query2 =
-        // "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent1_Andrei> where {?s ?p ?o} order by ?s ?p";
-
-        String query1 = "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/32> where {?s ?p ?o} order by ?s ?p";
-        String query2 =
-                "select ?s ?p ?o from <http://semantic.digital-agenda-data.eu/import/ent2_Andrei> where {?s ?p ?o} order by ?s ?p";
-
-        TupleQueryResult result1 = null;
-        TupleQueryResult result2 = null;
-        RepositoryConnection repoConn = null;
-        try {
-            repoConn = SesameUtil.getRepositoryConnection();
-            TupleQuery tupleQuery1 = repoConn.prepareTupleQuery(QueryLanguage.SPARQL, query1);
-            TupleQuery tupleQuery2 = repoConn.prepareTupleQuery(QueryLanguage.SPARQL, query2);
-            System.out.println("Evaluating query1 ...");
-            result1 = tupleQuery1.evaluate();
-            System.out.println("Evaluating query2 ...");
-            result2 = tupleQuery2.evaluate();
-            System.out.println("Comparing ...");
-            boolean b = compare(result1, result2);
-            System.out.println("result: " + b);
-        } finally {
-            SesameUtil.close(result1);
-            SesameUtil.close(result2);
-            SesameUtil.close(repoConn);
-        }
-    }
 }

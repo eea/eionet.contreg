@@ -78,6 +78,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.FolderDAO#createUserHomeFolder(java.lang.String)
      */
     @Override
@@ -120,6 +121,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.FolderDAO#createFolder(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
@@ -172,12 +174,11 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, folder, homeFolder));
             statements.add(new ContextStatementImpl(newFolder, allowSubObjectType, file, homeFolder));
 
-
             repoConn.add(statements);
 
-            //if a new project is created add subfolders
+            // if a new project is created add subfolders
             if (FolderUtil.isProjectRootFolder(parentFolderUri)) {
-                repoConn.add( getProjectFolderCreationStatements(folderName, vf));
+                repoConn.add(getProjectFolderCreationStatements(folderName, vf));
             }
 
             createNeverHarvestedSources(sqlConn, statements);
@@ -218,6 +219,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.FolderDAO#fileOrFolderExists(java.lang.String)
      */
     @Override
@@ -430,7 +432,6 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
     }
 
-
     private List<Statement> getProjectFolderCreationStatements(String projectName, ValueFactory vf) {
 
         String projectRootFolder = FolderUtil.getProjectsFolder();
@@ -455,10 +456,10 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         result.add(new ContextStatementImpl(bookmarksUri, rdfType, bookmarksFile, projectsRootURI));
         result.add(new ContextStatementImpl(bookmarksUri, rdfsLabel, bookmarksLabel, projectsRootURI));
 
-
         return result;
 
     }
+
     /**
      *
      * @param user
@@ -558,7 +559,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
     }
 
-
+    @Override
     public void createProjectBookmarksFolder(String projectName) throws DAOException {
 
         Connection sqlConn = null;

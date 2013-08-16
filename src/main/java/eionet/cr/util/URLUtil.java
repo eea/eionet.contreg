@@ -120,11 +120,7 @@ public class URLUtil {
             urlConnection.setIfModifiedSince(timestamp);
 
             int responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                return false;
-            } else {
-                return true;
-            }
+            return responseCode != HttpURLConnection.HTTP_NOT_MODIFIED;
         } finally {
             URLUtil.disconnect(urlConnection);
         }
