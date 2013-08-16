@@ -2,7 +2,7 @@ package eionet.cr.web.sparqlClient.helpers;
 
 /**
  * A result-value object for any subject/predicate/object to be used in CR's SPARQL endpoint query results.
- * 
+ *
  * @author jaanus
  */
 public class ResultValue {
@@ -18,7 +18,7 @@ public class ResultValue {
 
     /**
      * Simple constructor for the {@link #value} and {@link #isLiteral()} fields.
-     * 
+     *
      * @param value
      * @param isLiteral
      */
@@ -30,7 +30,7 @@ public class ResultValue {
 
     /**
      * Simple constructor for the {@link #value}, {@link #isLiteral()} and {@link #isAnonymous} fields.
-     * 
+     *
      * @param value
      * @param isLiteral
      * @param isAnonymous

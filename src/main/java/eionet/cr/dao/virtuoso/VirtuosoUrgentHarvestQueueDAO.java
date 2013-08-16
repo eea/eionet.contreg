@@ -39,9 +39,9 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
@@ -112,7 +112,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestQueueDAO#addPushHarvest(eionet.cr.dto.HarvestQueueItemDTO)
      */
     @Override
@@ -141,7 +141,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.HarvestQueueDAO#getUrgentHarvestQueue()
      */
     @Override
@@ -151,7 +151,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#poll()
      */
     @Override
@@ -174,7 +174,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
-     * 
+     *
      * @param conn
      * @return
      * @throws SQLException
@@ -191,7 +191,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
-     * 
+     *
      * @param queueItem
      * @throws SQLException
      */
@@ -206,7 +206,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String)
      */
     @Override
@@ -237,7 +237,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#removeUrl(java.lang.String)
      */
     @Override
@@ -252,7 +252,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#removeItems(java.util.List)
      */
     @Override

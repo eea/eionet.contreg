@@ -249,11 +249,11 @@ public final class SQLUtil {
             SQLUtil.close(stmt);
         }
     }
-    
+
     /**
      * Executes the given SQL statement by issuing a {@link Statement#execute(String)} command on a statement obtained from the
      * given SQL statement.
-     * 
+     *
      * @param sql The given SQL statement
      * @param conn The given SQL connection.
      * @return Statement execution result as returned by {@link Statement#execute(String)}.
@@ -269,7 +269,7 @@ public final class SQLUtil {
             SQLUtil.close(stmt);
         }
     }
-    
+
     /**
      *
      * @param parameterizedSQL

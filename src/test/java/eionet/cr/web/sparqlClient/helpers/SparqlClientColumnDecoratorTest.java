@@ -12,13 +12,13 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 
 /**
  * A unit test for {@link SparqlClientColumnDecoratorTest}.
- * 
+ *
  * @author jaanus
  */
 public class SparqlClientColumnDecoratorTest extends TestCase {
 
     /**
-     * 
+     *
      * @throws UnsupportedEncodingException
      */
     @Test

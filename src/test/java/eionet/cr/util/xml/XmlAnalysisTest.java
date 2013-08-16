@@ -55,7 +55,7 @@ public class XmlAnalysisTest {
         assertNull(xmlAnalysis.getSystemDtd());
         assertNull(xmlAnalysis.getPublicDtd());
     }
- 
+
     /**
      * Parsing from an inputstream. The xsi:schemaLocation has extra whitespace.
      */

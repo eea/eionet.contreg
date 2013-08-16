@@ -105,7 +105,7 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
-     * 
+     *
      * @return
      * @throws DAOException
      */

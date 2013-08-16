@@ -24,9 +24,9 @@ import java.io.Serializable;
 
 /**
  * A DTO class representing a row (i.e. an item) in the URGENT_HARVEST_QUEUE table.
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public class UrgentHarvestQueueItemDTO implements Serializable {
 
@@ -105,7 +105,7 @@ public class UrgentHarvestQueueItemDTO implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isPushHarvest() {

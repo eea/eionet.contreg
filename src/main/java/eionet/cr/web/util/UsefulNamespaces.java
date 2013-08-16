@@ -17,10 +17,10 @@ import eionet.cr.util.URIUtil;
  * A linked hash-map of prefix-to-namespace pairs that could be useful at SPARQL query entrance in CR web forms.
  * Loaded from {@value #PROPERTIES_FILE}.
  * Using {@link LinkedHashMap} and line-by-line reading to preserve the order of the pairs in the file.
- * 
+ *
  * It is a singleton implemented by the Bill Pugh pattern:
  * http://en.wikipedia.org/wiki/Singleton_pattern#The_solution_of_Bill_Pugh
- * 
+ *
  * @author jaanus
  */
 public class UsefulNamespaces extends LinkedHashMap<String, String> {
@@ -77,7 +77,7 @@ public class UsefulNamespaces extends LinkedHashMap<String, String> {
 
     /**
      * Public accessor for the singleton instance.
-     * 
+     *
      * @return The singleton instance.
      */
     public static UsefulNamespaces getInstance() {
@@ -87,7 +87,7 @@ public class UsefulNamespaces extends LinkedHashMap<String, String> {
     /**
      * {@link UsefulNamespacesHolder} is loaded on the first execution of {@link UsefulNamespaces#getInstance()}.
      * or the first access to {@link #INSTANCE}, not before.
-     * 
+     *
      * See singleton pattern by Bill Hugh at http://en.wikipedia.org/wiki/Singleton_pattern#The_solution_of_Bill_Pugh.
      */
     private static class UsefulNamespacesHolder {

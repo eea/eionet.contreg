@@ -17,7 +17,7 @@ public class SearchResultColumnTest extends TestCase {
 
     /**
      * @throws UnsupportedEncodingException
-     * 
+     *
      */
     @Test
     public void test() throws UnsupportedEncodingException {

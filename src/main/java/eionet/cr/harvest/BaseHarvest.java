@@ -79,7 +79,7 @@ import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author Jaanus Heinlaid
  */
 public abstract class BaseHarvest implements Harvest {
@@ -160,9 +160,9 @@ public abstract class BaseHarvest implements Harvest {
     private Integer timeout;
 
     /**
-     * 
+     *
      * Class constructor.
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -172,7 +172,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextSourceDTO
      */
     protected BaseHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -188,7 +188,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#execute()
      */
     @Override
@@ -213,7 +213,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * @throws HarvestException
-     * 
+     *
      */
     private void startHarvest() throws HarvestException {
 
@@ -235,13 +235,13 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @throws HarvestException
      */
     protected abstract void doHarvest() throws HarvestException;
 
     /**
-     * 
+     *
      * @param dontThrowException
      * @throws HarvestException
      */
@@ -364,7 +364,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param scriptDtos
      * @param conn
      */
@@ -432,7 +432,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Adds source int inference rule, if source is inference rule. (It is done because rule set must be updated after the harvest
      * is done)
-     * 
+     *
      * @throws DAOException
      */
     private void addIntoInferenceRule() throws DAOException {
@@ -444,7 +444,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Deletes sources with permanent errors after batch harvesting.
-     * 
+     *
      * @throws DAOException
      *             if deleting fails
      */
@@ -552,13 +552,13 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected abstract String getHarvestType();
 
     /**
-     * 
+     *
      * @param date
      */
     protected String formatDate(Date date) {
@@ -566,7 +566,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param messageObject
      * @return
      */
@@ -575,7 +575,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param messageObject
      * @param contextGraphUri
      * @return
@@ -586,7 +586,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#getContextUrl()
      */
     @Override
@@ -623,7 +623,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param url
      * @return
      * @throws DAOException
@@ -634,7 +634,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      */
@@ -657,7 +657,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param contextUrl
      * @throws HarvestException
      * @throws DAOException
@@ -676,7 +676,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param predicate
      * @param objectDTO
      */
@@ -697,7 +697,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param messageType
      */
@@ -706,7 +706,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param messageType
      * @param stackTrace
@@ -724,7 +724,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Derives new harvest sources from stored content.
-     * 
+     *
      */
     private void deriveNewHarvestSources() {
 
@@ -743,7 +743,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#getStoredTriplesCount()
      */
     @Override
@@ -761,7 +761,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#setHarvestUser(java.lang.String)
      */
     @Override
@@ -777,7 +777,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param message
      * @param throwable
      */
@@ -840,7 +840,7 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * 
+     *
      * @param messageBody
      */
     private void sendErrorMessage(String messageBody) {
@@ -872,7 +872,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Returns the list of e-mail addresses to which the error notifications of this harvest source should be sent. Does *NOT*
      * include the "default" list provided in system configuration.
-     * 
+     *
      * @return As indicated above.
      */
     private String[] getContextSourceEmailReceivers() {
@@ -887,9 +887,9 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Returns true if harvest errors should be sent as notifications to selected addresses. Otherwise returns false.
-     * 
+     *
      * {@link BaseHarvest} always returns false for this method, as default behavior. Extending classes can override it.
-     * 
+     *
      * @return
      */
     protected boolean isSendNotifications() {
@@ -906,7 +906,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see eionet.cr.harvest.Harvest#isBeingHarvested(java.lang.String)
      */
     @Override
@@ -919,7 +919,7 @@ public abstract class BaseHarvest implements Harvest {
      * Calculates the duration of the given source's last harvest. If the last harvest failed, the default harvest timeout is
      * returned as the result of this method. Otherwise, if the last harvest duration cannot be detected due to some reason, the
      * method returns 0.
-     * 
+     *
      * @param harvestSource
      *            The source in question.
      * @return The duration of the given source's last harvest.
@@ -952,7 +952,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Calculates timeout based on last harvests. Timeout is not greater than maximum timeout specified in HARVEST_TIMEOUT_TRESHOLD
      * If last harvest has not taken more than MINIMAL_HARVEST_TIMEOUT minimal timeout is used
-     * 
+     *
      * @return timeout in milliseconds
      */
     protected int getTimeout() {
@@ -989,7 +989,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Determines if the given throwable is fatal exception that occured during harvesting. If so, raises the fatal error flag. The
      * method is null-safe.
-     * 
+     *
      * @param t
      *            Throwable
      */
@@ -1010,7 +1010,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Harvests file in a local filestore.
      * Does not load it through /home servlet but takes it directly from the file system
-     * 
+     *
      * @param file Given file
      * @param contentType content type saved in earlier harvest
      * @return number of triples
@@ -1065,7 +1065,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Loads file into triplestore.
-     * 
+     *
      * @param file object in file system.
      * @param contentLoader does the actual loading of triples.
      * @return number of triples.
@@ -1079,7 +1079,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Loads given files into repository, using the given loaders.
-     * 
+     *
      * @param filesAndLoaders Files and corresponding loaders to use.
      * @return Total number of triples loaded.
      * @throws DAOException When repository access error happens.
@@ -1104,7 +1104,7 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Returns content loader for local files.
-     * 
+     *
      * @param file File to re-harvest
      * @param contentType content type originally stored
      * @return ContentLoader

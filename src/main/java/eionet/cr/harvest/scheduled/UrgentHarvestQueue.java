@@ -37,9 +37,9 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.web.security.CRUser;
 
 /**
- * 
+ *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- * 
+ *
  */
 public final class UrgentHarvestQueue {
 
@@ -66,10 +66,10 @@ public final class UrgentHarvestQueue {
 
     /**
      * Adds a pull-harvest to the urgent harvest queue.
-     * 
+     *
      * @param urls The URL to harvest.
      * @param userName User who is adding. Might be null or blank, in which case {@link CRUser#APPLICATION} is used as default.
-     * 
+     *
      * @throws HarvestException Wraps any sort of exception that happens.
      */
     public static synchronized void addPullHarvests(List<String> urls, String userName) throws HarvestException {
@@ -102,7 +102,7 @@ public final class UrgentHarvestQueue {
 
     /**
      * Adds a push-harvest to the urgent queue. Since it is pushed, the content is already provided.
-     * 
+     *
      * @param pushContent
      * @param url URL to register it on
      * @throws HarvestException
@@ -122,7 +122,7 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     * 
+     *
      * @return UrgentHarvestQueueItemDTO
      * @throws DAOException
      */
@@ -132,7 +132,7 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     * 
+     *
      * @return boolean
      * @throws DAOException
      */

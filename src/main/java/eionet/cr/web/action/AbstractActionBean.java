@@ -376,7 +376,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * See {@link UsefulNamespaces}.
-     * 
+     *
      * @return The {@link UsefulNamespaces} singleton.
      */
     public UsefulNamespaces getUsefulNamespaces() {

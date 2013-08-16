@@ -149,14 +149,14 @@ public abstract class SearchResultColumn {
     /**
      * Builds a factsheet HTML link (relative to the webapp root) for the given URI.
      * Returns full
-     * 
+     *
      * <pre>
      * <a href="..." title="...">...</a>
      * </pre>
-     * 
+     *
      * tag.
      * URL encodings and XML escapings also preformed.
-     * 
+     *
      * @param uri The given URI.
      * @param isAnonymous True if the given URI is an anonymous resource.
      * @param label The link's displayed label.

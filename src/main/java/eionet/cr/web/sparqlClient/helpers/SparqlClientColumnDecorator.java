@@ -17,7 +17,7 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
 
 /**
  * A Dispkyatg decorator for the table cells of the SPARQL ednpoint query results.
- * 
+ *
  * @author jaanus
  */
 public class SparqlClientColumnDecorator extends TableDecorator {
@@ -30,7 +30,7 @@ public class SparqlClientColumnDecorator extends TableDecorator {
 
     /**
      * Called by Displaytag upon displaying the given property of a given result set row. Returns thr property's "decorated" value.
-     * 
+     *
      * @param propertyName The given property.
      * @return As indicated above.
      * @throws UnsupportedEncodingException Thrown when URL-encoding is done with unsupported character encoding.
@@ -44,7 +44,7 @@ public class SparqlClientColumnDecorator extends TableDecorator {
 
     /**
      * Convenience method, that returns the "decorated" value of the given property in the given row-map.
-     * 
+     *
      * @param rowMap The given row-map.
      * @param propertyName The given property.
      * @param webappContextPath Context path of the current web-app.
@@ -81,7 +81,7 @@ public class SparqlClientColumnDecorator extends TableDecorator {
 
     /**
      * Lazy getter for the {@link #factsheetUrlBinding}.
-     * 
+     *
      * @return
      */
     private String getFactsheetUrlBinding() {
