@@ -86,7 +86,7 @@ public class ObjectTypes {
         ObjectType qbObservation = new ObjectType("http://purl.org/linked-data/cube#Observation", "Data Cube observation");
         qbObservation.setDatasetIdTemplate("<variable>");
         qbObservation.setDatasetIdNamespace("http://semantic.digital-agenda-data.eu/codelist/indicator/");
-        //qbObservation.setObjectIdTemplate("<variable>,<breakdown>,<unit>,<country>,<year>");
+        // qbObservation.setObjectIdTemplate("<variable>,<breakdown>,<unit>,<country>,<year>");
         qbObservation.setObjectIdTemplate("<indicator>/<breakdown>/<unit>/<refArea>/<timePeriod>");
         qbObservation.setObjectIdNamespace("http://semantic.digital-agenda-data.eu/data/scoreboard/");
 
@@ -119,8 +119,8 @@ public class ObjectTypes {
         qbObservation.addProperty(property, false, "indicator", "indicatorCode", "variable", "variableCode", "indic");
 
         property =
-                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/unit-measure", "unit",
-                        "Unit (code)", ObjectProperty.Range.RESOURCE);
+                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/unit-measure", "unit", "Unit (code)",
+                        ObjectProperty.Range.RESOURCE);
         property.setValueTemplate("http://semantic.digital-agenda-data.eu/codelist/unit-measure/<value>");
         property.setHint("Expects a Eurostat measurement unit code. e.g. pc_emp, pc_ent, pc_turn, etc.");
         qbObservation.addProperty(property, true, "unit", "unitMeasure", "unitCode");
@@ -133,25 +133,25 @@ public class ObjectTypes {
         qbObservation.addProperty(property, true, "value", "observedValue", "obsValue");
 
         property =
-                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/note", "note",
-                        "Note (any text)", ObjectProperty.Range.LITERAL);
+                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/note", "note", "Note (any text)",
+                        ObjectProperty.Range.LITERAL);
         property.setDataType(XMLSchema.STRING.stringValue());
         property.setHint("Expects any text that servers as a comment/note to the observation.");
         qbObservation.addProperty(property, false, "note", "notes", "comment", "comments");
 
         property =
-                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/flag", "flag",
-                        "Flag (status flag)", ObjectProperty.Range.RESOURCE);
+                new ObjectProperty("http://semantic.digital-agenda-data.eu/def/property/flag", "flag", "Flag (status flag)",
+                        ObjectProperty.Range.RESOURCE);
         property.setValueTemplate("http://eurostat.linked-statistics.org/dic/flags#<value>");
         property.setHint("Expects a flag indicating the obsevration's status as in http://eurostat.linked-statistics.org/dic/flags. e.g. u, n, p. r, etc.");
         qbObservation.addProperty(property, false, "flag", "status", "statusFlag", "flagStatus", "flags");
 
         // hidden properties
 
-        //        ObjectHiddenProperty hiddenProperty =
-        //                new ObjectHiddenProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", ObjectProperty.Range.RESOURCE);
-        //        hiddenProperty.setValue("http://purl.org/linked-data/cube#Observation");
-        //        qbObservation.addHiddenProperty(hiddenProperty);
+        // ObjectHiddenProperty hiddenProperty =
+        // new ObjectHiddenProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", ObjectProperty.Range.RESOURCE);
+        // hiddenProperty.setValue("http://purl.org/linked-data/cube#Observation");
+        // qbObservation.addHiddenProperty(hiddenProperty);
 
         ObjectHiddenProperty hiddenProperty =
                 new ObjectHiddenProperty("http://purl.org/linked-data/cube#dataSet", ObjectProperty.Range.RESOURCE);
@@ -161,60 +161,64 @@ public class ObjectTypes {
         return qbObservation;
     }
 
-    //    /**
-    //     * Creates the observation type.
-    //     *
-    //     * @return the object type
-    //     */
-    //    private static ObjectType createObservationType() {
+    // /**
+    // * Creates the observation type.
+    // *
+    // * @return the object type
+    // */
+    // private static ObjectType createObservationType() {
     //
-    //        ObjectType qbObservation = new ObjectType("http://purl.org/linked-data/cube#Observation", "Data Cube observation");
-    //        qbObservation.setDatasetIdTemplate("<dataSet>");
-    //        qbObservation.setDatasetIdNamespace("http://scoreboard.lod2.eu/data/");
-    //        qbObservation.setObjectIdTemplate("<dataSet>#A,<breakdown>,<unit>,<refArea>,<timePeriod>");
-    //        qbObservation.setObjectIdNamespace("http://scoreboard.lod2.eu/data/");
+    // ObjectType qbObservation = new ObjectType("http://purl.org/linked-data/cube#Observation", "Data Cube observation");
+    // qbObservation.setDatasetIdTemplate("<dataSet>");
+    // qbObservation.setDatasetIdNamespace("http://scoreboard.lod2.eu/data/");
+    // qbObservation.setObjectIdTemplate("<dataSet>#A,<breakdown>,<unit>,<refArea>,<timePeriod>");
+    // qbObservation.setObjectIdNamespace("http://scoreboard.lod2.eu/data/");
     //
-    //        // sdmx-dimension:refArea
-    //        ObjectProperty property =
-    //                new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#refArea", "SDMX reference area",
-    //                        ObjectProperty.Range.RESOURCE);
-    //        property.setValueTemplate("http://eurostat.linked-statistics.org/dic/geo#<value>");
-    //        qbObservation.addProperty(property, null, "refArea");
+    // // sdmx-dimension:refArea
+    // ObjectProperty property =
+    // new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#refArea", "SDMX reference area",
+    // ObjectProperty.Range.RESOURCE);
+    // property.setValueTemplate("http://eurostat.linked-statistics.org/dic/geo#<value>");
+    // qbObservation.addProperty(property, null, "refArea");
     //
-    //        // sdmx-dimension:timePeriod
-    //        property =
-    //                new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#timePeriod", "SDMX time period",
-    //                        ObjectProperty.Range.LITERAL);
-    //        property.setDataType(XMLSchema.GYEAR.stringValue());
-    //        qbObservation.addProperty(property, null, "timePeriod");
+    // // sdmx-dimension:timePeriod
+    // property =
+    // new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#timePeriod", "SDMX time period",
+    // ObjectProperty.Range.LITERAL);
+    // property.setDataType(XMLSchema.GYEAR.stringValue());
+    // qbObservation.addProperty(property, null, "timePeriod");
     //
-    //        // sdmx-dimension:freq
-    //        property =
-    //                new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#freq", "SDMX frequency",
-    //                        ObjectProperty.Range.RESOURCE);
-    //        property.setValueTemplate("http://purl.org/linked-data/sdmx/2009/code#freq-<value>");
-    //        qbObservation.addProperty(property, null, "timePeriod");
+    // // sdmx-dimension:freq
+    // property =
+    // new ObjectProperty("http://purl.org/linked-data/sdmx/2009/dimension#freq", "SDMX frequency",
+    // ObjectProperty.Range.RESOURCE);
+    // property.setValueTemplate("http://purl.org/linked-data/sdmx/2009/code#freq-<value>");
+    // qbObservation.addProperty(property, null, "timePeriod");
     //
-    //        // qb:dataSet
-    //        property = new ObjectProperty("http://purl.org/linked-data/cube#dataSet", "Data Cube dataset", ObjectProperty.Range.RESOURCE);
-    //        property.setValueTemplate("http://scoreboard.lod2.eu/data/<value>");
-    //        qbObservation.addProperty(property, null, "dataSet");
+    // // qb:dataSet
+    // property = new ObjectProperty("http://purl.org/linked-data/cube#dataSet", "Data Cube dataset",
+    // ObjectProperty.Range.RESOURCE);
+    // property.setValueTemplate("http://scoreboard.lod2.eu/data/<value>");
+    // qbObservation.addProperty(property, null, "dataSet");
     //
-    //        // scb:breakdown
-    //        property = new ObjectProperty("http://data.lod2.eu/scoreboard/properties/breakdown", "Scoreboard breakdown", ObjectProperty.Range.RESOURCE);
-    //        property.setValueTemplate("http://scoreboard.lod2.eu/breakdowns/<value>");
-    //        qbObservation.addProperty(property, null, "breakdown");
+    // // scb:breakdown
+    // property = new ObjectProperty("http://data.lod2.eu/scoreboard/properties/breakdown", "Scoreboard breakdown",
+    // ObjectProperty.Range.RESOURCE);
+    // property.setValueTemplate("http://scoreboard.lod2.eu/breakdowns/<value>");
+    // qbObservation.addProperty(property, null, "breakdown");
     //
-    //        // sdmx-attribute:unitMeasure
-    //        property = new ObjectProperty("http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure", "SMDX unit measure", ObjectProperty.Range.LITERAL);
-    //        qbObservation.addProperty(property, null, "unit");
+    // // sdmx-attribute:unitMeasure
+    // property = new ObjectProperty("http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure", "SMDX unit measure",
+    // ObjectProperty.Range.LITERAL);
+    // qbObservation.addProperty(property, null, "unit");
     //
-    //        // sdmx-measure:obsValue
-    //        property = new ObjectProperty("http://purl.org/linked-data/sdmx/2009/measure#obsValue", "SMDX observed value", ObjectProperty.Range.LITERAL);
-    //        property.setDataType(XMLSchema.DOUBLE.stringValue());
-    //        qbObservation.addProperty(property, null, "value");
-    //        return qbObservation;
-    //    }
+    // // sdmx-measure:obsValue
+    // property = new ObjectProperty("http://purl.org/linked-data/sdmx/2009/measure#obsValue", "SMDX observed value",
+    // ObjectProperty.Range.LITERAL);
+    // property.setDataType(XMLSchema.DOUBLE.stringValue());
+    // qbObservation.addProperty(property, null, "value");
+    // return qbObservation;
+    // }
 
     /**
      * Adds the dummy types.
@@ -236,7 +240,9 @@ public class ObjectTypes {
                 String propLabel = typeLabel + "_prop" + j;
                 propLabels.add(propLabel);
 
-                ObjectProperty property = new ObjectProperty("http://dummy.org/properties#"+ propLabel, "prop_" + j, propLabel, ObjectProperty.Range.LITERAL);
+                ObjectProperty property =
+                        new ObjectProperty("http://dummy.org/properties#" + propLabel, "prop_" + j, propLabel,
+                                ObjectProperty.Range.LITERAL);
                 type.addProperty(property, true, "col" + j);
                 properties.add(property);
             }

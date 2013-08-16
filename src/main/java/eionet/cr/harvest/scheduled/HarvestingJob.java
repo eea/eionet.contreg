@@ -152,7 +152,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         // looping over them, as there are specific sources for which the batch-harvesting hours should be ignored. Currently these
         // are sources whose harvest interval is less than 8 hours.
 
-        if (isBatchHarvestingHour()){
+        if (isBatchHarvestingHour()) {
             LOGGER.trace("Handling batch queue...");
         }
 
@@ -167,7 +167,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         // Get next scheduled sources.
         List<HarvestSourceDTO> nextScheduledSources = getNextScheduledSources();
-        if (isBatchHarvestingHour()){
+        if (isBatchHarvestingHour()) {
             LOGGER.trace(nextScheduledSources.size() + " next scheduled sources found");
         }
 
@@ -442,9 +442,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 harvest.execute();
             } catch (HarvestException e) {
                 if (e.getCause() instanceof RDFParseException) {
-                    LOGGER.warn("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "] - " + e.toString());
+                    LOGGER.warn("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl()
+                            + "] - " + e.toString());
                 } else {
-                    LOGGER.error("Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "]", e);
+                    LOGGER.error(
+                            "Got exception from " + harvest.getClass().getSimpleName() + " [" + harvest.getContextUrl() + "]", e);
                 }
             } finally {
                 CurrentHarvests.setQueuedHarvest(null);
@@ -524,6 +526,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     @Override
@@ -548,6 +551,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /*
      * (non-Javadoc)
+     *
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     @Override

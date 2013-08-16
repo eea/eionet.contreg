@@ -94,7 +94,7 @@ public class HarvestStatsActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getHarvestDetailsBeanClass(){
+    public Class getHarvestDetailsBeanClass() {
         return HarvestActionBean.class;
     }
 }

@@ -77,7 +77,6 @@ public class DimensionsMetadataImportActionBean extends AbstractActionBean {
      */
     private void execute() {
 
-
     }
 
     /**
@@ -102,7 +101,6 @@ public class DimensionsMetadataImportActionBean extends AbstractActionBean {
 
         getContext().setSourcePageResolution(new ForwardResolution(JSP));
     }
-
 
     /**
      * Validates the the user is authorised for any operations on this action bean. If user not authorised, redirects to the
@@ -154,14 +152,12 @@ public class DimensionsMetadataImportActionBean extends AbstractActionBean {
         return Dimension.values();
     }
 
-
     /**
      * @return the query
      */
     public String getQuery() {
         return query;
     }
-
 
     /**
      * @param query the query to set

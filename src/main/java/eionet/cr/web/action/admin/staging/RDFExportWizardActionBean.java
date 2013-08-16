@@ -258,20 +258,20 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         }
 
         // Ensure that the dataset ID template has been provided and is valid.
-        //        String datasetIdTemplate = queryConf.getDatasetIdTemplate();
-        //        if (StringUtils.isBlank(datasetIdTemplate)) {
-        //            addGlobalValidationError("You must specify the dataset identifier template!");
-        //        } else if (!validateColumnPlaceholders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
-        //            addGlobalValidationError("A placeholder in dataset identifier template does not match any of the selected columns!");
-        //        }
+        // String datasetIdTemplate = queryConf.getDatasetIdTemplate();
+        // if (StringUtils.isBlank(datasetIdTemplate)) {
+        // addGlobalValidationError("You must specify the dataset identifier template!");
+        // } else if (!validateColumnPlaceholders(datasetIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+        // addGlobalValidationError("A placeholder in dataset identifier template does not match any of the selected columns!");
+        // }
         //
-        //        // Ensure that the object ID template has been provided and is valid.
-        //        String objectIdTemplate = queryConf.getObjectIdTemplate();
-        //        if (StringUtils.isBlank(objectIdTemplate)) {
-        //            addGlobalValidationError("You must specify the objects identifier template!");
-        //        } else if (!validateColumnPlaceholders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
-        //            addGlobalValidationError("A placeholder in objects identifier template does not match any of the selected columns!");
-        //        }
+        // // Ensure that the object ID template has been provided and is valid.
+        // String objectIdTemplate = queryConf.getObjectIdTemplate();
+        // if (StringUtils.isBlank(objectIdTemplate)) {
+        // addGlobalValidationError("You must specify the objects identifier template!");
+        // } else if (!validateColumnPlaceholders(objectIdTemplate, colMappings == null ? null : colMappings.keySet())) {
+        // addGlobalValidationError("A placeholder in objects identifier template does not match any of the selected columns!");
+        // }
 
         getContext().setSourcePageResolution(new ForwardResolution(STEP2_JSP));
     }
@@ -363,6 +363,7 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
 
     /**
      * To be called when database name has changed.
+     *
      * @throws DAOException
      */
     private void dbNameChanged() throws DAOException {

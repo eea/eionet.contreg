@@ -224,7 +224,7 @@ public final class SesameUtil {
      * @throws MalformedQueryException
      */
     public static void executeSPARUL(String sparul, Bindings bindings, RepositoryConnection conn) throws RepositoryException,
-    QueryEvaluationException, MalformedQueryException {
+            QueryEvaluationException, MalformedQueryException {
 
         BooleanQuery query = conn.prepareBooleanQuery(QueryLanguage.SPARQL, sparul);
         if (bindings != null) {
@@ -234,8 +234,8 @@ public final class SesameUtil {
 
         query.evaluate();
 
-        if (LOGGER.isTraceEnabled()){
-            LOGGER.trace("SPARUL execution took " + Util.durationSince(startTime)+ "; sparul=" + sparul);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("SPARUL execution took " + Util.durationSince(startTime) + "; sparul=" + sparul);
         }
     }
 
@@ -556,11 +556,11 @@ public final class SesameUtil {
      * @param times
      * @return
      */
-    public static String createSPARQLVariablesCSV(String varName, int times){
+    public static String createSPARQLVariablesCSV(String varName, int times) {
 
         StringBuilder sb = new StringBuilder();
-        for (int i=1; i <= times; i++){
-            if (i > 1){
+        for (int i = 1; i <= times; i++) {
+            if (i > 1) {
                 sb.append(", ");
             }
             sb.append("?").append(varName).append(i);

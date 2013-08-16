@@ -104,14 +104,14 @@ public class EndpointQueryActionBean extends AbstractActionBean {
 
     /**
      * A utility method that does the save, regardless of whether the event was "save" or "save & close".
+     *
      * @throws DAOException If any sort of data access error happens.
      */
     private void doSave() throws DAOException {
 
         if (query != null && query.getId() > 0) {
             DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).update(query);
-        }
-        else{
+        } else {
             int queryId = DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).create(query);
             if (query == null) {
                 query = new EndpointHarvestQueryDTO();

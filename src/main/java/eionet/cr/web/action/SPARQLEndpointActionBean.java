@@ -434,7 +434,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             if (isWebBrowser()) {
                 return new ForwardResolution(FORM_PAGE);
             } else {
-                return new ErrorStreamingResolution(HttpServletResponse.SC_BAD_REQUEST, "Query missing or blank in request parameters");
+                return new ErrorStreamingResolution(HttpServletResponse.SC_BAD_REQUEST,
+                        "Query missing or blank in request parameters");
             }
         }
 
@@ -750,7 +751,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -762,21 +763,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();

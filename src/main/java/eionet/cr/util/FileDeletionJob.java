@@ -115,8 +115,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
                 } catch (RuntimeException e) {
                     LOGGER.error("Unexpected RuntimeException when trying to delete " + file, e);
                 }
-            }
-            else{
+            } else {
                 toBeRemvedFromQueue.add(file);
             }
         }
@@ -132,10 +131,9 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
     public static synchronized void register(File file) {
 
         if (file != null && file.exists()) {
-            if (file.delete() == false){
+            if (file.delete() == false) {
                 QUEUED_FILES.add(file);
-            }
-            else{
+            } else {
                 LOGGER.debug("File successfully deleted: " + file);
             }
         }

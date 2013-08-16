@@ -191,6 +191,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /**
      * Returns the entries of the check resolutions map.
+     *
      * @return the entries
      */
     public Set<Entry<String, eionet.cr.harvest.UpToDateChecker.Resolution>> getCheckResolutionsEntries() {

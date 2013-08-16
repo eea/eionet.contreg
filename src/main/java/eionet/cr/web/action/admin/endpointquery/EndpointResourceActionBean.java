@@ -71,8 +71,7 @@ public class EndpointResourceActionBean extends AbstractActionBean {
 
         if (StringUtils.isBlank(url) || StringUtils.isBlank(endpoint)) {
             return new ErrorResolution(400, "Missing URL of resource or endpoint!");
-        }
-        else{
+        } else {
             String query = StringUtils.replace(QUERY_TEMPLATE, "URL", url);
             queryResult = DAOFactory.get().getDao(EndpointHarvestQueryDAO.class).testConstructQuery(query, endpoint);
             return new ForwardResolution(REMOTE_RESOURCE_JSP);

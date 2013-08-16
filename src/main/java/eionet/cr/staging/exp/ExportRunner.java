@@ -264,7 +264,7 @@ public class ExportRunner extends Thread {
             indicatorValueURI = vf.createURI("http://semantic.digital-agenda-data.eu/codelist/indicator/" + indicator);
         }
 
-        importURI = vf.createURI("http://semantic.digital-agenda-data.eu/import/"+ exportId);
+        importURI = vf.createURI("http://semantic.digital-agenda-data.eu/import/" + exportId);
         importedResourceURI = vf.createURI("http://semantic.digital-agenda-data.eu/importedResource");
     }
 
@@ -293,7 +293,7 @@ public class ExportRunner extends Thread {
      * @throws RepositoryException the repository exception
      */
     private void exportRow(ResultSet rs, int rowIndex, RepositoryConnection repoConn, ValueFactory vf) throws SQLException,
-    RepositoryException {
+            RepositoryException {
 
         // Prepare subject ID on the basis of ID template in query configuration. If it's blank, auto-generate it.
         String subjectId = queryConf.getObjectIdTemplate();
@@ -400,7 +400,7 @@ public class ExportRunner extends Thread {
                         if (tripleCount % 5000 == 0) {
                             LOGGER.debug(tripleCount + " triples exported so far");
                         }
-                        //                        distinctGraphs.add(graphURI.toString());
+                        // distinctGraphs.add(graphURI.toString());
                     }
                 }
             }

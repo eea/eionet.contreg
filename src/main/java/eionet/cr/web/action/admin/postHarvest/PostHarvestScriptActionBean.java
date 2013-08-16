@@ -156,8 +156,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
             return resolutionToScripts();
         } else {
-            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id).addParameter("cancelUrl",
-                    cancelUrl).addParameter("testSourceUrl", testSourceUrl);
+            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id)
+                    .addParameter("cancelUrl", cancelUrl).addParameter("testSourceUrl", testSourceUrl);
         }
     }
 
@@ -192,7 +192,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults =
                     DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -299,7 +299,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         if (StringUtils.isBlank(targetUrl)) {
             addGlobalValidationError("Target URL has to be selected");
         } else {
-            //no need to process the other checks to avoid unnecessary error messages
+            // no need to process the other checks to avoid unnecessary error messages
             TargetType clipboardTargetType = (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
             List<String> validationErros =
                     PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType,

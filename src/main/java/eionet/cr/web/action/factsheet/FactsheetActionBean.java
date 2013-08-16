@@ -211,7 +211,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         if (subjectDto != null && CsvImportUtil.isSourceTableFile(subjectDto)) {
             // Harvest table file
             try {
-                //harvestTableFile();
+                // harvestTableFile();
                 List<String> warnings = CsvImportUtil.harvestTableFile(subjectDto, uri, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
@@ -363,10 +363,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }

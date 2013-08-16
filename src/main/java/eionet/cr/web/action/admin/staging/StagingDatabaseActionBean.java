@@ -100,8 +100,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
 
         if (dbDTO == null) {
             addWarningMessage("Found no database by the given id or name!");
-        }
-        else{
+        } else {
             tablesColumns = dao.getTablesColumns(dbDTO.getName());
         }
 
@@ -116,7 +115,6 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
      */
     public Resolution edit() throws DAOException {
 
-
         StagingDatabaseDAO dao = DAOFactory.get().getDao(StagingDatabaseDAO.class);
         if (dbId > 0) {
             dbDTO = dao.getDatabaseById(dbId);
@@ -126,8 +124,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
 
         if (dbDTO == null) {
             addWarningMessage("Found no database by the given id or name!");
-        }
-        else{
+        } else {
             dbName = dbDTO.getName();
             dbDescription = dbDTO.getDescription();
             defaultQuery = dbDTO.getDefaultQuery();
