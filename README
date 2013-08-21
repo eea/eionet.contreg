@@ -35,7 +35,7 @@ CR uses OpenLink Virtuoso as its backend for relational database and triple
 store. Download Open-Source Edition of Virtuoso from here
 http://virtuoso.openlinksw.com/dataspace/dav/wiki/Main
 
-CR has been tested and run on Open-Source Virtuoso versions 6.1.2 ans 6.1.3.
+CR has been tested and run on Open-Source Virtuoso version 6.1.5.
 
 To install Virtuoso's Open-Source Edition, follow these guidelines:
 http://virtuoso.openlinksw.com/dataspace/dav/wiki/Main/VOSUsageWindows (Windows)
@@ -49,6 +49,10 @@ http://virtuoso.openlinksw.com/dataspace/dav/wiki/Main/VOSIndex
 
 NB!!! For security reasons, be sure to change your Virtuoso administrator password to
 something other than the default!
+
+CR will ask virtuoso to load files from the temporary directory. You must ensure
+the the value for harvester.tempFileDir in local.properties is listed for DirsAllowed
+in virtuoso.ini.
 
 ****************************************************************************
 3. Download, configure and build CR source code
