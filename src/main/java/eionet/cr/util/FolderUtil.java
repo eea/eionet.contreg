@@ -224,8 +224,9 @@ public final class FolderUtil {
                         DAOFactory.get().getDao(FolderDAO.class).getSubFolders(FolderUtil.getProjectsFolder());
                 if (projectFolders != null && projectFolders.size() > 0) {
                     for (String furi : projectFolders) {
-                        String aclPath = FolderUtil.extractPathInSpecialFolder(furi, "project");
-                        if (!StringUtils.isBlank(aclPath) && CRUser.hasPermission(user.getUserName(), aclPath, "i")) {
+                        String aclPath = StringUtils.substringBefore(FolderUtil.extractPathInSpecialFolder(furi, "project"), "/");
+                        if (!StringUtils.isBlank(aclPath) && !folders.contains(furi)
+                                && CRUser.hasPermission(user.getUserName(), "/project/" + aclPath, "i")) {
                             folders.add(furi);
                         }
                     }
@@ -255,8 +256,8 @@ public final class FolderUtil {
             if (projectFolders != null && projectFolders.size() > 0) {
                 folders = new ArrayList<String>();
                 for (String furi : projectFolders) {
-                    String projectName = FolderUtil.extractPathInSpecialFolder(furi, "project");
-                    if (!StringUtils.isBlank(projectName)
+                    String projectName = StringUtils.substringBefore(FolderUtil.extractPathInSpecialFolder(furi, "project"), "/");
+                    if (!StringUtils.isBlank(projectName) && !folders.contains(projectName)
                             && CRUser.hasPermission(userName, "/project/" + projectName, permission)) {
                         folders.add(projectName);
                     }
