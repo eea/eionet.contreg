@@ -139,7 +139,7 @@ public class PingActionBean extends AbstractActionBean {
                 }
 
                 if (doHarvest) {
-                    UrgentHarvestQueue.addPullHarvest(uri, CRUser.APPLICATION.getUserName());
+                    UrgentHarvestQueue.addPullHarvest(uri, CRUser.PING_HARVEST.getUserName());
                     message = "URL added to the urgent harvest queue: " + uri;
                 }
             }

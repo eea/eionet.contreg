@@ -126,11 +126,11 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 if (!StringUtils.isBlank(url)) {
 
                     if (queueItem.isPushHarvest()) {
-                        pushHarvest(url, queueItem.getPushedContent());
+                        pushHarvest(url, queueItem.getPushedContent(), queueItem.getUserName());
                     } else {
                         HarvestSourceDTO src = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
                         if (src != null) {
-                            pullHarvest(src, true);
+                            pullHarvest(src, true, queueItem.getUserName());
                         } else {
                             LOGGER.warn("Urgent harvest URL could not be found in harvest source:" + url);
                         }
@@ -211,7 +211,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 iter.remove();
 
                 LOGGER.trace("Going to batch-harvest " + sourceDTO.getUrl());
-                pullHarvest(sourceDTO, false);
+                pullHarvest(sourceDTO, false, CRUser.BATCH_HARVEST.getUserName());
             }
         }
 
@@ -378,11 +378,12 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     *
-     * @param url
-     * @param pushedContent
+     * Executes push harvest of the given pushed content under the given URL by the given user.
+     * @param url Source URL under which the content should be pushed.
+     * @param pushedContent The content to harvest.
+     * @param userName The user who is "pushing". May be null, in which case the harvester assumes default.
      */
-    private void pushHarvest(String url, String pushedContent) {
+    private void pushHarvest(String url, String pushedContent, String userName) {
 
         // if the source is currently being harvested then return
         if (url != null && CurrentHarvests.contains(url)) {
@@ -400,7 +401,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             }
 
             Harvest harvest = new PushHarvest(pushedContent, url);
-            harvest.setHarvestUser(CRUser.APPLICATION.getUserName());
+            harvest.setHarvestUser(CRUser.PUSH_HARVEST.getUserName());
             executeHarvest(harvest);
         } catch (DAOException e) {
             LOGGER.error(e.toString(), e);
@@ -410,11 +411,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
+     * Executes pull harvest of the given harvest source.
      *
-     * @param harvestSource
-     * @throws DAOException
+     * @param harvestSource The harvest source.
+     * @param isUrgentHarvest True if this is an urgent harvest.
+     * @param userName Initiating user. Might be null, in which case harvester is expected to assume default.
+     * @throws DAOException When problem with creating new harvest record.
      */
-    private void pullHarvest(HarvestSourceDTO harvestSource, boolean isUrgentHarvest) throws DAOException {
+    private void pullHarvest(HarvestSourceDTO harvestSource, boolean isUrgentHarvest, String userName) throws DAOException {
 
         if (harvestSource != null) {
 
@@ -426,6 +430,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
             PullHarvest harvest = new PullHarvest(harvestSource);
             harvest.setOnDemandHarvest(isUrgentHarvest);
+            harvest.setHarvestUser(userName);
             executeHarvest(harvest);
         }
     }

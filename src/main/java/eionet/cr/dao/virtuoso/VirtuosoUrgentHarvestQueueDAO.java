@@ -126,7 +126,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         }
         values.add(url);
         values.add(queueItem.getPushedContent());
-        values.add(CRUser.APPLICATION.getUserName());
+        values.add(CRUser.PUSH_HARVEST.getUserName());
 
         Connection conn = null;
         try {

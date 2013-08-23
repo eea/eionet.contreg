@@ -53,6 +53,15 @@ public class CRUser {
     /** */
     public static final CRUser APPLICATION = new CRUser("application");
 
+    /** A constant user representing batch harvester. */
+    public static final CRUser BATCH_HARVEST = new CRUser("batch harvest");
+
+    /** A constant user representing ping harvest. */
+    public static final CRUser PING_HARVEST = new CRUser("ping harvest");
+
+    /** A constant user representing push harvest. */
+    public static final CRUser PUSH_HARVEST = new CRUser("push harvest");
+
     /** */
     private String userName;
 
@@ -498,5 +507,28 @@ public class CRUser {
      */
     public boolean hasProjectPrivilege(HttpSession session, String projectName, String privilege) {
         return CRUser.hasPermission(session, "/project/" + projectName, privilege);
+    }
+
+    /**
+     * Returns true if this is user is considered an authenticated human user.
+     *
+     * @return As indicated above.
+     */
+    public boolean isHuman() {
+        return userName != null && !userName.equals(CRUser.APPLICATION.getUserName())
+                && !userName.equals(CRUser.BATCH_HARVEST.getUserName())
+                && !userName.equals(CRUser.PING_HARVEST.getUserName())
+                && !userName.equals(CRUser.PUSH_HARVEST.getUserName());
+    }
+
+    /**
+     * Returns true if the given user represents an authenticated human user.
+     *
+     * @param userName The user name to check.
+     * @return As indicated above.
+     */
+    public static boolean isHuman(String userName) {
+
+        return StringUtils.isBlank(userName) ? false : new CRUser(userName).isHuman();
     }
 }

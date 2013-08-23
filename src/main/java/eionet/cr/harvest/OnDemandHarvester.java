@@ -21,6 +21,7 @@
 package eionet.cr.harvest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
@@ -39,6 +40,9 @@ import eionet.cr.web.security.CRUser;
  *
  */
 public final class OnDemandHarvester extends Thread {
+
+    /** The static logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(OnDemandHarvester.class);
 
     /** */
     public enum Resolution {
@@ -69,6 +73,7 @@ public final class OnDemandHarvester extends Thread {
      *
      * @see java.lang.Thread#run()
      */
+    @Override
     public void run() {
 
         PullHarvest pullHarvest = null;
@@ -92,12 +97,10 @@ public final class OnDemandHarvester extends Thread {
 
         } catch (HarvestException e) {
             harvestException = e;
-        } catch (Throwable e) {
-            if (e instanceof HarvestException) {
-                harvestException = (HarvestException) e;
-            } else {
-                harvestException = new HarvestException(e.toString(), e);
-            }
+            LOGGER.error("On-demand harvest of " + sourceUrl + " threw exception:", e);
+        } catch (Exception e) {
+            harvestException = new HarvestException(e.toString(), e);
+            LOGGER.error("On-demand harvest of " + sourceUrl + " threw exception:", e);
         } finally {
             if (pullHarvest != null) {
                 rdfContentFound = pullHarvest.getStoredTriplesCount() > 0;
