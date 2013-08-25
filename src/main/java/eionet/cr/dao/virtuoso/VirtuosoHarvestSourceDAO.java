@@ -1499,6 +1499,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         int triplesLoaded = 0;
         boolean backupCreated = false;
+        boolean wasOrigEmpty = false;
         try {
 
             // Clear potential leftover from previous harvest
@@ -1508,7 +1509,20 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
             try {
-                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+
+                // We need to know if the "original" graph is empty.
+                wasOrigEmpty = getGraphTriplesCount(sqlConn, graphResource) == 0;
+
+                // Prepare base URI for resolving relative URIs and also the target graph where the triples will be loaded into.
+                // The latter is either "original" or temporary graph, depending on whether original is empty or not.
+                String baseUri = graphUri;
+                String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
+
+                if (wasOrigEmpty) {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into ORIGINAL graph", graphUri));
+                } else {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+                }
 
                 for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
 
@@ -1517,7 +1531,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                     if (loader instanceof RDFFormatLoader) {
                         RDFFormat rdfFormat = ((RDFFormatLoader) loader).getRdfFormat();
-                        loadRdfFile(file, rdfFormat, sqlConn, graphUri, tempGraphUri);
+                        loadRdfFile(file, rdfFormat, sqlConn, baseUri, targetGraphUri);
                     } else {
                         InputStream inputStream = null;
                         try {
@@ -1528,7 +1542,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                             // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
                             // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
                             repoConn.setAutoCommit(false);
-                            triplesLoaded += loader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                            triplesLoaded += loader.load(inputStream, repoConn, sqlConn, baseUri, targetGraphUri);
                             repoConn.commit();
                             repoConn.setAutoCommit(true);
                         } finally {
@@ -1537,13 +1551,20 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     }
                 }
 
-                // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
-                forceLogEnable(2, sqlConn, LOGGER);
-                renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
-                backupCreated = true;
+                if (!wasOrigEmpty) {
 
-                forceLogEnable(2, sqlConn, LOGGER);
-                renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+                    int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
+                    LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
+
+                    // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force,
+                    // even if you set auto-commit to false.
+                    forceLogEnable(2, sqlConn, LOGGER);
+                    renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
+                    backupCreated = true;
+
+                    forceLogEnable(2, sqlConn, LOGGER);
+                    renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+                }
 
             } catch (Exception e) {
 
@@ -1565,7 +1586,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 // Clean-up attempt
                 boolean cleanupSuccess = false;
-                cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+                if (wasOrigEmpty) {
+                    cleanupSuccess = clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
+                } else {
+                    cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+                }
 
                 // Throw the reason why content loading failed.
                 String msg = "Failed content loading ";
@@ -1573,15 +1598,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     msg = msg + "(and the subsequent restore from backup) ";
                 }
                 if (!cleanupSuccess) {
-                    msg = msg + "(and the subsequent cleanup of temporary graph) ";
+                    if (wasOrigEmpty) {
+                        msg = msg + "(and the subsequent cleanup of original graph) ";
+                    } else  {
+                        msg = msg + "(and the subsequent cleanup of temporary graph) ";
+                    }
                 }
                 throw new DAOException(msg + "of " + graphUri, e);
             }
 
-            // Content successfully loaded, clear the backup and temp graphs created two steps ago.
-            clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
-            if (backupCreated) {
-                clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+            if (!wasOrigEmpty) {
+                // Content successfully loaded, clear the backup and temp graphs created two steps ago.
+                clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
+                if (backupCreated) {
+                    clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+                }
             }
 
             // Get the total number of triples in the loaded graph
@@ -1613,7 +1644,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             Object o = SQLUtil.executeSingleReturnValueQuery(sql, sqlConn);
             return Integer.parseInt(o.toString());
         } catch (Exception e) {
-            throw new DAOException(e.getMessage(), e);
+            throw new DAOException("Failed to get triples count for <" + graphResource.stringValue() + ">", e);
         }
     }
 
@@ -1658,6 +1689,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         int triplesLoaded = 0;
         boolean backupCreated = false;
+        boolean wasOrigEmpty = false;
         try {
 
             // Clear potential leftover from previous harvest
@@ -1670,23 +1702,44 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause "Too many open statements".
                 // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
                 // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
-
                 repoConn.setAutoCommit(false);
-                LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+
+                // We need to know if the "original" graph is empty
+                wasOrigEmpty = getGraphTriplesCount(sqlConn, graphResource) == 0;
+
+                // Prepare base URI for resolving relative URIs and also the target graph where the triples will be loaded into.
+                // The latter is either "original" or temporary graph, depending on whether original is empty or not.
+                String baseUri = graphUri;
+                String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
+
+                if (wasOrigEmpty) {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into ORIGINAL graph", graphUri));
+                } else {
+                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+                }
+
                 for (Pair<InputStream, ContentLoader> pair : streams) {
+
                     InputStream inputStream = pair.getLeft();
                     ContentLoader contentLoader = pair.getRight();
-                    triplesLoaded += contentLoader.load(inputStream, repoConn, sqlConn, graphUri, tempGraphUri);
+                    triplesLoaded += contentLoader.load(inputStream, repoConn, sqlConn, baseUri, targetGraphUri);
                 }
 
                 repoConn.commit();
                 repoConn.setAutoCommit(true);
 
-                // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force, even if you set auto-commit to false.
-                renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
-                backupCreated = true;
+                if (!wasOrigEmpty) {
 
-                renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+                    int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
+                    LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
+
+                    // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force,
+                    // even if you set auto-commit to false.
+                    renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
+                    backupCreated = true;
+
+                    renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+                }
 
             } catch (Exception e) {
 
@@ -1708,7 +1761,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 // Clean-up attempt
                 boolean cleanupSuccess = false;
-                cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+                if (wasOrigEmpty) {
+                    cleanupSuccess = clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
+                } else {
+                    cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+                }
 
                 // Throw the reason why content loading failed.
                 String msg = "Failed content loading ";
@@ -1716,14 +1773,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     msg = msg + "(and the subsequent restore from backup) ";
                 }
                 if (!cleanupSuccess) {
-                    msg = msg + "(and the subsequent cleanup of temporary graph) ";
+                    if (wasOrigEmpty) {
+                        msg = msg + "(and the subsequent cleanup of original graph) ";
+                    } else  {
+                        msg = msg + "(and the subsequent cleanup of temporary graph) ";
+                    }
                 }
                 throw new DAOException(msg + "of " + graphUri, e);
             }
-            // Content successfully loaded, clear the backup and temp graphs created two steps ago.
-            clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
-            if (backupCreated) {
-                clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+
+            if (!wasOrigEmpty) {
+                // Content successfully loaded, clear the backup and temp graphs created two steps ago.
+                clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
+                if (backupCreated) {
+                    clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+                }
             }
         } finally {
             // Ensure connections will be closed regardless of success or exceptions.

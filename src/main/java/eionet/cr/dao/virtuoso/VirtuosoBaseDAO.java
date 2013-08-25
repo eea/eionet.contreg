@@ -435,7 +435,8 @@ public abstract class VirtuosoBaseDAO {
 
         PreparedStatement pstmt = null;
         try {
-            pstmt = conn.prepareStatement("log_enable(?)");
+            // Using 1 as the second argument forces silent execution even if same log_enable level is already set.
+            pstmt = conn.prepareStatement("log_enable(?, 1)");
             pstmt.setInt(1, value);
             return pstmt.execute();
         } catch (Exception e) {
