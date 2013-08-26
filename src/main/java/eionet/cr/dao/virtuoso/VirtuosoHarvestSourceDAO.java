@@ -1501,6 +1501,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         boolean backupCreated = false;
         boolean wasOrigEmpty = false;
         try {
+            // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
+            forceLogEnable(2, sqlConn, LOGGER);
 
             // Clear potential leftover from previous harvest
             clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
@@ -1523,6 +1525,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 } else {
                     LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
                 }
+
+                // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
+                forceLogEnable(2, sqlConn, LOGGER);
 
                 for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
 
