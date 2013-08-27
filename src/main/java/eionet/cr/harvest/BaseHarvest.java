@@ -1093,11 +1093,7 @@ public abstract class BaseHarvest implements Harvest {
         HarvestSourceDAO dao = getHarvestSourceDAO();
         String url = getContextUrl();
 
-        // Use fast load when it's an instant harvest issued by a human user.
-        // This is for evaluating the fast load function before applying it to all harvesting.
-        boolean useFastLoad = isOnDemandHarvest && CRUser.isHuman(harvestUser);
-
-        int tripleCount = useFastLoad ? dao.loadContentFast(filesAndLoaders, url) : dao.loadContent(filesAndLoaders, url);
+        int tripleCount = dao.loadContentFast(filesAndLoaders, url);
         return tripleCount;
     }
 
