@@ -68,10 +68,13 @@ import eionet.cr.util.sql.SingleObjectReader;
 
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
 
-    /** Suffix used in backup graph Uris. */
+    /** Static logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(VirtuosoHarvestSourceDAO.class);
+
+    /** Suffix used in backup graph uris. */
     private static final String BACKUP_GRAPH_SUFFIX = "_backup";
 
-    /** Suffix used in temporary graph Uris. */
+    /** Suffix used in temporary graph uris. */
     private static final String TEMP_GRAPH_SUFFIX = "_tempharvest";
     /** */
     private static final String GET_SOURCES_SQL =
@@ -117,8 +120,25 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('%new_graph%') "
                     + "WHERE g = iri_to_id ('%old_graph%',0)";
 
-    /** class logger. */
-    private static final Logger LOGGER = Logger.getLogger(VirtuosoHarvestSourceDAO.class);
+    /** */
+    private static final String GRAPH_SYNC_SPARUL1 = "" +
+            "DELETE FROM GRAPH <%perm_graph%> {\n" +
+            "    ?s ?p ?o\n" +
+            "}\n" +
+            "WHERE {\n" +
+            "  GRAPH <%perm_graph%> {?s ?p ?o}\n" +
+            "  FILTER (!bif:exists((select(1) where {graph <%temp_graph%> {?s ?p ?o}})))\n" +
+            "}";
+
+    /** */
+    private static final String GRAPH_SYNC_SPARUL2 = "" +
+            "INSERT INTO GRAPH <%perm_graph%> {\n" +
+            "    ?s ?p ?o\n" +
+            "}\n" +
+            "WHERE {\n" +
+            "  GRAPH <%temp_graph%> {?s ?p ?o}\n" +
+            "  FILTER (!bif:exists((select (1) where {graph <%perm_graph%> {?s ?p ?o}})))\n" +
+            "}";
 
     /*
      * (non-Javadoc)
@@ -1498,7 +1518,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
 
         int triplesLoaded = 0;
-        boolean backupCreated = false;
         boolean wasOrigEmpty = false;
         try {
             // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
@@ -1506,7 +1525,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
             // Clear potential leftover from previous harvest
             clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
-            clearGraph(sqlConn, backupGraphUri, "Clearing potential leftover of previous BACKUP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
@@ -1558,17 +1576,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 if (!wasOrigEmpty) {
 
+                    // Log the number of triples loaded into TEMP graph.
                     int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
                     LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
 
-                    // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force,
-                    // even if you set auto-commit to false.
-                    forceLogEnable(2, sqlConn, LOGGER);
-                    renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
-                    backupCreated = true;
-
-                    forceLogEnable(2, sqlConn, LOGGER);
-                    renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
+                    // XOR the temporary and original graphs.
+                    LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
+                    synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
                 }
 
             } catch (Exception e) {
@@ -1576,47 +1590,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 // The repository connection rollback is ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
                 SesameUtil.rollback(repoConn);
 
-                // Restore attempt
-                boolean restoredFromBackupSuccess = false;
-                if (backupCreated) {
-                    try {
-                        clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", false);
-                        renameGraph(sqlConn, backupGraphResource, graphResource, "Renaming BACKUP graph back to ORIGINAL");
-                        restoredFromBackupSuccess = true;
-                    } catch (Exception ee) {
-                        LOGGER.warn(BaseHarvest
-                                .loggerMsg("Failed restoring ORIGINAL graph after failed content loading", graphUri));
-                    }
-                }
-
                 // Clean-up attempt
-                boolean cleanupSuccess = false;
                 if (wasOrigEmpty) {
-                    cleanupSuccess = clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
-                } else {
-                    cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
+                    clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
                 }
 
                 // Throw the reason why content loading failed.
-                String msg = "Failed content loading ";
-                if (backupCreated && !restoredFromBackupSuccess) {
-                    msg = msg + "(and the subsequent restore from backup) ";
-                }
-                if (!cleanupSuccess) {
-                    if (wasOrigEmpty) {
-                        msg = msg + "(and the subsequent cleanup of original graph) ";
-                    } else  {
-                        msg = msg + "(and the subsequent cleanup of temporary graph) ";
-                    }
-                }
-                throw new DAOException(msg + "of " + graphUri, e);
-            }
+                throw new DAOException("Failed content loading of " + graphUri, e);
 
-            if (!wasOrigEmpty) {
-                // Content successfully loaded, clear the backup and temp graphs created two steps ago.
-                clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
-                if (backupCreated) {
-                    clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
+            } finally {
+                if (!wasOrigEmpty) {
+                    forceLogEnable(2, sqlConn, LOGGER);
+                    clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph", true);
                 }
             }
 
@@ -1630,7 +1615,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         // Return the number of triples loaded into the graph.
-
         return triplesLoaded;
     }
 
@@ -1838,6 +1822,42 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
         } catch (Exception e) {
             throw new DAOException("Failed to rename graph. " + logMessage, e);
+        }
+    }
+
+    /**
+     *
+     * @param sqlConn
+     * @param permGraph
+     * @param tempGraph
+     * @throws DAOException
+     */
+    private void synchronizeGraphs(Connection sqlConn, URI permGraph, URI tempGraph) throws DAOException {
+
+        String tempGraphStr = tempGraph.stringValue();
+        String permGraphStr = permGraph.stringValue();
+
+        Statement stmt = null;
+        try {
+            String sparul1 = GRAPH_SYNC_SPARUL1.replace("%perm_graph%", permGraphStr);
+            sparul1 = sparul1.replace("%temp_graph%", tempGraphStr);
+            stmt = sqlConn.createStatement();
+            LOGGER.debug(BaseHarvest.loggerMsg("Executing 1st XOR query", permGraph.stringValue()));
+            stmt.execute("log_enable(2,1)");
+            stmt.execute("SPARQL " + sparul1);
+            SQLUtil.close(stmt);
+
+            String sparul2 = GRAPH_SYNC_SPARUL2.replace("%perm_graph%", permGraphStr);
+            sparul2 = sparul2.replace("%temp_graph%", tempGraphStr);
+            stmt = sqlConn.createStatement();
+            LOGGER.debug(BaseHarvest.loggerMsg("Executing 2nd XOR query", permGraph.stringValue()));
+            stmt.execute("log_enable(2,1)");
+            stmt.execute("SPARQL " + sparul2);
+
+        } catch (Exception e) {
+            throw new DAOException("Failed to XOR <" + tempGraphStr + "> with <" + permGraphStr + ">", e);
+        } finally {
+            SQLUtil.close(stmt);
         }
     }
 
