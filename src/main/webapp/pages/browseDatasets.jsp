@@ -59,7 +59,7 @@
         <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post" style="margin-top:20px">
 
             <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
-            <stripes:text name="titleFilter" size="60" id="txtTitle" onclick="this.value='';"/>&nbsp;
+            <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
             <stripes:submit name="filter" value="Filter"/>
 
             <fieldset style="margin-top:10px">
@@ -86,10 +86,10 @@
                                         <c:set var="isCreatorChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();">
+                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('creator_${creatorsLoop.index}');submitFiltersForm();return false;">
                                             <label for="creator_${creatorsLoop.index}" title="Select this creator" style="color:#2A6495"><c:out value="${availableCreator}"/></label>
                                         </td>
-                                        <td style="width:7%" onclick="toggleCheckbox('creator_${creatorsLoop.index}');return submitFiltersForm();">
+                                        <td style="width:7%">
                                             <input type="checkbox" id="creator_${creatorsLoop.index}" name="creator" value="${availableCreator}" onchange="return submitFiltersForm();" title="Select this creator" ${isCreatorChecked}/>
                                         </td>
                                     </tr>
@@ -123,10 +123,10 @@
                                         <c:set var="isSubjectChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();">
+                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('subject_${subjectsLoop.index}');submitFiltersForm();return false;">
                                             <label for="subject_${subjectsLoop.index}" title="Select this subject" style="color:#2A6495"><c:out value="${availableSubject}"/></label>
                                         </td>
-                                        <td style="width:7%" onclick="toggleCheckbox('subject_${subjectsLoop.index}');return submitFiltersForm();">
+                                        <td style="width:7%">
                                             <input type="checkbox" id="subject_${subjectsLoop.index}" name="subject" value="${availableSubject}" onchange="return submitFiltersForm();" title="Select this subject" ${isSubjectChecked}/>
                                         </td>
                                     </tr>
