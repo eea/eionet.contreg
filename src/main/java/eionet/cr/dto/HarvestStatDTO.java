@@ -34,6 +34,9 @@ public class HarvestStatDTO extends HarvestDTO {
     /** */
     private static final DecimalFormat DURATION_STATEMENTS_RATIO_FORMAT = new DecimalFormat("#.###");
 
+    /** Number of seconds in a minute, decalred as a double. */
+    private static final double SECONDS_IN_MINUTE = 60d;
+
     /** Harvest source url. */
     private String sourceUrl;
 
@@ -79,6 +82,25 @@ public class HarvestStatDTO extends HarvestDTO {
         } else {
             double ratio = duration.doubleValue() / statements.doubleValue();
             return Double.valueOf(Math.round(ratio * 100) / 100.0d);
+        }
+    }
+
+    /**
+     * Returns the statements-per-minute ratio of this harvest. The ratio is rounded to the closest whole number.
+     *
+     * @return The ratio.
+     */
+    public Long getStatementsPerMinute() {
+
+        Integer durationSeconds = getDuration();
+        Integer statements = getTotalStatements();
+
+        if (durationSeconds == null || durationSeconds.intValue() <= 0) {
+            return null;
+        } else {
+            double minutes = Math.max(durationSeconds.doubleValue() / SECONDS_IN_MINUTE, 1d);
+            double ratio = statements.doubleValue() / minutes;
+            return Math.round(ratio);
         }
     }
 }

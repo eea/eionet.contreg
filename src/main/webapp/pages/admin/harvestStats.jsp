@@ -32,10 +32,10 @@
                     </c:choose>
                 </display:column>
                 <display:column property="totalStatements" title="Statements" sortable="true" />
-                <display:column title="Duration/statements" sortable="true" sortProperty="durationStatementsRatio">
+                <display:column title="Statements/minute" sortable="true" sortProperty="statementsPerMinute">
                     <c:choose>
-                        <c:when test="${item.durationStatementsRatio == null}">N/A</c:when>
-                        <c:otherwise>&#126;&nbsp;<fmt:formatNumber type="number" pattern="0.000" value="${item.durationStatementsRatio}"/></c:otherwise>
+                        <c:when test="${item.statementsPerMinute == null}">N/A</c:when>
+                        <c:otherwise><c:out value="${item.statementsPerMinute}"/></c:otherwise>
                     </c:choose>
                 </display:column>
             </display:table>
