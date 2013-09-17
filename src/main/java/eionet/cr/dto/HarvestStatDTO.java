@@ -98,7 +98,7 @@ public class HarvestStatDTO extends HarvestDTO {
         if (durationSeconds == null || durationSeconds.intValue() <= 0) {
             return null;
         } else {
-            double minutes = Math.max(durationSeconds.doubleValue() / SECONDS_IN_MINUTE, 1d);
+            double minutes = durationSeconds.doubleValue() / SECONDS_IN_MINUTE;
             double ratio = statements.doubleValue() / minutes;
             return Math.round(ratio);
         }
