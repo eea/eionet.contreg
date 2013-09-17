@@ -159,6 +159,21 @@ public abstract class BaseHarvest implements Harvest {
     /** The timeout value of this harvest. Initialized at first access to the getter. */
     private Integer timeout;
 
+    /** Harvest status classifier for started and on-going harvests. */
+    public static final String STATUS_STARTED = "started";
+
+    /** Harvest status classifier for properly finished harvests. */
+    public static final String STATUS_FINISHED = "finished";
+
+    /** Harvest status classifier for abandoned (e.g. killed by Tomcat restart) harvests. */
+    public static final String STATUS_ABANDONED = "abandoned";
+
+    /** Classifier for indicating harvests where the content is being pulled from the source. */
+    public static final String TYPE_PULL = "pull";
+
+    /** Classifier for indicating harvests where the content is being pushed by the source. */
+    public static final String TYPE_PUSH = "push";
+
     /**
      *
      * Class constructor.
@@ -228,7 +243,7 @@ public abstract class BaseHarvest implements Harvest {
 
         // create harvest record in the database
         try {
-            harvestId = getHarvestDAO().insertStartedHarvest(sourceId, getHarvestType(), user, HarvestConstants.STATUS_STARTED);
+            harvestId = getHarvestDAO().insertStartedHarvest(sourceId, getHarvestType(), user, BaseHarvest.STATUS_STARTED);
         } catch (DAOException e) {
             throw new HarvestException(e.getMessage(), e);
         }

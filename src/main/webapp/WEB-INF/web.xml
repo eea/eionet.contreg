@@ -129,6 +129,9 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <listener>
+        <listener-class>eionet.cr.web.util.AbandonedHarvestsMarker</listener-class>
+    </listener>
+    <listener>
         <listener-class>eionet.cr.web.util.ApplicationCache</listener-class>
     </listener>
     <listener>

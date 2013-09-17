@@ -20,12 +20,12 @@ import eionet.cr.util.Util;
 public class UpToDateCheckerMock extends UpToDateChecker {
 
     /** Various cases of URLs to check. */
-    public static final String NOT_HARVEST_SOURCE = "http://not.harvest.source";
-    public static final String NEVER_HARVESTED_YET = "http://never.harvested.yet";
-    public static final String OUT_OF_DATE = "http://out.of.date";
-    public static final String UP_TO_DATE = "http://up.to.date";
-    public static final String CONVERSION_MODIFIED = "http://conversion.out.of.date";
-    public static final String SCRIPTS_MODIFIED = "http://scripts.modified";
+    public static final String NOT_HARVEST_SOURCE = "http://test.ee/not_harvest_source";
+    public static final String NEVER_HARVESTED_YET = "http://test.ee/never_harvested_yet";
+    public static final String OUT_OF_DATE = "http://test.ee/out_of_date";
+    public static final String UP_TO_DATE = "http://test.ee/up_to_date";
+    public static final String CONVERSION_MODIFIED = "http://test.ee/conversion_out_of_date";
+    public static final String SCRIPTS_MODIFIED = "http://test.ee/scripts_modified";
 
     /** Dummy conversion URL. */
     public static final String CONVERSION_URL = "http://conversion.com";

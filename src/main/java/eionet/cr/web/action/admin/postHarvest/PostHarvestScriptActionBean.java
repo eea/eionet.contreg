@@ -156,8 +156,14 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
             return resolutionToScripts();
         } else {
-            return new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id)
-                    .addParameter("cancelUrl", cancelUrl).addParameter("testSourceUrl", testSourceUrl);
+            RedirectResolution redirResolution = new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id);
+            if (StringUtils.isNotBlank(cancelUrl)) {
+                redirResolution.addParameter("cancelUrl", cancelUrl);
+            }
+            if (StringUtils.isNotBlank(testSourceUrl)) {
+                redirResolution.addParameter("testSourceUrl", testSourceUrl);
+            }
+            return redirResolution;
         }
     }
 

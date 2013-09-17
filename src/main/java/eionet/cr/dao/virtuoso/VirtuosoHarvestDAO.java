@@ -32,7 +32,7 @@ import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
 import eionet.cr.dao.readers.MinimalHarvestDTOReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestStatDTO;
-import eionet.cr.harvest.HarvestConstants;
+import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
@@ -44,8 +44,11 @@ import eionet.cr.util.sql.SQLUtil;
  */
 public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
-    /** */
+    /** SQL for fetching a harvest by its ID. */
     private static final String GET_HARVEST_BY_ID_SQL = "select *, USERNAME as \"USER\" from HARVEST where HARVEST_ID=?";
+
+    /** SQL for marking all abandoned harvests. */
+    private static final String MARK_ABANDONED_HARVESTS_SQL = "UPDATE harvest SET status = ? WHERE status = ? AND finished IS NULL";
 
     /**
      * {@inheritDoc}
@@ -93,7 +96,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
                         + " WHERE h.status = ? ORDER BY h.finished DESC";
 
         List<Object> values = new ArrayList<Object>();
-        values.add(HarvestConstants.STATUS_FINISHED);
+        values.add(BaseHarvest.STATUS_FINISHED);
         return executeSQL(getHarvestStatsSQL, values, new HarvestStatReader());
     }
 
@@ -158,7 +161,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     public void updateFinishedHarvest(int harvestId, int noOfTriples, int httpCode) throws DAOException {
 
         List<Object> values = new ArrayList<Object>();
-        values.add(HarvestConstants.STATUS_FINISHED);
+        values.add(BaseHarvest.STATUS_FINISHED);
         values.add(Util.currentDateAsString());
         values.add(new Integer(noOfTriples));
         values.add(new Integer(httpCode));
@@ -225,5 +228,25 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         return list != null && !list.isEmpty() ? list.get(0) : null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.HarvestDAO#markAbandonedHarvests()
+     */
+    @Override
+    public int markAbandonedHarvests() throws DAOException {
 
+        List<Object> values = new ArrayList<Object>();
+        values.add(BaseHarvest.STATUS_ABANDONED);
+        values.add(BaseHarvest.STATUS_STARTED);
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            return SQLUtil.executeUpdate(MARK_ABANDONED_HARVESTS_SQL, values, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
 }

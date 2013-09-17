@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 
+import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.web.util.WebConstants;
 
 /**
@@ -33,6 +34,7 @@ import eionet.cr.web.util.WebConstants;
  */
 public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
 
+    /** */
     private Integer harvestId;
     private Integer harvestSourceId;
     private String harvestType;
@@ -45,15 +47,20 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     private Integer litObjStatements;
     private String dateString;
 
-    /** http response code. */
+    /** HTTP response code. */
     private int responseCode;
 
     /**
-     *
+     * Default constructor.
      */
     public HarvestDTO() {
+        // Empty constructor.
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDurationString() {
         if (datetimeStarted == null) {
             return WebConstants.NOT_AVAILABLE;
@@ -226,13 +233,27 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
         return (responseCode <= 0 ? "N/A" : String.valueOf(responseCode));
     }
 
+    /**
+     * Return the HTTP response code of this harvest.
+     * @return
+     */
     public int getResponseCode() {
         return responseCode;
     }
 
+    /**
+     * Set this harvest's HTTP response code.
+     * @param responseCode
+     */
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
     }
 
-
+    /**
+     * Returns true if this is an abandoned harvest, otherwise returns false.
+     * @return Abandoned or not.
+     */
+    public boolean isAbandoned() {
+        return BaseHarvest.STATUS_ABANDONED.equals(this.status);
+    }
 }

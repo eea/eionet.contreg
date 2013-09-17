@@ -80,7 +80,7 @@ public class PushHarvest extends BaseHarvest {
     @Override
     protected String getHarvestType() {
 
-        return HarvestConstants.TYPE_PUSH;
+        return BaseHarvest.TYPE_PUSH;
     }
 
     /**

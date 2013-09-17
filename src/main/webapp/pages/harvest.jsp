@@ -29,7 +29,14 @@
             <tr>
                 <td>Status:</td>
                 <td>
-                    <c:out value="${actionBean.harvestDTO.status}"/>
+                    <c:choose>
+                        <c:when test="${actionBean.harvestDTO.abandoned}">
+                            <span style="color:#ff0000"><c:out value="abandoned"/></span>
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${actionBean.harvestDTO.status}"/>
+                        </c:otherwise>
+                    </c:choose>
                 </td>
             </tr>
              <tr>

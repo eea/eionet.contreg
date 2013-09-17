@@ -23,6 +23,8 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
@@ -52,12 +54,28 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
         harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
         harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
-        harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(rs.getString("LAST_HARVEST_FAILED")));
-        harvestSourceDTO.setPrioritySource(YesNoBoolean.parse(rs.getString("PRIORITY_SOURCE")));
         harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
-        harvestSourceDTO.setPermanentError(YesNoBoolean.parse(rs.getString("PERMANENT_ERROR")));
         harvestSourceDTO.setMediaType(rs.getString("MEDIA_TYPE"));
-        harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(rs.getString("IS_SPARQL_ENDPOINT")));
+
+        String isPrioritySourceStr = rs.getString("PRIORITY_SOURCE");
+        if (StringUtils.isNotBlank(isPrioritySourceStr)) {
+            harvestSourceDTO.setPrioritySource(YesNoBoolean.parse(isPrioritySourceStr));
+        }
+
+        String lastHarvestFailedStr = rs.getString("LAST_HARVEST_FAILED");
+        if (StringUtils.isNotBlank(lastHarvestFailedStr)) {
+            harvestSourceDTO.setLastHarvestFailed(YesNoBoolean.parse(lastHarvestFailedStr));
+        }
+
+        String isPermErrorStr = rs.getString("PERMANENT_ERROR");
+        if (StringUtils.isNotBlank(isPermErrorStr)) {
+            harvestSourceDTO.setPermanentError(YesNoBoolean.parse(isPermErrorStr));
+        }
+
+        String isSparqlEndpointStr = rs.getString("IS_SPARQL_ENDPOINT");
+        if (StringUtils.isNotBlank(isSparqlEndpointStr)) {
+            harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(isSparqlEndpointStr));
+        }
 
         resultList.add(harvestSourceDTO);
     }

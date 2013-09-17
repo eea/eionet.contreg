@@ -103,4 +103,13 @@ public interface HarvestDAO extends DAO {
     */
    HarvestDTO getLastRealHarvestBySourceId(Integer harvestSourceId) throws DAOException;
 
+   /**
+    * "Marks" all unfinished harvests as abandoned, by setting their status to "ABANDONED". This method considers unfinished
+    * to be all harvests whose finish time is NULL and status is "STARTED"! So this method should be only be called at system
+    * start-up, as during normal operations the NULL finish time and "STARTED" status means the harvest is still still going on.
+    *
+    * @return The number of harvests marked as abandoned.
+    * @throws DAOException
+    */
+   int markAbandonedHarvests() throws DAOException;
 }

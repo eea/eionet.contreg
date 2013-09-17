@@ -1185,7 +1185,7 @@ public class PullHarvest extends BaseHarvest {
     @Override
     protected String getHarvestType() {
 
-        return HarvestConstants.TYPE_PULL;
+        return BaseHarvest.TYPE_PULL;
     }
 
     /**

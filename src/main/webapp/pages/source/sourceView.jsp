@@ -208,8 +208,16 @@
                                     <td><c:out value="${harv.user}" /></td>
                                     <td><fmt:formatDate value="${harv.datetimeStarted}"
                                         pattern="dd-MM-yy HH:mm:ss" /></td>
-                                    <td><fmt:formatDate value="${harv.datetimeFinished}"
-                                        pattern="dd-MM-yy HH:mm:ss" /></td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${harv.abandoned}">
+                                                <span style="color:#ff0000"><c:out value="abandoned"/></span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <fmt:formatDate value="${harv.datetimeFinished}" pattern="dd-MM-yy HH:mm:ss"/>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
                                     <td><c:out value="${harv.totalStatements}" /></td>
                                     <td><c:out value="${harv.durationString}" /></td>
                                     <td><c:out value="${harv.responseCodeString}" /></td>

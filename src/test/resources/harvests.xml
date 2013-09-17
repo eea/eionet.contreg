@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <harvest_source harvest_source_id="1" url_hash="2951453010645159546" url="http://rod.eionet.europa.eu/obligations" emails="jaanus.heinlaid@tietoenator.com" time_created="2008-02-28 10:34:22.0"/>
+    <harvest harvest_id="1" harvest_source_id="1" type="pull" username="heinlja" status="finished" started="2008-02-28 18:15:36.0" finished="2008-02-28 18:16:01.0" tot_statements="22043" http_code="200"/>
+    <harvest harvest_id="2" harvest_source_id="1" type="pull" username="heinlja" status="finished" started="2008-02-28 18:15:36.0" finished="2008-02-28 18:16:01.0" tot_statements="22043" http_code="200"/>
+    <harvest harvest_id="3" harvest_source_id="1" type="pull" username="heinlja" status="started" started="2008-02-28 18:15:36.0"/>
+    <harvest harvest_id="4" harvest_source_id="1" type="pull" username="heinlja" status="started" started="2008-02-28 18:15:36.0"/>
+</dataset>

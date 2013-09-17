@@ -368,7 +368,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     private static final String ADD_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
-                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT) VALUES (?,?,?,NOW(),?,?,?,?,?)";
+                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL) VALUES (?,?,?,NOW(),?,?,?,?,?,0)";
 
     /*
      * (non-Javadoc)
