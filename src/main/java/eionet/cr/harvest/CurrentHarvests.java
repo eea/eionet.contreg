@@ -20,25 +20,24 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
+ * A global utility class for keeping record of currently on-going harvests.
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * @author <a href="mailto:jaanus.heinlaid@gmail.com">Jaanus Heinlaid</a>
  */
 public final class CurrentHarvests {
 
-    /** */
+    /** Harvest currently executed by {@link HarvestingJob}. This can execute only harvest at a time. */
     private static Harvest queuedHarvest;
-    private static HashMap<String, String> onDemandHarvests;
 
-    /**
-     *
-     */
-    static {
-        onDemandHarvests = new HashMap<String, String>();
-    }
+    /** Map of on-going on-demand harvests. Key is source URL, value is harvesting user. */
+    private static LinkedHashMap<String, String> onDemandHarvests = new LinkedHashMap<String, String>();
 
     /**
      * Hide utility class constructor.
@@ -48,6 +47,8 @@ public final class CurrentHarvests {
     }
 
     /**
+     * Returns the harvest currently executed by {@link HarvestingJob}. This can execute only harvest at a time.
+     *
      * @return the queuedHarvest
      */
     public static synchronized Harvest getQueuedHarvest() {
@@ -55,6 +56,7 @@ public final class CurrentHarvests {
     }
 
     /**
+     * Sets the harvest currently executed by {@link HarvestingJob}. This can execute only harvest at a time.
      * @param queuedHarvest the queuedHarvest to set
      */
     public static synchronized void setQueuedHarvest(Harvest queuedHarvest) {
@@ -62,9 +64,10 @@ public final class CurrentHarvests {
     }
 
     /**
+     * Register this URL-user pair as a currently on-going on-demand harvest.
      *
-     * @param url
-     * @param user
+     * @param url The URL of the harvested source.
+     * @param user The harvesting user.
      */
     public static synchronized void addOnDemandHarvest(String url, String user) {
 
@@ -74,8 +77,9 @@ public final class CurrentHarvests {
     }
 
     /**
+     * Remove given URL from the currently on-going on-demand harvests.
      *
-     * @param url
+     * @param url The URL.
      */
     public static synchronized void removeOnDemandHarvest(String url) {
         if (url != null) {
@@ -84,9 +88,11 @@ public final class CurrentHarvests {
     }
 
     /**
+     * Returns true if the given URL is currently being harvested, whether by {@link HarvestingJob} or on-demand.
+     * Otherwise returns false.
      *
-     * @param url
-     * @return
+     * @param url The URL to check.
+     * @return The flag as indicated above.
      */
     public static synchronized boolean contains(String url) {
 
@@ -103,5 +109,14 @@ public final class CurrentHarvests {
         }
 
         return false;
+    }
+
+    /**
+     * Returns an unmodifiable copy of the map of all currently on-going on-demand harvests.
+     *
+     * @return The map as indicated above. Key represents a harvested source URL, values represents the harvesting user.
+     */
+    public static synchronized Map<String, String> getOnDemandHarvests() {
+        return Collections.unmodifiableMap(onDemandHarvests);
     }
 }

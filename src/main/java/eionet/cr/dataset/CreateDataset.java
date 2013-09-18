@@ -81,6 +81,7 @@ public class CreateDataset {
             jobDetail.getJobDataMap().put("selectedFiles", selectedFiles);
             jobDetail.getJobDataMap().put("datasetUri", dataset);
             jobDetail.getJobDataMap().put("overwrite", overwrite);
+            jobDetail.getJobDataMap().put("userName", user == null ? (String) null : user.getUserName());
 
             LoadTriplesJobListener listener = new LoadTriplesJobListener();
             jobDetail.addJobListener(listener.getName());

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -39,6 +41,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
 /**
@@ -52,14 +55,14 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     /** The JSP that displays the urgent harvest queue. */
     private static final String HARVEST_QUEUE_JSP = "/pages/harvestQueue.jsp";
 
-    /**
-     * Name of the batch queue
-     */
+    /** Name of the batch harvests queue. */
     private static final String TYPE_BATCH = "batch";
-    /**
-     * Name of the urgent queue
-     */
+
+    /** Name of the urgent harvests queue. */
     private static final String TYPE_URGENT = "urgent";
+
+    /** Names of the instant harvests list. */
+    private static final String TYPE_DEMAND = "demand";
 
     /** */
     private static List<Map<String, String>> queueTypes;
@@ -76,6 +79,9 @@ public class HarvestQueueActionBean extends AbstractActionBean {
 
     /** */
     private List<Integer> selectedItems;
+
+    /** Map of on-going on-demand harvests. Key is URL, values is harvesting user. */
+    private Map<String, String> onDemandHarvests;
 
     /**
      *
@@ -97,8 +103,10 @@ public class HarvestQueueActionBean extends AbstractActionBean {
             if (batchQueue == null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }
-        } else {
+        } else if (getQueueType().equals(TYPE_URGENT)) {
             urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
+        } else {
+            onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
         }
 
         return new ForwardResolution(HARVEST_QUEUE_JSP);
@@ -180,6 +188,11 @@ public class HarvestQueueActionBean extends AbstractActionBean {
             qType.put("queueType", TYPE_BATCH);
             qtBuildUp.add(qType);
 
+            qType = new HashMap<String, String>();
+            qType.put("title", "On-demand harvests");
+            qType.put("queueType", TYPE_DEMAND);
+            qtBuildUp.add(qType);
+
             queueTypes = qtBuildUp;
         }
         return queueTypes;
@@ -202,6 +215,15 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     }
 
     /**
+     * Returns true if the currently selected type of view is "on-demand harvests". Otherwise returns false.
+     *
+     * @return Boolean as indicated above.
+     */
+    public boolean isTypeDemand() {
+        return getQueueType().equals(TYPE_DEMAND);
+    }
+
+    /**
      *
      * @return
      */
@@ -221,5 +243,14 @@ public class HarvestQueueActionBean extends AbstractActionBean {
      */
     public void setSelectedItems(List<Integer> selectedItems) {
         this.selectedItems = selectedItems;
+    }
+
+    /**
+     * Returns the entry set of the on-going on-demand harvests map.
+     *
+     * @return The set as indicated above.
+     */
+    public Set<Entry<String, String>> getOnDemandHarvestEntries() {
+        return onDemandHarvests == null ? null : onDemandHarvests.entrySet();
     }
 }

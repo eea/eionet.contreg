@@ -68,7 +68,7 @@
             <c:if test="${actionBean.typeUrgent}">
                 <c:choose>
                     <c:when test="${not empty actionBean.urgentQueue}">
-                    
+
                         <c:forEach items="${actionBean.urgentQueue}" var="queueItem">
                             <c:if test="${actionBean.user.administrator || (not empty actionBean.user.userName && actionBean.user.userName eq queueItem.userName)}">
                                 <c:set var="isRemovables" value="true"/>
@@ -76,11 +76,11 @@
                         </c:forEach>
 
                         <crfn:form id="resultSetForm" beanclass="${actionBean.class.name}" method="post">
-                        
+
                             <display:table name="${actionBean.urgentQueue}" class="sortable" pagesize="20" sort="list" id="queueItem" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
-    
+
                                 <display:setProperty name="paging.banner.items_name" value="queue items"/>
-                                
+
                                 <c:if test="${isRemovables}">
                                     <display:column style="width:10px">
                                         <c:choose>
@@ -94,7 +94,7 @@
                                 <display:column property="url" sortable="true" style="width:60%" title='<span title="URL to be harvested">URL</span>'/>
                                 <display:column property="timeAdded" sortable="true" style="max-width:20%" title='<span title="Time when the item was added to the queue">Time added</span>'/>
                                 <display:column property="userName" sortable="true" style="max-width:20%" title='<span title="The user who added the item to the queue">User</span>'/>
-    
+
                             </display:table>
                             <c:if test="${isRemovables}">
                                 <div>
@@ -102,7 +102,7 @@
                                     <input type="button" name="selectAll" value="Select all" onclick="toggleSelectAllForField('resultSetForm', 'selectedItems');return false;"/>
                                 </div>
                             </c:if>
-                            
+
                         </crfn:form>
                     </c:when>
                     <c:otherwise>
@@ -127,6 +127,31 @@
                     </c:when>
                     <c:otherwise>
                         <p>No items found in this queue.</p>
+                    </c:otherwise>
+                </c:choose>
+            </c:if>
+
+            <c:if test="${actionBean.typeDemand}">
+                <c:choose>
+                    <c:when test="${not empty actionBean.onDemandHarvestEntries}">
+
+                        <display:table name="${actionBean.onDemandHarvestEntries}" class="sortable" pagesize="20" sort="list" id="entry" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
+
+                            <display:setProperty name="paging.banner.items_name" value="sources"/>
+
+                            <display:column title="URL" sortable="true" sortProperty="key">
+                                <stripes:link beanclass="eionet.cr.web.action.factsheet.FactsheetActionBean">
+                                    <stripes:param name="uri" value="${entry.key}"/>
+                                    <c:out value="${entry.key}"/>
+                                </stripes:link>
+                            </display:column>
+                            <display:column property="value" title="User" sortable="true"/>
+
+                        </display:table>
+
+                    </c:when>
+                    <c:otherwise>
+                        <p>No items found in this list.</p>
                     </c:otherwise>
                 </c:choose>
             </c:if>

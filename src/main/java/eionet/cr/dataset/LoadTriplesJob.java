@@ -36,6 +36,7 @@ public class LoadTriplesJob implements Job {
     public LoadTriplesJob() {
     }
 
+    @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
@@ -43,11 +44,12 @@ public class LoadTriplesJob implements Job {
         List<String> selectedFiles = (List<String>) dataMap.get("selectedFiles");
         String datasetUri = dataMap.getString("datasetUri");
         boolean overwrite = dataMap.getBoolean("overwrite");
+        String userName = dataMap.getString("userName");
 
         try {
             if (!StringUtils.isBlank(datasetUri) && selectedFiles != null && selectedFiles.size() > 0) {
                 // Perform harvest for files that are not yet harvested
-                harvestUnharvestedFiles(selectedFiles);
+                harvestUnharvestedFiles(selectedFiles, userName);
 
                 DAOFactory.get().getDao(CompiledDatasetDAO.class).saveDataset(selectedFiles, datasetUri, overwrite);
                 DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(datasetUri);
@@ -62,8 +64,12 @@ public class LoadTriplesJob implements Job {
 
     /**
      * Check if file is already harvested. If not, then harvest.
-     * */
-    private void harvestUnharvestedFiles(List<String> selectedFiles) throws Exception {
+     *
+     * @param selectedFiles Files to check/harvest.
+     * @param userName Currently acting user (may be null).
+     * @throws Exception General exception.
+     */
+    private void harvestUnharvestedFiles(List<String> selectedFiles, String userName) throws Exception {
 
         if (selectedFiles != null) {
             for (String fileUri : selectedFiles) {
@@ -101,7 +107,7 @@ public class LoadTriplesJob implements Job {
                     try {
                         if (harvestSourceDTO != null) {
                             PullHarvest harvest = new PullHarvest(harvestSourceDTO);
-                            CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), "harvester");
+                            CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
                             try {
                                 harvest.execute();
                             } finally {

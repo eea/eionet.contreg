@@ -194,6 +194,7 @@ public class CompiledDatasetActionBean extends AbstractActionBean {
             jobDetail.getJobDataMap().put("overwrite", true);
             List<String> datasetFiles = DAOFactory.get().getDao(CompiledDatasetDAO.class).getDatasetFiles(uri);
             jobDetail.getJobDataMap().put("selectedFiles", datasetFiles);
+            jobDetail.getJobDataMap().put("userName", getUserName());
 
             LoadTriplesJobListener listener = new LoadTriplesJobListener();
             jobDetail.addJobListener(listener.getName());
