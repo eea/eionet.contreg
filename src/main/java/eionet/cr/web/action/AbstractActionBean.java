@@ -56,9 +56,6 @@ import eionet.cr.web.util.UsefulNamespaces;
 public abstract class AbstractActionBean implements ActionBean {
 
     /** */
-    private static final String SESSION_MESSAGES = AbstractActionBean.class.getName() + ".sessionMessages";
-
-    /** */
     private static final String SYSTEM_MESSAGES = "systemMessages";
     private static final String CAUTION_MESSAGES = "cautionMessages";
     private static final String WARNING_MESSAGES = "warningMessages";
@@ -233,6 +230,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Adds all given validation errors to the context.
+     *
      * @param errors List of error texts
      */
     public void addGlobalValidationErrors(List<String> errors) {
@@ -350,6 +348,7 @@ public abstract class AbstractActionBean implements ActionBean {
 
     /**
      * Checks is client request comes from web browser.
+     *
      * @return true if request comes from web browser or Mobile browser
      */
     protected boolean isWebBrowser() {
@@ -381,5 +380,15 @@ public abstract class AbstractActionBean implements ActionBean {
      */
     public UsefulNamespaces getUsefulNamespaces() {
         return UsefulNamespaces.getInstance();
+    }
+
+    /**
+     * For conveniently and refactoring-safely accessing {@link HarvestSourceActionBean} class from JSP.
+     *
+     * @return The class.
+     */
+    @SuppressWarnings("rawtypes")
+    public Class getHarvestSourceActionBeanClass() {
+        return HarvestSourceActionBean.class;
     }
 }

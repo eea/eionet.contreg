@@ -8,38 +8,56 @@
 
         <h1>Harvest queue</h1>
 
-        <p>This page displays the harvest queue. It is divided into two: <em>urgent queue</em> and <em>batch queue</em>.
-        The batch queue contains the sources that are being harvested at the current run of the batch harvester. If the
-        batch harvester is not executing at the moment, then the batch queue displays the sources that will be harvested
-        next time the batch harvester executes. If the batch queue is empty then either there is nothing to harvest or
-        batch harvesting has been turned off.
-        The urgent queue is created by system administrators who can request an urgent harvest at any time.
-        Harvests in the urgent queue have always a higher priority over those in the batch queue.</p>
+        <p>
+            This page displays the queues of urgent and batch harvests, and the list of on-going on-demand harvests.
+            <p>
+                An <b>urgent</b> harvest is urgent, but not immediate. An <b>on-demand</b> harvest is immediate. A <b>batch</b>
+                harvest is executed according to time schedule.
+            </p>
+            <p>
+                At most one harvest is picked from the urgent and batch queues at a time, and no batch harvest is executed before
+                the urgent queue is completed. The queues are checked every ${actionBean.queueCheckingInterval} seconds.
+                On-demand harvests can be executed several in parallel, and also at the same time with a harvest from the urgent
+                or batch queue. However, no source is executed by the on-demand harvester and urgent/batch queue at the same time.
+            </p>
+        </p>
 
-        <c:if test="${empty actionBean.batchHarvestingHours}">
-            <div class="tip-msg" style="margin-bottom:10px">
-                According to the current configuration, batch harvesting is turned off!
-            </div>
-        </c:if>
+        <div class="tip-msg">
+            <strong>Information</strong>
+            <c:if test="${actionBean.typeBatch and empty actionBean.batchHarvestingHours}">
+                <p>According to the current configuration, batch harvesting is turned off!</p>
+            </c:if>
+            <c:if test="${actionBean.typeBatch and not empty actionBean.batchHarvestingHours}">
+                <p>Batch harvesting has been configured to run only at these hours: <c:out value="${actionBean.batchHarvestingHours}"/></p>
+            </c:if>
+            <c:if test="${empty actionBean.currentQueuedHarvest and empty actionBean.onDemandHarvestEntries}">
+                <p>No harvest being executed at the moment!</p>
+            </c:if>
+            <c:if test="${not empty actionBean.currentQueuedHarvest or not empty actionBean.onDemandHarvestEntries}">
+                <c:if test="${not empty actionBean.currentQueuedHarvest}">
+                    <p>
+                        Currently executing from the urgent or batch queue:<br/>
+                        <stripes:link beanclass="${actionBean.harvestSourceActionBeanClass}" title="${actionBean.currentQueuedHarvest.contextUrl}">
+                            <c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.contextUrl,110)}"/>
+                                <stripes:param name="harvestSource.url" value="${actionBean.currentQueuedHarvest.contextUrl}"/>
+                        </stripes:link>
+                    </p>
+                </c:if>
+                <c:if test="${not empty actionBean.onDemandHarvestEntries}">
+                    <p>
+                        Currently on-going on-demand harvests:
+                        <c:forEach items="${actionBean.onDemandHarvestEntries}" var="onDemandHarvest">
+                            <br/>
+                            <stripes:link beanclass="${actionBean.harvestSourceActionBeanClass}" title="${onDemandHarvest.key}">
+                                <c:out value="${crfn:cutAtFirstLongToken(onDemandHarvest.key, 110)}"/>
+                                    <stripes:param name="harvestSource.url" value="${onDemandHarvest.key}"/>
+                            </stripes:link>
+                        </c:forEach>
+                    </p>
+                </c:if>
+            </c:if>
 
-        <c:if test="${not empty actionBean.batchHarvestingHours}">
-            <div class="tip-msg" style="margin-bottom:10px">
-                Batch harvesting has been configured to run only at these hours: <c:out value="${actionBean.batchHarvestingHours}"/>
-            </div>
-        </c:if>
-
-        <c:if test="${not empty actionBean.currentQueuedHarvest}">
-            <div class="advise-msg" style="margin-bottom:10px">
-                <c:choose>
-                    <c:when test="${fn:endsWith(currentHarvest.class.name, 'PushHarvest')}">Currently push-harvesting:</c:when>
-                    <c:otherwise>Currently pull-harvesting:</c:otherwise>
-                </c:choose><stripes:link href="/source.action" title="${actionBean.currentQueuedHarvest.contextUrl}">
-<c:out value="${crfn:cutAtFirstLongToken(actionBean.currentQueuedHarvest.contextUrl,55)}"/>
-<stripes:param name="view" value=""/>
-<stripes:param name="harvestSource.url" value="${actionBean.currentQueuedHarvest.contextUrl}"/>
-</stripes:link>
-            </div>
-        </c:if>
+        </div>
 
         <div id="tabbedmenu">
             <ul>
@@ -127,31 +145,6 @@
                     </c:when>
                     <c:otherwise>
                         <p>No items found in this queue.</p>
-                    </c:otherwise>
-                </c:choose>
-            </c:if>
-
-            <c:if test="${actionBean.typeDemand}">
-                <c:choose>
-                    <c:when test="${not empty actionBean.onDemandHarvestEntries}">
-
-                        <display:table name="${actionBean.onDemandHarvestEntries}" class="sortable" pagesize="20" sort="list" id="entry" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
-
-                            <display:setProperty name="paging.banner.items_name" value="sources"/>
-
-                            <display:column title="URL" sortable="true" sortProperty="key">
-                                <stripes:link beanclass="eionet.cr.web.action.factsheet.FactsheetActionBean">
-                                    <stripes:param name="uri" value="${entry.key}"/>
-                                    <c:out value="${entry.key}"/>
-                                </stripes:link>
-                            </display:column>
-                            <display:column property="value" title="User" sortable="true"/>
-
-                        </display:table>
-
-                    </c:when>
-                    <c:otherwise>
-                        <p>No items found in this list.</p>
                     </c:otherwise>
                 </c:choose>
             </c:if>

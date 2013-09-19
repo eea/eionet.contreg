@@ -308,7 +308,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      *
      * @return the interval in seconds
      */
-    public static Integer getIntervalSeconds() {
+    public static synchronized Integer getIntervalSeconds() {
 
         if (intervalSeconds == null) {
 
@@ -379,6 +379,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      * Executes push harvest of the given pushed content under the given URL by the given user.
+     *
      * @param url Source URL under which the content should be pushed.
      * @param pushedContent The content to harvest.
      * @param userName The user who is "pushing". May be null, in which case the harvester assumes default.

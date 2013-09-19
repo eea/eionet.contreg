@@ -61,9 +61,6 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     /** Name of the urgent harvests queue. */
     private static final String TYPE_URGENT = "urgent";
 
-    /** Names of the instant harvests list. */
-    private static final String TYPE_DEMAND = "demand";
-
     /** */
     private static List<Map<String, String>> queueTypes;
 
@@ -98,15 +95,15 @@ public class HarvestQueueActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution view() throws DAOException {
 
+        onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
+
         if (getQueueType().equals(TYPE_BATCH)) {
             batchQueue = HarvestingJob.getBatchQueue();
             if (batchQueue == null || batchQueue.isEmpty()) {
                 batchQueue = HarvestingJob.getNextScheduledSources();
             }
-        } else if (getQueueType().equals(TYPE_URGENT)) {
-            urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
         } else {
-            onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
+            urgentQueue = factory.getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
         }
 
         return new ForwardResolution(HARVEST_QUEUE_JSP);
@@ -188,11 +185,6 @@ public class HarvestQueueActionBean extends AbstractActionBean {
             qType.put("queueType", TYPE_BATCH);
             qtBuildUp.add(qType);
 
-            qType = new HashMap<String, String>();
-            qType.put("title", "On-demand harvests");
-            qType.put("queueType", TYPE_DEMAND);
-            qtBuildUp.add(qType);
-
             queueTypes = qtBuildUp;
         }
         return queueTypes;
@@ -212,15 +204,6 @@ public class HarvestQueueActionBean extends AbstractActionBean {
      */
     public boolean isTypeBatch() {
         return getQueueType().equals(TYPE_BATCH);
-    }
-
-    /**
-     * Returns true if the currently selected type of view is "on-demand harvests". Otherwise returns false.
-     *
-     * @return Boolean as indicated above.
-     */
-    public boolean isTypeDemand() {
-        return getQueueType().equals(TYPE_DEMAND);
     }
 
     /**
@@ -252,5 +235,14 @@ public class HarvestQueueActionBean extends AbstractActionBean {
      */
     public Set<Entry<String, String>> getOnDemandHarvestEntries() {
         return onDemandHarvests == null ? null : onDemandHarvests.entrySet();
+    }
+
+    /**
+     * Returns the harvest queue checking interval as in {@link HarvestingJob#getIntervalSeconds()}.
+     *
+     * @return
+     */
+    public int getQueueCheckingInterval() {
+        return HarvestingJob.getIntervalSeconds().intValue();
     }
 }
