@@ -30,18 +30,18 @@ import eionet.cr.util.Bindings;
 
 /**
  * Utility methods for building SPARQL queries.
- *
+ * 
  * @author Enriko Käsper
  */
 public final class SPARQLQueryUtil {
 
     /** Chars not allowed in IRI. */
-    private static final char[] BAD_CHARS = { ' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`' };
+    private static final char[] BAD_CHARS = {' ', '{', '}', '<', '>', '"', '|', '\\', '^', '`'};
 
     /**
-     * Inference definition in SPARQL.
+     * Owl Same As definition in SPARQL.
      */
-    public static final String INFERENCE_DEF = "DEFINE input:inference";
+    public static final String OWL_SAME_AS_DEF = "DEFINE input:same-as \"yes\"";
 
     /**
      * Hide utility class constructor.
@@ -51,23 +51,20 @@ public final class SPARQLQueryUtil {
     }
 
     /**
-     * Constructs inference definition.
-     *
+     * Constructs same-as "yes" definition.
+     * 
      * @return
      */
-    public static StringBuilder getCrInferenceDefinition() {
+    public static StringBuilder getCrOwlSameAsDefinition() {
 
         StringBuilder strBuilder = new StringBuilder();
-        if (GeneralConfig.isUseInferencing()) {
-            strBuilder.append(INFERENCE_DEF).append("'").append(GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME))
-            .append("' ");
-        }
+        strBuilder.append(OWL_SAME_AS_DEF);
         return strBuilder;
     }
 
     /**
      * Construct the prefixes definitions.
-     *
+     * 
      * @param namespaces
      * @return
      */
@@ -84,31 +81,47 @@ public final class SPARQLQueryUtil {
 
     /**
      * Build SPARQL query heading with prefixes and inference definitions.
-     *
-     * @param useCrInference add CRInference rule definition.
-     * @param namespaces add namespace prefixes
+     * 
+     * @param useCrInference
+     *            add CRInference rule definition.
+     * @param namespaces
+     *            add namespace prefixes
+     * @return start of SPARQL query
+     * @Deprecated Inferencing is removed from CR
+     */
+    @Deprecated
+    public static StringBuilder getSparqlQueryHeader(boolean useCrInference, Namespace... namespaces) {
+        return getSparqlQueryHeader(namespaces);
+    }
+    
+    /**
+     * Build SPARQL query heading with prefixes
+     * 
+     * @param namespaces
+     *            add namespace prefixes
      * @return start of SPARQL query
      */
-    public static StringBuilder getSparqlQueryHeader(boolean useCrInference, Namespace... namespaces) {
+    public static StringBuilder getSparqlQueryHeader(Namespace... namespaces) {
         StringBuilder strBuilder = new StringBuilder();
 
-        if (useCrInference) {
-            strBuilder.append(getCrInferenceDefinition());
-        }
         if (namespaces != null) {
             strBuilder.append(getPrefixes(namespaces));
         }
         return strBuilder;
     }
+    
 
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values. Fills bindings with correct values. Example:
      * urisToCSV(List{<http://uri1.notexist.com>, <http://uri2.notexist.com>}, "subjectValue")= ?subjectValue1,subjectValue2.
      * bindings are filled: subjectValue1=http://uri1.notexist.com, subjectValue2=http://uri2.notexist.com
-     *
-     * @param uriList uris to be used as SPARQL parameters
-     * @param variableAliasName prefix for the value alias in the SPARQL query
-     * @param bindings SPARQL bindings
+     * 
+     * @param uriList
+     *            uris to be used as SPARQL parameters
+     * @param variableAliasName
+     *            prefix for the value alias in the SPARQL query
+     * @param bindings
+     *            SPARQL bindings
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList, String variableAliasName, Bindings bindings) {
@@ -139,8 +152,9 @@ public final class SPARQLQueryUtil {
 
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values.
-     *
-     * @param uriList uris to be used as SPARQL parameters
+     * 
+     * @param uriList
+     *            uris to be used as SPARQL parameters
      * @return comma separated String for Sparql
      */
     public static String urisToCSV(Collection<String> uriList) {
@@ -159,32 +173,35 @@ public final class SPARQLQueryUtil {
     }
 
     /**
-     * Returns CR inference rule definition.
-     *
-     * @return SPARQL inference rule definition to be used at the bginning of SPARQL sentences.
+     * Returns CR same-as "yes" rule definition.
+     * 
+     * @return SPARQL same-as "yes" rule definition to be used at the bginning of SPARQL sentences.
      */
-    public static String getCrInferenceDefinitionStr() {
-        return getCrInferenceDefinition().toString();
+    public static String getCrOwlSameAsDefinitionStr() {
+        return getCrOwlSameAsDefinition().toString();
     }
 
     /**
      * Order by clause used in many SPARQL sentences. Composes ORDER BY clause by the optional field (mostly rdfs:label) if label
      * not specified takes the last part of the URI.
-     *
-     * @param aliasName alias field name in the sparql
-     * @param sortOrder valid sort order for the SPARQL (asc or desc)
+     * 
+     * @param aliasName
+     *            alias field name in the sparql
+     * @param sortOrder
+     *            valid sort order for the SPARQL (asc or desc)
      * @return SPARQL fragment.
      */
     public static String getOrderByClause(final String aliasName, final String sortOrder) {
         return "ORDER BY " + sortOrder + "(bif:either( bif:isnull(?" + aliasName + ") , "
-        + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
-        + "bif:lcase(?" + aliasName + ")))";
+                + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
+                + "bif:lcase(?" + aliasName + ")))";
     }
 
     /**
      * Determines if it is valid IRI (for SPARQL).
-     *
-     * @param str given URI
+     * 
+     * @param str
+     *            given URI
      * @return true if the URI is valid IRI
      */
     public static boolean isIRI(String str) {
@@ -197,9 +214,11 @@ public final class SPARQLQueryUtil {
 
     /**
      * Changes SPARQL query to use IRI function for this parameter value. ?subject -> IRI(?subject)
-     *
-     * @param query SPARQL query
-     * @param paramName parameter to be replaced
+     * 
+     * @param query
+     *            SPARQL query
+     * @param paramName
+     *            parameter to be replaced
      * @return
      */
     public static String parseIRIQuery(String query, String paramName) {

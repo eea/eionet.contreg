@@ -57,7 +57,7 @@ public class ExporterDAOTest extends VirtuosoExporterDAO {
         }
 
         assertEquals(
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct * where {?s ?p ?o .?s ?p1 ?o1 . filter(?p1 = ?p1Val) . "
+                "select distinct * where {?s ?p ?o .?s ?p1 ?o1 . filter(?p1 = ?p1Val) . "
                 + "filter(?o1 = ?o1Val) . ?s ?p2 ?o2 . filter(?p2 = ?p2Val) . filter bif:contains(?o2, ?o2Val) . "
                 + "filter (?p IN (?exportPredicateValue1,?exportPredicateValue2,?exportPredicateValue3,"
                 + "?exportPredicateValue4,?exportPredicateValue5))} ORDER BY ?s", sparql);

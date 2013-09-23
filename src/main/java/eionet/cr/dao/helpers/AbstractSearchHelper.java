@@ -30,7 +30,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
- * Abstract helper class for constructing queries. Contains methods for building paging, sorting and inference parts.
+ * Abstract helper class for constructing queries. Contains methods for building paging and sorting.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *

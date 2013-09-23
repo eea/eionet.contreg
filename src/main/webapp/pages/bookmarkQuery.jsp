@@ -11,7 +11,7 @@
       <strong>Query:</strong>
       <pre><c:out value="${actionBean.query}" /></pre>
       <span><strong>Output format:&nbsp;</strong> <c:out value="${actionBean.format}" /></span>
-      <span style="padding-left: 20px"><strong>Use  inferencing:&nbsp;</strong> <c:out value="${actionBean.useInferencing}" /></span>
+      <span style="padding-left: 20px"><strong>Use owl:SameAs:&nbsp;</strong> <c:out value="${actionBean.useOwlSameAs}" /></span>
       <span style="padding-left: 20px"><strong>Hits per page:&nbsp;</strong> <c:out value="${actionBean.nrOfHits}" /></span>
     </div>
 
@@ -52,8 +52,8 @@
 
         <stripes:hidden name="query" value="${actionBean.query}" />
         <stripes:hidden name="format" value="${actionBean.format}" />
-        <stripes:hidden name="useInferencing"
-          value="${actionBean.useInferencing}" />
+        <stripes:hidden name="useOwlSameAs"
+          value="${actionBean.useOwlSameAs}" />
         <stripes:hidden name="nrOfHits" value="${actionBean.nrOfHits}" />
 
       </div>

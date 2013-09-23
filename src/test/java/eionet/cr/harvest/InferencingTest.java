@@ -44,6 +44,13 @@ public class InferencingTest {
         loader = new RdfLoader("persons.rdf");
     }
 
+    /**
+     * 
+     * @throws Exception
+     * 
+     * @Deprecated Inferencing is removed from CR
+     */
+    @Deprecated
     @Test
     public void testInverseOf() throws Exception {
         RepositoryConnection con = null;
@@ -51,7 +58,7 @@ public class InferencingTest {
         //run this test only if inversion is turned on
         if (GeneralConfig.isUseInferencing()){
             String query =
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + " PREFIX test: <http://test.com/test/test-schema.rdf#>"
+                " PREFIX test: <http://test.com/test/test-schema.rdf#>"
                 + " SELECT ?s" + " FROM <http://test.com/test/persons.rdf>" + " WHERE" + "{"
                 + "?s test:hasParent <http://test.com/test/person/1>" + "}";
             try {

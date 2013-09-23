@@ -33,17 +33,17 @@ import eionet.cr.util.Bindings;
  */
 public class SPARQLQueryUtilTest extends TestCase {
 
-    private static final String CR_INFERENCE_DEF = SPARQLQueryUtil.getCrInferenceDefinitionStr();
+    private static final String CR_OWLSAMEAS_DEF = "DEFINE input:same-as \"yes\"";
     private static final String CR_NAMESPACE_DEF = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ";
     private static final String RDF_NAMESPACE_DEF = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ";
     private static final String RDFS_NAMESPACE_DEF = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ";
 
     /**
-     * Test getCrInferenceDefinition method.
+     * Test getOwlSameAsDefinition method.
      */
-    public static void testCrInference() {
+    public static void testOwlSameAs() {
 
-        assertEquals(CR_INFERENCE_DEF, SPARQLQueryUtil.getCrInferenceDefinitionStr());
+        assertEquals(CR_OWLSAMEAS_DEF, SPARQLQueryUtil.getCrOwlSameAsDefinitionStr());
     }
 
     /**
@@ -62,11 +62,11 @@ public class SPARQLQueryUtilTest extends TestCase {
     public static void testSparqlQueryHeader() {
 
         assertEquals("", SPARQLQueryUtil.getSparqlQueryHeader(false).toString());
-        assertEquals(CR_INFERENCE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(true).toString());
-        assertEquals(CR_INFERENCE_DEF.concat(CR_NAMESPACE_DEF), SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR)
+        assertEquals(CR_OWLSAMEAS_DEF, SPARQLQueryUtil.getSparqlQueryHeader(true).toString());
+        assertEquals(CR_OWLSAMEAS_DEF.concat(CR_NAMESPACE_DEF), SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR)
                 .toString());
         assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR).toString());
-        assertEquals(CR_INFERENCE_DEF.concat(CR_NAMESPACE_DEF).concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
+        assertEquals(CR_OWLSAMEAS_DEF.concat(CR_NAMESPACE_DEF).concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
                 SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
         assertEquals(CR_NAMESPACE_DEF.concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
                 SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());

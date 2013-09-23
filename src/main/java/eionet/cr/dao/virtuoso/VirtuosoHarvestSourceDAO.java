@@ -267,8 +267,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
+     * 
+     * @Deprecated Inferencing is removed from CR
      */
     @Override
+    @Deprecated
     public Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest, String sourceUris) throws DAOException {
 
@@ -917,8 +920,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
+     * 
+     * @Deprecated Inferencing is removed from CR
      */
     @Override
+    @Deprecated
     public String getSourcesInInferenceRules() throws DAOException {
 
         Connection conn = null;
@@ -961,8 +967,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
+     * 
+     * @Deprecated Inferencing is removed from CR
      */
     @Override
+    @Deprecated
     public boolean isSourceInInferenceRule(String url) throws DAOException {
 
         Connection conn = null;
@@ -995,8 +1004,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
+     * 
+     * @Deprecated Inferencing is removed from CR
      */
     @Override
+    @Deprecated
     public boolean addSourceIntoInferenceRule(String url) throws DAOException {
 
         Connection conn = null;
@@ -1027,7 +1039,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
+     * @Deprecated Inference is removed from CR
      */
+    @Deprecated
     @Override
     public boolean removeSourceFromInferenceRule(String url) throws DAOException {
 

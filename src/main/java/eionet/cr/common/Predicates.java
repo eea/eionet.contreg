@@ -109,7 +109,7 @@ public interface Predicates {
     String CR_ERROR_MESSAGE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#errorMessage";
     String CR_FIRST_SEEN = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#firstSeen";
     String CR_SPARQL_QUERY = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#sparqlQuery";
-    String CR_USE_INFERENCE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#useInference";
+    String CR_USE_OWLSAMEAS = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#useOwlSameAs";
     String CR_HAS_FOLDER = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#hasFolder";
     String CR_ALLOW_SUBOBJECT_TYPE = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#allowSubObjectType";
     String CR_HARVESTED_STATEMENTS = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#harvestedStatements";

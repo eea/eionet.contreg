@@ -44,7 +44,7 @@ public class UserFolderDAOTest {
         VirtuosoUserFolderSearchHelper helper = new VirtuosoUserFolderSearchHelper(parentFolder, pagingRequest, sortingRequest);
 
         String query = helper.getUnorderedQuery(new ArrayList<Object>());
-        assertEquals(SPARQLQueryUtil.getCrInferenceDefinitionStr() + "SELECT ?parent ?subject bif:either( bif:isnull(?lbl) , "
+        assertEquals("SELECT ?parent ?subject bif:either( bif:isnull(?lbl) , "
                 + "?subject, ?lbl) as ?label ?fileCount ?folderCount WHERE {?subject a <" + Subjects.CR_USER_FOLDER
                 + "> .?parent ?hasPredicate ?subject .  FILTER (?hasPredicate IN (<"
                 + Predicates.CR_HAS_FILE + ">, <" + Predicates.CR_HAS_FOLDER + ">)) .  FILTER(?parent= ?parentFolder)  "

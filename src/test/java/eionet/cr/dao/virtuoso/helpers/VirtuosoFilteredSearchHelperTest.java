@@ -35,7 +35,7 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getQuery(inParams);
 
-        assertEquals(query, SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct ?s where {?s ?p1 ?o1 . "
+        assertEquals(query, "select distinct ?s where {?s ?p1 ?o1 . "
                 + "filter(?p1 = ?p1Val) . filter(?o1 = ?o1Val)} limit 15 offset 0");
 
     }
@@ -54,7 +54,7 @@ public class VirtuosoFilteredSearchHelperTest {
 
         String query = helper.getOrderedQuery(inParams);
 
-        assertEquals(query, SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct ?s where {?s ?p1 ?o1 . "
+        assertEquals(query, "select distinct ?s where {?s ?p1 ?o1 . "
                 + "filter(?p1 = ?p1Val) . filter bif:contains(?o1, ?o1Val) . OPTIONAL {?s ?sortPred ?sortObjVal}} "
                 + "order by desc(bif:either( bif:isnull(?sortObjVal) , (bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), "
                 + "bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , bif:lcase(?sortObjVal)))");
@@ -78,7 +78,7 @@ public class VirtuosoFilteredSearchHelperTest {
 
         assertEquals(
                 query,
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct ?s where {?s ?p1 ?o1 . "
+                "select distinct ?s where {?s ?p1 ?o1 . "
                 + "filter(?p1 = ?p1Val) . filter(?o1 = ?o1Val) . ?s ?p2 ?o2 . filter(?p2 = ?p2Val) . filter bif:contains(?o2, ?o2Val)}");
     }
 
@@ -137,7 +137,7 @@ public class VirtuosoFilteredSearchHelperTest {
         String query = helper.getOrderedQuery(inParams);
 
         assertEquals(
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct ?s where {?s ?p1 ?o1 . "
+                "select distinct ?s where {?s ?p1 ?o1 . "
                 + "filter(?p1 = ?p1Val) . filter bif:contains(?o1, ?sortObjVal)} order by asc(bif:either( bif:isnull(?sortObjVal) , "
                 + "(bif:lcase(bif:subseq (bif:replace (?s, '/', '#'), bif:strrchr (bif:replace (?s, '/', '#'), '#')+1))) , "
                 + "bif:lcase(?sortObjVal)))", query);

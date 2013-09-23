@@ -92,6 +92,7 @@ public final class GeneralConfig {
     /**
      * General ruleSet name for inferencing. Schema sources are added into that ruleset.
      * */
+    @Deprecated
     public static final String VIRTUOSO_CR_RULESET_NAME = "virtuoso.cr.ruleset.name";
 
     /** */
@@ -267,10 +268,11 @@ public final class GeneralConfig {
     /**
      * If ruleset name property is available in cr.properties, then use inferencing in queries.
      * @return
+     * 
+     * @deprecated As inferencing is not used in CR
      */
+    @Deprecated
     public static synchronized boolean isUseInferencing() {
-
-        String crRulesetName = getProperty(VIRTUOSO_CR_RULESET_NAME);
-        return !StringUtils.isBlank(crRulesetName);
+        return false;
     }
 }

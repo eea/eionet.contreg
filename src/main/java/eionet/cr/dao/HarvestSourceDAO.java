@@ -209,7 +209,9 @@ public interface HarvestSourceDAO extends DAO {
      * @return String
      * @throws DAOException
      *             if relational database is unavailable.
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     String getSourcesInInferenceRules() throws DAOException;
 
     /**
@@ -220,7 +222,9 @@ public interface HarvestSourceDAO extends DAO {
      * @return Pair<Integer, List<HarvestSourceDTO>>
      * @throws DAOException
      *             if relational database is unavailable.
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     Pair<Integer, List<HarvestSourceDTO>> getInferenceSources(String searchString, PagingRequest pagingRequest,
             SortingRequest sortingRequest, String sourceUris) throws DAOException;
 
@@ -229,7 +233,9 @@ public interface HarvestSourceDAO extends DAO {
      * @return boolean
      * @throws DAOException
      *             if relational database is unavailable.
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     boolean isSourceInInferenceRule(String url) throws DAOException;
 
     /**
@@ -239,7 +245,10 @@ public interface HarvestSourceDAO extends DAO {
      * @return boolean
      * @throws DAOException
      *             if relational database is unavailable.
+     *             
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     boolean addSourceIntoInferenceRule(String url) throws DAOException;
 
     /**
@@ -249,7 +258,10 @@ public interface HarvestSourceDAO extends DAO {
      * @return boolean
      * @throws DAOException
      *             if relational database is unavailable.
+     *             
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
     /**

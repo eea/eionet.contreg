@@ -239,7 +239,6 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         bindings.setURI("crHasFile", Predicates.CR_HAS_FILE);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(SPARQLQueryUtil.getCrInferenceDefinitionStr());
         sb.append("select count(*) where { ");
         sb.append("?parentFolder ?p ?o . ");
         sb.append("filter (?p IN (?crHasFolder, ?crHasFile)) . ");

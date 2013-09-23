@@ -225,7 +225,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      *
      * @param url
      * @throws DAOException
+     * 
+     * @Deprecated Inferencing is removed from CR
      */
+    @Deprecated
     private void manageRuleset(String url) throws DAOException {
 
         if (GeneralConfig.isUseInferencing()) {

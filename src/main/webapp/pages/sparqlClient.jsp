@@ -296,8 +296,8 @@ while (l--) {
                         <stripes:text name="nrOfHits" size="2" id="nrOfHits" />
                     </div>
                     <div style="position: absolute; top: 5px; left: 410px;">
-                        <stripes:label for="inferencing" class="question">Use CR inferencing</stripes:label>
-                        <stripes:checkbox name="useInferencing" id="inferencing" />
+                        <stripes:label for="owlsameas" class="question">Use owl:SameAs</stripes:label>
+                        <stripes:checkbox name="useOwlSameAs" id="owlsameas" />
                     </div>
 
                     <c:choose>
@@ -353,7 +353,7 @@ while (l--) {
                             The Operations menu also provides a list of shared bookmarked queries which you can select to
                             pre-fill your query.<br/><br/>
                             The output format of the query depends on the one you select from the above select box. In order
-                            to make the query use inference rules, turn on the relevant checkbox. A link to common useful
+                            to make the query use owl:SameAs rule, turn on the relevant checkbox. A link to common useful
                             SPARQL functions is also available below the Operations menu.
                         </div>
                     </c:if>

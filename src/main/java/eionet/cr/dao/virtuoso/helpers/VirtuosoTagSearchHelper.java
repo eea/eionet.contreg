@@ -42,9 +42,20 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
     /** Tags to search by. */
     private List<String> tags;
 
+    
+    public VirtuosoTagSearchHelper(Map<String, String> filters, Set<String> literalRangeFilters, PagingRequest pagingRequest,
+            SortingRequest sortingRequest) {
+        super(filters, literalRangeFilters, pagingRequest, sortingRequest);
+    }
+    
+    /*
+     * 
+     * @Deprecated Inferencing is removed from CR
+     */
+    @Deprecated
     public VirtuosoTagSearchHelper(Map<String, String> filters, Set<String> literalRangeFilters, PagingRequest pagingRequest,
             SortingRequest sortingRequest, boolean useInferencing) {
-        super(filters, literalRangeFilters, pagingRequest, sortingRequest, useInferencing);
+        this(filters, literalRangeFilters, pagingRequest, sortingRequest);
     }
 
     /**
@@ -86,9 +97,12 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
      * must use inferencing
      *
      * @return StringBuilder to be used for the query.
+     * 
+     * @deprecated As inferencing is not used in CR
      */
+    @Deprecated
     private StringBuilder initQueryStringBuilder() {
-        return new StringBuilder(useInferencing ? SPARQLQueryUtil.getCrInferenceDefinition() : "");
+        return new StringBuilder("");
     }
 
     /**

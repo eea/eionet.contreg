@@ -13,15 +13,15 @@ import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
- *
+ * 
  * @author jaanus
- *
+ * 
  */
 public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see eionet.cr.dao.ExporterDAO#exportByTypeAndFilters(java.util.Map, java.util.List,
      * eionet.cr.util.sql.ResultSetExportReader)
      */
@@ -55,9 +55,8 @@ public class VirtuosoExporterDAO extends VirtuosoBaseDAO implements ExporterDAO 
 
         // TODO does not work with multiple predicates and inferencing - check if Virtuoso issue is solved
         String sparql =
-                SPARQLQueryUtil.getCrInferenceDefinitionStr() + "select distinct * where {?s ?p ?o " + subjectsSubQuery
-                        + " . filter (?p IN (" + SPARQLQueryUtil.urisToCSV(predicateUris, "exportPredicateValue", bindings)
-                        + "))} ORDER BY ?s";
+                "select distinct * where {?s ?p ?o " + subjectsSubQuery + " . filter (?p IN ("
+                        + SPARQLQueryUtil.urisToCSV(predicateUris, "exportPredicateValue", bindings) + "))} ORDER BY ?s";
         return sparql;
     }
 }

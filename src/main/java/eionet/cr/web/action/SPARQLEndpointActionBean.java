@@ -138,7 +138,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private boolean isAskQuery;
-    private boolean useInferencing;
+    private boolean useOwlSameAs;
 
     /** */
     private QueryResult result;
@@ -220,7 +220,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /**
      * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
-     * to use inference.
+     * to use same-as "yes".
      *
      * @throws DAOException
      */
@@ -233,8 +233,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         this.query = subjectDTO.getObjectValue(Predicates.CR_SPARQL_QUERY);
         this.format = subjectDTO.getObjectValue(Predicates.DC_FORMAT);
-        String flagString = subjectDTO.getObjectValue(Predicates.CR_USE_INFERENCE);
-        this.useInferencing = Util.toBooolean(flagString);
+        String flagString = subjectDTO.getObjectValue(Predicates.CR_USE_OWLSAMEAS);
+        this.useOwlSameAs = Util.toBooolean(flagString);
         this.bookmarkName = subjectDTO.getObjectValue(Predicates.RDFS_LABEL);
     }
 
@@ -311,9 +311,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         objectDTO.setSourceUri(bookmarksUri);
         subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
 
-        objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
+        objectDTO = new ObjectDTO(Boolean.toString(useOwlSameAs), true, XMLSchema.BOOLEAN);
         objectDTO.setSourceUri(bookmarksUri);
-        subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
+        subjectDTO.addObject(Predicates.CR_USE_OWLSAMEAS, objectDTO);
 
         objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
         objectDTO.setSourceUri(bookmarksUri);
@@ -324,7 +324,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         predicateUris.add(Predicates.RDF_TYPE);
         predicateUris.add(Predicates.CR_SPARQL_QUERY);
         predicateUris.add(Predicates.DC_FORMAT);
-        predicateUris.add(Predicates.CR_USE_INFERENCE);
+        predicateUris.add(Predicates.CR_USE_OWLSAMEAS);
         predicateUris.add(Predicates.RDFS_LABEL);
 
         List<String> subjectUris = Collections.singletonList(bookmarkUri);
@@ -396,9 +396,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         objectDTO.setSourceUri(bookmarksUri);
         subjectDTO.addObject(Predicates.DC_FORMAT, objectDTO);
 
-        objectDTO = new ObjectDTO(Boolean.toString(useInferencing), true, XMLSchema.BOOLEAN);
+        objectDTO = new ObjectDTO(Boolean.toString(useOwlSameAs), true, XMLSchema.BOOLEAN);
         objectDTO.setSourceUri(bookmarksUri);
-        subjectDTO.addObject(Predicates.CR_USE_INFERENCE, objectDTO);
+        subjectDTO.addObject(Predicates.CR_USE_OWLSAMEAS, objectDTO);
 
         objectDTO = new ObjectDTO(bookmarkName, true, XMLSchema.STRING);
         objectDTO.setSourceUri(bookmarksUri);
@@ -409,7 +409,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         predicateUris.add(Predicates.RDF_TYPE);
         predicateUris.add(Predicates.CR_SPARQL_QUERY);
         predicateUris.add(Predicates.DC_FORMAT);
-        predicateUris.add(Predicates.CR_USE_INFERENCE);
+        predicateUris.add(Predicates.CR_USE_OWLSAMEAS);
         predicateUris.add(Predicates.RDFS_LABEL);
 
         List<String> subjectUris = Collections.singletonList(bookmarkUri);
@@ -441,12 +441,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // Set the default-graph-uri and named-graph-uri (see SPARQL protocol specifications).
         setDefaultAndNamedGraphs();
+        
+        
 
-        // If user has requested use of inferencing, then ensure that the relevant command is present in the query.
-        if (useInferencing) {
-            String inferenceCommand = SPARQLQueryUtil.getCrInferenceDefinitionStr();
-            if (query.indexOf(inferenceCommand) == -1) {
-                query = inferenceCommand + "\n" + query;
+        // If user has requested use of same-as "yes", then ensure that the relevant command is present in the query.
+        String sameasyesCommand = SPARQLQueryUtil.getCrOwlSameAsDefinitionStr();
+        if (useOwlSameAs) {
+            if (query.indexOf(sameasyesCommand) == -1) {
+                query = sameasyesCommand + "\n" + query;
+            }
+        } else {
+            if (query.contains(sameasyesCommand)) {
+                query = query.replace(sameasyesCommand,"");
             }
         }
 
@@ -960,15 +966,15 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * @return
      */
-    public boolean isUseInferencing() {
-        return useInferencing;
+    public boolean isUseOwlSameAs() {
+        return useOwlSameAs;
     }
 
     /**
-     * @param useInferencing
+     * @param useOwlSameAs
      */
-    public void setUseInferencing(boolean useInferencing) {
-        this.useInferencing = useInferencing;
+    public void setUseOwlSameAs(boolean useOwlSameAs) {
+        this.useOwlSameAs = useOwlSameAs;
     }
 
     /**

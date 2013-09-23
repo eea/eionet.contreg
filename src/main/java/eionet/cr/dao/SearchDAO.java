@@ -55,6 +55,20 @@ public interface SearchDAO extends DAO {
     SearchResultDTO<SubjectDTO> searchByFreeText(SearchExpression expression, FreeTextSearchHelper.FilterType filterType,
             boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
+    
+    /**
+     * @param filters - search filters.
+     * @param checkFiltersRange - set of literal predicates
+     * @param pagingRequest - page request
+     * @param sortingRequest - sorting request
+     * @param selectPredicates - predicates filter
+     * @return SearchResultDTO<SubjectDTO>
+     * @throws DAOException
+     */
+    SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates)
+            throws DAOException;
+    
     /**
      * @param filters - search filters.
      * @param checkFiltersRange - set of literal predicates
@@ -64,7 +78,9 @@ public interface SearchDAO extends DAO {
      * @param useInference if query uses inferencing. If inferencing is not needed it is reasoneable to switch it off
      * @return SearchResultDTO<SubjectDTO>
      * @throws DAOException
+     * 
      */
+    @Deprecated
     SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
             throws DAOException;

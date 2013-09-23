@@ -57,9 +57,12 @@ create table CR.cr3user.harvest_source (
 
 create table CR.cr3user.urgent_harvest_queue
 (
+	item_id integer NOT NULL IDENTITY,
     url varchar(1024) NOT NULL,
     "timestamp" datetime NOT NULL,
-    pushed_content long varchar
+    pushed_content long varchar,
+    username varchar(45) DEFAULT NULL,
+	PRIMARY KEY (item_id)
 );
 
 create table CR.cr3user.spo_binary
