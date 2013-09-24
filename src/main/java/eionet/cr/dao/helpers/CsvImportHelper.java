@@ -23,7 +23,6 @@ package eionet.cr.dao.helpers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -33,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.URI;
@@ -240,11 +240,14 @@ public class CsvImportHelper {
         // File file = FileStore.getInstance(getUserName()).getFile(relativeFilePath);
         File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, userName)).getFile(relativeFilePath);
         if (file != null && file.exists()) {
+            char delim = getDelimiter();
             if (guessEncoding) {
                 Charset charset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"));
-                result = new CSVReader(new InputStreamReader(new FileInputStream(file), charset), getDelimiter());
+                // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
+                result = new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file)), charset), delim);
             } else {
-                result = new CSVReader(new FileReader(file), getDelimiter());
+                // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
+                result = new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file))), delim);
             }
         }
 
@@ -293,6 +296,7 @@ public class CsvImportHelper {
         query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
         query.append("SELECT *\nFROM <").append(fileUri).append(">\nWHERE {\n");
         for (String column : columnLabels) {
+
             column = column.replace(" ", "_");
             String columnUri = "tableFile:" + column;
             // Note that "_:" is the standard N3 namespace prefix for blank nodes.
