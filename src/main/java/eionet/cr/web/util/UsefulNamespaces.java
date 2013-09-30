@@ -23,7 +23,7 @@ import eionet.cr.util.URIUtil;
  *
  * @author jaanus
  */
-public class UsefulNamespaces extends LinkedHashMap<String, String> {
+public class UsefulNamespaces extends OrderedProperties {
 
     /** Auto-generated serial version. */
     private static final long serialVersionUID = 3867281673204174828L;
@@ -38,41 +38,7 @@ public class UsefulNamespaces extends LinkedHashMap<String, String> {
      * Private constructor that loads the values.
      */
     private UsefulNamespaces() {
-        super();
-        load();
-    }
-
-    /**
-     * Loads the useful namespaces from {@link #PROPERTIES_FILE}, in exactly the same order as they appear in the file.
-     */
-    private void load() {
-
-        InputStream inputStream = null;
-        try {
-            inputStream = GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE);
-            List<String> lines = IOUtils.readLines(inputStream);
-            for (String line : lines) {
-                String trimmedLine = line.trim();
-                if (StringUtils.isNotBlank(trimmedLine) && trimmedLine.charAt(0) != '#') {
-                    int index = trimmedLine.indexOf('=');
-                    if (index > 0 && index < trimmedLine.length() - 1) {
-                        String prefix = trimmedLine.substring(0, index).trim();
-                        if (StringUtils.isNotBlank(prefix)) {
-                            String uri = trimmedLine.substring(index + 1).trim();
-                            if (URIUtil.isURI(uri)) {
-                                put(prefix, uri);
-                            } else {
-                                LOGGER.warn("Invalid URI for the \"" + prefix + "\" namespace in " + PROPERTIES_FILE);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new CRRuntimeException("Failed to load " + PROPERTIES_FILE, e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
+        super(PROPERTIES_FILE, LOGGER, true);
     }
 
     /**

@@ -57,6 +57,7 @@ public class CharsetToolkit {
     private byte[] buffer;
     private Charset defaultCharset;
     private boolean enforce8Bit = false;
+    private boolean returnNullIfNotDetected = false;
 
     /**
      * Constructor of the <code>com.glaforge.i18n.io.CharsetToolkit</code> utility class.
@@ -262,8 +263,12 @@ public class CharsetToolkit {
         if (validU8Char) {
             return Charset.forName("UTF-8");
         }
-        // finally, if it's not UTF-8 nor US-ASCII, let's assume the encoding is the default encoding
-        return this.defaultCharset;
+        // finally, if it's not UTF-8 nor US-ASCII, let's assume the encoding is the default encoding or return null.
+        if (this.isReturnNullIfNotDetected()){
+            return null;
+        } else {
+            return this.defaultCharset;
+        }
     }
 
     /**
@@ -301,6 +306,18 @@ public class CharsetToolkit {
      * @throws IOException
      */
     public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset, boolean enforce8bit) throws IOException {
+        return guessEncoding(f, bufferLength, defaultCharset, false, false);
+    }
+        
+        
+    /**
+     * @param f
+     * @param bufferLength
+     * @param defaultCharset
+     * @return
+     * @throws IOException
+     */
+    public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset, boolean enforce8bit, boolean returnNullIfNotDetected) throws IOException {  
         FileInputStream fis = new FileInputStream(f);
         byte[] buffer = new byte[bufferLength];
         fis.read(buffer);
@@ -308,6 +325,7 @@ public class CharsetToolkit {
         CharsetToolkit toolkit = new CharsetToolkit(buffer);
         toolkit.setDefaultCharset(defaultCharset);
         toolkit.setEnforce8Bit(enforce8bit);
+        toolkit.setReturnNullIfNotDetected(returnNullIfNotDetected);
         return toolkit.guessEncoding();
     }
     
@@ -428,5 +446,13 @@ public class CharsetToolkit {
     public static Charset[] getAvailableCharsets() {
         Collection collection = Charset.availableCharsets().values();
         return (Charset[]) collection.toArray(new Charset[collection.size()]);
+    }
+
+    public boolean isReturnNullIfNotDetected() {
+        return returnNullIfNotDetected;
+    }
+
+    public void setReturnNullIfNotDetected(boolean returnNullIfNotDetected) {
+        this.returnNullIfNotDetected = returnNullIfNotDetected;
     }
 }

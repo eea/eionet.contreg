@@ -234,26 +234,64 @@ public class CsvImportHelper {
      * @return
      * @throws IOException
      */
+    public CSVReader createCSVReader(String folderUri, String relativeFilePath, String userName, Charset encoding)
+            throws IOException {
+        return createCSVReader(folderUri, relativeFilePath, userName, false, encoding);
+    }
+
+    /**
+     * @param guessEncoding
+     * @return
+     * @throws IOException
+     */
     public CSVReader createCSVReader(String folderUri, String relativeFilePath, String userName, boolean guessEncoding)
             throws IOException {
+        return createCSVReader(folderUri, relativeFilePath, userName, guessEncoding, null);
+    }
+
+    /**
+     * @param guessEncoding
+     * @return
+     * @throws IOException
+     */
+    public CSVReader createCSVReader(String folderUri, String relativeFilePath, String userName, boolean guessEncoding,
+            Charset charset) throws IOException {
 
         CSVReader result = null;
-        File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, userName)).getFile(relativeFilePath);
+        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, userName));
+        File file = fileStore.getFile(relativeFilePath);
         if (file != null && file.exists()) {
             char delim = getDelimiter();
             if (guessEncoding) {
-                Charset charset = CharsetToolkit.guessEncoding(file, 4096, Charset.forName("UTF-8"), false);
+                Charset guessedCharset = CharsetToolkit.guessEncoding(file, 65535, Charset.forName("UTF-8"), true);
                 // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
+
                 result =
-                        new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file), ByteOrderMark.UTF_16LE,
-                                ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE), charset), delim);
+                        new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file), ByteOrderMark.UTF_8,
+                                ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE),
+                                guessedCharset), delim);
             } else {
                 // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
-                result = new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file))), delim);
+                result =
+                        new CSVReader(new InputStreamReader(new BOMInputStream(new FileInputStream(file), ByteOrderMark.UTF_8,
+                                ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE),
+                                charset), delim);
             }
         }
 
         return result;
+    }
+
+    public Charset detectCSVencoding(String folderUri, String relativeFilePath, String userName) throws IOException {
+
+        Charset charset = null;
+        File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, userName)).getFile(relativeFilePath);
+
+        if (file != null && file.exists()) {
+            charset = CharsetToolkit.guessEncoding(file, 65535, null, false, true);
+        }
+
+        return charset;
     }
 
     /**

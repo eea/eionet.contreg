@@ -69,10 +69,21 @@
                                     <td><stripes:checkbox name="overwrite" id="overwriteCheck" /><label for="overwriteCheck">Yes</label></td>
                                 </tr>
                                 <tr>
+                                    <td><label class="question" for="encodingSelect" title="">File encoding</label></td>
+                                    <td>
+                                        <stripes:select name="fileEncoding" id="encodingSelect" value="${actionBean.fileEncoding}" style="width: 350px;">
+                                            <c:forEach var="col" items="${actionBean.fileEncodings}">
+                                                <stripes:option value="${col.key}" label="${col.value}" />
+                                            </c:forEach>
+                                        </stripes:select>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td colspan="2" align="right">
                                         <stripes:submit name="upload" onclick="javascript:uploadFile();" value="Upload" />
                                     </td>
                                 </tr>
+                                
                             </table>
                         </crfn:form>
                         <div class="csvWizardDesc">
@@ -217,6 +228,7 @@
                                         <stripes:hidden name="relativeFilePath"/>
                                         <stripes:hidden name="fileType"/>
                                         <stripes:hidden name="fileName"/>
+                                        <stripes:hidden name="fileEncoding"/>
                                         <stripes:submit name="save" value="Save"/>
                                     </td>
                                 </tr>

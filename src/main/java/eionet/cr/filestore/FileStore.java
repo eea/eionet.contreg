@@ -1,12 +1,19 @@
 package eionet.cr.filestore;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLDecoder;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import net.sourceforge.stripes.action.FileBean;
@@ -227,17 +234,27 @@ public final class FileStore {
 
                 String oldName = entry.getKey();
                 String newName = entry.getValue();
-
-                File file = new File(userDir, oldName);
-                if (file.exists() && file.isFile()) {
-
-                    file.renameTo(new File(userDir, newName));
-                    renamedCount++;
-                }
+                
+                rename(oldName, newName);
+                renamedCount++;
             }
         }
 
         LOGGER.debug("Total of " + renamedCount + " files renamed in the file store");
+    }
+    
+    /**
+     * Rename single file
+     * 
+     * @param oldName
+     * @param newName
+     */
+    public void rename(String oldName, String newName){
+
+        File file = new File(userDir, oldName);
+        if (file.exists() && file.isFile()) {
+            file.renameTo(new File(userDir, newName));
+        }
     }
 
     /**
@@ -334,6 +351,65 @@ public final class FileStore {
 
         return false;
 
+    }
+    
+    /**
+     * Changes the encoding of a local file. 
+     * 
+     * Original file is removed and the new file is saved with the original name.  
+     * 
+     * @param relativePath
+     * @param currentEncoding
+     * @param targetEncoding
+     * @throws IOException
+     */
+    public void changeFileEncoding(String relativePath, Charset currentEncoding, Charset targetEncoding) throws IOException {
+        
+        if (!StringUtils.isBlank(relativePath)) {
+            File file = new File(userDir, relativePath);
+            
+            String tempFileName = relativePath+".encoding.temp";
+            File tempFile = new File(userDir, tempFileName);
+            
+            if (tempFile.exists() && tempFile.isFile()) {
+                tempFile.delete();
+            }
+            
+            if (file.exists() && file.isFile()) {
+                
+                CharBuffer buffer = CharBuffer.allocate(1024);    
+                int bytesRead;
+                
+                FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                InputStreamReader isr = new InputStreamReader(fis, currentEncoding);
+                
+                FileOutputStream fos = new FileOutputStream(tempFile.getAbsolutePath());
+                Writer out = new OutputStreamWriter(fos, targetEncoding);
+                
+                boolean encodingSuccessful = false;
+                
+                try {
+                    while ((bytesRead = isr.read(buffer)) != -1) {
+                        out.write(buffer.array(), 0, bytesRead);
+                        buffer.clear();
+                    }
+                } finally {
+                    fis.close();
+                    isr.close();
+                    out.close();
+                    fos.close();
+                    encodingSuccessful = true;
+                }
+                
+                if (encodingSuccessful){
+                    delete(relativePath);
+                    rename(tempFileName, relativePath);
+                }
+                
+            }    
+        }
+
+        
     }
 
 }
