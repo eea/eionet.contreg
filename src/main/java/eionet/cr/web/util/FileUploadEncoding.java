@@ -3,9 +3,9 @@ package eionet.cr.web.util;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * Container of all supported encodings for uploading files
- * 
+ *
  * @author Jaak
  */
 public final class FileUploadEncoding extends OrderedProperties {
@@ -18,7 +18,7 @@ public final class FileUploadEncoding extends OrderedProperties {
     /** */
     private static final Logger LOGGER = Logger.getLogger(FileUploadEncoding.class);
 
- 
+
     private FileUploadEncoding() {
         super(PROPERTIES_FILE, LOGGER);
     }
@@ -41,5 +41,5 @@ public final class FileUploadEncoding extends OrderedProperties {
     private static class FileUploadEncodingHolder {
         public static final FileUploadEncoding INSTANCE = new FileUploadEncoding();
     }
-    
+
 }

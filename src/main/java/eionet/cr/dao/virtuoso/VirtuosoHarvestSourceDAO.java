@@ -267,7 +267,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      *
      * @see eionet.cr.dao.HarvestSourceDAO#getInferenceSources(java.lang.String, eionet.cr.util.PagingRequest,
      * eionet.cr.util.SortingRequest)
-     * 
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Override
@@ -920,7 +920,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#getSourcesInInferenceRules()
-     * 
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Override
@@ -967,7 +967,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#isSourceInInferenceRule()
-     * 
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Override
@@ -1004,7 +1004,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#addSourceIntoInferenceRule()
-     * 
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Override

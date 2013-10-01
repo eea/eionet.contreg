@@ -142,23 +142,23 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** Column labels detected in the uploaded file (titles without type and language code). */
     private List<String> columnLabels;
-    
+
     /** Encoding of the uploadable file */
     private String fileEncoding;
-    
-    
+
+
     private static final String ENCODING_AUTODETECT_ID = "AUTODETECT";
-    
+
     /** Upload file encoding values */
     private static Map<String, String> fileEncodings;
-    
+
     static {
         fileEncodings = new LinkedHashMap<String, String>();
         fileEncodings.put(ENCODING_AUTODETECT_ID, "Auto detect");
         fileEncodings.putAll(FileUploadEncoding.getInstance());
     }
-    
-    
+
+
 
     /**
      * @return
@@ -213,7 +213,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
                             source);
 
-            // Detect charset and convert the file to UTF-8          
+            // Detect charset and convert the file to UTF-8
             if (fileEncoding.equals(ENCODING_AUTODETECT_ID)){
                 Charset detectedCharset = helper.detectCSVencoding(folderUri, relativeFilePath, getUserName());
                 if (detectedCharset == null){
@@ -224,15 +224,15 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
                 }
             } else {
-                fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8")); 
+                fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
             }
-            
+
             // Store file as new source, but don't harvest it
             helper.insertFileMetadataAndSource(fileSize, getUserName());
 
             // Add metadata about user folder update
             helper.linkFileToFolder(folderUri, getUserName());
-            
+
             // Prepare data linkins scripts dropdown
             dataLinkingScripts = new ArrayList<DataLinkingScript>();
             dataLinkingScripts.add(new DataLinkingScript());
@@ -264,10 +264,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
                         source);
         try {
-            
+
             // The file was encoded to UTF-8 after upload
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
-            
+
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();
 

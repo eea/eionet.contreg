@@ -245,7 +245,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return boolean
      * @throws DAOException
      *             if relational database is unavailable.
-     *             
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Deprecated
@@ -258,7 +258,7 @@ public interface HarvestSourceDAO extends DAO {
      * @return boolean
      * @throws DAOException
      *             if relational database is unavailable.
-     *             
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Deprecated

@@ -449,7 +449,7 @@ public abstract class BaseHarvest implements Harvest {
      * is done)
      *
      * @throws DAOException
-     * 
+     *
      * @Deprecated Inferencing is removed from CR
      */
     @Deprecated

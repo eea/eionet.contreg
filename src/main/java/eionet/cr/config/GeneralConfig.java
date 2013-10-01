@@ -268,7 +268,7 @@ public final class GeneralConfig {
     /**
      * If ruleset name property is available in cr.properties, then use inferencing in queries.
      * @return
-     * 
+     *
      * @deprecated As inferencing is not used in CR
      */
     @Deprecated

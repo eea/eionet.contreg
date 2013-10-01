@@ -15,13 +15,13 @@ import eionet.cr.util.URIUtil;
 
 
 /**
- * 
+ *
  * A customized properties file loader for ordered resultset.
  *
  * @author Jaak
  */
 public abstract class OrderedProperties extends LinkedHashMap<String, String> {
-    
+
     /**  */
     private static final long serialVersionUID = 1L;
 
@@ -29,12 +29,12 @@ public abstract class OrderedProperties extends LinkedHashMap<String, String> {
         super();
         load(propertiesFile, logger, false);
     }
-    
+
     protected OrderedProperties(String propertiesFile, Logger logger, boolean testIfvalueIsUri){
         super();
         load(propertiesFile, logger, testIfvalueIsUri);
     }
-    
+
     /**
      * Loads the useful namespaces from {@link #PROPERTIES_FILE}, in exactly the same order as they appear in the file.
      */

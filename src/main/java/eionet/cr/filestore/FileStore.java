@@ -234,7 +234,7 @@ public final class FileStore {
 
                 String oldName = entry.getKey();
                 String newName = entry.getValue();
-                
+
                 rename(oldName, newName);
                 renamedCount++;
             }
@@ -242,10 +242,10 @@ public final class FileStore {
 
         LOGGER.debug("Total of " + renamedCount + " files renamed in the file store");
     }
-    
+
     /**
      * Rename single file
-     * 
+     *
      * @param oldName
      * @param newName
      */
@@ -352,42 +352,42 @@ public final class FileStore {
         return false;
 
     }
-    
+
     /**
-     * Changes the encoding of a local file. 
-     * 
-     * Original file is removed and the new file is saved with the original name.  
-     * 
+     * Changes the encoding of a local file.
+     *
+     * Original file is removed and the new file is saved with the original name.
+     *
      * @param relativePath
      * @param currentEncoding
      * @param targetEncoding
      * @throws IOException
      */
     public void changeFileEncoding(String relativePath, Charset currentEncoding, Charset targetEncoding) throws IOException {
-        
+
         if (!StringUtils.isBlank(relativePath)) {
             File file = new File(userDir, relativePath);
-            
+
             String tempFileName = relativePath+".encoding.temp";
             File tempFile = new File(userDir, tempFileName);
-            
+
             if (tempFile.exists() && tempFile.isFile()) {
                 tempFile.delete();
             }
-            
+
             if (file.exists() && file.isFile()) {
-                
-                CharBuffer buffer = CharBuffer.allocate(1024);    
+
+                CharBuffer buffer = CharBuffer.allocate(1024);
                 int bytesRead;
-                
+
                 FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 InputStreamReader isr = new InputStreamReader(fis, currentEncoding);
-                
+
                 FileOutputStream fos = new FileOutputStream(tempFile.getAbsolutePath());
                 Writer out = new OutputStreamWriter(fos, targetEncoding);
-                
+
                 boolean encodingSuccessful = false;
-                
+
                 try {
                     while ((bytesRead = isr.read(buffer)) != -1) {
                         out.write(buffer.array(), 0, bytesRead);
@@ -400,16 +400,16 @@ public final class FileStore {
                     fos.close();
                     encodingSuccessful = true;
                 }
-                
+
                 if (encodingSuccessful){
                     delete(relativePath);
                     rename(tempFileName, relativePath);
                 }
-                
-            }    
+
+            }
         }
 
-        
+
     }
 
 }
