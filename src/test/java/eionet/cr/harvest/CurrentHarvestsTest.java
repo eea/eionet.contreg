@@ -25,6 +25,8 @@ public class CurrentHarvestsTest extends CRDatabaseTestCase {
     @Before
     protected void setUp() throws Exception {
 
+        super.setUp();
+
         // First clean up the on-demand harvests.
         Map<String, String> onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
         if (onDemandHarvests != null && !onDemandHarvests.isEmpty()) {

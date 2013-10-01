@@ -61,15 +61,10 @@ public class SPARQLQueryUtilTest extends TestCase {
      */
     public static void testSparqlQueryHeader() {
 
-        assertEquals("", SPARQLQueryUtil.getSparqlQueryHeader(false).toString());
-        assertEquals(CR_OWLSAMEAS_DEF, SPARQLQueryUtil.getSparqlQueryHeader(true).toString());
-        assertEquals(CR_OWLSAMEAS_DEF.concat(CR_NAMESPACE_DEF), SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR)
-                .toString());
-        assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR).toString());
-        assertEquals(CR_OWLSAMEAS_DEF.concat(CR_NAMESPACE_DEF).concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
-                SPARQLQueryUtil.getSparqlQueryHeader(true, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
+        assertEquals("", SPARQLQueryUtil.getSparqlQueryHeader().toString());
+        assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(Namespace.CR).toString());
         assertEquals(CR_NAMESPACE_DEF.concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
-                SPARQLQueryUtil.getSparqlQueryHeader(false, Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
+                SPARQLQueryUtil.getSparqlQueryHeader(Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
     }
 
     public void testUrisToCSV() {

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.test.helpers.RdfLoader;
@@ -39,19 +40,31 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public class HelperDAOTest {
 
-    private static RdfLoader loader;
+    /** Seed file. */
+    private static final String SEED_FILE = "obligations.rdf";
 
+
+    /**
+     * Unit test set up method.
+     *
+     * @throws Exception When any error happens.
+     */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        loader = new RdfLoader("obligations.rdf");
+        RdfLoader rdfLoader = new RdfLoader();
+        rdfLoader.clearAllTriples();
+        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
     }
 
+    /**
+     * Test getting sample triples.
+     * @throws Exception
+     */
     @Test
     public void testGetSampleTriples() throws Exception {
         List<TripleDTO> result =
                 DAOFactory.get().getDao(HelperDAO.class)
-                        .getSampleTriplesInSource(loader.getGraphUri(), PagingRequest.create(1, 10));
-
+                        .getSampleTriplesInSource(RdfLoader.getSeedFileGraphUri(SEED_FILE), PagingRequest.create(1, 10));
         assertNotNull(result);
         assertEquals(100, result.size());
     }

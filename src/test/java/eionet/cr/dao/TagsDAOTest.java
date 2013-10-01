@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.RdfLoader;
@@ -37,15 +38,29 @@ import eionet.cr.test.helpers.RdfLoader;
  */
 public class TagsDAOTest {
 
-    private static final String seedFile = "tags.rdf";
+    /** Seed file. */
+    private static final String SEED_FILE = "tags.rdf";
 
+    /**
+     * Test set-up.
+     *
+     * @throws Exception When any error happens.
+     */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new RdfLoader(seedFile);
+        RdfLoader rdfLoader = new RdfLoader();
+        rdfLoader.clearAllTriples();
+        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
     }
 
+    /**
+     * Test tag cloud frequencies.
+     *
+     * @throws Exception When any error happens.
+     */
     @Test
     public void testTagCloudFrequencies() throws Exception {
+
         List<TagDTO> result = DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
 
         assertTrue(result.contains(new TagDTO("tag1", 1, 4)));

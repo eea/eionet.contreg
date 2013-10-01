@@ -21,7 +21,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import junit.framework.TestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
@@ -62,7 +61,7 @@ public class XMLExporterTest extends TestCase {
 
     }
 
-    @Ignore
+
     public void testDoExport() throws Exception {
 
         // fill in search data

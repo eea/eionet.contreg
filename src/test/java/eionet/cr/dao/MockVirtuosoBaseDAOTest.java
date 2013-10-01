@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.hssf.record.formula.functions.T;
 import org.junit.Ignore;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Value;
@@ -16,6 +17,7 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.n3.N3ParserFactory;
 
+import eionet.cr.dao.MockVirtuosoBaseDAOTest.MockRDFHandler;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.util.Bindings;
@@ -25,7 +27,7 @@ import eionet.cr.util.sesame.SPARQLResultSetReader;
  * Mock for testing queries. Working only for testing readers. Each implementing class must have a corresponding file in N3 format
  * that can be exported from SPARQL endpoint.
  */
-@Ignore
+@Ignore("Does not seem to be a class under test, but a helper class for classes under test")
 public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     /** Tag name in N3. */
     private static final String RESULTVARIABLE_NAME = "http://www.w3.org/2005/sparql-results#resultVariable";

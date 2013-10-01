@@ -22,37 +22,115 @@ package eionet.cr.test.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.dbunit.dataset.DataSetException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
 
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 
 /**
- *
+ * Helper class for loading any given resource file into triple store.
  */
 public class RdfLoader {
 
-    private static String graphUri;
-    public static String TEST_GRAPH_URI = "http://test.com/test/";
+    /** SQL for deleting all triples. */
+    private static final String DELETE_ALL_TRIPLES_SQL = "delete from DB.DBA.RDF_QUAD";
 
-    public RdfLoader(String datasetName) throws Exception {
-        InputStream is = getFile(datasetName);
-        if (is != null) {
-            graphUri = getGraphUri(datasetName);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).loadIntoRepository(is, null, graphUri, true);
+    /** URI prefix for generating dummy graph URIs. */
+    public static final String DUMMY_GRAPH_PREFIX = "http://test.com/test/";
+
+    /**
+     * Calls {@link #loadIntoTripleStore(String, RDFFormat, String, String)} with the last two inputs set to null.
+     *
+     * @param fileName See {@link #loadIntoTripleStore(String, RDFFormat, String, String)}.
+     * @param rdfFormat See {@link #loadIntoTripleStore(String, RDFFormat, String, String)}.
+     * @throws IOException See {@link #loadIntoTripleStore(String, RDFFormat, String, String)}.
+     * @throws OpenRDFException See {@link #loadIntoTripleStore(String, RDFFormat, String, String)}.
+     */
+    public void loadIntoTripleStore(String fileName, RDFFormat rdfFormat) throws IOException, OpenRDFException {
+        loadIntoTripleStore(fileName, rdfFormat, null, null);
+    }
+
+    /**
+     * Loads given file into triple store.
+     *
+     * @param fileName Name of the resource (i.e. seed) file to load. Must not be blank!
+     * @param graphUri Target graph URI. If blank, then assumed to be {@link #DUMMY_GRAPH_PREFIX} + fileName.
+     * @param baseUri Base URI for resolving relative URLs in the file. If blank then assumed same as target graph URI.
+     * @throws IOException When problem with reading the resource file.
+     * @throws OpenRDFException When problem with accessing the triple store or parsing the file.
+     */
+    public void loadIntoTripleStore(String fileName, RDFFormat rdfFormat, String graphUri, String baseUri) throws IOException,
+            OpenRDFException {
+
+        if (StringUtils.isBlank(fileName)) {
+            throw new IllegalArgumentException("File name must not be blank!");
+        } else {
+            fileName = fileName.trim();
+        }
+
+        if (StringUtils.isBlank(graphUri)) {
+            graphUri = getSeedFileGraphUri(fileName);
+        }
+
+        if (StringUtils.isBlank(baseUri)) {
+            baseUri = graphUri;
+        }
+
+        if (rdfFormat == null) {
+            rdfFormat = RDFFormat.RDFXML;
+        }
+
+        RepositoryConnection repoConn = null;
+        InputStream inputStream = null;
+        try {
+            inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+            if (inputStream == null) {
+                throw new IOException("Could not load resource by the name of " + fileName);
+            }
+            repoConn = SesameUtil.getRepositoryConnection();
+            repoConn.add(inputStream, baseUri, rdfFormat, repoConn.getValueFactory().createURI(graphUri));
+        } finally {
+            SesameUtil.close(repoConn);
+            IOUtils.closeQuietly(inputStream);
         }
     }
 
-    private InputStream getFile(String fileName) throws DataSetException, IOException {
-        return CRDatabaseTestCase.class.getClassLoader().getResourceAsStream(fileName);
+    /**
+     * Deletes all triples from the triple store.
+     *
+     * @throws SQLException When any sort of SQL error happens.
+     */
+    public void clearAllTriples() throws SQLException {
+
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+
+            stmt = conn.createStatement();
+            stmt.executeUpdate(DELETE_ALL_TRIPLES_SQL);
+        } finally {
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
     }
 
-    public String getGraphUri() {
-        return graphUri;
-    }
-
-    public static String getGraphUri(String datasetName) {
-        return TEST_GRAPH_URI + datasetName;
+    /**
+     * Returns the URI of the graph where the {@link RdfLoader} would load a given file if the graph name is not given.
+     * In such a case the graph URI is generated as {@link #DUMMY_GRAPH_PREFIX} + fileName, where the latter is file loaded-
+     *
+     * @param fileName The loadable file.
+     * @return The generated graph URI.
+     */
+    public static String getSeedFileGraphUri(String fileName) {
+        return DUMMY_GRAPH_PREFIX + fileName;
     }
 }

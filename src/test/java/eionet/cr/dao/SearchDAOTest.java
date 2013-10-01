@@ -27,10 +27,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SearchResultDTO;
@@ -45,23 +48,43 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public class SearchDAOTest {
 
-    private static final String seedFile = "obligations.rdf";
+    /** Seed file. */
+    private static final String SEED_FILE = "obligations.rdf";
 
+    /**
+     * Test set-up.
+     *
+     * @throws Exception When any error happens.
+     */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new RdfLoader(seedFile);
+        RdfLoader rdfLoader = new RdfLoader();
+        rdfLoader.clearAllTriples();
+        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
     }
 
+    /**
+     * Test free-text search hit counts.
+     *
+     * @throws Exception When any error happens.
+     */
     @Test
     public void testFreeTextSearchCountResults() throws Exception {
 
+        // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
+        // By "real-time" we mean that the index is updated instantly after loading a triple.
+        if (isRealTimeFullTextIndexingActivated() == false) {
+            System.out.println("Skipping full-text search test, as no real-time full-text indexing has been activated!");
+            return;
+        }
+
         PagingRequest pagingRequest = PagingRequest.create(1);
         SearchResultDTO<SubjectDTO> result =
-            DAOFactory
-            .get()
-            .getDao(SearchDAO.class)
-            .searchByFreeText(new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT,
-                    false, pagingRequest, null);
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByFreeText(new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT,
+                                false, pagingRequest, null);
 
         assertEquals(2, result.getMatchCount());
     }
@@ -79,9 +102,19 @@ public class SearchDAOTest {
         List<String> selectedPredicates = new ArrayList<String>();
 
         SearchResultDTO<SubjectDTO> result =
-            DAOFactory.get().getDao(SearchDAO.class)
-            .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
+                DAOFactory.get().getDao(SearchDAO.class)
+                        .searchByTypeAndFilters(filters, false, pagingRequest, null, selectedPredicates);
 
         assertEquals(3, result.getMatchCount());
+    }
+
+    /**
+     * Returns true if the configuration says that the underlying triple-store has real-time full-text indexing activated.
+     *
+     * @return True/false.
+     */
+    private boolean isRealTimeFullTextIndexingActivated() {
+        String value = GeneralConfig.getProperty("virtuoso.realTimeFullTextIndexing");
+        return BooleanUtils.toBoolean(value);
     }
 }

@@ -43,7 +43,7 @@ public class VirtuosoUserFolderSearchHelper extends AbstractSearchHelper {
      */
     private static final String USER_HOMES_SPARQL =
 
-        SPARQLQueryUtil.getSparqlQueryHeader(true)
+        SPARQLQueryUtil.getSparqlQueryHeader()
         .append("SELECT ?parent ?subject bif:either( bif:isnull(?lbl) , ?subject, ?lbl) as ?label ?fileCount ?folderCount ")
         .append("WHERE {")
         .append("?subject a <").append(Subjects.CR_USER_FOLDER).append("> .")

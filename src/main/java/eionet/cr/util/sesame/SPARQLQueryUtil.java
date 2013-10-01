@@ -25,12 +25,11 @@ import java.util.Collection;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.common.Namespace;
-import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Bindings;
 
 /**
  * Utility methods for building SPARQL queries.
- * 
+ *
  * @author Enriko Käsper
  */
 public final class SPARQLQueryUtil {
@@ -52,7 +51,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Constructs same-as "yes" definition.
-     * 
+     *
      * @return
      */
     public static StringBuilder getCrOwlSameAsDefinition() {
@@ -64,7 +63,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Construct the prefixes definitions.
-     * 
+     *
      * @param namespaces
      * @return
      */
@@ -80,23 +79,8 @@ public final class SPARQLQueryUtil {
     }
 
     /**
-     * Build SPARQL query heading with prefixes and inference definitions.
-     * 
-     * @param useCrInference
-     *            add CRInference rule definition.
-     * @param namespaces
-     *            add namespace prefixes
-     * @return start of SPARQL query
-     * @Deprecated Inferencing is removed from CR
-     */
-    @Deprecated
-    public static StringBuilder getSparqlQueryHeader(boolean useCrInference, Namespace... namespaces) {
-        return getSparqlQueryHeader(namespaces);
-    }
-    
-    /**
      * Build SPARQL query heading with prefixes
-     * 
+     *
      * @param namespaces
      *            add namespace prefixes
      * @return start of SPARQL query
@@ -109,13 +93,13 @@ public final class SPARQLQueryUtil {
         }
         return strBuilder;
     }
-    
+
 
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values. Fills bindings with correct values. Example:
      * urisToCSV(List{<http://uri1.notexist.com>, <http://uri2.notexist.com>}, "subjectValue")= ?subjectValue1,subjectValue2.
      * bindings are filled: subjectValue1=http://uri1.notexist.com, subjectValue2=http://uri2.notexist.com
-     * 
+     *
      * @param uriList
      *            uris to be used as SPARQL parameters
      * @param variableAliasName
@@ -152,7 +136,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Builds a comma-separated String of SPARQL aliases the given parameter values.
-     * 
+     *
      * @param uriList
      *            uris to be used as SPARQL parameters
      * @return comma separated String for Sparql
@@ -174,7 +158,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Returns CR same-as "yes" rule definition.
-     * 
+     *
      * @return SPARQL same-as "yes" rule definition to be used at the bginning of SPARQL sentences.
      */
     public static String getCrOwlSameAsDefinitionStr() {
@@ -184,7 +168,7 @@ public final class SPARQLQueryUtil {
     /**
      * Order by clause used in many SPARQL sentences. Composes ORDER BY clause by the optional field (mostly rdfs:label) if label
      * not specified takes the last part of the URI.
-     * 
+     *
      * @param aliasName
      *            alias field name in the sparql
      * @param sortOrder
@@ -199,7 +183,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Determines if it is valid IRI (for SPARQL).
-     * 
+     *
      * @param str
      *            given URI
      * @return true if the URI is valid IRI
@@ -214,7 +198,7 @@ public final class SPARQLQueryUtil {
 
     /**
      * Changes SPARQL query to use IRI function for this parameter value. ?subject -> IRI(?subject)
-     * 
+     *
      * @param query
      *            SPARQL query
      * @param paramName

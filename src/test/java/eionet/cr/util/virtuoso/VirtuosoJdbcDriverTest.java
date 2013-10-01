@@ -21,7 +21,6 @@
 
 package eionet.cr.util.virtuoso;
 
-import java.io.IOException;
 import java.net.URI;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
@@ -33,7 +32,6 @@ import org.junit.Test;
 import virtuoso.jdbc3.VirtuosoConnectionPoolDataSource;
 import virtuoso.jdbc3.VirtuosoPooledConnection;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.test.helpers.RdfLoader;
 
 /**
  * Test Virtuoso Jdbc driver.
@@ -42,11 +40,17 @@ import eionet.cr.test.helpers.RdfLoader;
  */
 public class VirtuosoJdbcDriverTest extends TestCase {
 
+    /** Dummy graph URI. */
+    private static final String DUMMY_GRAPH_URI = "http://test.virtuoso.jdbc.validity.com";
+
     /**
-     * Test if CR uses correct Virtuoso jdbc driver. It shouldn't get "Too many open statements" error.
+     * Test if CR uses correct Virtuoso JDBC driver. It shouldn't get "Too many open statements" error.
+     *
+     * @throws SQLException When problem with connecting to Virtuoso.
      */
     @Test
-    public void testTooManyOpenStmts() throws IOException, SQLException, InterruptedException {
+    public void testTooManyOpenStmts() throws SQLException {
+
         VirtuosoConnectionPoolDataSource dbsource = new VirtuosoConnectionPoolDataSource();
 
         String testDbURI = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
@@ -67,7 +71,7 @@ public class VirtuosoJdbcDriverTest extends TestCase {
                 stmt = con.prepareCall(jdbcComp);
                 stmt.setString(1, "");
                 stmt.setString(2, "");
-                stmt.setString(3, RdfLoader.getGraphUri("test.rdf"));
+                stmt.setString(3, DUMMY_GRAPH_URI);
                 stmt.setInt(4, 256);
                 stmt.execute();
                 con.commit();

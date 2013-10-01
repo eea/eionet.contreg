@@ -34,7 +34,11 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.n3.N3WriterFactory;
+import org.openrdf.rio.ntriples.NTriplesWriterFactory;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.turtle.TurtleWriterFactory;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -89,6 +93,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private static final String FORMAT_TSV = "tsv";
     private static final String FORMAT_HTML = "html";
     private static final String FORMAT_HTML_PLUS = "html+";
+    private static final String FORMAT_N3 = "n3";
+    private static final String FORMAT_TURTLE = "turtle";
+    private static final String FORMAT_NTRIPLES = "ntriples";
 
     /** A set of all supported MIME types requested in "Accept" header. */
     private static final HashSet<String> SUPPORTED_MIME_TYPES = createSupportedMimeTypes();
@@ -441,8 +448,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // Set the default-graph-uri and named-graph-uri (see SPARQL protocol specifications).
         setDefaultAndNamedGraphs();
-        
-        
 
         // If user has requested use of same-as "yes", then ensure that the relevant command is present in the query.
         String sameasyesCommand = SPARQLQueryUtil.getCrOwlSameAsDefinitionStr();
@@ -452,11 +457,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         } else {
             if (query.contains(sameasyesCommand)) {
-                query = query.replace(sameasyesCommand,"");
+                query = query.replace(sameasyesCommand, "");
             }
         }
 
-        // Content negotiation: prefer the value of "format" request parameter. If it's blank fall back to the request's "Accept"
+        // Content negotiation: prefer the value of "format" request parameter. If it's blank, fall back to the request's "Accept"
         // header. If that one is blank too, fall back to the default.
         // TODO Currently the header's parsing does not parse quality weights as stated in the HTTP standard. Instead, the quality
         // weights (separated by ';') are ignored, and the very first MIME type supported is the one used.
@@ -673,13 +678,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 } else if (queryObject instanceof GraphQuery) {
 
                     // Evaluate CONSTRUCT query.
-                    if (outputFormat.equals(FORMAT_HTML) == false) {
-
-                        RDFXMLWriter writer = new RDFXMLWriter(outputStream);
-                        ((GraphQuery) queryObject).evaluate(writer);
-
-                    } else {
-
+                    if (outputFormat.equals(FORMAT_HTML)) {
                         long startTime = System.currentTimeMillis();
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
                         TupleQueryResult bindings = resultsTable.evaluate();
@@ -687,6 +686,22 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         if (bindings != null) {
                             result = new QueryResult(bindings, false);
                         }
+
+                    } else if (outputFormat.equals(FORMAT_XML)) {
+                        RDFXMLWriter writer = new RDFXMLWriter(outputStream);
+                        ((GraphQuery) queryObject).evaluate(writer);
+
+                    } else if (outputFormat.equals(FORMAT_N3)) {
+                        RDFWriter n3Writer = new N3WriterFactory().getWriter(outputStream);
+                        ((GraphQuery) queryObject).evaluate(n3Writer);
+
+                    } else if (outputFormat.equals(FORMAT_TURTLE)) {
+                        RDFWriter turtleWriter = new TurtleWriterFactory().getWriter(outputStream);
+                        ((GraphQuery) queryObject).evaluate(turtleWriter);
+
+                    } else if (outputFormat.equals(FORMAT_NTRIPLES)) {
+                        RDFWriter nTriplesWriter = new NTriplesWriterFactory().getWriter(outputStream);
+                        ((GraphQuery) queryObject).evaluate(nTriplesWriter);
                     }
                 } else {
 
@@ -1277,6 +1292,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         map.put("application/x-ms-access-export+xml", FORMAT_XML_SCHEMA);
         map.put("application/sparql-results+json", FORMAT_JSON);
         map.put("application/json", FORMAT_JSON);
+        map.put("text/n3", FORMAT_N3);
+        map.put("text/turtle", FORMAT_TURTLE);
+        map.put("application/x-turtle", FORMAT_TURTLE);
+        map.put("text/plain", FORMAT_NTRIPLES);
         return Collections.unmodifiableMap(map);
     }
 

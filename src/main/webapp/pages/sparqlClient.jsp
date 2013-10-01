@@ -5,9 +5,9 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint" bodyAttribute="onLoad=\"format_select()\"">
 
     <stripes:layout-component name="head">
-    
+
         <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
-        
+
         <script type="text/javascript">
         // <![CDATA[
             var last_format = 1;
@@ -22,6 +22,9 @@
                     }
                     format.options[0] = new Option('HTML', 'text/html');
                     format.options[1] = new Option('RDF/XML', 'application/rdf+xml');
+                    format.options[2] = new Option('Turtle', 'text/turtle');
+                    format.options[3] = new Option('N3', 'text/n3');
+                    format.options[4] = new Option('N-Triples', 'text/plain');
                     format.selectedIndex = 1;
                     last_format = 2;
                 }
@@ -107,7 +110,7 @@
                             $('#prefixesDialog').dialog("close");
                             return true;
                         });
-                        
+
                         // The handling of useful namespaces
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
@@ -168,7 +171,7 @@
                 // ]]>
             </script>
         </c:if>
-        
+
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
@@ -590,11 +593,11 @@ while (l--) {
                 </c:otherwise>
             </c:choose>
             </div>
-            
+
             <%-- The "Useful namesoaces" dialog, hidden by default --%>
-            
+
             <div id="prefixesDialog" title="Useful namespaces">
-                
+
                 <c:if test="${empty actionBean.usefulNamespaces}">
                     <p>None found!</p>
                 </c:if>
@@ -606,7 +609,7 @@ while (l--) {
                     </ul>
                 </c:if>
                 <button id="closePrefixesDialog">Close</button>
-                
+
             </div>
 
     </stripes:layout-component>

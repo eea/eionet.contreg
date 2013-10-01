@@ -104,6 +104,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
+                    <!-- Disable JVM assertions when running surefire. Prevents from false JUnit assertion errors. -->
+                    <enableAssertions>false</enableAssertions>
                 </configuration>
             </plugin>
 
