@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cd="http://www.recshop.fake/cd#">
+
+<rdf:Description rdf:about="http://www.recshop.fake/cd/CD_title_1">
+
+  <cd:artist>Artist 1</cd:artist>
+  <cd:country>USA</cd:country>
+  <cd:company>Cømpany</cd:company>
+  <cd:price>10.90</cd:price>
+  <cd:year>1985</cd:year>
+  
+</rdf:Description>
+
+<rdf:Description rdf:about="http://www.recshop.fake/cd/CD_title_2">
+  <cd:artist>Tiit Õunapuu</cd:artist>
+  <cd:country>UK</cd:country>
+  <cd:company>увц</cd:company>
+  <cd:price>9.90</cd:price>
+  <cd:year>1988</cd:year>
+</rdf:Description>
+
+</rdf:RDF> 
