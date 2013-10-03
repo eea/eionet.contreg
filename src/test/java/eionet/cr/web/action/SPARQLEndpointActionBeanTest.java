@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
@@ -13,12 +14,19 @@ import net.sourceforge.stripes.mock.MockServletOutputStream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.helpers.RDFParserBase;
+import org.openrdf.rio.ntriples.NTriplesParser;
+import org.openrdf.rio.rdfxml.RDFXMLParser;
+import org.openrdf.rio.turtle.TurtleParser;
 
 import eionet.cr.test.helpers.RdfLoader;
+import eionet.cr.test.helpers.SimpleStatementRecorder;
 
 /**
  * tests for SPARQL endpoint action bean.
@@ -144,10 +152,44 @@ public class SPARQLEndpointActionBeanTest {
     }
 
     /**
+     * Create and return new instance of {@link RDFParserBase} for the given MIME type.
+     * Inject given {@link RDFHandler} to the parser's {@link RDFParserBase#setRDFHandler(RDFHandler)} method.
+     *
+     * @param mimeType The given MIME type.
+     * @param handler {@link RDFHandler} to be injected into the created parser.
+     * @return The parser.
+     */
+    private RDFParserBase createRDFParser(String mimeType, RDFHandler handler) {
+
+        if (StringUtils.isBlank(mimeType)) {
+            throw new IllegalArgumentException("Mime type must not be blank!");
+        }
+
+        RDFParserBase parser = null;
+        if (mimeType.equals("application/rdf+xml")) {
+            parser = new RDFXMLParser();
+        } else if (mimeType.equals("text/turtle")) {
+            parser = new TurtleParser();
+        } else if (mimeType.equals("application/x-turtle")) {
+            parser = new TurtleParser();
+        } else if (mimeType.equals("text/n3")) {
+            parser = new TurtleParser();
+        } else if (mimeType.equals("text/plain")) {
+            parser = new NTriplesParser();
+        } else {
+            throw new IllegalArgumentException("Unsupported mime type: " + mimeType);
+        }
+
+        parser.setRDFHandler(handler);
+        return parser;
+    }
+
+    /**
      *
      * @param acceptedContentType
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     private void testConstructQuery(String acceptedContentType) throws Exception {
 
         String graphUri = RdfLoader.getSeedFileGraphUri(RDF_SEED_FILE);
@@ -173,12 +215,45 @@ public class SPARQLEndpointActionBeanTest {
         // Check response content type.
         List<Object> responseContentTypes = (List<Object>) responseHeaders.get("content-type");
         assertTrue("Expected non-empty response content type", CollectionUtils.isNotEmpty(responseContentTypes));
-        assertEquals("Expected response content type to be", acceptedContentType, responseContentTypes.iterator().next()
-                .toString());
+        String responseContentType = responseContentTypes.iterator().next().toString();
+        assertEquals("Expected response content type to be", acceptedContentType, responseContentType);
 
         // Check response output
         byte[] outputBytes = response.getOutputBytes();
         String outputString = new String(outputBytes, "UTF-8");
         assertTrue("Expected a non-blank response output", StringUtils.isNotBlank(outputString));
+
+        SimpleStatementRecorder statementRecorder = new SimpleStatementRecorder();
+        RDFParserBase rdfParser = createRDFParser(responseContentType, statementRecorder);
+        ByteArrayInputStream inputStream = null;
+        try {
+            inputStream = new ByteArrayInputStream(outputBytes);
+            String baseUri = graphUri;
+            rdfParser.parse(inputStream, baseUri);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+
+        int numberOfRecordedStatements = statementRecorder.getNumberOfRecordedStatements();
+        assertTrue("Expected at least one RDF statement in the response output", numberOfRecordedStatements > 0);
+
+        assertRecordedStatement(statementRecorder, "http://www.recshop.fake/cd/CD_title_1", "http://www.recshop.fake/cd#artist",
+                "Artist 1");
+        assertRecordedStatement(statementRecorder, "http://www.recshop.fake/cd/CD_title_1", "http://www.recshop.fake/cd#company",
+                "Cømpany");
+    }
+
+    /**
+     * Assert that the given RDF statement has been recorded by the given statement recorder.
+     *
+     * @param recorder The statement recorder.
+     * @param subject Subject of the statement to assert.
+     * @param predicate Predicate of the statement to assert
+     * @param object Object of the statement to assert
+     */
+    private void assertRecordedStatement(SimpleStatementRecorder recorder, String subject, String predicate, String object) {
+
+        boolean hasStatement = recorder.hasStatement(subject, predicate, object);
+        assertTrue("Was expecting this triple in the output:  " + subject + "  " + predicate + "  " + object, hasStatement);
     }
 }
