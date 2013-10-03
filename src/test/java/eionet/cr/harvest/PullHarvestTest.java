@@ -20,7 +20,9 @@
  */
 package eionet.cr.harvest;
 
-import org.dbunit.dataset.IDataSet;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -35,18 +37,19 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  */
 public class PullHarvestTest extends CRDatabaseTestCase {
 
-    /** */
-    // private static final String[] ignoreCols = {"SOURCE", "GEN_TIME"};
-
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("emptydb.xml");
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
     }
 
+    /**
+     *
+     */
     @Test
     public void testSimpleRdf() {
 

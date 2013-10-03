@@ -1,9 +1,9 @@
 package eionet.cr.dao;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestDTO;
@@ -18,11 +18,12 @@ public class HarvestDAOTest extends CRDatabaseTestCase {
 
     /*
      * (non-Javadoc)
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
     @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("harvests.xml");
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("harvests.xml");
     }
 
     /**

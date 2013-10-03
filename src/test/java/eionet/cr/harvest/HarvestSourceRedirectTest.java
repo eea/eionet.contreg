@@ -1,6 +1,7 @@
 package eionet.cr.harvest;
 
-import org.dbunit.dataset.IDataSet;
+import java.util.Arrays;
+import java.util.List;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
@@ -15,10 +16,11 @@ public class HarvestSourceRedirectTest extends CRDatabaseTestCase {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("emptydb.xml");
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
     }
 
     /**

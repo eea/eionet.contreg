@@ -20,9 +20,9 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -42,10 +42,11 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("emptydb.xml");
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
     }
 
     @Test

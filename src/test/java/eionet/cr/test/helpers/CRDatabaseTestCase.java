@@ -20,11 +20,12 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.test.helpers;
 
-import java.io.IOException;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
@@ -53,17 +54,29 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
-    protected abstract IDataSet getDataSet() throws Exception;
+    @SuppressWarnings("deprecation")
+    @Override
+    protected IDataSet getDataSet() throws Exception {
+
+        List<String> xmlDataSetFiles = getXMLDataSetFiles();
+        if (CollectionUtils.isEmpty(xmlDataSetFiles)) {
+            return null;
+        }
+
+        int i = 0;
+        IDataSet[] dataSets = new IDataSet[xmlDataSetFiles.size()];
+        for (String fileName : xmlDataSetFiles) {
+            dataSets[i++] = new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream(fileName));
+        }
+
+        CompositeDataSet compositeDataSet = new CompositeDataSet(dataSets);
+        return compositeDataSet;
+    }
 
     /**
+     * Abstract method to be implemented by extending classes.
      *
-     * @param fileName
-     * @return
-     * @throws DataSetException
-     * @throws IOException
+     * @return List of names of XML-formatted DBUnit dataset seed files. These will be loaded in the test set-up.
      */
-    protected IDataSet getXmlDataSet(String fileName) throws DataSetException, IOException {
-
-        return new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream(fileName));
-    }
+    protected abstract List<String> getXMLDataSetFiles();
 }

@@ -22,9 +22,9 @@
 package eionet.cr.dao.virtuoso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import com.ibm.icu.util.Calendar;
@@ -43,21 +43,28 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  */
 public class PostHarvestScriptDAOTest extends CRDatabaseTestCase {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.dbunit.DatabaseTestCase#getDataSet()
-     */
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("emptydb.xml");
-    }
-
+    /** */
     String script =
             "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject a cr:File } FROM ?harvestedSource";
+
+    /** */
     String script2 =
             "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> INSERT INTO ?harvestedSource  { ?subject <http://www.w3.org/2000/01/rdf-schema#label> \"new soruce\" } FROM ?harvestedSource";
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
+     */
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
     @Test
     public void testInsert() throws DAOException {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf#Delivery";

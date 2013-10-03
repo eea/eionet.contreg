@@ -20,9 +20,9 @@
  */
 package eionet.cr.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -41,13 +41,17 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
     /*
      * (non-Javadoc)
      *
-     * @see org.dbunit.DatabaseTestCase#getDataSet()
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
     @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("sources-harvests-messages.xml");
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("sources-harvests-messages.xml");
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void testAddSource() throws Exception {
 
@@ -105,9 +109,9 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
         assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
     }
 
-
     /**
      * tests unauthorized sources query.
+     *
      * @throws Exception if fails
      */
     @Test
@@ -123,6 +127,7 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
     /**
      * tests unauthorized query filter.
+     *
      * @throws Exception if fails
      */
     @Test
@@ -136,7 +141,6 @@ public class HarvestSourceDAOTest extends CRDatabaseTestCase {
 
         HarvestSourceDTO source = dto.getRight().get(0);
         assertEquals("http://rod.eionet.europa.eu/countries", source.getUrl());
-
 
     }
 }

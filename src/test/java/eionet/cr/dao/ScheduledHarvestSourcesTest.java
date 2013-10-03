@@ -20,10 +20,10 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -34,13 +34,17 @@ public class ScheduledHarvestSourcesTest extends CRDatabaseTestCase {
     /*
      * (non-Javadoc)
      *
-     * @see org.dbunit.DatabaseTestCase#getDataSet()
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
     @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("emptydb.xml");
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void testScheduledSources() throws Exception {
 

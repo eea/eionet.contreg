@@ -1,8 +1,9 @@
 package eionet.cr.harvest;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import org.dbunit.dataset.IDataSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,16 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author Jaanus
  */
 public class CurrentHarvestsTest extends CRDatabaseTestCase {
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
+     */
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("harvests.xml");
+    }
 
     /*
      * (non-Javadoc)
@@ -48,16 +59,6 @@ public class CurrentHarvestsTest extends CRDatabaseTestCase {
     @After
     protected void tearDown() throws Exception {
         // No tear-down logic yet.
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getDataSet()
-     */
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        return getXmlDataSet("harvests.xml");
     }
 
     /**
