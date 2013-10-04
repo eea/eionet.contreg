@@ -20,16 +20,13 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 
@@ -38,22 +35,18 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author Risto Alt
  *
  */
-public class HelperDAOTest {
+public class HelperDAOTest extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
 
-
-    /**
-     * Unit test set up method.
-     *
-     * @throws Exception When any error happens.
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
      */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        RdfLoader rdfLoader = new RdfLoader();
-        rdfLoader.clearAllTriples();
-        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
+    @Override
+    protected List<String> getRDFXMLSeedFiles() {
+        return Arrays.asList(SEED_FILE);
     }
 
     /**

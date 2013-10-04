@@ -20,17 +20,14 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
@@ -38,7 +35,7 @@ import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.test.helpers.RdfLoader;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
 
 /**
@@ -46,21 +43,19 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author Risto Alt
  *
  */
-public class SearchDAOTest {
+public class SearchDAOTest extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
 
-    /**
-     * Test set-up.
+    /*
+     * (non-Javadoc)
      *
-     * @throws Exception When any error happens.
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
      */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        RdfLoader rdfLoader = new RdfLoader();
-        rdfLoader.clearAllTriples();
-        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
+    @Override
+    protected List<String> getRDFXMLSeedFiles() {
+        return Arrays.asList(SEED_FILE);
     }
 
     /**

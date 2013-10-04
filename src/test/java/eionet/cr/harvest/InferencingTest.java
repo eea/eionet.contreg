@@ -3,20 +3,19 @@
  */
 package eionet.cr.harvest;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
@@ -25,7 +24,7 @@ import eionet.cr.util.sesame.SesameUtil;
  * @author Risto Alt
  *
  */
-public class InferencingTest {
+public class InferencingTest extends CRDatabaseTestCase {
 
     /** Rule-set seed file. */
     private static final String RULESET_SEED_FILE = "test-schema.rdf";
@@ -33,25 +32,28 @@ public class InferencingTest {
     /** Data seed file. */
     private static final String DATA_SEED_FILE = "persons.rdf";
 
-    /**
-     * Test set-up method.
+    /*
+     * (non-Javadoc)
      *
-     * @throws Exception
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
      */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    @Override
+    protected List<String> getRDFXMLSeedFiles() {
+        return Arrays.asList(RULESET_SEED_FILE, DATA_SEED_FILE);
+    }
 
-        RdfLoader rdfLoader = new RdfLoader();
-        rdfLoader.clearAllTriples();
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
 
-        // Load inference rule-set.
-        rdfLoader.loadIntoTripleStore(RULESET_SEED_FILE, RDFFormat.RDFXML);
+        super.setUp();
         String rulesetGraphUri = RdfLoader.getSeedFileGraphUri(RULESET_SEED_FILE);
         DAOFactory.get().getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(rulesetGraphUri);
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(rulesetGraphUri);
-
-        // Load the data upon which we shall try the above-loaded rule-set.
-        rdfLoader.loadIntoTripleStore("persons.rdf", RDFFormat.RDFXML);
     }
 
     /**

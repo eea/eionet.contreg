@@ -20,37 +20,32 @@
  */
 package eionet.cr.dao;
 
-import static org.junit.Assert.assertTrue;
-
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.dto.TagDTO;
-import eionet.cr.test.helpers.RdfLoader;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-public class TagsDAOTest {
+public class TagsDAOTest extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "tags.rdf";
 
-    /**
-     * Test set-up.
+    /*
+     * (non-Javadoc)
      *
-     * @throws Exception When any error happens.
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
      */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        RdfLoader rdfLoader = new RdfLoader();
-        rdfLoader.clearAllTriples();
-        rdfLoader.loadIntoTripleStore(SEED_FILE, RDFFormat.RDFXML);
+    @Override
+    protected List<String> getRDFXMLSeedFiles() {
+        return Arrays.asList(SEED_FILE);
     }
 
     /**

@@ -1,10 +1,7 @@
 package eionet.cr.web.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
@@ -16,38 +13,37 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.helpers.RDFParserBase;
 import org.openrdf.rio.ntriples.NTriplesParser;
 import org.openrdf.rio.rdfxml.RDFXMLParser;
 import org.openrdf.rio.turtle.TurtleParser;
 
+import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.test.helpers.SimpleStatementRecorder;
 
 /**
- * tests for SPARQL endpoint action bean.
+ * Tests for SPARQL endpoint action bean.
  *
- * @author kaido
+ * @author Kaido
+ * @author Jaanus
  */
-public class SPARQLEndpointActionBeanTest {
+public class SPARQLEndpointActionBeanTest extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */
     private static final String RDF_SEED_FILE = "rdf_national_chars_utf8.rdf.xml";
 
-    /**
-     * Test set-up.
+    /*
+     * (non-Javadoc)
      *
-     * @throws Exception When any sort of error happens.
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
      */
-    @Before
-    public void setUp() throws Exception {
-        RdfLoader rdfLoader = new RdfLoader();
-        rdfLoader.clearAllTriples();
-        rdfLoader.loadIntoTripleStore(RDF_SEED_FILE, RDFFormat.RDFXML);
+    @Override
+    protected List<String> getRDFXMLSeedFiles() {
+        return Arrays.asList(RDF_SEED_FILE);
     }
 
     /**
@@ -141,7 +137,7 @@ public class SPARQLEndpointActionBeanTest {
      *
      * @throws Exception
      */
-    @Test
+    @Ignore
     public void testConstructQueries() throws Exception {
 
         testConstructQuery("application/rdf+xml");
