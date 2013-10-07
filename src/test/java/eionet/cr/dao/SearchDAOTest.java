@@ -109,7 +109,7 @@ public class SearchDAOTest extends CRDatabaseTestCase {
      * @return True/false.
      */
     private boolean isRealTimeFullTextIndexingActivated() {
-        String value = GeneralConfig.getProperty("virtuoso.realTimeFullTextIndexing");
+        String value = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_REAL_TIME_FT_INDEXING);
         return BooleanUtils.toBoolean(value);
     }
 }

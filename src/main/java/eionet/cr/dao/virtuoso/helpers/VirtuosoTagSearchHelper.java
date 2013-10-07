@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import eionet.cr.common.Predicates;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 
 /**
  * Search helper for tagged data search.
@@ -118,13 +117,24 @@ public class VirtuosoTagSearchHelper extends VirtuosoFilteredSearchHelper {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < tags.size(); i++) {
+
             String tagLiteral = "tagLiteral" + i;
             bindings.setString(tagLiteral, tags.get(i));
 
+            if (i > 0) {
+                sb.append(" . ");
+            }
+
             sb.append("?s ");
             sb.append("?" + tagPredicate);
-            sb.append(" ?" + tagLiteral + " .");
+            sb.append(" ?" + tagLiteral);
         }
+
+        if (sb.length() > 0 && sortPredicate != null) {
+            sb.append(" . OPTIONAL {?s ?sortPred ?").append(SORT_OBJECT_VALUE_VARIABLE).append("}");
+            bindings.setURI("sortPred", sortPredicate);
+        }
+
         return sb.toString();
     }
 

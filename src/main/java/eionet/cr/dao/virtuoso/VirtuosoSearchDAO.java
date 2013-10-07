@@ -49,7 +49,6 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
@@ -654,26 +653,13 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
      */
     private static final String CRTAG_SUBPROPS_SPARQL = "SELECT ?s WHERE { ?s ?subPropertyOf  ?crTagPredicate  }";
 
-    /**
-     * Search by tags implementation in Virtuoso.
-     *
-     * @see eionet.cr.dao.SearchDAO#searchByTags(java.util.List, eionet.cr.util.pagination.PagingRequest,
-     *      eionet.cr.util.SortingRequest, java.util.List)
-     * @param tags
-     *            List<String> - tag names
-     * @param selectedPredicates
-     *            List<String> - predicates to be shown
-     * @param pagingRequest
-     *            sortingRequest PagingRequest
-     * @param sortingRequest
-     *            pagingRequest SortingRequest
-     * @return Pair <Integer, List<SubjectDTO>>
-     * @throws DAOException
-     *             if query fails
+    /*
+     * (non-Javadoc)
+     * @see eionet.cr.dao.SearchDAO#searchByTags(java.util.List, eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest)
      */
     @Override
-    public SearchResultDTO<SubjectDTO> searchByTags(final List<String> tags, final PagingRequest pagingRequest,
-            final SortingRequest sortingRequest, final List<String> selectedPredicates) throws DAOException {
+    public SearchResultDTO<SubjectDTO> searchByTags(List<String> tags, PagingRequest pagingRequest, SortingRequest sortingRequest)
+            throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
 

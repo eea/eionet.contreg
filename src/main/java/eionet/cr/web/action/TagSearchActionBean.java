@@ -21,7 +21,6 @@
 package eionet.cr.web.action;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -128,14 +127,12 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
             selectedTags.add(getSearchTag().trim());
         }
 
-        List<String> predicates = Arrays.asList(new String[] {Predicates.RDF_TYPE, Predicates.RDFS_LABEL, Predicates.CR_TAG});
-
         SearchResultDTO<SubjectDTO> searchResult =
-            DAOFactory
-            .get()
-            .getDao(SearchDAO.class)
-            .searchByTags(selectedTags, PagingRequest.create(getPageN()),
-                    new SortingRequest(getSortP(), SortOrder.parse(getSortO())), predicates);
+                DAOFactory
+                        .get()
+                        .getDao(SearchDAO.class)
+                        .searchByTags(selectedTags, PagingRequest.create(getPageN()),
+                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
         resultList = searchResult.getItems();
         matchCount = searchResult.getMatchCount();
         queryString = searchResult.getQuery();

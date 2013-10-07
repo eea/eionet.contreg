@@ -122,6 +122,9 @@ public final class GeneralConfig {
     public static final String STAGING_FILES_DIR = "stagingFilesDir";
 
     /** */
+    public static final String VIRTUOSO_REAL_TIME_FT_INDEXING = "virtuoso.realTimeFullTextIndexing";
+
+    /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
     public static final int SEVERITY_WARNING = 3;

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
 import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
@@ -55,7 +56,6 @@ public interface SearchDAO extends DAO {
     SearchResultDTO<SubjectDTO> searchByFreeText(SearchExpression expression, FreeTextSearchHelper.FilterType filterType,
             boolean exactMatch, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
-
     /**
      * @param filters - search filters.
      * @param checkFiltersRange - set of literal predicates
@@ -66,8 +66,7 @@ public interface SearchDAO extends DAO {
      * @throws DAOException
      */
     SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
-            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates)
-            throws DAOException;
+            PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates) throws DAOException;
 
     /**
      * @param filters - search filters.
@@ -162,16 +161,16 @@ public interface SearchDAO extends DAO {
     Vector<Hashtable<String, Vector<String>>> searchDeliveriesForROD(PagingRequest pagingRequest) throws DAOException;
 
     /**
+     * Searches for subjects by {@link Predicates#CR_TAG}.
      *
-     * @param tags
-     * @param pagingRequest
-     * @param sortingRequest
-     * @param selectedPredicates
-     * @return search result
-     * @throws DAOException
+     * @param tags Tags (i.e. potential values of {@link Predicates#CR_TAG}) to search by.
+     * @param pagingRequest Search results paging request.
+     * @param sortingRequest Search results sorting request.
+     * @return The search result.
+     * @throws DAOException If any sort of query failure occurs.
      */
-    SearchResultDTO<SubjectDTO> searchByTags(List<String> tags, PagingRequest pagingRequest, SortingRequest sortingRequest,
-            List<String> selectedPredicates) throws DAOException;
+    SearchResultDTO<SubjectDTO> searchByTags(List<String> tags, PagingRequest pagingRequest, SortingRequest sortingRequest)
+            throws DAOException;
 
     /**
      *

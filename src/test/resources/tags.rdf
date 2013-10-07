@@ -7,17 +7,21 @@
 	<tag>tag2</tag>
 	<tag>tag3</tag>
 	<tag>tag4</tag>
+	<rdfs:label>Google</rdfs:label>
 </rdf:Description>
 <rdf:Description rdf:about="http://www.yahoo.com">
 	<tag>tag2</tag>
 	<tag>tag3</tag>
 	<tag>tag4</tag>
+	<rdfs:label>Yahoo</rdfs:label>
 </rdf:Description>
 <rdf:Description rdf:about="http://www.bing.com">
 	<tag>tag3</tag>
 	<tag>tag4</tag>
+	<rdfs:label>Bing</rdfs:label>
 </rdf:Description>
 <rdf:Description rdf:about="http://www.altavista.com">
 	<tag>tag4</tag>
+	<rdfs:label>Altavista</rdfs:label>
 </rdf:Description>
 </rdf:RDF>
