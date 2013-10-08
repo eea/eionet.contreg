@@ -13,6 +13,7 @@
 <Obligation rdf:about="obligations/171">
 	<instrument rdf:resource="instruments/545"/>
     <dcterms:title>3 yearly report on quality of water for human consumption</dcterms:title>
+    <rdfs:label>3 yearly report on quality of water for human consumption</rdfs:label>
     <guidelines>DWD reporting resources include the support files for the reporting under the next request by the Commission (DWD Questionnaire 2011). The Commission letter launching this reporting exercise sets out the reference years for reporting (2008-2010) and provides the background of the main reporting requirements.
 
 The support files consist of help (guidance) documents, schemas, Excel spreadsheets, etc.
@@ -81,6 +82,7 @@ According to Article 13, the Member State have the obligation to publish a repor
 <instrument rdf:resource="instruments/606"/>
     <dcterms:valid rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-17</dcterms:valid>
     <dcterms:title>4th air quality daughter directive (Art.5) assessment annual reporting exceedances</dcterms:title>
+    <rdfs:label>4th air quality daughter directive (Art.5) assessment annual reporting exceedances</rdfs:label>
     <guidelines>Modification of the Questionnaire under Decision 2004/461/EC and related guidance has been prepared to enable reporting of 4th Daughter Directive on a voluntary basis already for the reporting year 2007, with the deadline of submission at 30 September 2008. This reporting will become mandatory in 2009. 
 
 Guidance document available at: http://ec.europa.eu/environment/air/quality/legislation/pdf/guidelines_quest.pdf</guidelines>
@@ -153,6 +155,7 @@ The information shall be transmitted for each calendar year, by no later than 30
 <Obligation rdf:about="obligations/370">    
 <instrument rdf:resource="instruments/585"/>
     <dcterms:title>Action plan summaries 1 (DF 7)</dcterms:title>
+    <rdfs:label>Action plan summaries 1 (DF 7)</rdfs:label>
     <nextdeadline rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-01-18</nextdeadline>
     <nextdeadline2 rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-01-18</nextdeadline2>
     <lastUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-09-16</lastUpdate>

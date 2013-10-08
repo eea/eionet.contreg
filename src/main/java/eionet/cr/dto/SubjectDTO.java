@@ -96,7 +96,8 @@ public class SubjectDTO implements Serializable {
      */
     @Override
     public String toString() {
-        return "SubjectDTO[uri=" + uri + ",predicates=" + predicates.toString() + "]";
+        //return "SubjectDTO[uri=" + uri + ",predicates=" + predicates.toString() + "]";
+        return "SubjectDTO[uri=" + uri + "]";
     }
 
     /**

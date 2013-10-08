@@ -51,11 +51,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
     public ReferringPredicatesColumn(ReferencesActionBean actionBean) {
 
         this.actionBean = actionBean;
-
-        referringToHash = actionBean.getAnonHash();
-        if (referringToHash == 0 && !StringUtils.isBlank(actionBean.getUri())) {
-            referringToHash = Hashes.spoHash(actionBean.getUri());
-        }
+        referringToHash = StringUtils.isBlank(actionBean.getUri()) ? 0 : Hashes.spoHash(actionBean.getUri());
     }
 
     /*
@@ -63,6 +59,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
      *
      * @see eionet.cr.web.util.search.SearchResultColumn#format(java.lang.Object)
      */
+    @Override
     public String format(Object object) {
 
         if (object instanceof SubjectDTO) {
@@ -105,6 +102,7 @@ public class ReferringPredicatesColumn extends SearchResultColumn {
      *
      * @see eionet.cr.web.util.search.SearchResultColumn#getSortParamValue()
      */
+    @Override
     public String getSortParamValue() {
         return getClass().getSimpleName();
     }

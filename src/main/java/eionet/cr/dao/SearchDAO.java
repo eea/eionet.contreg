@@ -100,17 +100,6 @@ public interface SearchDAO extends DAO {
 
     /**
      *
-     * @param subjectHash
-     * @param pagingRequest
-     * @param sortingRequest
-     * @return Pair<Integer, List<SubjectDTO>>
-     * @throws DAOException
-     */
-    Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash, PagingRequest pagingRequest, SortingRequest sortingRequest)
-            throws DAOException;
-
-    /**
-     *
      * @param box
      * @param sourceUri
      * @param pagingRequest

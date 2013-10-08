@@ -188,7 +188,31 @@ public class VirtuosoUpgradeTest extends CRDatabaseTestCase {
         assertEquals("Expected 3 matching items", 3, items.size());
 
         SubjectDTO firstSubject = items.iterator().next();
-        assertEquals("Expected first subject to be http://www.yahoo.com",
-                "http://www.yahoo.com", firstSubject.getUri());
+        assertEquals("Expected first subject to be http://www.yahoo.com", "http://www.yahoo.com", firstSubject.getUri());
+    }
+
+    /**
+     * Test that search of references has survived the Virtuoso upgrade.
+     *
+     * @throws DAOException If query fails.
+     */
+    public void testSearchReferences() throws DAOException {
+
+        String subjectUri = "http://rod.eionet.europa.eu/spatial/10";
+        PagingRequest pagingRequest = PagingRequest.create(1, 200);
+        SortingRequest sortRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.DESCENDING);
+
+        SearchDAO dao = DAOFactory.get().getDao(SearchDAO.class);
+        Pair<Integer, List<SubjectDTO>> result = dao.searchReferences(subjectUri, pagingRequest, sortRequest);
+
+        assertNotNull("Expected search result not to be null", result);
+
+        List<SubjectDTO> items = result.getRight();
+        assertNotNull("Expected search result items not to be null", items);
+        assertFalse("Expected search result items not to be empty", items.isEmpty());
+
+        String firstSubject = items.iterator().next().getUri();
+        String expectedUri = "http://rod.eionet.europa.eu/obligations/370";
+        assertEquals("Expected first subject to be " + expectedUri, expectedUri, firstSubject);
     }
 }

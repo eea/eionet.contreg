@@ -67,7 +67,6 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     /** */
     private String uri;
-    private long anonHash;
     private SubjectDTO subject;
     private boolean noCriteria;
 
@@ -84,25 +83,19 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
+    @Override
     public Resolution search() throws DAOException {
 
-        if (StringUtils.isBlank(uri) && anonHash == 0) {
+        if (StringUtils.isBlank(uri)) {
 
             noCriteria = true;
-            addCautionMessage("Resource identifier not specified!");
+            addCautionMessage("Resource URI not specified!");
         } else {
             Pair<Integer, List<SubjectDTO>> searchResult = null;
             SearchDAO searchDAO = DAOFactory.get().getDao(SearchDAO.class);
 
-            if (anonHash == 0) {
-                searchResult =
-                        searchDAO.searchReferences(uri, PagingRequest.create(getPageN()),
-                                new SortingRequest(getSortP(), SortOrder.parse(getSortO())));
-            } else {
-                searchResult =
-                        searchDAO.searchReferences(anonHash, PagingRequest.create(getPageN()), new SortingRequest(getSortP(),
-                                SortOrder.parse(getSortO())));
-            }
+            SortingRequest sortingRequest = new SortingRequest(getSortP(), SortOrder.parse(getSortO()));
+            searchResult = searchDAO.searchReferences(uri, PagingRequest.create(getPageN()), sortingRequest);
 
             resultList = searchResult.getRight();
             matchCount = searchResult.getLeft();
@@ -132,6 +125,7 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      *
      * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
      */
+    @Override
     public List<SearchResultColumn> getColumns() throws DAOException {
 
         ArrayList<SearchResultColumn> list = new ArrayList<SearchResultColumn>();
@@ -177,20 +171,6 @@ public class ReferencesActionBean extends AbstractSearchActionBean<SubjectDTO> {
      */
     public void setUri(String uri) {
         this.uri = uri;
-    }
-
-    /**
-     * @return the anonHash
-     */
-    public long getAnonHash() {
-        return anonHash;
-    }
-
-    /**
-     * @param anonHash the anonHash to set
-     */
-    public void setAnonHash(long hash) {
-        this.anonHash = hash;
     }
 
     /**

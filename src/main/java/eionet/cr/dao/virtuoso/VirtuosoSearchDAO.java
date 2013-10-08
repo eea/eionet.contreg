@@ -478,19 +478,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.SearchDAO#searchReferences(java.lang.Long, eionet.cr.util.pagination.PagingRequest,
-     * eionet.cr.util.SortingRequest)
-     */
-    @Override
-    public Pair<Integer, List<SubjectDTO>> searchReferences(Long subjectHash, PagingRequest pagingRequest,
-            SortingRequest sortingRequest) throws DAOException {
-
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see eionet.cr.dao.SearchDAO#searchBySpatialBox(eionet.cr.dao.util.BBOX, java.lang.String,
      * eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest, boolean)
      */
