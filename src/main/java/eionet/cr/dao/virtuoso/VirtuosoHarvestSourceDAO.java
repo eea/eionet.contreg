@@ -116,7 +116,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND "
                     + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
     /** */
-    private static final String RENAME_GRAPH_SQL =
+    public static final String RENAME_GRAPH_SQL =
             "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('%new_graph%') "
                     + "WHERE g = iri_to_id ('%old_graph%',0)";
 

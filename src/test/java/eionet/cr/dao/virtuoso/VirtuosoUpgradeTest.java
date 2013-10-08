@@ -1,11 +1,19 @@
 package eionet.cr.dao.virtuoso;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
@@ -24,6 +32,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 
 /**
  * Unit tests for SPARQL and SQL queries that are potentially sensitive to Virtuoso upgrade.
@@ -214,5 +224,96 @@ public class VirtuosoUpgradeTest extends CRDatabaseTestCase {
         String firstSubject = items.iterator().next().getUri();
         String expectedUri = "http://rod.eionet.europa.eu/obligations/370";
         assertEquals("Expected first subject to be " + expectedUri, expectedUri, firstSubject);
+    }
+
+    /**
+     * Test that various quite specific Virtuoso and/or SPARQL function have survived the Virtuoso upgrade.
+     *
+     * @throws Exception If any error occurs.
+     */
+    public void testVariousFunctions() throws Exception {
+
+        // The following queries are tested syntactically only, to enusre Virtuoso supports the specific functions used in them.
+        // No actual data comparisons are made.
+
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            String query = "select fn:substring-after(str(?o),\"whatever\") where {?s ?p ?o} limit 1";
+            runTupleQuery(repoConn, query);
+
+            query = "select fn:substring-before(str(?o),\"whatever\") where {?s ?p ?o} limit 1";
+            runTupleQuery(repoConn, query);
+
+            query = "select strStarts(str(?o),\"whatever\") where {?s ?p ?o} limit 1";
+            runTupleQuery(repoConn, query);
+
+            query = "select strEnds(str(?o),\"whatever\") where {?s ?p ?o} limit 1";
+            runTupleQuery(repoConn, query);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
+    }
+
+    /**
+     * Test that the graph renaming syntax has survived the Virtuoso upgrade.
+     *
+     * @throws Exception
+     */
+    public void testGraphRename() throws Exception {
+
+        String oldGraph = getSeedFileGraphUri(OBLIGATIONS_RDF);
+        String newGraph = "http://new.graph.uri";
+
+        String sqlTemplate = VirtuosoHarvestSourceDAO.RENAME_GRAPH_SQL;
+        String renameSql = sqlTemplate.replace("%old_graph%", oldGraph).replaceFirst("%new_graph%", newGraph);
+
+        String countSql = "select count(*) from DB.DBA.RDF_QUAD where G=iri_to_id('%graph_uri%')";
+
+        Connection sqlConn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            sqlConn = SesameUtil.getSQLConnection();
+            stmt = sqlConn.createStatement();
+
+            rs = stmt.executeQuery(countSql.replace("%graph_uri%", oldGraph));
+            int countOld = rs.next() ? rs.getInt(1) : 0;
+            assertTrue("Expected at least one triple in " + oldGraph, countOld > 0);
+            SQLUtil.close(rs);
+
+            stmt.execute(renameSql);
+
+            rs = stmt.executeQuery(countSql.replace("%graph_uri%", newGraph));
+            int countNew = rs.next() ? rs.getInt(1) : 0;
+
+            assertEquals("Expected row-count to stay same after rename", countOld, countNew);
+
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(sqlConn);
+        }
+    }
+
+    /**
+     * Runs the given SPAQRL tuple query on the given repository connection.
+     *
+     * @param repoConn The repository connection.
+     * @param query The SPAQRL query.
+     * @return True if the query succeeded and returned at least one row. Otherwise false.
+     * @throws OpenRDFException If the query fails.
+     */
+    private boolean runTupleQuery(RepositoryConnection repoConn, String query) throws OpenRDFException {
+
+        TupleQueryResult queryResult = null;
+        try {
+            TupleQuery tupleQuery = repoConn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            queryResult = tupleQuery.evaluate();
+            return queryResult != null && queryResult.hasNext();
+        } finally {
+            SesameUtil.close(queryResult);
+        }
     }
 }
