@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
@@ -106,6 +107,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** */
     private static final String FORM_PAGE = "/pages/sparqlClient.jsp";
     private static final String BOOKMARK_PAGE = "/pages/bookmarkQuery.jsp";
+    private static final String AJAX_PAGE = "/pages/sparqlClientAjax.jsp";
 
     /**
      * Option value in the folder dropdown for Shared bookmarks.
@@ -128,6 +130,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** HTTP status error message to be returned to external client. */
     private String errorMessage;
+
+    /** Defines AJAX component to be loaded */
+    private Integer ajaxRequestId = 0;
 
     /** */
     private String query;
@@ -243,6 +248,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         String flagString = subjectDTO.getObjectValue(Predicates.CR_USE_OWLSAMEAS);
         this.useOwlSameAs = Util.toBooolean(flagString);
         this.bookmarkName = subjectDTO.getObjectValue(Predicates.RDFS_LABEL);
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    @HandlesEvent("ajaxrequest")
+    public Resolution ajaxrequest() throws DAOException{
+        return new ForwardResolution(AJAX_PAGE);
     }
 
     /**
@@ -772,7 +787,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -784,21 +799,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                        .get()
-                        .getDao(HarvestSourceDAO.class)
-                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1270,6 +1285,22 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public void setBookmarkFolder(String folder) {
         this.bookmarkFolder = folder;
+    }
+
+    /**
+     *
+     * @param id
+     */
+    public void setAjaxRequestId(Integer id){
+        this.ajaxRequestId = id;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Integer getAjaxRequestId(){
+        return this.ajaxRequestId;
     }
 
     /**
