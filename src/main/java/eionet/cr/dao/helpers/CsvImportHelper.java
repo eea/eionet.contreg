@@ -71,6 +71,9 @@ import eionet.cr.web.util.CharsetToolkit;
  */
 public class CsvImportHelper {
 
+    /** First N bytes that have to ba parsed for encoding detection. */
+    private static final int ENCODING_DETECTION_LENGTH = 65535;
+
     /** Column name for empty name. */
     public static final String EMPTY_COLUMN = "Empty";
 
@@ -263,7 +266,7 @@ public class CsvImportHelper {
         if (file != null && file.exists()) {
             char delim = getDelimiter();
             if (guessEncoding) {
-                Charset guessedCharset = CharsetToolkit.guessEncoding(file, 65535, Charset.forName("UTF-8"), true);
+                Charset guessedCharset = CharsetToolkit.guessEncoding(file, ENCODING_DETECTION_LENGTH, Charset.forName("UTF-8"), true);
                 // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
 
                 result =
@@ -288,7 +291,7 @@ public class CsvImportHelper {
         File file = FileStore.getInstance(FolderUtil.getUserDir(folderUri, userName)).getFile(relativeFilePath);
 
         if (file != null && file.exists()) {
-            charset = CharsetToolkit.guessEncoding(file, 65535, null, false, true);
+            charset = CharsetToolkit.guessEncoding(file, ENCODING_DETECTION_LENGTH, null, false, true);
         }
 
         return charset;
