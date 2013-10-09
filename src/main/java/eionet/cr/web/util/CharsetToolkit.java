@@ -250,7 +250,7 @@ public class CharsetToolkit {
         }
         // if no byte with an high order bit set, the encoding is US-ASCII
         // (it might have been UTF-7, but this encoding is usually internally used only by mail systems)
-        if (!highOrderBit) {
+        if (!highOrderBit && !this.isReturnNullIfNotDetected()) {
             // returns the default charset rather than US-ASCII if the enforce8Bit flag is set.
             if (this.enforce8Bit) {
                 return this.defaultCharset;

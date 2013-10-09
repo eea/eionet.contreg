@@ -83,7 +83,7 @@
                                         <stripes:submit name="upload" onclick="javascript:uploadFile();" value="Upload" />
                                     </td>
                                 </tr>
-                                
+
                             </table>
                         </crfn:form>
                         <div class="csvWizardDesc">
@@ -229,6 +229,7 @@
                                         <stripes:hidden name="fileType"/>
                                         <stripes:hidden name="fileName"/>
                                         <stripes:hidden name="fileEncoding"/>
+                                        <stripes:hidden name="finalEncoding"/>
                                         <stripes:submit name="save" value="Save"/>
                                     </td>
                                 </tr>

@@ -80,6 +80,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** */
     private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
 
+    /** */
+    private static final String PARAM_FINAL_ENCODING = "finalEncoding";
+
     /** Enum for uploaded files' types. */
     public enum FileType {
         CSV, TSV;
@@ -144,6 +147,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** Encoding of the uploadable file */
     private String fileEncoding;
+
+    /** Encoding used to parse the file*/
+    private String finalEncoding;
 
 
     private static final String ENCODING_AUTODETECT_ID = "AUTODETECT";
@@ -222,8 +228,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 } else if (!detectedCharset.toString().startsWith("UTF")){
                     fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
                 }
+                resolution.addParameter(PARAM_FINAL_ENCODING, detectedCharset.name());
             } else {
                 fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
+                resolution.addParameter(PARAM_FINAL_ENCODING, "UTF-8");
             }
 
             // Store file as new source, but don't harvest it
@@ -264,8 +272,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
                         source);
         try {
 
-            // The file was encoded to UTF-8 after upload
-            csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), true);
+            // The file was encoded to UTF-8 or UTF-* after upload
+            csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), Charset.forName(finalEncoding));
 
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();
@@ -715,6 +723,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     public void setFileEncoding(String fileEncoding) {
         this.fileEncoding = fileEncoding;
+    }
+
+    public String getFinalEncoding() {
+        return finalEncoding;
+    }
+
+    public void setFinalEncoding(String finalEncoding) {
+        this.finalEncoding = finalEncoding;
     }
 
 }
