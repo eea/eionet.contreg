@@ -173,18 +173,3 @@
 	</c:choose>
 
 </c:if>
-
-
-<c:if test="${actionBean.ajaxRequestId == 4}">
-	<c:if test="${empty actionBean.usefulNamespaces}">
-	    <p>None found!</p>
-	</c:if>
-	<c:if test="${not empty actionBean.usefulNamespaces}">
-	    <ul>
-	     <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
-	        <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
-	     </c:forEach>
-	    </ul>
-	</c:if>
-
-</c:if>

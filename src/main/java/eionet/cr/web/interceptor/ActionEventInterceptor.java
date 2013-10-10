@@ -48,10 +48,8 @@ import eionet.cr.util.Util;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 
 /**
- * An implementation of {@link Interceptor} that intercepts {@link LifecycleStage#EventHandling}.
- * Current purposes:
- * - send user back to last action event after login
- * - set servlet response buffer size for every reuqest/response that goes via Stripes.
+ * An implementation of {@link Interceptor} that intercepts {@link LifecycleStage#EventHandling}. Current purposes: - send user back
+ * to last action event after login - set servlet response buffer size for every reuqest/response that goes via Stripes.
  *
  * @author gerasvad
  *
@@ -76,8 +74,11 @@ public class ActionEventInterceptor implements Interceptor {
 
         Method eventMethod = context.getHandler();
 
+        HttpServletRequest req = actionBean.getContext().getRequest();
+        boolean ajaxRequest = "XMLHttpRequest".equals(req.getHeader("X-Requested-With"));
+
         if (context.getActionBeanContext().getValidationErrors().isEmpty()
-                && !eventMethod.isAnnotationPresent(DontSaveLastActionEvent.class)) {
+                && !eventMethod.isAnnotationPresent(DontSaveLastActionEvent.class) && !ajaxRequest) {
 
             HttpServletRequest request = context.getActionBean().getContext().getRequest();
             String actionEventURL = null;

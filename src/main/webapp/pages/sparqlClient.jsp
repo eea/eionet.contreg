@@ -99,7 +99,6 @@
                         // Open prefixes dialog
                         $("#prefixesLink").click(function() {
                             $('#prefixesDialog').dialog('open');
-                            $('#prefixesDialogContent').load( "${pageContext.request.contextPath}/sparql?ajaxrequest=true&ajaxRequestId=4" );
                             return false;
                         });
 
@@ -117,8 +116,8 @@
 
                         // The handling of useful namespaces
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
-                            $("#prefix${usefulNamespacesLoop.index}").click(function() {
-                                return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
+                        $("#prefix${usefulNamespacesLoop.index}").click(function() {
+                            return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
                             });
                         </c:forEach>
 
@@ -430,25 +429,32 @@ while (l--) {
             <%-- Bookmarked queries dialog --%>
 
             <div id="bookmarksDialog" title="Bookmarked queries">
-            	Loading bookmarks...
+                Loading bookmarks...
             </div>
 
             <%-- Shared bookmarked queries dialog --%>
             <div id="sharedBookmarksDialog" title="Bookmarked queries">
-            	Loading bookmarks...
+                Loading bookmarks...
             </div>
 
            <%-- project Bookmarked queries dialog --%>
             <div id="projectBookmarksDialog" title="Project queries">
-            	Loading bookmarks...
+                Loading bookmarks...
             </div>
 
             <%-- The "Useful namespaces" dialog, hidden by default --%>
             <div id="prefixesDialog" title="Useful namespaces">
-            	<div id="prefixesDialogContent" title="Useful namespaces">
-                	Loading useful namespaces
-                </div>
-                <button id="closePrefixesDialog">Close</button>
+                <c:if test="${empty actionBean.usefulNamespaces}">
+                    <p>None found!</p>
+                </c:if>
+                <c:if test="${not empty actionBean.usefulNamespaces}">
+                    <ul>
+                    <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                        <li><span id="prefix${usefulNamespacesLoop.index}" class="shadowHover">PREFIX <c:out value="${usefulNamespace.key}"/>: &lt;<c:out value="${usefulNamespace.value}"/>&gt;</span></li>
+                    </c:forEach>
+                    </ul>
+
+                </c:if>
             </div>
 
     </stripes:layout-component>

@@ -60,6 +60,7 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
@@ -256,6 +257,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     @HandlesEvent("ajaxrequest")
+    @DontSaveLastActionEvent
     public Resolution ajaxrequest() throws DAOException{
         return new ForwardResolution(AJAX_PAGE);
     }
