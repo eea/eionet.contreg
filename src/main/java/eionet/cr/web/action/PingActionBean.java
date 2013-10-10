@@ -131,7 +131,10 @@ public class PingActionBean extends AbstractActionBean {
                     // Graph does not exist, but must be created as indicated in request parameters
                     source = new HarvestSourceDTO();
                     source.setUrl(uri);
-                    source.setIntervalMinutes(GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, 60480));
+
+                    // If the new introduced property has not been set in the config file, use deprecated value
+                    source.setIntervalMinutes(GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES, 60480)));
+
                     DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
                     doHarvest = true;
                 } else {

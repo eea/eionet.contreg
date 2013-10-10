@@ -254,8 +254,16 @@ public class FactsheetActionBean extends AbstractActionBean {
                 HarvestSourceDTO dto = new HarvestSourceDTO();
                 dto.setUrl(StringUtils.substringBefore(uri, "#"));
                 dto.setEmails("");
-                dto.setIntervalMinutes(Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+
+                int minutes = 0;
+
+                // If the new value has been set, use the new value. If not set, use the deprecated value instead.
+                minutes =
+                        GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
+                                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+
+                dto.setIntervalMinutes(minutes);
                 dto.setPrioritySource(false);
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);
@@ -363,10 +371,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(
-                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+        .get()
+        .getDao(HarvestSourceDAO.class)
+        .addSourceIgnoreDuplicate(
+                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }

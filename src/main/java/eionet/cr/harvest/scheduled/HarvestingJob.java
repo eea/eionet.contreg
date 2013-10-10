@@ -312,7 +312,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         if (intervalSeconds == null) {
 
-            int seconds = Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim());
+            // Using new property value if available. If not, using the deprecated value
+            int seconds = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.HARVESTER_JOB_INTERVAL, Integer.parseInt(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_JOB_INTERVAL_SECONDS).trim()) * 1000) / 1000;
             seconds = Math.min(3600, seconds);
             seconds = Math.max(5, seconds);
 

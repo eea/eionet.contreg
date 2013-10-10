@@ -53,8 +53,8 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
     /** */
     private static final String INSERT_SQL = "insert soft HARVEST_SOURCE "
             + "(URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),"
-            + Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))) + ")";
+            + GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
+                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)))) + ")";
 
     /** */
     private static final int BATCH_LIMIT = 1000;

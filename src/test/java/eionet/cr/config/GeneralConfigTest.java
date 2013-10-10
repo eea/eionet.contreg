@@ -43,4 +43,87 @@ public class GeneralConfigTest extends TestCase {
         int propValue = GeneralConfig.getIntProperty("wrong.intproperty", 55);
         assertTrue(propValue == 55);
     }
+
+    public static void testTimePropertiesMilliseconds(){
+
+        int ms = 0;
+
+        // should return 60 minutes in milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.minute.ordinary", -1);
+        assertEquals(60*60*1000, ms);
+
+        // should return 60 minutes in milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.minute.gaps", -1);
+        assertEquals(60*60*1000, ms);
+
+        // should return 60 minutes in milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.minute.capital", -1);
+        assertEquals(60*60*1000, ms);
+
+        // should return default value
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.minute.faulty1", -1);
+        assertEquals(-1, ms);
+
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.minute.faulty2", -1);
+        assertEquals(-1, ms);
+
+        // should return 60 sec in milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.second.ordinary", -1);
+        assertEquals(60*1000, ms);
+
+        // should return default value
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.second.faulty", -1);
+        assertEquals(-1, ms);
+
+        // should return 2h in milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.hour.ordinary", -1);
+        assertEquals(2 * 60 * 60 * 1000, ms);
+
+        // should return 2 milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.millisecond.ordinary", -1);
+        assertEquals(2, ms);
+
+        // should return 123 milliseconds
+        ms = GeneralConfig.getTimePropertyMilliseconds("timeproperty.millisecond.nosuffix", -1);
+        assertEquals(123, ms);
+
+
+    }
+
+    public static void testTimePropertiesMinutes(){
+
+        int minutes = 0;
+
+        // should return 60 minutes in minutes
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.minute.ordinary", -1);
+        assertEquals(60, minutes);
+
+        // should return default value
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.minute.faulty1", -1);
+        assertEquals(-1, minutes);
+
+        // should return 1 minute
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.underminute", -1);
+        assertEquals(1, minutes);
+
+        // should return 1 minute
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.overminute", -1);
+        assertEquals(1, minutes);
+
+        // should return 10 minutes
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.over10minute", -1);
+        assertEquals(10, minutes);
+
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.notfound", 100);
+        assertEquals(100, minutes);
+
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.empty", 100);
+        assertEquals(100, minutes);
+
+        // Introducing a construction used to initialize a new property instead of old one, but return the old if first not found or default constant.
+        minutes = GeneralConfig.getTimePropertyMinutes("timeproperty.millisecond.empty", GeneralConfig.getTimePropertyMinutes("timeproperty.minute.ordinary", -1));
+        assertEquals(60, minutes);
+
+    }
+
 }

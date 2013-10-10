@@ -43,8 +43,21 @@ public final class GeneralConfig {
     /** */
     public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
     public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
+
+    /** As the system has been introduced with the option to define time intervals with suffices, predefined property values should be removed */
+    @Deprecated
     public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
-    public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.intervalMinutes";
+
+    /** Replaces the harvester.batchHarvestingIntervalSeconds property */
+    public static final String HARVESTER_JOB_INTERVAL = "harvester.batchHarvestingInterval";
+
+    /** As the system has been introduced with the option to define time intervals with suffices, predefined property values should be removed */
+    @Deprecated
+    public static final String HARVESTER_REFERRALS_INTERVAL_MINUTES = "harvester.referrals.intervalMinutes";
+
+    /** Replaces the harvester.referrals.intervalMinutes property */
+    public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.interval";
+
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
     public static final String HARVESTER_MAX_CONTENT_LENGTH = "harvester.maximumContentLength";
     public static final String HARVESTER_HTTP_TIMEOUT = "harvester.httpConnection.timeout";
@@ -195,10 +208,27 @@ public final class GeneralConfig {
     }
 
     /**
+     *
+     */
+    public static synchronized boolean isPropertySet(String key){
+        if (properties == null) {
+            init();
+        }
+
+        if (properties.getProperty(key) == null){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Returns integer property.
      *
-     * @param key property key in the properties file
-     * @param defaultValue default value that is returned if not specified or in incorrect format
+     * @param key
+     *            property key in the properties file
+     * @param defaultValue
+     *            default value that is returned if not specified or in incorrect format
      * @return property value or default if not specified correctly
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
@@ -218,6 +248,91 @@ public final class GeneralConfig {
 
         return value;
     }
+
+    /**
+     * Get property value of time in milliseconds presented by time value and unit suffix (1h, 30m, 15s etc).
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static synchronized int getTimePropertyMilliseconds(final String key, final int defaultValue) {
+
+        if (properties == null) {
+            init();
+        }
+
+        int coeficient = 1;
+
+        String propValue = properties.getProperty(key);
+        int value = defaultValue;
+
+        if (propValue != null) {
+
+            propValue = propValue.replace(" ", "").toLowerCase();
+
+            if (propValue.length() > 1 && propValue.endsWith("ms") && propValue.replace("ms", "").length() == propValue.length() - 2) {
+                coeficient = 1;
+                propValue = propValue.replace("ms", "");
+            }
+
+            if (propValue.length() > 1 && propValue.endsWith("s") && propValue.replace("s", "").length() == propValue.length() - 1) {
+                coeficient = 1000;
+                propValue = propValue.replace("s", "");
+            }
+
+            if (propValue.length() > 1 && propValue.endsWith("m") && propValue.replace("m", "").length() == propValue.length() - 1) {
+                coeficient = 1000 * 60;
+                propValue = propValue.replace("m", "");
+            }
+
+            if (propValue.length() > 1 && propValue.endsWith("h") && propValue.replace("h", "").length() == propValue.length() - 1) {
+                coeficient = 1000 * 60 * 60;
+                propValue = propValue.replace("h", "");
+            }
+
+            try {
+                value = Integer.valueOf(propValue) * coeficient;
+            } catch (Exception e) {
+                // Ignore exceptions resulting from string-to-integer conversion here.
+            }
+        }
+
+        return value;
+    }
+
+
+    /**
+     * Get property value of time in minutes presented by time value and unit suffix (1h, 30m, 15s etc).
+     *
+     * The results are rounded to nearest minute value if the value is not exact minutes.
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static synchronized int getTimePropertyMinutes(String key, int defaultValue){
+
+        int ms = 0;
+
+        if (defaultValue != Integer.MIN_VALUE){
+            ms = getTimePropertyMilliseconds(key, Integer.MIN_VALUE);
+            if (ms == Integer.MIN_VALUE){
+                return defaultValue;
+            }
+        } else {
+            ms = getTimePropertyMilliseconds(key, Integer.MAX_VALUE);
+            if (ms == Integer.MAX_VALUE){
+                return defaultValue;
+            }
+        }
+
+        double exactMinutes = ms / ((double) 60 * 1000);
+        int minutes = (int) Math.round(exactMinutes);
+
+        return minutes;
+    }
+
 
     /**
      *
@@ -270,6 +385,7 @@ public final class GeneralConfig {
 
     /**
      * If ruleset name property is available in cr.properties, then use inferencing in queries.
+     *
      * @return
      *
      * @deprecated As inferencing is not used in CR

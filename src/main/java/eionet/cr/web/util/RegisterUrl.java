@@ -29,10 +29,14 @@ public final class RegisterUrl {
     /**
      * Register a URL.
      *
-     * @param url - URL to register
-     * @param user - Authentication object
-     * @param saveToBookmarks - a flag to say whether to also create a bookmark in user's bookmarks
-     * @param label - bookmark label
+     * @param url
+     *            - URL to register
+     * @param user
+     *            - Authentication object
+     * @param saveToBookmarks
+     *            - a flag to say whether to also create a bookmark in user's bookmarks
+     * @param label
+     *            - bookmark label
      * @throws DAOException
      * @throws HarvestException
      */
@@ -46,8 +50,10 @@ public final class RegisterUrl {
 
         String urlWithoutFragment = StringUtils.substringBefore(url, "#");
         Integer intervalMinutes =
-                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)));
+                GeneralConfig.getTimePropertyMinutes(
+                        GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
+                        Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
+                                String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);

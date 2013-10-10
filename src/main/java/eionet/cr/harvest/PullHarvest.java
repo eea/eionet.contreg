@@ -750,7 +750,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-            RDFHandlerException, RDFParseException {
+    RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -941,7 +941,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
     private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -953,7 +953,7 @@ public class PullHarvest extends BaseHarvest {
         connection.setInstanceFollowRedirects(false);
 
         // Set the timeout both for establishing the connection, and reading from it once established.
-        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
+        int httpTimeout = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
 
@@ -976,7 +976,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -1015,7 +1015,7 @@ public class PullHarvest extends BaseHarvest {
         connection.setInstanceFollowRedirects(false);
 
         // Set the timeout both for establishing the connection, and reading from it once established.
-        int httpTimeout = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
+        int httpTimeout = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
         connection.setConnectTimeout(httpTimeout);
         connection.setReadTimeout(httpTimeout);
 
@@ -1067,7 +1067,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
-            IOException, SAXException, ParserConfigurationException {
+    IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);

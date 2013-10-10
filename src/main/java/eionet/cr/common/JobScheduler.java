@@ -67,17 +67,17 @@ public class JobScheduler implements ServletContextListener {
     static {
         INTERVAL_JOBS =
                 new Pair[] {
-                        new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
-                                DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                DeliverySearchPicklistCacheUpdater.class)),
+                new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
+                        DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+                        DeliverySearchPicklistCacheUpdater.class)),
                         new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
                                 RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                 RecentResourcesCacheUpdater.class)),
-                        new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
-                                TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                TagCloudCacheUpdater.class)),
-                        new Pair(GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL, new JobDetail(TypeCacheUpdater.class.getSimpleName(),
-                                JobScheduler.class.getName(), TypeCacheUpdater.class))};
+                                new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
+                                        TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+                                        TagCloudCacheUpdater.class)),
+                                        new Pair(GeneralConfig.TYPE_CACHE_UPDATE_INTERVAL, new JobDetail(TypeCacheUpdater.class.getSimpleName(),
+                                                JobScheduler.class.getName(), TypeCacheUpdater.class))};
 
     }
 
@@ -101,7 +101,7 @@ public class JobScheduler implements ServletContextListener {
      * @throws ParseException
      */
     public static synchronized void scheduleCronJob(String cronExpression, JobDetail jobDetails) throws SchedulerException,
-            ParseException {
+    ParseException {
 
         CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setCronExpression(cronExpression);
@@ -120,7 +120,7 @@ public class JobScheduler implements ServletContextListener {
      * @throws ParseException
      */
     public static synchronized void scheduleIntervalJob(long repeatInterval, JobDetail jobDetails) throws SchedulerException,
-            ParseException {
+    ParseException {
 
         SimpleTrigger trigger = new SimpleTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setRepeatInterval(repeatInterval);
@@ -181,8 +181,8 @@ public class JobScheduler implements ServletContextListener {
                 // if interval specified, then schedule the job, otherwise
                 // consider it administrator's will to not schedule this particular job
                 if (!StringUtils.isBlank(intervString)) {
-
-                    scheduleIntervalJob(Long.parseLong(intervString), job.getRight());
+                    int intervMillis = GeneralConfig.getTimePropertyMilliseconds(job.getLeft(), -1);
+                    scheduleIntervalJob(intervMillis, job.getRight());
                     logger.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
                 }
             } catch (Exception e) {
