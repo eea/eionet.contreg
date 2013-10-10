@@ -428,18 +428,18 @@ while (l--) {
 
             <%-- Bookmarked queries dialog --%>
 
-            <div id="bookmarksDialog" title="Bookmarked queries">
-                Loading bookmarks...
+            <div id="bookmarksDialog" title="My bookmarked queries">
+                Loading bookmarked queries ...
             </div>
 
             <%-- Shared bookmarked queries dialog --%>
-            <div id="sharedBookmarksDialog" title="Bookmarked queries">
-                Loading bookmarks...
+            <div id="sharedBookmarksDialog" title="Shared bookmarked queries">
+                Loading bookmarked queries ...
             </div>
 
            <%-- project Bookmarked queries dialog --%>
-            <div id="projectBookmarksDialog" title="Project queries">
-                Loading bookmarks...
+            <div id="projectBookmarksDialog" title="Bookmarks in projects">
+                Loading bookmarked queries ...
             </div>
 
             <%-- The "Useful namespaces" dialog, hidden by default --%>
