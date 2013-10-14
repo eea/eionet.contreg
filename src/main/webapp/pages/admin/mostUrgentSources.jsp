@@ -32,7 +32,13 @@
 
             <display:table name="${actionBean.sources}" class="datatable" id="source" requestURI="${actionBean.urlBinding}" style="width:100%">
 
-                <display:column property="url" title="URL"/>
+				<c:url value="sourceView.action" var="sourceUrl">
+				    <c:param name="uri" value="${ source.url }" />
+				</c:url>
+
+                <display:column title="URL">
+                    <stripes:link href="${ sourceUrl }"><c:out value="${source.url}"/></stripes:link>
+                </display:column>
                 <display:column property="lastHarvest" title="Last harvest" format="{0,date,dd.MM.yy HH:mm:ss}"/>
                 <display:column property="intervalMinutes" title="Interval (min)"/>
                 <display:column property="harvestUrgencyScore" title="Urgency" format="{0,number,#.###}"/>
