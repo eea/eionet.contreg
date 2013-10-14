@@ -16,11 +16,6 @@
                     <p>
                         References to
                         <c:choose>
-                            <c:when test="${actionBean.anonHash!=0}">
-                                <stripes:link href="/factsheet.action">this anonymous resource
-                                    <stripes:param name="uriHash" value="${actionBean.anonHash}"/>
-                                </stripes:link>
-                            </c:when>
                             <c:when test="${actionBean.uriResolvable}">
                                 <a class="link-external" href="${fn:escapeXml(actionBean.uri)}"><c:out value="${actionBean.uri}"/></a>
                             </c:when>
