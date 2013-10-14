@@ -256,7 +256,7 @@ public final class GeneralConfig {
      * @param defaultValue
      * @return
      */
-    public static synchronized int getTimePropertyMilliseconds(final String key, final int defaultValue) {
+    public static synchronized Integer getTimePropertyMilliseconds(final String key, Integer defaultValue) {
 
         if (properties == null) {
             init();
@@ -265,7 +265,7 @@ public final class GeneralConfig {
         int coeficient = 1;
 
         String propValue = properties.getProperty(key);
-        int value = defaultValue;
+        Integer value = defaultValue;
 
         if (propValue != null) {
 
@@ -313,24 +313,16 @@ public final class GeneralConfig {
      */
     public static synchronized int getTimePropertyMinutes(String key, int defaultValue){
 
-        int ms = 0;
+        Integer ms = 0;
+        ms = getTimePropertyMilliseconds(key, null);
 
-        if (defaultValue != Integer.MIN_VALUE){
-            ms = getTimePropertyMilliseconds(key, Integer.MIN_VALUE);
-            if (ms == Integer.MIN_VALUE){
-                return defaultValue;
-            }
+        if (ms != null){
+            double exactMinutes = ms / ((double) 60 * 1000);
+            int minutes = (int) Math.round(exactMinutes);
+            return minutes;
         } else {
-            ms = getTimePropertyMilliseconds(key, Integer.MAX_VALUE);
-            if (ms == Integer.MAX_VALUE){
-                return defaultValue;
-            }
+            return defaultValue;
         }
-
-        double exactMinutes = ms / ((double) 60 * 1000);
-        int minutes = (int) Math.round(exactMinutes);
-
-        return minutes;
     }
 
 
