@@ -49,11 +49,7 @@ public final class RegisterUrl {
         // (the dao is responsible for handling if HARVEST_SOURCE already has such a URL)
 
         String urlWithoutFragment = StringUtils.substringBefore(url, "#");
-        Integer intervalMinutes =
-                GeneralConfig.getTimePropertyMinutes(
-                        GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                        Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
-                                String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
+        Integer intervalMinutes = GeneralConfig.getDefaultHarvestIntervalMinutes();
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(urlWithoutFragment);

@@ -34,7 +34,6 @@ import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -52,9 +51,8 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /** */
     private static final String INSERT_SQL = "insert soft HARVEST_SOURCE "
-            + "(URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),"
-            + GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, Integer.parseInt(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
-                    String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL)))) + ")";
+            + "(URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW()," + GeneralConfig.getDefaultHarvestIntervalMinutes()
+            + ")";
 
     /** */
     private static final int BATCH_LIMIT = 1000;
@@ -88,6 +86,7 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -207,7 +206,9 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
         return sourceCount;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)
      */
     @Override

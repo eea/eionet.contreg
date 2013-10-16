@@ -254,16 +254,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 HarvestSourceDTO dto = new HarvestSourceDTO();
                 dto.setUrl(StringUtils.substringBefore(uri, "#"));
                 dto.setEmails("");
-
-                int minutes = 0;
-
-                // If the new value has been set, use the new value. If not set, use the deprecated value instead.
-                minutes =
-                        GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL,
-                                Integer.valueOf(GeneralConfig.getProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES,
-                                        String.valueOf(HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL))));
-
-                dto.setIntervalMinutes(minutes);
+                dto.setIntervalMinutes(GeneralConfig.getDefaultHarvestIntervalMinutes());
                 dto.setPrioritySource(false);
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);

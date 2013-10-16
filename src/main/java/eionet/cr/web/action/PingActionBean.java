@@ -133,7 +133,7 @@ public class PingActionBean extends AbstractActionBean {
                     source.setUrl(uri);
 
                     // If the new introduced property has not been set in the config file, use deprecated value
-                    source.setIntervalMinutes(GeneralConfig.getTimePropertyMinutes(GeneralConfig.HARVESTER_REFERRALS_INTERVAL, GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_REFERRALS_INTERVAL_MINUTES, 60480)));
+                    source.setIntervalMinutes(GeneralConfig.getDefaultHarvestIntervalMinutes());
 
                     DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
                     doHarvest = true;

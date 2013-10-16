@@ -29,6 +29,8 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eionet.cr.harvest.scheduled.HarvestingJob;
+
 /**
  *
  * @author heinljab
@@ -44,19 +46,11 @@ public final class GeneralConfig {
     public static final String HARVESTER_FILES_LOCATION = "harvester.tempFileDir";
     public static final String HARVESTER_BATCH_HARVESTING_HOURS = "harvester.batchHarvestingHours";
 
-    /** As the system has been introduced with the option to define time intervals with suffices, predefined property values should be removed */
-    @Deprecated
-    public static final String HARVESTER_JOB_INTERVAL_SECONDS = "harvester.batchHarvestingIntervalSeconds";
+    /** Interval at which the {@link HarvestingJob} should run. */
+    public static final String HARVESTING_JOB_INTERVAL = "harvester.jobInterval";
 
-    /** Replaces the harvester.batchHarvestingIntervalSeconds property */
-    public static final String HARVESTER_JOB_INTERVAL = "harvester.batchHarvestingInterval";
-
-    /** As the system has been introduced with the option to define time intervals with suffices, predefined property values should be removed */
-    @Deprecated
-    public static final String HARVESTER_REFERRALS_INTERVAL_MINUTES = "harvester.referrals.intervalMinutes";
-
-    /** Replaces the harvester.referrals.intervalMinutes property */
-    public static final String HARVESTER_REFERRALS_INTERVAL = "harvester.referrals.interval";
+    /** Property for the default harvest interval. */
+    public static final String DEFAULT_HARVEST_INTERVAL = "harvester.defaultHarvestInterval";
 
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
     public static final String HARVESTER_MAX_CONTENT_LENGTH = "harvester.maximumContentLength";
@@ -210,12 +204,12 @@ public final class GeneralConfig {
     /**
      *
      */
-    public static synchronized boolean isPropertySet(String key){
+    public static synchronized boolean isPropertySet(String key) {
         if (properties == null) {
             init();
         }
 
-        if (properties.getProperty(key) == null){
+        if (properties.getProperty(key) == null) {
             return false;
         } else {
             return true;
@@ -271,7 +265,8 @@ public final class GeneralConfig {
 
             propValue = propValue.replace(" ", "").toLowerCase();
 
-            if (propValue.length() > 1 && propValue.endsWith("ms") && propValue.replace("ms", "").length() == propValue.length() - 2) {
+            if (propValue.length() > 1 && propValue.endsWith("ms")
+                    && propValue.replace("ms", "").length() == propValue.length() - 2) {
                 coeficient = 1;
                 propValue = propValue.replace("ms", "");
             }
@@ -301,7 +296,6 @@ public final class GeneralConfig {
         return value;
     }
 
-
     /**
      * Get property value of time in minutes presented by time value and unit suffix (1h, 30m, 15s etc).
      *
@@ -311,12 +305,12 @@ public final class GeneralConfig {
      * @param defaultValue
      * @return
      */
-    public static synchronized int getTimePropertyMinutes(String key, int defaultValue){
+    public static synchronized int getTimePropertyMinutes(String key, int defaultValue) {
 
         Integer ms = 0;
         ms = getTimePropertyMilliseconds(key, null);
 
-        if (ms != null){
+        if (ms != null) {
             double exactMinutes = ms / ((double) 60 * 1000);
             int minutes = (int) Math.round(exactMinutes);
             return minutes;
@@ -324,7 +318,6 @@ public final class GeneralConfig {
             return defaultValue;
         }
     }
-
 
     /**
      *
@@ -385,5 +378,52 @@ public final class GeneralConfig {
     @Deprecated
     public static synchronized boolean isUseInferencing() {
         return false;
+    }
+
+    /**
+     * Returns the interval at which the {@link HarvestingJob} should check for batch/urgent harvest queues.
+     * The value is returned in seconds, as method name suggests!
+     *
+     * @return The interval as described above.
+     */
+    public static int getHarvestingJobIntervalSeconds() {
+
+        int seconds = 0;
+
+        // Get interval by the defualt property name.
+        int millis = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.HARVESTING_JOB_INTERVAL, 0);
+        if (millis <= 0) {
+            // This is to backward-support the previous name we had for this property.
+            seconds = NumberUtils.toInt(GeneralConfig.getProperty("harvester.batchHarvestingIntervalSeconds"));
+        } else {
+            seconds = Math.round(millis / 1000f);
+        }
+
+        return seconds <= 0 ? 20 : seconds;
+    }
+
+    /**
+     * Returns default harvest interval to be used in situations where the system has auto-discovered new harvest sources, or it
+     * is not possible to ask the interval from the user. The value is in minutes!
+     *
+     * @return The default harvest interval in minutes!
+     */
+    public static int getDefaultHarvestIntervalMinutes() {
+
+        // Get interval minutes by the defualt property name.
+        int minutes = GeneralConfig.getTimePropertyMinutes(GeneralConfig.DEFAULT_HARVEST_INTERVAL, 0);
+        if (minutes <= 0) {
+            // This is to backward-support the previous name we had for this property.
+            minutes = GeneralConfig.getTimePropertyMinutes("harvester.referrals.interval", 0);
+        }
+
+        if (minutes <= 0) {
+            // This is to backward-support the previous-previous name we had for this property. It reflected minutes as unit!
+            // Apache Commons NumberUtils converts the string to int. If it fails or the property is missing, it returns 0.
+            minutes = NumberUtils.toInt(GeneralConfig.getProperty("harvester.referrals.intervalMinutes"));
+        }
+
+        // If still no value found (i.e. it is <= 0), then fall back to 42 days, i.e. 60480 minutes.
+        return minutes <= 0 ? 60480 : minutes;
     }
 }
