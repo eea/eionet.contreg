@@ -45,7 +45,7 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 
-import virtuoso.jdbc3.VirtuosoException;
+import virtuoso.jdbc4.VirtuosoException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
@@ -185,8 +185,8 @@ public class RDFExportWizardActionBean extends AbstractActionBean {
         StagingDatabaseDTO dbDTO = DAOFactory.get().getDao(StagingDatabaseDAO.class).getDatabaseByName(dbName);
         ExportRunner.start(dbDTO, exportName, getUserName(), queryConf);
 
-        addSystemMessage("RDF export successfully started!" +
-        		" Use operations menu to list ongoing and finished RDF exports from this database.");
+        addSystemMessage("RDF export successfully started!"
+                + " Use operations menu to list ongoing and finished RDF exports from this database.");
         return new RedirectResolution(StagingDatabaseActionBean.class).addParameter("dbName", dbName);
     }
 
