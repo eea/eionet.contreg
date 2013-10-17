@@ -12,7 +12,7 @@
                 maxWait="10000"
                 username="${virtuoso.db.usr}"
                 password="${virtuoso.db.pwd}"
-                driverClassName="${virtuoso.db.drv}"
+                driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}">
     </Resource>
 
@@ -25,7 +25,7 @@
                 maxWait="10000"
                 username="${virtuoso.db.rousr}"
                 password="${virtuoso.db.ropwd}"
-                driverClassName="${virtuoso.db.drv}"
+                driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}"
                 removeAbandoned="true"
                 removeAbandonedTimeout="60"
