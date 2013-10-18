@@ -51,8 +51,8 @@ NB!!! For security reasons, be sure to change your Virtuoso administrator passwo
 something other than the default!
 
 CR will ask virtuoso to load files from the temporary directory. You must ensure
-the the value for harvester.tempFileDir in local.properties is listed for DirsAllowed
-in virtuoso.ini.
+the the values for harvester.tempFileDir and filestore.path in local.properties are
+listed for DirsAllowed in virtuoso.ini.
 
 ****************************************************************************
 3. Download, configure and build CR source code
