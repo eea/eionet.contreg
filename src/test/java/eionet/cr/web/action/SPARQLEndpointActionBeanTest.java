@@ -65,7 +65,6 @@ public class SPARQLEndpointActionBeanTest extends CRDatabaseTestCase {
 
         // http response code = 200
         MockHttpServletResponse response = (MockHttpServletResponse) bean.getContext().getResponse();
-        System.out.println("response.getOutputString() = " + response.getOutputString());
         assertEquals(200, response.getStatus());
 
         MockServletOutputStream os = (MockServletOutputStream) bean.getContext().getResponse().getOutputStream();
