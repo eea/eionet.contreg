@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -488,6 +489,24 @@ public final class SesameUtil {
             valueFactory.createURI(uriString);
             return true;
         } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if the given string is a valid URI by {@link URIImpl}. Otherwise returns false.
+     *
+     * @param uriString The URI string to check.
+     * @return The boolean as indicated.
+     */
+    public static boolean isValidURI(String uriString) {
+        try {
+            @SuppressWarnings("unused")
+            URIImpl uriImpl = new URIImpl(uriString);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (AssertionError e) {
             return false;
         }
     }

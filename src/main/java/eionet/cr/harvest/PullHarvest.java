@@ -82,6 +82,7 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
@@ -750,7 +751,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -776,7 +777,7 @@ public class PullHarvest extends BaseHarvest {
                     processedFile = fileProcessor.process();
 
                     String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                    if (StringUtils.isNotBlank(conversionSchemaUri)) {
+                    if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
                         addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
                     }
 
@@ -941,7 +942,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
     private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -976,7 +977,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -1067,7 +1068,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
-    IOException, SAXException, ParserConfigurationException {
+            IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);

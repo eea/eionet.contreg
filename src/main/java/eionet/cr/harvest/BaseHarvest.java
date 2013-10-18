@@ -1060,7 +1060,7 @@ public abstract class BaseHarvest implements Harvest {
                 processedFile = fileProcessor.process();
 
                 String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                if (StringUtils.isNotBlank(conversionSchemaUri)) {
+                if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
                     addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
                 }
 
