@@ -360,7 +360,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         /* get the properties for given subject types */
         // TODO - actually it is a static set based on DC properties
-        if (subjectUri != null && !subjectUri.isEmpty()) {
+        if (subjectUri != null && !subjectUri.isEmpty() && subjectTypes != null && !subjectTypes.isEmpty()) {
 
             bindings = new Bindings();
             String subjectTypesCSV = SPARQLQueryUtil.urisToCSV(subjectTypes, "subjectValue", bindings);
