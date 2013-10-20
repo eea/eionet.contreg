@@ -38,6 +38,7 @@ public final class PostHarvestScriptParser {
 
     /** */
     public static final String HARVESTED_SOURCE_VARIABLE = "harvestedSource";
+    /** The name of the variable to bind the RDF type to. */
     public static final String ASSOCIATED_TYPE_VARIABLE = "thisType";
 
     /**

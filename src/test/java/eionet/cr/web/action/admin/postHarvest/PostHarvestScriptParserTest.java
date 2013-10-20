@@ -36,6 +36,9 @@ public class PostHarvestScriptParserTest {
     private int limit = PostHarvestScriptParser.TEST_RESULTS_LIMIT;
     private String harvestedSource = "?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE;
 
+    /** The name of the variable to bind the RDF type to. */
+    private String thisType = "?" + PostHarvestScriptParser.ASSOCIATED_TYPE_VARIABLE;
+
     /**
      *
      * @throws ScriptParseException
@@ -214,6 +217,66 @@ public class PostHarvestScriptParserTest {
         input = "PREFIX dc:<x> INSERT {3}";
         exptd = "PREFIX dc:<x> CONSTRUCT {3} WHERE {?s ?p ?o} LIMIT " + limit;
         assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, "http://", null));
+    }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    @Test
+    public void checkTypeExpansionForInsert() throws ScriptParseException {
+
+        String testSource = "http://";
+        String expandedSource = "<" + testSource + ">";
+
+        String testType = "urn:nowhere:type";
+        String expnType = "<" + testType + ">";
+
+        String input = "PREFIX dc:<x> INSERT INTO <y> {2} FROM " + harvestedSource + " WHERE { ?s a "
+            + thisType + "; a ?rdftype FILTER(?rdftype != " + thisType + ") }";
+        String exptd = "PREFIX dc:<x> CONSTRUCT {2} FROM "+ expandedSource + " WHERE { ?s a "
+            + expnType + "; a ?rdftype FILTER(?rdftype != " + expnType + ") } LIMIT " + limit;
+        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
+    }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    @Test
+    public void checkTypeExpansionForModify() throws ScriptParseException {
+
+        String testSource = "http://mysource";
+        String expandedSource = "<" + testSource + ">";
+
+        String testType = "http://nowhere/type";
+        String expandedType = "<" + testType + ">";
+
+        String input = "PREFIX dc:<x> MODIFY <y> DELETE {1} INSERT {2} FROM " + harvestedSource + " WHERE {?s a " + thisType + "}";
+        String exptd = "PREFIX dc:<x> CONSTRUCT {2} FROM " + expandedSource + " WHERE {?s a " + expandedType + "} LIMIT " + limit;
+
+        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
+    }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    @Test
+    public void checkTypeExpansionForDelete() throws ScriptParseException {
+
+        String testSource = "urn:nowhere:source";
+        String expandedSource = "<" + testSource + ">";
+
+        String testType = "urn:nowhere:type";
+        String expandedType = "<" + testType + ">";
+
+        String input = "PREFIX dc:<x> " + "DELETE FROM <y> {3} FROM " + harvestedSource + " WHERE { GRAPH "
+            + harvestedSource + " {    ?s a " + thisType + "\n  }\n}";
+        String exptd = "PREFIX dc:<x> CONSTRUCT {3} FROM " + expandedSource + " WHERE { GRAPH "
+            + expandedSource +  " {    ?s a " + expandedType + "\n  }\n} LIMIT " + limit;
+
+        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
     }
 
 }

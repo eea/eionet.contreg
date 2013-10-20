@@ -249,7 +249,8 @@
 PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 PREFIX cr: &lt;http://cr.eionet.europa.eu/ontologies/contreg.rdf#&gt;
 
-SELECT * WHERE {
+SELECT *
+WHERE {
   ?bookmark a cr:SparqlBookmark ;
             rdfs:label ?label
 } LIMIT 50</c:if>${crfn:escapeHtml(actionBean.query)}</textarea>
