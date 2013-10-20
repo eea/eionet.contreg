@@ -234,7 +234,7 @@ public class PostHarvestScriptParserTest {
 
         String input = "PREFIX dc:<x> INSERT INTO <y> {2} FROM " + harvestedSource + " WHERE { ?s a "
             + thisType + "; a ?rdftype FILTER(?rdftype != " + thisType + ") }";
-        String exptd = "PREFIX dc:<x> CONSTRUCT {2} FROM "+ expandedSource + " WHERE { ?s a "
+        String exptd = "PREFIX dc:<x> CONSTRUCT {2} FROM " + expandedSource + " WHERE { ?s a "
             + expnType + "; a ?rdftype FILTER(?rdftype != " + expnType + ") } LIMIT " + limit;
         assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
     }
@@ -277,6 +277,64 @@ public class PostHarvestScriptParserTest {
             + expandedSource +  " {    ?s a " + expandedType + "\n  }\n} LIMIT " + limit;
 
         assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
+    }
+
+    /**
+     *
+     * @throws ScriptParseException
+     */
+    @Test
+    public void testParseForExecution() throws ScriptParseException {
+
+        String testSource = "urn:nowhere:source";
+        String expandedSource = "<" + testSource + ">";
+
+        String testType = "urn:nowhere:type";
+        String expnType = "<" + testType + ">";
+
+        String input = "PREFIX dc:<x> INSERT INTO <y> {2} FROM " + harvestedSource + " WHERE { ?s a "
+            + thisType + "; a ?rdftype FILTER(?rdftype != " + thisType + ") }";
+        String exptd = "PREFIX dc:<x> INSERT INTO <y> {2} FROM " + expandedSource + " WHERE { ?s a "
+            + expnType + "; a ?rdftype FILTER(?rdftype != " + expnType + ") }";
+
+        assertEquals(exptd, PostHarvestScriptParser.parseForExecution(input, testSource, testType));
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testDeriveSelectFromSelect() {
+
+        String testSource = "urn:nowhere:source";
+        String expandedSource = "<" + testSource + ">";
+
+        String input = "PREFIX dc:<x> SELECT ?s ?rdftype WHERE { ?s a "
+            + "<z>; a ?rdftype FILTER(?rdftype != <z>) }";
+        String exptd = "PREFIX dc:<x> SELECT ?s ?rdftype FROM " + expandedSource + " WHERE  ?s a "
+            + "<z>; a ?rdftype FILTER(?rdftype != <z>)  LIMIT " + limit;
+
+        assertEquals(exptd, PostHarvestScriptParser.deriveSelect(input, testSource));
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testDeriveSelectFromDelete() {
+
+        String testSource = "urn:nowhere:source";
+        String expandedSource = "<" + testSource + ">";
+
+        String input = "PREFIX dc:<x> DELETE FROM <y> {3} FROM <a> WHERE {4}";
+        String exptd = "PREFIX dc:<x> SELECT FROM <y> 3 FROM <a> WHERE {4} LIMIT " + limit;
+
+        assertEquals(exptd, PostHarvestScriptParser.deriveSelect(input, testSource));
+
+        input = "PREFIX dc:<x> DELETE FROM <y> {3} WHERE { GRAPH <a> {4}}";
+        exptd = "PREFIX dc:<x> SELECT FROM <y> 3 WHERE { GRAPH <a> {4}} LIMIT " + limit;
+
+        assertEquals(exptd, PostHarvestScriptParser.deriveSelect(input, testSource));
     }
 
 }
