@@ -82,7 +82,6 @@ public interface Predicates {
     String ROD_RELEASED = "http://rod.eionet.europa.eu/schema.rdf#released";
     String ROD_COVERAGE_NOTE = "http://rod.eionet.europa.eu/schema.rdf#coverageNote";
 
-    String CR_FIRSTSEEN_TIME = "urn:eionet:contreg:firstseen-time";
     String CR_URL = "urn:eionet:contreg:url";
     String CR_SCHEMA = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#xmlSchema";
     String CR_LAST_MODIFIED = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#contentLastModified";

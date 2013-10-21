@@ -130,10 +130,9 @@ public class UploadHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
 
         // add source metadata resulting from this harvest
-        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
-        String lastRefreshed = formatDate(new Date());
+        addFirstSeenPredicate();
 
-        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        String lastRefreshed = formatDate(new Date());
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
     }
 
@@ -158,10 +157,9 @@ public class UploadHarvest extends BaseHarvest {
         }
 
         // add source metadata resulting from this harvest
-        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
-        String lastRefreshed = formatDate(new Date());
+        addFirstSeenPredicate();
 
-        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        String lastRefreshed = formatDate(new Date());
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
 
         if (error != null) {

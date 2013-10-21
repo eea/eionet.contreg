@@ -1039,7 +1039,7 @@ public abstract class BaseHarvest implements Harvest {
      * @throws RDFParseException if error in RDF parsing
      */
     protected int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
-            RDFHandlerException, RDFParseException {
+    RDFHandlerException, RDFParseException {
 
         // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
         // Otherwise try to process the file into RDF format and *then* proceed to loading.
@@ -1182,5 +1182,17 @@ public abstract class BaseHarvest implements Harvest {
         }
 
         return contentLoader;
+    }
+
+    protected void addFirstSeenPredicate(){
+        // add source metadata resulting from this harvest
+
+        boolean subjectSeen = helperDAO.isSubjectSeen(getContextSourceDTO().getUrl());
+
+        if (!subjectSeen){
+            String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
+            addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        }
+
     }
 }

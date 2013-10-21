@@ -160,12 +160,12 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             if (rdfType.equals(Subjects.ROD_OBLIGATION_CLASS)) {
                 // properties for obligations
                 String[] neededPredicatesObl =
-                        {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
+                    {Predicates.RDFS_LABEL, Predicates.ROD_ISSUE_PROPERTY, Predicates.ROD_INSTRUMENT_PROPERTY};
                 neededPredicates = neededPredicatesObl;
             } else if (rdfType.equals(Subjects.ROD_DELIVERY_CLASS)) {
                 // properties for deliveries
                 String[] neededPredicatesDeliveries =
-                        {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
+                    {Predicates.RDFS_LABEL, Predicates.ROD_OBLIGATION_PROPERTY, Predicates.ROD_LOCALITY_PROPERTY};
                 neededPredicates = neededPredicatesDeliveries;
             }
 
@@ -539,17 +539,23 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // get the subject that the user wants to register
         SubjectDTO registeredSubject = getSubject(url);
 
-        // if subject did not exist or it isn't registered in user's registrations yet,
+        // if subject did not exist yet,
         // then add the necessary triples
-        if (registeredSubject == null || !registeredSubject.isRegisteredBy(user)) {
+        if (registeredSubject == null) {
 
-            // add the rdf:type=cr:File triple into user's registrations
-            registeredSubject = new SubjectDTO(url, registeredSubject == null ? false : registeredSubject.isAnonymous());
-            ObjectDTO objectDTO = new ObjectDTO(Subjects.CR_FILE, false);
-            objectDTO.setSourceUri(user.getRegistrationsUri());
-            registeredSubject.addObject(Predicates.RDF_TYPE, objectDTO);
+            ObjectDTO objectDTO;
 
-            addTriples(registeredSubject);
+            // add the rdf:type=cr:firstSeen triple into user's registrations if the url is not present before.
+            if (!isSubjectSeen(url)){
+
+                String firstSeen = Util.virtuosoDateToString(new Date());
+                registeredSubject = new SubjectDTO(url, registeredSubject == null ? false : registeredSubject.isAnonymous());
+                objectDTO = ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME);
+                objectDTO.setSourceUri(user.getRegistrationsUri());
+                registeredSubject.addObject(Predicates.CR_FIRST_SEEN, objectDTO);
+                addTriples(registeredSubject);
+            }
+
 
             // add the URL into user's history
             SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
@@ -616,7 +622,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         // (but set harvest interval minutes to 0, since we don't really want it to be harvested )
         // by background harvester)
         DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
+        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(user.getBookmarksUri(), true, 0, user.getUserName()));
 
     }
 
@@ -1398,8 +1404,8 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
 
         StringBuilder query = new StringBuilder();
         query.append("select distinct ?s ?date where {graph ?g {?s ?p ?o}. filter (?s in (")
-                .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
-                .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
+        .append(SPARQLQueryUtil.urisToCSV(resourceUris, "sValue", bindings)).append(")). ?g <")
+        .append(Predicates.CR_LAST_MODIFIED).append("> ?date}");
 
         HashMap<String, Date> result = new HashMap<String, Date>();
         MapReader reader = new MapReader();
@@ -1607,6 +1613,27 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         triple.setSourceUri(StringUtils.substringBeforeLast(uri, "/"));
         deleteTriples(Collections.singletonList(triple));
 
+    }
+
+    @Override
+    public boolean isSubjectSeen(String uri) {
+
+        SubjectDTO subject = null;
+
+        try {
+            subject = getSubject(uri);
+        } catch (DAOException e) {
+            return false;
+        }
+
+        if (subject != null ){
+            Collection<ObjectDTO> predicates = subject.getPredicates().get(Predicates.CR_FIRST_SEEN);
+            if (predicates == null || (predicates != null && predicates.size() == 0)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

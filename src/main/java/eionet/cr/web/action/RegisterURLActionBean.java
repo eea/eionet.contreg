@@ -47,6 +47,8 @@ public class RegisterURLActionBean extends AbstractActionBean {
     private String url;
     private String label;
     private boolean bookmark = false;
+    private boolean showFactsheetLink = false;
+    private String registrationMessage;
 
     /**
      *
@@ -69,7 +71,27 @@ public class RegisterURLActionBean extends AbstractActionBean {
 
         // register URL
         url = URLUtil.escapeIRI(url);
-        RegisterUrl.register(url, getUser(), bookmark, label);
+
+        if (RegisterUrl.isSubjectRegistered(url)){
+
+            showFactsheetLink = true;
+
+            // User wants to bookmark the subject and the bookmark is not registered yet.
+            if (bookmark && !RegisterUrl.isSubjectBookmarkedByUser(url, getUser())){
+                RegisterUrl.saveSubjectUserBookmark(url, getUser(), label);
+                registrationMessage = "Url already registered in the system, but added a personal bookmark.";
+            } else if (bookmark && RegisterUrl.isSubjectBookmarkedByUser(url, getUser())){
+                registrationMessage = "Url and bookmark both already registered in the system.";
+            } else {
+                registrationMessage = "Url already registered in the system.";
+            }
+
+            return new ForwardResolution("/pages/registerUrl.jsp");
+
+        } else {
+            RegisterUrl.register(url, getUser(), false, label);
+        }
+
         // go to factsheet in edit mode
         return new RedirectResolution(FactsheetActionBean.class, "edit").addParameter("uri", url);
     }
@@ -89,14 +111,20 @@ public class RegisterURLActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param url the url to set
+     * @param url
+     *            the url to set
      */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    public String getUrl(){
+        return this.url;
+    }
+
     /**
-     * @param bookmark the bookmark to set
+     * @param bookmark
+     *            the bookmark to set
      */
     public void setBookmark(boolean bookmark) {
         this.bookmark = bookmark;
@@ -104,5 +132,21 @@ public class RegisterURLActionBean extends AbstractActionBean {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public boolean isShowFactsheetLink() {
+        return showFactsheetLink;
+    }
+
+    public void setShowFactsheetLink(boolean showFactsheetLink) {
+        this.showFactsheetLink = showFactsheetLink;
+    }
+
+    public String getRegistrationMessage() {
+        return registrationMessage;
+    }
+
+    public void setRegistrationMessage(String registrationMessage) {
+        this.registrationMessage = registrationMessage;
     }
 }

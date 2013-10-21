@@ -684,10 +684,9 @@ public class PullHarvest extends BaseHarvest {
      */
     private void addSourceMetadata(HttpURLConnection urlConn, int responseCode, String responseMessage, Exception exception) {
 
-        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
-        String lastRefreshed = formatDate(new Date());
+        addFirstSeenPredicate();
 
-        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
+        String lastRefreshed = formatDate(new Date());
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
 
         if (isError(responseCode)) {

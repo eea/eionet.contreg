@@ -441,4 +441,11 @@ public interface HelperDAO extends DAO {
      * @throws DAOException if deleting fails
      */
     void deleteProjectBookmark(String uri) throws DAOException;
+
+    /**
+     * Test if the Subject has any firstSeen values set.
+     * @param uri
+     * @return
+     */
+    boolean isSubjectSeen(String uri);
 }

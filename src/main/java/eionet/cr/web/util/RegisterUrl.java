@@ -61,4 +61,31 @@ public final class RegisterUrl {
         // schedule urgent harvest of this URL
         UrgentHarvestQueue.addPullHarvest(urlWithoutFragment, user.getUserName());
     }
+
+    /**
+     * Test if the url is already registered
+     *
+     * @param subject
+     * @return
+     * @throws DAOException
+     */
+    public static boolean isSubjectRegistered(String subject) throws DAOException{
+        return DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(subject);
+    }
+
+    /**
+     * Test if the provided subject is already bookmarked by the user
+     *
+     * @param subject
+     * @param user
+     * @return
+     * @throws DAOException
+     */
+    public static boolean isSubjectBookmarkedByUser(String subject, CRUser user) throws DAOException{
+        return DAOFactory.get().getDao(HelperDAO.class).isSubjectUserBookmark(user, subject);
+    }
+
+    public static void saveSubjectUserBookmark(String subject, CRUser user, String label) throws DAOException{
+        DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(user, subject, label);
+    }
 }
