@@ -546,7 +546,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             ObjectDTO objectDTO;
 
             // add the rdf:type=cr:firstSeen triple into user's registrations if the url is not present before.
-            if (!isSubjectSeen(url)){
+            if (!isSubjectSeen(url)) {
 
                 String firstSeen = Util.virtuosoDateToString(new Date());
                 registeredSubject = new SubjectDTO(url, registeredSubject == null ? false : registeredSubject.isAnonymous());
@@ -555,7 +555,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
                 registeredSubject.addObject(Predicates.CR_FIRST_SEEN, objectDTO);
                 addTriples(registeredSubject);
             }
-
 
             // add the URL into user's history
             SubjectDTO userHomeItemSubject = new SubjectDTO(user.getHomeItemUri(url), false);
@@ -1623,17 +1622,19 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
         try {
             subject = getSubject(uri);
         } catch (DAOException e) {
-            return false;
+            logger.info("Subject " + uri + " not found with exception: "+e.getMessage());
         }
 
-        if (subject != null ){
+        if (subject != null) {
             Collection<ObjectDTO> predicates = subject.getPredicates().get(Predicates.CR_FIRST_SEEN);
-            if (predicates == null || (predicates != null && predicates.size() == 0)){
+            if (predicates == null || (predicates != null && predicates.size() == 0)) {
                 return false;
+            } else {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
 }
