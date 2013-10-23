@@ -121,8 +121,8 @@
                                     <td><c:out value="${actionBean.fileName}"/></td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question" title="Title of the table that this CSV/TSV file represents.">Table title</label></td>
-                                    <td><stripes:text name="fileLabel" size="80" /></td>
+                                    <td><label class="question" for="fileLabel" title="Title of the table that this CSV/TSV file represents.">Table title</label></td>
+                                    <td><stripes:text name="fileLabel" id="fileLabel" size="80" /></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -179,7 +179,7 @@
                                 </tr>
                                 <!-- Data linking -->
                                 <tr>
-                                    <td><label class="question" title="If you add links to the data you can join with other datasets over the links.">Add links to the data</label></td>
+                                    <td><label class="question" title="If you improve the data you can join with other datasets over the links.">Improve the data</label></td>
                                     <td><stripes:checkbox name="addDataLinkingScripts" id="addLinksCheckbox" /></td>
                                 </tr>
                                 <tr id="addLinksRow">
