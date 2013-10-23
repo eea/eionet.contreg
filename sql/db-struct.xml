@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+     You can run this change log on your database as many times as you want, it will ignore the
+     changes that are already applied. It also means that you can't modify an existing revision.
+     Always add to the end.
+
+     Use the maven goals: liquibase:update, liquibase:status or liquibase:changelogSync
+      Potentially with -Dliquibase.dropFirst=true
+ -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="roug" id="rev-1">
+        <comment>Access control lists</comment>
+        <sql>create table "CR"."cr3user"."acls"
+(
+  "acl_id" INTEGER IDENTITY,
+  "acl_name" VARCHAR(100),
+  "parent_name" VARCHAR(100),
+  "owner" VARCHAR(255),
+  "description" VARCHAR(255),
+  PRIMARY KEY ("acl_id")
+)</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-2">
+        <sql>create table "CR"."cr3user"."acl_rows"
+(
+  "acl_id" INTEGER,
+  "type" VARCHAR(50),
+  "entry_type" VARCHAR(50),
+  "principal" VARCHAR(16),
+  "status" INTEGER,
+  "permissions" VARCHAR(255),
+  PRIMARY KEY ("acl_id", "type", "entry_type", "principal", "status")
+)</sql>
+        <sql>ALTER TABLE "CR"."cr3user"."acl_rows"
+  ADD CHECK ( entry_type  = 'owner'  OR  entry_type  = 'user'  OR  entry_type  = 'localgroup'  OR  entry_type  = 'other'  OR  entry_type  = 'foreign'  OR  entry_type  = 'unauthenticated'  OR  entry_type  = 'authenticated'  OR  entry_type  = 'mask' )</sql>
+        <sql>ALTER TABLE "CR"."cr3user"."acl_rows"
+  ADD CHECK ( type  = 'object'  OR  type  = 'doc'  OR  type  = 'dcc' )/</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-3">
+        <sql>create table "CR"."cr3user"."delivery_filter"
+(
+  "delivery_filter_id" INTEGER IDENTITY,
+  "obligation" VARCHAR(255),
+  "obligation_label" VARCHAR(255),
+  "locality" VARCHAR(255),
+  "locality_label" VARCHAR(255),
+  "year" VARCHAR(10),
+  "username" VARCHAR(10)
+)</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-4">
+        <sql>create table "CR"."cr3user"."documentation"
+(
+  "page_id" VARCHAR(255),
+  "content_type" VARCHAR(100),
+  "title" VARCHAR(512),
+  PRIMARY KEY ("page_id")
+)</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-5">
+        <sql>create table "CR"."cr3user"."endpoint_harvest_query"
+(
+  "endpoint_harvest_query_id" INTEGER IDENTITY,
+  "title" VARCHAR(255),
+  "query" LONG VARCHAR,
+  "endpoint_url" VARCHAR(1024),
+  "endpoint_url_hash" BIGINT,
+  "position_number" INTEGER,
+  "active" VARCHAR(1),
+  "last_modified" DATETIME,
+  PRIMARY KEY ("endpoint_harvest_query_id")
+)</sql>
+        <sql>ALTER TABLE "CR"."cr3user"."endpoint_harvest_query"
+  ADD CONSTRAINT "fk_url_hash" FOREIGN KEY ("endpoint_url_hash")
+    REFERENCES "CR"."cr3user"."harvest_source" ("url_hash") ON UPDATE CASCADE ON DELETE CASCADE</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-6">
+        <sql>create table "CR"."cr3user"."harvest"
+(
+  "harvest_id" INTEGER IDENTITY,
+  "harvest_source_id" INTEGER,
+  "type" VARCHAR(20),
+  "username" VARCHAR(45),
+  "status" VARCHAR(10),
+  "started" DATETIME,
+  "finished" DATETIME,
+  "tot_statements" INTEGER,
+  "lit_statements" INTEGER,
+  "res_statements" INTEGER,
+  "enc_schemes" INTEGER,
+  "http_code" INTEGER,
+  PRIMARY KEY ("harvest_id")
+)</sql>
+        <sql>ALTER TABLE "CR"."cr3user"."harvest"
+  ADD CONSTRAINT "ha_haso_fk" FOREIGN KEY ("harvest_source_id")
+    REFERENCES "CR"."cr3user"."harvest_source" ("harvest_source_id") ON DELETE CASCADE</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-7">
+        <sql>create table "CR"."cr3user"."harvest_message"
+(
+  "harvest_message_id" INTEGER IDENTITY,
+  "harvest_id" INTEGER,
+  "type" VARCHAR(3),
+  "message" LONG VARCHAR,
+  "stack_trace" LONG VARCHAR,
+  PRIMARY KEY ("harvest_message_id")
+)</sql>
+        <sql>ALTER TABLE "CR"."cr3user"."harvest_message"
+  ADD CONSTRAINT "hame_ha_fk" FOREIGN KEY ("harvest_id")
+    REFERENCES "CR"."cr3user"."harvest" ("harvest_id") ON DELETE CASCADE</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-8">
+        <sql>create table "CR"."cr3user"."remove_source_queue"
+(
+  "url" VARCHAR(1024),
+  PRIMARY KEY ("url")
+)</sql>
+    </changeSet>
+
+
+    <changeSet author="roug" id="rev-9">
+        <sql>create table "CR"."cr3user"."spo_binary"
+(
+  "subject" BIGINT,
+  "obj_lang" VARCHAR(10),
+  "datatype" VARCHAR(50),
+  "must_embed" VARCHAR(1),
+  PRIMARY KEY ("subject")
+)</sql>
+    </changeSet>
+
+
+</databaseChangeLog>
