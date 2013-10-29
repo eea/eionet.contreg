@@ -42,9 +42,11 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.readers.HarvestSourceDTOReader;
 import eionet.cr.dao.readers.NewSourcesReaderWriter;
+import eionet.cr.dao.readers.UrlAuthenticationDTOReader;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UrlAuthenticationDTO;
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
@@ -231,7 +233,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         return getSources(
                 StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
-                searchString, pagingRequest, sortingRequest);
+                        searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -546,7 +548,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException,
-            DAOException {
+    DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -703,9 +705,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         StringBuffer buf =
                 new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                        .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                        .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                        .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -1096,8 +1098,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int
-            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-                    throws IOException, OpenRDFException {
+    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+            throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1147,7 +1149,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-            IOException {
+    IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -1244,7 +1246,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-            RepositoryException, IOException {
+    RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -1946,5 +1948,82 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         } finally {
             SQLUtil.close(pstmt);
         }
+    }
+
+    @Override
+    public List<UrlAuthenticationDTO> getUrlAuthentications() throws DAOException {
+        String query = "SELECT authurl_id, url_namestart, url_username, url_password FROM AUTHURL ORDER BY url_namestart";
+        List<Object> inParams = new LinkedList<Object>();
+        List<UrlAuthenticationDTO> list = executeSQL(query, inParams, new UrlAuthenticationDTOReader());
+        return list;
+    }
+
+    @Override
+    public UrlAuthenticationDTO getUrlAuthentication(int id) throws DAOException{
+
+        String query = "SELECT authurl_id, url_namestart, url_username, url_password FROM AUTHURL WHERE authurl_id = ?";
+
+        List<Object> inParams = new LinkedList<Object>();
+        inParams.add(id);
+        List<UrlAuthenticationDTO> list = executeSQL(query, inParams, new UrlAuthenticationDTOReader());
+
+        if (list != null && list.size() > 0){
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Insert a record into the the table of authentication data for harvest source urls.
+     */
+    private static final String ADD_AUTHURL = "INSERT INTO AUTHURL (url_namestart, url_username, url_password) VALUES (?,?,?)";
+    private static final String EDIT_AUTHURL = "UPDATE AUTHURL set url_namestart=?, url_username=?, url_password=? WHERE authurl_id=?";
+
+    @Override
+    public int saveUrlAuthentication(UrlAuthenticationDTO urlAuthentication) throws DAOException{
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            if (urlAuthentication.getId() == 0){
+                ps = conn.prepareStatement(ADD_AUTHURL);
+            } else {
+                ps = conn.prepareStatement(EDIT_AUTHURL);
+                ps.setInt(4, urlAuthentication.getId());
+            }
+
+            ps.setString(1, urlAuthentication.getUrlBeginning());
+            ps.setString(2, urlAuthentication.getUsername());
+            ps.setString(3, urlAuthentication.getPassword());
+
+            ps.executeUpdate();
+            ps = conn.prepareStatement("select identity_value()");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                throw new CRException("No auto-generated keys returned!");
+            }
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    throw new DAOException(e.toString(), e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void deleteUrlAuthentication(int id) throws DAOException{
+        String query = "DELETE FROM AUTHURL WHERE authurl_id = ?";
+        List<Object> inParams = new LinkedList<Object>();
+        inParams.add(id);
+        executeSQL(query, inParams, new UrlAuthenticationDTOReader());
     }
 }

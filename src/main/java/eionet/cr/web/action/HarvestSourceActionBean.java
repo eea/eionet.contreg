@@ -52,6 +52,7 @@ import eionet.cr.dataset.CreateDataset;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.TripleDTO;
+import eionet.cr.dto.UrlAuthenticationDTO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
@@ -105,6 +106,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     private boolean overwriteDataset;
 
     private boolean schemaSource;
+    private int urlAuthenticationId = 0;
+
+    private UrlAuthenticationDTO urlAuthentication = null;
+    private List<UrlAuthenticationDTO> urlAuthentications = null;
 
     /** */
     static {
@@ -160,7 +165,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     @DefaultHandler
     @HandlesEvent("view")
     public Resolution view() throws DAOException {
-        return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
+        if (harvestSource != null){
+            return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
+        } else {
+            return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", null);
+        }
     }
 
     /**
@@ -220,6 +229,141 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
         return resolution;
     }
+
+    /**
+     * Lists all the urls that require username and password for harvesting.
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution authentications() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+
+            urlAuthentications = factory.getDao(HarvestSourceDAO.class).getUrlAuthentications();
+
+            Resolution resolution = new ForwardResolution("/pages/admin/authentedHarvestSources.jsp");
+
+            return resolution;
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
+
+    /**
+     * Shows the url authentication data
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution viewauthenticationdata() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+
+            if (urlAuthenticationId > 0){
+                urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlAuthenticationId);
+            } else {
+                urlAuthentication = new UrlAuthenticationDTO();
+            }
+
+            Resolution resolution = new ForwardResolution("/pages/admin/authentedHarvestSourceView.jsp");
+            return resolution;
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
+
+
+    /**
+     * Prepares url authentication data form
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution editauthenticationdata() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+
+            if (urlAuthenticationId > 0){
+                urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlAuthenticationId);
+            } else {
+                urlAuthentication = new UrlAuthenticationDTO();
+            }
+
+            Resolution resolution = new ForwardResolution("/pages/admin/authentedHarvestSourceEdit.jsp");
+            return resolution;
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
+
+    /**
+     * Shows the url authentication data
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution deleteauthentedurl() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+
+            if (urlAuthenticationId > 0){
+                factory.getDao(HarvestSourceDAO.class).deleteUrlAuthentication(urlAuthenticationId);
+            }
+
+            addSystemMessage("Url authentication data successfully deleted.");
+            return authentications();
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
+
+
+    /**
+     * Saves url authentication data.
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution saveauthentedurl() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+            int id = factory.getDao(HarvestSourceDAO.class).saveUrlAuthentication(urlAuthentication);
+            if (urlAuthenticationId > 0){
+                addSystemMessage("Url authentication data successfully saved.");
+                return viewauthenticationdata();
+            } else {
+                urlAuthenticationId = id;
+                addSystemMessage("Url authentication data successfully added.");
+                return viewauthenticationdata();
+            }
+
+
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
+
 
     /**
      *
@@ -393,7 +537,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param intervalMultiplier the intervalMultiplier to set
+     * @param intervalMultiplier
+     *            the intervalMultiplier to set
      */
     public void setIntervalMultiplier(int intervalMultiplier) {
         this.intervalMultiplier = intervalMultiplier;
@@ -480,7 +625,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param selectedTab the selectedTab to set
+     * @param selectedTab
+     *            the selectedTab to set
      */
     public void setSelectedTab(String selectedTab) {
         this.selectedTab = selectedTab;
@@ -494,7 +640,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param exportType the exportType to set
+     * @param exportType
+     *            the exportType to set
      */
     public void setExportType(String exportType) {
         this.exportType = exportType;
@@ -518,7 +665,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param urlBefore the urlBefore to set
+     * @param urlBefore
+     *            the urlBefore to set
      */
     public void setUrlBefore(String urlBefore) {
         this.urlBefore = urlBefore;
@@ -554,5 +702,25 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     public void setFolder(String folder) {
         this.folder = folder;
+    }
+
+    public List<UrlAuthenticationDTO> getUrlAuthentications() {
+        return urlAuthentications;
+    }
+
+    public void setUrlAuthentications(List<UrlAuthenticationDTO> urlAuthentications) {
+        this.urlAuthentications = urlAuthentications;
+    }
+
+    public void setUrlAuthenticationId(int urlAuthenticationId) {
+        this.urlAuthenticationId = urlAuthenticationId;
+    }
+
+    public UrlAuthenticationDTO getUrlAuthentication() {
+        return urlAuthentication;
+    }
+
+    public void setUrlAuthentication(UrlAuthenticationDTO urlAuthentication) {
+        this.urlAuthentication = urlAuthentication;
     }
 }

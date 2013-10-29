@@ -37,6 +37,7 @@ import org.openrdf.rio.RDFParseException;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UrlAuthenticationDTO;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
@@ -492,4 +493,38 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     void updateHarvestedStatementsTriple(String sourceUri) throws DAOException;
+
+    /**
+     * Returns the list of all urls which have been assigned a username and password
+     *
+     * @return list of authenticated urls
+     * @throws DAOException
+     */
+    List<UrlAuthenticationDTO> getUrlAuthentications() throws DAOException;
+
+    /**
+     * Returns single url with authentication information
+     *
+     * @param id
+     * @return url with authentication
+     * @throws DAOException
+     */
+    UrlAuthenticationDTO getUrlAuthentication(int id) throws DAOException;
+
+    /**
+     * Saves or adds urlAuthentication to database. If no id is provided, new url is added.
+     * If id is present, existing url is overwritten.
+     *
+     * @param urlAuthentication
+     * @throws DAOException
+     */
+    int saveUrlAuthentication(UrlAuthenticationDTO urlAuthentication) throws DAOException;
+
+    /**
+     * Deletes urlAuthentication from database.
+     *
+     * @param urlAuthentication
+     * @throws DAOException
+     */
+    void deleteUrlAuthentication(int id) throws DAOException;
 }

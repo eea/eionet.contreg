@@ -7,19 +7,27 @@
     <stripes:layout-component name="contents">
 
             <c:if test='${crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
-                <div id="operations">
-                    <ul>
-                        <li>
-                            <stripes:link href="/source.action" event="add">
-                                <c:out value="Add new source"/>
-                                <c:if test="${actionBean.type != null && actionBean.type eq 'endpoints'}">
-                                    <stripes:param name="harvestSource.sparqlEndpoint" value="true"/>
-                                </c:if>
-                            </stripes:link>
-                        </li>
-                    </ul>
-                </div>
+                <ul id="dropdown-operations">
+                    <li><a href="#">Operations</a>
+                        <ul>
+                            <li>
+	                            <stripes:link href="/source.action" event="add">
+	                                <c:out value="Add new source"/>
+	                                <c:if test="${actionBean.type != null && actionBean.type eq 'endpoints'}">
+	                                    <stripes:param name="harvestSource.sparqlEndpoint" value="true"/>
+	                                </c:if>
+	                            </stripes:link>
+	                        </li>
+	                        <li>
+                                <stripes:link href="/source.action" event="authentications">
+                                    <c:out value="Manage login data"/>
+                                </stripes:link>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </c:if>
+
 
             <h1>Harvesting sources</h1>
             <p></p>
