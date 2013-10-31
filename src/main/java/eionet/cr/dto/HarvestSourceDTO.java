@@ -60,6 +60,13 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     private boolean isSparqlEndpoint;
 
     /**
+     * Fields are used when adding new source.
+     */
+    private boolean authenticated;
+    private String username;
+    private String password;
+
+    /**
      *
      */
     public HarvestSourceDTO() {
@@ -356,5 +363,29 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      */
     public void setSparqlEndpoint(boolean isSparqlEndpoint) {
         this.isSparqlEndpoint = isSparqlEndpoint;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -123,24 +123,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     + "WHERE g = iri_to_id ('%old_graph%',0)";
 
     /** */
-    private static final String GRAPH_SYNC_SPARUL1 = "" +
-            "DELETE FROM GRAPH <%perm_graph%> {\n" +
-            "    ?s ?p ?o\n" +
-            "}\n" +
-            "WHERE {\n" +
-            "  GRAPH <%perm_graph%> {?s ?p ?o}\n" +
-            "  FILTER (!bif:exists((select(1) where {graph <%temp_graph%> {?s ?p ?o}})))\n" +
-            "}";
+    private static final String GRAPH_SYNC_SPARUL1 = "" + "DELETE FROM GRAPH <%perm_graph%> {\n" + "    ?s ?p ?o\n" + "}\n"
+            + "WHERE {\n" + "  GRAPH <%perm_graph%> {?s ?p ?o}\n"
+            + "  FILTER (!bif:exists((select(1) where {graph <%temp_graph%> {?s ?p ?o}})))\n" + "}";
 
     /** */
-    private static final String GRAPH_SYNC_SPARUL2 = "" +
-            "INSERT INTO GRAPH <%perm_graph%> {\n" +
-            "    ?s ?p ?o\n" +
-            "}\n" +
-            "WHERE {\n" +
-            "  GRAPH <%temp_graph%> {?s ?p ?o}\n" +
-            "  FILTER (!bif:exists((select (1) where {graph <%perm_graph%> {?s ?p ?o}})))\n" +
-            "}";
+    private static final String GRAPH_SYNC_SPARUL2 = "" + "INSERT INTO GRAPH <%perm_graph%> {\n" + "    ?s ?p ?o\n" + "}\n"
+            + "WHERE {\n" + "  GRAPH <%temp_graph%> {?s ?p ?o}\n"
+            + "  FILTER (!bif:exists((select (1) where {graph <%perm_graph%> {?s ?p ?o}})))\n" + "}";
 
     /*
      * (non-Javadoc)
@@ -1041,6 +1031,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#removeSourceFromInferenceRule()
+     *
      * @Deprecated Inference is removed from CR
      */
     @Deprecated
@@ -1654,13 +1645,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * Loads the given input streams into given target graph. Streams are given as a collection of pairs where the left-side is
-     * the stream to load, and the right side is the loader to use.
+     * Loads the given input streams into given target graph. Streams are given as a collection of pairs where the left-side is the
+     * stream to load, and the right side is the loader to use.
      *
-     * @param streams The streams as descibred above.
-     * @param graphUri The target graph URI.
+     * @param streams
+     *            The streams as descibred above.
+     * @param graphUri
+     *            The target graph URI.
      * @return Total number of loaded triples.
-     * @throws DAOException All exceptions are wrapped into this one.
+     * @throws DAOException
+     *             All exceptions are wrapped into this one.
      */
     private int loadContent(Collection<Pair<InputStream, ContentLoader>> streams, String graphUri) throws DAOException {
 
@@ -1780,7 +1774,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 if (!cleanupSuccess) {
                     if (wasOrigEmpty) {
                         msg = msg + "(and the subsequent cleanup of original graph) ";
-                    } else  {
+                    } else {
                         msg = msg + "(and the subsequent cleanup of temporary graph) ";
                     }
                 }
@@ -1807,11 +1801,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Replace graph URI with new one.
      *
-     * @param sqlConn Connection.
-     * @param oldGraph Existing graph URI.
-     * @param newGraph The new URI of the graph.
-     * @param message Log message written into log file.
-     * @throws DAOException Database error.
+     * @param sqlConn
+     *            Connection.
+     * @param oldGraph
+     *            Existing graph URI.
+     * @param newGraph
+     *            The new URI of the graph.
+     * @param message
+     *            Log message written into log file.
+     * @throws DAOException
+     *             Database error.
      */
     private void renameGraph(Connection sqlConn, URI oldGraph, URI newGraph, String message) throws DAOException {
 
@@ -1880,12 +1879,17 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Deletes the given graph from repository by executing SPARQL "clear graph" statement.
      *
-     * @param sqlConn SQL Connection to be used when deleting the graph.
-     * @param graphUri Graph Uri to be deleted.
-     * @param message Log message written into log file.
-     * @param failSafely if true, then the Exception will not be thrown and it is only logged on warning level.
+     * @param sqlConn
+     *            SQL Connection to be used when deleting the graph.
+     * @param graphUri
+     *            Graph Uri to be deleted.
+     * @param message
+     *            Log message written into log file.
+     * @param failSafely
+     *            if true, then the Exception will not be thrown and it is only logged on warning level.
      * @return true if the graph was successfully deleted from repository.
-     * @throws DAOException if clear graph failed and the method don't have to fail safely.
+     * @throws DAOException
+     *             if clear graph failed and the method don't have to fail safely.
      */
     private boolean clearGraph(Connection sqlConn, String graphUri, String message, boolean failSafely) throws DAOException {
 
@@ -1908,15 +1912,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * Load given RDF file, using the fast DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and
-     * DB.DBA.TTLP(file_open(f), graph, graph) functions. The file's exact syntax is determined by the given {@link RDFFormat}.
+     * Load given RDF file, using the fast DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and DB.DBA.TTLP(file_open(f), graph,
+     * graph) functions. The file's exact syntax is determined by the given {@link RDFFormat}.
      *
-     * @param file File to load.
-     * @param rdfFormat The file's exact RDF format.
-     * @param conn The SQL connection to use.
-     * @param baseUri The base URI to for resolving relative URLs in the file.
-     * @param contextUri The target graph where the the triples must be loaded into.
-     * @throws SQLException In case database access error happens.
+     * @param file
+     *            File to load.
+     * @param rdfFormat
+     *            The file's exact RDF format.
+     * @param conn
+     *            The SQL connection to use.
+     * @param baseUri
+     *            The base URI to for resolving relative URLs in the file.
+     * @param contextUri
+     *            The target graph where the the triples must be loaded into.
+     * @throws SQLException
+     *             In case database access error happens.
      */
     private void loadRdfFile(File file, RDFFormat rdfFormat, Connection conn, String baseUri, String contextUri)
             throws SQLException {
@@ -1959,7 +1969,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     @Override
-    public UrlAuthenticationDTO getUrlAuthentication(int id) throws DAOException{
+    public UrlAuthenticationDTO getUrlAuthentication(int id) throws DAOException {
 
         String query = "SELECT authurl_id, url_namestart, url_username, url_password FROM AUTHURL WHERE authurl_id = ?";
 
@@ -1967,7 +1977,31 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         inParams.add(id);
         List<UrlAuthenticationDTO> list = executeSQL(query, inParams, new UrlAuthenticationDTOReader());
 
-        if (list != null && list.size() > 0){
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public UrlAuthenticationDTO getUrlAuthentication(String fullUrl) throws DAOException {
+
+        String queryExact =
+                "SELECT authurl_id, url_namestart, url_username, url_password FROM CR.cr3user.authurl WHERE ? LIKE url_namestart";
+
+        String queryBeginning =
+                "SELECT authurl_id, url_namestart, url_username, url_password FROM CR.cr3user.authurl WHERE ? LIKE CONCAT(url_namestart, '%')";
+
+        List<Object> inParams = new LinkedList<Object>();
+        inParams.add(fullUrl.toLowerCase());
+        List<UrlAuthenticationDTO> list = executeSQL(queryExact, inParams, new UrlAuthenticationDTOReader());
+
+        if (list == null || list.size() == 0) {
+            list = executeSQL(queryBeginning, inParams, new UrlAuthenticationDTOReader());
+        }
+
+        if (list != null && list.size() > 0) {
             return list.get(0);
         } else {
             return null;
@@ -1978,23 +2012,24 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * Insert a record into the the table of authentication data for harvest source urls.
      */
     private static final String ADD_AUTHURL = "INSERT INTO AUTHURL (url_namestart, url_username, url_password) VALUES (?,?,?)";
-    private static final String EDIT_AUTHURL = "UPDATE AUTHURL set url_namestart=?, url_username=?, url_password=? WHERE authurl_id=?";
+    private static final String EDIT_AUTHURL =
+            "UPDATE AUTHURL set url_namestart=?, url_username=?, url_password=? WHERE authurl_id=?";
 
     @Override
-    public int saveUrlAuthentication(UrlAuthenticationDTO urlAuthentication) throws DAOException{
+    public int saveUrlAuthentication(UrlAuthenticationDTO urlAuthentication) throws DAOException {
 
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            if (urlAuthentication.getId() == 0){
+            if (urlAuthentication.getId() == 0) {
                 ps = conn.prepareStatement(ADD_AUTHURL);
             } else {
                 ps = conn.prepareStatement(EDIT_AUTHURL);
                 ps.setInt(4, urlAuthentication.getId());
             }
 
-            ps.setString(1, urlAuthentication.getUrlBeginning());
+            ps.setString(1, urlAuthentication.getUrlBeginning().toLowerCase());
             ps.setString(2, urlAuthentication.getUsername());
             ps.setString(3, urlAuthentication.getPassword());
 
@@ -2020,7 +2055,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     @Override
-    public void deleteUrlAuthentication(int id) throws DAOException{
+    public void deleteUrlAuthentication(int id) throws DAOException {
         String query = "DELETE FROM AUTHURL WHERE authurl_id = ?";
         List<Object> inParams = new LinkedList<Object>();
         inParams.add(id);

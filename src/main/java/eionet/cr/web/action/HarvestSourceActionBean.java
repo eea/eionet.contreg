@@ -111,6 +111,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     private UrlAuthenticationDTO urlAuthentication = null;
     private List<UrlAuthenticationDTO> urlAuthentications = null;
 
+    /** Used to perform bulk operations with several url authentications at a time*/
+    private List<String> selectedUrlAuthenticationIds;
+
     /** */
     static {
         tabs = new LinkedList<Pair<String, String>>();
@@ -209,6 +212,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         manageRuleset(hSourceDTO.getUrl());
                     }
                     factory.getDao(HarvestSourceDAO.class).addSource(hSourceDTO);
+
+                    if (hSourceDTO.isAuthenticated()){
+                        UrlAuthenticationDTO urlAuth = new UrlAuthenticationDTO();
+                        urlAuth.setUrlBeginning(hSourceDTO.getUrl());
+                        urlAuth.setUsername(hSourceDTO.getUsername());
+                        urlAuth.setPassword(hSourceDTO.getPassword());
+                        factory.getDao(HarvestSourceDAO.class).saveUrlAuthentication(urlAuth);
+                    }
 
                     // set up the resolution
                     resolution = new ForwardResolution(HarvestSourcesActionBean.class);
@@ -310,7 +321,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * Shows the url authentication data
+     * Deletes the url authentication data
      *
      * @return
      * @throws DAOException
@@ -364,6 +375,36 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         }
     }
 
+
+
+
+    /**
+     * Deletes a list of url authentication data
+     *
+     * @return
+     * @throws DAOException
+     * @throws SchedulerException
+     * @throws HarvestException
+     * @throws MalformedURLException
+     */
+    public Resolution deleteSelectedUrlAuthentications() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+
+        boolean isUserLoggedIn = isUserLoggedIn();
+        if (isUserLoggedIn){
+
+            if (selectedUrlAuthenticationIds != null && selectedUrlAuthenticationIds.size() > 0){
+                for (String id : selectedUrlAuthenticationIds){
+                    factory.getDao(HarvestSourceDAO.class).deleteUrlAuthentication(Integer.parseInt(id));
+                }
+            }
+
+            addSystemMessage("Url authentication data successfully deleted.");
+            return authentications();
+        } else {
+            addWarningMessage(getBundle().getString("not.logged.in"));
+            return view();
+        }
+    }
 
     /**
      *
@@ -490,8 +531,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     /**
      *
      * @return boolean
+     * @throws DAOException
      */
-    public boolean validateAddEdit() {
+    public boolean validateAddEdit() throws DAOException {
 
         if (isPostRequest()) {
 
@@ -507,7 +549,27 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
                     if (!StringUtils.equals(urlBefore, urlString)
                             && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
-                        addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
+                        if (URLUtil.isUnauthorized(urlString)){
+
+                            UrlAuthenticationDTO urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlString);
+                            if (urlAuthentication == null){
+                                if (!harvestSource.isAuthenticated()){
+                                    addGlobalValidationError(new SimpleError("There is no valid authentication information stored for this url before."));
+                                } else {
+                                    if (!URLUtil.isValidAuthentication(urlString, harvestSource.getUsername(), harvestSource.getPassword())){
+                                        addGlobalValidationError(new SimpleError("The provided username and password are not valid for this source."));
+                                    }
+                                }
+                            } else {
+                                if (!harvestSource.isAuthenticated()){
+                                    if (!URLUtil.isValidAuthentication(urlString, urlAuthentication.getUsername(), urlAuthentication.getPassword())){
+                                        addGlobalValidationError(new SimpleError("An existing username and password is stored for this url pattern, but are not valid this exact source."));
+                                    }
+                                }
+                            }
+                        } else {
+                            addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
+                        }
                     }
 
                     Integer intervalMinutes = harvestSource.getIntervalMinutes();
@@ -722,5 +784,13 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     public void setUrlAuthentication(UrlAuthenticationDTO urlAuthentication) {
         this.urlAuthentication = urlAuthentication;
+    }
+
+    public List<String> getSelectedUrlAuthenticationIds() {
+        return selectedUrlAuthenticationIds;
+    }
+
+    public void setSelectedUrlAuthenticationIds(List<String> selectedUrlAuthenticationIds) {
+        this.selectedUrlAuthenticationIds = selectedUrlAuthenticationIds;
     }
 }

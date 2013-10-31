@@ -152,10 +152,70 @@ public class URLUtil {
             URLUtil.disconnect(urlConnection);
         }
 
+        System.out.println("Response code: "+responseCode);
+
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
                 || responseCode == HttpURLConnection.HTTP_VERSION;
     }
+
+    /**
+     * Connect to the URL and check if it exists at the remote end and whether it has basic authentication enabled.
+     *
+     * @param urlStr the URL to check.
+     * @return As described above.
+     */
+    public static boolean isUnauthorized(String urlStr) {
+
+        int responseCode = -1;
+        IOException ioe = null;
+        URLConnection urlConnection = null;
+        try {
+            URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
+            urlConnection = escapeIRI(url).openConnection();
+            urlConnection.setRequestProperty("Connection", "close");
+            responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
+        } catch (IOException e) {
+            ioe = e;
+        } finally {
+            URLUtil.disconnect(urlConnection);
+        }
+
+        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
+                || responseCode == HttpURLConnection.HTTP_FORBIDDEN || responseCode == HttpURLConnection.HTTP_UNAUTHORIZED;
+    }
+
+    /**
+     * Connect to the URL and check if it exists at the remote end and whether it has basic authentication enabled.
+     *
+     * @param urlStr the URL to check.
+     * @return As described above.
+     */
+    public static boolean isValidAuthentication(String urlStr, String username, String password) {
+
+        int responseCode = -1;
+        IOException ioe = null;
+        URLConnection urlConnection = null;
+        try {
+            URL url = new URL(StringUtils.substringBefore(urlStr, "#"));
+            urlConnection = escapeIRI(url).openConnection();
+            urlConnection.setRequestProperty("Connection", "close");
+
+            String userpass = username + ":" + password;
+            String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+            urlConnection.setRequestProperty ("Authorization", basicAuth);
+
+            responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
+        } catch (IOException e) {
+            ioe = e;
+        } finally {
+            URLUtil.disconnect(urlConnection);
+        }
+
+        return !(ioe instanceof MalformedURLException) && !(ioe instanceof UnknownHostException)
+                && responseCode != HttpURLConnection.HTTP_FORBIDDEN && responseCode != HttpURLConnection.HTTP_UNAUTHORIZED;
+    }
+
 
     /**
      * Calls {@link #isNotExisting(String, boolean)} with the boolean set to false. See documentation of that method.

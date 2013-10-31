@@ -512,6 +512,15 @@ public interface HarvestSourceDAO extends DAO {
     UrlAuthenticationDTO getUrlAuthentication(int id) throws DAOException;
 
     /**
+     * Returns single url with authentication information
+     *
+     * @param fullUrl
+     * @return url with authentication
+     * @throws DAOException
+     */
+    UrlAuthenticationDTO getUrlAuthentication(String fullUrl) throws DAOException;
+
+    /**
      * Saves or adds urlAuthentication to database. If no id is provided, new url is added.
      * If id is present, existing url is overwritten.
      *

@@ -17,46 +17,54 @@
                              <c:out value="Add new login data"/>
                          </stripes:link>
                      </li>
+                     <li>
+                         <stripes:link href="/sources.action" event="search">
+                             <c:out value="Return to harvest sources"/>
+                         </stripes:link>
+                     </li>
                  </ul>
              </li>
          </ul>
 
-        <c:if test="${ actionBean.urlAuthentications!=null && fn:length(actionBean.urlAuthentications)>0 }">
+        <c:if test="${not empty actionBean.urlAuthentications}">
+            <div style="margin-top:20px">
+                <crfn:form id="urlAuthenticationsForm" beanclass="${actionBean.class.name}" method="post">
+                    <display:table name="${actionBean.urlAuthentications}" class="datatable" id="authentication" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:80%">
 
-        <table id="urlAuthenticationsList" class="datatable">
-		<thead>
-		    <tr>
-			    <th scope="col">Url starts with</th>
-			    <th scope="col">Username</th>
-			    <th scope="col">Password</th>
-		    </tr>
-		</thead>
-		<tbody>
-		    <c:forEach items="${actionBean.urlAuthentications}" var="resultListItem" varStatus="rowStatus">
-		    <tr
-		        <c:choose>
-		            <c:when test="${rowStatus.count%2 != 0}">
-		                 class="odd"
-		            </c:when>
-		            <c:otherwise>
-		                class="even"
-		            </c:otherwise>
-		        </c:choose>>
+                        <display:setProperty name="paging.banner.item_name" value="Url authentication"/>
+                        <display:setProperty name="paging.banner.items_name" value="Url authentications"/>
+                        <display:setProperty name="paging.banner.all_items_found" value='<div class="pagebanner">{0} {1} found.</div>'/>
+                        <display:setProperty name="paging.banner.onepage" value=""/>
 
-		        <td>
-                    <stripes:link href="/source.action" event="viewauthenticationdata">
-                        <c:out value="${ resultListItem.urlBeginning }"/>
-                        <stripes:param name="urlAuthenticationId" value="${resultListItem.id }"/>
-                    </stripes:link>
-		        </td>
-		        <td>${ resultListItem.username }</td>
-		        <td>${ resultListItem.password }</td>
-		    </tr>
-		</c:forEach>
-		    </tbody>
-		</table>
+                        <display:column style="width:2em;text-align:center">
+                            <input type="checkbox" name="selectedUrlAuthenticationIds" value="${authentication.id}" title="Select this authentication"/>
+                        </display:column>
 
+                        <display:column style="width:12em;text-align:left" title='<span title="Url starts with">Url starts with</span>'>
+                            <stripes:link href="/source.action" event="viewauthenticationdata">
+                                <c:out value="${ authentication.urlBeginning }"/>
+                                <stripes:param name="urlAuthenticationId" value="${authentication.id }"/>
+                            </stripes:link>
+                        </display:column>
+
+                        <display:column style="width:12em;text-align:left" title='<span title="Username">Username</span>'>
+                            <c:out value="${authentication.username}"/>
+                        </display:column>
+
+                        <display:column style="width:12em;text-align:left" title='<span title="Password">Password</span>'>
+                            <c:out value="${authentication.password}"/>
+                        </display:column>
+                    </display:table>
+
+                    <div>
+                        <stripes:submit name="deleteSelectedUrlAuthentications" onclick="confirm('Are you sure you want to delete the selected url authentications?');" value="Delete" title="Delete selected url authentications"/>
+                        <input type="button" onclick="toggleSelectAll('urlAuthenticationsForm');return false" value="Select all" name="selectAll"/>
+                    </div>
+
+                </crfn:form>
+            </div>
         </c:if>
+
 
 
     </c:when>

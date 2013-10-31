@@ -71,6 +71,7 @@ import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UrlAuthenticationDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
@@ -750,7 +751,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-            RDFHandlerException, RDFParseException {
+    RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -931,6 +932,15 @@ public class PullHarvest extends BaseHarvest {
     }
 
     /**
+     * Adds basic authentication information to URL connection
+     */
+    private void addBasicAuthentication(HttpURLConnection urlConnection, String username, String password){
+        String userpass = username + ":" + password;
+        String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+        urlConnection.setRequestProperty ("Authorization", basicAuth);
+    }
+
+    /**
      * Prepares the {@link HttpURLConnection} to be invoked for the given URL's harvest.
      *
      * @param connectUrl URL to harvest.
@@ -941,7 +951,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
     private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-            ParserConfigurationException {
+    ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -950,6 +960,13 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Accept", ACCEPT_HEADER);
         connection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
         connection.setRequestProperty("Connection", "close");
+
+        UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(connectUrl);
+        if (authentication != null){
+            addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
+            LOGGER.info("Source has basic authentication. Using credentials of "+authentication.getUrlBeginning());
+        }
+
         connection.setInstanceFollowRedirects(false);
 
         // Set the timeout both for establishing the connection, and reading from it once established.
@@ -976,7 +993,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -1000,7 +1017,7 @@ public class PullHarvest extends BaseHarvest {
      * @return The prepared {@link HttpURLConnection}.
      * @throws IOException Several IO exception can happen on the way.
      */
-    private HttpURLConnection prepareEndpointConnection(String endpointUrl, String query) throws IOException {
+    private HttpURLConnection prepareEndpointConnection(String endpointUrl, String query) throws IOException, DAOException {
 
         String charset = "UTF-8";
         String queryString = String.format("query=%s", URLEncoder.encode(query, charset));
@@ -1013,6 +1030,14 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("User-Agent", URLUtil.userAgentHeader());
         connection.setRequestProperty("Connection", "close");
         connection.setInstanceFollowRedirects(false);
+
+        UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(queryString);
+        if (authentication != null){
+            addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
+            System.out.println("Using basic auth");
+        } else {
+            System.out.println("NOT Using basic auth");
+        }
 
         // Set the timeout both for establishing the connection, and reading from it once established.
         int httpTimeout = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.HARVESTER_HTTP_TIMEOUT, getTimeout());
@@ -1067,7 +1092,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
-            IOException, SAXException, ParserConfigurationException {
+    IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);
