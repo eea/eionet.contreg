@@ -512,6 +512,12 @@ public final class PostHarvestScriptParser {
 
             if (token.equalsIgnoreCase(tokenToReplace)) {
                 buf.append(replacement);
+            } else if (StringUtils.startsWithIgnoreCase(token, tokenToReplace)) {
+                if (!Character.isLetterOrDigit(token.charAt(tokenToReplace.length()))) {
+                    buf.append(replacement).append(StringUtils.substringAfter(token, tokenToReplace));
+                } else {
+                    buf.append(token);
+                }
             } else {
                 buf.append(token);
             }

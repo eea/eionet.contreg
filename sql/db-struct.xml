@@ -11,140 +11,293 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet author="roug" id="rev-1">
-        <comment>Access control lists</comment>
-        <sql>create table "CR"."cr3user"."acls"
-(
-  "acl_id" INTEGER IDENTITY,
-  "acl_name" VARCHAR(100),
-  "parent_name" VARCHAR(100),
-  "owner" VARCHAR(255),
-  "description" VARCHAR(255),
-  PRIMARY KEY ("acl_id")
-)</sql>
+     <changeSet author="heinlja" id="rev-1">
+        <comment>Create the table of the dynamically edited documentation content</comment>
+        <sql>
+            create table "documentation"
+            (
+                "page_id" VARCHAR(255),
+                "content_type" VARCHAR(100),
+                "title" VARCHAR(512),
+                PRIMARY KEY ("page_id")
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-2">
+        <comment>Create the table where the metadata of harvest sources is stored.</comment>
+        <sql>
+            create table "harvest_source"
+            (
+                "url_hash" BIGINT,
+                "harvest_source_id" INTEGER IDENTITY,
+                "url" VARCHAR(1024),
+                "emails" VARCHAR(255),
+                "time_created" DATETIME,
+                "last_harvest_id" INTEGER,
+                "statements" INTEGER,
+                "count_unavail" INTEGER,
+                "last_harvest" DATETIME,
+                "interval_minutes" INTEGER,
+                "source" BIGINT,
+                "gen_time" BIGINT,
+                "last_harvest_failed" VARCHAR(1),
+                "priority_source" VARCHAR(1),
+                "source_owner" VARCHAR(20),
+                "permanent_error" VARCHAR(1),
+                "media_type" VARCHAR(255),
+                "is_sparql_endpoint" VARCHAR(1),
+                PRIMARY KEY ("url_hash")
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-3">
+        <comment>Create the table where the metadata of every harvest is stored.</comment>
+        <sql>
+            create table "harvest"
+            (
+				"harvest_id" INTEGER IDENTITY,
+				"harvest_source_id" INTEGER,
+				"type" VARCHAR(20),
+				"username" VARCHAR(45),
+				"status" VARCHAR(10),
+				"started" DATETIME,
+				"finished" DATETIME,
+				"tot_statements" INTEGER,
+				"lit_statements" INTEGER,
+				"res_statements" INTEGER,
+				"enc_schemes" INTEGER,
+				"http_code" INTEGER,
+				PRIMARY KEY ("harvest_id")
+            )
+        </sql>
+        <sql>
+            ALTER TABLE "harvest"
+            ADD FOREIGN KEY ("harvest_source_id")
+            REFERENCES "harvest_source" ("harvest_source_id") ON DELETE CASCADE
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-4">
+        <comment>Create the table where the harvest messages are stored.</comment>
+        <sql>
+            create table "harvest_message"
+            (
+                "harvest_message_id" INTEGER IDENTITY,
+                "harvest_id" INTEGER,
+                "type" VARCHAR(3),
+                "message" LONG VARCHAR,
+                "stack_trace" LONG VARCHAR,
+                PRIMARY KEY ("harvest_message_id")
+            )
+        </sql>
+        <sql>
+            ALTER TABLE "harvest_message"
+            ADD FOREIGN KEY ("harvest_id")
+            REFERENCES "harvest" ("harvest_id") ON DELETE CASCADE
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-5">
+        <comment>The table where the binary content of the local resources is stored.</comment>
+        <sql>
+            create table "spo_binary"
+            (
+				"subject" BIGINT,
+				"obj_lang" VARCHAR(10),
+				"datatype" VARCHAR(50),
+				"must_embed" VARCHAR(1),
+				PRIMARY KEY ("subject")
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-6">
+        <comment>Create the table that stores the queue of harvest sources to be removed.</comment>
+        <sql>
+            create table "remove_source_queue"
+            (
+				"url" VARCHAR(1024),
+				PRIMARY KEY ("url")
+            )
+        </sql>
     </changeSet>
 
 
-    <changeSet author="roug" id="rev-2">
-        <sql>create table "CR"."cr3user"."acl_rows"
-(
-  "acl_id" INTEGER,
-  "type" VARCHAR(50),
-  "entry_type" VARCHAR(50),
-  "principal" VARCHAR(16),
-  "status" INTEGER,
-  "permissions" VARCHAR(255),
-  PRIMARY KEY ("acl_id", "type", "entry_type", "principal", "status")
-)</sql>
-        <sql>ALTER TABLE "CR"."cr3user"."acl_rows"
-  ADD CHECK ( entry_type  = 'owner'  OR  entry_type  = 'user'  OR  entry_type  = 'localgroup'  OR  entry_type  = 'other'  OR  entry_type  = 'foreign'  OR  entry_type  = 'unauthenticated'  OR  entry_type  = 'authenticated'  OR  entry_type  = 'mask' )</sql>
-        <sql>ALTER TABLE "CR"."cr3user"."acl_rows"
-  ADD CHECK ( type  = 'object'  OR  type  = 'doc'  OR  type  = 'dcc' )/</sql>
+    <changeSet author="heinlja" id="rev-7">
+        <comment>Create the table that stores the post-harvest SPARQL scripts.</comment>
+        <sql>
+            create table "post_harvest_script"
+            (
+				"post_harvest_script_id" INTEGER IDENTITY,
+				"target_source_url" VARCHAR(1024),
+				"target_type_url" VARCHAR(1024),
+				"title" VARCHAR(255),
+				"script" LONG VARCHAR,
+				"position_number" INTEGER,
+				"active" VARCHAR(1),
+				"run_once" VARCHAR(1),
+				"last_modified" DATETIME,
+				PRIMARY KEY ("post_harvest_script_id")
+            )
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD CHECK ( target_source_url  IS NULL OR  target_type_url  IS NULL)
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-3">
-        <sql>create table "CR"."cr3user"."delivery_filter"
-(
-  "delivery_filter_id" INTEGER IDENTITY,
-  "obligation" VARCHAR(255),
-  "obligation_label" VARCHAR(255),
-  "locality" VARCHAR(255),
-  "locality_label" VARCHAR(255),
-  "year" VARCHAR(10),
-  "username" VARCHAR(10)
-)</sql>
+    <changeSet author="heinlja" id="rev-8">
+        <comment>Create the table for filtering Reportnet deliveries.</comment>
+        <sql>
+            create table "delivery_filter"
+            (
+				"delivery_filter_id" INTEGER IDENTITY,
+				"obligation" VARCHAR(255),
+				"obligation_label" VARCHAR(255),
+				"locality" VARCHAR(255),
+				"locality_label" VARCHAR(255),
+				"year" VARCHAR(10),
+				"username" VARCHAR(10)
+            )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-4">
-        <sql>create table "CR"."cr3user"."documentation"
-(
-  "page_id" VARCHAR(255),
-  "content_type" VARCHAR(100),
-  "title" VARCHAR(512),
-  PRIMARY KEY ("page_id")
-)</sql>
+    <changeSet author="heinlja" id="rev-9">
+        <comment>Create the table of Access Control Lists</comment>
+        <sql>
+            create table "acls"
+            (
+				"acl_id" INTEGER IDENTITY,
+				"acl_name" VARCHAR(100),
+				"parent_name" VARCHAR(100),
+				"owner" VARCHAR(255),
+				"description" VARCHAR(255),
+				PRIMARY KEY ("acl_id")
+            )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-5">
-        <sql>create table "CR"."cr3user"."endpoint_harvest_query"
-(
-  "endpoint_harvest_query_id" INTEGER IDENTITY,
-  "title" VARCHAR(255),
-  "query" LONG VARCHAR,
-  "endpoint_url" VARCHAR(1024),
-  "endpoint_url_hash" BIGINT,
-  "position_number" INTEGER,
-  "active" VARCHAR(1),
-  "last_modified" DATETIME,
-  PRIMARY KEY ("endpoint_harvest_query_id")
-)</sql>
-        <sql>ALTER TABLE "CR"."cr3user"."endpoint_harvest_query"
-  ADD CONSTRAINT "fk_url_hash" FOREIGN KEY ("endpoint_url_hash")
-    REFERENCES "CR"."cr3user"."harvest_source" ("url_hash") ON UPDATE CASCADE ON DELETE CASCADE</sql>
+    <changeSet author="heinlja" id="rev-10">
+        <comment>Create the table of the rows of Access Control Lists</comment>
+        <sql>
+            create table "acl_rows"
+            (
+				"acl_id" INTEGER,
+				"type" VARCHAR(50),
+				"entry_type" VARCHAR(50),
+				"principal" VARCHAR(16),
+				"status" INTEGER,
+				"permissions" VARCHAR(255),
+				PRIMARY KEY ("acl_id", "type", "entry_type", "principal", "status")
+            )
+        </sql>
+        <sql>
+            ALTER TABLE "acl_rows"
+            ADD CHECK ( entry_type  = 'owner'  OR  entry_type  = 'user'  OR  entry_type  = 'localgroup'  OR  entry_type  = 'other'  OR  entry_type  = 'foreign'  OR  entry_type  = 'unauthenticated'  OR  entry_type  = 'authenticated'  OR  entry_type  = 'mask' )
+        </sql>
+        <sql>
+            ALTER TABLE "acl_rows"
+            ADD CHECK ( type  = 'object'  OR  type  = 'doc'  OR  type  = 'dcc' )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-6">
-        <sql>create table "CR"."cr3user"."harvest"
-(
-  "harvest_id" INTEGER IDENTITY,
-  "harvest_source_id" INTEGER,
-  "type" VARCHAR(20),
-  "username" VARCHAR(45),
-  "status" VARCHAR(10),
-  "started" DATETIME,
-  "finished" DATETIME,
-  "tot_statements" INTEGER,
-  "lit_statements" INTEGER,
-  "res_statements" INTEGER,
-  "enc_schemes" INTEGER,
-  "http_code" INTEGER,
-  PRIMARY KEY ("harvest_id")
-)</sql>
-        <sql>ALTER TABLE "CR"."cr3user"."harvest"
-  ADD CONSTRAINT "ha_haso_fk" FOREIGN KEY ("harvest_source_id")
-    REFERENCES "CR"."cr3user"."harvest_source" ("harvest_source_id") ON DELETE CASCADE</sql>
+    <changeSet author="heinlja" id="rev-11">
+        <comment>Create the table of staging databases of the Digital Agenda Scoreboard module.</comment>
+        <sql>
+            create table "staging_db"
+            (
+				"database_id" INTEGER IDENTITY,
+				"name" VARCHAR(150),
+				"creator" VARCHAR(80),
+				"created" DATETIME,
+				"description" LONG VARCHAR,
+				"import_status" VARCHAR(30),
+				"import_log" LONG VARCHAR,
+				"default_query" LONG VARCHAR,
+				PRIMARY KEY ("database_id")
+            )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-7">
-        <sql>create table "CR"."cr3user"."harvest_message"
-(
-  "harvest_message_id" INTEGER IDENTITY,
-  "harvest_id" INTEGER,
-  "type" VARCHAR(3),
-  "message" LONG VARCHAR,
-  "stack_trace" LONG VARCHAR,
-  PRIMARY KEY ("harvest_message_id")
-)</sql>
-        <sql>ALTER TABLE "CR"."cr3user"."harvest_message"
-  ADD CONSTRAINT "hame_ha_fk" FOREIGN KEY ("harvest_id")
-    REFERENCES "CR"."cr3user"."harvest" ("harvest_id") ON DELETE CASCADE</sql>
+    <changeSet author="heinlja" id="rev-12">
+        <comment>Create the table of the RDF exports from staging databases of the Digital Agenda Scoreboard module.</comment>
+        <sql>
+            create table "staging_db_rdf_export"
+            (
+				"export_id" INTEGER IDENTITY,
+				"database_id" INTEGER,
+				"export_name" VARCHAR(150),
+				"user_name" VARCHAR(80),
+				"query_conf" LONG VARCHAR,
+				"started" DATETIME,
+				"finished" DATETIME,
+				"status" VARCHAR(30),
+				"export_log" LONG VARCHAR,
+				"row_count" INTEGER,
+				"noof_subjects" INTEGER,
+				"noof_triples" INTEGER,
+				"missing_concepts" LONG VARCHAR,
+				"graphs" LONG VARCHAR,
+				PRIMARY KEY ("export_id")
+            )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-8">
-        <sql>create table "CR"."cr3user"."remove_source_queue"
-(
-  "url" VARCHAR(1024),
-  PRIMARY KEY ("url")
-)</sql>
+    <changeSet author="heinlja" id="rev-13">
+        <comment>Create the table of the SPARQL queries executed on harvest sources that are SPARQL endpoints.</comment>
+        <sql>
+            create table "endpoint_harvest_query"
+            (
+				"endpoint_harvest_query_id" INTEGER IDENTITY,
+				"title" VARCHAR(255),
+				"query" LONG VARCHAR,
+				"endpoint_url" VARCHAR(1024),
+				"endpoint_url_hash" BIGINT,
+				"position_number" INTEGER,
+				"active" VARCHAR(1),
+				"last_modified" DATETIME,
+				PRIMARY KEY ("endpoint_harvest_query_id")
+            )
+        </sql>
     </changeSet>
 
-
-    <changeSet author="roug" id="rev-9">
-        <sql>create table "CR"."cr3user"."spo_binary"
-(
-  "subject" BIGINT,
-  "obj_lang" VARCHAR(10),
-  "datatype" VARCHAR(50),
-  "must_embed" VARCHAR(1),
-  PRIMARY KEY ("subject")
-)</sql>
+    <changeSet author="heinlja" id="rev-14">
+        <comment>Create the table of where the queue of urgent harvests is to be stored.</comment>
+        <sql>
+            create table "urgent_harvest_queue"
+            (
+				"item_id" INTEGER IDENTITY,
+				"url" VARCHAR(1024),
+				"timestamp" DATETIME,
+				"pushed_content" LONG VARCHAR,
+				"username" VARCHAR(45),
+				PRIMARY KEY ("item_id")
+            )
+        </sql>
     </changeSet>
 
+    <changeSet author="heinlja" id="rev-15">
+        <comment>Create the table where the authentication credentials of remote harvest sources are stored.</comment>
+        <sql>
+            create table "authurl"
+            (
+				"authurl_id" integer NOT NULL IDENTITY,
+				"url_namestart" varchar(200) NOT NULL default '',
+				"url_username" varchar(50) NOT NULL default '',
+				"url_password" varchar(50) NOT NULL default '',
+				PRIMARY KEY ("authurl_id")
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-16">
+        <comment>Add foreign key relationship between the URL hashes of the "endpoint_harvest_query" and "harvest_source".</comment>
+        <sql>
+            ALTER TABLE "endpoint_harvest_query"
+            ADD FOREIGN KEY ("endpoint_url_hash") REFERENCES "harvest_source" ("url_hash") ON UPDATE CASCADE ON DELETE CASCADE
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

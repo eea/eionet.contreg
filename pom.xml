@@ -143,14 +143,41 @@
                                 <include>dropdownmenus.txt</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <directory>${basedir}/sql</directory>
+                            <targetPath>WEB-INF/classes/sql</targetPath>
+                            <includes>
+                                <include>db-struct.xml</include>
+                            </includes>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
+
+            <!-- Run Ant for various preparation tasks, declared in build.xml -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.3</version>
                 <executions>
+
+                    <execution>
+                        <id>Prepare application home directory</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <antcall target="prepare_apphome">
+                                    <param name="propertiesFile"
+                                        value="${env}.properties" />
+                                </antcall>
+                            </tasks>
+                        </configuration>
+                    </execution>
+
                     <!-- FIXME after updating Maven version from 2.0.4 the following lines can be removed -->
                     <!-- The task renames cr.properties file in classes folder before executing unit tests. -->
                     <execution>
@@ -165,6 +192,7 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+
                     <!-- FIXME after updating Maven version from 2.0.4 the following lines can be removed -->
                     <execution>
                         <id>post-test</id>
@@ -181,27 +209,26 @@
                 </executions>
             </plugin>
 
-            <!-- Run Ant for various preparation tasks, declared in build.xml -->
-
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.3</version>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.0.4</version>
+                <configuration>
+                    <propertyFile>target/classes/liquibase.properties</propertyFile>
+                    <changeLogFile>sql/db-struct.xml</changeLogFile>
+                    <databaseClass>eionet.cr.util.liquibase.VirtuosoDatabase</databaseClass>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>Prepare application home directory</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
+                        <id>Update test database</id>
+                        <phase>process-test-resources</phase>
                         <configuration>
-                            <tasks>
-                                <antcall target="prepare_apphome">
-                                    <param name="propertiesFile"
-                                        value="${env}.properties" />
-                                </antcall>
-                            </tasks>
+                            <skip>${maven.test.skip}</skip>
+                            <propertyFile>target/test-classes/liquibase.properties</propertyFile>
                         </configuration>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -601,7 +628,17 @@
             <artifactId>jackcess</artifactId>
             <version>1.2.9</version>
         </dependency>
-<!-- TEST dependencies -->
+
+        <!-- Liquibase -->
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+
+        <!-- TEST dependencies -->
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -614,6 +651,7 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <reporting>
         <plugins>

@@ -236,7 +236,8 @@ public class PostHarvestScriptParserTest {
             + thisType + "; a ?rdftype FILTER(?rdftype != " + thisType + ") }";
         String exptd = "PREFIX dc:<x> CONSTRUCT {2} FROM " + expandedSource + " WHERE { ?s a "
             + expnType + "; a ?rdftype FILTER(?rdftype != " + expnType + ") } LIMIT " + limit;
-        assertEquals(exptd, PostHarvestScriptParser.deriveConstruct(input, testSource, testType));
+        String actual = PostHarvestScriptParser.deriveConstruct(input, testSource, testType);
+        assertEquals(exptd, actual);
     }
 
     /**

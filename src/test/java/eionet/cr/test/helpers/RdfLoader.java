@@ -32,6 +32,7 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 
@@ -114,6 +115,10 @@ public class RdfLoader {
         Statement stmt = null;
         try {
             conn = SesameUtil.getSQLConnection();
+            String url = conn.getMetaData().getURL();
+            if (url != null && url.contains(":1111/")) {
+                throw new CRRuntimeException("Triplestore clearance not supported on port 1111, as a double security measure!");
+            }
 
             stmt = conn.createStatement();
             stmt.executeUpdate(DELETE_ALL_TRIPLES_SQL);

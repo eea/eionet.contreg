@@ -1988,10 +1988,10 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public UrlAuthenticationDTO getUrlAuthentication(String fullUrl) throws DAOException {
 
         String queryExact =
-                "SELECT authurl_id, url_namestart, url_username, url_password FROM CR.cr3user.authurl WHERE ? LIKE url_namestart";
+                "SELECT authurl_id, url_namestart, url_username, url_password FROM authurl WHERE ? LIKE url_namestart";
 
         String queryBeginning =
-                "SELECT authurl_id, url_namestart, url_username, url_password FROM CR.cr3user.authurl WHERE ? LIKE CONCAT(url_namestart, '%')";
+                "SELECT authurl_id, url_namestart, url_username, url_password FROM authurl WHERE ? LIKE CONCAT(url_namestart, '%')";
 
         List<Object> inParams = new LinkedList<Object>();
         inParams.add(fullUrl.toLowerCase());
