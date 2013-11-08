@@ -27,6 +27,7 @@ import java.util.List;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -56,6 +57,9 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
+
+    /** Max number of rows where a paging request's offset can start from in Virtuoso. */
+    private static final int VIRTUOSO_MAX_PAGING_ROWS = 10000;
 
     /** */
     private static final String UNAVAILABLE_TYPE = "unavail";
@@ -123,6 +127,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractSearchActionBean#search()
      */
     @Override
@@ -130,14 +135,23 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     public Resolution search() throws DAOException {
 
         try {
+            PagingRequest pagingRequest = PagingRequest.create(getPageN());
+            SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
+
+            if (pagingRequest != null) {
+                boolean pageAllowed = isPageAllowed(pagingRequest);
+                if (!pageAllowed) {
+                    addCautionMessage("The requested page number exceeds the backend's maximum number of rows "
+                            + "that can be paged through! Please narrow your search by using the filter below.");
+                    return new RedirectResolution(getClass());
+                }
+            }
+
             String filterString = null;
             if (!StringUtils.isEmpty(this.searchString)) {
                 this.searchString = URLUtil.escapeIRI(this.searchString);
                 filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }
-
-            PagingRequest pagingRequest = PagingRequest.create(getPageN());
-            SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
 
             Pair<Integer, List<HarvestSourceDTO>> pair = null;
             HarvestSourceDAO harvestSourceDAO = factory.getDao(HarvestSourceDAO.class);
@@ -146,9 +160,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
             } else if (PRIORITY.equals(type)) {
                 pair = harvestSourceDAO.getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (UNAVAILABLE_TYPE.equals(type)) {
-                pair =
-                        harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest,
-                                sortingRequest);
+                pair = harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest, sortingRequest);
             } else if (FAILED_HARVESTS.equals(type)) {
                 pair = harvestSourceDAO.getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (UNAUHTORIZED_HARVESTS.equals(type)) {
@@ -157,9 +169,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
                 // Get comma separated sources that are included into
                 // inferencing ruleset
                 String sourceUris = harvestSourceDAO.getSourcesInInferenceRules();
-                pair =
-                        harvestSourceDAO.getInferenceSources(filterString, pagingRequest, sortingRequest,
-                                sourceUris);
+                pair = harvestSourceDAO.getInferenceSources(filterString, pagingRequest, sortingRequest, sourceUris);
             } else if (SPARQL_ENDPOINTS.equals(type)) {
                 pair = harvestSourceDAO.getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
             }
@@ -400,6 +410,7 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.web.action.AbstractActionBean#excludeFromSortAndPagingUrls()
      */
     @Override
@@ -407,11 +418,43 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
         return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
     }
 
+    /**
+     * @return
+     */
     public List<String> getSources() {
         return sources;
     }
 
+    /**
+     * @param sources
+     */
     public void setSources(List<String> sources) {
         this.sources = sources;
+    }
+
+    /**
+     * Checks if Virtuoso is capable of handling the given paging request.
+     * Virtuoso allows to page no more than 10000 rows. So if the given paging reuqest is such that the offset would start after
+     * 10000 then Virtuoso will throw an error like this:
+     * SR353: Sorted TOP clause specifies more than 361110 rows to sort. Only 10000 are allowed.
+     * Either decrease the offset and/or row count or use a scrollable cursor.
+     *
+     * So the idea of this function is to check whether the given paging request's offset will be <= 10000 rows.
+     * Returns true if yes, otherwise returns false.
+     *
+     * @param pagingRequest The paging request to check.
+     * @return Boolean as indicated above.
+     */
+    private boolean isPageAllowed(PagingRequest pagingRequest) {
+
+        if (pagingRequest == null) {
+            return false;
+        }
+
+        int pageNumber = pagingRequest.getPageNumber();
+        int itemsPerPage = pagingRequest.getItemsPerPage();
+
+        int rowCount = pageNumber * itemsPerPage;
+        return rowCount <= VIRTUOSO_MAX_PAGING_ROWS;
     }
 }
