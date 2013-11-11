@@ -289,7 +289,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 }
             }
 
-            // Run all post-harvest scripts specific to this source (i.e. the uploaded file).
+            // Run all post-harvest scripts specific to this source (i.e. to this uploaded file).
             // This will run both the data data-linking scripts saved in the previous block, plus any that existed already.
             try {
                 LOGGER.debug("Running all source-specific post-harvest scripts of " + fileUri);
@@ -304,11 +304,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 addWarningMessage("Failed to run data linking scripts: " + e.getMessage());
             }
 
+            // Finally, make sure that the file has the correct number of harvested statements in its predicates.
+            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
+
         } catch (Exception e) {
-            LOGGER.error("Exception while reading uploaded file:", e);
+            LOGGER.error("Exception while processing the uploaded file:", e);
             addWarningMessage(e.toString());
             return new ForwardResolution(JSP_PAGE);
         } finally {
+            try {
+                helper.generateAndStoreTableFileQuery();
+            } catch (Exception e2) {
+                LOGGER.error("Failed to generate SPARQL query", e2);
+            }
             CsvImportHelper.close(csvReader);
         }
 

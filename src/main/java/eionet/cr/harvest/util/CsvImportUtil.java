@@ -2,7 +2,6 @@ package eionet.cr.harvest.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +75,7 @@ public final class CsvImportUtil {
         String relativeFilePath = FolderUtil.extractPathInUserHome(fileUri);
 
         // Clear graph
-        DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri));
+        DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(uri);
 
         CsvImportHelper helper =
                 new CsvImportHelper(new ArrayList<String>(uniqueColumns), fileUri, fileLabel, fileType, objectsType, publisher,
@@ -108,10 +107,19 @@ public final class CsvImportUtil {
                 LOGGER.error("Failed to run data linking scripts", e);
                 warningMessages.add("Failed to run data linking scripts: " + e.getMessage());
             }
+
+            // Finally, make sure that the file has the correct number of harvested statements in its predicates.
+            DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
+
         } catch (Exception e) {
-            LOGGER.error("Exception while reading uploaded file", e);
+            LOGGER.error("Exception while processing the uploaded file", e);
             warningMessages.add("Exception while reading uploaded file: " + e.getMessage());
         } finally {
+            try {
+                helper.generateAndStoreTableFileQuery();
+            } catch (Exception e2) {
+                LOGGER.error("Failed to generate SPARQL query", e2);
+            }
             CsvImportHelper.close(csvReader);
         }
 

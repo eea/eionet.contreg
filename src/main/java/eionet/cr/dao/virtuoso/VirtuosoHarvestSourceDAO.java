@@ -223,7 +223,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         return getSources(
                 StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
-                        searchString, pagingRequest, sortingRequest);
+                searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -538,7 +538,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException,
-    DAOException {
+            DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -695,9 +695,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         StringBuffer buf =
                 new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+                        .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+                        .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+                        .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -1089,8 +1089,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int
-    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
+            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+                    throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1140,7 +1140,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-    IOException {
+            IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -1237,7 +1237,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-    RepositoryException, IOException {
+            RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
@@ -1987,8 +1987,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public UrlAuthenticationDTO getUrlAuthentication(String fullUrl) throws DAOException {
 
-        String queryExact =
-                "SELECT authurl_id, url_namestart, url_username, url_password FROM authurl WHERE ? LIKE url_namestart";
+        String queryExact = "SELECT authurl_id, url_namestart, url_username, url_password FROM authurl WHERE ? LIKE url_namestart";
 
         String queryBeginning =
                 "SELECT authurl_id, url_namestart, url_username, url_password FROM authurl WHERE ? LIKE CONCAT(url_namestart, '%')";
@@ -2054,11 +2053,45 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#deleteUrlAuthentication(int)
+     */
     @Override
     public void deleteUrlAuthentication(int id) throws DAOException {
         String query = "DELETE FROM AUTHURL WHERE authurl_id = ?";
         List<Object> inParams = new LinkedList<Object>();
         inParams.add(id);
         executeSQL(query, inParams, new UrlAuthenticationDTOReader());
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#getDistinctPredicates(java.lang.String, java.lang.String)
+     */
+    @Override
+    public List<String> getDistinctPredicates(String grpahUri, String typeUri) throws DAOException {
+
+        String sparqlTemplate =
+                "select distinct ?p from <@GRAPH_URI@> where {?s ?p ?o. ?s a <@TYPE_URI@>"
+                        + " filter (?p!=<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>)}";
+
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            ValueFactory vf = repoConn.getValueFactory();
+            String sparql = StringUtils.replaceOnce(sparqlTemplate, "@GRAPH_URI@", vf.createURI(grpahUri).stringValue());
+            sparql = StringUtils.replaceOnce(sparql, "@TYPE_URI@", vf.createURI(typeUri).stringValue());
+
+            List<String> list = executeSPARQL(sparql, new SingleObjectReader<String>());
+            return list;
+        } catch (RepositoryException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
     }
 }

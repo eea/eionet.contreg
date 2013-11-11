@@ -101,6 +101,8 @@ public class TableFileActionBean extends AbstractActionBean {
                 SesameUtil.close(result);
                 SesameUtil.close(con);
             }
+        } else {
+            addCautionMessage("Found no SPARQL query for displaying this file's contents!");
         }
 
         return new ForwardResolution("/pages/factsheet/tableFile.jsp");

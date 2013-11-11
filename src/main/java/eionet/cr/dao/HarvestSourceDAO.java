@@ -277,7 +277,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-    OpenRDFException;
+            OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -306,6 +306,7 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Loads the given files with given loaders into the given target graph. Files and corresponding loaders given as map.
+     *
      * @param filesAndLoaders The given files with given loaders.
      * @param graphUri The target graph URI.
      * @return Total number of loaded triples.
@@ -365,7 +366,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-    RepositoryException, IOException;
+            RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -536,4 +537,14 @@ public interface HarvestSourceDAO extends DAO {
      * @throws DAOException
      */
     void deleteUrlAuthentication(int id) throws DAOException;
+
+    /**
+     * Returns a list of distinct predicates used by resources of the given rdf:type in the given graph.
+     *
+     * @param grpahUri The graph to look in.
+     * @param typeUri The rdf:type of the resources whose predicates are to be looked in.
+     * @return The list of distinct predicates. Empty if no single predicate found.
+     * @throws DAOException if any sort of database access error occurs.
+     */
+    List<String> getDistinctPredicates(String grpahUri, String typeUri) throws DAOException;
 }

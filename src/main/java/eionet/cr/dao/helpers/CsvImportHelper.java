@@ -30,13 +30,17 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -44,6 +48,7 @@ import org.openrdf.repository.RepositoryException;
 import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -266,7 +271,8 @@ public class CsvImportHelper {
         if (file != null && file.exists()) {
             char delim = getDelimiter();
             if (guessEncoding) {
-                Charset guessedCharset = CharsetToolkit.guessEncoding(file, ENCODING_DETECTION_LENGTH, Charset.forName("UTF-8"), true);
+                Charset guessedCharset =
+                        CharsetToolkit.guessEncoding(file, ENCODING_DETECTION_LENGTH, Charset.forName("UTF-8"), true);
                 // Using BOMInputStream to skip possible Byte Order Mark (BOM, http://en.wikipedia.org/wiki/Byte_order_mark)
 
                 result =
@@ -333,25 +339,6 @@ public class CsvImportHelper {
         } finally {
             SesameUtil.close(conn);
         }
-
-        // Construct a SPARQL query and store it as a property
-        StringBuilder query = new StringBuilder();
-        query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
-        query.append("SELECT *\nFROM <").append(fileUri).append(">\nWHERE {\n");
-        for (String column : columnLabels) {
-
-            column = column.replace(" ", "_");
-            String columnUri = "tableFile:" + column;
-            // Note that "_:" is the standard N3 namespace prefix for blank nodes.
-            query.append(" OPTIONAL { _:rec ").append(columnUri).append(" ?").append(column).append(" } .\n");
-        }
-        query.append("}");
-
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_SPARQL_QUERY, ObjectDTO.createLiteral(query.toString()));
-
-        // Finally, make sure that the file has the correct number of harvested statements in its predicates.
-        DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
     }
 
     /**
@@ -404,27 +391,41 @@ public class CsvImportHelper {
     }
 
     /**
-     * Saves the selected data linking script information and stores it as source specific post harvest script.
+     * Saves the given data linking scripts as source-specific post-harvest scripts.
+     * The source in this case is the file URI of the uploaded CSV/TSV file.
      *
-     * @throws DAOException
+     * @param dataLinkingScripts The data-linking scripts to save. If null or empty, nothing will be done.
+     * @throws DAOException If any sort of DAO access error happens.
      */
     public void saveDataLinkingScripts(List<DataLinkingScript> dataLinkingScripts) throws DAOException {
-        PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
-        List<PostHarvestScriptDTO> scripts = dao.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
 
+        // Exit right away if no scripts given.
+        if (CollectionUtils.isEmpty(dataLinkingScripts)) {
+            return;
+        }
+
+        // Retrieve the list of already stored post-harvest scripts.
+        PostHarvestScriptDAO postHarvestScriptDAO = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+        List<PostHarvestScriptDTO> postHarvestScripts = postHarvestScriptDAO.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+
+        // Loop over the given data-linking scripts, save each one as a post-harvest script in the database.
         for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
 
+            // Prepare URI of the column that this data-linking script is associated with.
             String columnUri = fileUri + "#" + dataLinkingScript.getColumn();
             columnUri = "<" + columnUri.replace(" ", "_") + ">";
 
+            // Prepare the data-linking script SPARQL based on the template retrieved by the script's id.
             ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(dataLinkingScript.getScriptId());
-            String script = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
+            String sparql = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
 
-            int existingScriptId = isUniqueScript(scripts, fileUri, scriptTemplate.getName());
+            String scriptTemplateName = scriptTemplate.getName();
+            int existingScriptId = getMatchingScriptId(postHarvestScripts, fileUri, scriptTemplateName);
             if (existingScriptId == 0) {
-                dao.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplate.getName(), script, true, true);
+                postHarvestScriptDAO.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
+                        true);
             } else {
-                dao.save(existingScriptId, scriptTemplate.getName(), script, true, true);
+                postHarvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true);
             }
         }
     }
@@ -504,19 +505,26 @@ public class CsvImportHelper {
     }
 
     /**
-     * Checks if script with given uri and name already exists in database. If so, the id of the script is returned.
+     * Loops through the given post-harvest scripts and returns the id of the script that has the same target URL and title
+     * as given in the method's inputs. Returns 0 if no such script is found.
      *
-     * @param scripts
-     * @param uri
-     * @param name
-     * @return
+     * @param scripts The post-harvest scripts to loop through.
+     * @param targetUrl Script's target URL to check against.
+     * @param title Script's title to check against.
+     * @return Matching script's id.
      */
-    private int isUniqueScript(List<PostHarvestScriptDTO> scripts, String uri, String name) {
+    private int getMatchingScriptId(List<PostHarvestScriptDTO> scripts, String targetUrl, String title) {
+
         for (PostHarvestScriptDTO script : scripts) {
-            if (uri.equalsIgnoreCase(script.getTargetUrl()) && name.equalsIgnoreCase(script.getTitle())) {
+
+            boolean targetUrlEqual = StringUtils.equalsIgnoreCase(script.getTargetUrl(), targetUrl);
+            boolean titleEqual = StringUtils.equalsIgnoreCase(script.getTitle(), title);
+
+            if (targetUrlEqual && titleEqual) {
                 return script.getId();
             }
         }
+
         return 0;
     }
 
@@ -720,4 +728,84 @@ public class CsvImportHelper {
         return fileType != null && fileType.equals(FileType.TSV) ? '\t' : ',';
     }
 
+    /**
+     *
+     * @throws DAOException
+     */
+    public void generateAndStoreTableFileQuery()
+            throws DAOException {
+
+        String objectsTypeUri = fileUri + "/" + objectsType;
+
+        // From the given file's graph, get all distinct predicates of resources whose rdf:type matches the given objects type.
+        HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        List<String> predicates = harvestSourceDAO.getDistinctPredicates(fileUri, objectsTypeUri);
+
+        // Predicates that we're interested in, should start with the this prefix.
+        String predicatePrefix = fileUri + "#";
+
+        // From the above-found predicates, extract all stored column names.
+        HashSet<String> storedColumns = new HashSet<String>();
+        for (String predicate : predicates) {
+
+            if (predicate.startsWith(predicatePrefix)) {
+                String storedColumn = StringUtils.substringAfter(predicate, predicatePrefix);
+                storedColumns.add(storedColumn);
+            }
+        }
+
+        // Prepare the list of original columns.
+        ArrayList<String> originalColumns = new ArrayList<String>();
+        for (String column : columns) {
+            originalColumns.add(column.replace(' ', '_'));
+        }
+
+        // Prepare the list of final columns.
+        ArrayList<String> finalColumns = new ArrayList<String>();
+
+        // Into the list of final columns, put every original column already present in the stored columns.
+        for (String originalColumn : originalColumns) {
+            if (storedColumns.contains(originalColumn)) {
+                finalColumns.add(originalColumn);
+            }
+        }
+
+        // Into the list of final columns, append also stored columns that are not present in the original ones.
+        for (String storedColumn : storedColumns) {
+            if (!originalColumns.contains(storedColumn)) {
+                finalColumns.add(storedColumn);
+            }
+        }
+
+        // Based on the final columns, build the SPARQL query.
+        StringBuilder query = new StringBuilder();
+        query.append("PREFIX tableFile: <" + fileUri + "#>\n\n");
+        query.append("SELECT *\nFROM <").append(fileUri).append(">\nWHERE {\n");
+        for (String column : finalColumns) {
+
+            column = column.replace(" ", "_");
+            String columnUri = "tableFile:" + column;
+            // Note that "_:" is the standard N3 namespace prefix for blank nodes.
+            query.append(" OPTIONAL { _:rec ").append(columnUri).append(" ?").append(column).append(" } .\n");
+        }
+        query.append("}");
+
+        // Store the built SPARQL query, but ensure the older one (if any) is removed from the repository first.
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+            ValueFactory vf = repoConn.getValueFactory();
+            URI subjectURI = vf.createURI(fileUri);
+            URI predicateURI = vf.createURI(Predicates.CR_SPARQL_QUERY);
+            Literal objectLiteral = vf.createLiteral(query.toString());
+            URI graphURI = vf.createURI(GeneralConfig.HARVESTER_URI);
+
+            repoConn.remove(subjectURI, predicateURI, null);
+            repoConn.add(subjectURI, predicateURI, objectLiteral, graphURI);
+        } catch (RepositoryException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
+    }
 }
