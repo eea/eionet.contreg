@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Art17Test" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5fdf51a3-6223-4e1d-8edd-541fe3d0d613">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="COUNTRY_CODE" class="java.lang.String"/>
+	<queryString language="SPARQL">
+		<![CDATA[SELECT ?s ?p ?countryName
+ WHERE
+{?s ?p ?countryName .
+  FILTER (?s = iri(bif:concat("http://rdfdata.eionet.europa.eu/eea/countries/", $P{COUNTRY_CODE})) )  .
+  FILTER (?p = rdfs:label)
+}]]>
+	</queryString>
+	<field name="countryName" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="48" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="34c91a31-ca87-4667-9d55-e52e458479e7" x="0" y="0" width="555" height="20"/>
+				<textElement>
+					<font fontName="Candara" size="14"/>
+				</textElement>
+				<text><![CDATA[First QA/QC report on Art.17 data for ]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1a4a8342-51e9-48bf-8118-1a2481ec0a6f" x="226" y="0" width="109" height="20"/>
+				<textElement>
+					<font fontName="Candara" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{countryName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="594" splitType="Stretch">
+			<subreport isUsingCache="false" runToBottom="true">
+				<reportElement uuid="96c61c3d-a6cd-447d-bb96-9759de491a18" isPrintRepeatedValues="false" x="0" y="208" width="555" height="365"/>
+				<subreportParameter name="COUNTRY_CODE">
+					<subreportParameterExpression><![CDATA[$P{COUNTRY_CODE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "Art17Table6.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement uuid="896d3e56-649b-4b49-9c53-01b7ae024c84" mode="Opaque" x="0" y="38" width="458" height="64" forecolor="#FFFFFF" backcolor="#666600"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[	1st QA/QC report on Article 17 data for ]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ffb33266-46f9-4af4-899b-e0115e542f21" mode="Opaque" x="409" y="38" width="146" height="64" forecolor="#FFFFFF" backcolor="#666600"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{countryName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
