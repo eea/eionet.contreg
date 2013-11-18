@@ -1,0 +1,11 @@
+SPARQL adapter for iReports
+
+Until there is no maven support:
+
+- build a JAR file:
+
+cd {cr_home}/contrib/reportgenerator
+
+$JAVA_HOME/bin/jar" cf repgen-sparql.jar *
+
+- integrate the component int oiReports as specified at: http://taskman.eionet.europa.eu/attachments/download/2924/SPARQL%20integration%20tutorial.pdf
