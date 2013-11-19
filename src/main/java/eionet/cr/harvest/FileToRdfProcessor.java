@@ -22,21 +22,21 @@
 package eionet.cr.harvest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URLEncoder;
 import java.nio.channels.FileLockInterruptionException;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
 
 import javax.imageio.IIOException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.rio.RDFFormat;
@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.harvest.util.FileRdfFormatDetector;
+import eionet.cr.util.CompressUtil;
 import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.FileUtil;
 import eionet.cr.util.xml.ConversionsParser;
@@ -111,10 +112,10 @@ public class FileToRdfProcessor {
      */
     public File process() throws IOException, SAXException, RDFHandlerException, RDFParseException {
 
-        // try unzipping (if the file is not zipped, reference to the same file is returned,
-        // otherwise reference to the newly created unzipped file is returned)
-        File unzippedFile = tryUnzip(file);
-        if (unzippedFile != file) {
+        // Try unpacking (if the file is not zipped/archived, reference to the same file is returned,
+        // otherwise reference to the newly created unpacked file is returned)
+        File unpackedFile = tryUnpack(file);
+        if (unpackedFile != file) {
             LOGGER.debug(loggerMsg("File was zipped!"));
         }
 
@@ -122,7 +123,7 @@ public class FileToRdfProcessor {
         File resultFile = null;
         try {
             // See if the unzipped (if it was zipped) file is an XML that can be processed into RDF.
-            XmlAnalysis xmlAnalysis = createXmlAnalysis(unzippedFile);
+            XmlAnalysis xmlAnalysis = createXmlAnalysis(unpackedFile);
             if (xmlAnalysis != null) {
 
                 // File seems to be XML.
@@ -131,13 +132,13 @@ public class FileToRdfProcessor {
                 if (startElemUri != null && startElemUri.startsWith("http://www.w3.org/1999/02/22-rdf-syntax-ns#RDF")) {
                     // Unlikely to reach this block, as we already detected above that the file was not of any RDF format.
                     LOGGER.debug(loggerMsg("Seems to be XML file with rdf:RDF start element"));
-                    resultFile = unzippedFile;
+                    resultFile = unpackedFile;
                     rdfFormat = RDFFormat.RDFXML;
                 } else {
                     // The file's start element was not RDF, so try to convert it to RDF.
                     LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
                     conversionSchemaUri = xmlAnalysis.getConversionSchema();
-                    resultFile = attemptRdfConversion(unzippedFile, conversionSchemaUri, contextUrl);
+                    resultFile = attemptRdfConversion(unpackedFile, conversionSchemaUri, contextUrl);
                     if (resultFile != null) {
                         rdfFormat = RDFFormat.RDFXML;
                     }
@@ -145,10 +146,10 @@ public class FileToRdfProcessor {
             } else {
                 // The file wasn't XML, so see if it is any of the supported RDF formats.
                 FileRdfFormatDetector rdfFormatDetector = new FileRdfFormatDetector();
-                rdfFormat = rdfFormatDetector.detect(unzippedFile, contextUrl);
+                rdfFormat = rdfFormatDetector.detect(unpackedFile, contextUrl);
                 if (rdfFormat != null) {
                     // File was one of RDF formats, so assign to result file.
-                    resultFile = unzippedFile;
+                    resultFile = unpackedFile;
                 } else {
                     // File was not of any RDF format, but log any parsing errors encountered in the process.
                     for (Entry<RDFFormat, Exception> entry : rdfFormatDetector.getParsingExceptions().entrySet()) {
@@ -172,38 +173,78 @@ public class FileToRdfProcessor {
 
             // if file = unzippedFile (in case it could not be unzipped) it is deleted in the calling method
             // will be excluded here to prevent local non-RDF (binary) files to be deleted
-            if (resultFile != unzippedFile && file != unzippedFile) {
-                FileDeletionJob.register(unzippedFile);
+            if (resultFile != unpackedFile && file != unpackedFile) {
+                FileDeletionJob.register(unpackedFile);
             }
         }
     }
 
     /**
+     * Attempts to unpack the given file.
      *
-     * @param file
-     * @return
+     * First the method checks if this is a compressed file (e.g. gzipped). If yes, then the file is uncompressed and it is checked
+     * if the latter is an archive file (e.g. TAR, ZIP) in which case the archive's first entry is what is finally returned by the
+     * method. If the uncompressed file is not an archive file, then the method returns the uncompressed file.
+     *
+     * However, if the original file was not a compressed file and actually happens to be an archive file, then again the archive's
+     * first entry is what is returned by the method.
+     *
+     * In all other cases the original file is returned as it is.
+     *
+     * @param file The file to process.
+     * @return The resulting file (may be the input file itself, it wasn't a packed file at all).
      */
-    private File tryUnzip(File file) {
+    private File tryUnpack(File file) {
 
-        GZIPInputStream inputStream = null;
-        FileOutputStream outputStream = null;
-        FileInputStream fis = null;
-
+        File uncompressedFile = new File(file.getAbsolutePath() + ".uncmopressed");
         try {
-            // closing GZIPInputStream does not seem to close the given InputStream
-            fis = new FileInputStream(file);
-            inputStream = new GZIPInputStream(fis);
-            File unzippedFile = new File(file.getAbsolutePath() + ".unzipped");
-            outputStream = new FileOutputStream(unzippedFile);
-            IOUtils.copy(inputStream, outputStream);
-            return unzippedFile;
-
+            CompressUtil.uncompress(file, uncompressedFile);
         } catch (IOException e) {
+            // Decompression failed, but check if this is an archive file.
+            List<ArchiveEntry> archiveEntries = CompressUtil.getArchiveEntries(file);
+            if (CollectionUtils.isNotEmpty(archiveEntries)) {
+                // Looks like archived file, so lets extract the first file.
+                String firstEntryName = archiveEntries.iterator().next().getName();
+                String extractedFileName = file.getName() + ".extracted";
+                try {
+                    CompressUtil.extract(file, Collections.singletonMap(firstEntryName, extractedFileName));
+                    return new File(file.getParent(), extractedFileName);
+                } catch (IOException ee) {
+                    // Extraction failed, yet at this point it *must* be an archived file. So lets just return the original file.
+                    return file;
+                }
+            } else {
+                // Not an archive file either, so return the original file as it is.
+                return file;
+            }
+        }
+
+        if (uncompressedFile.exists() && uncompressedFile.isFile()) {
+
+            // Check if the uncompressed file is an archive file.
+            List<ArchiveEntry> archiveEntries = CompressUtil.getArchiveEntries(uncompressedFile);
+            if (CollectionUtils.isNotEmpty(archiveEntries)) {
+
+                // Looks like archived file, so lets extract the first file.
+                String firstEntryName = archiveEntries.iterator().next().getName();
+                String extractedFileName = file.getName() + ".extracted";
+                try {
+                    CompressUtil.extract(uncompressedFile, Collections.singletonMap(firstEntryName, extractedFileName));
+                    // Ensure the uncompressed file gets deleted.
+                    FileDeletionJob.register(uncompressedFile);
+                    // Return final file, i.e. the extracted one.
+                    return new File(file.getParent(), extractedFileName);
+                } catch (IOException e) {
+                    // Extraction failed, yet at this point it *must* be an archived file. So lets just return the original file.
+                    return file;
+                }
+            } else {
+                // The uncompressed file is not an archive file, so return it as it is.
+                return uncompressedFile;
+            }
+        } else {
+            // no uncompressed file actually existing
             return file;
-        } finally {
-            IOUtils.closeQuietly(fis);
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
         }
     }
 
