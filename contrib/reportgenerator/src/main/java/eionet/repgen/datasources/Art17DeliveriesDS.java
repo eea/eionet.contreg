@@ -10,6 +10,7 @@ import eionet.repgen.SPARQLUtil;
 
 /**
  * sample class for Art17 deliveries.
+ *
  * @author Kaido Laine
  */
 public class Art17DeliveriesDS extends SPARQLDataSource {
@@ -29,7 +30,7 @@ public class Art17DeliveriesDS extends SPARQLDataSource {
 
     public Art17DeliveriesDS(String countryCode) throws Exception {
 
-        //bookmark with name below has to exist in CR bookmarks:
+        // bookmark with name below has to exist in CR bookmarks:
         sparql = SPARQLUtil.getSparqlBookmarkByName("Art 17 reports delivered");
         sparql = SPARQLUtil.replaceSparqlParam(sparql, "countryCode", countryCode);
 
@@ -61,7 +62,7 @@ public class Art17DeliveriesDS extends SPARQLDataSource {
         return null;
     }
 
-    //return only 1 row
+    // return only 1 row
     @Override
     public boolean next() throws JRException {
 

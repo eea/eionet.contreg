@@ -14,8 +14,8 @@ public class SPARQLDataSourceProvider implements JRDataSourceProvider {
 
     @Override
     public JRDataSource create(JasperReport arg0) throws JRException {
-        return new SPARQLDataSource( );
-        //return null;
+        return new SPARQLDataSource();
+        // return null;
     }
 
     @Override
@@ -37,7 +37,6 @@ public class SPARQLDataSourceProvider implements JRDataSourceProvider {
         field2.setValueClassName("java.lang.String");
         fields.add(field2);
 
-
         return (JRField[]) fields.toArray(new JRField[fields.size()]);
 
     }
@@ -46,8 +45,5 @@ public class SPARQLDataSourceProvider implements JRDataSourceProvider {
     public boolean supportsGetFieldsOperation() {
         return false;
     }
-
-
-
 
 }

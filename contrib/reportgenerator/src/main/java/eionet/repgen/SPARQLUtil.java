@@ -12,7 +12,7 @@ import org.openrdf.repository.sparql.SPARQLRepository;
 
 public class SPARQLUtil {
 
-    //FIXME - to be propertized
+    // FIXME - to be propertized
     private static String testEndpointURL = "http://test.tripledev.ee/cr/sparql";
     private static String endpointURL = "http://cr.eionet.europa.eu/sparql";
 
@@ -33,8 +33,6 @@ public class SPARQLUtil {
     /**
      * Search XML files through CR SPARQL endpoint.
      *
-     * @param schema
-     *            XML schema
      * @return the list of CR file objects
      * @throws DCMException
      */
@@ -47,9 +45,10 @@ public class SPARQLUtil {
             // FIXME get sparql bookmarks from *production* repository
             conn = testEndpoint.getConnection();
 
-            //TODO CR url is hardcoded
+            // TODO CR url is hardcoded
             String query =
-                    "select  ?o where {?s ?p ?o . ?s a <http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark> . ?s rdfs:label ?lbl .  filter (?p = <http://cr.eionet.europa.eu/ontologies/contreg.rdf#sparqlQuery>) . "
+                    "select  ?o where {?s ?p ?o . ?s a <http://cr.eionet.europa.eu/ontologies/contreg.rdf#SparqlBookmark> . "
+                    + "?s rdfs:label ?lbl .  filter (?p = <http://cr.eionet.europa.eu/ontologies/contreg.rdf#sparqlQuery>) . "
                             + "filter (str(?lbl)='" + name + "') }";
 
             TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);

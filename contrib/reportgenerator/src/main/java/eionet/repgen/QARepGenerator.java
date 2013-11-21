@@ -45,8 +45,7 @@ public class QARepGenerator {
      * @param countryCode
      * @throws JRException
      */
-    public void fill(String countryCode) throws JRException
-    {
+    public void fill(String countryCode) throws JRException {
         long start = System.currentTimeMillis();
         //Preparing parameters
         Map parameters = new HashMap();
@@ -80,8 +79,7 @@ public class QARepGenerator {
     /**
     *
     */
-   public void pdf() throws JRException
-   {
+   public void pdf() throws JRException {
        long start = System.currentTimeMillis();
        JasperExportManager.exportReportToPdfFile("ExpertQA.jrprint");
        //TODO Logger

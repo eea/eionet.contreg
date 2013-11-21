@@ -44,7 +44,6 @@ public class ReportGenerator extends HttpServlet {
         handleSubmit(request, response);
     }
 
-
     /**
      * Handles form submissions for <code>#doGet</code> and <code>#doPost</code>.
      *
@@ -78,7 +77,7 @@ public class ReportGenerator extends HttpServlet {
             Map parameters = new HashMap();
             // parameters.put("ReportTitle", "Address Report");
             parameters.put("DataFile", "Art17DeliveriesDS.java");
-            //parameters.put("Art17Table1", "Art17DeliveriesDS.java");
+            // parameters.put("Art17Table1", "Art17DeliveriesDS.java");
 
             // fill the report
             JasperPrint jasperPrint = null;
@@ -86,7 +85,7 @@ public class ReportGenerator extends HttpServlet {
 
                 parameters.put("Art17Table1DataSource", new Art17DeliveriesDS(countryCode));
 
-                SPARQLDataSource table6DS  = new SPARQLDataSource();
+                SPARQLDataSource table6DS = new SPARQLDataSource();
                 String tbl6Sparql = SPARQLUtil.getSparqlBookmarkByName("Art17 table 6");
                 tbl6Sparql = SPARQLUtil.replaceSparqlParam(tbl6Sparql, "countryCode", countryCode);
                 table6DS.init(tbl6Sparql);
@@ -107,8 +106,6 @@ public class ReportGenerator extends HttpServlet {
             String contentType = "unknown";
             String contentHeader = "";
 
-
-
             if (jasperPrint != null) {
 
                 if (format.equalsIgnoreCase("pdf")) {
@@ -118,14 +115,14 @@ public class ReportGenerator extends HttpServlet {
                 } else if (format.equalsIgnoreCase("doc")) {
                     // TODO
                     String fileName = getServletContext().getRealPath("/") + jasperPrint.getName() + ".docx";
-                     destFile = new File(fileName);
+                    destFile = new File(fileName);
                     //
-                     JRDocxExporter exporter = new JRDocxExporter();
+                    JRDocxExporter exporter = new JRDocxExporter();
                     //
-                     exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-                     exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, destFile.toString());
+                    exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+                    exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, destFile.toString());
 
-                     exporter.exportReport();
+                    exporter.exportReport();
                     //
                     //
                     retrunBytes = read(fileName);
@@ -139,7 +136,7 @@ public class ReportGenerator extends HttpServlet {
                 response.setHeader("Content-disposition", contentHeader);
                 outstream.write(retrunBytes);
             } else {
-                throw new JRException("Error gettting data " );
+                throw new JRException("Error gettting data ");
             }
 
         } catch (JRException jre) {
@@ -186,44 +183,38 @@ public class ReportGenerator extends HttpServlet {
         }
     }
 
-
-
-   private byte[] read(String aInputFileName){
+    private byte[] read(String aInputFileName) {
         log("Reading in binary file named : " + aInputFileName);
         File file = new File(aInputFileName);
         log("File size: " + file.length());
-        byte[] result = new byte[(int)file.length()];
+        byte[] result = new byte[(int) file.length()];
         try {
-          InputStream input = null;
-          try {
-            int totalBytesRead = 0;
-            input = new BufferedInputStream(new FileInputStream(file));
-            while(totalBytesRead < result.length){
-              int bytesRemaining = result.length - totalBytesRead;
-              //input.read() returns -1, 0, or more :
-              int bytesRead = input.read(result, totalBytesRead, bytesRemaining);
-              if (bytesRead > 0){
-                totalBytesRead = totalBytesRead + bytesRead;
-              }
+            InputStream input = null;
+            try {
+                int totalBytesRead = 0;
+                input = new BufferedInputStream(new FileInputStream(file));
+                while (totalBytesRead < result.length) {
+                    int bytesRemaining = result.length - totalBytesRead;
+                    // input.read() returns -1, 0, or more :
+                    int bytesRead = input.read(result, totalBytesRead, bytesRemaining);
+                    if (bytesRead > 0) {
+                        totalBytesRead = totalBytesRead + bytesRead;
+                    }
+                }
+                /*
+                 * the above style is a bit tricky: it places bytes into the 'result' array; 'result' is an output parameter; the
+                 * while loop usually has a single iteration only.
+                 */
+                log("Num bytes read: " + totalBytesRead);
+            } finally {
+                log("Closing input stream.");
+                input.close();
             }
-            /*
-             the above style is a bit tricky: it places bytes into the 'result' array;
-             'result' is an output parameter;
-             the while loop usually has a single iteration only.
-            */
-            log("Num bytes read: " + totalBytesRead);
-          }
-          finally {
-            log("Closing input stream.");
-            input.close();
-          }
-        }
-        catch (FileNotFoundException ex) {
-          log("File not found.");
-        }
-        catch (IOException ex) {
-          ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            log("File not found.");
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         return result;
-      }
+    }
 }

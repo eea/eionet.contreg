@@ -8,9 +8,11 @@ import eionet.repgen.datasources.SPARQLDataSource;
 public class SPARQLQueryExecuter implements JRQueryExecuter {
 
     private String sparql;
+
     public SPARQLQueryExecuter(String sparql) {
         this.sparql = sparql;
     }
+
     @Override
     public JRDataSource createDatasource() throws JRException {
         SPARQLDataSource ds = new SPARQLDataSource();
