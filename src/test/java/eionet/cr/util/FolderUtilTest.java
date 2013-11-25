@@ -113,7 +113,7 @@ public class FolderUtilTest extends TestCase {
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
         String aclPath = FolderUtil.extractAclPath(appHomeUrl + "/project/aux/poux");
 
-        assertEquals("/project/aux", aclPath);
+        assertEquals("/project/aux/poux", aclPath);
     }
 
     public void testEmtpyProcectAcl() {
@@ -122,5 +122,9 @@ public class FolderUtilTest extends TestCase {
         String aclPath = FolderUtil.extractAclPath(appHomeUrl);
 
         assertEquals("", aclPath);
+    }
+
+    public void testExtractParentFolderUri() {
+        assertEquals("http://aa.bb.com/level1/level2/level3", FolderUtil.extractParentFolderUri("http://aa.bb.com/level1/level2/level3/somethingattheen"));
     }
 }

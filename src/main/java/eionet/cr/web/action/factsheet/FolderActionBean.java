@@ -69,6 +69,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.home.HomesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -134,12 +135,17 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     public Resolution view() throws DAOException {
         aclPath = FolderUtil.extractAclPath(uri);
 
-        // allow to view the folder by default if there is no ACL
-        boolean allowFolderView = CRUser.hasPermission(aclPath, getUser(), "v", true);
+        // allow to view the folder if there is no ACL
+        boolean allowFolderView = CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true);
 
         if (!allowFolderView) {
             addSystemMessage("Viewing content of this folder is prohibited.");
-            return new RedirectResolution(FolderActionBean.class).addParameter("uri", StringUtils.substringBeforeLast(uri, "/"));
+            String redirectUri = StringUtils.substringBeforeLast(uri, "/");
+            if (FolderUtil.isHomeFolder(redirectUri)) {
+                return new RedirectResolution(HomesActionBean.class);
+            } else {
+                return new RedirectResolution(FolderActionBean.class).addParameter("uri", redirectUri);
+            }
         }
         initTabs();
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
@@ -197,17 +203,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Handles the renaming event.
      *
-     * @return
-     * @throws DAOException
+     * @return stripes resolution
+     * @throws DAOException if renam in the repositry fails
+     * @throws SignOnException if rename ACLs fails
      */
-    public Resolution rename() throws DAOException {
+    public Resolution rename() throws DAOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
-        // TODO why renaming needs d-permission
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "d", false);
-        if (!actionAllowed) {
-            addSystemMessage("Only authorized users can rename files.");
-            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        }
 
         // Rename files
         Set<String> uniqueNewNames = new HashSet<String>();
@@ -263,6 +264,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
 
+        String check = renameableItemsHaveUpdatePermission();
+        if (check != null) {
+            addSystemMessage("Not authorized to rename items: " + check);
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
         if (uriRenamings.size() > 0) {
             helperDAO.renameUserUploads(uriRenamings);
             renameAcls(uriRenamings);
@@ -278,19 +284,20 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Handles deletion event.
      *
-     * @return
-     * @throws DAOException
+     * @return Stripes resolution
+     * @throws DAOException if delete files and filders fails in RDF store
+     * @throws SignOnException if deleting ACL fails
      */
-    public Resolution delete() throws DAOException {
+    public Resolution delete() throws DAOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
 
         // allow to view the folder by default if there is no ACL
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "d", false);
-
-        if (!actionAllowed) {
-            addSystemMessage("Only authorized users can delete files.");
-            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        }
+//        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
+//
+//        if (!actionAllowed) {
+//            addSystemMessage("Only authorized users can delete files.");
+//            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+//        }
 
         if (itemsNotSelected()) {
             addSystemMessage("Select files or folders to delete.");
@@ -305,6 +312,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         check = selectedItemsReserved();
         if (check != null) {
             addSystemMessage("Cannot delete. File or folder is reserved: " + check);
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+
+        check = selectedItemsHaveDeletePermission();
+        if (check != null) {
+            addSystemMessage("Cannot delete. Not authorized to delete: " + check);
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
@@ -351,14 +364,17 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * Create new folder.
      *
      * @return Resolution
-     * @throws DAOException if DAO method execution fails
+     * @throws DAOException
+     *             if DAO method execution fails
+     * @throws SignOnException
+     *             if adding ACL to the DB fails
      */
-    public Resolution createFolder() throws DAOException {
+    public Resolution createFolder() throws DAOException, SignOnException {
 
         aclPath = FolderUtil.extractAclPath(uri);
 
         // check if use r has permission to add entries in the parent
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
         if (!actionAllowed) {
             addSystemMessage("No permission to add folder.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -379,26 +395,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         String context = FolderUtil.folderContext(uri);
 
-        // TODO - can be generalized for all folders not only project when DDC is ready in ACL mechanism
         folderDAO.createFolder(uri, title, label, context);
+        AccessController.addAcl(aclPath + "/" + title, getUserName(), title, true);
 
-        try {
-            if (FolderUtil.isProjectFolder(uri)) {
-
-                String path = FolderUtil.extractPathInSpecialFolder(uri + "/" + title, "project");
-                if (!StringUtils.isBlank(path)) {
-                    String[] tokens = path.split("/");
-                    if (tokens != null && tokens.length == 1) {
-                        String aclP = "/project/" + tokens[0];
-                        if (!AccessController.getAcls().containsKey(aclP)) {
-                            // KL220512 - anonymous user should not be allowed to add project folders:
-                            AccessController.addAcl(aclP, getUserName(), "");
-                        }
-                    }
-                }
-            }
-        } catch (SignOnException e) {
-            e.printStackTrace();
+        if (FolderUtil.isProjectRootFolder(uri)) {
+            AccessController.addAcl(aclPath + "/" + title + "/bookmarks", getUserName(), "Bookmarks for " + title, true);
         }
 
         addSystemMessage("Folder created successfully.");
@@ -410,15 +411,28 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      *
      * @return
      * @throws DAOException
+     * @throws SignOnException
      */
-    public Resolution uploadForm() throws DAOException {
+    public Resolution uploadForm() throws DAOException, SignOnException {
+        if (!hasPermission(uri, CRUser.INSERT_PERMISSION)) {
+            addSystemMessage("No permission to upload file.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        }
+
         initTabs();
         return new ForwardResolution("/pages/folder/uploadFile.jsp");
     }
 
-    public Resolution upload() throws DAOException, IOException {
+    /**
+     * Upload file to CR folder.
+     * @return Stripes resolution
+     * @throws DAOException if harvesting or any other DB operation fails
+     * @throws IOException if I/O error
+     * @throws SignOnException if creating ACL fails
+     */
+    public Resolution upload() throws DAOException, IOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
         if (!actionAllowed) {
             addWarningMessage("Not authorized to upload files");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -455,6 +469,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // redirect to the uploads list
         // String urlBinding = getUrlBinding();
         // resolution = new RedirectResolution(StringUtils.replace(urlBinding, "{username}", getUserName()));
+
+        //add file ACL
+        AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
+
         addSystemMessage("File successfully uploaded.");
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
     }
@@ -750,6 +768,42 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
+     * checks selected items delete permission.
+     * @return list of declined items
+     * @throws SignOnException if acl check fails
+     */
+    private String selectedItemsHaveDeletePermission() throws SignOnException {
+        StringBuilder result = new StringBuilder();
+        for (RenameFolderItemDTO item : selectedItems) {
+            String acl = aclPath + "/" + item.getName();
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.DELETE_PERMISSION)) {
+                result.append(item.getName()).append(" ");
+            }
+
+        }
+
+        return StringUtils.isEmpty(result.toString()) ? null : result.toString();
+
+    }
+
+    /**
+     * checks if items selected to be renamed have update permission.
+     * @return list of declined items
+     * @throws SignOnException if acl check fails
+     */
+    private String renameableItemsHaveUpdatePermission() throws SignOnException {
+        StringBuilder result = new StringBuilder();
+        for (RenameFolderItemDTO item : renameItems) {
+            String acl = aclPath + "/" + item.getName();
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.UPDATE_PERMISSION)) {
+                result.append(item.getName()).append(" ");
+            }
+        }
+
+        return StringUtils.isEmpty(result.toString()) ? null : result.toString();
+    }
+
+    /**
      * Returns true, if none of the items are marked selected.
      *
      * @return
@@ -784,7 +838,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Renames corresponding ACLs of the renamed folders.
      *
-     * @param renamings renamings hash keys: old urls, values: new urls
+     * @param renamings
+     *            renamings hash keys: old urls, values: new urls
      */
     private void renameAcls(HashMap<String, String> renamings) {
         String appHome = GeneralConfig.getProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -802,28 +857,18 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * Deletes coresponding ACLs of the deleted items.
+     * Deletes corresponding ACLs of the deleted items.
      *
-     * @param uris array of URIs that are deleted
+     * @param uris
+     *            array of URIs that are deleted
+     * @throws SignOnException
+     *             if delete ACLs files
      */
-    private void deleteAcls(List<String> uris) {
+    private void deleteAcls(List<String> uris) throws SignOnException {
         for (String uriToDelete : uris) {
-            try {
-                if (FolderUtil.isProjectFolder(uriToDelete)) {
-
-                    String path = FolderUtil.extractPathInSpecialFolder(uriToDelete, "project");
-                    if (!StringUtils.isBlank(path)) {
-                        String[] tokens = path.split("/");
-                        if (tokens != null && tokens.length == 1) {
-                            String aclP = "/project/" + tokens[0];
-                            if (AccessController.getAcls().containsKey(aclP)) {
-                                AccessController.removeAcl(aclP);
-                            }
-                        }
-                    }
-                }
-            } catch (SignOnException e) {
-                e.printStackTrace();
+            String aclP = FolderUtil.extractAclPath(uriToDelete);
+            if (AccessController.getAcls().containsKey(aclP)) {
+                AccessController.removeAcl(aclP);
             }
         }
     }
@@ -880,7 +925,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param uri the uri to set
+     * @param uri
+     *            the uri to set
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -908,7 +954,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param folderItems the folderItems to set
+     * @param folderItems
+     *            the folderItems to set
      */
     public void setFolderItems(List<FolderItemDTO> folderItems) {
         this.folderItems = folderItems;
@@ -922,7 +969,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param selectedItems the selectedItems to set
+     * @param selectedItems
+     *            the selectedItems to set
      */
     public void setSelectedItems(List<RenameFolderItemDTO> selectedItems) {
         this.selectedItems = selectedItems;
@@ -936,7 +984,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param title the title to set
+     * @param title
+     *            the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -950,7 +999,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param uploadedFile the uploadedFile to set
+     * @param uploadedFile
+     *            the uploadedFile to set
      */
     public void setUploadedFile(FileBean uploadedFile) {
         this.uploadedFile = uploadedFile;
@@ -964,7 +1014,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param replaceExisting the replaceExisting to set
+     * @param replaceExisting
+     *            the replaceExisting to set
      */
     public void setReplaceExisting(boolean replaceExisting) {
         this.replaceExisting = replaceExisting;
@@ -978,7 +1029,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param renameItems the renameItems to set
+     * @param renameItems
+     *            the renameItems to set
      */
     public void setRenameItems(List<RenameFolderItemDTO> renameItems) {
         this.renameItems = renameItems;
@@ -992,7 +1044,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     }
 
     /**
-     * @param label the label to set
+     * @param label
+     *            the label to set
      */
     public void setLabel(String label) {
         this.label = label;
@@ -1002,4 +1055,15 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         return aclPath;
     }
 
+    /**
+     * checks if user has permission for this acl.
+     * @param folderUri folder full URI
+     * @param permission permission to check
+     * @return tru if user has permission
+     * @throws SignOnException if check fails
+     */
+    private boolean hasPermission(String folderUri, String permission) throws SignOnException {
+        String acl = FolderUtil.extractAclPath(folderUri);
+        return CRUser.hasPermission(getUserName(), acl, permission);
+    }
 }

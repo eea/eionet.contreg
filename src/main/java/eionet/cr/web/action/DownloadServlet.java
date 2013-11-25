@@ -39,7 +39,10 @@ import org.apache.log4j.Logger;
 
 import eionet.cr.common.CRException;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.util.FolderUtil;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.StripesExceptionHandler;
+import eionet.cr.web.util.WebConstants;
 
 /**
  *
@@ -67,6 +70,7 @@ public class DownloadServlet extends HttpServlet {
      *
      * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
      */
+    @Override
     protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Process request without content.
         processRequest(request, response, false);
@@ -77,6 +81,7 @@ public class DownloadServlet extends HttpServlet {
      *
      * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
      */
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // Process request with content.
@@ -99,6 +104,15 @@ public class DownloadServlet extends HttpServlet {
         String requestedUri = request.getParameter("uri");
         if (requestedUri == null) {
             handleFileNotFound("No file URI supplied in the request!", request, response);
+            return;
+        }
+
+        //check ACL
+        CRUser crUser =(CRUser) request.getSession().getAttribute(WebConstants.USER_SESSION_ATTR);
+        String aclPath = FolderUtil.extractAclPath(requestedUri);
+        // perform ACL check, if no ACL - proceed with showing:
+        if (!CRUser.hasPermission(aclPath, crUser, CRUser.VIEW_PERMISSION, true)) {
+            handleHttpError("Not authorized to view the file", request, response, HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -328,6 +342,11 @@ public class DownloadServlet extends HttpServlet {
         }
     }
 
+    private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        handleHttpError(message, request, response, HttpServletResponse.SC_NOT_FOUND);
+    }
+
     /**
      *
      * @param message
@@ -336,7 +355,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws IOException
      * @throws ServletException
      */
-    private void handleFileNotFound(String message, HttpServletRequest request, HttpServletResponse response)
+    private void handleHttpError(String message, HttpServletRequest request, HttpServletResponse response, int httpErrorCode)
     throws ServletException, IOException {
 
         LOGGER.info(message);
@@ -362,7 +381,7 @@ public class DownloadServlet extends HttpServlet {
             request.setAttribute(StripesExceptionHandler.EXCEPTION_ATTR, new CRException(message));
             request.getRequestDispatcher(StripesExceptionHandler.ERROR_PAGE).forward(request, response);
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.sendError(httpErrorCode);
         }
     }
 

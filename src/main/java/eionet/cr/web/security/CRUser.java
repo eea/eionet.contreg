@@ -35,6 +35,7 @@ import com.tee.uit.security.AclNotFoundException;
 import com.tee.uit.security.SignOnException;
 
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.WebConstants;
@@ -61,6 +62,18 @@ public class CRUser {
 
     /** A constant user representing push harvest. */
     public static final CRUser PUSH_HARVEST = new CRUser("push harvest");
+
+    /** Permission to view files and folders. */
+    public static final String VIEW_PERMISSION = "v";
+
+    /** Permission to create files and folders. */
+    public static final String INSERT_PERMISSION = "i";
+
+    /** Permission to update (rename) files and folders. */
+    public static final String UPDATE_PERMISSION = "u";
+
+    /** Permission to delete files and folders. */
+    public static final String DELETE_PERMISSION = "d";
 
     /** */
     private String userName;
@@ -154,28 +167,32 @@ public class CRUser {
      * @param aclPath ACL Path
      * @param user Current user (null if not logged in)
      * @param permission permission to be checked
-     * @param allowAnonymous - indicates if to allow anonymous users if ACL does not exist
+     * @param allowByDefault - indicates if to allow users to perform the action if ACL does not exist
+     *  if the parameter is true only authenticated users are allowed otherwise all users are allowed
      * @return true if user can perform the action
      */
-    public static boolean hasPermission(String aclPath, CRUser user, String permission, boolean allowAnonymous) {
+    public static boolean hasPermission(String aclPath, CRUser user, String permission, boolean allowByDefault) {
 
         // allow to view the folder by default if there is no ACL
         boolean allowAction = true;
 
         try {
-            AccessControlListIF acl = AccessController.getAcl(aclPath);
+            AccessControlListIF acl = null;
+            if (AccessController.getAcls().containsKey(aclPath)) {
+                acl = AccessController.getAcl(aclPath);
+            }
 
             String userName = (user != null ? user.getUserName() : null);
             if (acl != null) {
                 allowAction = acl.checkPermission(userName, permission);
             } else {
+                logger.warn("ACL does not exist " + aclPath);
                 // ACL does not exist - check the additional parameter
-                if (!allowAnonymous) {
+                if (!allowByDefault) {
                     allowAction = (user != null);
                 }
             }
         } catch (SignOnException e) {
-            // TODO Auto-generated catch block
             logger.error("Error in ACL check " + e.toString());
         }
 
@@ -485,15 +502,22 @@ public class CRUser {
      */
     public void createDefaultAcls() {
 
-        // String aclPath, String owner, String description
         String mainUserAcl = "/home/" + getUserName();
         try {
             if (!AccessController.getAcls().containsKey(mainUserAcl)) {
-                AccessController.addAcl(mainUserAcl, getUserName(), "Home folder for " + getUserName());
+                AccessController.addAcl(mainUserAcl, getUserName(), "Home folder for " + getUserName(), true);
+
+                //special folders
+                for (String uri : getReservedFolderAndFileUris()) {
+                    String aclPath = FolderUtil.extractAclPath(uri);
+                    if (!AccessController.getAcls().containsKey(aclPath)) {
+                        AccessController.addAcl(aclPath, getUserName(), StringUtils.substringAfterLast(aclPath, "/")
+                                + " for " + getUserName(), true);
+                    }
+                }
             }
-            // TODO subfolders ACL's when DDC will be imple,mented in the acl mechanism
+
         } catch (SignOnException e) {
-            // TODO Auto-generated catch block
             logger.error("Error creating ACL's " + e.toString());
         }
     }

@@ -31,6 +31,8 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -68,9 +70,15 @@ public class BookmarksActionBean extends AbstractActionBean {
      *
      * @return
      * @throws DAOException if DAO call fails
+     * @throws SignOnException if communicating with ACL component fails
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution view() throws DAOException, SignOnException {
+        String aclPath = FolderUtil.extractAclPath(uri);
+        if (!CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true)) {
+            addSystemMessage("Not authorized to view bookmarks.");
+            return new ForwardResolution(FolderActionBean.class).addParameter("uri", FolderUtil.extractParentFolderUri(uri));
+        }
         initTabs();
         bookmarks = DAOFactory.get().getDao(HelperDAO.class).getUserBookmarks(uri);
 
@@ -215,7 +223,7 @@ public class BookmarksActionBean extends AbstractActionBean {
      */
     public boolean isDeletePermission() {
         String aclPath = FolderUtil.extractAclPath(uri);
-        return CRUser.hasPermission(aclPath, getUser(), "d", false);
+        return CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
     }
 
     /**

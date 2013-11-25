@@ -27,6 +27,7 @@ import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -40,15 +41,19 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -82,7 +87,18 @@ public class TableFileActionBean extends AbstractActionBean {
      * @throws QueryEvaluationException
      */
     @DefaultHandler
-    public Resolution view() throws DAOException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public Resolution view() throws DAOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SignOnException {
+
+        boolean viewPermission = true;
+        String aclPath = FolderUtil.extractAclPath(uri);
+
+        viewPermission = CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true);
+
+        if (!viewPermission) {
+            addWarningMessage("Not authorized to view the file");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", StringUtils.substringBeforeLast(uri, "/"));
+        }
+
         initTabs();
 
         // Get query result - CSV/TSV contents

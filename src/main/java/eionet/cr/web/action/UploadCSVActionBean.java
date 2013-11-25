@@ -43,6 +43,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
+
+import com.tee.uit.security.AccessController;
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -170,6 +174,11 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution init() {
+        if (!uploadAllowed()) {
+            addSystemMessage("No permission to upload CSV/TSV file.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
+        }
+
         return new ForwardResolution(JSP_PAGE);
     }
 
@@ -177,8 +186,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
      *
      * @return
      * @throws DAOException
+     * @throws SignOnException if adding ACL fails
      */
-    public Resolution upload() throws DAOException {
+    public Resolution upload() throws DAOException, SignOnException {
+
+        if (!uploadAllowed()) {
+            addSystemMessage("No permission to upload CSV/TSV file.");
+            return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
+        }
 
         // Prepare resolution.
         ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
@@ -251,6 +266,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // Tell the JSP page that it should display the wizard.
             resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
+
+            //add ACL>
+            AccessController.addAcl(FolderUtil.extractAclPath(folderUri) + "/" + fileName, getUserName(), "");
 
         } catch (Exception e) {
             LOGGER.error("Error while reading the file: ", e);
@@ -375,7 +393,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // for all the above POST events, user must be authorized
         String aclPath = FolderUtil.extractAclPath(folderUri);
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), "i", false);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
 
         if (!actionAllowed) {
             addGlobalValidationError("You are not authorised for this operation!");
@@ -741,4 +759,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
         this.finalEncoding = finalEncoding;
     }
 
+    /**
+     * True if user can upload the file.
+     * @return boolean
+     */
+    private boolean uploadAllowed() {
+        String aclPath = FolderUtil.extractAclPath(folderUri);
+        return CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
+    }
 }

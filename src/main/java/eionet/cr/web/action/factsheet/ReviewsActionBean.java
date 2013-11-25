@@ -19,6 +19,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -70,9 +72,15 @@ public class ReviewsActionBean extends AbstractActionBean {
      *
      * @return
      * @throws DAOException
+     * @throws SignOnException
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution view() throws DAOException, SignOnException {
+        String aclPath = FolderUtil.extractAclPath(uri);
+        if (!CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true)) {
+            addSystemMessage("Not authorized to view reviews.");
+            return new ForwardResolution(FolderActionBean.class).addParameter("uri", FolderUtil.extractParentFolderUri(uri));
+        }
 
         if (StringUtils.isBlank(uri) && isUserLoggedIn()) {
             uri = getUser().getReviewsUri();

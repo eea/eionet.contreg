@@ -30,6 +30,8 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.tee.uit.security.SignOnException;
+
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -64,9 +66,16 @@ public class HistoryActionBean extends AbstractActionBean {
      *
      * @return
      * @throws DAOException
+     * @throws SignOnException
      */
     @DefaultHandler
-    public Resolution view() throws DAOException {
+    public Resolution view() throws DAOException, SignOnException {
+        String aclPath = FolderUtil.extractAclPath(uri);
+        if (!CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true)) {
+            addSystemMessage("Not authorized to view history.");
+            return new ForwardResolution(FolderActionBean.class).addParameter("uri", FolderUtil.extractParentFolderUri(uri));
+        }
+
         initTabs();
 
         histories = DAOFactory.get().getDao(HelperDAO.class).getUserHistory(uri);
