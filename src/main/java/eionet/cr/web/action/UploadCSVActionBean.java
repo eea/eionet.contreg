@@ -267,8 +267,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Tell the JSP page that it should display the wizard.
             resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
 
-            //add ACL>
-            AccessController.addAcl(FolderUtil.extractAclPath(folderUri) + "/" + fileName, getUserName(), "");
+            //add ACL if not overwirting
+            if (!overwrite) {
+                AccessController.addAcl(FolderUtil.extractAclPath(folderUri) + "/" + fileName, getUserName(), "");
+            }
 
         } catch (Exception e) {
             LOGGER.error("Error while reading the file: ", e);
@@ -765,6 +767,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     private boolean uploadAllowed() {
         String aclPath = FolderUtil.extractAclPath(folderUri);
-        return CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
+        return CRUser.hasPermission(aclPath, getUser(), overwrite ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION, false);
     }
 }

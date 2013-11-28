@@ -432,7 +432,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public Resolution upload() throws DAOException, IOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
+        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), replaceExisting ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION, false);
         if (!actionAllowed) {
             addWarningMessage("Not authorized to upload files");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -470,8 +470,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // String urlBinding = getUrlBinding();
         // resolution = new RedirectResolution(StringUtils.replace(urlBinding, "{username}", getUserName()));
 
-        //add file ACL
-        AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
+        //add file ACL if not existing
+        if (!replaceExisting) {
+            AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
+        }
 
         addSystemMessage("File successfully uploaded.");
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
