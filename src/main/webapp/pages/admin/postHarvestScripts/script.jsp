@@ -42,7 +42,18 @@
 
     <c:if test="${actionBean.pastePossible}">
         <div class="advice-msg" style="font-size:0.8em">
-            There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the buffer.
+            There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the buffer:
+            <c:forEach items="${actionBean.clipBoardScripts}" var="clipboardItem">
+
+                <stripes:link href="/admin/postHarvestScript">
+                    <c:out value="${clipboardItem.title}"/>
+                    <stripes:param name="id" value="${actionBean.id}"/>
+                    <stripes:param name="clipboardItemId" value="${clipboardItem.id}"/>
+                    <stripes:param name="backToTargetUrl" value="${actionBean.backToTargetUrl}"/>
+                    <stripes:param name="targetType" value="${actionBean.targetType}"/>
+                    <stripes:param name="targetUrl" value="${actionBean.targetUrl}"/>
+                </stripes:link><span>; </span>
+            </c:forEach>
         </div>
     </c:if>
 
@@ -100,6 +111,7 @@
                         </div>
                         <script type="text/javascript">
 // <![CDATA[
+
 function makeExpandingArea(container) {
  var area = container.querySelector('textarea');
  var span = container.querySelector('span');
@@ -164,9 +176,6 @@ while (l--) {
                         <stripes:submit name="save" value="Save & close"/>
                         <stripes:submit name="test" value="Test"/>
                         <stripes:submit name="cancel" value="Cancel"/>
-                        <c:if test="${actionBean.pastePossible}">
-                            <stripes:submit name="paste" value="Paste" title="Paste selected script(s): ${actionBean.clipBoardScripts}" />
-                        </c:if>
                     </td>
                 </tr>
             </table>
@@ -231,11 +240,11 @@ while (l--) {
                 <div>No test results found!</div>
             </c:if>
         </c:if>
-        
+
     <%-- The "Useful namesoaces" dialog, hidden by default --%>
-            
+
     <div id="prefixesDialog" title="Useful namespaces">
-        
+
         <c:if test="${empty actionBean.usefulNamespaces}">
             <p>None found!</p>
         </c:if>
@@ -247,7 +256,7 @@ while (l--) {
             </ul>
         </c:if>
         <button id="closePrefixesDialog">Close</button>
-        
+
     </div>
 
 </stripes:layout-definition>

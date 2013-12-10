@@ -210,9 +210,11 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
         // PostHarvestScriptUtil.validateScripts(this, this.getSession(), targetType, targetUrl);
 
         TargetType clipboardTargetType = (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
-        List<String> validationErros =
-                PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType, targetUrl);
-        addGlobalValidationErrors(validationErros);
+        if (targetType != null){
+            List<String> validationErros =
+                    PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType, targetUrl);
+            addGlobalValidationErrors(validationErros);
+        }
 
         getContext().setSourcePageResolution(list());
     }

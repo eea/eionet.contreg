@@ -87,6 +87,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private List<String> testResultColumns;
     private String executedTestQuery;
     private String testError;
+    private int clipboardItemId;
 
     /**
      * The URL to redirect to when Cancel event called. Used when the script creating/editing page has been reached, for example,
@@ -111,6 +112,18 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
                 targetType = dto.getTargetType();
                 active = dto.isActive();
                 runOnce = dto.isRunOnce();
+            }
+        }
+
+        if (clipboardItemId > 0) {
+            List<PostHarvestScriptDTO> clipboardScripts = getClipBoardScripts();
+
+            for (PostHarvestScriptDTO clipboardScript : clipboardScripts) {
+                if (clipboardScript.getId() == clipboardItemId){
+                    script = clipboardScript.getScript();
+                    title = clipboardScript.getTitle();
+                    break;
+                }
             }
         }
 
@@ -203,7 +216,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults =
                     DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                    .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }
@@ -608,5 +621,13 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     @SuppressWarnings("unchecked")
     public List<PostHarvestScriptDTO> getClipBoardScripts() {
         return (List<PostHarvestScriptDTO>) getSession().getAttribute(SCRIPTS_CLIPBOARD);
+    }
+
+    public int getClipboardItemId() {
+        return clipboardItemId;
+    }
+
+    public void setClipboardItemId(int clipboardItemId) {
+        this.clipboardItemId = clipboardItemId;
     }
 }

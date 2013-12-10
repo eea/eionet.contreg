@@ -7,15 +7,15 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Post-harvest scripts">
 
     <stripes:layout-component name="head">
-    
+
         <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
-        
+
         <script type="text/javascript">
         // <![CDATA[
             ( function($) {
                 $(document).ready(
                     function(){
-                    	
+
                     	// Open prefixes dialog
                         $("#prefixesLink").click(function() {
                             $('#prefixesDialog').dialog('open');
@@ -33,7 +33,7 @@
                             $('#prefixesDialog').dialog("close");
                             return true;
                         });
-                        
+
                     	// The handling of useful namespace clicks
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
@@ -53,12 +53,6 @@
 
     <c:choose>
         <c:when test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
-        <c:if test="${actionBean.pastePossible}">
-            <div class="tip-msg">
-                There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the clipboard.
-            </div>
-        </c:if>
-
             <div id="tabbedmenu">
                 <ul>
                     <c:forEach items="${actionBean.tabs}" var="tab">
