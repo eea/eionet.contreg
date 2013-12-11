@@ -74,6 +74,9 @@ public class PingActionBean extends AbstractActionBean {
     /** Hosts allowed to use CR's ping API. May contain entries with wildcards. */
     private static final HashSet<String> PING_WHITELIST = getPingWhiteList();
 
+    /** Hosts NOT allowed to use CR's ping API. May contain entries with wildcards. */
+    private static final HashSet<String> PING_BLACKLIST = getPingBlackList();
+
     /** The URI to ping. Required. */
     private String uri;
 
@@ -168,6 +171,13 @@ public class PingActionBean extends AbstractActionBean {
      */
     private boolean isTrustedRequester(String host, String ip) {
 
+        for (String pattern : PING_BLACKLIST) {
+
+            if (StringUtils.isNotBlank(host) && Util.wildCardMatch(host.toLowerCase(), pattern)) {
+                return false;
+            }
+        }
+
         for (String pattern : PING_WHITELIST) {
 
             if (StringUtils.isNotBlank(host) && Util.wildCardMatch(host.toLowerCase(), pattern)) {
@@ -236,6 +246,34 @@ public class PingActionBean extends AbstractActionBean {
         result.add("::1");
 
         String property = GeneralConfig.getProperty(GeneralConfig.PING_WHITELIST);
+
+        parseUrlList(result, property);
+
+        return result;
+    }
+
+    /**
+     * Utility method for obtaining the set of ping blacklist (i.e. hosts not allowed to call CR's ping API) from configuration.
+     *
+     * @return The ping blacklist as a hash-set
+     */
+    private static HashSet<String> getPingBlackList() {
+
+        HashSet<String> result = new HashSet<String>();
+        String property = GeneralConfig.getProperty(GeneralConfig.PING_BLACKLIST);
+        parseUrlList(result, property);
+
+        return result;
+    }
+
+
+    /**
+     * Utility method to parse list of url from the configuration file.
+     *
+     * @param result
+     * @param property
+     */
+    private static void parseUrlList(HashSet<String> result, String property){
         if (!StringUtils.isBlank(property)) {
             String[] split = property.split("\\s*,\\s*");
             for (int i = 0; i < split.length; i++) {
@@ -244,9 +282,8 @@ public class PingActionBean extends AbstractActionBean {
                 }
             }
         }
-
-        return result;
     }
+
 
     /**
      * @param create

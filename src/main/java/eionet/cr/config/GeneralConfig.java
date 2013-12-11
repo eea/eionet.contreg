@@ -126,6 +126,9 @@ public final class GeneralConfig {
     public static final String PING_WHITELIST = "pingWhitelist";
 
     /** */
+    public static final String PING_BLACKLIST = "pingBlacklist";
+
+    /** */
     public static final String STAGING_FILES_DIR = "stagingFilesDir";
 
     /** */
