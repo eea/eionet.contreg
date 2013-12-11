@@ -134,14 +134,6 @@ public interface HelperDAO extends DAO {
     List<Pair<String, String>> getPredicatesUsedForType(String typeUri) throws DAOException;
 
     /**
-     * Gets sources that have some spatial content.
-     *
-     * @return List<String>
-     * @throws DAOException if query fails
-     */
-    List<String> getSpatialSources() throws DAOException;
-
-    /**
      * @param subjectUri
      * @return SubjectDTO
      * @throws DAOException if query fails

@@ -30,7 +30,6 @@ import eionet.cr.dao.readers.FreeTextSearchReader;
 import eionet.cr.dao.readers.GenericSubjectDataReader;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dao.readers.SubjectDataReader;
-import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoDeliveriesSearchHelper;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoFilteredSearchHelper;
@@ -176,7 +175,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Deprecated
     private SearchResultDTO<SubjectDTO> searchByFilters_alternative(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
 
         SearchResultDTO<SubjectDTO> result = new SearchResultDTO<SubjectDTO>();
         Bindings bindings = new Bindings();
@@ -428,7 +427,7 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
     @Deprecated
     public SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException {
+                    throws DAOException {
         return searchByFilters(filters, checkFiltersRange, pagingRequest, sortingRequest, selectPredicates);
     }
 
@@ -473,71 +472,6 @@ public class VirtuosoSearchDAO extends VirtuosoBaseDAO implements SearchDAO {
         }
 
         return ret;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.SearchDAO#searchBySpatialBox(eionet.cr.dao.util.BBOX, java.lang.String,
-     * eionet.cr.util.pagination.PagingRequest, eionet.cr.util.SortingRequest, boolean)
-     */
-    @Override
-    public Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box, String sourceUri, PagingRequest pagingRequest,
-            SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-        // // create query helper
-        // PostgreSpatialSearchHelper helper = new PostgreSpatialSearchHelper(box, sourceUri,
-        // pagingRequest, sortingRequest, sortByObjectHash);
-        //
-        // // create the list of IN parameters of the query
-        // ArrayList<Object> inParams = new ArrayList<Object>();
-        //
-        // // let the helper create the query and fill IN parameters
-        // String query = helper.getQuery(inParams);
-        //
-        // long startTime = System.currentTimeMillis();
-        // logger.trace("Spatial search, executing subject finder query: " + query);
-        //
-        // // execute the query, with the IN parameters
-        // List<Long> list = executeSQL(query, inParams, new SingleObjectReader<Long>());
-        //
-        // int totalRowCount = 0;
-        // List<SubjectDTO> subjects = new ArrayList<SubjectDTO>();
-        //
-        // // if result list not null and not empty, then get the subjects data and total rowcount
-        // if (list != null && !list.isEmpty()) {
-        //
-        // // create the subjects map that needs to be fed into the subjects data reader
-        // Map<Long,SubjectDTO> subjectsMap = new LinkedHashMap<Long, SubjectDTO>();
-        // for (Long hash : list) {
-        // subjectsMap.put(hash, null);
-        // }
-        //
-        // logger.trace("Spatial search, getting the data of the found subjects");
-        //
-        // // get the data of all found subjects
-        // subjects = getSubjectsData(subjectsMap);
-        //
-        // // if paging required, get the total number of found subjects too
-        // if (pagingRequest != null) {
-        //
-        // inParams = new ArrayList<Object>();
-        // query = helper.getCountQuery(inParams);
-        //
-        // logger.trace("Spatial search, executing rowcount query: " + query);
-        //
-        // totalRowCount = Integer.valueOf(executeUniqueResultSQL(
-        // helper.getCountQuery(inParams),
-        // inParams, new SingleObjectReader<Long>()).toString());
-        // }
-        // }
-        //
-        // logger.debug("Search references, total query time " + Util.durationSince(startTime));
-        //
-        // // the result Pair contains total number of subjects and the requested sub-list
-        // return new Pair<Integer,List<SubjectDTO>>(Integer.valueOf(totalRowCount), subjects);
-
     }
 
     /*

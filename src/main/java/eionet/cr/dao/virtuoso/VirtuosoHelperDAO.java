@@ -435,17 +435,6 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HelperDAO#getSpatialSources()
-     */
-    @Override
-    public List<String> getSpatialSources() throws DAOException {
-        throw new UnsupportedOperationException("Method not implemented");
-
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HelperDAO#getSubject(java.lang.String)
      */
     @Override

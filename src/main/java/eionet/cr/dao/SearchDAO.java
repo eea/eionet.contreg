@@ -27,7 +27,6 @@ import java.util.Vector;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.helpers.FreeTextSearchHelper;
-import eionet.cr.dao.util.BBOX;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.dto.DeliveryDTO;
 import eionet.cr.dto.SearchResultDTO;
@@ -82,7 +81,7 @@ public interface SearchDAO extends DAO {
     @Deprecated
     SearchResultDTO<SubjectDTO> searchByFilters(Map<String, String> filters, boolean checkFiltersRange,
             PagingRequest pagingRequest, SortingRequest sortingRequest, List<String> selectPredicates, boolean useInference)
-            throws DAOException;
+                    throws DAOException;
 
     /**
      *
@@ -97,19 +96,6 @@ public interface SearchDAO extends DAO {
      */
     CustomPaginatedList<DeliveryDTO> searchDeliveries(String obligation, String locality, String year, String sortCol,
             PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
-
-    /**
-     *
-     * @param box
-     * @param sourceUri
-     * @param pagingRequest
-     * @param sortingRequest
-     * @param sortByObjectHash
-     * @return Pair<Integer, List<SubjectDTO>>
-     * @throws DAOException
-     */
-    Pair<Integer, List<SubjectDTO>> searchBySpatialBox(BBOX box, String sourceUri, PagingRequest pagingRequest,
-            SortingRequest sortingRequest, boolean sortByObjectHash) throws DAOException;
 
     /**
      *
@@ -170,7 +156,7 @@ public interface SearchDAO extends DAO {
      * @throws DAOException
      */
     Pair<Integer, List<SubjectDTO>>
-            searchReferences(String subjectUri, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+    searchReferences(String subjectUri, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * Returns distinct values of all types used in triples.
