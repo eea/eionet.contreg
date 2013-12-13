@@ -21,6 +21,9 @@
 
 package eionet.cr.dto;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * Folder item DTO.
  *
@@ -172,6 +175,21 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
      */
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
+    }
+
+    /**
+     * Returns name that is urlDecoded.
+     * @return
+     */
+    public String getUrlDecodedName(){
+
+        try {
+            return URLDecoder.decode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 }

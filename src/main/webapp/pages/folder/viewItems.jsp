@@ -79,10 +79,10 @@
                         Projects folder
                     </c:when>
                     <c:when test="${actionBean.homeFolder}">
-                        Home folder (${actionBean.folder.name})
+                        Home folder (${actionBean.folder.urlDecodedName})
                     </c:when>
                     <c:otherwise>
-                        ${actionBean.folder.name}
+                        ${actionBean.folder.urlDecodedName}
                         <c:if test="${not empty actionBean.folder.title}">
                             (${actionBean.folder.title})
                         </c:if>
@@ -137,7 +137,7 @@
                             <td class="${cssClass}">
                                 <stripes:link href="/view.action">
                                     <stripes:param name="uri" value="${item.uri}"/>
-                                    ${item.name}
+                                    ${item.urlDecodedName}
                                 </stripes:link>
                                 <c:if test="${not empty item.title}">
                                     (${item.title})

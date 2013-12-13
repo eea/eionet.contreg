@@ -22,7 +22,7 @@
                     <stripes:hidden name="renameItems[${loop.index}].type" value="${item.type}"/>
                     <stripes:hidden name="renameItems[${loop.index}].name" value="${item.name}"/>
                     <tr>
-                        <td style="padding-right:20px">${item.name}</td>
+                        <td style="padding-right:20px">${item.urlDecodedName}</td>
                         <td>to:&nbsp;<stripes:text name="renameItems[${loop.index}].newName"  value="${item.newName}"/></td>
                     </tr>
                 </c:forEach>

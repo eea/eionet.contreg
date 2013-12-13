@@ -24,6 +24,8 @@ package eionet.cr.web.action.factsheet;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -231,7 +234,17 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
             if (StringUtils.isNotEmpty(item.getNewName())) {
                 String oldUri = item.getUri();
-                String newUri = uri + "/" + StringUtils.replace(item.getNewName(), " ", "%20");
+
+                String newUri = uri + "/";
+                String newName = StringUtils.replace(item.getNewName(), " ", "---TEMP_SPACE_REPLACEMENT---");
+                try {
+                    newName = URLEncoder.encode(newName, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                newName = StringUtils.replace(newName, "---TEMP_SPACE_REPLACEMENT---", "%20");
+
+                newUri+= newName;
 
                 if (!uniqueNewNames.add(item.getNewName())) {
                     addSystemMessage("Cannot name multiple items with the same name: " + item.getNewName());
@@ -292,12 +305,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         aclPath = FolderUtil.extractAclPath(uri);
 
         // allow to view the folder by default if there is no ACL
-//        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
-//
-//        if (!actionAllowed) {
-//            addSystemMessage("Only authorized users can delete files.");
-//            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-//        }
+        //        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
+        //
+        //        if (!actionAllowed) {
+        //            addSystemMessage("Only authorized users can delete files.");
+        //            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        //        }
 
         if (itemsNotSelected()) {
             addSystemMessage("Select files or folders to delete.");
@@ -368,8 +381,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      *             if DAO method execution fails
      * @throws SignOnException
      *             if adding ACL to the DB fails
+     * @throws URIException
+     * @throws UnsupportedEncodingException
      */
-    public Resolution createFolder() throws DAOException, SignOnException {
+    public Resolution createFolder() throws DAOException, SignOnException, URIException, UnsupportedEncodingException {
 
         aclPath = FolderUtil.extractAclPath(uri);
 
@@ -385,7 +400,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        title = StringUtils.replace(title, " ", "%20");
+        title = StringUtils.replace(title, " ", "---TEMP_SPACE_REPLACEMENT---");
+        title = URLEncoder.encode(title, "UTF-8");
+        title = StringUtils.replace(title, "---TEMP_SPACE_REPLACEMENT---", "%20");
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (folderDAO.fileOrFolderExists(uri, title)) {
@@ -601,10 +618,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(
-                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+            .get()
+            .getDao(HarvestSourceDAO.class)
+            .addSourceIgnoreDuplicate(
+                    HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;

@@ -21,6 +21,9 @@
 
 package eionet.cr.dto;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * Folder item object that is used for selecting, renaming and deleting.
  *
@@ -106,6 +109,21 @@ public class RenameFolderItemDTO {
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    /**
+     * Returns name that is urlDecoded.
+     * @return
+     */
+    public String getUrlDecodedName(){
+
+        try {
+            return URLDecoder.decode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 }

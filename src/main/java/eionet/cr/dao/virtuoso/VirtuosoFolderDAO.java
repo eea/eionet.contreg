@@ -55,7 +55,6 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
@@ -232,6 +231,7 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
         String parentFolderUri = StringUtils.substringBeforeLast(folderUri, "/");
         Bindings bindings = new Bindings();
+
         bindings.setURI("parentFolder", parentFolderUri);
         bindings.setURI("folderUri", folderUri);
         bindings.setURI("crFolder", Subjects.CR_FOLDER);
