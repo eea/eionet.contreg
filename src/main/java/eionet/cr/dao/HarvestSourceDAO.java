@@ -43,6 +43,7 @@ import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.sparqlClient.helpers.QueryResult;
 
 /**
  * @author altnyris
@@ -146,6 +147,15 @@ public interface HarvestSourceDAO extends DAO {
      *             if relational database is unavailable.
      */
     Long getUrgencySourcesCount() throws DAOException;
+
+    /**
+     * Adds all sources found by a Sparql query
+     *
+     * @param queryResult
+     * @return inserted sources identity values list
+     * @throws DAOException
+     */
+    public void addBulkSourcesFromSparql(QueryResult queryResult) throws DAOException;
 
     /**
      *
@@ -277,7 +287,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-            OpenRDFException;
+    OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -366,7 +376,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-            RepositoryException, IOException;
+    RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.

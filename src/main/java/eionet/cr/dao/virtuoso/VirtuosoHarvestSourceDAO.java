@@ -55,12 +55,15 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.sparqlClient.helpers.ResultValue;
 
 /**
  * Methods operating with harvest sources. Implementation for Virtuoso.
@@ -131,6 +134,10 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String GRAPH_SYNC_SPARUL2 = "" + "INSERT INTO GRAPH <%perm_graph%> {\n" + "    ?s ?p ?o\n" + "}\n"
             + "WHERE {\n" + "  GRAPH <%temp_graph%> {?s ?p ?o}\n"
             + "  FILTER (!bif:exists((select (1) where {graph <%perm_graph%> {?s ?p ?o}})))\n" + "}";
+
+
+    /** */
+    private static final int BATCH_CHUNK_SIZE = 5000;
 
     /*
      * (non-Javadoc)
@@ -223,7 +230,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         return getSources(
                 StringUtils.isBlank(searchString) ? GET_HARVEST_SOURCES_UNAVAIL_SQL : SEARCH_HARVEST_SOURCES_UNAVAIL_SQL,
-                searchString, pagingRequest, sortingRequest);
+                        searchString, pagingRequest, sortingRequest);
     }
 
     /*
@@ -364,6 +371,76 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String ADD_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
                     + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL) VALUES (?,?,?,NOW(),?,?,?,?,?,0)";
+
+    private static final String UPDATE_BULK_SOURCE_LAST_HARVEST = "update HARVEST_SOURCE set LAST_HARVEST=stringdate('2000-01-01') where URL_HASH=?";
+    private static final String INSERT_BULK_SOURCE = "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?)";
+
+    /**
+     * Adds all sources found by a Sparql query
+     *
+     * @param queryResult
+     * @return inserted sources identity values list
+     * @throws DAOException
+     */
+    @Override
+    public void addBulkSourcesFromSparql(QueryResult queryResult) throws DAOException {
+
+
+
+        Connection conn = null;
+        try {
+            // execute the insert statement
+            conn = getSQLConnection();
+
+            PreparedStatement insertAndUpdate = null;
+            PreparedStatement updateLastHarvest = null;
+
+            insertAndUpdate = conn.prepareStatement(INSERT_BULK_SOURCE);
+            updateLastHarvest = conn.prepareStatement(UPDATE_BULK_SOURCE_LAST_HARVEST);
+
+            int counter = 0;
+            int batchDivideCounter = 0;
+
+            for (Map<String, ResultValue> row : queryResult.getRows()) {
+                for (Entry<String, ResultValue> entry : row.entrySet()) {
+                    String source = eionet.cr.util.URLUtil.escapeIRI(entry.getValue().toString().toLowerCase());
+                    if (URIUtil.isURI(source)) {
+                        insertAndUpdate.setString(1, source);
+                        insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
+                        insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
+                        insertAndUpdate.addBatch();
+
+                        updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(source)));
+                        updateLastHarvest.addBatch();
+
+                        counter++;
+                        batchDivideCounter++;
+                    }
+
+                    // If the batch is becoming too large, execute, clear and add new rows in a separate cycle.
+                    if (batchDivideCounter == BATCH_CHUNK_SIZE){
+                        insertAndUpdate.executeBatch();
+                        updateLastHarvest.executeBatch();
+                        insertAndUpdate.clearBatch();
+                        updateLastHarvest.clearBatch();
+                        batchDivideCounter = 0;
+
+                        LOGGER.info("Added/updated a batch of "+ BATCH_CHUNK_SIZE + " bulk sources from Sparql endpoint query.");
+                    }
+                }
+            }
+
+            insertAndUpdate.executeBatch();
+            updateLastHarvest.executeBatch();
+
+            LOGGER.info("Added/updated a total of "+counter + " bulk sources from Sparql endpoint query.");
+
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
 
     /*
      * (non-Javadoc)
@@ -538,7 +615,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      */
     private void removeHarvestSources(Collection<String> sourceUrls, RepositoryConnection conn) throws RepositoryException,
-            DAOException {
+    DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
         Resource harvesterContext = valueFactory.createURI(GeneralConfig.HARVESTER_URI);
@@ -695,9 +772,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         StringBuffer buf =
                 new StringBuffer().append("select left (datestring(LAST_HARVEST), 10) AS HARVESTDAY,")
-                        .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
-                        .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
-                        .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
+                .append(" COUNT(HARVEST_SOURCE_ID) AS HARVESTS FROM CR.cr3user.HARVEST_SOURCE where")
+                .append(" LAST_HARVEST IS NOT NULL AND dateadd('day', " + days + ", LAST_HARVEST) > now()")
+                .append(" GROUP BY (HARVESTDAY) ORDER BY HARVESTDAY DESC");
 
         List<HarvestedUrlCountDTO> result = new ArrayList<HarvestedUrlCountDTO>();
         Connection conn = null;
@@ -1089,8 +1166,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public int
-            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-                    throws IOException, OpenRDFException {
+    loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+            throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
         boolean isSuccess = false;
@@ -1140,7 +1217,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-            IOException {
+    IOException {
 
         if (sourceMetadata.getPredicateCount() > 0) {
 
@@ -1237,7 +1314,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     @Override
     public void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-            RepositoryException, IOException {
+    RepositoryException, IOException {
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();

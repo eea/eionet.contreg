@@ -11,6 +11,7 @@
         <script type="text/javascript">
         // <![CDATA[
             var last_format = 1;
+
             function format_select() {
                 var query_obg = document.getElementById('queryText');
                 var query = query_obg.value;
@@ -121,6 +122,7 @@
                             });
                         </c:forEach>
 
+
                     });
             } ) ( jQuery );
             // ]]>
@@ -167,7 +169,20 @@
                             return true;
                         });
 
+                        // Toggle bulk action buttons
+                        $("#bulkActionsLink").click(function() {
+                            $("#bulkActions").toggle();
 
+                            var isVisible = $("#bulkActions").is(":visible");
+                            if (isVisible) {
+                                $("#bulkActionsLink").text("Hide bulk actions");
+                                $("#bulkActionsPanelVisible").val("true");
+                            } else {
+                                $("#bulkActionsLink").text("Show bulk actions");
+                                $("#bulkActionsPanelVisible").val("false");
+                            }
+                            return false;
+                        });
                     });
                 } ) ( jQuery );
 
@@ -180,7 +195,7 @@
     <stripes:layout-component name="contents">
 
         <ul id="dropdown-operations">
-            <li><a href="#">Operations</a>
+            <li><a href="#" onclick="return false;">Operations</a>
                 <ul>
                     <li>
                         <a href="#" id="sharedBookmarksLink">Shared bookmarked queries</a>
@@ -198,6 +213,20 @@
                     <li>
                         <a href="#" id="prefixesLink">Useful namespaces</a>
                     </li>
+
+                    <c:if test="${actionBean.bulkActionsAvailable == 'true'}">
+                       <li>
+                           <c:choose>
+                           <c:when test="${actionBean.bulkActionsPanelVisible == 'true'}">
+                               <a href="#" id="bulkActionsLink">Hide bulk actions</a>
+                            </c:when>
+                            <c:otherwise>
+                               <a href="#" id="bulkActionsLink">Show bulk actions</a>
+                           </c:otherwise>
+                           </c:choose>
+                       </li>
+                    </c:if>
+
                 </ul>
             </li>
         </ul>
@@ -309,10 +338,11 @@ while (l--) {
 
                     <c:choose>
                         <c:when test="${actionBean.user != null}">
-                            <div style="position: absolute; top: 5px; left: 590px;">
+                            <div style="position: absolute; top: 5px; left: 590px; display:block;">
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
                                 <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>
+                                <stripes:hidden name="bulkActionsPanelVisible" id="bulkActionsPanelVisible" value="${actionBean.bulkActionsPanelVisible}"/>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -322,6 +352,17 @@ while (l--) {
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <c:if test="${actionBean.bulkActionsAvailable == 'true'}">
+                    <div id="bulkActions" style=" position: relative; width:900px; height: 30px; margin-top:40px; margin-bottom:10px; padding:10px; border: 1px solid black; background-color:#F8F8F8 ;
+                        <c:if test="${actionBean.bulkActionsPanelVisible == 'false'}">
+                            display: none;
+                        </c:if>
+                        ">
+                        <b>Bulk actions:</b>
+                        <stripes:submit name="executeAddSources" value="Execute and add sources" id="executeConstructAddSources"/>
+                    </div>
+                </c:if>
 
                 <div style="clear:both">
                     <c:if test="${not empty actionBean.query && empty param.bookmark && empty param.fillfrom}">

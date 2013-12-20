@@ -51,11 +51,22 @@ public class QueryResult {
     private static final Log LOGGER = LogFactory.getLog(QueryResult.class);
 
     /**
+     * Constructor that by default limits the result count.
      *
      * @param queryResult
      * @throws QueryEvaluationException
      */
     public QueryResult(TupleQueryResult queryResult, boolean virtuosoFormat) throws QueryEvaluationException {
+        this(queryResult, virtuosoFormat, true);
+    }
+
+    /**
+     *
+     * @param queryResult
+     * @throws QueryEvaluationException
+     */
+    public QueryResult(TupleQueryResult queryResult, boolean virtuosoFormat, boolean limitResultCount)
+            throws QueryEvaluationException {
         this.virtuosoFormat = virtuosoFormat;
 
         if (queryResult != null && queryResult.hasNext()) {
@@ -67,7 +78,7 @@ public class QueryResult {
                 add(queryResult.next());
                 counter++;
                 // if query result exceeds max rows count, return the resultset
-                if (counter == MAX_ROWS_COUNT) {
+                if (counter == MAX_ROWS_COUNT && limitResultCount) {
                     LOGGER.debug("Maximum rows count exceeded, returning first rows");
                     allRowsReturned = false;
                     break;
@@ -179,7 +190,8 @@ public class QueryResult {
     /**
      * Setter of allRowsReturned.
      *
-     * @param allRowsReturned to indicate if full query is returned.
+     * @param allRowsReturned
+     *            to indicate if full query is returned.
      */
     public void setAllRowsReturned(final boolean allRowsReturned) {
         this.allRowsReturned = allRowsReturned;

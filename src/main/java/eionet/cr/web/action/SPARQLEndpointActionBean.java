@@ -66,6 +66,7 @@ import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
 import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
@@ -204,6 +205,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** Selected project for the bookmark. */
     private String bookmarkFolder;
+
+    /** Sets a parameter that adds a special command for administrators to add sources from a sparql query result */
+    private boolean bulkActionsAvailable;
+
+    /** Keeps the state of the bulk actions buttons visibility cross the requests */
+    private boolean bulkActionsPanelVisible;
 
     /**
      *
@@ -448,11 +455,63 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
+     * Executes the SparqlEndpoint query
      *
      * @return Resolution
      */
     public Resolution execute() {
 
+        Resolution resolution = executeSparqlQuery();
+
+        if (isAdminPrivilege()){
+            bulkActionsAvailable = true;
+        }
+
+        return resolution;
+    }
+
+    /**
+     * Executes the SparqlEndpoint query and adds result to sources.
+     *
+     * @return Resolution
+     * @throws DAOException
+     */
+    public Resolution executeAddSources() throws DAOException {
+        Resolution resolution = executeSparqlQuery(false);
+
+        if (isAdminPrivilege()){
+            bulkActionsAvailable = true;
+            String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
+            if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)){
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                .addBulkSourcesFromSparql(result);
+
+                addSystemMessage("Successfully added " + result.getRows().size() + " sources.");
+            } else {
+                addGlobalValidationError(resultValidation);
+            }
+        } else {
+            addGlobalValidationError("Must have administrator permissions to insert bulk sources through Sparql endpoint");
+        }
+
+        return resolution;
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    private Resolution executeSparqlQuery(){
+        return executeSparqlQuery(true);
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    private Resolution executeSparqlQuery(boolean limitResultCount){
         // If query is blank then send HTTP 400 if not a browser, otherwise take the browser to the SPARQL endpoint form page.
         if (StringUtils.isBlank(query)) {
             if (isWebBrowser()) {
@@ -520,7 +579,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else if (STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.containsKey(mimeType)) {
             resolution = executeStreamingQuery(mimeType);
         } else {
-            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse());
+            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(), limitResultCount);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -530,6 +589,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         return resolution;
     }
+
+
 
     /**
      * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties. See SPARQL
@@ -550,6 +611,18 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Checks if user has update rights to "admin" ACL.
+     *
+     * @return true, if user is in admin group.
+     */
+    public boolean isAdminPrivilege() {
+        if (getUser() != null && getUser().isAdministrator()) {
+            return true;
+        }
         return false;
     }
 
@@ -623,6 +696,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return resolution;
     }
 
+    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response) {
+        executeQuery(outputFormat, outputStream, response, true);
+    }
+
     /**
      * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers of the given servlet
      * response.
@@ -636,7 +713,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @param response
      *            Servlet response.
      */
-    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response) {
+    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response, boolean limitResultCount) {
 
         // If outputFormat is blank, fall back to "XML".
         if (StringUtils.isBlank(outputFormat)) {
@@ -701,7 +778,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         TupleQueryResult bindings = resultsTable.evaluate();
                         executionTime = System.currentTimeMillis() - startTime;
                         if (bindings != null) {
-                            result = new QueryResult(bindings, false);
+                            result = new QueryResult(bindings, false, limitResultCount);
                         }
 
                     } else if (outputFormat.equals(FORMAT_XML)) {
@@ -753,7 +830,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         queryResult = ((TupleQuery) queryObject).evaluate();
                         executionTime = System.currentTimeMillis() - startTime;
                         if (queryResult != null) {
-                            result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS));
+                            result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
                     }
                 }
@@ -1358,5 +1435,17 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             os.write(b);
         }
 
+    }
+
+    public boolean isBulkActionsAvailable() {
+        return bulkActionsAvailable;
+    }
+
+    public boolean isBulkActionsPanelVisible() {
+        return bulkActionsPanelVisible;
+    }
+
+    public void setBulkActionsPanelVisible(boolean bulkActionsPanelVisible) {
+        this.bulkActionsPanelVisible = bulkActionsPanelVisible;
     }
 }
