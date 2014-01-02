@@ -42,7 +42,7 @@
 
     <c:if test="${actionBean.pastePossible}">
         <div class="advice-msg" style="font-size:0.8em">
-            There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the buffer:
+            There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the clipboard:
             <c:forEach items="${actionBean.clipBoardScripts}" var="clipboardItem">
 
                 <stripes:link href="/admin/postHarvestScript">
