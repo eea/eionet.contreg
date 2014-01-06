@@ -21,8 +21,8 @@
 
 package eionet.cr.dao.readers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +79,7 @@ public abstract class SubjectDataReader extends ResultSetMixedReader<SubjectDTO>
      */
     @Override
     public List<SubjectDTO> getResultList() {
-        return new LinkedList<SubjectDTO>(subjectsMap.values());
+        return new ArrayList<SubjectDTO>(subjectsMap.values());
     }
 
     /**

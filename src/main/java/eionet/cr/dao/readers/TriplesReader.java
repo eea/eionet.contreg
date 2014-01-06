@@ -22,8 +22,8 @@ package eionet.cr.dao.readers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.openrdf.model.Value;
@@ -39,7 +39,7 @@ import eionet.cr.dto.TripleDTO;
 public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
 
     /** */
-    private List<TripleDTO> resultList = new LinkedList<TripleDTO>();
+    private ArrayList<TripleDTO> resultList = new ArrayList<TripleDTO>();
 
     /** */
     private HashSet<Long> distinctHashes = new HashSet<Long>();
@@ -49,6 +49,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
      *
      * @see eionet.cr.util.sql.ResultSetListReader#getResultList()
      */
+    @Override
     public List<TripleDTO> getResultList() {
         return resultList;
     }
@@ -58,6 +59,7 @@ public class TriplesReader extends ResultSetMixedReader<TripleDTO> {
      *
      * @see eionet.cr.util.sql.ResultSetBaseReader#readRow(java.sql.ResultSet)
      */
+    @Override
     public void readRow(ResultSet rs) throws SQLException, ResultSetReaderException {
 
         TripleDTO dto = new TripleDTO(rs.getLong("SUBJECT"), rs.getLong("PREDICATE"), rs.getString("OBJECT"));
