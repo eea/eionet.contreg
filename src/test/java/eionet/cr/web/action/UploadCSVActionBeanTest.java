@@ -1,11 +1,12 @@
 package eionet.cr.web.action;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -32,6 +33,9 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author Jaanus
  */
 public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
+
+    /** Name for the request attribute via which we inject rich-type (e.g. file bean) request parameters for the action bean. */
+    public static final String RICH_TYPE_REQUEST_PARAMS_ATTR_NAME = "RICH_TYPE_REQUEST_PARAMS";
 
     /** The name of user whose folder we're testing in. */
     public static final String TEST_USER_NAME = "somebody";
@@ -72,6 +76,11 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
+
+        HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
+        FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
+        richTypeRequestParams.put("fileBean", fileBean);
+        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         trip.setParameter("folderUri", TEST_FOLDER_URI);
         trip.setParameter("overwrite", "true");
@@ -167,15 +176,21 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
             ValidationErrors validationErrors = super.bind(bean, context, validate);
 
-            URL resourceURL = getClass().getClassLoader().getResource(TEST_FILE_NAME);
-            try {
-                URI resourceURI = resourceURL.toURI();
-                File file = new File(resourceURI);
-                FileBean fileBean = new FileBean(file, "text/plain", file.getName());
-                BeanUtil.setPropertyValue("fileBean", bean, fileBean);
+            if (bean != null && context != null) {
+                HttpServletRequest request = context.getRequest();
+                if (request != null) {
+                    Object o = request.getAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME);
+                    if (o instanceof HashMap<?, ?>) {
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, Object> richTypeRequestParams = (HashMap<String, Object>) o;
+                        for (Entry<String, Object> entry : richTypeRequestParams.entrySet()) {
 
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Wasn't expecting a URI syntax exception: " + e);
+                            String paramName = entry.getKey();
+                            Object paramValue = entry.getValue();
+                            BeanUtil.setPropertyValue(paramName, bean, paramValue);
+                        }
+                    }
+                }
             }
 
             return validationErrors;
