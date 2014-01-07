@@ -22,6 +22,8 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import org.apache.commons.lang.ArrayUtils;
 
 import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
+import eionet.cr.filestore.FileStore;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
 /**
@@ -30,6 +32,36 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author Jaanus
  */
 public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
+
+    /** The name of user whose folder we're testing in. */
+    public static final String TEST_USER_NAME = "somebody";
+
+    /** The name of seeded CSV file we're testing. */
+    public static final String TEST_FILE_NAME = "USPresidents.csv";
+
+    /** The URI of the virtual CR folder we're testing in. */
+    public static final String TEST_FOLDER_URI = "http://127.0.0.1:8080/cr/home/" + TEST_USER_NAME;
+
+    /** The URI of the uploaded file we're testing. */
+    public static final String TEST_FILE_URI = TEST_FOLDER_URI + "/" + TEST_FILE_NAME;
+
+    /** Abstract reference to the file under test. */
+    public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
+
+    /** Size of the file under test before test. */
+    private long testFileSize;
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+
+        super.setUp();
+        testFileSize = TEST_FILE.length();
+    }
 
     /**
      * A test that tests the whole sequence of uploading and saving a CSV file.
@@ -41,7 +73,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
-        trip.setParameter("folderUri", "http://127.0.0.1:8080/cr/home/somebody");
+        trip.setParameter("folderUri", TEST_FOLDER_URI);
         trip.setParameter("overwrite", "true");
         trip.setParameter("fileType", "CSV");
 
@@ -51,10 +83,28 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
         assertEquals(200, response.getStatus());
 
-        String[] statement =
-                {"http://127.0.0.1:8080/cr/home/somebody", Predicates.CR_HAS_FILE,
-                        "http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv"};
-        assertTrue("Expected statement: " + ArrayUtils.toString(statement), hasResourceStatement(statement));
+        File storedFile = FileStore.getByUri(TEST_FILE_URI);
+        long storedFileSize = storedFile.length();
+
+        boolean flag =
+                storedFile != null && storedFile.exists() && storedFile.isFile() && TEST_FILE_NAME.equals(storedFile.getName());
+        assertTrue("Expected an existing stored file with name: " + TEST_FILE_NAME, flag);
+        assertEquals("Expected stored file size to be equal to the uploaded file size", testFileSize, storedFileSize);
+
+        String[] statement1 = {TEST_FOLDER_URI, Predicates.CR_HAS_FILE, TEST_FILE_URI};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement1), hasResourceStatement(statement1));
+
+        String[] statement2 = {TEST_FILE_URI, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize)};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement2), hasLiteralStatement(statement2));
+
+        String[] statement3 = {TEST_FILE_URI, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement3), hasResourceStatement(statement3));
+
+        String[] statement4 = {TEST_FILE_URI, Predicates.CR_MEDIA_TYPE, "CSV"};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement4), hasLiteralStatement(statement4));
+
+        String[] statement5 = {TEST_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
     }
 
     /**
@@ -76,6 +126,20 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         ctx.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
 
         return ctx;
+    }
+
+    /**
+     * Helper method for getting abstract reference to the file under test.
+     *
+     * @param fileName The name of the resource file to locate.
+     * @return The file reference.
+     */
+    public static File getTestFile(String fileName) {
+        try {
+            return new File(UploadCSVActionBeanTest.class.getClassLoader().getResource(fileName).toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Could not locate resource file by the name of: " + fileName);
+        }
     }
 
     /**
@@ -103,7 +167,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
             ValidationErrors validationErrors = super.bind(bean, context, validate);
 
-            URL resourceURL = getClass().getClassLoader().getResource("USPresidents.csv");
+            URL resourceURL = getClass().getClassLoader().getResource(TEST_FILE_NAME);
             try {
                 URI resourceURI = resourceURL.toURI();
                 File file = new File(resourceURI);
