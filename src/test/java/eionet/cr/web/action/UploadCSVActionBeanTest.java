@@ -2,6 +2,8 @@ package eionet.cr.web.action;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +54,19 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     /** Abstract reference to the file under test. */
     public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
+    /** The expected SPARQL query to be generated for the uploaded CSV file. NB! Ignore whitespace when comparing. */
+    public static final String EXPECTED_SPARQL_QUERY =
+            "PREFIX tableFile: <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv#> "
+                    + "SELECT * FROM <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv> WHERE {"
+                    + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+                    + "    OPTIONAL { _:rec tableFile:President ?President } ."
+                    + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+                    + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+                    + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ."
+                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
+                    + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+                    + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+
     /** Size of the file under test before test. */
     private long testFileSize;
 
@@ -74,6 +89,9 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
      */
     public void testWholeSequence() throws Exception {
 
+        // First lets do the file upload.
+        // ///////////////////////////////
+
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
@@ -85,6 +103,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         trip.setParameter("folderUri", TEST_FOLDER_URI);
         trip.setParameter("overwrite", "true");
         trip.setParameter("fileType", "CSV");
+        trip.setParameter("fileEncoding", "UTF-8");
 
         trip.execute("upload");
 
@@ -114,6 +133,52 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         String[] statement5 = {TEST_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
+
+        // Now lets do the processing of the uploaded file, i.e. the "save" step.
+        // ///////////////////////////////////////////////////////////////////////
+
+        ctx = createContextMock();
+        trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
+
+        richTypeRequestParams = new HashMap<String, Object>();
+
+        ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
+        dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
+        richTypeRequestParams.put("dataLinkingScripts", dataLinkingScripts);
+        richTypeRequestParams.put("uniqueColumns", Collections.singletonList("Presidency"));
+        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
+
+        trip.setParameter("overwrite", "true");
+        trip.setParameter("addDataLinkingScripts", "true");
+
+        trip.setParameter("attribution", "testCopyright");
+        trip.setParameter("license", "All rights reserved");
+        trip.setParameter("publisher", "testPublisher");
+        trip.setParameter("source", "testSource");
+
+        trip.setParameter("fileType", "CSV");
+        trip.setParameter("objectsType", "President");
+        trip.setParameter("fileEncoding", "UTF-8");
+        trip.setParameter("finalEncoding", "UTF-8");
+
+        trip.setParameter("fileName", TEST_FILE_NAME);
+        trip.setParameter("fileLabel", TEST_FILE_NAME);
+        trip.setParameter("folderUri", TEST_FOLDER_URI);
+        trip.setParameter("relativeFilePath", TEST_FILE_NAME);
+
+        trip.execute("save");
+
+        actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
+        response = (MockHttpServletResponse) actionBean.getContext().getResponse();
+
+        // On successful saving, we expect to be redirected, hence expecting code 302.
+        assertEquals(302, response.getStatus());
+
+        String[] statement6 = {TEST_FILE_URI, Predicates.CR_OBJECTS_UNIQUE_COLUMN, "Presidency"};
+        assertTrue("Expected statement: " + ArrayUtils.toString(statement6), hasLiteralStatement(statement6));
+
+        String[] statement7 = {TEST_FILE_URI, Predicates.CR_SPARQL_QUERY, null};
+        assertTrue("Expected statement: " + ArrayUtils.toString(7), hasLiteralStatement(statement7));
     }
 
     /**

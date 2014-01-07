@@ -64,4 +64,18 @@ public class DataLinkingScript {
         this.column = column;
     }
 
+    /**
+     * Convenience method for creating {@link DataLinkingScript} with a one-liner.
+     *
+     * @param column The script's target column.
+     * @param scriptId The script's id.
+     * @return The created script POJO.
+     */
+    public static DataLinkingScript create(String column, String scriptId) {
+
+        DataLinkingScript script = new DataLinkingScript();
+        script.setColumn(column);
+        script.setScriptId(scriptId);
+        return script;
+    }
 }
