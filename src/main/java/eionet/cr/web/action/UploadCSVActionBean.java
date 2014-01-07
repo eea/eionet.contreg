@@ -234,19 +234,21 @@ public class UploadCSVActionBean extends AbstractActionBean {
                             source);
 
             // Detect charset and convert the file to UTF-8
-            if (fileEncoding.equals(ENCODING_AUTODETECT_ID)){
-                Charset detectedCharset = helper.detectCSVencoding(folderUri, relativeFilePath, getUserName());
-                if (detectedCharset == null){
-                    addCautionMessage("The charset of the uploaded file could not be detected automatically. Please select the files charset from the list.");
-                    fileStore.delete(relativeFilePath);
-                    return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
-                } else if (!detectedCharset.toString().startsWith("UTF")){
-                    fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
+            if (StringUtils.isNotBlank(fileEncoding)) {
+                if (fileEncoding.equals(ENCODING_AUTODETECT_ID)){
+                    Charset detectedCharset = helper.detectCSVencoding(folderUri, relativeFilePath, getUserName());
+                    if (detectedCharset == null){
+                        addCautionMessage("The charset of the uploaded file could not be detected automatically. Please select the files charset from the list.");
+                        fileStore.delete(relativeFilePath);
+                        return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
+                    } else if (!detectedCharset.toString().startsWith("UTF")){
+                        fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
+                    }
+                    resolution.addParameter(PARAM_FINAL_ENCODING, detectedCharset.name());
+                } else {
+                    fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
+                    resolution.addParameter(PARAM_FINAL_ENCODING, "UTF-8");
                 }
-                resolution.addParameter(PARAM_FINAL_ENCODING, detectedCharset.name());
-            } else {
-                fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
-                resolution.addParameter(PARAM_FINAL_ENCODING, "UTF-8");
             }
 
             // Store file as new source, but don't harvest it
@@ -267,7 +269,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             // Tell the JSP page that it should display the wizard.
             resolution.addParameter(PARAM_DISPLAY_WIZARD, "");
 
-            //add ACL if not overwirting
+            // Add ACL, unless overwriting an already existing one.
             if (!overwrite) {
                 AccessController.addAcl(FolderUtil.extractAclPath(folderUri) + "/" + fileName, getUserName(), "");
             }
@@ -765,7 +767,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * True if user can upload the file.
      * @return boolean
      */
-    private boolean uploadAllowed() {
+    protected boolean uploadAllowed() {
         String aclPath = FolderUtil.extractAclPath(folderUri);
         return CRUser.hasPermission(aclPath, getUser(), overwrite ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION, false);
     }

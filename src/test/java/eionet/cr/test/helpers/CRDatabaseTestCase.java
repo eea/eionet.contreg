@@ -27,15 +27,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.openrdf.OpenRDFException;
+import org.openrdf.model.Literal;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
+import eionet.cr.util.sesame.SesameUtil;
 
 /**
  *
@@ -44,14 +49,31 @@ import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
  */
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
-    /**
-     * {@inheritDoc}
-     * @throws Exception
+    /** Repository connection to be used for checking existence of expected triples in the repository */
+    private RepositoryConnection repoConn;
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.dbunit.DatabaseTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception {
+
         super.setUp();
         setUpTripleStore();
+        repoConn = SesameUtil.getRepositoryConnection();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.dbunit.DatabaseTestCase#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception {
+
+        SesameUtil.close(repoConn);
     }
 
     /**
@@ -183,4 +205,133 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
     protected String getSeedFileGraphUri(String fileName) {
         return RdfLoader.getSeedFileGraphUri(fileName);
     }
+
+    /**
+     * A convenience method for checking if the given statement exists in the repository. The object is expected to be a literal.
+     * Graph is optional.
+     *
+     * @param subj The subject.
+     * @param pred The predicate.
+     * @param obj The literal object.
+     * @param graph The graph.
+     * @return True if statement exists, otherwise false.
+     * @throws OpenRDFException When problems with querying the repository.
+     */
+    protected boolean hasLiteralStatement(String subj, String pred, String obj, String... graph) throws OpenRDFException {
+
+        if (repoConn == null) {
+            throw new IllegalStateException("Expected the repository connection to be already created!");
+        }
+
+        boolean result = false;
+
+        ValueFactory vf = repoConn.getValueFactory();
+        org.openrdf.model.URI subjURI = StringUtils.isBlank(subj) ? null : vf.createURI(subj);
+        org.openrdf.model.URI predURI = StringUtils.isBlank(pred) ? null : vf.createURI(pred);
+        Literal objLiteral = StringUtils.isBlank(obj) ? null : vf.createLiteral(obj);
+
+        if (graph != null && graph.length > 0) {
+
+            org.openrdf.model.URI[] graphs = new org.openrdf.model.URI[graph.length];
+            for (int i = 0; i < graph.length; i++) {
+                graphs[i] = vf.createURI(graph[i]);
+            }
+
+            result = repoConn.hasStatement(subjURI, predURI, objLiteral, false, graphs);
+        } else {
+            result = repoConn.hasStatement(subjURI, predURI, objLiteral, false);
+        }
+
+        return result;
+    }
+
+    /**
+     * A convenience method for checking if the given statement exists in the repository. The object is expected to be a resource.
+     * Graph is optional.
+     *
+     * @param subj The subject.
+     * @param pred The predicate.
+     * @param obj The resource object.
+     * @param graph The graph.
+     * @return True if statement exists, otherwise false.
+     * @throws OpenRDFException When problems with querying the repository.
+     */
+    protected boolean hasResourceStatement(String subj, String pred, String obj, String... graph) throws OpenRDFException {
+
+        if (repoConn == null) {
+            throw new IllegalStateException("Expected the repository connection to be already created!");
+        }
+
+        boolean result = false;
+
+        ValueFactory vf = repoConn.getValueFactory();
+        org.openrdf.model.URI subjURI = StringUtils.isBlank(subj) ? null : vf.createURI(subj);
+        org.openrdf.model.URI predURI = StringUtils.isBlank(pred) ? null : vf.createURI(pred);
+        org.openrdf.model.URI objURI = StringUtils.isBlank(obj) ? null : vf.createURI(obj);
+
+        if (graph != null && graph.length > 0) {
+
+            org.openrdf.model.URI[] graphs = new org.openrdf.model.URI[graph.length];
+            for (int i = 0; i < graph.length; i++) {
+                graphs[i] = vf.createURI(graph[i]);
+            }
+
+            result = repoConn.hasStatement(subjURI, predURI, objURI, false, graphs);
+        } else {
+            result = repoConn.hasStatement(subjURI, predURI, objURI, false);
+        }
+
+        return result;
+    }
+
+    /**
+     * A convenience method for checking if the given statement exists in the repository.
+     * Calls {@link #hasLiteralStatement(String, String, String, String...)} by forming the required arguments from the respective
+     * positions in the given statement array.
+     *
+     * @param statement The given statement array.
+     * @return Exists or not.
+     * @throws OpenRDFException When problems with querying the repository.
+     */
+    protected boolean hasLiteralStatement(String[] statement) throws OpenRDFException {
+
+        if (statement == null || statement.length < 3) {
+            throw new IllegalArgumentException("The given statement array must be at least of length 3!");
+        }
+
+        boolean result = false;
+        if (statement.length == 3) {
+            result = hasLiteralStatement(statement[0], statement[1], statement[2]);
+        } else {
+            String[] graphs = Arrays.copyOfRange(statement, 3, statement.length);
+            result = hasLiteralStatement(statement[0], statement[1], statement[2], graphs);
+        }
+        return result;
+    }
+
+    /**
+     * A convenience method for checking if the given statement exists in the repository.
+     * Calls {@link #hasResourceStatement(String, String, String, String...)} by forming the required arguments from the respective
+     * positions in the given statement array.
+     *
+     * @param statement The given statement array.
+     * @return Exists or not.
+     * @throws OpenRDFException When problems with querying the repository.
+     */
+    protected boolean hasResourceStatement(String[] statement) throws OpenRDFException {
+
+        if (statement == null || statement.length < 3) {
+            throw new IllegalArgumentException("The given statement array must be at least of length 3!");
+        }
+
+        boolean result = false;
+        if (statement.length == 3) {
+            result = hasResourceStatement(statement[0], statement[1], statement[2]);
+        } else {
+            String[] graphs = Arrays.copyOfRange(statement, 3, statement.length);
+            result = hasResourceStatement(statement[0], statement[1], statement[2], graphs);
+        }
+        return result;
+    }
+
 }
