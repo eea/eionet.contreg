@@ -359,8 +359,8 @@ while (l--) {
                             display: none;
                         </c:if>
                         ">
-                        <b>Bulk actions:</b>
-                        <stripes:submit name="executeAddSources" value="Execute and add sources" id="executeConstructAddSources"/>
+                        <b>Add bulk sources:</b> Add sources from the sqarql query results first column
+                        <stripes:submit name="executeAddSources" value="Execute" id="executeConstructAddSources" onclick="return confirm('All urls from the resultset\\\'s first column will be added to harvest source list and will be scheduled for urgent harvest. Continue?');"/>
                     </div>
                 </c:if>
 

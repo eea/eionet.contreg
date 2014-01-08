@@ -79,6 +79,10 @@ import eionet.cr.web.util.ServletOutputLazyStream;
 @UrlBinding("/sparql")
 public class SPARQLEndpointActionBean extends AbstractActionBean {
 
+    /** Message to notify about missing administrator permissions */
+    public static final String VALIDATION_ERROR_MUST_BE_ADMINISTRATOR =
+            "Must have administrator permissions to insert bulk sources through Sparql endpoint";
+
     /** */
     private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
 
@@ -206,9 +210,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Selected project for the bookmark. */
     private String bookmarkFolder;
 
-    /** Sets a parameter that adds a special command for administrators to add sources from a sparql query result */
-    private boolean bulkActionsAvailable;
-
     /** Keeps the state of the bulk actions buttons visibility cross the requests */
     private boolean bulkActionsPanelVisible;
 
@@ -265,7 +266,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @HandlesEvent("ajaxrequest")
     @DontSaveLastActionEvent
-    public Resolution ajaxrequest() throws DAOException{
+    public Resolution ajaxrequest() throws DAOException {
         return new ForwardResolution(AJAX_PAGE);
     }
 
@@ -463,10 +464,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         Resolution resolution = executeSparqlQuery();
 
-        if (isAdminPrivilege()){
-            bulkActionsAvailable = true;
-        }
-
         return resolution;
     }
 
@@ -479,19 +476,20 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     public Resolution executeAddSources() throws DAOException {
         Resolution resolution = executeSparqlQuery(false);
 
-        if (isAdminPrivilege()){
-            bulkActionsAvailable = true;
+        if (isAdminPrivilege()) {
             String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
-            if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)){
-                DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addBulkSourcesFromSparql(result);
+            if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
+                DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
 
-                addSystemMessage("Successfully added " + result.getRows().size() + " sources.");
+                addSystemMessage(result.getRows().size() + " sources added and scheduled for urgent harvest.");
+                LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
             } else {
                 addGlobalValidationError(resultValidation);
+                LOGGER.info("Sparql endpoint add bulk sources validation error: " + resultValidation);
             }
         } else {
-            addGlobalValidationError("Must have administrator permissions to insert bulk sources through Sparql endpoint");
+            addGlobalValidationError(VALIDATION_ERROR_MUST_BE_ADMINISTRATOR);
+            LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk sources through Sparql endpoint");
         }
 
         return resolution;
@@ -502,7 +500,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      *
      * @return
      */
-    private Resolution executeSparqlQuery(){
+    private Resolution executeSparqlQuery() {
         return executeSparqlQuery(true);
     }
 
@@ -511,7 +509,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      *
      * @return
      */
-    private Resolution executeSparqlQuery(boolean limitResultCount){
+    private Resolution executeSparqlQuery(boolean limitResultCount) {
         // If query is blank then send HTTP 400 if not a browser, otherwise take the browser to the SPARQL endpoint form page.
         if (StringUtils.isBlank(query)) {
             if (isWebBrowser()) {
@@ -579,7 +577,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else if (STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.containsKey(mimeType)) {
             resolution = executeStreamingQuery(mimeType);
         } else {
-            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(), limitResultCount);
+            executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
+                    limitResultCount);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -589,8 +588,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         return resolution;
     }
-
-
 
     /**
      * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties. See SPARQL
@@ -713,7 +710,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @param response
      *            Servlet response.
      */
-    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response, boolean limitResultCount) {
+    private void executeQuery(String outputFormat, OutputStream outputStream, HttpServletResponse response,
+            boolean limitResultCount) {
 
         // If outputFormat is blank, fall back to "XML".
         if (StringUtils.isBlank(outputFormat)) {
@@ -1370,7 +1368,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      *
      * @param id
      */
-    public void setAjaxRequestId(Integer id){
+    public void setAjaxRequestId(Integer id) {
         this.ajaxRequestId = id;
     }
 
@@ -1378,7 +1376,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Integer getAjaxRequestId(){
+    public Integer getAjaxRequestId() {
         return this.ajaxRequestId;
     }
 
@@ -1438,7 +1436,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     public boolean isBulkActionsAvailable() {
-        return bulkActionsAvailable;
+        return isAdminPrivilege();
     }
 
     public boolean isBulkActionsPanelVisible() {

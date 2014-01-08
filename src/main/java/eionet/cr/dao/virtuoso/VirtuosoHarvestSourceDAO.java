@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -55,7 +56,6 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
-import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
@@ -401,33 +401,36 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             int counter = 0;
             int batchDivideCounter = 0;
 
+            String firstColumn = (String) queryResult.getCols().get(0).get("property");
+
             for (Map<String, ResultValue> row : queryResult.getRows()) {
-                for (Entry<String, ResultValue> entry : row.entrySet()) {
-                    String source = eionet.cr.util.URLUtil.escapeIRI(entry.getValue().toString().toLowerCase());
-                    if (URIUtil.isURI(source)) {
-                        insertAndUpdate.setString(1, source);
-                        insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
-                        insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
-                        insertAndUpdate.addBatch();
 
-                        updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(source)));
-                        updateLastHarvest.addBatch();
+                String resultValue = row.get(firstColumn).getValue();
+                String source = eionet.cr.util.URLUtil.escapeIRI(resultValue.toLowerCase());
+                if (UrlValidator.getInstance().isValid(source)) {
+                    insertAndUpdate.setString(1, source);
+                    insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
+                    insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
+                    insertAndUpdate.addBatch();
 
-                        counter++;
-                        batchDivideCounter++;
-                    }
+                    updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(source)));
+                    updateLastHarvest.addBatch();
 
-                    // If the batch is becoming too large, execute, clear and add new rows in a separate cycle.
-                    if (batchDivideCounter == BATCH_CHUNK_SIZE){
-                        insertAndUpdate.executeBatch();
-                        updateLastHarvest.executeBatch();
-                        insertAndUpdate.clearBatch();
-                        updateLastHarvest.clearBatch();
-                        batchDivideCounter = 0;
-
-                        LOGGER.info("Added/updated a batch of "+ BATCH_CHUNK_SIZE + " bulk sources from Sparql endpoint query.");
-                    }
+                    counter++;
+                    batchDivideCounter++;
                 }
+
+                // If the batch is becoming too large, execute, clear and add new rows in a separate cycle.
+                if (batchDivideCounter == BATCH_CHUNK_SIZE){
+                    insertAndUpdate.executeBatch();
+                    updateLastHarvest.executeBatch();
+                    insertAndUpdate.clearBatch();
+                    updateLastHarvest.clearBatch();
+                    batchDivideCounter = 0;
+
+                    LOGGER.info("Added/updated a batch of "+ BATCH_CHUNK_SIZE + " bulk sources from Sparql endpoint query.");
+                }
+
             }
 
             insertAndUpdate.executeBatch();
