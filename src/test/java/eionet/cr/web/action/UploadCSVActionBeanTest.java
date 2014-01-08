@@ -22,10 +22,15 @@ import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.util.bean.BeanUtil;
 import net.sourceforge.stripes.validation.ValidationErrors;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 
@@ -54,8 +59,8 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     /** Abstract reference to the file under test. */
     public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
-    /** The expected SPARQL query to be generated for the uploaded CSV file. NB! Ignore whitespace when comparing. */
-    public static final String EXPECTED_SPARQL_QUERY =
+    /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
+    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS =
             "PREFIX tableFile: <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv#> "
                     + "SELECT * FROM <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv> WHERE {"
                     + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
@@ -63,8 +68,20 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
                     + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
                     + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
                     + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ."
-                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
-                    + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ." + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+                    + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+
+    /** Expected SPARQL query to be generated for the file when data-linking scripts NOT used. Ignore whitespace when comparing! */
+    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS =
+            "PREFIX tableFile: <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv#> "
+                    + "SELECT * FROM <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv> WHERE {"
+                    + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+                    + "    OPTIONAL { _:rec tableFile:President ?President } ."
+                    + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+                    + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+                    + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ."
+                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ." + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+                    + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
                     + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
 
     /** Size of the file under test before test. */
@@ -83,42 +100,92 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     }
 
     /**
-     * A test that tests the whole sequence of uploading and saving a CSV file.
+     * A test for testing two uploads/saves of one and the same file in a row in overwrite mode.
+     * First upload/save is WITH data linking scripts, the second one is without.
      *
-     * @throws Exception
+     * @throws Exception Any sort of error that happens.
      */
-    public void testWholeSequence() throws Exception {
+    public void test() throws Exception {
 
-        // First lets do the file upload.
-        // ///////////////////////////////
+        // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
+        // remove after the "upload". But we shall need it once more for the second run of the upload/save chain.
+        File backupFile = new File(TEST_FILE.getParentFile(), TEST_FILE.getName() + ".backup");
+        FileUtils.copyFile(TEST_FILE, backupFile);
 
+        // Now do a run WITH data linking script(s).
+        ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
+        dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
+        doUploadOverwriteSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS);
+
+        // Now restore the file-under-test from the above-made backup if indeed it has been deleted as noted above.
+        if (!TEST_FILE.exists()) {
+            if (backupFile.exists()) {
+                FileUtils.copyFile(backupFile, TEST_FILE);
+            } else {
+                throw new IllegalStateException("Test seed file has gone and no backup file is present either!");
+            }
+        }
+
+        // Now do a run WITHOUT data linking script(s).
+        doUploadOverwriteSave(null, EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS);
+    }
+
+    /**
+     * Does and tests the file's upload and save, using the given data linking scripts and expecting the given SPARQL query
+     * to be generated for the file. The upload is done with "overwrite=true".
+     *
+     * @param dataLinkingScripts The data-linking scripts.
+     * @param expectedSparql The expected SPARQL to be generated.
+     *
+     * @throws Exception Any sort of error that happens.
+     */
+    private void doUploadOverwriteSave(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
+
+        doUploadOverwrite();
+        doSave(dataLinkingScripts, expectedSparql);
+    }
+
+    /**
+     * Does and tests the file's "upload" step, doing it with "overwrite=true".
+     *
+     * @throws Exception Any sort of error that happens.
+     */
+    private void doUploadOverwrite() throws Exception {
+
+        // Prepare the servlet context mock + Stripes action bean roundtrip.
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
+        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by MyActionBeanPropertyBinder
+        // that has already been injected into the servlet context mock obtained above.
         HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
         FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
         richTypeRequestParams.put("fileBean", fileBean);
         trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
+        // Prepare simple string-based request parameters.
         trip.setParameter("folderUri", TEST_FOLDER_URI);
         trip.setParameter("overwrite", "true");
         trip.setParameter("fileType", "CSV");
         trip.setParameter("fileEncoding", "UTF-8");
 
+        // Execute the event.
         trip.execute("upload");
 
+        // Assert the returned HTTP code.
         UploadCSVActionBean actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
         MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
         assertEquals(200, response.getStatus());
 
+        // Assert that the file was created in CR filestore.
         File storedFile = FileStore.getByUri(TEST_FILE_URI);
         long storedFileSize = storedFile.length();
-
         boolean flag =
                 storedFile != null && storedFile.exists() && storedFile.isFile() && TEST_FILE_NAME.equals(storedFile.getName());
         assertTrue("Expected an existing stored file with name: " + TEST_FILE_NAME, flag);
         assertEquals("Expected stored file size to be equal to the uploaded file size", testFileSize, storedFileSize);
 
+        // Assert existence of various triples about the uploaded file and its parent folder.
         String[] statement1 = {TEST_FOLDER_URI, Predicates.CR_HAS_FILE, TEST_FILE_URI};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement1), hasResourceStatement(statement1));
 
@@ -133,23 +200,33 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         String[] statement5 = {TEST_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
+    }
 
-        // Now lets do the processing of the uploaded file, i.e. the "save" step.
-        // ///////////////////////////////////////////////////////////////////////
+    /**
+     * Does and tests the "save" step, using the given data-linking scripts and expecting the given SPARQL to be generated.
+     *
+     * @param dataLinkingScripts The given data-linking scripts.
+     * @param expectedSparql Expecting this SPARQL query to be generated for the saved file.
+     * @throws Exception For any sort of problems.
+     */
+    private void doSave(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
 
-        ctx = createContextMock();
-        trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
+        MockServletContext ctx = createContextMock();
+        MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
-        richTypeRequestParams = new HashMap<String, Object>();
-
-        ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
-        dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
-        richTypeRequestParams.put("dataLinkingScripts", dataLinkingScripts);
+        // Prepare the rich-type request parameters: the given data-linking scripts (if any)
+        // and specifying the list of columns that will constitute unique key.
+        HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
+        if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
+            richTypeRequestParams.put("dataLinkingScripts", dataLinkingScripts);
+        }
         richTypeRequestParams.put("uniqueColumns", Collections.singletonList("Presidency"));
         trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
+        if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
+            trip.setParameter("addDataLinkingScripts", "true");
+        }
         trip.setParameter("overwrite", "true");
-        trip.setParameter("addDataLinkingScripts", "true");
 
         trip.setParameter("attribution", "testCopyright");
         trip.setParameter("license", "All rights reserved");
@@ -168,17 +245,27 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         trip.execute("save");
 
-        actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
-        response = (MockHttpServletResponse) actionBean.getContext().getResponse();
+        UploadCSVActionBean actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
+        MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
 
-        // On successful saving, we expect to be redirected, hence expecting code 302.
+        // On successful saving, we expect to be redirected, hence expecting response code 302.
         assertEquals(302, response.getStatus());
 
+        // Assert existence of various triples about the uploaded file.
         String[] statement6 = {TEST_FILE_URI, Predicates.CR_OBJECTS_UNIQUE_COLUMN, "Presidency"};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement6), hasLiteralStatement(statement6));
 
         String[] statement7 = {TEST_FILE_URI, Predicates.CR_SPARQL_QUERY, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(7), hasLiteralStatement(statement7));
+
+        // Assert that the SPARQL query generated for the uploaded file is correct.
+        // Keeping in mind that above we requested the delete-column script on the "Thumbnail" column.
+        SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
+        assertTrue("Expected a non-null file subject with predicates", fileSubject != null && fileSubject.getPredicateCount() > 0);
+        String actualSparql = fileSubject.getObjectValue(Predicates.CR_SPARQL_QUERY);
+        String actualSparqlCompressed = actualSparql == null ? null : actualSparql.replaceAll("\\s+", "");
+        String expectedSparqlCompressed = expectedSparql.replaceAll("\\s+", "");
+        assertEquals("Actual SPARQL query is not what expected", expectedSparqlCompressed, actualSparqlCompressed);
     }
 
     /**
@@ -208,7 +295,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
      * @param fileName The name of the resource file to locate.
      * @return The file reference.
      */
-    public static File getTestFile(String fileName) {
+    private static File getTestFile(String fileName) {
         try {
             return new File(UploadCSVActionBeanTest.class.getClassLoader().getResource(fileName).toURI());
         } catch (URISyntaxException e) {
