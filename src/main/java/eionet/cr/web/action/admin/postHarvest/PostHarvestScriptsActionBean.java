@@ -383,4 +383,24 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
     }
 
+    /**
+     * True if bulk paste is available for specific target type.
+     *
+     * @return boolean
+     */
+    public boolean isBulkPasteAvailable(){
+        return isPastePossible();
+    }
+
+    /**
+     * If target type is empty, SOURCE is returned.
+     *
+     * @return
+     */
+    public TargetType getBulkPasteTargetType(){
+
+        return targetType == null ? TargetType.SOURCE : targetType;
+
+    }
+
 }

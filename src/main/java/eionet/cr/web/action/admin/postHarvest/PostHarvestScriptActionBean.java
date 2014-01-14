@@ -60,14 +60,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** */
     private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n\n"
-            + "INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
-            + "    ?s cr:tag `bif:lower(?o)`\n"
-            + "}\n"
-            + "WHERE {\n"
-            + "  GRAPH ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
-            + "    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n"
-            + "  }\n"
-            + "}";
+            + "INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n" + "    ?s cr:tag `bif:lower(?o)`\n"
+            + "}\n" + "WHERE {\n" + "  GRAPH ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
+            + "    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n" + "  }\n" + "}";
 
     /** */
     private int id;
@@ -95,6 +90,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     private String cancelUrl;
 
+    private boolean bulkPaste;
+
     /**
      *
      * @return
@@ -119,7 +116,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             List<PostHarvestScriptDTO> clipboardScripts = getClipBoardScripts();
 
             for (PostHarvestScriptDTO clipboardScript : clipboardScripts) {
-                if (clipboardScript.getId() == clipboardItemId){
+                if (clipboardScript.getId() == clipboardItemId) {
                     script = clipboardScript.getScript();
                     title = clipboardScript.getTitle();
                     break;
@@ -183,6 +180,15 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
             return redirResolution;
         }
+    }
+
+    /**
+     *
+     * @return
+     * @throws DAOException
+     */
+    public Resolution addFromBulkPaste() throws DAOException {
+        return paste();
     }
 
     /**
@@ -275,22 +281,11 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"save"})
     public void validateSave() throws DAOException {
 
-        if (getUser() == null || !getUser().isAdministrator()) {
-            addGlobalValidationError("You are not authorized for this operation!");
+        if (!validateAdministrator()){
             return;
         }
 
-        if (targetType != null) {
-            if (StringUtils.isBlank(targetUrl)) {
-                addGlobalValidationError("Target " + targetType.toString().toLowerCase() + " must not be blank!");
-            } else if (targetType.equals(TargetType.SOURCE)) {
-                HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
-                if (dto == null) {
-                    addGlobalValidationError("No source by this URL was found: " + targetUrl);
-                    targetUrl = null;
-                }
-            }
-        }
+        validateTargetType();
 
         if (StringUtils.isBlank(title)) {
             addGlobalValidationError("Title must not be blank!");
@@ -303,6 +298,41 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));
+    }
+
+    private void validateTargetType() throws DAOException {
+        if (targetType != null) {
+            if (StringUtils.isBlank(targetUrl)) {
+                addGlobalValidationError("Target " + targetType.toString().toLowerCase() + " must not be blank!");
+            } else if (targetType.equals(TargetType.SOURCE)) {
+                HarvestSourceDTO dto = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(targetUrl);
+                if (dto == null) {
+                    addGlobalValidationError("No source by this URL was found: " + targetUrl);
+                    targetUrl = null;
+                }
+            }
+        }
+    }
+
+    private boolean validateAdministrator(){
+        if (getUser() == null || !getUser().isAdministrator()) {
+            addGlobalValidationError("You are not authorized for this operation!");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validates bulk paste
+     */
+    @ValidationMethod(on = {"addFromBulkPaste"})
+    public void validateAddFromBulkPaste() throws DAOException {
+        if (!validateAdministrator()){
+            return;
+        }
+        validateTargetType();
+
+        getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP).addParameter("bulkPaste", true));
     }
 
     /**
@@ -629,5 +659,13 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     public void setClipboardItemId(int clipboardItemId) {
         this.clipboardItemId = clipboardItemId;
+    }
+
+    public boolean isBulkPaste() {
+        return bulkPaste;
+    }
+
+    public void setBulkPaste(boolean bulkPaste) {
+        this.bulkPaste = bulkPaste;
     }
 }

@@ -9,6 +9,7 @@
 	                <c:out value="Search scripts"/>
 	            </stripes:link>
             </li>
+
             <c:if test="${empty actionBean.targetType}">
                 <li>
                      <stripes:link href="/admin/postHarvestScript" title="Create all-source script">
@@ -16,6 +17,9 @@
                      </stripes:link>
                 </li>
              </c:if>
+
+
+
              <c:if test="${not empty actionBean.targetType}">
                  <c:if test="${empty actionBean.targetUrl}">
                      <li>
@@ -25,6 +29,22 @@
                          </stripes:link>
                      </li>
                  </c:if>
+
+
+            </c:if>
+
+            <c:if test="${actionBean.bulkPasteAvailable}">
+                    <li>
+                        <stripes:link href="/admin/postHarvestScript" title="Paste scripts for another ${fn:toLowerCase(actionBean.bulkPasteTargetType)}">
+                            <c:out value="Paste scripts to another ${fn:toLowerCase(actionBean.bulkPasteTargetType)}"/>
+                            <stripes:param name="targetType" value="${actionBean.bulkPasteTargetType}"/>
+                            <stripes:param name="backToTargetUrl" value="${actionBean.targetUrl}"/>
+                            <stripes:param name="bulkPaste" value="true"/>
+                        </stripes:link>
+                    </li>
+            </c:if>
+
+            <c:if test="${not empty actionBean.targetType}">
                  <c:if test="${not empty actionBean.targetUrl}">
                      <li>
                         <stripes:link href="/admin/postHarvestScript" title="Create script for this ${fn:toLowerCase(actionBean.targetType)}">

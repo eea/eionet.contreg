@@ -16,31 +16,38 @@
         <c:when test="${actionBean.id>0}">
             <h4>Edit script:</h4>
         </c:when>
+
+        <c:when test="${actionBean.bulkPaste}">
+            <h4>Paste from clipboard to a source:</h4>
+        </c:when>
+
         <c:otherwise>
             <h4>Create script:</h4>
         </c:otherwise>
     </c:choose>
 
-    <div class="advice-msg" style="font-size:0.8em">
-        Hints:
-        <ul>
-            <li>
-                in the script, use <span style="font-family:Courier;font-size:1.2em">?${actionBean.harvestedSourceVariable}</span> to denote the harvested source
-                <c:if test="${actionBean.targetType=='TYPE'}"> and <span style="font-family:Courier;font-size:1.2em">?${actionBean.associatedTypeVariable}</span> to denote the associated type</c:if>
-            </li>
-            <li>
-                the Test button returns the result of a CONSTRUCT query derived from your script
-            </li>
-            <li>
-                the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source will be used as replacer for ?${actionBean.harvestedSourceVariable} when you run Test
-            </li>
-            <li>
-                type at least 4 characters for suggestions in the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source.
-            </li>
-        </ul>
-    </div>
+    <c:if test="${not actionBean.bulkPaste}">
+        <div class="advice-msg" style="font-size:0.8em">
+            Hints:
+            <ul>
+                <li>
+                    in the script, use <span style="font-family:Courier;font-size:1.2em">?${actionBean.harvestedSourceVariable}</span> to denote the harvested source
+                    <c:if test="${actionBean.targetType=='TYPE'}"> and <span style="font-family:Courier;font-size:1.2em">?${actionBean.associatedTypeVariable}</span> to denote the associated type</c:if>
+                </li>
+                <li>
+                    the Test button returns the result of a CONSTRUCT query derived from your script
+                </li>
+                <li>
+                    the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source will be used as replacer for ?${actionBean.harvestedSourceVariable} when you run Test
+                </li>
+                <li>
+                    type at least 4 characters for suggestions in the ${actionBean.targetType=='SOURCE'? 'Target' : 'Test'} source.
+                </li>
+            </ul>
+        </div>
+    </c:if>
 
-    <c:if test="${actionBean.pastePossible}">
+    <c:if test="${actionBean.pastePossible && not actionBean.bulkPaste}">
         <div class="advice-msg" style="font-size:0.8em">
             There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the clipboard:
             <c:forEach items="${actionBean.clipBoardScripts}" var="clipboardItem">
@@ -92,24 +99,49 @@
                         </td>
                     </tr>
                 </c:if>
-                <tr>
-                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                        <label for="titleText" class="required question">Title:</label>
+
+                <c:choose>
+                <c:when test="${actionBean.bulkPaste}">
+                     <tr>
+                     <td colspan="2" style="vertical-align:top;padding-right:0.3em;text-align:left">
+                        <display:table name="${actionBean.clipBoardScripts}" class="datatable" id="script" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:80%">
+
+                            <display:setProperty name="paging.banner.item_name" value="script"/>
+                            <display:setProperty name="paging.banner.items_name" value="scripts"/>
+                            <display:setProperty name="paging.banner.all_items_found" value='<div class="pagebanner">{0} {1} found.</div>'/>
+                            <display:setProperty name="paging.banner.onepage" value=""/>
+
+                            <display:column  style="text-align:left" title='<span title="Title assigned to the script">Scripts at the clipboard</span>'>
+                                <stripes:link href="/admin/postHarvestScript" title="View, edit and test this script">
+                                    <c:out value="${script.title}"/>
+                                    <stripes:param name="id" value="${script.id}"/>
+                                </stripes:link>
+                            </display:column>
+
+                        </display:table>
                     </td>
-                    <td>
-                        <stripes:text name="title" id="titleText" size="80"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                        <label for="queryText" class="required question">Script:</label>
-                    </td>
-                    <td>
-                        <div class="expandingArea">
-                           <pre><span></span><br /></pre>
-                           <stripes:textarea name="script" id="queryText" cols="80" rows="5"/>
-                        </div>
-                        <script type="text/javascript">
+                    </tr>
+
+                </c:when>
+                <c:otherwise>
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="titleText" class="required question">Title:</label>
+                        </td>
+                        <td>
+                            <stripes:text name="title" id="titleText" size="80"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="queryText" class="required question">Script:</label>
+                        </td>
+                        <td>
+                            <div class="expandingArea">
+                               <pre><span></span><br /></pre>
+                               <stripes:textarea name="script" id="queryText" cols="80" rows="5"/>
+                            </div>
+                            <script type="text/javascript">
 // <![CDATA[
 
 function makeExpandingArea(container) {
@@ -138,43 +170,56 @@ while (l--) {
  makeExpandingArea(areas[l]);
 }
 // ]]>
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                        <label for="activeCheckbox" class="question">Active:</label>
-                    </td>
-                    <td>
-                        <stripes:checkbox name="active" id="activeCheckbox"/>
-                    </td>
-                </tr>
-<!--                <tr>
-                    <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                        <label for="runOnceCheckbox" class="question" title="If set to false, harvester will execute the script until the returned update count is 0.">
-                            Run once:
-                        </label>
-                    </td>
-                    <td>
-                        <stripes:checkbox name="runOnce" id="runOnceCheckbox"/>
-                    </td>
-                </tr> -->
-                <c:if test="${empty actionBean.targetType || actionBean.targetType=='TYPE'}">
-                    <tr>
-                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                            <label for="harvestSource" class="question">Test source:</label>
-                        </td>
-                        <td>
-                            <stripes:text name="testSourceUrl" id="harvestSource" value="${actionBean.testSourceUrl}" size="80"/>
+                            </script>
                         </td>
                     </tr>
-                </c:if>
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="activeCheckbox" class="question">Active:</label>
+                        </td>
+                        <td>
+                            <stripes:checkbox name="active" id="activeCheckbox"/>
+                        </td>
+                    </tr>
+    <!--                <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="runOnceCheckbox" class="question" title="If set to false, harvester will execute the script until the returned update count is 0.">
+                                Run once:
+                            </label>
+                        </td>
+                        <td>
+                            <stripes:checkbox name="runOnce" id="runOnceCheckbox"/>
+                        </td>
+                    </tr> -->
+                    <c:if test="${empty actionBean.targetType || actionBean.targetType=='TYPE'}">
+                        <tr>
+                            <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                                <label for="harvestSource" class="question">Test source:</label>
+                            </td>
+                            <td>
+                                <stripes:text name="testSourceUrl" id="harvestSource" value="${actionBean.testSourceUrl}" size="80"/>
+                            </td>
+                        </tr>
+                    </c:if>
+
+                    </c:otherwise>
+                </c:choose>
+
                 <tr>
                     <td>&nbsp;</td>
                     <td>
-                        <stripes:submit name="save" value="Save"/>
-                        <stripes:submit name="save" value="Save & close"/>
-                        <stripes:submit name="test" value="Test"/>
+                        <c:choose>
+	                        <c:when test="${actionBean.bulkPaste}">
+	                           <stripes:submit name="addFromBulkPaste" value="Add clipboard scripts to target ${fn:toLowerCase(actionBean.targetType)}"/>
+	                           <stripes:hidden name="bulkPaste" value="true"/>
+	                        </c:when>
+	                        <c:otherwise>
+
+		                        <stripes:submit name="save" value="Save"/>
+		                        <stripes:submit name="save" value="Save & close"/>
+		                        <stripes:submit name="test" value="Test"/>
+	                        </c:otherwise>
+                        </c:choose>
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
                 </tr>
