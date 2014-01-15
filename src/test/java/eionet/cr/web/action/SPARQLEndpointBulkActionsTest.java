@@ -58,7 +58,7 @@ public class SPARQLEndpointBulkActionsTest extends CRDatabaseTestCase {
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
                         + "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> " + "select distinct ?s where "
                         + "{?s a ?type " + ". FILTER (strStarts(str(?s),'http://www.eea.europa.eu/')) "
-                        + ". FILTER (strStarts(str(?type),'http://www.eea.europa.eu/portal_types'))" + "}";
+                        + ". FILTER (strStarts(str(?type),'http://www.eea.europa.eu/portal_types'))" + "} order by ?s";
         trip.setParameter("query", sparql);
         trip.setParameter("format", "html");
 
