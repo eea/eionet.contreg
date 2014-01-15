@@ -1,3 +1,6 @@
 /deploy.bat
 /local.properties
 /rebuild.bat
+/target
+/.project
+/.classpath
