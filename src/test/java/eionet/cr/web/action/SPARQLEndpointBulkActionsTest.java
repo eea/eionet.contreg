@@ -24,7 +24,7 @@ import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
  *
  * Test cases for SPARQLEndpoint sources from query functionality.
  *
- * @author Jaak Kapten
+ * @author Jaak Kaptenaaa
  */
 public class SPARQLEndpointBulkActionsTest extends CRDatabaseTestCase {
 
