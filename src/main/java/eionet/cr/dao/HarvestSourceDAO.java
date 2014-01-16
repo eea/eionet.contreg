@@ -34,6 +34,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -287,7 +288,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws OpenRDFException
      */
     int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-    OpenRDFException;
+            OpenRDFException;
 
     /**
      * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
@@ -376,7 +377,7 @@ public interface HarvestSourceDAO extends DAO {
      * @throws IOException
      */
     void insertUpdateSourceMetadata(String subject, String predicate, ObjectDTO... object) throws DAOException,
-    RepositoryException, IOException;
+            RepositoryException, IOException;
 
     /**
      * Inserts given metadata into /harvester context.
@@ -447,11 +448,24 @@ public interface HarvestSourceDAO extends DAO {
     void updateSourceHarvestFinished(HarvestSourceDTO sourceDTO) throws DAOException;
 
     /**
+     * Equal to calling {@link #removeHarvestSources(Collection, true)}, see JavaDoc there.
      *
-     * @param sourceUrls
-     * @throws DAOException
+     * @param sourceUrls The URLs of the harvest sources to remove.
+     * @throws DAOException Any sort of error will be wrapped into this one.
      */
     void removeHarvestSources(Collection<String> sourceUrls) throws DAOException;
+
+    /**
+     * Removes harvest sources denoted by the given URLs. Records will be deleted from HARVEST_SOURCE + all related tables.
+     * Also cleared will be graphs by the same URLs, and also all triples where these URLs are in subject position. If the flag
+     * is true then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}.
+     * Otherwise they will be deleted regardless of graph.
+     *
+     * @param sourceUrls The given URLs.
+     * @param harvesterContextOnly The flag as indicated above.
+     * @throws DAOException Any sort of error will be wrapped into this one.
+     */
+    void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly) throws DAOException;
 
     /**
      *
