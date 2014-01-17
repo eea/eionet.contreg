@@ -33,6 +33,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.web.security.CRUser;
 
 /**
  * A class for testing the behavior of {@link UploadCSVActionBean}.
@@ -51,7 +52,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     public static final String TEST_FILE_NAME = "USPresidents.csv";
 
     /** The URI of the virtual CR folder we're testing in. */
-    public static final String TEST_FOLDER_URI = "http://127.0.0.1:8080/cr/home/" + TEST_USER_NAME;
+    public static final String TEST_FOLDER_URI = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
 
     /** The URI of the uploaded file we're testing. */
     public static final String TEST_FILE_URI = TEST_FOLDER_URI + "/" + TEST_FILE_NAME;
@@ -60,29 +61,26 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS =
-            "PREFIX tableFile: <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv#> "
-                    + "SELECT * FROM <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv> WHERE {"
-                    + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-                    + "    OPTIONAL { _:rec tableFile:President ?President } ."
-                    + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-                    + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-                    + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ."
-                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ." + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
-                    + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI
+            + "/USPresidents.csv#> " + "SELECT * FROM <" + TEST_FOLDER_URI + "/USPresidents.csv> WHERE {"
+            + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+            + "    OPTIONAL { _:rec tableFile:President ?President } ."
+            + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+            + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+            + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
+            + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+            + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts NOT used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS =
-            "PREFIX tableFile: <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv#> "
-                    + "SELECT * FROM <http://127.0.0.1:8080/cr/home/somebody/USPresidents.csv> WHERE {"
-                    + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-                    + "    OPTIONAL { _:rec tableFile:President ?President } ."
-                    + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-                    + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-                    + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ."
-                    + "    OPTIONAL { _:rec tableFile:Party ?Party } ." + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
-                    + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
-                    + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI
+            + "/USPresidents.csv#> " + "SELECT * FROM <" + TEST_FOLDER_URI + "/USPresidents.csv> WHERE {"
+            + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+            + "    OPTIONAL { _:rec tableFile:President ?President } ."
+            + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+            + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+            + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
+            + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ." + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
+            + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
 
     /** Size of the file under test before test. */
     private long testFileSize;
