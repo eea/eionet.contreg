@@ -179,6 +179,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         // Assert that the file was created in CR filestore.
         File storedFile = FileStore.getByUri(TEST_FILE_URI);
+        assertNotNull("Didn't expect the stored file to be null!", storedFile);
         long storedFileSize = storedFile.length();
         boolean flag =
                 storedFile != null && storedFile.exists() && storedFile.isFile() && TEST_FILE_NAME.equals(storedFile.getName());
