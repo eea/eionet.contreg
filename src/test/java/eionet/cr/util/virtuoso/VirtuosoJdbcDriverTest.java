@@ -23,7 +23,10 @@ package eionet.cr.util.virtuoso;
 
 import java.net.URI;
 import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import junit.framework.TestCase;
 
@@ -32,6 +35,8 @@ import org.junit.Test;
 import virtuoso.jdbc4.VirtuosoConnectionPoolDataSource;
 import virtuoso.jdbc4.VirtuosoPooledConnection;
 import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 
 /**
  * Test Virtuoso Jdbc driver.
@@ -83,6 +88,47 @@ public class VirtuosoJdbcDriverTest extends TestCase {
                     stmt.close();
                 }
             }
+        }
+    }
+
+    /**
+     * Test simple insert into RDF_QUAD and a selecy afterwards.
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testSimpleInsertAndSparqlSelect() throws SQLException {
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.createStatement();
+            int i =
+                    stmt.executeUpdate("insert into DB.DBA.RDF_QUAD (S,P,O,G) values (" + "iri_to_id('http://test.uri/subject')"
+                            + ", iri_to_id('http://test.uri/predicate')" + ", iri_to_id('http://test.uri/object')"
+                            + ", iri_to_id('http://test.uri/graph'))");
+            assertEquals("Expect one triple to have been inserted!", 1, i);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.createStatement();
+            rs =
+                    stmt.executeQuery("sparql select * where { graph ?g {"
+                            + "<http://test.uri/subject> <http://test.uri/predicate> <http://test.uri/object>}} limit 1");
+            assertTrue("Expected the previously inserted triple to exist in triplestore", rs.next());
+            String graph = "http://test.uri/graph";
+            assertEquals("Expected previously inserted triple in " + graph, graph, rs.getString(1));
+        } catch (SQLException e) {
+            fail("Wasn't expecting this exception: " + e);
+            throw e;
+        } finally {
+            SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
         }
     }
 }
