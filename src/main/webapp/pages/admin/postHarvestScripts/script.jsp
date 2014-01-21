@@ -223,6 +223,69 @@ while (l--) {
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
                 </tr>
+
+
+
+                <c:if test="${not empty actionBean.targetType}">
+                    <tr>
+                        <th colspan="2">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="vertical-align:top;padding-right:0.3em;text-align:left">Use script template:</th>
+                    </tr>
+
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="scriptTemplateId" title="Linking script." class="question">Linking script</label></td>
+                        <td>
+                            <stripes:select name="scriptTemplateId" id="scriptTemplateId" value="${actionBean.scriptTemplateId}" style="max-width:100%;">
+                                <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
+                            </stripes:select>
+                        </td>
+                    </tr>
+                    <c:choose>
+                        <c:when test="${actionBean.targetType=='SOURCE'}">
+                            <tr>
+                                <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                                    <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
+                                </td>
+                                <td>
+                                    <stripes:select name="scriptPredicate" id="scriptPredicate">
+                                         <stripes:option value="" label="-- general script --"/>
+                                         <c:forEach items="${actionBean.sourceAllDistinctPredicates}" var="scriptPredicate">
+                                             <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
+                                         </c:forEach>
+                                     </stripes:select>
+                                </td>
+                            </tr>
+                        </c:when>
+                        <c:otherwise>
+
+                           <tr>
+                                <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                                    <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
+                                </td>
+                                <td>
+                                    <stripes:select name="scriptPredicate" id="scriptPredicate">
+                                         <stripes:option value="" label="-- general script --"/>
+                                         <c:forEach items="${actionBean.typeAllDistinctPredicates}" var="scriptPredicate">
+                                             <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
+                                         </c:forEach>
+                                     </stripes:select>
+                                </td>
+                            </tr>
+
+                        </c:otherwise>
+                    </c:choose>
+                    <tr>
+	                    <td>&nbsp;</td>
+	                    <td>
+                            <stripes:submit name="useTemplate" value="Update script using template"/>
+                        </td>
+                    </tr>
+
+                </c:if>
+
             </table>
         <div>
             <stripes:hidden name="id"/>
