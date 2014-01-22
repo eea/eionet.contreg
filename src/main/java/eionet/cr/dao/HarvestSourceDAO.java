@@ -318,21 +318,27 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Loads the given files with given loaders into the given target graph. Files and corresponding loaders given as map.
      *
-     * @param filesAndLoaders The given files with given loaders.
-     * @param graphUri The target graph URI.
+     * @param filesAndLoaders
+     *            The given files with given loaders.
+     * @param graphUri
+     *            The target graph URI.
      * @return Total number of loaded triples.
-     * @throws DAOException All exceptions are wrapped into this one.
+     * @throws DAOException
+     *             All exceptions are wrapped into this one.
      */
     int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
 
     /**
-     * A prototype of the files loader method that is hopefully significantly faster than {@link #loadContent(Map, String)},
-     * because it uses DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and DB.DBA.TTLP(file_open(f), graph, graph) functions.
+     * A prototype of the files loader method that is hopefully significantly faster than {@link #loadContent(Map, String)}, because
+     * it uses DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and DB.DBA.TTLP(file_open(f), graph, graph) functions.
      *
-     * @param filesAndLoaders The given files with given loaders.
-     * @param graphUri The target graph URI.
+     * @param filesAndLoaders
+     *            The given files with given loaders.
+     * @param graphUri
+     *            The target graph URI.
      * @return Total number of loaded triples.
-     * @throws DAOException All exceptions are wrapped into this one.
+     * @throws DAOException
+     *             All exceptions are wrapped into this one.
      */
     int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
 
@@ -450,20 +456,25 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Equal to calling {@link #removeHarvestSources(Collection, true)}, see JavaDoc there.
      *
-     * @param sourceUrls The URLs of the harvest sources to remove.
-     * @throws DAOException Any sort of error will be wrapped into this one.
+     * @param sourceUrls
+     *            The URLs of the harvest sources to remove.
+     * @throws DAOException
+     *             Any sort of error will be wrapped into this one.
      */
     void removeHarvestSources(Collection<String> sourceUrls) throws DAOException;
 
     /**
-     * Removes harvest sources denoted by the given URLs. Records will be deleted from HARVEST_SOURCE + all related tables.
-     * Also cleared will be graphs by the same URLs, and also all triples where these URLs are in subject position. If the flag
-     * is true then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}.
-     * Otherwise they will be deleted regardless of graph.
+     * Removes harvest sources denoted by the given URLs. Records will be deleted from HARVEST_SOURCE + all related tables. Also
+     * cleared will be graphs by the same URLs, and also all triples where these URLs are in subject position. If the flag is true
+     * then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}. Otherwise they
+     * will be deleted regardless of graph.
      *
-     * @param sourceUrls The given URLs.
-     * @param harvesterContextOnly The flag as indicated above.
-     * @throws DAOException Any sort of error will be wrapped into this one.
+     * @param sourceUrls
+     *            The given URLs.
+     * @param harvesterContextOnly
+     *            The flag as indicated above.
+     * @throws DAOException
+     *             Any sort of error will be wrapped into this one.
      */
     void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly) throws DAOException;
 
@@ -546,8 +557,8 @@ public interface HarvestSourceDAO extends DAO {
     UrlAuthenticationDTO getUrlAuthentication(String fullUrl) throws DAOException;
 
     /**
-     * Saves or adds urlAuthentication to database. If no id is provided, new url is added.
-     * If id is present, existing url is overwritten.
+     * Saves or adds urlAuthentication to database. If no id is provided, new url is added. If id is present, existing url is
+     * overwritten.
      *
      * @param urlAuthentication
      * @throws DAOException
@@ -565,13 +576,15 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Returns a list of distinct predicates used by resources of the given rdf:type in the given graph.
      *
-     * @param graphUri The graph to look in.
-     * @param typeUri The rdf:type of the resources whose predicates are to be looked in.
+     * @param graphUri
+     *            The graph to look in.
+     * @param typeUri
+     *            The rdf:type of the resources whose predicates are to be looked in.
      * @return The list of distinct predicates. Empty if no single predicate found.
-     * @throws DAOException if any sort of database access error occurs.
+     * @throws DAOException
+     *             if any sort of database access error occurs.
      */
     List<String> getDistinctPredicates(String graphUri, String typeUri) throws DAOException;
-
 
     /**
      * Returns a list of all distinct predicates available for specified source

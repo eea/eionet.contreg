@@ -99,7 +99,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     List<String> typeAllDistinctPredicates;
 
-
     /** Available scripts. */
     private List<ScriptTemplateDTO> scriptTemplates;
     private String scriptTemplateId;
@@ -199,20 +198,19 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * Replaces the script and title fields with a template script and title.
-     * Title is replaced ONLY if empty.
+     * Replaces the script and title fields with a template script and title. Title is replaced ONLY if empty.
      *
      * @return
      * @throws DAOException
      */
     public Resolution useTemplate() throws DAOException {
 
-        if (validateAdministrator()){
-            if (!StringUtils.isEmpty(scriptPredicate) && !StringUtils.isEmpty(scriptTemplateId)){
+        if (validateAdministrator()) {
+            if (!StringUtils.isEmpty(scriptPredicate) && !StringUtils.isEmpty(scriptTemplateId)) {
                 ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(scriptTemplateId);
                 setScript(StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", scriptPredicate));
 
-                if (StringUtils.isEmpty(title)){
+                if (StringUtils.isEmpty(title)) {
                     title = scriptTemplate.getName();
                     addSystemMessage("Script and title replaced with template!");
                 } else {
@@ -325,7 +323,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"save"})
     public void validateSave() throws DAOException {
 
-        if (!validateAdministrator()){
+        if (!validateAdministrator()) {
             return;
         }
 
@@ -358,7 +356,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         }
     }
 
-    private boolean validateAdministrator(){
+    private boolean validateAdministrator() {
         if (getUser() == null || !getUser().isAdministrator()) {
             addGlobalValidationError("You are not authorized for this operation!");
             return false;
@@ -371,7 +369,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     @ValidationMethod(on = {"addFromBulkPaste"})
     public void validateAddFromBulkPaste() throws DAOException {
-        if (!validateAdministrator()){
+        if (!validateAdministrator()) {
             return;
         }
         validateTargetType();
@@ -720,8 +718,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public List<String> getSourceAllDistinctPredicates() throws DAOException {
-        if (sourceAllDistinctPredicates == null){
-            sourceAllDistinctPredicates = DAOFactory.get().getDao(HarvestSourceDAO.class).getSourceAllDistinctPredicates(targetUrl);
+        if (sourceAllDistinctPredicates == null) {
+            sourceAllDistinctPredicates =
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).getSourceAllDistinctPredicates(targetUrl);
         }
         return sourceAllDistinctPredicates;
     }
@@ -743,7 +742,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public List<String> getTypeAllDistinctPredicates() throws DAOException {
-        if (typeAllDistinctPredicates == null){
+        if (typeAllDistinctPredicates == null) {
             typeAllDistinctPredicates = DAOFactory.get().getDao(HarvestSourceDAO.class).getTypeAllDistinctPredicates(targetUrl);
         }
         return typeAllDistinctPredicates;
@@ -764,8 +763,5 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public void setScriptTemplateId(String scriptTemplateId) {
         this.scriptTemplateId = scriptTemplateId;
     }
-
-
-
 
 }
