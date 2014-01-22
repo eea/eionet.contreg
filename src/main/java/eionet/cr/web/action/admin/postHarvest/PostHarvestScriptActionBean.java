@@ -199,6 +199,8 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
+     * Replaces the script and title fields with a template script and title.
+     * Title is replaced ONLY if empty.
      *
      * @return
      * @throws DAOException

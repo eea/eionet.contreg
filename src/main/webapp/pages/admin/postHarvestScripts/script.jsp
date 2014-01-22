@@ -231,7 +231,7 @@ while (l--) {
                         <th colspan="2">&nbsp;</th>
                     </tr>
                     <tr>
-                        <th colspan="2" style="vertical-align:top;padding-right:0.3em;text-align:left">Use script template:</th>
+                        <th colspan="2" style="vertical-align:top;padding-left:0; padding-bottom: 0.5em;text-align:left">Use script template:</th>
                     </tr>
 
                     <tr>
@@ -251,7 +251,7 @@ while (l--) {
                                 </td>
                                 <td>
                                     <stripes:select name="scriptPredicate" id="scriptPredicate">
-                                         <stripes:option value="" label="-- general script --"/>
+                                         <stripes:option value="" label=""/>
                                          <c:forEach items="${actionBean.sourceAllDistinctPredicates}" var="scriptPredicate">
                                              <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
                                          </c:forEach>
@@ -267,7 +267,7 @@ while (l--) {
                                 </td>
                                 <td>
                                     <stripes:select name="scriptPredicate" id="scriptPredicate">
-                                         <stripes:option value="" label="-- general script --"/>
+                                         <stripes:option value="" label=""/>
                                          <c:forEach items="${actionBean.typeAllDistinctPredicates}" var="scriptPredicate">
                                              <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
                                          </c:forEach>
