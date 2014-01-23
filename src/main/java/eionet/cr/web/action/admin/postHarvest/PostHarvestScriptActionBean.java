@@ -224,6 +224,17 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         return new ForwardResolution(SCRIPTS_CONTAINER_JSP).addParameter("title", title).addParameter("script", script);
     }
 
+    public Resolution loadTemplatePredicates() throws DAOException {
+
+        if (validateAdministrator()){
+            if (StringUtils.isEmpty(targetUrl)) {
+                addWarningMessage("Target is not defined. Cannot load predicates for empty target.");
+            }
+        }
+
+        return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
+    }
+
     /**
      *
      * @return

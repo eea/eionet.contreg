@@ -226,7 +226,7 @@ while (l--) {
 
 
 
-                <c:if test="${not empty actionBean.targetType}">
+                <c:if test="${not empty actionBean.targetType && not empty actionBean.targetUrl}">
                     <tr>
                         <th colspan="2">&nbsp;</th>
                     </tr>
@@ -284,6 +284,12 @@ while (l--) {
                         </td>
                     </tr>
 
+                </c:if>
+
+                <c:if test="${not empty actionBean.targetType && empty actionBean.targetUrl}">
+                    <tr>
+                        <td colspan="2" style="vertical-align:middle;padding-left:0; padding-bottom: 0.5em;padding-top: 1.5em;text-align:left">To use script templates, insert a valid target URL and load predicates: <stripes:submit name="loadTemplatePredicates" value="Load predicates"/></td>
+                    </tr>
                 </c:if>
 
             </table>
