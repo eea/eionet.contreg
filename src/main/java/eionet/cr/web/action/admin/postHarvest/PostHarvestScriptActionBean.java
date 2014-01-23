@@ -104,6 +104,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String scriptTemplateId;
 
     /**
+     * ActionBean default handler
      *
      * @return
      * @throws DAOException
@@ -161,7 +162,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /**
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution save() throws DAOException {
@@ -200,7 +201,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     /**
      * Replaces the script and title fields with a template script and title. Title is replaced ONLY if empty.
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution useTemplate() throws DAOException {
@@ -227,7 +228,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     /**
      * Functionality to reload the templates and predicates list for new scripts.
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution loadTemplatePredicates() throws DAOException {
@@ -242,8 +243,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
+     * Adds from bulk paste.
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution addFromBulkPaste() throws DAOException {
