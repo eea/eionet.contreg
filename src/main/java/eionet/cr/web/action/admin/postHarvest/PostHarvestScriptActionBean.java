@@ -224,9 +224,15 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         return new ForwardResolution(SCRIPTS_CONTAINER_JSP).addParameter("title", title).addParameter("script", script);
     }
 
+    /**
+     * Functionality to reload the templates and predicates list for new scripts.
+     *
+     * @return
+     * @throws DAOException
+     */
     public Resolution loadTemplatePredicates() throws DAOException {
 
-        if (validateAdministrator()){
+        if (validateAdministrator()) {
             if (StringUtils.isEmpty(targetUrl)) {
                 addWarningMessage("Target is not defined. Cannot load predicates for empty target.");
             }
