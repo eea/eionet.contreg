@@ -209,16 +209,16 @@ while (l--) {
                     <td>&nbsp;</td>
                     <td>
                         <c:choose>
-	                        <c:when test="${actionBean.bulkPaste}">
-	                           <stripes:submit name="addFromBulkPaste" value="Add clipboard scripts to target ${fn:toLowerCase(actionBean.targetType)}"/>
-	                           <stripes:hidden name="bulkPaste" value="true"/>
-	                        </c:when>
-	                        <c:otherwise>
+                            <c:when test="${actionBean.bulkPaste}">
+                               <stripes:submit name="addFromBulkPaste" value="Add clipboard scripts to target ${fn:toLowerCase(actionBean.targetType)}"/>
+                               <stripes:hidden name="bulkPaste" value="true"/>
+                            </c:when>
+                            <c:otherwise>
 
-		                        <stripes:submit name="save" value="Save"/>
-		                        <stripes:submit name="save" value="Save & close"/>
-		                        <stripes:submit name="test" value="Test"/>
-	                        </c:otherwise>
+                                <stripes:submit name="save" value="Save"/>
+                                <stripes:submit name="save" value="Save & close"/>
+                                <stripes:submit name="test" value="Test"/>
+                            </c:otherwise>
                         </c:choose>
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
@@ -243,43 +243,25 @@ while (l--) {
                             </stripes:select>
                         </td>
                     </tr>
-                    <c:choose>
-                        <c:when test="${actionBean.targetType=='SOURCE'}">
-                            <tr>
-                                <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                                    <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
-                                </td>
-                                <td>
-                                    <stripes:select name="scriptPredicate" id="scriptPredicate">
-                                         <stripes:option value="" label=""/>
-                                         <c:forEach items="${actionBean.sourceAllDistinctPredicates}" var="scriptPredicate">
-                                             <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
-                                         </c:forEach>
-                                     </stripes:select>
-                                </td>
-                            </tr>
-                        </c:when>
-                        <c:otherwise>
-
-                           <tr>
-                                <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                                    <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
-                                </td>
-                                <td>
-                                    <stripes:select name="scriptPredicate" id="scriptPredicate">
-                                         <stripes:option value="" label=""/>
-                                         <c:forEach items="${actionBean.typeAllDistinctPredicates}" var="scriptPredicate">
-                                             <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
-                                         </c:forEach>
-                                     </stripes:select>
-                                </td>
-                            </tr>
-
-                        </c:otherwise>
-                    </c:choose>
                     <tr>
-	                    <td>&nbsp;</td>
-	                    <td>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
+                        </td>
+                        <td>
+                            <c:set var="targetPredicates" value="${actionBean.targetType eq 'SOURCE' ? actionBean.sourceAllDistinctPredicates : actionBean.typeAllDistinctPredicates}"/>
+                            <stripes:select name="scriptPredicate" id="scriptPredicate">
+                                 <c:if test="${empty targetPredicates}">
+                                    <stripes:option value="" label="-- Found no predicates for this target ${fn:toLowerCase(actionBean.targetType)} --"/>
+                                 </c:if>
+                                 <c:forEach items="${targetPredicates}" var="scriptPredicate">
+                                     <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
+                                 </c:forEach>
+                             </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
                             <stripes:submit name="useTemplate" value="Update script using template"/>
                         </td>
                     </tr>

@@ -207,9 +207,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public Resolution useTemplate() throws DAOException {
 
         if (validateAdministrator()) {
-            if (!StringUtils.isEmpty(scriptPredicate) && !StringUtils.isEmpty(scriptTemplateId)) {
+            if (StringUtils.isNotEmpty(scriptPredicate) && StringUtils.isNotEmpty(scriptTemplateId)) {
                 ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(scriptTemplateId);
-                setScript(StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", scriptPredicate));
+                setScript(StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", "<" + scriptPredicate + ">"));
 
                 if (StringUtils.isEmpty(title)) {
                     title = scriptTemplate.getName();
