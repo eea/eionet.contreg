@@ -481,7 +481,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
                 DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
 
-                addSystemMessage(result.getRows().size() + " sources added and scheduled for urgent harvest.");
+                addSystemMessage(result.getRows().size() + " sources scheduled for urgent batch harvest!");
                 LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
             } else {
                 addGlobalValidationError(resultValidation);

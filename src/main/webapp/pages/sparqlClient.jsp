@@ -359,8 +359,8 @@ while (l--) {
                             display: none;
                         </c:if>
                         ">
-                        <b>Add bulk sources:</b> Add sources from the sqarql query results first column
-                        <stripes:submit name="executeAddSources" value="Execute" id="executeConstructAddSources" onclick="return confirm('All urls from the resultset\\\'s first column will be added to harvest source list and will be scheduled for urgent harvest. Continue?');"/>
+                        <strong>Schedule urgent batch harvest</strong> for sources returned in the first result set column:
+                        <stripes:submit name="executeAddSources" value="Execute" id="executeConstructAddSources" onclick="return confirm('All URLs returned in the first result set column will now be scheduled for urgent batch harvest. They will be picked up by the batch harvester when it runs. Are you sure you want to continue?');"/>
                     </div>
                 </c:if>
 
