@@ -300,4 +300,12 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet author="heinlja" id="rev-17">
+        <comment>A timestamp indicating when a harvest source was marked for batch deletion.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "delete_requested" DATETIME DEFAULT NULL
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
