@@ -405,7 +405,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             for (Map<String, ResultValue> row : queryResult.getRows()) {
 
                 String resultValue = row.get(firstColumn).getValue();
-                String source = eionet.cr.util.URLUtil.escapeIRI(resultValue.toLowerCase());
+                String source = eionet.cr.util.URLUtil.escapeIRI(resultValue);
                 if (URLUtil.isURL(source)) {
                     insertAndUpdate.setString(1, source);
                     insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
