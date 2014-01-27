@@ -2,7 +2,7 @@ package eionet.cr.web.sparqlClient.helpers;
 
 import java.util.Map;
 
-import org.apache.commons.validator.routines.UrlValidator;
+import eionet.cr.util.URLUtil;
 
 /**
  *
@@ -40,7 +40,8 @@ public class QueryResultValidator {
                     String firstColumn = (String) queryResult.getCols().get(0).get("property");
                     ResultValue resultValue = row.get(firstColumn);
 
-                    if (!UrlValidator.getInstance().isValid(resultValue.getValue())){
+                    String strValue = resultValue.getValue();
+                    if (!URLUtil.isURL(strValue)) {
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
                 }

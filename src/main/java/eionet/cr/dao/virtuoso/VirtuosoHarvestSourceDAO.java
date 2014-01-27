@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -56,6 +55,7 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
+import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.pagination.PagingRequest;
@@ -406,7 +406,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 String resultValue = row.get(firstColumn).getValue();
                 String source = eionet.cr.util.URLUtil.escapeIRI(resultValue.toLowerCase());
-                if (UrlValidator.getInstance().isValid(source)) {
+                if (URLUtil.isURL(source)) {
                     insertAndUpdate.setString(1, source);
                     insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
                     insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
