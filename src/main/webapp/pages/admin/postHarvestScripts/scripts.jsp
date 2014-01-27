@@ -5,9 +5,9 @@
         <li><a href="#">Operations</a>
             <ul>
             <li>
-	            <stripes:link href="/admin/postHarvestScripts" event="search" title="Search scripts">
-	                <c:out value="Search scripts"/>
-	            </stripes:link>
+                <stripes:link href="/admin/postHarvestScripts" event="search" title="Search scripts">
+                    <c:out value="Search scripts"/>
+                </stripes:link>
             </li>
 
             <c:if test="${empty actionBean.targetType}">
