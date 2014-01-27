@@ -44,6 +44,8 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.dto.ScriptTemplateDTO;
+import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean.ActionType;
 import eionet.cr.web.util.ApplicationCache;
@@ -92,7 +94,17 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     private boolean bulkPaste;
 
+    List<String> sourceAllDistinctPredicates;
+    String scriptPredicate;
+
+    List<String> typeAllDistinctPredicates;
+
+    /** Available scripts. */
+    private List<ScriptTemplateDTO> scriptTemplates;
+    private String scriptTemplateId;
+
     /**
+     * ActionBean default handler
      *
      * @return
      * @throws DAOException
@@ -150,7 +162,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /**
      *
-     * @return
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution save() throws DAOException {
@@ -178,13 +190,62 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             if (StringUtils.isNotBlank(testSourceUrl)) {
                 redirResolution.addParameter("testSourceUrl", testSourceUrl);
             }
+
+            redirResolution.addParameter("scriptPredicate", scriptPredicate);
+            redirResolution.addParameter("scriptTemplateId", scriptTemplateId);
+
             return redirResolution;
         }
     }
 
     /**
+     * Replaces the script and title fields with a template script and title. Title is replaced ONLY if empty.
      *
-     * @return
+     * @return Resolution
+     * @throws DAOException
+     */
+    public Resolution useTemplate() throws DAOException {
+
+        if (validateAdministrator()) {
+            if (StringUtils.isNotEmpty(scriptPredicate) && StringUtils.isNotEmpty(scriptTemplateId)) {
+                ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(scriptTemplateId);
+                setScript(StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", "<" + scriptPredicate + ">"));
+
+                if (StringUtils.isEmpty(title)) {
+                    title = scriptTemplate.getName();
+                    addSystemMessage("Script and title replaced with template!");
+                } else {
+                    addSystemMessage("Script replaced with template!");
+                }
+            } else {
+                addWarningMessage("Both script template and predicate must be selected to add script from a template.");
+            }
+        }
+
+        return new ForwardResolution(SCRIPTS_CONTAINER_JSP).addParameter("title", title).addParameter("script", script);
+    }
+
+    /**
+     * Functionality to reload the templates and predicates list for new scripts.
+     *
+     * @return Resolution
+     * @throws DAOException
+     */
+    public Resolution loadTemplatePredicates() throws DAOException {
+
+        if (validateAdministrator()) {
+            if (StringUtils.isEmpty(targetUrl)) {
+                addWarningMessage("Target is not defined. Cannot load predicates for empty target.");
+            }
+        }
+
+        return new ForwardResolution(SCRIPTS_CONTAINER_JSP);
+    }
+
+    /**
+     * Adds from bulk paste.
+     *
+     * @return Resolution
      * @throws DAOException
      */
     public Resolution addFromBulkPaste() throws DAOException {
@@ -281,7 +342,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     @ValidationMethod(on = {"save"})
     public void validateSave() throws DAOException {
 
-        if (!validateAdministrator()){
+        if (!validateAdministrator()) {
             return;
         }
 
@@ -314,7 +375,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         }
     }
 
-    private boolean validateAdministrator(){
+    private boolean validateAdministrator() {
         if (getUser() == null || !getUser().isAdministrator()) {
             addGlobalValidationError("You are not authorized for this operation!");
             return false;
@@ -327,7 +388,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
      */
     @ValidationMethod(on = {"addFromBulkPaste"})
     public void validateAddFromBulkPaste() throws DAOException {
-        if (!validateAdministrator()){
+        if (!validateAdministrator()) {
             return;
         }
         validateTargetType();
@@ -668,4 +729,58 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public void setBulkPaste(boolean bulkPaste) {
         this.bulkPaste = bulkPaste;
     }
+
+    /**
+     * Returns distinct list of predicates associated to a source.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public List<String> getSourceAllDistinctPredicates() throws DAOException {
+        if (sourceAllDistinctPredicates == null) {
+            sourceAllDistinctPredicates =
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).getSourceAllDistinctPredicates(targetUrl);
+        }
+        return sourceAllDistinctPredicates;
+    }
+
+    /**
+     * @return the scriptTemplates
+     */
+    public List<ScriptTemplateDTO> getScriptTemplates() {
+        if (scriptTemplates == null) {
+            scriptTemplates = new ScriptTemplateDaoImpl().getScriptTemplates();
+        }
+        return scriptTemplates;
+    }
+
+    /**
+     * Returns distinct list of predicates associated to a type.
+     *
+     * @return
+     * @throws DAOException
+     */
+    public List<String> getTypeAllDistinctPredicates() throws DAOException {
+        if (typeAllDistinctPredicates == null) {
+            typeAllDistinctPredicates = DAOFactory.get().getDao(HarvestSourceDAO.class).getTypeAllDistinctPredicates(targetUrl);
+        }
+        return typeAllDistinctPredicates;
+    }
+
+    public String getScriptPredicate() {
+        return scriptPredicate;
+    }
+
+    public void setScriptPredicate(String scriptPredicate) {
+        this.scriptPredicate = scriptPredicate;
+    }
+
+    public String getScriptTemplateId() {
+        return scriptTemplateId;
+    }
+
+    public void setScriptTemplateId(String scriptTemplateId) {
+        this.scriptTemplateId = scriptTemplateId;
+    }
+
 }

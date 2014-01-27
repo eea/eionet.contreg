@@ -209,20 +209,71 @@ while (l--) {
                     <td>&nbsp;</td>
                     <td>
                         <c:choose>
-	                        <c:when test="${actionBean.bulkPaste}">
-	                           <stripes:submit name="addFromBulkPaste" value="Add clipboard scripts to target ${fn:toLowerCase(actionBean.targetType)}"/>
-	                           <stripes:hidden name="bulkPaste" value="true"/>
-	                        </c:when>
-	                        <c:otherwise>
+                            <c:when test="${actionBean.bulkPaste}">
+                               <stripes:submit name="addFromBulkPaste" value="Add clipboard scripts to target ${fn:toLowerCase(actionBean.targetType)}"/>
+                               <stripes:hidden name="bulkPaste" value="true"/>
+                            </c:when>
+                            <c:otherwise>
 
-		                        <stripes:submit name="save" value="Save"/>
-		                        <stripes:submit name="save" value="Save & close"/>
-		                        <stripes:submit name="test" value="Test"/>
-	                        </c:otherwise>
+                                <stripes:submit name="save" value="Save"/>
+                                <stripes:submit name="save" value="Save & close"/>
+                                <stripes:submit name="test" value="Test"/>
+                            </c:otherwise>
                         </c:choose>
                         <stripes:submit name="cancel" value="Cancel"/>
                     </td>
                 </tr>
+
+
+
+                <c:if test="${not empty actionBean.targetType && not empty actionBean.targetUrl}">
+                    <tr>
+                        <th colspan="2">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="vertical-align:top;padding-left:0; padding-bottom: 0.5em;text-align:left">Use script template:</th>
+                    </tr>
+
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="scriptTemplateId" title="Linking script." class="question">Linking script</label></td>
+                        <td>
+                            <stripes:select name="scriptTemplateId" id="scriptTemplateId" value="${actionBean.scriptTemplateId}" style="max-width:100%;">
+                                <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
+                            </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="scriptPredicate" title="Predicate" class="question">Predicate</label>
+                        </td>
+                        <td>
+                            <c:set var="targetPredicates" value="${actionBean.targetType eq 'SOURCE' ? actionBean.sourceAllDistinctPredicates : actionBean.typeAllDistinctPredicates}"/>
+                            <stripes:select name="scriptPredicate" id="scriptPredicate">
+                                 <c:if test="${empty targetPredicates}">
+                                    <stripes:option value="" label="-- Found no predicates for this target ${fn:toLowerCase(actionBean.targetType)} --"/>
+                                 </c:if>
+                                 <c:forEach items="${targetPredicates}" var="scriptPredicate">
+                                     <stripes:option value="${scriptPredicate}" label="${scriptPredicate}"/>
+                                 </c:forEach>
+                             </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                            <stripes:submit name="useTemplate" value="Update script using template"/>
+                        </td>
+                    </tr>
+
+                </c:if>
+
+                <c:if test="${not empty actionBean.targetType && empty actionBean.targetUrl}">
+                    <tr>
+                        <td colspan="2" style="vertical-align:middle;padding-left:0; padding-bottom: 0.5em;padding-top: 1.5em;text-align:left">To use script templates, insert a valid target URL and load predicates: <stripes:submit name="loadTemplatePredicates" value="Load predicates"/></td>
+                    </tr>
+                </c:if>
+
             </table>
         <div>
             <stripes:hidden name="id"/>

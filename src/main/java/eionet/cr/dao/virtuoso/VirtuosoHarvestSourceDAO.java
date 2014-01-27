@@ -548,9 +548,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /**
      * Removes HARVEST_SOURCE records matching the given URLs + all related records in other tables.
      *
-     * @param conn The SQL connection to use.
-     * @param sourceUrls The URLs in question.
-     * @throws SQLException Any sort of SQL exception.
+     * @param conn
+     *            The SQL connection to use.
+     * @param sourceUrls
+     *            The URLs in question.
+     * @throws SQLException
+     *             Any sort of SQL exception.
      */
     private void removeHarvestSources(Connection conn, Collection<String> sourceUrls) throws SQLException {
 
@@ -612,15 +615,19 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * Clear graphs denoted by the given URLs and also deletes triples where the given URLs are in subject position. If the flag
-     * is true then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}.
-     * Otherwise they will be deleted regardless of graph.
+     * Clear graphs denoted by the given URLs and also deletes triples where the given URLs are in subject position. If the flag is
+     * true then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}. Otherwise
+     * they will be deleted regardless of graph.
      *
-     * @param conn The repository connection to use.
-     * @param sourceUrls The URLs in question.
-     * @param harvesterContextOnly Indicates if the triples where the given URLs are in subject position, will be deleted from
-     *            harvester context only.
-     * @throws RepositoryException Any sort of repository exception.
+     * @param conn
+     *            The repository connection to use.
+     * @param sourceUrls
+     *            The URLs in question.
+     * @param harvesterContextOnly
+     *            Indicates if the triples where the given URLs are in subject position, will be deleted from harvester context
+     *            only.
+     * @throws RepositoryException
+     *             Any sort of repository exception.
      */
     private void removeGraphsAndResources(RepositoryConnection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
             throws RepositoryException, DAOException {
@@ -2170,7 +2177,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @see eionet.cr.dao.HarvestSourceDAO#getDistinctPredicates(java.lang.String, java.lang.String)
      */
     @Override
-    public List<String> getDistinctPredicates(String grpahUri, String typeUri) throws DAOException {
+    public List<String> getDistinctPredicates(String graphUri, String typeUri) throws DAOException {
 
         String sparqlTemplate =
                 "select distinct ?p from <@GRAPH_URI@> where {?s ?p ?o. ?s a <@TYPE_URI@>"
@@ -2181,7 +2188,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             repoConn = SesameUtil.getRepositoryConnection();
 
             ValueFactory vf = repoConn.getValueFactory();
-            String sparql = StringUtils.replaceOnce(sparqlTemplate, "@GRAPH_URI@", vf.createURI(grpahUri).stringValue());
+            String sparql = StringUtils.replaceOnce(sparqlTemplate, "@GRAPH_URI@", vf.createURI(graphUri).stringValue());
             sparql = StringUtils.replaceOnce(sparql, "@TYPE_URI@", vf.createURI(typeUri).stringValue());
 
             List<String> list = executeSPARQL(sparql, new SingleObjectReader<String>());
@@ -2192,4 +2199,55 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             SesameUtil.close(repoConn);
         }
     }
+
+    /**
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#getSourceAllDistinctPredicates(java.lang.String)
+     */
+    @Override
+    public List<String> getSourceAllDistinctPredicates(String sourceUri) throws DAOException {
+        String sparqlTemplate = "SELECT distinct ?p from <@SOURCE_URI@> where {?s ?p ?o} order by ?p";
+
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            ValueFactory vf = repoConn.getValueFactory();
+            String sparql = StringUtils.replaceOnce(sparqlTemplate, "@SOURCE_URI@", vf.createURI(sourceUri).stringValue());
+
+            List<String> list = executeSPARQL(sparql, new SingleObjectReader<String>());
+            return list;
+        } catch (RepositoryException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
+    }
+
+    /**
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#getTypeAllDistinctPredicates(java.lang.String)
+     */
+    @Override
+    public List<String> getTypeAllDistinctPredicates(String typeUri) throws DAOException {
+        String sparqlTemplate = "SELECT distinct ?p where {?s a <@TYPE_URI@> . ?s ?p ?o } order by ?p";
+
+        RepositoryConnection repoConn = null;
+        try {
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            ValueFactory vf = repoConn.getValueFactory();
+            String sparql = StringUtils.replaceOnce(sparqlTemplate, "@TYPE_URI@", vf.createURI(typeUri).stringValue());
+
+            List<String> list = executeSPARQL(sparql, new SingleObjectReader<String>());
+            return list;
+        } catch (RepositoryException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SesameUtil.close(repoConn);
+        }
+    }
+
 }
