@@ -24,11 +24,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.mortbay.jetty.Server;
 
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.JettyUtil;
 
 /**
  *
@@ -48,13 +51,17 @@ public class PullHarvestTest extends CRDatabaseTestCase {
     }
 
     /**
+     * @throws Exception
      *
      */
     @Test
-    public void testSimpleRdf() {
+    public void testSimpleRdf() throws Exception {
 
+        Server server = null;
         try {
-            String url = "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/simple-rdf.xml";
+            server = JettyUtil.startResourceServerMock(8999, "/testResources", "simple-rdf.xml");
+            String url = "http://localhost:8999/testResources/simple-rdf.xml";
+
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
@@ -64,37 +71,42 @@ public class PullHarvestTest extends CRDatabaseTestCase {
             harvest.execute();
             assertTrue(harvest.isSourceAvailable());
             assertEquals(12, harvest.getStoredTriplesCount());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Was not expecting this exception: " + e.toString());
+        } finally {
+            JettyUtil.close(server);
         }
     }
 
+    /**
+     * @throws DAOException
+     * @throws HarvestException
+     *
+     */
     @Test
-    public void testHarvestNonExistingURL() {
+    public void testHarvestNonExistingURL() throws DAOException, HarvestException {
 
-        try {
-            String url = "http://www.jaanusheinlaid.tw";
-            HarvestSourceDTO source = new HarvestSourceDTO();
-            source.setUrl(url);
-            source.setIntervalMinutes(5);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+        String url = "http://www.jaanusheinlaid.tw";
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(url);
+        source.setIntervalMinutes(5);
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
 
-            PullHarvest harvest = new PullHarvest(url);
-            harvest.execute();
-            assertFalse(harvest.isSourceAvailable());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Was not expecting this exception: " + e.toString());
-        }
+        PullHarvest harvest = new PullHarvest(url);
+        harvest.execute();
+        assertFalse(harvest.isSourceAvailable());
     }
 
+    /**
+     * @throws Exception
+     *
+     */
     @Test
-    public void testEncodingRdf() {
+    public void testEncodingRdf() throws Exception {
 
+        Server server = null;
         try {
-            String url =
-                    "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/encoding-scheme-rdf.xml";
+            server = JettyUtil.startResourceServerMock(8999, "/testResources", "encoding-scheme-rdf.xml");
+            String url = "http://localhost:8999/testResources/encoding-scheme-rdf.xml";
+
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
@@ -104,18 +116,24 @@ public class PullHarvestTest extends CRDatabaseTestCase {
             harvest.execute();
 
             assertEquals(3, harvest.getStoredTriplesCount());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail("Was not expecting this exception: " + e.toString());
+        } finally {
+            JettyUtil.close(server);
         }
 
     }
 
+    /**
+     * @throws Exception
+     *
+     */
     @Test
-    public void testInlineRdf() {
+    public void testInlineRdf() throws Exception {
 
+        Server server = null;
         try {
-            String url = "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/inline-rdf.xml";
+            server = JettyUtil.startResourceServerMock(8999, "/testResources", "inline-rdf.xml");
+            String url = "http://localhost:8999/testResources/inline-rdf.xml";
+
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
@@ -125,9 +143,8 @@ public class PullHarvestTest extends CRDatabaseTestCase {
             harvest.execute();
 
             assertEquals(6, harvest.getStoredTriplesCount());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail("Was not expecting this exception: " + e.toString());
+        } finally {
+            JettyUtil.close(server);
         }
     }
 }

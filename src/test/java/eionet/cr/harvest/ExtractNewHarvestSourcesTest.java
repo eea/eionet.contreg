@@ -24,11 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
+import org.mortbay.jetty.Server;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 
@@ -38,6 +40,9 @@ import eionet.cr.util.Pair;
  *
  */
 public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
+
+    /** Jetty mock server for serving test resources via HTTP. */
+    private static Server resourcesMockServer;
 
     /*
      * (non-Javadoc)
@@ -49,12 +54,17 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
         return Arrays.asList("emptydb.xml");
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
-    public void test() {
+    public void test() throws Exception {
 
+        Server server = null;
         try {
-            String url =
-                    "https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk/src/test/resources/extract-new-sources.xml";
+            server = JettyUtil.startResourceServerMock(8999, "/testResources", "extract-new-sources.xml");
+            String url = "http://localhost:8999/testResources/extract-new-sources.xml";
 
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
@@ -79,9 +89,8 @@ public class ExtractNewHarvestSourcesTest extends CRDatabaseTestCase {
             assertNotNull(harvestSource);
             assertEquals("http://test.com/datasets#dataset2", harvestSource.getUrl());
             assertEquals(Hashes.spoHash("http://test.com/datasets#dataset2"), harvestSource.getUrlHash().longValue());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail("Was not expecting this exception: " + e.toString());
+        } finally {
+            JettyUtil.close(server);
         }
     }
 }

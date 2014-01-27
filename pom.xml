@@ -657,6 +657,21 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Jetty -->
+
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.25</version>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>6.1.25</version>
+            <scope>test</scope>
+		</dependency>
+
     </dependencies>
     <reporting>
         <plugins>
