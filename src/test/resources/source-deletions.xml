@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <harvest_source harvest_source_id="1" url_hash="2951453010645159546" url="http://rod.eionet.europa.eu/obligations" emails="jaanus.heinlaid@tietoenator.com" time_created="2008-02-28 10:34:22.0"/>
+    <harvest_source harvest_source_id="2" url_hash="-4591620959060771807" url="http://rod.eionet.europa.eu/countries" emails="jaanus.heinlaid@tietoenator.com" time_created="2008-02-28 10:33:48.0"  last_harvest_id="30"/>
+    <harvest_source harvest_source_id="3" url_hash="403633679657319373" url="http://rod.eionet.europa.eu/instruments" emails="jaanus.heinlaid@tietoenator.com" time_created="2008-02-28 10:34:10.0"/>
+    <harvest_source harvest_source_id="4" url_hash="-2760457918174006820" url="http://www.eionet.europa.eu/seris/rdf" emails="jaanus.heinlaid@tietoenator.com" time_created="2008-02-28 10:39:40.0" last_harvest_id="29"/>
+    <harvest_source harvest_source_id="5" url_hash="-6409923175068484775" url="http://localhost:8080/cr/pages/test.xml" emails="bob@europe.eu" time_created="2008-02-28 16:59:19.0"/>
+</dataset>

@@ -18,6 +18,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.ReviewsDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dao.TagsDAO;
@@ -66,6 +67,7 @@ public final class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(BrowseVoidDatasetsDAO.class, VirtuosoBrowseVoidDatasetsDAO.class);
         registeredDaos.put(StagingDatabaseDAO.class, VirtuosoStagingDatabaseDAO.class);
         registeredDaos.put(EndpointHarvestQueryDAO.class, VirtuosoEndpointHarvestQueryDAO.class);
+        registeredDaos.put(SourceDeletionsDAO.class, VirtuosoSourceDeletionsDAO.class);
     }
 
     /**
