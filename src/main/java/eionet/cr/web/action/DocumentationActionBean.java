@@ -32,17 +32,20 @@ import eionet.doc.DocumentationService;
 import eionet.doc.dto.DocPageDTO;
 
 /**
+ * Action bean for handling events related to the online editing of CR documentation.
  *
  * @author Risto Alt
- *
  */
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
 
-    /** */
+    /** The page id. */
     private String pageId;
+
+    /** The event. */
     private String event;
 
+    /** The page object. */
     private DocPageDTO pageObject;
 
     /**
@@ -98,6 +101,12 @@ public class DocumentationActionBean extends AbstractActionBean {
         return new RedirectResolution("/documentation/" + pageObject.getPid() + "/edit");
     }
 
+    /**
+     * Validate page id.
+     *
+     * @param errors the errors
+     * @throws Exception the exception
+     */
     @ValidationMethod(on = {"addContent"})
     public void validatePageId(ValidationErrors errors) throws Exception {
         // Expects that first parameter is named "pageObject" in this actionBean class
@@ -133,26 +142,56 @@ public class DocumentationActionBean extends AbstractActionBean {
         return new RedirectResolution("/documentation/contents");
     }
 
+    /**
+     * Gets the page id.
+     *
+     * @return the page id
+     */
     public String getPageId() {
         return pageId;
     }
 
+    /**
+     * Sets the page id.
+     *
+     * @param pageId the new page id
+     */
     public void setPageId(String pageId) {
         this.pageId = pageId;
     }
 
+    /**
+     * Gets the event.
+     *
+     * @return the event
+     */
     public String getEvent() {
         return event;
     }
 
+    /**
+     * Sets the event.
+     *
+     * @param event the new event
+     */
     public void setEvent(String event) {
         this.event = event;
     }
 
+    /**
+     * Gets the page object.
+     *
+     * @return the page object
+     */
     public DocPageDTO getPageObject() {
         return pageObject;
     }
 
+    /**
+     * Sets the page object.
+     *
+     * @param pageObject the new page object
+     */
     public void setPageObject(DocPageDTO pageObject) {
         this.pageObject = pageObject;
     }

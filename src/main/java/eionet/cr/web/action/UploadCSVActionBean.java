@@ -71,26 +71,32 @@ import eionet.cr.web.util.FileUploadEncoding;
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
-
-    /** */
-    private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
-
-    /** */
-    private static final String UPLOAD_EVENT = "upload";
-    private static final String SAVE_EVENT = "save";
-
-    /** */
-    private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
-
-    /** */
-    private static final String PARAM_FINAL_ENCODING = "finalEncoding";
-
     /** Enum for uploaded files' types. */
     public enum FileType {
-        CSV, TSV;
+
+        /** The CSV file type. */
+        CSV,
+        /** The TSV file type. */
+        TSV;
     }
+
+    /** Static logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
+
+    /** Default JSP to forward to. */
+    private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
+
+    /** The Constant UPLOAD_EVENT. */
+    private static final String UPLOAD_EVENT = "upload";
+
+    /** The Constant SAVE_EVENT. */
+    private static final String SAVE_EVENT = "save";
+
+    /** The Constant PARAM_DISPLAY_WIZARD. */
+    private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
+
+    /** The Constant PARAM_FINAL_ENCODING. */
+    private static final String PARAM_FINAL_ENCODING = "finalEncoding";
 
     /** URI of the folder where the file will be uploaded. */
     private String folderUri;
@@ -152,25 +158,27 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** Encoding of the uploadable file */
     private String fileEncoding;
 
-    /** Encoding used to parse the file*/
+    /** Encoding used to parse the file */
     private String finalEncoding;
-
 
     private static final String ENCODING_AUTODETECT_ID = "AUTODETECT";
 
     /** Upload file encoding values */
     private static Map<String, String> fileEncodings;
 
+    /**
+     * Static initialization block.
+     */
     static {
         fileEncodings = new LinkedHashMap<String, String>();
         fileEncodings.put(ENCODING_AUTODETECT_ID, "Auto detect");
         fileEncodings.putAll(FileUploadEncoding.getInstance());
     }
 
-
-
     /**
-     * @return
+     * Default event.
+     *
+     * @return Resolution to got to.
      */
     @DefaultHandler
     public Resolution init() {
@@ -217,7 +225,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
         } else {
             if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
                 addCautionMessage("File or folder with the same name already exists.");
-                return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
+                return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter(
+                        "fileEncoding", fileEncoding);
             }
         }
 
@@ -235,18 +244,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // Detect charset and convert the file to UTF-8
             if (StringUtils.isNotBlank(fileEncoding)) {
-                if (fileEncoding.equals(ENCODING_AUTODETECT_ID)){
+                if (fileEncoding.equals(ENCODING_AUTODETECT_ID)) {
                     Charset detectedCharset = helper.detectCSVencoding(folderUri, relativeFilePath, getUserName());
-                    if (detectedCharset == null){
+                    if (detectedCharset == null) {
                         addCautionMessage("The charset of the uploaded file could not be detected automatically. Please select the files charset from the list.");
                         fileStore.delete(relativeFilePath);
-                        return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
-                    } else if (!detectedCharset.toString().startsWith("UTF")){
-                        fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
+                        return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri)
+                                .addParameter("fileEncoding", fileEncoding);
+                    } else if (!detectedCharset.toString().startsWith("UTF")) {
+                        fileStore.changeFileEncoding(relativeFilePath, detectedCharset, Charset.forName("UTF-8"));
                     }
                     resolution.addParameter(PARAM_FINAL_ENCODING, detectedCharset.name());
                 } else {
-                    fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
+                    fileStore.changeFileEncoding(relativeFilePath, Charset.forName(fileEncoding), Charset.forName("UTF-8"));
                     resolution.addParameter(PARAM_FINAL_ENCODING, "UTF-8");
                 }
             }
@@ -765,6 +775,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /**
      * True if user can upload the file.
+     *
      * @return boolean
      */
     protected boolean uploadAllowed() {

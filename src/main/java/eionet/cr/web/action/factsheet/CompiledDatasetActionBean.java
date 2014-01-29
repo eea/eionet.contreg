@@ -72,10 +72,10 @@ import eionet.cr.web.util.tabs.TabElement;
 @UrlBinding("/compiledDataset.action")
 public class CompiledDatasetActionBean extends AbstractActionBean {
 
-    /** */
+    /** Static logger fot this class. */
     private static final Logger LOGGER = Logger.getLogger(CompiledDatasetActionBean.class);
 
-    /**  */
+    /** Default JSP to return to. */
     private static final String COMPILED_DATASET_JSP = "/pages/factsheet/compiledDataset.jsp";
 
     /** URI by which the factsheet has been requested. */

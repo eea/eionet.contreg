@@ -42,7 +42,6 @@ import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 
 import eionet.cr.staging.AvailableFile;
 import eionet.cr.staging.FileDownloader;
@@ -59,28 +58,25 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 @UrlBinding("/admin/availFiles.action")
 public class AvailableFilesActionBean extends AbstractActionBean {
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(AvailableFilesActionBean.class);
-
-    /** */
+    /** Default JSP to forward to. */
     private static final String LIST_JSP = "/pages/admin/staging/availableFiles.jsp";
 
-    /** */
+    /** Available files to list. */
     private ArrayList<AvailableFile> availableFiles = new ArrayList<AvailableFile>();
 
-    /** */
+    /** User-uploaded file. */
     private FileBean uploadFile;
 
-    /** */
+    /** URL from which to download a file. */
     private String downloadUrl;
 
-    /** */
+    /** New file name when renaming. */
     private String newFileName;
 
-    /** */
+    /** Maximum file posting size. */
     private int maxFilePostSize;
 
-    /** */
+    /** Names of selected files. */
     private List<String> fileNames;
 
     /**

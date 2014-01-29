@@ -45,9 +45,9 @@ import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.WebConstants;
 
 /**
+ * A servlet for handling HTTP 1.1 complaint downloads of CR content.
  *
  * @author jaanus
- *
  */
 public class DownloadServlet extends HttpServlet {
 
@@ -98,7 +98,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content) throws IOException,
-    ServletException {
+            ServletException {
 
         // Get requested file URI from request parameters, send 404 if its missing
         String requestedUri = request.getParameter("uri");
@@ -107,8 +107,8 @@ public class DownloadServlet extends HttpServlet {
             return;
         }
 
-        //check ACL
-        CRUser crUser =(CRUser) request.getSession().getAttribute(WebConstants.USER_SESSION_ATTR);
+        // check ACL
+        CRUser crUser = (CRUser) request.getSession().getAttribute(WebConstants.USER_SESSION_ATTR);
         String aclPath = FolderUtil.extractAclPath(requestedUri);
         // perform ACL check, if no ACL - proceed with showing:
         if (!CRUser.hasPermission(aclPath, crUser, CRUser.VIEW_PERMISSION, true)) {
@@ -356,7 +356,7 @@ public class DownloadServlet extends HttpServlet {
      * @throws ServletException
      */
     private void handleHttpError(String message, HttpServletRequest request, HttpServletResponse response, int httpErrorCode)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
 
         LOGGER.info(message);
         boolean isWebBrowser = false;
@@ -398,8 +398,8 @@ public class DownloadServlet extends HttpServlet {
         String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
         Arrays.sort(acceptValues);
         return Arrays.binarySearch(acceptValues, toAccept) > -1
-        || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
-        || Arrays.binarySearch(acceptValues, "*/*") > -1;
+                || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
+                || Arrays.binarySearch(acceptValues, "*/*") > -1;
     }
 
     /**

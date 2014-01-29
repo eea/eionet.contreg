@@ -72,49 +72,77 @@ import eionet.cr.web.util.RDFGenerator;
 @UrlBinding("/source.action")
 public class HarvestSourceActionBean extends AbstractActionBean {
 
-    /** */
+    /**
+     * Export types enumeration.
+     */
+    private enum ExportType {
+
+        /** File. */
+        FILE,
+        /** Homespace. */
+        HOMESPACE
+    }
+
+    /** List of specifically known media types of harvest sources (e.g. text/html, etc). */
     public static final List<String> MEDIA_TYPES;
 
-    /** */
+    /** The harvest source. */
     private HarvestSourceDTO harvestSource;
+
+    /** The harvests. */
     private List<HarvestDTO> harvests;
 
-    /** */
+    /** The sample triples. */
     private List<TripleDTO> sampleTriples;
 
-    /** */
+    /** The interval multiplier. */
     private int intervalMultiplier;
+
+    /** The interval multipliers. */
     private static LinkedHashMap<Integer, String> intervalMultipliers;
 
-    /** */
+    /** The Constant tabs. */
     private static final List<Pair<String, String>> tabs;
+
+    /** The selected tab. */
     private String selectedTab = "view";
 
-    /** */
+    /** The URL before saving. */
     private String urlBefore;
 
-    /** */
-    private enum ExportType {
-        FILE, HOMESPACE
-    };
-
-    /** */
+    /** User-accessible folders. */
     private List<String> folders;
+
+    /** The export type when exporting source contents. */
     private String exportType;
+
+    /** The dataset name when exporting source contents into a dataset. */
     private String datasetName;
+
+    /** The target folder when exporting source contents into a dataset. */
     private String folder;
+
+    /** Should we overwrite the dataset when exporting source contents into a dataset. */
     private boolean overwriteDataset;
 
+    /** Is it a schema source or not? */
     private boolean schemaSource;
+
+    /** The URL authentication id. */
     private int urlAuthenticationId = 0;
 
+    /** The URL authentication DTO. */
     private UrlAuthenticationDTO urlAuthentication = null;
+
+    /** The URL authentications. */
     private List<UrlAuthenticationDTO> urlAuthentications = null;
 
-    /** Used to perform bulk operations with several url authentications at a time*/
+    /** Used to perform bulk operations with several url authentications at a time */
     private List<String> selectedUrlAuthenticationIds;
 
-    /** */
+    /**
+     * Static initialization block.
+     */
     static {
         tabs = new LinkedList<Pair<String, String>>();
         tabs.add(new Pair<String, String>("view", "View"));
@@ -168,7 +196,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     @DefaultHandler
     @HandlesEvent("view")
     public Resolution view() throws DAOException {
-        if (harvestSource != null){
+        if (harvestSource != null) {
             return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
         } else {
             return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", null);
@@ -213,7 +241,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     }
                     factory.getDao(HarvestSourceDAO.class).addSource(hSourceDTO);
 
-                    if (hSourceDTO.isAuthenticated()){
+                    if (hSourceDTO.isAuthenticated()) {
                         UrlAuthenticationDTO urlAuth = new UrlAuthenticationDTO();
                         urlAuth.setUrlBeginning(hSourceDTO.getUrl());
                         urlAuth.setUsername(hSourceDTO.getUsername());
@@ -252,7 +280,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution authentications() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
 
             urlAuthentications = factory.getDao(HarvestSourceDAO.class).getUrlAuthentications();
 
@@ -276,9 +304,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution viewauthenticationdata() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
 
-            if (urlAuthenticationId > 0){
+            if (urlAuthenticationId > 0) {
                 urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlAuthenticationId);
             } else {
                 urlAuthentication = new UrlAuthenticationDTO();
@@ -292,7 +320,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         }
     }
 
-
     /**
      * Prepares url authentication data form
      *
@@ -304,9 +331,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution editauthenticationdata() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
 
-            if (urlAuthenticationId > 0){
+            if (urlAuthenticationId > 0) {
                 urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlAuthenticationId);
             } else {
                 urlAuthentication = new UrlAuthenticationDTO();
@@ -331,9 +358,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution deleteauthentedurl() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
 
-            if (urlAuthenticationId > 0){
+            if (urlAuthenticationId > 0) {
                 factory.getDao(HarvestSourceDAO.class).deleteUrlAuthentication(urlAuthenticationId);
             }
 
@@ -344,7 +371,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
             return view();
         }
     }
-
 
     /**
      * Saves url authentication data.
@@ -357,9 +383,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public Resolution saveauthentedurl() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
             int id = factory.getDao(HarvestSourceDAO.class).saveUrlAuthentication(urlAuthentication);
-            if (urlAuthenticationId > 0){
+            if (urlAuthenticationId > 0) {
                 addSystemMessage("Url authentication data successfully saved.");
                 return viewauthenticationdata();
             } else {
@@ -368,15 +394,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                 return viewauthenticationdata();
             }
 
-
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
             return view();
         }
     }
-
-
-
 
     /**
      * Deletes a list of url authentication data
@@ -387,13 +409,14 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @throws HarvestException
      * @throws MalformedURLException
      */
-    public Resolution deleteSelectedUrlAuthentications() throws DAOException, SchedulerException, HarvestException, MalformedURLException {
+    public Resolution deleteSelectedUrlAuthentications() throws DAOException, SchedulerException, HarvestException,
+            MalformedURLException {
 
         boolean isUserLoggedIn = isUserLoggedIn();
-        if (isUserLoggedIn){
+        if (isUserLoggedIn) {
 
-            if (selectedUrlAuthenticationIds != null && selectedUrlAuthenticationIds.size() > 0){
-                for (String id : selectedUrlAuthenticationIds){
+            if (selectedUrlAuthenticationIds != null && selectedUrlAuthenticationIds.size() > 0) {
+                for (String id : selectedUrlAuthenticationIds) {
                     factory.getDao(HarvestSourceDAO.class).deleteUrlAuthentication(Integer.parseInt(id));
                 }
             }
@@ -549,21 +572,27 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
                     if (!StringUtils.equals(urlBefore, urlString)
                             && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
-                        if (URLUtil.isUnauthorized(urlString)){
+                        if (URLUtil.isUnauthorized(urlString)) {
 
-                            UrlAuthenticationDTO urlAuthentication = factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlString);
-                            if (urlAuthentication == null){
-                                if (!harvestSource.isAuthenticated()){
-                                    addGlobalValidationError(new SimpleError("There is no valid authentication information stored for this url before."));
+                            UrlAuthenticationDTO urlAuthentication =
+                                    factory.getDao(HarvestSourceDAO.class).getUrlAuthentication(urlString);
+                            if (urlAuthentication == null) {
+                                if (!harvestSource.isAuthenticated()) {
+                                    addGlobalValidationError(new SimpleError(
+                                            "There is no valid authentication information stored for this url before."));
                                 } else {
-                                    if (!URLUtil.isValidAuthentication(urlString, harvestSource.getUsername(), harvestSource.getPassword())){
-                                        addGlobalValidationError(new SimpleError("The provided username and password are not valid for this source."));
+                                    if (!URLUtil.isValidAuthentication(urlString, harvestSource.getUsername(),
+                                            harvestSource.getPassword())) {
+                                        addGlobalValidationError(new SimpleError(
+                                                "The provided username and password are not valid for this source."));
                                     }
                                 }
                             } else {
-                                if (!harvestSource.isAuthenticated()){
-                                    if (!URLUtil.isValidAuthentication(urlString, urlAuthentication.getUsername(), urlAuthentication.getPassword())){
-                                        addGlobalValidationError(new SimpleError("An existing username and password is stored for this url pattern, but are not valid this exact source."));
+                                if (!harvestSource.isAuthenticated()) {
+                                    if (!URLUtil.isValidAuthentication(urlString, urlAuthentication.getUsername(),
+                                            urlAuthentication.getPassword())) {
+                                        addGlobalValidationError(new SimpleError(
+                                                "An existing username and password is stored for this url pattern, but are not valid this exact source."));
                                     }
                                 }
                             }
@@ -727,49 +756,100 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param urlBefore
-     *            the urlBefore to set
+     * Sets the url before.
+     *
+     * @param urlBefore the urlBefore to set
      */
     public void setUrlBefore(String urlBefore) {
         this.urlBefore = urlBefore;
     }
 
+    /**
+     * Gets the dataset name.
+     *
+     * @return the dataset name
+     */
     public String getDatasetName() {
         return datasetName;
     }
 
+    /**
+     * Sets the dataset name.
+     *
+     * @param datasetName the new dataset name
+     */
     public void setDatasetName(String datasetName) {
         this.datasetName = datasetName;
     }
 
+    /**
+     * Gets the overwrite dataset.
+     *
+     * @return the overwrite dataset
+     */
     public boolean getOverwriteDataset() {
         return overwriteDataset;
     }
 
+    /**
+     * Sets the overwrite dataset.
+     *
+     * @param overwriteDataset the new overwrite dataset
+     */
     public void setOverwriteDataset(boolean overwriteDataset) {
         this.overwriteDataset = overwriteDataset;
     }
 
+    /**
+     * Gets the folders.
+     *
+     * @return the folders
+     */
     public List<String> getFolders() {
         return folders;
     }
 
+    /**
+     * Sets the folders.
+     *
+     * @param folders the new folders
+     */
     public void setFolders(List<String> folders) {
         this.folders = folders;
     }
 
+    /**
+     * Gets the folder.
+     *
+     * @return the folder
+     */
     public String getFolder() {
         return folder;
     }
 
+    /**
+     * Sets the folder.
+     *
+     * @param folder the new folder
+     */
     public void setFolder(String folder) {
         this.folder = folder;
     }
 
+    /**
+     * Gets the url authentications.
+     *
+     * @return the url authentications
+     */
     public List<UrlAuthenticationDTO> getUrlAuthentications() {
         return urlAuthentications;
     }
 
+    /**
+     * Sets the url authentications.
+     *
+     * @param urlAuthentications the new url authentications
+     */
     public void setUrlAuthentications(List<UrlAuthenticationDTO> urlAuthentications) {
         this.urlAuthentications = urlAuthentications;
     }
@@ -778,18 +858,38 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         this.urlAuthenticationId = urlAuthenticationId;
     }
 
+    /**
+     * Gets the url authentication.
+     *
+     * @return the url authentication
+     */
     public UrlAuthenticationDTO getUrlAuthentication() {
         return urlAuthentication;
     }
 
+    /**
+     * Sets the url authentication.
+     *
+     * @param urlAuthentication the new url authentication
+     */
     public void setUrlAuthentication(UrlAuthenticationDTO urlAuthentication) {
         this.urlAuthentication = urlAuthentication;
     }
 
+    /**
+     * Gets the selected url authentication ids.
+     *
+     * @return the selected url authentication ids
+     */
     public List<String> getSelectedUrlAuthenticationIds() {
         return selectedUrlAuthenticationIds;
     }
 
+    /**
+     * Sets the selected url authentication ids.
+     *
+     * @param selectedUrlAuthenticationIds the new selected url authentication ids
+     */
     public void setSelectedUrlAuthenticationIds(List<String> selectedUrlAuthenticationIds) {
         this.selectedUrlAuthenticationIds = selectedUrlAuthenticationIds;
     }

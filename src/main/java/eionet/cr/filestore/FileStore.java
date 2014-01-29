@@ -2,7 +2,6 @@ package eionet.cr.filestore;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,26 +28,26 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * A utility class representing CR local file store.
  *
  * @author jaanus
  *
  */
 public final class FileStore {
 
-    /** */
+    /** Static logger for this class */
     private static final Logger LOGGER = Logger.getLogger(FileStore.class);
 
-    /** */
+    /** File store path in file-system. */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
-    /**
-     * current user home folder.
-     */
+    /** Current user home folder. */
     private final File userDir;
 
     /**
+     * Instantiates a new file store.
      *
-     * @param userName
+     * @param userName the user name
      */
     private FileStore(String userName) {
 
@@ -249,7 +248,7 @@ public final class FileStore {
      * @param oldName
      * @param newName
      */
-    public void rename(String oldName, String newName){
+    public void rename(String oldName, String newName) {
 
         File file = new File(userDir, oldName);
         if (file.exists() && file.isFile()) {
@@ -282,8 +281,9 @@ public final class FileStore {
     }
 
     /**
+     * Gets file by its URI.
      *
-     * @param uriString
+     * @param uriString the uri string
      * @return File
      */
     public static File getByUri(String uriString) {
@@ -368,7 +368,7 @@ public final class FileStore {
         if (!StringUtils.isBlank(relativePath)) {
             File file = new File(userDir, relativePath);
 
-            String tempFileName = relativePath+".encoding.temp";
+            String tempFileName = relativePath + ".encoding.temp";
             File tempFile = new File(userDir, tempFileName);
 
             if (tempFile.exists() && tempFile.isFile()) {
@@ -401,15 +401,12 @@ public final class FileStore {
                     encodingSuccessful = true;
                 }
 
-                if (encodingSuccessful){
+                if (encodingSuccessful) {
                     delete(relativePath);
                     rename(tempFileName, relativePath);
                 }
 
             }
         }
-
-
     }
-
 }

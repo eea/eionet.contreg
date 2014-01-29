@@ -31,14 +31,19 @@ import java.net.URLDecoder;
  */
 public class RenameFolderItemDTO {
 
+    /** The folder URI. */
     private String uri;
 
+    /** The folder name. */
     private String name;
 
+    /** The new name. */
     private String newName;
 
+    /** The folder type. */
     private FolderItemDTO.Type type;
 
+    /** Is it selected? */
     private boolean selected;
 
     /**
@@ -113,9 +118,10 @@ public class RenameFolderItemDTO {
 
     /**
      * Returns name that is urlDecoded.
+     *
      * @return
      */
-    public String getUrlDecodedName(){
+    public String getUrlDecodedName() {
 
         try {
             return URLDecoder.decode(name, "UTF-8");

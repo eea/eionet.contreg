@@ -42,41 +42,54 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * Action bean for dealing with a displayed list of post-harvest scripts.
  *
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScripts")
 public class PostHarvestScriptsActionBean extends AbstractActionBean {
 
-    /** action type, indicating if scripts are Cut or copied. */
+    /** Action type, indicating if scripts are cut or copied. */
     public enum ActionType {
-        COPY, CUT
+
+        /** The copy action. */
+        COPY,
+        /** The cut action. */
+        CUT
     };
 
-    /** */
+    /** JSP for scripts searching form. */
     private static final String SEARCH_JSP = "/pages/admin/postHarvestScripts/searchScripts.jsp";
+
+    /** JSP for displaying scripts of particular target type. Is contained by {@link #SCRIPTS_CONTAINER_JSP}. */
     private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
+
+    /** The scripts/script container JSP. */
     public static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
 
-    /** */
+    /** The script target type. */
     private TargetType targetType;
+
+    /** The script target source/type URL. */
     private String targetUrl;
 
-    /** shows if scripts selected for copy/cut for this target type */
-    // private boolean scriptsExistInClipBoard = false;
-
-    /** */
+    /** Available script targets. */
     private List<Pair<String, Integer>> targets;
+
+    /** Scripts to be displayed in the list. */
     private List<PostHarvestScriptDTO> scripts;
+
+    /** Tabs in container JSP. */
     private List<Tab> tabs;
 
-    /** */
+    /** IDs of selected scripts */
     private List<Integer> selectedIds;
 
     /**
+     * Default event.
      *
-     * @return
-     * @throws DAOException
+     * @return Resolution to return to.
+     * @throws DAOException If database access error.
      */
     @DefaultHandler
     public Resolution list() throws DAOException {
@@ -210,9 +223,10 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
         // PostHarvestScriptUtil.validateScripts(this, this.getSession(), targetType, targetUrl);
 
         TargetType clipboardTargetType = (TargetType) getSession().getAttribute(SCRIPTS_CLIPBOARD_TYPE);
-        if (targetType != null){
+        if (targetType != null) {
             List<String> validationErros =
-                    PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType, targetUrl);
+                    PostHarvestScriptUtil.getValidateScriptErrors(getClipBoardScripts(), clipboardTargetType, targetType,
+                            targetUrl);
             addGlobalValidationErrors(validationErros);
         }
 
@@ -388,7 +402,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      *
      * @return boolean
      */
-    public boolean isBulkPasteAvailable(){
+    public boolean isBulkPasteAvailable() {
         return isPastePossible();
     }
 
@@ -397,7 +411,7 @@ public class PostHarvestScriptsActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public TargetType getBulkPasteTargetType(){
+    public TargetType getBulkPasteTargetType() {
 
         return targetType == null ? TargetType.SOURCE : targetType;
 

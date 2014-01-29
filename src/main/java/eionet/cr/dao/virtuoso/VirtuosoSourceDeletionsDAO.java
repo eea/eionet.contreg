@@ -30,7 +30,6 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 
-// TODO: Auto-generated Javadoc
 /**
  * Virtuoso-specific implementation of {@link SourceDeletionsDAO}.
  *

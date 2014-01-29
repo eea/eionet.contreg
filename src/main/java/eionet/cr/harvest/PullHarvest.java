@@ -87,44 +87,45 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
+ * Performs a pull-harvest.
  *
  * @author Jaanus Heinlaid
  */
 public class PullHarvest extends BaseHarvest {
 
-    /** */
-    private static final int NO_RESPONSE = -1;
-
-    /** */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(PullHarvest.class);
 
-    /** */
+    /** Code reserved for saying that "no HTTP response was returned. " */
+    private static final int NO_RESPONSE = -1;
+
+    /** Number of redirections to follow before giving up. */
     private static final int MAX_REDIRECTIONS = 4;
 
-    /** */
-    private static final int MAX_CONTENTLENGTH = 5;
-
-    /** */
+    /** Default "Accept" HTTP header when submitting HTTP requests to sources. */
     private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
-    /** */
+    /** Was the source available? */
     private boolean isSourceAvailable;
 
-    /** */
+    /** URL that the source redirected to. */
     private final List<String> redirectedUrls = new ArrayList<String>();
 
     /**
-     * @param contextUrl
-     * @throws HarvestException
+     * Instantiates a new pull harvest.
+     *
+     * @param contextUrl the context url
+     * @throws HarvestException the harvest exception
      */
     public PullHarvest(String contextUrl) throws HarvestException {
         super(contextUrl);
     }
 
     /**
+     * Instantiates a new pull harvest.
      *
-     * @param contextSourceDTO
-     * @throws DAOException
+     * @param contextSourceDTO the context source dto
+     * @throws DAOException the DAO exception
      */
     public PullHarvest(HarvestSourceDTO contextSourceDTO) throws DAOException {
         super(contextSourceDTO);
@@ -751,7 +752,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -934,10 +935,10 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Adds basic authentication information to URL connection
      */
-    private void addBasicAuthentication(HttpURLConnection urlConnection, String username, String password){
+    private void addBasicAuthentication(HttpURLConnection urlConnection, String username, String password) {
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-        urlConnection.setRequestProperty ("Authorization", basicAuth);
+        urlConnection.setRequestProperty("Authorization", basicAuth);
     }
 
     /**
@@ -951,7 +952,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
     private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -962,9 +963,9 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Connection", "close");
 
         UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(connectUrl);
-        if (authentication != null){
+        if (authentication != null) {
             addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
-            LOGGER.info("Source has basic authentication. Using credentials of "+authentication.getUrlBeginning());
+            LOGGER.info("Source has basic authentication. Using credentials of " + authentication.getUrlBeginning());
         }
 
         connection.setInstanceFollowRedirects(false);
@@ -993,7 +994,7 @@ public class PullHarvest extends BaseHarvest {
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
@@ -1032,7 +1033,7 @@ public class PullHarvest extends BaseHarvest {
         connection.setInstanceFollowRedirects(false);
 
         UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(queryString);
-        if (authentication != null){
+        if (authentication != null) {
             addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
             System.out.println("Using basic auth");
         } else {
@@ -1092,7 +1093,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
-    IOException, SAXException, ParserConfigurationException {
+            IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);

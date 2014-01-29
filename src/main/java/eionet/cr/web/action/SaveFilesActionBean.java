@@ -45,25 +45,46 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.action.factsheet.CompiledDatasetActionBean;
 
+// TODO: Auto-generated JavDoc for fields.
 /**
+ * Action bean for saving delivery files when merging them in CR triplestore.
  *
  * @author altnyris
- *
  */
 @UrlBinding("/saveFiles.action")
 public class SaveFilesActionBean extends DisplaytagSearchActionBean {
 
+    /** The selected deliveries. */
     private List<String> selectedDeliveries;
+
+    /** The delivery files. */
     private List<DeliveryFilesDTO> deliveryFiles;
+
+    /** The existing datasets. */
     private List<DatasetDTO> existingDatasets;
+
+    /** The newest existing datasets. */
     private List<DatasetDTO> newestExistingDatasets;
+
+    /** The folders. */
     private List<String> folders;
 
+    /** The selected files. */
     private List<String> selectedFiles;
+
+    /** The dataset id. */
     private String datasetId;
+
+    /** The dataset title. */
     private String datasetTitle;
+
+    /** The folder. */
     private String folder;
+
+    /** The overwrite. */
     private boolean overwrite;
+
+    /** The dataset. */
     private String dataset;
 
     /** Search criteria to be stored for compiled dataset. */
@@ -243,82 +264,182 @@ public class SaveFilesActionBean extends DisplaytagSearchActionBean {
         }
     }
 
+    /**
+     * Gets the selected files.
+     *
+     * @return the selected files
+     */
     public List<String> getSelectedFiles() {
         return selectedFiles;
     }
 
+    /**
+     * Sets the selected files.
+     *
+     * @param selectedFiles the new selected files
+     */
     public void setSelectedFiles(List<String> selectedFiles) {
         this.selectedFiles = selectedFiles;
     }
 
+    /**
+     * Checks if is overwrite.
+     *
+     * @return true, if is overwrite
+     */
     public boolean isOverwrite() {
         return overwrite;
     }
 
+    /**
+     * Sets the overwrite.
+     *
+     * @param overwrite the new overwrite
+     */
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
     }
 
+    /**
+     * Gets the selected deliveries.
+     *
+     * @return the selected deliveries
+     */
     public List<String> getSelectedDeliveries() {
         return selectedDeliveries;
     }
 
+    /**
+     * Sets the selected deliveries.
+     *
+     * @param selectedDeliveries the new selected deliveries
+     */
     public void setSelectedDeliveries(List<String> selectedDeliveries) {
         this.selectedDeliveries = selectedDeliveries;
     }
 
+    /**
+     * Gets the delivery files.
+     *
+     * @return the delivery files
+     */
     public List<DeliveryFilesDTO> getDeliveryFiles() {
         return deliveryFiles;
     }
 
+    /**
+     * Gets the existing datasets.
+     *
+     * @return the existing datasets
+     */
     public List<DatasetDTO> getExistingDatasets() {
         return existingDatasets;
     }
 
+    /**
+     * Sets the existing datasets.
+     *
+     * @param existingDatasets the new existing datasets
+     */
     public void setExistingDatasets(List<DatasetDTO> existingDatasets) {
         this.existingDatasets = existingDatasets;
     }
 
+    /**
+     * Gets the dataset.
+     *
+     * @return the dataset
+     */
     public String getDataset() {
         return dataset;
     }
 
+    /**
+     * Sets the dataset.
+     *
+     * @param dataset the new dataset
+     */
     public void setDataset(String dataset) {
         this.dataset = dataset;
     }
 
+    /**
+     * Gets the folder.
+     *
+     * @return the folder
+     */
     public String getFolder() {
         return folder;
     }
 
+    /**
+     * Sets the folder.
+     *
+     * @param folder the new folder
+     */
     public void setFolder(String folder) {
         this.folder = folder;
     }
 
+    /**
+     * Gets the folders.
+     *
+     * @return the folders
+     */
     public List<String> getFolders() {
         return folders;
     }
 
+    /**
+     * Gets the dataset title.
+     *
+     * @return the dataset title
+     */
     public String getDatasetTitle() {
         return datasetTitle;
     }
 
+    /**
+     * Sets the dataset title.
+     *
+     * @param datasetTitle the new dataset title
+     */
     public void setDatasetTitle(String datasetTitle) {
         this.datasetTitle = datasetTitle;
     }
 
+    /**
+     * Gets the dataset id.
+     *
+     * @return the dataset id
+     */
     public String getDatasetId() {
         return datasetId;
     }
 
+    /**
+     * Sets the dataset id.
+     *
+     * @param datasetId the new dataset id
+     */
     public void setDatasetId(String datasetId) {
         this.datasetId = datasetId;
     }
 
+    /**
+     * Gets the newest existing datasets.
+     *
+     * @return the newest existing datasets
+     */
     public List<DatasetDTO> getNewestExistingDatasets() {
         return newestExistingDatasets;
     }
 
+    /**
+     * Sets the newest existing datasets.
+     *
+     * @param newestExistingDatasets the new newest existing datasets
+     */
     public void setNewestExistingDatasets(List<DatasetDTO> newestExistingDatasets) {
         this.newestExistingDatasets = newestExistingDatasets;
     }

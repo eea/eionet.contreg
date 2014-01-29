@@ -244,7 +244,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                 }
                 newName = StringUtils.replace(newName, "---TEMP_SPACE_REPLACEMENT---", "%20");
 
-                newUri+= newName;
+                newUri += newName;
 
                 if (!uniqueNewNames.add(item.getNewName())) {
                     addSystemMessage("Cannot name multiple items with the same name: " + item.getNewName());
@@ -305,12 +305,12 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         aclPath = FolderUtil.extractAclPath(uri);
 
         // allow to view the folder by default if there is no ACL
-        //        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
+        // boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
         //
-        //        if (!actionAllowed) {
-        //            addSystemMessage("Only authorized users can delete files.");
-        //            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        //        }
+        // if (!actionAllowed) {
+        // addSystemMessage("Only authorized users can delete files.");
+        // return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
+        // }
 
         if (itemsNotSelected()) {
             addSystemMessage("Select files or folders to delete.");
@@ -442,6 +442,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Upload file to CR folder.
+     *
      * @return Stripes resolution
      * @throws DAOException if harvesting or any other DB operation fails
      * @throws IOException if I/O error
@@ -449,7 +450,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public Resolution upload() throws DAOException, IOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), replaceExisting ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION, false);
+        boolean actionAllowed =
+                CRUser.hasPermission(aclPath, getUser(), replaceExisting ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION,
+                        false);
         if (!actionAllowed) {
             addWarningMessage("Not authorized to upload files");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -487,7 +490,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // String urlBinding = getUrlBinding();
         // resolution = new RedirectResolution(StringUtils.replace(urlBinding, "{username}", getUserName()));
 
-        //add file ACL if not existing
+        // add file ACL if not existing
         if (!replaceExisting) {
             AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
         }
@@ -618,10 +621,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory
-            .get()
-            .getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(
-                    HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(
+                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -788,6 +791,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks selected items delete permission.
+     *
      * @return list of declined items
      * @throws SignOnException if acl check fails
      */
@@ -795,7 +799,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         StringBuilder result = new StringBuilder();
         for (RenameFolderItemDTO item : selectedItems) {
             String acl = aclPath + "/" + item.getName();
-            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.DELETE_PERMISSION)) {
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl)
+                    && !CRUser.hasPermission(getUserName(), acl, CRUser.DELETE_PERMISSION)) {
                 result.append(item.getName()).append(" ");
             }
 
@@ -807,6 +812,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks if items selected to be renamed have update permission.
+     *
      * @return list of declined items
      * @throws SignOnException if acl check fails
      */
@@ -814,7 +820,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         StringBuilder result = new StringBuilder();
         for (RenameFolderItemDTO item : renameItems) {
             String acl = aclPath + "/" + item.getName();
-            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.UPDATE_PERMISSION)) {
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl)
+                    && !CRUser.hasPermission(getUserName(), acl, CRUser.UPDATE_PERMISSION)) {
                 result.append(item.getName()).append(" ");
             }
         }
@@ -1076,6 +1083,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks if user has permission for this acl.
+     *
      * @param folderUri folder full URI
      * @param permission permission to check
      * @return tru if user has permission

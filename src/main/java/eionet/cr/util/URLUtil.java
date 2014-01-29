@@ -45,29 +45,32 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 
 /**
+ * Utility methods for dealing with URLs.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
  */
 public class URLUtil {
 
-    /**  */
-    private static final String[] BAD_IRI_CHARS = {" ", "{", "}", "<", ">", "\"", "|", "\\", "^", "`"};
-    private static final String[] BAD_IRI_CHARS_ESCAPES = {"%20", "%7B", "%7D", "%3C", "%3E", "%22", "%7C", "%5C", "%5E", "%60"};
-
-    /** */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
 
-    /** */
+    /** Illegal characters in IRI. */
+    private static final String[] BAD_IRI_CHARS = {" ", "{", "}", "<", ">", "\"", "|", "\\", "^", "`"};
+
+    /** Escape codes for illegal characters in IRI (same order as the above array of illegal characters). */
+    private static final String[] BAD_IRI_CHARS_ESCAPES = {"%20", "%7B", "%7D", "%3C", "%3E", "%22", "%7C", "%5C", "%5E", "%60"};
+
+    /** The default character encoding . */
     private static final String DEFAULT_CHARACTAER_ENCODING = "UTF-8";
 
-    /** */
+    /** Various session identifiers to look for in URLs. */
     private static final List<String> SESSSION_IDENTIFIERS = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
 
     /**
+     * Returns true if the given string is a URL by Java's {@link URL} constructor.
      *
-     * @param s
-     * @return boolean
+     * @param s String to check.
+     * @return boolean True/false.
      */
     public static boolean isURL(String s) {
 
@@ -152,7 +155,7 @@ public class URLUtil {
             URLUtil.disconnect(urlConnection);
         }
 
-        System.out.println("Response code: "+responseCode);
+        System.out.println("Response code: " + responseCode);
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
@@ -203,7 +206,7 @@ public class URLUtil {
 
             String userpass = username + ":" + password;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-            urlConnection.setRequestProperty ("Authorization", basicAuth);
+            urlConnection.setRequestProperty("Authorization", basicAuth);
 
             responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
         } catch (IOException e) {
@@ -216,9 +219,9 @@ public class URLUtil {
                 && responseCode != HttpURLConnection.HTTP_FORBIDDEN && responseCode != HttpURLConnection.HTTP_UNAUTHORIZED;
     }
 
-
     /**
      * Calls {@link #isNotExisting(String, boolean)} with the boolean set to false. See documentation of that method.
+     *
      * @param urlStr As described above.
      * @return As described above.
      */

@@ -44,7 +44,7 @@ import eionet.cr.web.action.AbstractActionBean;
 @UrlBinding("/admin/sourceBulkActions")
 public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
-    /** Static Log4j logger for this class. */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(HarvestSourceBulkActionBean.class);
 
     /** JSP page. */

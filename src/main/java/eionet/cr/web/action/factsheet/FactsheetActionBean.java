@@ -85,10 +85,10 @@ import eionet.cr.web.util.tabs.TabElement;
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
 
-    /**  */
+    /** Prefix for the name of the "which page of predicate values to display" request parameter. */
     public static final String PAGE_PARAM_PREFIX = "page";
 
-    /** */
+    /** Name for session attributes for addible properties. */
     private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
     /** URI by which the factsheet has been requested. */
@@ -362,10 +362,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }

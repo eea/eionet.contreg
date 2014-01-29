@@ -79,12 +79,13 @@ import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * Base abstract class for harvest-performing classes.
  *
  * @author Jaanus Heinlaid
  */
 public abstract class BaseHarvest implements Harvest {
 
-    /** */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
 
     /** No of latest harvests whose history is kept in the database. Used in houskeeping. */
@@ -1039,7 +1040,7 @@ public abstract class BaseHarvest implements Harvest {
      * @throws RDFParseException if error in RDF parsing
      */
     protected int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
         // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
         // Otherwise try to process the file into RDF format and *then* proceed to loading.
@@ -1184,12 +1185,12 @@ public abstract class BaseHarvest implements Harvest {
         return contentLoader;
     }
 
-    protected void addFirstSeenPredicate(){
+    protected void addFirstSeenPredicate() {
         // add source metadata resulting from this harvest
 
         boolean subjectSeen = helperDAO.isSubjectSeen(getContextSourceDTO().getUrl());
 
-        if (!subjectSeen){
+        if (!subjectSeen) {
             String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
             addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
         }

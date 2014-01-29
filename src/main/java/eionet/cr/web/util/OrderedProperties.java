@@ -13,30 +13,47 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.URIUtil;
 
-
 /**
  *
  * A customized properties file loader for ordered resultset.
  *
  * @author Jaak
+ * @author Jaanus
  */
 public abstract class OrderedProperties extends LinkedHashMap<String, String> {
 
-    /**  */
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    protected OrderedProperties(String propertiesFile, Logger logger){
+    /**
+     * Instantiates a new ordered properties.
+     *
+     * @param propertiesFile the properties file
+     * @param logger the logger
+     */
+    protected OrderedProperties(String propertiesFile, Logger logger) {
         super();
         load(propertiesFile, logger, false);
     }
 
-    protected OrderedProperties(String propertiesFile, Logger logger, boolean testIfvalueIsUri){
+    /**
+     * Instantiates a new ordered properties.
+     *
+     * @param propertiesFile the properties file
+     * @param logger the logger
+     * @param testIfvalueIsUri the test ifvalue is uri
+     */
+    protected OrderedProperties(String propertiesFile, Logger logger, boolean testIfvalueIsUri) {
         super();
         load(propertiesFile, logger, testIfvalueIsUri);
     }
 
     /**
      * Loads the useful namespaces from {@link #PROPERTIES_FILE}, in exactly the same order as they appear in the file.
+     *
+     * @param propertiesFile the properties file
+     * @param logger the logger
+     * @param testIfvalueIsUri the test ifvalue is uri
      */
     private void load(String propertiesFile, Logger logger, boolean testIfvalueIsUri) {
 
@@ -52,7 +69,7 @@ public abstract class OrderedProperties extends LinkedHashMap<String, String> {
                         String key = trimmedLine.substring(0, index).trim();
                         if (StringUtils.isNotBlank(key)) {
                             String value = trimmedLine.substring(index + 1).trim();
-                            if (testIfvalueIsUri){
+                            if (testIfvalueIsUri) {
                                 if (URIUtil.isURI(value)) {
                                     put(key, value);
                                 } else {

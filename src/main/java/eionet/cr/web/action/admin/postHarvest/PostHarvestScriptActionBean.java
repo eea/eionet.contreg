@@ -51,56 +51,89 @@ import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean.Actio
 import eionet.cr.web.util.ApplicationCache;
 
 /**
+ * Action bean for dealing with a post-harvest script.
  *
  * @author Jaanus Heinlaid
  */
 @UrlBinding("/admin/postHarvestScript")
 public class PostHarvestScriptActionBean extends AbstractActionBean {
 
-    /** */
+    /** Default JSP to return to. */
     private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
 
-    /** */
+    /** Default script to display to user. */
     private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n\n"
             + "INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n" + "    ?s cr:tag `bif:lower(?o)`\n"
             + "}\n" + "WHERE {\n" + "  GRAPH ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
             + "    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n" + "  }\n" + "}";
 
-    /** */
+    /** The script id. */
     private int id;
+
+    /** The script title. */
     private String title;
+
+    /** The script content (i.e. the SPARQL query that is the content of the script). */
     private String script = DEFAULT_SCRIPT;
+
+    /** The target URL. */
     private String targetUrl;
+
+    /** The target type. */
     private TargetType targetType;
+
+    /** The URL of source to test on. */
     private String testSourceUrl;
+
+    /** Is the script activated? */
     private boolean active;
+
+    /** Should the script be run only once by the harvester? (alternative is to do until returned update count is 0). */
     private boolean runOnce = true;
+
+    /** Should the bean ignore ill-formed SPARQL for this particular request? */
     private boolean ignoreMalformedSparql;
+
+    /** The tabs to display in JSP. */
     private List<Tab> tabs;
+
+    /** The back to target URL. */
     private String backToTargetUrl;
 
-    /** */
+    /** Script test result list. */
     private List<Map<String, ObjectDTO>> testResults;
+
+    /** Script test result list columns. */
     private List<String> testResultColumns;
+
+    /** The actual executed test query after doing necessary processing. */
     private String executedTestQuery;
+
+    /** Script test error if any. */
     private String testError;
+
+    /** Copy-paste clipboard item id (relevant when copy-pasting scripts). */
     private int clipboardItemId;
 
-    /**
-     * The URL to redirect to when Cancel event called. Used when the script creating/editing page has been reached, for example,
-     * from harvest source view page.
-     */
-    private String cancelUrl;
-
+    /** Is bulk paste from clipboard? */
     private boolean bulkPaste;
 
-    List<String> sourceAllDistinctPredicates;
-    String scriptPredicate;
+    /** URL to redirect to when Cancel pressed. Used when script page was reached (e.g.) from harvest source view page. */
+    private String cancelUrl;
 
+    /** Distinct predicates used in all triples in the graph identified by the target source URL. */
+    List<String> sourceAllDistinctPredicates;
+
+    /** Distinct predicates used in all reources whose rdf:type is the current script target type. */
     List<String> typeAllDistinctPredicates;
 
-    /** Available scripts. */
+    /** Predicate to be used in relevant placeholder when generating script from a template. */
+    String scriptPredicate;
+
+    /** Available script templates. */
     private List<ScriptTemplateDTO> scriptTemplates;
+
+    /** Current script template id. */
     private String scriptTemplateId;
 
     /**
@@ -283,7 +316,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         try {
             testResults =
                     DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                    .test(executedTestQuery, targetType, targetUrl, harvestedSource);
+                            .test(executedTestQuery, targetType, targetUrl, harvestedSource);
         } catch (DAOException e) {
             testError = e.getMessage();
         }

@@ -58,13 +58,19 @@ import eionet.cr.web.security.CRUser;
 @UrlBinding("/ping")
 public class PingActionBean extends AbstractActionBean {
 
-    /** */
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = Logger.getLogger(PingActionBean.class);
 
-    /** */
+    /** The Constant ERR_BLANK_URI. */
     private static final int ERR_BLANK_URI = 1;
+
+    /** The Constant ERR_INVALID_URL. */
     private static final int ERR_INVALID_URL = 2;
+
+    /** The Constant ERR_FRAGMENT_URL. */
     private static final int ERR_FRAGMENT_URL = 3;
+
+    /** The Constant ERR_BROKEN_URL. */
     private static final int ERR_BROKEN_URL = 4;
 
     /** Template for the XML-messages to be sent as response to this API. */
@@ -266,14 +272,13 @@ public class PingActionBean extends AbstractActionBean {
         return result;
     }
 
-
     /**
      * Utility method to parse list of url from the configuration file.
      *
      * @param result
      * @param property
      */
-    private static void parseUrlList(HashSet<String> result, String property){
+    private static void parseUrlList(HashSet<String> result, String property) {
         if (!StringUtils.isBlank(property)) {
             String[] split = property.split("\\s*,\\s*");
             for (int i = 0; i < split.length; i++) {
@@ -283,7 +288,6 @@ public class PingActionBean extends AbstractActionBean {
             }
         }
     }
-
 
     /**
      * @param create
