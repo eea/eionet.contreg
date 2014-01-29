@@ -42,4 +42,13 @@ public interface SourceDeletionsDAO extends DAO {
      * @throws DAOException If database access error occurs.
      */
     List<Pair<String, Date>> getDeletionQueue(String filterStr, PagingRequest pagingRequest) throws DAOException;
+
+    /**
+     * Removes given URLs from the source deletion queue.
+     *
+     * @param sourceUrls The given URLs.
+     * @return Number of rows deleted from the queue.
+     * @throws DAOException If database access error occurs.
+     */
+    int cancelDeletion(Collection<String> sourceUrls) throws DAOException;
 }

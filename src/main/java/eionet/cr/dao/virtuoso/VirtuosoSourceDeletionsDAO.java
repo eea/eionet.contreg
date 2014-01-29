@@ -57,6 +57,9 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             "SELECT url AS LCOL, delete_requested AS RCOL FROM harvest_source "
                     + "WHERE delete_requested IS NOT NULL AND url LIKE (?) ORDER BY delete_requested, url";
 
+    /** SQL for removing a given URL from the deletion queue. */
+    private static final String CANCEL_DELETION_SQL = "UPDATE harvest_source SET delete_requested=NULL where URL_HASH=?";
+
     /*
      * (non-Javadoc)
      *
@@ -245,6 +248,62 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
         } catch (ResultSetReaderException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.SourceDeletionsDAO#cancelDeletion(java.util.Collection)
+     */
+    @Override
+    public int cancelDeletion(Collection<String> sourceUrls) throws DAOException {
+
+        if (CollectionUtils.isEmpty(sourceUrls)) {
+            return 0;
+        }
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            conn.setAutoCommit(false);
+
+            pstmt = conn.prepareStatement(CANCEL_DELETION_SQL);
+
+            int batchCounter = 0;
+            int updateCounter = 0;
+
+            for (String sourceUrl : sourceUrls) {
+
+                pstmt.setLong(1, Hashes.spoHash(sourceUrl));
+                pstmt.addBatch();
+
+                if (++batchCounter % MARKING_BATCH_SIZE == 0) {
+
+                    int[] updateCounts = pstmt.executeBatch();
+                    for (int i = 0; i < updateCounts.length; i++) {
+                        updateCounter += updateCounts[i];
+                    }
+                }
+            }
+
+            if (batchCounter % MARKING_BATCH_SIZE != 0) {
+
+                int[] updateCounts = pstmt.executeBatch();
+                for (int i = 0; i < updateCounts.length; i++) {
+                    updateCounter += updateCounts[i];
+                }
+            }
+
+            conn.commit();
+            return updateCounter;
+        } catch (SQLException e) {
+            SQLUtil.rollback(conn);
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(pstmt);
             SQLUtil.close(conn);
         }
     }
