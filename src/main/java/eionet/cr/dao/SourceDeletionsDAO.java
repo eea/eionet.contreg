@@ -38,10 +38,10 @@ public interface SourceDeletionsDAO extends DAO {
      *
      * @param filterStr Sub-string of URLs to match. Blank = all URLs.
      * @param pagingRequest Result-set page to return.
-     * @return The requested result-set page.
+     * @return A pair where the left is the total match count and the right is the requested result-set page.
      * @throws DAOException If database access error occurs.
      */
-    List<Pair<String, Date>> getDeletionQueue(String filterStr, PagingRequest pagingRequest) throws DAOException;
+    Pair<Integer, List<Pair<String, Date>>> getDeletionQueue(String filterStr, PagingRequest pagingRequest) throws DAOException;
 
     /**
      * Removes given URLs from the source deletion queue.

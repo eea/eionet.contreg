@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -56,6 +57,14 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
     private static final String GET_DELETION_QUEUE_FILTERED_SQL =
             "SELECT url AS LCOL, delete_requested AS RCOL FROM harvest_source "
                     + "WHERE delete_requested IS NOT NULL AND url LIKE (?) ORDER BY delete_requested, url";
+
+    /** The SQL for returning the size of deletion queue. */
+    private static final String GET_DELETION_QUEUE_SIZE_SQL =
+            "SELECT count(*) FROM harvest_source WHERE delete_requested IS NOT NULL";
+
+    /** The SQL for returning the size of deletion queue filtered. */
+    private static final String GET_DELETION_QUEUE_SIZE_FILTERED_SQL = "SELECT count(*) FROM harvest_source "
+            + "WHERE delete_requested IS NOT NULL AND url LIKE (?)";
 
     /** SQL for removing a given URL from the deletion queue. */
     private static final String CANCEL_DELETION_SQL = "UPDATE harvest_source SET delete_requested=NULL where URL_HASH=?";
@@ -224,9 +233,12 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
      * @see eionet.cr.dao.SourceDeletionsDAO#getDeletionQueue(java.lang.String, eionet.cr.util.pagination.PagingRequest)
      */
     @Override
-    public List<Pair<String, Date>> getDeletionQueue(String filterStr, PagingRequest pagingRequest) throws DAOException {
+    public Pair<Integer, List<Pair<String, Date>>> getDeletionQueue(String filterStr, PagingRequest pagingRequest)
+            throws DAOException {
 
         String sql = StringUtils.isBlank(filterStr) ? GET_DELETION_QUEUE_SQL : GET_DELETION_QUEUE_FILTERED_SQL;
+        String countSql = StringUtils.isBlank(filterStr) ? GET_DELETION_QUEUE_SIZE_SQL : GET_DELETION_QUEUE_SIZE_FILTERED_SQL;
+
         if (pagingRequest != null) {
             String pagingParams = "TOP " + pagingRequest.getOffset() + ", " + pagingRequest.getItemsPerPage();
             sql = StringUtils.replaceOnce(sql, "SELECT", "SELECT " + pagingParams);
@@ -242,7 +254,15 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             conn = SesameUtil.getSQLConnection();
             PairReader<String, Date> reader = new PairReader<String, Date>();
             SQLUtil.executeQuery(sql, sqlValues, reader, conn);
-            return reader.getResultList();
+            List<Pair<String, Date>> resultList = reader.getResultList();
+
+            int totalMatchCount = resultList.size();
+            if (pagingRequest != null) {
+                Object count = SQLUtil.executeSingleReturnValueQuery(countSql, sqlValues, conn);
+                totalMatchCount = NumberUtils.toInt(count == null ? null : count.toString(), totalMatchCount);
+            }
+
+            return new Pair<Integer, List<Pair<String, Date>>>(totalMatchCount, resultList);
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } catch (ResultSetReaderException e) {

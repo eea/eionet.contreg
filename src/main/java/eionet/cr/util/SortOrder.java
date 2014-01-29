@@ -21,6 +21,7 @@
 package eionet.cr.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.displaytag.properties.SortOrderEnum;
 
 /**
  *
@@ -47,6 +48,7 @@ public enum SortOrder {
      *
      * @see java.lang.Enum#toString()
      */
+    @Override
     public String toString() {
         return s;
     }
@@ -64,10 +66,20 @@ public enum SortOrder {
      * @return
      */
     public SortOrder toOpposite() {
-        if (this.equals(ASCENDING))
+        if (this.equals(ASCENDING)) {
             return DESCENDING;
-        else
+        } else {
             return ASCENDING;
+        }
+    }
+
+    /**
+     * Converts this instance to a corresponding instance of DisplayTag's {@link SortOrderEnum}.
+     *
+     * @return The converted instance.
+     */
+    public SortOrderEnum toDisplayTagEnum() {
+        return this.equals(ASCENDING) ? SortOrderEnum.ASCENDING : SortOrderEnum.DESCENDING;
     }
 
     /**
@@ -76,10 +88,11 @@ public enum SortOrder {
      * @return
      */
     public static String oppositeSortOrder(String order) {
-        if (StringUtils.isBlank(order))
+        if (StringUtils.isBlank(order)) {
             return ASCENDING.toString();
-        else
+        } else {
             return parse(order).toOpposite().toString();
+        }
     }
 
     /**
@@ -89,13 +102,14 @@ public enum SortOrder {
      */
     public static SortOrder parse(String s) {
 
-        if (s == null)
+        if (s == null) {
             return null;
-        else if (s.equals(ASCENDING.toString()))
+        } else if (s.equals(ASCENDING.toString())) {
             return ASCENDING;
-        else if (s.equals(DESCENDING.toString()))
+        } else if (s.equals(DESCENDING.toString())) {
             return DESCENDING;
-        else
+        } else {
             throw new IllegalArgumentException("Unknown sort order: " + s);
+        }
     }
 }

@@ -354,13 +354,17 @@ while (l--) {
                 </div>
 
                 <c:if test="${actionBean.bulkActionsAvailable == 'true'}">
-                    <div id="bulkActions" style=" position: relative; width:900px; height: 30px; margin-top:40px; margin-bottom:10px; padding:10px; border: 1px solid black; background-color:#F8F8F8 ;
-                        <c:if test="${actionBean.bulkActionsPanelVisible == 'false'}">
-                            display: none;
-                        </c:if>
-                        ">
-                        <strong>Schedule urgent batch harvest</strong> for sources returned in the first result set column:
-                        <stripes:submit name="executeAddSources" value="Execute" id="executeConstructAddSources" onclick="return confirm('All URLs returned in the first result set column will now be scheduled for urgent batch harvest. They will be picked up by the batch harvester when it runs. Are you sure you want to continue?');"/>
+                    <div id="bulkActions" style=" position: relative; width:900px; height: 50px; margin-top:40px; margin-bottom:10px; padding:10px; border: 1px solid black; background-color:#F8F8F8 ; ${actionBean.bulkActionsPanelVisible ? '' : 'display: none;'}">
+                        <ul>
+                            <li>
+                                <strong>Schedule urgent batch harvest</strong> for sources returned in the first result set column:
+                                <stripes:submit name="executeAddSources" value="Execute" onclick="return confirm('All URLs returned in the first result set column will now be scheduled for urgent batch harvest. They will be picked up by the batch harvester when it runs. Are you sure you want to continue?');"/>
+                            </li>
+                            <li>
+                                <strong>Schedule background deletion</strong> for sources returned in the first result set column:
+                                <stripes:submit name="executeDeleteSources" value="Execute" onclick="return confirm('All URLs returned in the first result set column will now be scheduled for background deletion. Are you sure you want to continue?');"/>
+                            </li>
+                        </ul>
                     </div>
                 </c:if>
 

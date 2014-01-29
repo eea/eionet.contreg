@@ -98,7 +98,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
 
         // Test the size and contents of un-filtered deletion queue.
 
-        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null);
+        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", expectedNumberOfSparqlReturnedSubjects, deletionQueue.size());
 
@@ -112,7 +112,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
 
         // Test the size and contents of the filtered deletion queue.
 
-        deletionQueue = sourceDeletionsDao.getDeletionQueue("Burlesque", null);
+        deletionQueue = sourceDeletionsDao.getDeletionQueue("Burlesque", null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 1, deletionQueue.size());
         queuedUrls = new HashSet<String>();
@@ -124,7 +124,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
 
         // Test the size and contents of un-filtered paged deletion queue.
 
-        deletionQueue = sourceDeletionsDao.getDeletionQueue(null, PagingRequest.create(1, 1));
+        deletionQueue = sourceDeletionsDao.getDeletionQueue(null, PagingRequest.create(1, 1)).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 1, deletionQueue.size());
         queuedUrls = new HashSet<String>();
@@ -180,7 +180,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
                         "http://rod.eionet.europa.eu/countries"));
         assertEquals("Unexpected cancelled deletions count", 2, cancelledCount);
 
-        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null);
+        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 5, deletionQueue.size());
 

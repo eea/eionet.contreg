@@ -42,11 +42,17 @@
 
         <c:if test="${not empty actionBean.deletionQueue}">
 
-            <div style="width:75%;padding-top:10px">
+            <div style="width:100%;padding-top:10px">
 
                 <stripes:form id="deletionQueueForm" method="post" beanclass="${actionBean.class.name}">
 
-                    <display:table name="${actionBean.deletionQueue}" id="queueItem" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:100%">
+                    <div style="margin-bottom:10px">
+	                    <stripes:label for="filterText" class="question">URL filter:</stripes:label>
+	                    <stripes:text id="filterText" name="filter" size="60"/>
+	                    <stripes:submit name="view" value="Filter"/>
+                    </div>
+
+                    <display:table name="${actionBean.deletionQueuePaginated}" id="queueItem" class="sortable" sort="external" pagesize="${actionBean.resultListPageSize}" requestURI="${actionBean.urlBinding}" style="width:100%">
                         <display:column style="width:5%">
                             <stripes:checkbox name="cancelUrls" value="${queueItem.left}" />
                         </display:column>
@@ -60,7 +66,7 @@
                         </display:column>
                     </display:table>
 
-                    <stripes:submit name="cancel" value="Cancel" title="Cancel the deletion of selected URLs"/>
+                    <stripes:submit name="cancel" value="Cancel selected" title="Cancel the deletion of selected URLs"/>
                     <input type="button" onclick="toggleSelectAll('deletionQueueForm');return false" value="Select all" name="selectAll">
 
                 </stripes:form>

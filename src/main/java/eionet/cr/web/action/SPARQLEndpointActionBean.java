@@ -49,6 +49,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -470,8 +471,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Executes the SparqlEndpoint query and adds result to sources.
      *
-     * @return Resolution
-     * @throws DAOException
+     * @return Resolution to return to.
+     * @throws DAOException If DAO access error.
      */
     public Resolution executeAddSources() throws DAOException {
         Resolution resolution = executeSparqlQuery(false);
@@ -490,6 +491,27 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else {
             addGlobalValidationError(VALIDATION_ERROR_MUST_BE_ADMINISTRATOR);
             LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk sources through Sparql endpoint");
+        }
+
+        return resolution;
+    }
+
+    /**
+     * Schedules background deletion for sources identified by URLs returned in the 1st column of executed SPARQL results.
+     *
+     * @return Resolution to return to.
+     * @throws DAOException If DAO access error.
+     */
+    public Resolution executeDeleteSources() throws DAOException {
+
+        Resolution resolution = new ForwardResolution(FORM_PAGE);
+        if (!isAdminPrivilege()) {
+            addWarningMessage("You are not authorized for this operation!");
+        } else if (StringUtils.isBlank(query)){
+            addCautionMessage("Found no SPARQL query in the reqeust!");
+        } else {
+            int markedCount = DAOFactory.get().getDao(SourceDeletionsDAO.class).markForDeletionSparql(query);
+            addSystemMessage("A total of " + markedCount + " sources were scheduled for background deletion!");
         }
 
         return resolution;
