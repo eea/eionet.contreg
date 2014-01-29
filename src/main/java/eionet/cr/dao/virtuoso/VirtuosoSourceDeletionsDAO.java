@@ -30,6 +30,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  * Virtuoso-specific implementation of {@link SourceDeletionsDAO}.
  *
@@ -85,14 +86,14 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
 
             for (String sourceUrl : sourceUrls) {
 
-                addMarkingBatch(pstmtInsert, pstmtMark, sourceUrl);
+                addMarkingBatch(sourceUrl, pstmtInsert, pstmtMark);
                 if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                    updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark, updateCounter);
+                    updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
                 }
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark, updateCounter);
+                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             conn.commit();
@@ -108,13 +109,15 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
     }
 
     /**
+     * Adds given source URL to the deletion marking batch.
      *
-     * @param pstmtInsert
-     * @param pstmtMark
-     * @param sourceUrl
-     * @throws SQLException
+     * @param sourceUrl The source to mark.
+     * @param pstmtInsert Prepared statement for {@link #SOFT_INSERT_SOURCE}.
+     * @param pstmtMark Prepared statement for {@link #MARK_FOR_DELETION_SQL}
+     *
+     * @throws SQLException the SQL exception
      */
-    private void addMarkingBatch(PreparedStatement pstmtInsert, PreparedStatement pstmtMark, String sourceUrl) throws SQLException {
+    private void addMarkingBatch(String sourceUrl, PreparedStatement pstmtInsert, PreparedStatement pstmtMark) throws SQLException {
 
         pstmtInsert.setString(1, sourceUrl);
         pstmtInsert.setLong(2, Hashes.spoHash(sourceUrl));
@@ -125,15 +128,14 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
     }
 
     /**
+     * Executes current deletion marking batch.
      *
-     * @param pstmtInsert
-     * @param pstmtMark
-     * @param updateCounter
-     * @return
-     * @throws SQLException
+     * @param pstmtInsert Prepared statement for {@link #SOFT_INSERT_SOURCE}.
+     * @param pstmtMark Prepared statement for {@link #MARK_FOR_DELETION_SQL}
+     * @return The count of successfully executed rows.
+     * @throws SQLException the SQL exception
      */
-    private int executeMarkingBatch(PreparedStatement pstmtInsert, PreparedStatement pstmtMark, int updateCounter)
-            throws SQLException {
+    private int executeMarkingBatch(PreparedStatement pstmtInsert, PreparedStatement pstmtMark) throws SQLException {
 
         int resultCount = 0;
         pstmtInsert.executeBatch();
@@ -184,9 +186,9 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                         Value firstColumnValue = bindingSet.iterator().next().getValue();
                         if (firstColumnValue instanceof URI) {
 
-                            addMarkingBatch(pstmtInsert, pstmtMark, firstColumnValue.stringValue());
+                            addMarkingBatch(firstColumnValue.stringValue(), pstmtInsert, pstmtMark);
                             if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark, updateCounter);
+                                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
                             }
                         }
                     }
@@ -194,7 +196,7 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark, updateCounter);
+                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             sqlConn.commit();
