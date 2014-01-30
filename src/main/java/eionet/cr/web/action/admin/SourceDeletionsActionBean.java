@@ -76,7 +76,7 @@ public class SourceDeletionsActionBean extends DisplaytagSearchActionBean {
             addCautionMessage("You have no URLs specified!");
         } else {
             SourceDeletionsDAO dao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-            int cancelledCount = dao.cancelDeletion(cancelUrls);
+            int cancelledCount = dao.unmarkForDeletion(cancelUrls);
             addSystemMessage("Successfully cancelled the deletion of " + cancelledCount + " sources!");
         }
 

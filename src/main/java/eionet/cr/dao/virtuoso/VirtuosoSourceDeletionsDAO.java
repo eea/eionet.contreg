@@ -69,6 +69,10 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
     /** SQL for removing a given URL from the deletion queue. */
     private static final String CANCEL_DELETION_SQL = "UPDATE harvest_source SET delete_requested=NULL where URL_HASH=?";
 
+    /** SQL for picking the first source from the deletion queue. */
+    private static final String PICK_FOR_DELETION_SQL = "SELECT TOP 1 url FROM harvest_source " +
+    		"WHERE delete_requested IS NOT NULL ORDER BY delete_requested, url";
+
     /*
      * (non-Javadoc)
      *
@@ -278,7 +282,7 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
      * @see eionet.cr.dao.SourceDeletionsDAO#cancelDeletion(java.util.Collection)
      */
     @Override
-    public int cancelDeletion(Collection<String> sourceUrls) throws DAOException {
+    public int unmarkForDeletion(Collection<String> sourceUrls) throws DAOException {
 
         if (CollectionUtils.isEmpty(sourceUrls)) {
             return 0;
@@ -324,6 +328,26 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(pstmt);
+            SQLUtil.close(conn);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.SourceDeletionsDAO#pickForDeletion()
+     */
+    @Override
+    public String pickForDeletion() throws DAOException {
+
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            Object o = SQLUtil.executeSingleReturnValueQuery(PICK_FOR_DELETION_SQL, conn);
+            return o == null ? null : o.toString();
+        } catch (SQLException e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
             SQLUtil.close(conn);
         }
     }

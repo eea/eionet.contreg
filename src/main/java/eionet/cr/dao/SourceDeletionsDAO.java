@@ -50,5 +50,13 @@ public interface SourceDeletionsDAO extends DAO {
      * @return Number of rows deleted from the queue.
      * @throws DAOException If database access error occurs.
      */
-    int cancelDeletion(Collection<String> sourceUrls) throws DAOException;
+    int unmarkForDeletion(Collection<String> sourceUrls) throws DAOException;
+
+    /**
+     * Picks the first source form the deletion queue (the queue operates in FIFO principal). Returns the picked source's URL.
+     *
+     * @return The picked source's URL.
+     * @throws DAOException If database access error occurs.
+     */
+    String pickForDeletion() throws DAOException;
 }
