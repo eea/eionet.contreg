@@ -30,7 +30,11 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Test;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
 
 import virtuoso.jdbc4.VirtuosoConnectionPoolDataSource;
 import virtuoso.jdbc4.VirtuosoPooledConnection;
@@ -169,7 +173,8 @@ public class VirtuosoJdbcDriverTest extends CRDatabaseTestCase {
             conn = SesameUtil.getSQLConnection();
             stmt = conn.createStatement();
             rs =
-                    stmt.executeQuery("select top(1) id_to_iri(G) from DB.DBA.RDF_QUAD where " + "S=iri_to_id('http://test.uri/subject') "
+                    stmt.executeQuery("select top(1) id_to_iri(G) from DB.DBA.RDF_QUAD where "
+                            + "S=iri_to_id('http://test.uri/subject') "
                             + "and P=iri_to_id('http://test.uri/predicate') and O=iri_to_id('http://test.uri/object')");
             assertTrue("Expected the previously inserted row to exist in DB.DBA.RDF_QUAD", rs.next());
             String graph = "http://test.uri/graph";
@@ -179,6 +184,103 @@ public class VirtuosoJdbcDriverTest extends CRDatabaseTestCase {
             throw e;
         } finally {
             SQLUtil.close(rs);
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+    }
+
+    /**
+     * Test that the {@link RepositoryConnection#clear(org.openrdf.model.Resource...)} method works.
+     *
+     * @throws SQLException
+     * @throws RepositoryException
+     */
+    @Test
+    public void testRepositoryConnectionClearGraph() throws SQLException, RepositoryException {
+
+        Connection conn = null;
+        RepositoryConnection repoConn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            repoConn = SesameUtil.getRepositoryConnection();
+
+            String seedFileGraphUri = getSeedFileGraphUri("obligations.rdf");
+            ValueFactory vf = repoConn.getValueFactory();
+            repoConn.clear(vf.createURI(seedFileGraphUri));
+
+            Object count =
+                    SQLUtil.executeSingleReturnValueQuery("sparql select count(*) from <" + seedFileGraphUri
+                            + "> where {?s ?p ?o}", conn);
+            assertNotNull("Expected non-null count", count);
+            assertEquals("Unexpected count", "0", count.toString());
+        } finally {
+            SQLUtil.close(conn);
+            SesameUtil.close(repoConn);
+        }
+    }
+
+    /**
+     * Test that graph deletion works via SQL.
+     *
+     * @throws SQLException
+     * @throws RepositoryException
+     */
+    @Test
+    public void testSqlConnectionClearGraph() throws SQLException, RepositoryException {
+
+        String uri = getSeedFileGraphUri("obligations.rdf");
+        String countQuery = "sparql select count(*) from <" + uri + "> where {?s ?p ?o}";
+
+        Statement stmt = null;
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.createStatement();
+
+            Object count = SQLUtil.executeSingleReturnValueQuery(countQuery, conn);
+            assertNotNull("Expected non-null count", count);
+            assertTrue("Expected at least one triple in graph " + uri, NumberUtils.toInt(count.toString(), 0) > 0);
+
+            stmt.executeUpdate("SPARQL CLEAR GRAPH <" + uri + ">");
+
+            count = SQLUtil.executeSingleReturnValueQuery(countQuery, conn);
+            assertNotNull("Expected non-null count", count);
+            assertEquals("Unexpected count", "0", count.toString());
+        } finally {
+            SQLUtil.close(stmt);
+            SQLUtil.close(conn);
+        }
+    }
+
+    /**
+     * Test SPARQL for deleting all triples about a resource.
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testSparqlDeleteAllTriplesAboutResource() throws SQLException {
+
+        String uri = "http://rod.eionet.europa.eu/obligations/171";
+        String deleteSparql = "DELETE {GRAPH ?g {?s ?p ?o}} WHERE {GRAPH ?g {?s ?p ?o filter (?s = <" + uri + ">)}}";
+        String deleteSql = "SPARQL " + deleteSparql;
+
+        Statement stmt = null;
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            stmt = conn.createStatement();
+
+            String countQuery = "sparql select count(*) where {<" + uri + "> ?p ?o}";
+            Object count = SQLUtil.executeSingleReturnValueQuery(countQuery, conn);
+            assertNotNull("Expected non-null count", count);
+            assertTrue("Expected at least one triple about " + uri, NumberUtils.toInt(count.toString(), 0) > 0);
+
+            stmt.executeUpdate(deleteSql);
+
+            count = SQLUtil.executeSingleReturnValueQuery(countQuery, conn);
+            assertNotNull("Expected non-null count", count);
+            assertEquals("Unexpected count", "0", count.toString());
+        } finally {
             SQLUtil.close(stmt);
             SQLUtil.close(conn);
         }

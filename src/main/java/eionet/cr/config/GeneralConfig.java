@@ -134,6 +134,15 @@ public final class GeneralConfig {
     /** */
     public static final String VIRTUOSO_REAL_TIME_FT_INDEXING = "virtuoso.unittest.realTimeFullTextIndexing";
 
+    /** Interval for the job that deletes harvest sources in the background. */
+    public static final String SOURCE_DELETION_JOB_INTERVAL = "sourceDeletionJob.interval";
+
+    /** Comma-separated list of hours when source deletion background job should be active. */
+    public static final String SOURCE_DELETION_JOB_ACTIVE_HOURS = "sourceDeletionJob.activeHours";
+
+    /** Number of sources that the source deletion background job should delete during one run. */
+    public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
