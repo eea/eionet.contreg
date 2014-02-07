@@ -200,13 +200,6 @@ public interface HarvestSourceDAO extends DAO {
     void editSource(HarvestSourceDTO source) throws DAOException;
 
     /**
-     * @return List<String>
-     * @throws DAOException
-     *             if relational database is unavailable. fetches all scheduled source URLs, which are scheduled for removal.
-     */
-    List<String> getScheduledForDeletion() throws DAOException;
-
-    /**
      * Get a list of sources to harvest in the next harvesting round. The result is ordered with highest priority first.
      *
      * @param limit

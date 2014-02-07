@@ -22,6 +22,8 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.SourceDeletionsDAO;
+import eionet.cr.harvest.CurrentHarvests;
+import eionet.cr.harvest.Harvest;
 
 /**
  * A background job that deletes harvest sources that have been scheduled for background deletion.
@@ -39,9 +41,8 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
     private static final int INTERVAL_MILLIS = GeneralConfig.getTimePropertyMilliseconds(
             GeneralConfig.SOURCE_DELETION_JOB_INTERVAL, 20000);
 
-    /** Hours when the job should be active (valid values are 0-23). Default is from 19 to 7 included. */
-    private static final HashSet<Integer> ACTIVE_HOURS = parseActiveHours(GeneralConfig.getProperty(
-            GeneralConfig.SOURCE_DELETION_JOB_ACTIVE_HOURS, "19,20,21,22,23,0,1,2,3,4,5,6,7,15,16,17,18"));
+    /** Hours when the job should be active. */
+    private static final HashSet<Integer> ACTIVE_HOURS = getConfiguredActiveHours();
 
     /** Number of sources that the job should delete during one run. Default is 20. */
     private static final int BATCH_SIZE = GeneralConfig.getIntProperty(GeneralConfig.SOURCE_DELETION_JOB_BATCH_SIZE, 20);
@@ -116,8 +117,14 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
             String sourceUrl = sourceDeletionsDao.pickForDeletion();
             if (StringUtils.isNotBlank(sourceUrl)) {
                 countFoundUrls++;
-                LOGGER.debug("Deleting " + sourceUrl);
-                harvestSourceDao.removeHarvestSources(Collections.singletonList(sourceUrl), false);
+                Harvest currHarvest = CurrentHarvests.getQueuedHarvest();
+                if (currHarvest != null && currHarvest.isBeingHarvested(sourceUrl)) {
+                    LOGGER.debug("Postponing the deletion of currently harvested " + sourceUrl);
+                    break;
+                } else {
+                    LOGGER.debug("Deleting " + sourceUrl);
+                    harvestSourceDao.removeHarvestSources(Collections.singletonList(sourceUrl), false);
+                }
             } else if (sourceUrl != null && sourceUrl.trim().length() == 0) {
                 LOGGER.warn("Found a blank URL in deletion queue!");
             }
@@ -139,21 +146,37 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Parses the job's active hours from given input string.
+     * Get the job's configured active hours. If the configuration value is empty, the job should not run at all.
+     * If it's not empty, but cannot be parsed into valid values, then {@link #DEFAULT_ACTIVE_HOURS} is used.
      *
-     * @param str The string to parse.
      * @return The job's active hours (valid values from 0-23).
      */
-    private static HashSet<Integer> parseActiveHours(String str) {
+    private static HashSet<Integer> getConfiguredActiveHours() {
+
+        String str = GeneralConfig.getProperty(GeneralConfig.SOURCE_DELETION_JOB_ACTIVE_HOURS);
+
+        // Empty value means no active hours, i.e. the job is disabled. Non-parseable value means use default.
 
         HashSet<Integer> hours = new HashSet<Integer>();
         if (StringUtils.isNotBlank(str)) {
+
             String[] split = StringUtils.split(str, ',');
             for (int i = 0; i < split.length; i++) {
                 try {
-                    hours.add(Integer.valueOf(split[i].trim()));
+                    int hour = Integer.parseInt(split[i].trim());
+                    if (hour >= 0 && hour <= 23) {
+                        hours.add(hour);
+                    }
                 } catch (NumberFormatException e) {
                     // Do nothing.
+                }
+            }
+
+            // If no legal values found, fall back to default.
+            if (hours.isEmpty()) {
+                int[] defaults = {19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 15, 16, 17, 18};
+                for (int i = 0; i < defaults.length; i++) {
+                    hours.add(defaults[i]);
                 }
             }
         }

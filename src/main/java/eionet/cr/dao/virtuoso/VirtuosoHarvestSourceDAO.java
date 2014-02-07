@@ -82,44 +82,41 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** Suffix used in temporary graph uris. */
     private static final String TEMP_GRAPH_SUFFIX = "_tempharvest";
     /** */
-    private static final String GET_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+    private static final String GET_SOURCES_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE delete_requested is null ";
     /** */
     private static final String SEARCH_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND delete_requested is null ";
     /** */
     private static final String GET_HARVEST_SOURCES_FAILED_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
                     + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) AND LAST_HARVEST_FAILED = 'Y' "
-                    + "AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+                    + "AND delete_requested is null";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_FAILED_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
                     + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) "
-                    + "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+                    + "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND delete_requested is null";
     /** */
     private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL >= "
-            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND delete_requested is null";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_UNAVAIL_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL LIKE (?) AND COUNT_UNAVAIL >= "
-                    + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+                    + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND delete_requested is null";
 
     /** */
     private static final String GET_REMOTE_ENDPOINTS_SQL = "SELECT * FROM HARVEST_SOURCE WHERE IS_SPARQL_ENDPOINT='Y'"
-            + " AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            + " AND delete_requested is null";
     /** */
     private static final String SEARCH_REMOTE_ENDPOINTS_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE IS_SPARQL_ENDPOINT='Y' AND URL LIKE (?) AND URL NOT IN "
-                    + "(SELECT URL FROM REMOVE_SOURCE_QUEUE)";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE IS_SPARQL_ENDPOINT='Y' AND URL LIKE (?) AND delete_requested is null";
 
     /** */
     private static final String GET_PRIORITY_SOURCES_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE "
-            + "WHERE PRIORITY_SOURCE = 'Y' AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+            + "WHERE PRIORITY_SOURCE = 'Y' AND delete_requested is null ";
     /** */
     private static final String SEARCH_PRIORITY_SOURCES_SQL =
-            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND "
-                    + "URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+            "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE PRIORITY_SOURCE = 'Y' and URL like(?) AND delete_requested is null ";
     /** */
     public static final String RENAME_GRAPH_SQL =
             "UPDATE DB.DBA.RDF_QUAD TABLE OPTION (index RDF_QUAD_GS) SET g = iri_to_id ('%new_graph%') "
@@ -187,7 +184,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             query.append("AND HS.URL LIKE(?) ");
             params.add(searchString);
         }
-        query.append("AND HS.URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ");
+        query.append("AND HS.delete_requested is null ");
 
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             query.append("ORDER BY " + sortingRequest.getSortingColumnName() + " " + sortingRequest.getSortOrder().toSQL());
@@ -207,7 +204,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             if (StringUtils.isNotEmpty(searchString)) {
                 countQuery.append("AND HS.URL LIKE(?) ");
             }
-            countQuery.append("AND HS.URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ");
+            countQuery.append("AND HS.delete_requested is null ");
 
             rowCount =
                     Integer.parseInt(executeUniqueResultSQL(countQuery.toString(), params, new SingleObjectReader<Object>())
@@ -279,11 +276,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         String query =
                 "SELECT<pagingParams> * FROM HARVEST_SOURCE "
-                        + "WHERE URL IN (<sources>) AND URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+                        + "WHERE URL IN (<sources>) AND delete_requested is null ";
         if (!StringUtils.isBlank(searchString)) {
             query =
                     "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND URL IN (<sources>) AND "
-                            + " URL NOT IN (SELECT URL FROM REMOVE_SOURCE_QUEUE) ";
+                            + " delete_requested is null ";
         }
         query = query.replace("<sources>", sourceUris);
 
@@ -790,17 +787,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#getScheduledForDeletion()
-     */
-    @Override
-    public List<String> getScheduledForDeletion() throws DAOException {
-
-        return executeSQL("select URL from REMOVE_SOURCE_QUEUE", null, new SingleObjectReader<String>());
-    }
-
     /** */
     private static final String INCREASE_UNAVAIL_COUNT =
             "update HARVEST_SOURCE set COUNT_UNAVAIL=(COUNT_UNAVAIL+1) where URL_HASH=?";
@@ -1014,7 +1000,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             // repoConn.setAutoCommit(false);
 
             // Perform removals in triple store.
-            //removeGraphsAndResources(repoConn, sourceUrls, harvesterContextOnly);
+            // removeGraphsAndResources(repoConn, sourceUrls, harvesterContextOnly);
             removeGraphsAndResources(sqlConn, sourceUrls, harvesterContextOnly);
             // Perform removals in relational tables.
             removeHarvestSources(sqlConn, sourceUrls);

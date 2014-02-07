@@ -45,8 +45,15 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testMarkForDeletion() throws Exception {
+
+        HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDao.getHarvestSources(null, null, null);
+        assertNotNull("Expected non-null harvest sources result set", sources);
+        assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
+        assertEquals("Unexpected count of harvest sources", 5, sources.getLeft().intValue());
 
         List<String> sourceUrls =
                 Arrays.asList("http://rod.eionet.europa.eu/obligations", "http://rod.eionet.europa.eu/countries",
@@ -57,11 +64,10 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
         int updateCount = sourceDeletionsDao.markForDeletion(sourceUrls);
         assertEquals("Unexpected update count", sourceUrls.size(), updateCount);
 
-        HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDao.getHarvestSources(null, null, null);
+        sources = harvestSourceDao.getHarvestSources(null, null, null);
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
-        assertEquals("Unexpected count of harvest sources", sourceUrls.size(), sources.getLeft().intValue());
+        assertEquals("Unexpected count of harvest sources", 0, sources.getLeft().intValue());
     }
 
     /**
@@ -69,6 +75,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testMarkForDeletionSparqlUrls() throws Exception {
 
@@ -94,8 +101,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
 
-        int expectedSourceCount = expectedNumberOfSparqlReturnedSubjects + expectedInitialNumberOfHarvestSources;
-        assertEquals("Unexpected count of harvest sources", expectedSourceCount, sources.getLeft().intValue());
+        assertEquals("Unexpected count of harvest sources", expectedInitialNumberOfHarvestSources, sources.getLeft().intValue());
 
         // Test the size and contents of un-filtered deletion queue.
 
@@ -141,6 +147,7 @@ public class SourceDeletionsDAOTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testMarkForDeletionSparqlNonUrls() throws Exception {
 
