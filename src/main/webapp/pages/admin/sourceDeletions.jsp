@@ -19,11 +19,6 @@
 
     <stripes:layout-component name="contents">
 
-        <div class="caution-msg">
-            <strong>Caution ...</strong>
-            <p>Work in progress!</p>
-        </div>
-
         <%-- The page's heading --%>
 
         <h1>Monitor source deletions</h1>
