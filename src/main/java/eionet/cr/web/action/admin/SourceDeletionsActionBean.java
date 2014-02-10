@@ -1,5 +1,7 @@
 package eionet.cr.web.action.admin;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.util.Pair;
+import eionet.cr.util.SourceDeletionJob;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.DisplaytagSearchActionBean;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
@@ -46,6 +49,9 @@ public class SourceDeletionsActionBean extends DisplaytagSearchActionBean {
 
     /** Sub-string by which the sources in deletion queue will be filtered when queried. */
     private String filter;
+
+    /** Hours when the source deletion job is active. Valid values from 0-23.*/
+    String[] activeHours;
 
     /**
      * Default event handler.
@@ -164,5 +170,35 @@ public class SourceDeletionsActionBean extends DisplaytagSearchActionBean {
         } else {
             return new CustomPaginatedList<Pair<String, Date>>(this, totalMatchCount, deletionQueue, RESULT_LIST_PAGE_SIZE);
         }
+    }
+
+    /**
+     * Gets the active hours.
+     *
+     * @return the activeHours
+     */
+    public String[] getActiveHours() {
+
+        if (activeHours == null) {
+
+            ArrayList<Integer> hours = new ArrayList<Integer>(SourceDeletionJob.ACTIVE_HOURS);
+            Collections.sort(hours);
+            activeHours = new String[hours.size()];
+            int i = 0;
+            for (Integer hour : hours) {
+                activeHours[i++] = hour.toString();
+            }
+        }
+
+        return activeHours;
+    }
+
+    /**
+     * Returns the source deletion job's running interval in seconds.
+     *
+     * @return the job interval seconds
+     */
+    public int getJobIntervalSeconds() {
+        return SourceDeletionJob.INTERVAL_MILLIS / 1000;
     }
 }

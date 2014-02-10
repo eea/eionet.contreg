@@ -38,11 +38,11 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
     private static final Logger LOGGER = Logger.getLogger(SourceDeletionJob.class);
 
     /** This job's running interval in milliseconds. Default is every 20000 ms, i.e. every 20 seconds. */
-    private static final int INTERVAL_MILLIS = GeneralConfig.getTimePropertyMilliseconds(
+    public static final int INTERVAL_MILLIS = GeneralConfig.getTimePropertyMilliseconds(
             GeneralConfig.SOURCE_DELETION_JOB_INTERVAL, 20000);
 
     /** Hours when the job should be active. */
-    private static final HashSet<Integer> ACTIVE_HOURS = getConfiguredActiveHours();
+    public static final HashSet<Integer> ACTIVE_HOURS = getConfiguredActiveHours();
 
     /** Number of sources that the job should delete during one run. Default is 20. */
     private static final int BATCH_SIZE = GeneralConfig.getIntProperty(GeneralConfig.SOURCE_DELETION_JOB_BATCH_SIZE, 20);

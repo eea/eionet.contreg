@@ -33,6 +33,14 @@
                 </p>
         </div>
 
+        <div class="tip-msg">
+            <strong>Info</strong>
+            <p>
+                The source deletion job has been configured to run every ${actionBean.jobIntervalSeconds} seconds at these hours:<br/>
+                <c:out value="${fn:join(actionBean.activeHours,',')}"/>
+            </p>
+        </div>
+
         <%-- The section that displays the source deletion queue. --%>
 
         <c:if test="${not empty actionBean.deletionQueue}">
