@@ -412,8 +412,7 @@ public class CsvImportHelper {
         for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
 
             // Prepare URI of the column that this data-linking script is associated with.
-            String columnUri = fileUri + "#" + dataLinkingScript.getColumn();
-            columnUri = "<" + columnUri.replace(" ", "_") + ">";
+            String columnUri = "<" + columnLabelToUri(dataLinkingScript.getColumn(), fileUri) + ">";
 
             // Prepare the data-linking script SPARQL based on the template retrieved by the script's id.
             ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(dataLinkingScript.getScriptId());
@@ -732,8 +731,7 @@ public class CsvImportHelper {
      *
      * @throws DAOException
      */
-    public void generateAndStoreTableFileQuery()
-            throws DAOException {
+    public void generateAndStoreTableFileQuery() throws DAOException {
 
         String objectsTypeUri = fileUri + "/" + objectsType;
 
@@ -807,5 +805,78 @@ public class CsvImportHelper {
         } finally {
             SesameUtil.close(repoConn);
         }
+    }
+
+    /**
+     * A utility method for constructing a URI for a particular column of a particular file.
+     *
+     * @param columnLabel The column's label.
+     * @param fileUri The file's URI.
+     * @return The columns's URI.
+     */
+    public static String columnLabelToUri(String columnLabel, String fileUri) {
+        return new StringBuilder(fileUri).append("#").append(columnLabel.replace(' ', '_')).toString();
+    }
+
+    /**
+     * Returns data-linking scripts that already exist for this {@link #fileUri}, taking into account the the given columns
+     * exist in the file.
+     *
+     * @return The given column labels.
+     * @throws DAOException In case database access error occurs.
+     */
+    public List<DataLinkingScript> getExistingDataLinkingScripts(List<String> columnLabels) throws DAOException {
+
+        ArrayList<DataLinkingScript> resultList = new ArrayList<DataLinkingScript>();
+
+        PostHarvestScriptDAO scriptsDao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+        List<PostHarvestScriptDTO> existingScripts = scriptsDao.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+        if (CollectionUtils.isNotEmpty(existingScripts)) {
+
+            List<ScriptTemplateDTO> scriptTemplates = new ScriptTemplateDaoImpl().getScriptTemplates();
+            if (CollectionUtils.isNotEmpty(scriptTemplates)) {
+
+                // Loop over the file's existing post-harvest scripts, and find a matching data-linking script for each one.
+                // The latter is found by looping over all available data-linking script templates and
+                // - comparing the title of the post-harvest script and the name of the data-linking script template.
+                // - finding the data-linking column in the post-harvest script by looping over all possible column URIs and
+                // finding the first one whose URI is contained in the post-harvest script.
+
+                for (PostHarvestScriptDTO phScript : existingScripts) {
+
+                    String phScriptTitle = phScript.getTitle();
+                    String phScriptSparql = phScript.getScript();
+                    if (StringUtils.isNotBlank(phScriptTitle) && StringUtils.isNotBlank(phScriptSparql)) {
+
+                        for (ScriptTemplateDTO scriptTemplate : scriptTemplates) {
+
+                            String templateId = scriptTemplate.getId();
+                            String templateName = scriptTemplate.getName();
+
+                            boolean matchingTemplateFound = false;
+                            if (phScriptTitle.equals(templateName) && StringUtils.isNotBlank(templateId)) {
+
+                                for (String columnLabel : columnLabels) {
+
+                                    if (phScriptSparql.contains("<" + columnLabelToUri(columnLabel, fileUri) + ">")) {
+
+                                        DataLinkingScript dataLinkingScript = DataLinkingScript.create(columnLabel, templateId);
+                                        resultList.add(dataLinkingScript);
+                                        matchingTemplateFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (matchingTemplateFound) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return resultList;
     }
 }

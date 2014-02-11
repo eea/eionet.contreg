@@ -39,6 +39,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -203,10 +204,19 @@ public class UploadCSVActionBean extends AbstractActionBean {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
         }
 
-        // Prepare resolution.
+        // Prepare various stuff
         ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
-
         fileName = fileBean.getFileName();
+        relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
+        CsvImportHelper helper =
+                new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
+                        source);
+
+        // Get already existing data-linking scripts for this file URI, as we need to remember them before overwrite.
+        dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels());
+        if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
+            addDataLinkingScripts = true;
+        }
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (overwrite) {
@@ -233,14 +243,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
         try {
             // Save the file into user's file-store.
             long fileSize = fileBean.getSize();
-            relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
-            // FileStore fileStore = FileStore.getInstance(getUserName());
             FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
-
-            CsvImportHelper helper =
-                    new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
-                            source);
 
             // Detect charset and convert the file to UTF-8
             if (StringUtils.isNotBlank(fileEncoding)) {
@@ -268,8 +272,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
             helper.linkFileToFolder(folderUri, getUserName());
 
             // Prepare data linkins scripts dropdown
-            dataLinkingScripts = new ArrayList<DataLinkingScript>();
-            dataLinkingScripts.add(new DataLinkingScript());
+            if (CollectionUtils.isEmpty(dataLinkingScripts)) {
+                dataLinkingScripts = new ArrayList<DataLinkingScript>();
+                dataLinkingScripts.add(new DataLinkingScript());
+            }
 
             // If not given, the file's label equals the file's name
             if (StringUtils.isEmpty(fileLabel)) {
