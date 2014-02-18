@@ -83,12 +83,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label class="question" for="schema">Is "Schema" source:</label></td>
-                    <td>
-                        <stripes:checkbox name="schemaSource" id="schema"/>
-                    </td>
-                </tr>
-                <tr>
                     <td><label class="question" for="priority">Is "Priority" source:</label></td>
                     <td>
                         <stripes:checkbox name="harvestSource.prioritySource" id="priority"/>

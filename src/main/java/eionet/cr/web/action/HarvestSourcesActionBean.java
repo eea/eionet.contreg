@@ -44,9 +44,11 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URLUtil;
-import eionet.cr.util.pagination.Pagination;
 import eionet.cr.util.pagination.PagingRequest;
+import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.CustomPaginatedList;
 import eionet.cr.web.util.columns.GenericColumn;
 import eionet.cr.web.util.columns.HarvestSourcesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
@@ -56,93 +58,50 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  *
  */
 @UrlBinding("/sources.action")
-public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSourceDTO> {
+public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
+
+    /** Default size of the deletion queue result list page. */
+    public static final int RESULT_LIST_PAGE_SIZE = 15;
 
     /** Max number of rows where a paging request's offset can start from in Virtuoso. */
     private static final int VIRTUOSO_MAX_PAGING_ROWS = 10000;
 
-    /** */
-    private static final String UNAVAILABLE_TYPE = "unavail";
-    private static final String UNAUHTORIZED_HARVESTS = "unauth";
-    private static final String PRIORITY = "priority";
-    private static final String FAILED_HARVESTS = "failed";
-    private static final String SCHEMAS = "schemas";
-    private static final String SPARQL_ENDPOINTS = "endpoints";
-
-    /** */
+    /** Request parameters to exclude from paging and sorting URLs. */
     private static final String[] EXCLUDE_FROM_SORT_AND_PAGING_URLS = {"harvest", "delete", "sourceUrl"};
 
-    /** */
-    public static final List<Pair<String, String>> SOURCE_TYPES;
-
-    /** */
-    private static final GenericColumn CHECKBOX_COLUMN;
-    private static final HarvestSourcesColumn URL_COLUMN;
-    private static final HarvestSourcesColumn DATE_COLUMN;
-
-    /**
-     * the string to be searched
-     */
+    /** The string to search harvest sources by. */
     private String searchString;
 
-    private List<String> sources;
+    /** Indicates the currently selected tab on harvest sources list. */
+    private HarvestSourceType type = HarvestSourceType.TRACKED;
 
-    /** */
-    private String type;
-
-    /** */
+    /** The list of source URLs selected by user for deletion or possible other operations. */
     private List<String> sourceUrl;
 
-    /** */
-    private List<SearchResultColumn> columnList;
+    /** The result list of harvest sources matching the filtering criteria and requested paging+sorting. */
+    private List<HarvestSourceDTO> resultList = new ArrayList<HarvestSourceDTO>();
 
-    /** */
-    static {
-        // initialize the tabs of the harvest sources page
-        SOURCE_TYPES = new LinkedList<Pair<String, String>>();
-        SOURCE_TYPES.add(new Pair<String, String>(null, "Tracked files"));
-        SOURCE_TYPES.add(new Pair<String, String>(PRIORITY, "Priority"));
-        SOURCE_TYPES.add(new Pair<String, String>(SCHEMAS, "Schemas"));
-        SOURCE_TYPES.add(new Pair<String, String>(FAILED_HARVESTS, "Failed harvests"));
-        SOURCE_TYPES.add(new Pair<String, String>(UNAVAILABLE_TYPE, "Permanent failures"));
-        SOURCE_TYPES.add(new Pair<String, String>(UNAUHTORIZED_HARVESTS, "Unauthorized"));
-        SOURCE_TYPES.add(new Pair<String, String>(SPARQL_ENDPOINTS, "SPARQL endpoints"));
+    /** Paginated list object based on {@link #resultList} and fed into DisplayTag's table tag in JSP. */
+    private CustomPaginatedList<HarvestSourceDTO> paginatedList = new CustomPaginatedList<HarvestSourceDTO>();
 
-        // initialize column objects that will be used as columns in the harvest sources page
-
-        CHECKBOX_COLUMN = new GenericColumn();
-        CHECKBOX_COLUMN.setTitle("");
-        CHECKBOX_COLUMN.setSortable(false);
-        CHECKBOX_COLUMN.setEscapeXml(false);
-
-        URL_COLUMN = new HarvestSourcesColumn(false);
-        URL_COLUMN.setSortable(true);
-        URL_COLUMN.setTitle("URL");
-        URL_COLUMN.setEscapeXml(false);
-
-        DATE_COLUMN = new HarvestSourcesColumn(true);
-        DATE_COLUMN.setSortable(true);
-        DATE_COLUMN.setTitle("Last harvest");
-    }
-
-    /*
-     * (non-Javadoc)
+    /**
+     * Default action.
      *
-     * @see eionet.cr.web.action.AbstractSearchActionBean#search()
+     * @return The resolution to go to.
+     * @throws DAOException If any sort of data access error happens.
      */
-    @Override
     @DefaultHandler
     public Resolution search() throws DAOException {
 
         try {
-            PagingRequest pagingRequest = PagingRequest.create(getPageN());
-            SortingRequest sortingRequest = new SortingRequest(sortP, SortOrder.parse(sortO));
+            PagingRequest pagingRequest = PagingRequest.create(getPage(), RESULT_LIST_PAGE_SIZE);
+            SortingRequest sortingRequest = new SortingRequest(getSort(), SortOrder.parse(getDir()));
 
             if (pagingRequest != null) {
                 boolean pageAllowed = isPageAllowed(pagingRequest);
                 if (!pageAllowed) {
                     addCautionMessage("The requested page number exceeds the backend's maximum number of rows "
-                            + "that can be paged through! Please narrow your search by using the filter below.");
+                            + "that can be paged through! Please narrow your search by using the tabs and filter below.");
                     return new RedirectResolution(getClass());
                 }
             }
@@ -155,37 +114,33 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
             Pair<Integer, List<HarvestSourceDTO>> pair = null;
             HarvestSourceDAO harvestSourceDAO = factory.getDao(HarvestSourceDAO.class);
-            if (StringUtils.isBlank(type)) {
+            if (type == null || HarvestSourceType.TRACKED.equals(type)) {
+                if (type == null) {
+                    type = HarvestSourceType.TRACKED;
+                }
                 pair = harvestSourceDAO.getHarvestSources(filterString, pagingRequest, sortingRequest);
-            } else if (PRIORITY.equals(type)) {
+            } else if (HarvestSourceType.PRIORITY.equals(type)) {
                 pair = harvestSourceDAO.getPrioritySources(filterString, pagingRequest, sortingRequest);
-            } else if (UNAVAILABLE_TYPE.equals(type)) {
+            } else if (HarvestSourceType.UNAVAILABLE.equals(type)) {
                 pair = harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest, sortingRequest);
-            } else if (FAILED_HARVESTS.equals(type)) {
+            } else if (HarvestSourceType.FAILED.equals(type)) {
                 pair = harvestSourceDAO.getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
-            } else if (UNAUHTORIZED_HARVESTS.equals(type)) {
+            } else if (HarvestSourceType.UNAUHTORIZED.equals(type)) {
                 pair = harvestSourceDAO.getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
-            } else if (SCHEMAS.equals(type)) {
-                // Get comma separated sources that are included into
-                // inferencing ruleset
-                String sourceUris = harvestSourceDAO.getSourcesInInferenceRules();
-                pair = harvestSourceDAO.getInferenceSources(filterString, pagingRequest, sortingRequest, sourceUris);
-            } else if (SPARQL_ENDPOINTS.equals(type)) {
+            } else if (HarvestSourceType.ENDPOINT.equals(type)) {
                 pair = harvestSourceDAO.getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
             }
 
+            int matchCount = 0;
             if (pair != null) {
                 resultList = pair.getRight();
                 if (resultList == null) {
-                    resultList = new LinkedList<HarvestSourceDTO>();
+                    resultList = new ArrayList<HarvestSourceDTO>();
                 }
-                matchCount = pair.getLeft();
-            } else {
-                matchCount = 0;
+                matchCount = pair.getLeft() == null ? 0 : pair.getLeft().intValue();
             }
 
-            setPagination(Pagination.createPagination(matchCount, pagingRequest.getPageNumber(), this));
-
+            paginatedList = new CustomPaginatedList<HarvestSourceDTO>(this, matchCount, resultList, RESULT_LIST_PAGE_SIZE);
             return new ForwardResolution("/pages/sources.jsp");
         } catch (DAOException exception) {
             throw new RuntimeException("error in search", exception);
@@ -193,9 +148,10 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
+     * Indicates if user can delete the given harvest source.
      *
-     * @param harvestSourceDTO
-     * @return
+     * @param harvestSourceDTO The given harvest source.
+     * @return True/false flag.
      */
     public boolean userCanDelete(HarvestSourceDTO harvestSourceDTO) {
 
@@ -221,9 +177,10 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
+     * Delete action for deleting user-selected sources.
      *
-     * @return
-     * @throws DAOException
+     * @return The resolution to go to.
+     * @throws DAOException If data access error occurs.
      */
     public Resolution delete() throws DAOException {
 
@@ -306,9 +263,11 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
-     * @return Resolution
-     * @throws DAOException
-     * @throws HarvestException
+     * The harvest action for harvesting selected source(s).
+     *
+     * @return Resolution The resolution to go to.
+     * @throws DAOException If data access error occurs.
+     * @throws HarvestException If harvest exception occurs.
      */
     public Resolution harvest() throws DAOException, HarvestException {
 
@@ -329,83 +288,39 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     }
 
     /**
+     * Returns all possible values of {@link HarvestSourceType}.
      *
-     * @return List<Pair<String, String>>
+     * @return The array of possible values.
      */
-    public List<Pair<String, String>> getSourceTypes() {
-        return SOURCE_TYPES;
+    public HarvestSourceType[] getSourceTypes() {
+        return HarvestSourceType.values();
     }
 
     /**
-     * @return the type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     * @param sourceUrl the sourceUrl to set
+     * Sets the user-selected URLs.
+     *
+     * @param sourceUrl the new source url
      */
     public void setSourceUrl(List<String> sourceUrl) {
         this.sourceUrl = sourceUrl;
     }
 
     /**
+     * Sets the search string.
      *
-     * @return String
-     */
-    public String getPagingUrl() {
-
-        String urlBinding = getUrlBinding();
-        if (urlBinding.startsWith("/")) {
-            urlBinding = urlBinding.substring(1);
-        }
-
-        StringBuffer buf = new StringBuffer(urlBinding);
-        return buf.append("?view=").toString();
-    }
-
-    /**
-     * @param searchString the searchString to set
+     * @param searchString the new search string
      */
     public void setSearchString(String searchString) {
         this.searchString = searchString;
     }
 
     /**
-     * @return the searchString
+     * Gets the search string.
+     *
+     * @return the search string
      */
     public String getSearchString() {
         return searchString;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.web.action.AbstractSearchActionBean#getColumns()
-     */
-    @Override
-    public List<SearchResultColumn> getColumns() throws DAOException {
-
-        if (columnList == null) {
-
-            columnList = new ArrayList<SearchResultColumn>();
-            // display checkbox only when current session allows update rights in registrations ACL
-            if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u")) {
-                columnList.add(CHECKBOX_COLUMN);
-            }
-            columnList.add(URL_COLUMN);
-            columnList.add(DATE_COLUMN);
-        }
-
-        return columnList;
     }
 
     /*
@@ -416,20 +331,6 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
     @Override
     public String[] excludeFromSortAndPagingUrls() {
         return EXCLUDE_FROM_SORT_AND_PAGING_URLS;
-    }
-
-    /**
-     * @return
-     */
-    public List<String> getSources() {
-        return sources;
-    }
-
-    /**
-     * @param sources
-     */
-    public void setSources(List<String> sources) {
-        this.sources = sources;
     }
 
     /**
@@ -456,5 +357,112 @@ public class HarvestSourcesActionBean extends AbstractSearchActionBean<HarvestSo
 
         int rowCount = pageNumber * itemsPerPage;
         return rowCount <= VIRTUOSO_MAX_PAGING_ROWS;
+    }
+
+    /**
+     * Dynamic getter for {@link #RESULT_LIST_PAGE_SIZE}.
+     *
+     * @return The value.
+     */
+    public int getResultListPageSize() {
+        return RESULT_LIST_PAGE_SIZE;
+    }
+
+    /**
+     * Gets the paginated list.
+     *
+     * @return the paginated list
+     */
+    public CustomPaginatedList<HarvestSourceDTO> getPaginatedList() {
+        return paginatedList;
+    }
+
+    /**
+     * Returns true if the current user is allowed to make updates to the harvest sources. Otherwise returns false.
+     *
+     * @return True/false.
+     */
+    public boolean isUserAllowedUpdates() {
+        CRUser user = getUser();
+        return user != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/registrations", "u");
+    }
+
+    /**
+     * Returns the class of {@link HarvestSourceActionBean} for refactoring-safe access from JSP.
+     *
+     * @return The class.
+     */
+    public Class<HarvestSourceActionBean> getHarvestSourceBeanClass() {
+        return HarvestSourceActionBean.class;
+    }
+
+    /**
+     * Gets the type.
+     *
+     * @return the type
+     */
+    public HarvestSourceType getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type.
+     *
+     * @param type the new type
+     */
+    public void setType(HarvestSourceType type) {
+        this.type = type;
+    }
+
+    /**
+     * Classifies harvest sources by the different tabs by which the list of harevst sourecs is displayed to users.
+     *
+     * @author Jaanus
+     */
+    public static enum HarvestSourceType {
+
+        /** The tracked files. */
+        TRACKED("Tracked files"),
+
+        /** The priority sources. */
+        PRIORITY("Priority"),
+
+        /** Sources with failed latest harvest. */
+        FAILED("Failed harvests"),
+
+        /** Unavailable sources. */
+        UNAVAILABLE("Permanent failures"),
+
+        /** Unauhtorized sources. */
+        UNAUHTORIZED("Unauthorized"),
+
+        /** Remote SPARQL endpoints. */
+        ENDPOINT("SPARQL endpoints");
+
+        /** The classifier's human-readable title. */
+        private String title;
+
+        /**
+         * Simple constructor with given human-readable title.
+         *
+         * @param title The title.
+         */
+        HarvestSourceType(String title) {
+
+            if (title == null || title.trim().length() == 0) {
+                this.title = this.name();
+            } else {
+                this.title = title;
+            }
+        }
+
+        /**
+         * Gets the title.
+         *
+         * @return the title
+         */
+        public String getTitle() {
+            return title;
+        }
     }
 }

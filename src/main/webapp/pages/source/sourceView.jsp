@@ -132,19 +132,6 @@
                     </tr>
                 </c:if>
                 <tr>
-                    <th scope="row">"Schema" source</th>
-                    <td>
-                        <c:choose>
-                            <c:when test="${actionBean.schemaSource}">
-                                <c:out value="yes"/>
-                            </c:when>
-                            <c:otherwise>
-                                <c:out value="no"/>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
-                </tr>
-                <tr>
                     <th scope="row">"Priority" source</th>
                     <td>
                         <c:choose>
