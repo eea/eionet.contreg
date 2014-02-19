@@ -211,8 +211,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Selected project for the bookmark. */
     private String bookmarkFolder;
 
-    /** Keeps the state of the bulk actions buttons visibility cross the requests */
-    private boolean bulkActionsPanelVisible;
+    /** Keeps the state of the bulk actions visibility across requests */
+    private boolean displayBulkActions;
 
     /**
      *
@@ -507,7 +507,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = new ForwardResolution(FORM_PAGE);
         if (!isAdminPrivilege()) {
             addWarningMessage("You are not authorized for this operation!");
-        } else if (StringUtils.isBlank(query)){
+        } else if (StringUtils.isBlank(query)) {
             addCautionMessage("Found no SPARQL query in the reqeust!");
         } else {
             int markedCount = DAOFactory.get().getDao(SourceDeletionsDAO.class).markForDeletionSparql(query);
@@ -1457,15 +1457,26 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     }
 
-    public boolean isBulkActionsAvailable() {
+    /**
+     * Checks if is bulk actions panel should be available for the current user.
+     *
+     * @return true, if is bulk actions available
+     */
+    public boolean isBulkActionsAllowed() {
         return isAdminPrivilege();
     }
 
-    public boolean isBulkActionsPanelVisible() {
-        return bulkActionsPanelVisible;
+    /**
+     * @return the displayBulkActions
+     */
+    public boolean isDisplayBulkActions() {
+        return displayBulkActions;
     }
 
-    public void setBulkActionsPanelVisible(boolean bulkActionsPanelVisible) {
-        this.bulkActionsPanelVisible = bulkActionsPanelVisible;
+    /**
+     * @param displayBulkActions the displayBulkActions to set
+     */
+    public void setDisplayBulkActions(boolean displayBulkActions) {
+        this.displayBulkActions = displayBulkActions;
     }
 }
