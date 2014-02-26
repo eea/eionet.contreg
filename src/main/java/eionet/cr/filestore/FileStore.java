@@ -281,6 +281,22 @@ public final class FileStore {
     }
 
     /**
+     * Returns true if this file store has a file by the given relative path.
+     *
+     * @param relativePath The file's relative path.
+     * @return Boolean in indicating the file's existence.
+     */
+    public boolean fileExists(String relativePath) {
+
+        if (StringUtils.isBlank(relativePath)) {
+            return false;
+        }
+
+        File file = new File(userDir, relativePath);
+        return file.exists() && file.isFile();
+    }
+
+    /**
      * Gets file by its URI.
      *
      * @param uriString the uri string

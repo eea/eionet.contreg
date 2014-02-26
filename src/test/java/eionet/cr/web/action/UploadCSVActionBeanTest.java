@@ -28,11 +28,15 @@ import org.apache.commons.lang.ArrayUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
+import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
+import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -103,7 +107,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception Any sort of error that happens.
      */
-    public void test() throws Exception {
+    public void testTwoUploadsInARow() throws Exception {
 
         // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
         // remove after the "upload". But we shall need it once more for the second run of the upload/save chain.
@@ -113,7 +117,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
         dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
-        doUploadOverwriteSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS);
+        doUploadSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
 
         // Now restore the file-under-test from the above-made backup if indeed it has been deleted as noted above.
         if (!TEST_FILE.exists()) {
@@ -125,30 +129,80 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         }
 
         // Now do a run WITHOUT data linking script(s).
-        doUploadOverwriteSave(null, EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS);
+        doUploadSave(null, EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS, true);
+    }
+
+    /**
+     *
+     * @throws Exception
+     */
+    public void testBrandNewUpload() throws Exception {
+
+        deleteUploadedFile();
+
+        // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
+        // remove after the "upload". But we shall need it once more for the second run of the upload/save chain.
+        File backupFile = new File(TEST_FILE.getParentFile(), TEST_FILE.getName() + ".backup");
+        if (TEST_FILE.exists()) {
+            if (!backupFile.exists()) {
+                FileUtils.copyFile(TEST_FILE, backupFile);
+            }
+        } else {
+            if (backupFile.exists()) {
+                FileUtils.copyFile(backupFile, TEST_FILE);
+            } else {
+                throw new IllegalStateException("Test seed file has gone and no backup file is present either!");
+            }
+        }
+        testFileSize = TEST_FILE.length();
+
+        // Now do a run WITH data linking script(s).
+        ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
+        dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
+        doUploadSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
+    }
+
+    /**
+     * Deletes the file (from file-store) denoted by {@link #TEST_FILE} and its metadata.
+     *
+     * @throws DAOException If any sort of data access error happens.
+     */
+    private void deleteUploadedFile() throws DAOException {
+
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+        HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+        folderDAO.deleteFileOrFolderUris(TEST_FOLDER_URI, Collections.singletonList(TEST_FILE_URI));
+        harvestSourceDAO.removeHarvestSources(Collections.singletonList(TEST_FILE_URI));
+
+        FileStore fileStore = FileStore.getInstance(TEST_USER_NAME);
+        fileStore.delete(FolderUtil.extractPathInUserHome(TEST_FOLDER_URI + "/" + TEST_FILE_NAME));
     }
 
     /**
      * Does and tests the file's upload and save, using the given data linking scripts and expecting the given SPARQL query
-     * to be generated for the file. The upload is done with "overwrite=true".
+     * to be generated for the file. The upload is done with or without overwrite, depending on the given boolean.
      *
      * @param dataLinkingScripts The data-linking scripts.
      * @param expectedSparql The expected SPARQL to be generated.
+     * @param isOverwrite Overwrite or not.
      *
      * @throws Exception Any sort of error that happens.
      */
-    private void doUploadOverwriteSave(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
+    private void doUploadSave(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql, boolean isOverwrite)
+            throws Exception {
 
-        doUploadOverwrite();
+        doUpload(isOverwrite);
         doSave(dataLinkingScripts, expectedSparql);
     }
 
     /**
-     * Does and tests the file's "upload" step, doing it with "overwrite=true".
+     * Does and tests the file's "upload" step, doing it with or without overwrite, depending on the given boolean.
      *
+     * @param isOverwrite Overwrite or not.
      * @throws Exception Any sort of error that happens.
      */
-    private void doUploadOverwrite() throws Exception {
+    private void doUpload(boolean isOverwrite) throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.
         MockServletContext ctx = createContextMock();
@@ -163,7 +217,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         // Prepare simple string-based request parameters.
         trip.setParameter("folderUri", TEST_FOLDER_URI);
-        trip.setParameter("overwrite", "true");
+        trip.setParameter("overwrite", String.valueOf(isOverwrite));
         trip.setParameter("fileType", "CSV");
         trip.setParameter("fileEncoding", "UTF-8");
 

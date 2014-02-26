@@ -166,6 +166,9 @@ public class CsvImportHelper {
         CSVReader csvReader = null;
         try {
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, userName, true);
+            if (csvReader == null) {
+                throw new IllegalStateException("No CSV reader successfully created!");
+            }
             return helper.extractColumnLabels(helper.extractColumns(csvReader));
         } catch (Exception e) {
             throw e;
@@ -286,6 +289,8 @@ public class CsvImportHelper {
                                 ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE),
                                 charset), delim);
             }
+        } else {
+            throw new IOException("Found no such file: " + (file == null ? "null" : file.toString()));
         }
 
         return result;

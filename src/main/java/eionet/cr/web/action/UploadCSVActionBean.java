@@ -208,12 +208,15 @@ public class UploadCSVActionBean extends AbstractActionBean {
         ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
         fileName = fileBean.getFileName();
         relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
+        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
         CsvImportHelper helper =
                 new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
                         source);
 
         // Get already existing data-linking scripts for this file URI, as we need to remember them before overwrite.
-        dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels());
+        if (fileStore.fileExists(relativeFilePath)) {
+            dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels());
+        }
         if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
             addDataLinkingScripts = true;
         }
@@ -227,7 +230,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
             if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
                 String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
                 // Delete existing data
-                FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
                 folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
                 DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
                 fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + fileName));
@@ -243,7 +245,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
         try {
             // Save the file into user's file-store.
             long fileSize = fileBean.getSize();
-            FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
 
             // Detect charset and convert the file to UTF-8
@@ -312,6 +313,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // The file was encoded to UTF-8 or UTF-* after upload
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), Charset.forName(finalEncoding));
+            if (csvReader == null) {
+                throw new IllegalStateException("No CSV reader successfully created!");
+            }
 
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();

@@ -88,10 +88,13 @@ public final class CsvImportUtil {
         helper.linkFileToFolder(folderUri, userName);
 
         // Parse and insert triples from file to triplestore
-        CSVReader csvReader = helper.createCSVReader(folderUri, relativeFilePath, userName, true);
+        CSVReader csvReader = null;
 
         try {
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, userName, true);
+            if (csvReader == null) {
+                throw new IllegalStateException("No CSV reader successfully created!");
+            }
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();
 
