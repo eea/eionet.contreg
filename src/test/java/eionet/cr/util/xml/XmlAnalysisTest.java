@@ -78,4 +78,45 @@ public class XmlAnalysisTest {
                         + "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
         assertEquals(expected, xmlAnalysis.getSchemaLocation());
     }
+
+    /**
+     * Parsing from an inputstream. The file has no schema - only namespaces.
+     * getConversionSchema() shall return something based on namespace of first element
+     * getSchemaLocation() shall not return a namespace.
+     *
+     */
+    @Ignore @Test
+    public void onlyGetSchemas() throws Exception {
+        String inlineXml = "<gml:FeatureCollection "
+            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+            + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" "
+            + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
+            + "xmlns:swe=\"http://www.opengis.net/swe/2.0\">\n"
+            + "</gml:FeatureCollection>\n";
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
+        XmlAnalysis xmlAnalysis = new XmlAnalysis();
+        xmlAnalysis.parse(inputStream);
+        String expected = "http://www.opengis.net/gml/3.2FeatureCollection";
+        assertEquals(expected, xmlAnalysis.getConversionSchema());
+
+        assertEquals(null, xmlAnalysis.getSchemaLocation());
+    }
+
+    /**
+     * Check the system ID. It must not have trailing spaces.
+     */
+    @Ignore @Test
+    public void onlyGetSchemas() throws Exception {
+
+        String inlineXml = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd \">\n"
+                + "<html>\n"
+                + "</html>\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
+        XmlAnalysis xmlAnalysis = new XmlAnalysis();
+        xmlAnalysis.parse(inputStream);
+        String expected = "http://www.w3.org/TR/html4/loose.dtd";
+        assertEquals(expected, xmlAnalysis.getSystemDtd());
+    }
+
 }
