@@ -20,12 +20,14 @@
  */
 package eionet.cr.util.xml;
 
-import java.io.File;
-import java.io.ByteArrayInputStream;
-
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -61,20 +63,20 @@ public class XmlAnalysisTest {
      */
     @Test
     public void nsXmlAnalysis() throws Exception {
-        String inlineXml = "<gml:FeatureCollection "
-            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-            + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" "
-            + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
-            + "xmlns:swe=\"http://www.opengis.net/swe/2.0\" "
-            + "xsi:schemaLocation=\"http://aqd.ec.europa.eu/aqd/0.3.6b "
-            + "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd \n\n"
-            + "http://www.opengis.net/swe/2.0  http://schemas.opengis.net/sweCommon/2.0/swe.xsd\">\n"
-            + "</gml:FeatureCollection>\n";
+        String inlineXml =
+                "<gml:FeatureCollection " + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                        + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" " + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
+                        + "xmlns:swe=\"http://www.opengis.net/swe/2.0\" "
+                        + "xsi:schemaLocation=\"http://aqd.ec.europa.eu/aqd/0.3.6b "
+                        + "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd \n\n"
+                        + "http://www.opengis.net/swe/2.0  http://schemas.opengis.net/sweCommon/2.0/swe.xsd\">\n"
+                        + "</gml:FeatureCollection>\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         xmlAnalysis.parse(inputStream);
-        String expected = "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd "
+        String expected =
+                "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd "
                         + "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
         assertEquals(expected, xmlAnalysis.getSchemaLocation());
     }
@@ -85,14 +87,13 @@ public class XmlAnalysisTest {
      * getSchemaLocation() shall not return a namespace.
      *
      */
-    @Ignore @Test
-    public void onlyGetSchemas() throws Exception {
-        String inlineXml = "<gml:FeatureCollection "
-            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-            + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" "
-            + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
-            + "xmlns:swe=\"http://www.opengis.net/swe/2.0\">\n"
-            + "</gml:FeatureCollection>\n";
+    @Ignore
+    @Test
+    public void onlyGetSchemas1() throws Exception {
+        String inlineXml =
+                "<gml:FeatureCollection " + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                        + "xmlns:gml=\"http://www.opengis.net/gml/3.2\" " + "xmlns:aqd=\"http://aqd.ec.europa.eu/aqd/0.3.6b\" "
+                        + "xmlns:swe=\"http://www.opengis.net/swe/2.0\">\n" + "</gml:FeatureCollection>\n";
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
@@ -106,12 +107,13 @@ public class XmlAnalysisTest {
     /**
      * Check the system ID. It must not have trailing spaces.
      */
-    @Ignore @Test
-    public void onlyGetSchemas() throws Exception {
+    @Ignore
+    @Test
+    public void onlyGetSchemas2() throws Exception {
 
-        String inlineXml = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd \">\n"
-                + "<html>\n"
-                + "</html>\n";
+        String inlineXml =
+                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd \">\n"
+                        + "<html>\n" + "</html>\n";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         xmlAnalysis.parse(inputStream);
