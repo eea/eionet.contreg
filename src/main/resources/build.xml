@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="webapp.deploy" default="prepare.resources" basedir=".">
+
+    <!-- The target that prepares various resources needed by the webapp at runtime, but shouldn't be inside webadoo directory. -->
+
+    <target name="prepare.resources" unless="antrun.skip">
+
+    	<!-- Ensure that the "application.acl.folder" directory exists. -->
+    	<mkdir dir="${application.acl.folder}"/>
+
+        <!-- Copy all files from acl directory into "application.acl.folder", unless they already exist in the latter. -->
+        <copy todir="${application.acl.folder}">
+            <fileset dir="acl">
+                  <present present="srconly" targetdir="${application.acl.folder}"/>
+            </fileset>
+        </copy>
+
+        <!-- Always overwrite the permission definitions file(s) in "application.acl.folder". -->
+        <copy todir="${application.acl.folder}" overwrite="true">
+            <fileset dir="acl" includes="*.prms*"/>
+            <fileset dir="acl" includes="*.permissions*"/>
+        </copy>
+
+        <!-- Ensure that the "harvester.tempFileDir" directory exists. -->
+        <mkdir dir="${harvester.tempFileDir}"/>
+
+    </target>
+</project>
