@@ -215,7 +215,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
+     * Fills the bean's following properties from the bookmarked query:
+     * - the query itself - output format - hits per page - whether
      * to use same-as "yes".
      *
      * @throws DAOException
@@ -464,7 +465,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             }
         } else {
             addGlobalValidationError(VALIDATION_ERROR_MUST_BE_ADMINISTRATOR);
-            LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk sources through Sparql endpoint");
+            LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk "
+                    + "sources through Sparql endpoint");
         }
 
         return resolution;
@@ -586,8 +588,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties. See SPARQL
-     * protocol specifications for more.
+     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties.
+     * See SPARQL protocol specifications for more.
      */
     private void setDefaultAndNamedGraphs() {
         defaultGraphUris = getContext().getRequest().getParameterValues(DEFAULT_GRAPH_URI);
@@ -694,8 +696,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers of the given servlet
-     * response.
+     * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers
+     * of the given servlet response.
      *
      * TODO: the execution of the query and communication with Sesame should really not be in controller.
      *
@@ -825,7 +827,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         CRSPARQLTSVWriter sparqlWriter = new CRSPARQLTSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
-                    } else if (outputFormat.equals(FORMAT_HTML) || outputFormat.equals(FORMAT_HTML_PLUS)) {
+                    } else if (outputFormat != null && (outputFormat.equals(FORMAT_HTML)
+                            || outputFormat.equals(FORMAT_HTML_PLUS))) {
                         response.setContentType("text/html");
                         long startTime = System.currentTimeMillis();
                         queryResult = ((TupleQuery) queryObject).evaluate();
@@ -1320,7 +1323,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             // A ClassCastException means bad query too, because that's what is thrown when the query dos not start with
             // "SELECT", "CONSTRUCT" or "ASK".
-            if (isBadQuery == false) {
+            if (!isBadQuery) {
                 isBadQuery = exception instanceof ClassCastException;
             }
 
@@ -1468,7 +1471,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @param fileExtension file extension without dot
      */
     private void setFileNameToHeader(HttpServletResponse response, String fileExtension) {
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + DEFAULT_SPARQL_FILENAME + "." + fileExtension + "\"");
-
+        response.setHeader("Content-Disposition", "attachment; filename=\""
+                + DEFAULT_SPARQL_FILENAME + "." + fileExtension + "\"");
     }
 }
