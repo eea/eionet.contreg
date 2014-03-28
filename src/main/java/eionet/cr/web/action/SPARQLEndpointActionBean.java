@@ -796,25 +796,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     // Evaluate SELECT query.
                     if (outputFormat.equals(FORMAT_XML)) {
-//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.xml\"");
                         setFileNameToHeader(response, "xml");
                         CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
                         setFileNameToHeader(response, "xml");
-//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.xml\"");
                         CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
                         setFileNameToHeader(response, "json");
-//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.json\"");
                         CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
-//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.csv\"");
                         setFileNameToHeader(response, "csv");
                         addBOM(outputStream, "UTF-8");
 
@@ -822,7 +818,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         CRSPARQLCSVWriter sparqlWriter = new CRSPARQLCSVWriter(outputStream, ';');
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
-//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.csv\"");
                         setFileNameToHeader(response, "csv");
                         // MS Excel expects TSV to be UTF-16Little Endian
                         response.setCharacterEncoding("UTF-16LE");
