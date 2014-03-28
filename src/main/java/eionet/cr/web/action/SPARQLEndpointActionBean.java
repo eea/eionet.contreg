@@ -1,55 +1,9 @@
 package eionet.cr.web.action;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.n3.N3WriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.SourceDeletionsDAO;
+import eionet.cr.dao.*;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -63,14 +17,31 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
+import eionet.cr.web.sparqlClient.helpers.*;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
-import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.*;
+import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.n3.N3WriterFactory;
+import org.openrdf.rio.ntriples.NTriplesWriterFactory;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.turtle.TurtleWriterFactory;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.*;
 
 /**
  *
@@ -92,6 +63,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final String DEFAULT_STREAMING_RESPONSE_MIME_TYPE = "application/sparql-results+xml";
+
+    /** endpoint output file name. */
+    private static final String DEFAULT_SPARQL_FILENAME = "sparql-result";
 
     /** The endpoint's internal conventional output formats. */
     private static final String FORMAT_XML = "xml";
@@ -648,7 +622,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Checks if user has insert right to the project ACL.
      *
-     * @param project
+     * @param projectName
      *            name
      * @return true, if user can add resources to the project.
      */
@@ -747,6 +721,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
 
             TupleQueryResult queryResult = null;
+
             try {
                 if (queryObject instanceof BooleanQuery) {
 
@@ -821,23 +796,34 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     // Evaluate SELECT query.
                     if (outputFormat.equals(FORMAT_XML)) {
+//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.xml\"");
+                        setFileNameToHeader(response, "xml");
                         CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
+                        setFileNameToHeader(response, "xml");
+//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.xml\"");
                         CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
+                        setFileNameToHeader(response, "json");
+//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.json\"");
                         CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
+//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.csv\"");
+                        setFileNameToHeader(response, "csv");
                         addBOM(outputStream, "UTF-8");
+
                         // as main consumer of the result is Excel use ";" because otherwise Excel does not handle CSV correctly
                         CRSPARQLCSVWriter sparqlWriter = new CRSPARQLCSVWriter(outputStream, ';');
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
+//                        response.setHeader("Content-Disposition", "attachment; filename=\"sparql-result.csv\"");
+                        setFileNameToHeader(response, "csv");
                         // MS Excel expects TSV to be UTF-16Little Endian
                         response.setCharacterEncoding("UTF-16LE");
                         addBOM(outputStream, "utf-16le");
@@ -853,6 +839,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
                     }
+
                 }
             } finally {
                 SesameUtil.close(queryResult);
@@ -1478,5 +1465,15 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     public void setDisplayBulkActions(boolean displayBulkActions) {
         this.displayBulkActions = displayBulkActions;
+    }
+
+    /**
+     * adds file name header to response.
+      * @param response Http Response
+     * @param fileExtension file extension without dot
+     */
+    private void setFileNameToHeader(HttpServletResponse response, String fileExtension) {
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + DEFAULT_SPARQL_FILENAME + "." + fileExtension + "\"");
+
     }
 }
