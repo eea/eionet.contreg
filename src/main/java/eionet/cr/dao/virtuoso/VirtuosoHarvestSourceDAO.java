@@ -1031,6 +1031,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public void clearGraph(String graphUri) throws DAOException {
 
+        // Tolerate blank graph URI.
+        if (StringUtils.isBlank(graphUri)) {
+            return;
+        }
+
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();

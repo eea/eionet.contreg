@@ -139,6 +139,9 @@ public abstract class BaseHarvest implements Harvest {
     /** If true, all previously present harvest source metadata should be purged from the triple store. */
     private boolean cleanAllPreviousSourceMetadata;
 
+    /** If true, all triples must removed from the graph represented by the harvested source. */
+    private boolean clearTriples;
+
     /** The number of triples stored during this harvest. This does NOT include the generated harvest source metadata! */
     private int storedTriplesCount;
 
@@ -264,6 +267,13 @@ public abstract class BaseHarvest implements Harvest {
     private void finishHarvest(boolean dontThrowException) throws HarvestException {
 
         try {
+            // clear the triples if requested
+            if (clearTriples) {
+                LOGGER.debug("Clearing triples of " + getContextUrl());
+                DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(getContextUrl());
+                getContextSourceDTO().setStatements(0);
+            }
+
             // run post-harvest scripts
             runPostHarvestScripts();
 
@@ -279,7 +289,7 @@ public abstract class BaseHarvest implements Harvest {
                 }
             }
 
-            // update harvest source dto
+            // update harvest source DTO
             updateHarvestSourceFinished();
 
             // close harvest record, persist harvest messages
@@ -777,6 +787,16 @@ public abstract class BaseHarvest implements Harvest {
     protected void setCleanAllPreviousSourceMetadata(boolean cleanAllPreviousSourceMetadata) {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
     }
+
+    /**
+     * Sets the clearTriples flag.
+     *
+     * @param clearTriples the clearTriples to set
+     */
+    protected void setClearTriples(boolean clearTriples) {
+        this.clearTriples = clearTriples;
+    }
+
 
     /*
      * (non-Javadoc)

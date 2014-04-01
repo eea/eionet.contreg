@@ -541,8 +541,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
 
-        // since the server returned source-not-modified, we're keeping the old metadata,
-        // but still updating the cr:lastRefreshed
+        setClearTriples(true);
         setCleanAllPreviousSourceMetadata(false);
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
     }
