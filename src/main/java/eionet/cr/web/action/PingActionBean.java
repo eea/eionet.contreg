@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,12 +36,16 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
@@ -62,16 +67,16 @@ public class PingActionBean extends AbstractActionBean {
     private static final Logger LOGGER = Logger.getLogger(PingActionBean.class);
 
     /** The Constant ERR_BLANK_URI. */
-    private static final int ERR_BLANK_URI = 1;
+    public static final int ERR_BLANK_URI = 1;
 
     /** The Constant ERR_INVALID_URL. */
-    private static final int ERR_INVALID_URL = 2;
+    public static final int ERR_INVALID_URL = 2;
 
     /** The Constant ERR_FRAGMENT_URL. */
-    private static final int ERR_FRAGMENT_URL = 3;
+    public static final int ERR_FRAGMENT_URL = 3;
 
     /** The Constant ERR_BROKEN_URL. */
-    private static final int ERR_BROKEN_URL = 4;
+    public static final int ERR_BROKEN_URL = 4;
 
     /** Template for the XML-messages to be sent as response to this API. */
     private static final String RESPONSE_XML = "<?xml version=\"1.0\"?>\r\n" + "<response>\r\n"
@@ -103,7 +108,7 @@ public class PingActionBean extends AbstractActionBean {
         String host = processClientHostName(request.getRemoteHost(), ip);
         if (!isTrustedRequester(host, ip)) {
             LOGGER.debug("Client denied: host = " + host + ", IP = " + ip);
-            return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN);
+            return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Operation not allowed!");
         }
 
         // The default result-message and error code that will be printed into XML response.
@@ -153,6 +158,75 @@ public class PingActionBean extends AbstractActionBean {
                 if (doHarvest) {
                     UrgentHarvestQueue.addPullHarvest(uri, CRUser.PING_HARVEST.getUserName());
                     message = "URL added to the urgent harvest queue: " + uri;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("PING request failed: " + e.toString(), e);
+            return new ErrorResolution(HttpURLConnection.HTTP_INTERNAL_ERROR);
+        }
+
+        LOGGER.debug(message);
+        String response = RESPONSE_XML.replace("@message@", message);
+        response = response.replace("@errorCode@", String.valueOf(errorCode));
+        return new StreamingResolution("text/xml", response);
+    }
+
+    /**
+     * A handler for the "delete" event. Allows deletion of a particular source.
+     *
+     * @return Resolution to return to.
+     */
+    public Resolution delete() {
+
+        // Get client host/IP, ensure that it's in the whitelist.
+        HttpServletRequest request = getContext().getRequest();
+        String ip = request.getRemoteAddr();
+        String host = processClientHostName(request.getRemoteHost(), ip);
+        if (!isTrustedRequester(host, ip)) {
+            LOGGER.debug("Client denied: host = " + host + ", IP = " + ip);
+            return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Operation not allowed!");
+        }
+
+        // The default result-message and error code that will be printed into XML response.
+        int errorCode = 0;
+        String message = "";
+        try {
+            // Ensure that the pinged URI is not blank, is legal URI, does not have a fragment part and is not broken.
+            if (StringUtils.isBlank(uri)) {
+                errorCode = ERR_BLANK_URI;
+                message = "No URI given, no action taken.";
+            } else {
+                // Helper flag that will be raised the deletion should indeed be made.
+                boolean doDeletion = false;
+
+                // Check if a source by this URI exists.
+                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+                if (source != null) {
+
+                    Integer sourceId = source.getSourceId();
+                    if (sourceId == null) {
+                        throw new CRRuntimeException("Stumbled on harvest source with id=NULL: " + uri);
+                    }
+                    List<HarvestDTO> harvests = DAOFactory.get().getDao(HarvestDAO.class).getHarvestsBySourceId(sourceId);
+                    if (CollectionUtils.isNotEmpty(harvests)) {
+                        for (HarvestDTO harvestDTO : harvests) {
+                            if (CRUser.PING_HARVEST.getUserName().equals(harvestDTO.getUser())) {
+                                doDeletion = true;
+                            }
+                        }
+                    }
+
+                    if (!doDeletion) {
+                        return new ErrorResolution(HttpURLConnection.HTTP_UNAUTHORIZED, "Source not allowed for ping-deletion!");
+                    }
+
+                } else {
+                    message = "URL not in catalogue of sources, no action taken.";
+                }
+
+                if (doDeletion) {
+                    // TODO: Add to deletion queue
+                    message = "URL added to the deletion queue: " + uri;
                 }
             }
         } catch (Exception e) {

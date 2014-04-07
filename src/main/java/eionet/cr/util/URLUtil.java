@@ -22,6 +22,7 @@ package eionet.cr.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -157,7 +158,7 @@ public class URLUtil {
 
         System.out.println("Response code: " + responseCode);
 
-        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
+        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException || ioe instanceof ConnectException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
                 || responseCode == HttpURLConnection.HTTP_VERSION;
     }
