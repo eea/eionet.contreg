@@ -25,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -225,8 +226,8 @@ public class PingActionBean extends AbstractActionBean {
                 }
 
                 if (doDeletion) {
-                    // TODO: Add to deletion queue
-                    message = "URL added to the deletion queue: " + uri;
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri), false);
+                    message = "URL deleted: " + uri;
                 }
             }
         } catch (Exception e) {
