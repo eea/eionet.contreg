@@ -1,12 +1,24 @@
 package eionet.cr.web.action;
 
+import java.util.List;
+
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.mortbay.jetty.Server;
+
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.TripleDTO;
+import eionet.cr.harvest.PullHarvest;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.test.helpers.JettyUtil;
+import eionet.cr.test.helpers.RdfLoader;
 
 /**
  * Unit tests for the PING action bean.
@@ -18,7 +30,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
-    public void testWithoutURI() throws Exception {
+    public void testPingWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -43,7 +55,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
-    public void testWithInvalidURL() throws Exception {
+    public void testPingWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -70,7 +82,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
-    public void testCreateWithInvalidURL() throws Exception {
+    public void testPingCreateWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -99,7 +111,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    public void testCreateWithFragmentedURL() throws Exception {
+    public void testPingCreateWithFragmentedURL() throws Exception {
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -128,7 +140,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    public void testCreateWithBrokenURL() throws Exception {
+    public void testPingCreateWithBrokenURL() throws Exception {
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -157,7 +169,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    public void testNonExistingSourceWithoutCreate() throws Exception {
+    public void testPingNonExistingSourceWithoutCreate() throws Exception {
 
         String url = "http://www.eea.europa.eu/";
 
@@ -194,7 +206,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    public void testNonExistingSourceWithCreate() throws Exception {
+    public void testPingNonExistingSourceWithCreate() throws Exception {
 
         // Test that source does not exist yet.
         String url = "http://www.eea.europa.eu/";
@@ -222,8 +234,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
         String outputStr = response.getOutputString();
         System.out.println(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
-        assertTrue("Unexpected message",
-                outputStr.contains("<message>URL added to the urgent harvest queue"));
+        assertTrue("Unexpected message", outputStr.contains("<message>URL added to the urgent harvest queue"));
         assertTrue("Unexpected error code", outputStr.contains("<flerror>0</flerror>"));
 
         // Test that source exists now.
@@ -235,7 +246,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    public void testExistingSource() throws Exception {
+    public void testPingExistingSource() throws Exception {
 
         // First, create the source to test.
         HarvestSourceDTO source = new HarvestSourceDTO();
@@ -243,7 +254,6 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
         source.setIntervalMinutes(1440);
         HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         harvestSourceDao.addSource(source);
-
 
         // Set up and execute round-trip.
         MockServletContext ctx = ActionBeanUtils.getServletContext();
@@ -264,8 +274,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
         String outputStr = response.getOutputString();
         System.out.println(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
-        assertTrue("Unexpected message",
-                outputStr.contains("<message>URL added to the urgent harvest queue"));
+        assertTrue("Unexpected message", outputStr.contains("<message>URL added to the urgent harvest queue"));
         assertTrue("Unexpected error code", outputStr.contains("<flerror>0</flerror>"));
     }
 }

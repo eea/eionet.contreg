@@ -184,9 +184,10 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
      */
     @Override
     public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException {
-        /*
-         * Because "TOP N" cannot be used in subselect, I must get the highest started value from the last element in the resultset.
-         */
+
+        //
+        // Because "TOP N" cannot be used in subselect, I must get the highest started value from the last element in the resultset.
+        //
 
         // get harvest source id and maximum started time
         List<Object> selectParams = new ArrayList<Object>();

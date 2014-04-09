@@ -204,27 +204,34 @@ public class PingActionBean extends AbstractActionBean {
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
                 if (source != null) {
 
+                    // Source exists, ensure it has an ID too.
                     Integer sourceId = source.getSourceId();
                     if (sourceId == null) {
                         throw new CRRuntimeException("Stumbled on harvest source with id=NULL: " + uri);
                     }
+
+                    // Deletion allowed only for sources that have been pinged.
                     List<HarvestDTO> harvests = DAOFactory.get().getDao(HarvestDAO.class).getHarvestsBySourceId(sourceId);
                     if (CollectionUtils.isNotEmpty(harvests)) {
                         for (HarvestDTO harvestDTO : harvests) {
                             if (CRUser.PING_HARVEST.getUserName().equals(harvestDTO.getUser())) {
                                 doDeletion = true;
+                                break;
                             }
                         }
                     }
 
+                    // If deletion now alloed (i.e. source never pinged), then return unauthorized.
                     if (!doDeletion) {
                         return new ErrorResolution(HttpURLConnection.HTTP_UNAUTHORIZED, "Source not allowed for ping-deletion!");
                     }
 
                 } else {
+                    // No such source found, prepare relevant feedback message.
                     message = "URL not in catalogue of sources, no action taken.";
                 }
 
+                // If deletion approved, then do it.
                 if (doDeletion) {
                     DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(uri), false);
                     message = "URL deleted: " + uri;
