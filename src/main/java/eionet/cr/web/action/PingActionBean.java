@@ -109,7 +109,7 @@ public class PingActionBean extends AbstractActionBean {
         String host = processClientHostName(request.getRemoteHost(), ip);
         if (!isTrustedRequester(host, ip)) {
             LOGGER.debug("Client denied: host = " + host + ", IP = " + ip);
-            return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Operation not allowed!");
+            return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Client host denied!");
         }
 
         // The default result-message and error code that will be printed into XML response.
@@ -223,7 +223,7 @@ public class PingActionBean extends AbstractActionBean {
 
                     // If deletion now alloed (i.e. source never pinged), then return unauthorized.
                     if (!doDeletion) {
-                        return new ErrorResolution(HttpURLConnection.HTTP_UNAUTHORIZED, "Source not allowed for ping-deletion!");
+                        return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Source not allowed for ping-deletion!");
                     }
 
                 } else {

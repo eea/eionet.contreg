@@ -149,8 +149,8 @@ public class PingDeleteActionBeanTest extends CRDatabaseTestCase {
         SubjectDTO subject = helperDao.getSubject(url);
         assertTrue("Expected triples about " + url, subject != null && subject.getTripleCount() > 0);
 
-        // Try to delete and assert response=unauthorized (source not pinged yet, hence cannot be deleted via ping either).
-        doAndAssertUnauthorizedSourceDelete(url);
+        // Try to delete and assert response=forbidden (source not pinged yet, hence cannot be deleted via ping either).
+        doAndAssertForbiddenSourceDelete(url);
 
         // Insert a started and finished PING harvest.
         HarvestDAO harvestDao = DAOFactory.get().getDao(HarvestDAO.class);
@@ -161,7 +161,7 @@ public class PingDeleteActionBeanTest extends CRDatabaseTestCase {
         harvestDao.updateFinishedHarvest(harvestId, 12, 200);
 
         // Now the deletion via PING should work, as we have the source and have a PING harvest for it.
-        doAndAssertAuthorizedSourceDelete(url);
+        doAndAssertAllowedSourceDelete(url);
 
         // Assert that the source has gone, including its graph content and all triples *about* it
         source = sourceDao.getHarvestSourceByUrl(url);
@@ -178,7 +178,7 @@ public class PingDeleteActionBeanTest extends CRDatabaseTestCase {
      * @param create
      * @throws Exception
      */
-    private void doAndAssertAuthorizedSourceDelete(String url) throws Exception {
+    private void doAndAssertAllowedSourceDelete(String url) throws Exception {
 
         MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
@@ -207,7 +207,7 @@ public class PingDeleteActionBeanTest extends CRDatabaseTestCase {
      * @param url
      * @throws Exception
      */
-    private void doAndAssertUnauthorizedSourceDelete(String url) throws Exception {
+    private void doAndAssertForbiddenSourceDelete(String url) throws Exception {
 
         MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
@@ -218,6 +218,6 @@ public class PingDeleteActionBeanTest extends CRDatabaseTestCase {
 
         // Assert response code.
         MockHttpServletResponse response = (MockHttpServletResponse) bean.getContext().getResponse();
-        assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, response.getStatus());
+        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, response.getStatus());
     }
 }
