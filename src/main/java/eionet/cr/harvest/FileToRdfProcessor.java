@@ -339,7 +339,7 @@ public class FileToRdfProcessor {
     }
 
     /**
-     * Returns the {@link RDFFormat} of the analysed and/or converted file.
+     * Returns the {@link RDFFormat} of the analyzed and/or converted file.
      *
      * @return RDF
      */

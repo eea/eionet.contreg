@@ -797,7 +797,6 @@ public abstract class BaseHarvest implements Harvest {
         this.clearTriples = clearTriples;
     }
 
-
     /*
      * (non-Javadoc)
      *
@@ -1062,17 +1061,41 @@ public abstract class BaseHarvest implements Harvest {
     protected int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
             RDFHandlerException, RDFParseException {
 
-        // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
+        // If the file can be loaded straight away as it is, then proceed to loading straight away.
         // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
         ContentLoader contentLoader = getLocalFileContentloader(file, contentType);
+        int result = loadFileContent(file, contentLoader);
+        return result;
+    }
+
+    /**
+     * Loads content of the given file using the given content loader. The loader may be null, in which case the method attempts
+     * to further process the file into RDF format and create a loader from there.
+     *
+     * @param file The file whose content is to be loaded.
+     * @param contentLoader The loader to used. May be null as indicated above.
+     * @return Number of loaded triples.
+     *
+     * @throws DAOException If DAO call fails.
+     * @throws IOException If error in I/O.
+     * @throws SAXException If SAX parsing fails.
+     * @throws RDFHandlerException If error in RDF handler.
+     * @throws RDFParseException If error in RDF parsing.
+     */
+    protected int loadFileContent(File file, ContentLoader contentLoader) throws DAOException, IOException, SAXException,
+            RDFHandlerException, RDFParseException {
 
         if (contentLoader != null) {
+
             contentLoader.setTimeout(getTimeout());
-            LOGGER.debug(loggerMsg("Filestore file is in RDF or web feed format"));
-            return loadFile(file, contentLoader);
+            LOGGER.debug(loggerMsg("File is in RDF or web feed format"));
+            String loaderClassName = contentLoader.getClass().getSimpleName();
+            LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + loaderClassName));
+            return loadFiles(Collections.singletonMap(file, contentLoader));
         } else {
-            LOGGER.debug(loggerMsg("Filestore file is not in RDF or web feed format, processing the file further"));
+
+            LOGGER.debug(loggerMsg("File is not in RDF or web feed format, processing the file further"));
             File processedFile = null;
             try {
                 // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
@@ -1089,9 +1112,11 @@ public abstract class BaseHarvest implements Harvest {
                     LOGGER.debug(loggerMsg("File processed into RDF format"));
                     ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
                     rdfLoader.setTimeout(getTimeout());
-                    return loadFile(processedFile, rdfLoader);
+                    return loadFiles(Collections.singletonMap(processedFile, rdfLoader));
                 } else {
                     LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
+                    // If file couldn't be processed into RDF format, clear previously harvested content.
+                    getHarvestSourceDAO().clearGraph(getContextUrl());
                     return 0;
                 }
             } finally {
@@ -1100,20 +1125,6 @@ public abstract class BaseHarvest implements Harvest {
                 }
             }
         }
-    }
-
-    /**
-     * Loads file into triplestore.
-     *
-     * @param file object in file system.
-     * @param contentLoader does the actual loading of triples.
-     * @return number of triples.
-     * @throws DAOException database exception
-     */
-    protected int loadFile(File file, ContentLoader contentLoader) throws DAOException {
-
-        LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
-        return loadFiles(Collections.singletonMap(file, contentLoader));
     }
 
     /**

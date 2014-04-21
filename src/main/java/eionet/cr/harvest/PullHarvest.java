@@ -83,7 +83,6 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
-import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
@@ -762,41 +761,8 @@ public class PullHarvest extends BaseHarvest {
             // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
             ContentLoader contentLoader = createContentLoader(urlConn);
-
-            if (contentLoader != null) {
-                contentLoader.setTimeout(getTimeout());
-                LOGGER.debug(loggerMsg("Downloaded file is in RDF or web feed format"));
-                return loadFile(downloadedFile, contentLoader);
-            } else {
-                LOGGER.debug(loggerMsg("Downloaded file is not in RDF or web feed format, processing the file further"));
-                File processedFile = null;
-                try {
-                    // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
-                    // that simply wasn't declared in the server-returned content type.
-                    FileToRdfProcessor fileProcessor = new FileToRdfProcessor(downloadedFile, getContextUrl());
-                    processedFile = fileProcessor.process();
-
-                    String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                    if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
-                        addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
-                    }
-
-                    if (processedFile != null && fileProcessor.getRdfFormat() != null) {
-                        LOGGER.debug(loggerMsg("File processed into RDF format"));
-                        ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
-                        rdfLoader.setTimeout(getTimeout());
-                        return loadFile(processedFile, rdfLoader);
-                    } else {
-                        LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
-                        // if no conversion found but triples exist from previous harvests, clear content
-                        getHarvestSourceDAO().clearGraph(getContextUrl());
-
-                        return 0;
-                    }
-                } finally {
-                    FileDeletionJob.register(processedFile);
-                }
-            }
+            int result = loadFileContent(downloadedFile, contentLoader);
+            return result;
         } finally {
             FileDeletionJob.register(downloadedFile);
         }
