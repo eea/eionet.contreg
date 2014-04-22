@@ -1,0 +1,3 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gml:FeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:aqd="http://aqd.ec.europa.eu/aqd/0.3.6b" xmlns:swe="http://www.opengis.net/swe/2.0" xsi:schemaLocation="http://aqd.ec.europa.eu/aqd/0.3.6b http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd  http://www.opengis.net/swe/2.0  http://schemas.opengis.net/sweCommon/2.0/swe.xsd ">
+</gml:FeatureCollection>

@@ -62,9 +62,10 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#startDTD(java.lang.String, java.lang.String, java.lang.String)
      */
+    @Override
     public void startDTD(String name, String publicId, String systemId) throws SAXException {
-        this.dtdSystemId = systemId;
-        this.dtdPublicId = publicId;
+        this.dtdSystemId = systemId == null ? null : systemId.trim();
+        this.dtdPublicId = publicId == null ? null : publicId.trim();
     }
 
     /*
@@ -72,6 +73,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#endDTD()
      */
+    @Override
     public void endDTD() throws SAXException {
     }
 
@@ -80,6 +82,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#startEntity(java.lang.String)
      */
+    @Override
     public void startEntity(String name) throws SAXException {
     }
 
@@ -88,6 +91,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#endEntity(java.lang.String)
      */
+    @Override
     public void endEntity(String name) throws SAXException {
     }
 
@@ -96,6 +100,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#startCDATA()
      */
+    @Override
     public void startCDATA() throws SAXException {
     }
 
@@ -104,6 +109,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#endCDATA()
      */
+    @Override
     public void endCDATA() throws SAXException {
     }
 
@@ -112,6 +118,7 @@ public class SAXDoctypeReader implements LexicalHandler {
      *
      * @see org.xml.sax.ext.LexicalHandler#comment(char[], int, int)
      */
+    @Override
     public void comment(char[] text, int start, int length) throws SAXException {
     }
 

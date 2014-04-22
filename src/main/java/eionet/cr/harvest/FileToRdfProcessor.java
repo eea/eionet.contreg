@@ -50,6 +50,7 @@ import eionet.cr.harvest.util.FileRdfFormatDetector;
 import eionet.cr.util.CompressUtil;
 import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.FileUtil;
+import eionet.cr.util.xml.ConversionSchema;
 import eionet.cr.util.xml.ConversionsParser;
 import eionet.cr.util.xml.XmlAnalysis;
 
@@ -71,8 +72,8 @@ public class FileToRdfProcessor {
     /** Source content type. */
     private RDFFormat rdfFormat;
 
-    /** The source file's conversion schema URI if any. */
-    private String conversionSchemaUri;
+    /** The source file's conversion schema. */
+    private ConversionSchema conversionSchema;
 
     /**
      *
@@ -137,8 +138,9 @@ public class FileToRdfProcessor {
                 } else {
                     // The file's start element was not RDF, so try to convert it to RDF.
                     LOGGER.debug(loggerMsg("Seems to be XML file, attempting RDF conversion"));
-                    conversionSchemaUri = xmlAnalysis.getConversionSchema();
-                    resultFile = attemptRdfConversion(unpackedFile, conversionSchemaUri, contextUrl);
+
+                    conversionSchema = xmlAnalysis.getConversionSchema();
+                    resultFile = attemptRdfConversion(unpackedFile, conversionSchema.getStringValue(), contextUrl);
                     if (resultFile != null) {
                         rdfFormat = RDFFormat.RDFXML;
                     }
@@ -348,9 +350,9 @@ public class FileToRdfProcessor {
     }
 
     /**
-     * @return the conversionSchemaUri
+     * @return the conversionSchemaString
      */
-    public String getConversionSchemaUri() {
-        return conversionSchemaUri;
+    public ConversionSchema getConversionSchema() {
+        return conversionSchema;
     }
 }

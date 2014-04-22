@@ -132,36 +132,49 @@ public class XmlAnalysis {
             reader.parse(new InputSource(inputStream));
         } catch (SAXException e) {
             Exception ee = e.getException();
-            if (ee == null || !(ee instanceof CRException))
+            if (ee == null || !(ee instanceof CRException)) {
                 throw e;
+            }
         }
     }
 
     /**
-     * Method returns an URI by which conversions for the analyzed file should be looked for. If the file has a declared schema, it
-     * is returned. If not, then the method falls back to system DTD. If that one is not found either, the method falls back to
-     * public DTD. And should that one be missing too, the method returns fully qualified URI of the file's start element.
+     * Method returns a {@link ConversionSchema} by which conversions for the analyzed file should be searched for.
+     * If the file has a declared schema, it is returned. If not, then the method falls back to system DTD.
+     * If that one is not found either, the method falls back to public DTD. And should that one be missing too,
+     * the method returns a schema whose identifier is the fully qualified URI of the file's root element.
      *
      * @return the result
      */
-    public String getConversionSchema() {
+    public ConversionSchema getConversionSchema() {
 
-        // get schema URI, if it's not found then fall back to system DTD,
+        // Get schema URI, if it's not found then fall back to system DTD,
         // if it's not found then fall back to public DTD, and if still not
-        // found, fall back to the start element's URI
+        // found, fall back to the start element's URI.
 
-        String result = getSchemaLocation();
-        if (StringUtils.isBlank(result)) {
-            result = getSystemDtd();
-            if (StringUtils.isBlank(result)) {
-                result = getPublicDtd();
-                if (StringUtils.isBlank(result)) {
-                    result = getStartElemUri();
+        ConversionSchema.Type type = null;
+
+        String strValue = getSchemaLocation();
+        if (StringUtils.isBlank(strValue)) {
+            strValue = getSystemDtd();
+            if (StringUtils.isBlank(strValue)) {
+                strValue = getPublicDtd();
+                if (StringUtils.isBlank(strValue)) {
+                    strValue = getStartElemUri();
+                    if (StringUtils.isNotBlank(strValue)) {
+                        type = ConversionSchema.Type.ROOT_ELEM;
+                    }
+                } else {
+                    type = ConversionSchema.Type.PUBLIC_DTD;
                 }
+            } else {
+                type = ConversionSchema.Type.SYSTEM_DTD;
             }
+        } else {
+            type = ConversionSchema.Type.XML_SCHEMA;
         }
 
-        return result;
+        return StringUtils.isNotBlank(strValue) ? new ConversionSchema(strValue.trim(), type) : null;
     }
 
     /**
@@ -251,6 +264,7 @@ public class XmlAnalysis {
          * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
          * org.xml.sax.Attributes)
          */
+        @Override
         public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
 
             this.startElemNamespace = uri;
@@ -282,6 +296,7 @@ public class XmlAnalysis {
          *
          * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
          */
+        @Override
         public void error(SAXParseException e) {
         }
 
@@ -290,6 +305,7 @@ public class XmlAnalysis {
          *
          * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
          */
+        @Override
         public void fatalError(SAXParseException e) {
         }
 
@@ -298,6 +314,7 @@ public class XmlAnalysis {
          *
          * @see org.xml.sax.helpers.DefaultHandler#warning(org.xml.sax.SAXParseException)
          */
+        @Override
         public void warning(SAXParseException e) throws SAXException {
         }
 

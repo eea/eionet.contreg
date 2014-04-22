@@ -180,22 +180,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * Handle for ajax harvesting.
-     *
-     * @return Resolution
-     */
-    public Resolution harvestAjax() {
-        String message;
-        try {
-            message = harvestNow().getRight();
-        } catch (Exception ignored) {
-            logger.error("error while scheduling ajax harvest", ignored);
-            message = "Error occured, more info can be obtained in application logs";
-        }
-        return new StreamingResolution("text/html", message);
-    }
-
-    /**
      * Schedules a harvest for resource.
      *
      * @return view resolution
@@ -205,24 +189,26 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails
      */
     public Resolution harvest() throws HarvestException, DAOException {
-        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-        SubjectDTO subjectDto = helperDAO.getSubject(uri);
 
-        if (subjectDto != null && CsvImportUtil.isSourceTableFile(subjectDto)) {
-            // Harvest table file
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        SubjectDTO subjectDTO = helperDAO.getSubject(uri);
+
+        if (subjectDTO != null && CsvImportUtil.isSourceTableFile(subjectDTO)) {
+
+            // Special block for harvesting table files.
             try {
-                // harvestTableFile();
-                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDto, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDTO, uri, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }
-                addSystemMessage("Source successfully harvested");
+                addSystemMessage("Source successfully harvested!");
             } catch (Exception e) {
                 logger.error("Failed to harvest table file", e);
                 addWarningMessage("Failed to harvest table file: " + e.getMessage());
             }
         } else {
-            // Harvest other source
+
+            // Block for harvesting other, i.e. non-table-file sources.
             Pair<Boolean, String> message = harvestNow();
             if (message.getLeft()) {
                 addWarningMessage(message.getRight());
@@ -230,6 +216,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 addSystemMessage(message.getRight());
             }
         }
+
         return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
     }
 
@@ -248,7 +235,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         if (isUserLoggedIn()) {
             if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)) {
 
-                /* add this url into HARVEST_SOURCE table */
+                // Add this URL into HARVEST_SOURCE table.
 
                 HarvestSourceDAO dao = factory.getDao(HarvestSourceDAO.class);
                 HarvestSourceDTO dto = new HarvestSourceDTO();
@@ -259,11 +246,11 @@ public class FactsheetActionBean extends AbstractActionBean {
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);
 
-                /* issue an instant harvest of this url */
+                // Issue an instant harvest of this URL.
 
                 OnDemandHarvester.Resolution resolution = OnDemandHarvester.harvest(dto.getUrl(), getUserName());
 
-                /* give feedback to the user */
+                // Give feedback to the user.
 
                 if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING)) {
                     message = "The resource is currently being harvested by another user or background harvester!";
@@ -275,8 +262,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                     message = "The resource was not available!";
                 } else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA)) {
                     message = "The resource contained no RDF data!";
-                    // else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
-                    // message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 } else {
                     message = "No feedback given from harvest!";
                 }

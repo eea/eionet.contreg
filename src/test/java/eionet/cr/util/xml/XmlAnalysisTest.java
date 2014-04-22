@@ -23,11 +23,11 @@ package eionet.cr.util.xml;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -56,6 +56,13 @@ public class XmlAnalysisTest {
 
         assertNull(xmlAnalysis.getSystemDtd());
         assertNull(xmlAnalysis.getPublicDtd());
+        assertEquals("Unexpected root element", "habitat", xmlAnalysis.getStartElemUri());
+
+        ConversionSchema convSchema = xmlAnalysis.getConversionSchema();
+        assertNotNull("Expected a conversion schema", convSchema);
+        assertEquals("Unexpected type of conversion schema", ConversionSchema.Type.XML_SCHEMA, convSchema.getType());
+        assertEquals("Unexpected conversion schema value", "http://biodiversity.eionet.europa.eu/schemas/dir9243eec/habitats.xsd",
+                convSchema.getStringValue());
     }
 
     /**
@@ -79,6 +86,11 @@ public class XmlAnalysisTest {
                 "http://dd.eionet.europa.eu/schemas/id2011850eu/AirQualityReporting_0.3.6b.xsd "
                         + "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
         assertEquals(expected, xmlAnalysis.getSchemaLocation());
+
+        ConversionSchema convSchema = xmlAnalysis.getConversionSchema();
+        assertNotNull("Expected a conversion schema", convSchema);
+        assertEquals("Unexpected type of conversion schema", ConversionSchema.Type.XML_SCHEMA, convSchema.getType());
+        assertEquals("Unexpected conversion schema value", expected, convSchema.getStringValue());
     }
 
     /**
@@ -87,7 +99,6 @@ public class XmlAnalysisTest {
      * getSchemaLocation() shall not return a namespace.
      *
      */
-    @Ignore
     @Test
     public void onlyGetSchemas1() throws Exception {
         String inlineXml =
@@ -99,15 +110,18 @@ public class XmlAnalysisTest {
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         xmlAnalysis.parse(inputStream);
         String expected = "http://www.opengis.net/gml/3.2FeatureCollection";
-        assertEquals(expected, xmlAnalysis.getConversionSchema());
 
         assertEquals(null, xmlAnalysis.getSchemaLocation());
+
+        ConversionSchema convSchema = xmlAnalysis.getConversionSchema();
+        assertNotNull("Expected a conversion schema", convSchema);
+        assertEquals("Unexpected type of conversion schema", ConversionSchema.Type.ROOT_ELEM, convSchema.getType());
+        assertEquals("Unexpected conversion schema value", expected, convSchema.getStringValue());
     }
 
     /**
      * Check the system ID. It must not have trailing spaces.
      */
-    @Ignore
     @Test
     public void onlyGetSchemas2() throws Exception {
 
@@ -117,8 +131,16 @@ public class XmlAnalysisTest {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(inlineXml.getBytes("UTF-8"));
         XmlAnalysis xmlAnalysis = new XmlAnalysis();
         xmlAnalysis.parse(inputStream);
-        String expected = "http://www.w3.org/TR/html4/loose.dtd";
-        assertEquals(expected, xmlAnalysis.getSystemDtd());
-    }
 
+        String expectedSystemDTD = "http://www.w3.org/TR/html4/loose.dtd";
+        assertEquals(expectedSystemDTD, xmlAnalysis.getSystemDtd());
+
+        String expectedPublicDTD = "-//W3C//DTD HTML 4.01 Transitional//EN";
+        assertEquals(expectedPublicDTD, xmlAnalysis.getPublicDtd());
+
+        ConversionSchema convSchema = xmlAnalysis.getConversionSchema();
+        assertNotNull("Expected a conversion schema", convSchema);
+        assertEquals("Unexpected type of conversion schema", ConversionSchema.Type.SYSTEM_DTD, convSchema.getType());
+        assertEquals("Unexpected conversion schema value", expectedSystemDTD, convSchema.getStringValue());
+    }
 }

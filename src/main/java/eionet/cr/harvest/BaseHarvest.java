@@ -75,6 +75,8 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.util.xml.ConversionSchema;
+import eionet.cr.util.xml.ConversionSchema.Type;
 import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
@@ -1103,9 +1105,11 @@ public abstract class BaseHarvest implements Harvest {
                 FileToRdfProcessor fileProcessor = new FileToRdfProcessor(file, getContextUrl());
                 processedFile = fileProcessor.process();
 
-                String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
-                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
+                // Add conversion schema into source metadata under cr:xmlSchema attribute, unless there is no schema information
+                // or it is actually the file's root element.
+                ConversionSchema convSchema = fileProcessor.getConversionSchema();
+                if (convSchema != null && !ConversionSchema.Type.ROOT_ELEM.equals(convSchema.getType())) {
+                    addConversionSchemaMetadata(convSchema);
                 }
 
                 if (processedFile != null && fileProcessor.getRdfFormat() != null) {
@@ -1122,6 +1126,32 @@ public abstract class BaseHarvest implements Harvest {
             } finally {
                 if (processedFile != null && !file.getPath().equals(processedFile.getPath())) {
                     FileDeletionJob.register(processedFile);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds source metadata about the given conversion schema.
+     *
+     * @param convSchema The conversion schema object.
+     */
+    private void addConversionSchemaMetadata(ConversionSchema convSchema) {
+
+        Type convSchemaType = convSchema.getType();
+        String stringValue = convSchema.getStringValue();
+
+        if (StringUtils.isNotBlank(stringValue)) {
+
+            // We split, as the string value can contain actually multiple URIs.
+            String[] tokens = StringUtils.split(stringValue);
+            for (String token : tokens) {
+
+                // A Public DTD (i.e. as in XHTML documents) is not a URI, so make it literal. Otherwise URI.
+                if (convSchemaType.equals(ConversionSchema.Type.PUBLIC_DTD)) {
+                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(token, true, XMLSchema.STRING));
+                } else {
+                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(token, false));
                 }
             }
         }
