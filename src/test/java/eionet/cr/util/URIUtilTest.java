@@ -21,6 +21,7 @@
 package eionet.cr.util;
 
 import junit.framework.TestCase;
+import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 
 /**
  *
@@ -51,5 +52,21 @@ public class URIUtilTest extends TestCase {
      */
     public void testFixRelativeUrl() {
         assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
+    }
+
+    /**
+     *
+     */
+    public void testSanitizeVirtuosoBNodeUri() {
+
+        assertEquals(null, URIUtil.sanitizeVirtuosoBNodeUri(null));
+        assertEquals("", URIUtil.sanitizeVirtuosoBNodeUri(""));
+        assertEquals(" ", URIUtil.sanitizeVirtuosoBNodeUri(" "));
+        assertEquals("dummy", URIUtil.sanitizeVirtuosoBNodeUri("dummy"));
+
+        String expected = VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX + "b10233";
+        assertEquals(expected, URIUtil.sanitizeVirtuosoBNodeUri("_:b10233"));
+        assertEquals(expected, URIUtil.sanitizeVirtuosoBNodeUri(":b10233"));
+        assertEquals(expected, expected);
     }
 }

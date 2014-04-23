@@ -22,8 +22,9 @@
 package eionet.cr.web.action.admin.postHarvest;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+
 import org.junit.Ignore;
+import org.junit.Test;
 
 
 /**
@@ -325,7 +326,6 @@ public class PostHarvestScriptParserTest {
     public void testDeriveSelectFromDelete() {
 
         String testSource = "urn:nowhere:source";
-        String expandedSource = "<" + testSource + ">";
 
         String input = "PREFIX dc:<x> DELETE FROM <y> {3} FROM <a> WHERE {4}";
         String exptd = "PREFIX dc:<x> SELECT FROM <y> 3 FROM <a> WHERE {4} LIMIT " + limit;
@@ -337,5 +337,4 @@ public class PostHarvestScriptParserTest {
 
         assertEquals(exptd, PostHarvestScriptParser.deriveSelect(input, testSource));
     }
-
 }

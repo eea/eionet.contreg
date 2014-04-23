@@ -23,8 +23,8 @@ package eionet.cr.dao.virtuoso;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
@@ -35,6 +35,7 @@ import org.openrdf.query.BindingSet;
 
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 
 /**
@@ -48,22 +49,14 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
 
     /**  */
     public static final int PREDICATE_PAGE_SIZE = 10;
-    /** */
-    private List<String> acceptedLanguages;
 
     /** */
     private HashMap<String, HashSet<String>> distinctLiterals = new HashMap<String, HashSet<String>>();
     private HashSet<String> distinctResources = new HashSet<String>();
 
-    /**
-     * @param acceptedLanguages
-     */
-    public PredicateObjectsReader(List<String> acceptedLanguages) {
-        this.acceptedLanguages = acceptedLanguages;
-    }
-
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -77,16 +70,20 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
 
             String value = objectValue.stringValue();
             boolean isLiteral = objectValue instanceof Literal;
+            boolean isAnonymous = isLiteral ? false : objectValue instanceof BNode;
             if (!isLiteral) {
                 value = objectValue.toString();
+                if (isAnonymous) {
+                    value = URIUtil.sanitizeVirtuosoBNodeUri(value);
+                }
             }
+
             Literal literal = isLiteral ? (Literal) objectValue : null;
             String language = isLiteral ? literal.getLanguage() : null;
 
             if (!objectAlreadyAdded(value, isLiteral, language)) {
 
                 URI datatype = isLiteral ? literal.getDatatype() : null;
-                boolean isAnonymous = isLiteral ? false : objectValue instanceof BNode;
 
                 ObjectDTO objectDTO = new ObjectDTO(value, language, isLiteral, isAnonymous, datatype);
                 if (graphValue != null && graphValue instanceof Resource) {
@@ -98,6 +95,10 @@ public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO>
                     Literal labelLiteral = (Literal) objectLabelValue;
                     ObjectDTO labelObjectDTO = new ObjectDTO(labelLiteral.stringValue(), labelLiteral.getLanguage(), true, false);
                     objectDTO.setLabelObject(labelObjectDTO);
+                } else if (isAnonymous) {
+                    // For anonymous object resources ensure that there is a label by feeding it via derived label.
+                    String derivedValue = StringUtils.substringAfter(value, VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX);
+                    objectDTO.setDerviedLiteralValue(derivedValue);
                 }
 
                 resultList.add(objectDTO);

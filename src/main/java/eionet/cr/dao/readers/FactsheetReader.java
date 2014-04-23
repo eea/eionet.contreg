@@ -31,6 +31,7 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 import eionet.cr.web.util.WebConstants;
 
@@ -65,6 +66,7 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.util.sesame.SPARQLResultSetReader#readRow(org.openrdf.query.BindingSet)
      */
     @Override
@@ -115,6 +117,12 @@ public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
         if (isLiteral) {
             objectDTO = new ObjectDTO(label, language, true, false, datatype);
         } else {
+
+            // Virtuoso is unstable about to returning URIs of anonymous resources, so make sure it's properly sanitized.
+            if (isAnonymous) {
+                objectUri = URIUtil.sanitizeVirtuosoBNodeUri(objectUri);
+            }
+
             objectDTO = new ObjectDTO(objectUri, null, false, isAnonymous);
             if (!StringUtils.isBlank(label) && !label.equals(objectUri)) {
                 ObjectDTO labelObjectDTO = new ObjectDTO(label, language, true, false, datatype);
