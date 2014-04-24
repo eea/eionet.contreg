@@ -33,6 +33,7 @@ public interface UrgentHarvestQueueDAO extends DAO {
 
     /**
      * Adds the given items to the urgent harvest queue table.
+     *
      * @param queueItems Items to add.
      * @param userName User who is adding. Might be null or blank.
      *
@@ -41,30 +42,44 @@ public interface UrgentHarvestQueueDAO extends DAO {
     void addPullHarvests(List<UrgentHarvestQueueItemDTO> queueItems, String userName) throws DAOException;
 
     /**
+     * Adds given item as push harvest into the urgent harvest queue.
      *
-     * @param queueItem
-     * @throws DAOException
+     * @param queueItem the queue item
+     * @throws DAOException the DAO exception
      */
     void addPushHarvest(UrgentHarvestQueueItemDTO queueItem) throws DAOException;
 
     /**
+     * Gets the urgent harvest queue.
      *
-     * @return
+     * @return the urgent harvest queue
+     * @throws DAOException the DAO exception
      */
     List<UrgentHarvestQueueItemDTO> getUrgentHarvestQueue() throws DAOException;
 
     /**
+     * Poll the urgent harvest queue, returning the top-most item and removing it as well.
      *
-     * @return
-     * @throws DAOException
+     * @return the top-most item
+     * @throws DAOException the DAO exception
      */
     UrgentHarvestQueueItemDTO poll() throws DAOException;
 
     /**
+     * Return true if the given URL is in queue.
      *
-     * @param url
+     * @param url The URL to check.
      */
-    boolean isInQueue(String url);
+    boolean isInQueue(String url) throws DAOException;
+
+    /**
+     * Return true if the given URL requested by the given user name is in queue.
+     *
+     * @param url The URL.
+     * @param userName The user name.
+     * @return True/false.
+     */
+    boolean isInQueue(String url, String userName) throws DAOException;
 
     /**
      * Removes all urgent harvest queue entries where the URL is the one given in the method input.

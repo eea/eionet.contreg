@@ -66,6 +66,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /*
      * (non-Javadoc)
+     *
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#addPullHarvests(java.util.List, java.lang.String)
      */
     @Override
@@ -174,10 +175,11 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
+     * Returns top-most item in queue, but does not remove it.
      *
-     * @param conn
-     * @return
-     * @throws SQLException
+     * @param conn Db connection.
+     * @return The item.
+     * @throws SQLException if SQL error
      */
     private static UrgentHarvestQueueItemDTO peek(Connection conn) throws Exception {
 
@@ -191,9 +193,10 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
+     * Helper method for deleting given queue item.
      *
-     * @param queueItem
-     * @throws SQLException
+     * @param queueItem The queue item to delete.
+     * @throws SQLException if SQL error
      */
     private static void deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
 
@@ -210,7 +213,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String)
      */
     @Override
-    public boolean isInQueue(String url) {
+    public boolean isInQueue(String url) throws DAOException {
 
         boolean ret = false;
         String sql = "select top 1 * from URGENT_HARVEST_QUEUE where URL = ?";
@@ -226,13 +229,35 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
                 ret = true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DAOException(e.toString(), e);
         } finally {
+            SQLUtil.close(rs);
             SQLUtil.close(ps);
             SQLUtil.close(conn);
         }
         return ret;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean isInQueue(String url, String userName) throws DAOException {
+
+        String sql = "select top 1 URL from URGENT_HARVEST_QUEUE where URL = ? and USERNAME = ?";
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            Object urlObject = SQLUtil.executeSingleReturnValueQuery(sql, Arrays.asList(url, userName), conn);
+            return urlObject != null && urlObject.toString().equals(url);
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
     }
 
     /*

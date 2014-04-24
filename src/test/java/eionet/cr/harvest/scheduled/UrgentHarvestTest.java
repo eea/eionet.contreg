@@ -21,21 +21,70 @@
 
 package eionet.cr.harvest.scheduled;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
-import eionet.cr.dao.DAOException;
-import eionet.cr.harvest.HarvestException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.web.security.CRUser;
 
 /**
  * Test urgent harvests.
  *
  * @author Enriko Käsper
+ * @author Jaanus Heinlaid
  */
-public class UrgentHarvestTest extends TestCase {
+public class UrgentHarvestTest extends CRDatabaseTestCase {
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
+     */
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("emptydb.xml");
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#forceClearTriplesOnSetup()
+     */
+    @Override
+    protected boolean forceClearTriplesOnSetup() {
+        return true;
+    }
+
+    /**
+     * Test that no double ping harvest can be added to the urgent harvest queue.
+     */
     @Test
-    public void testUrgentHarvestUnicodeUrls() throws HarvestException, DAOException {
+    public void testNoDoublePing() throws Exception {
+
+        String url = "http://url.under.test/";
+        String pingUserName = CRUser.PING_HARVEST.getUserName();
+        UrgentHarvestQueue.addPullHarvest(url, pingUserName);
+        UrgentHarvestQueue.addPullHarvest(url, pingUserName);
+        UrgentHarvestQueue.addPullHarvest(url, "heinlja");
+
+        List<UrgentHarvestQueueItemDTO> queue = DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).getUrgentHarvestQueue();
+        assertNotNull("Urgent harevst queue should not be null", queue);
+        assertEquals("URL with ping user should not twice in queue", 2, queue.size());
+    }
+
+    /**
+     * Test UNICODE urls in urgent harvest queue.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUrgentHarvestUnicodeUrls() throws Exception {
+
         String url = "http://www.google.com/öö";
         UrgentHarvestQueue.addPullHarvest(url, "enriko");
 

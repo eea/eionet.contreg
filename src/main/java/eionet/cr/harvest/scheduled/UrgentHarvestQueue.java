@@ -22,7 +22,6 @@ package eionet.cr.harvest.scheduled;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -37,13 +36,15 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * Utility class for common operations with urgent harvest queue.
+ * Basically, these methods act as services, though this is not a good pattern for service design.
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author jaanus
  *
  */
 public final class UrgentHarvestQueue {
 
-    /** */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(UrgentHarvestQueue.class);
 
     /**
@@ -55,6 +56,7 @@ public final class UrgentHarvestQueue {
 
     /**
      * Calls {@link #addPullHarvests(List, String)} with a singleton-list from the given URL and the given user name.
+     *
      * @param url The URL.
      * @param userName The user name.
      * @throws HarvestException HarvestException Wraps any sort of exception that happens.
@@ -82,18 +84,27 @@ public final class UrgentHarvestQueue {
             userName = CRUser.APPLICATION.getUserName();
         }
 
+        boolean isPingHarvest = CRUser.PING_HARVEST.getUserName().equals(userName);
+
         try {
+            UrgentHarvestQueueDAO dao = DAOFactory.get().getDao(UrgentHarvestQueueDAO.class);
             List<UrgentHarvestQueueItemDTO> dtos = new ArrayList<UrgentHarvestQueueItemDTO>();
-            for (Iterator<String> i = urls.iterator(); i.hasNext();) {
-                UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
-                dto.setUrl(i.next());
-                dtos.add(dto);
+
+            for (String url : urls) {
+
+                if (isPingHarvest && UrgentHarvestQueue.isInQueue(url, userName)) {
+                    LOGGER.info("Skipping pinged URL that is already in queue: " + url);
+                } else {
+                    UrgentHarvestQueueItemDTO dto = new UrgentHarvestQueueItemDTO();
+                    dto.setUrl(url);
+                    dtos.add(dto);
+                }
             }
+            dao.addPullHarvests(dtos, userName);
 
-            DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).addPullHarvests(dtos, userName);
-
-            for (Iterator<String> i = urls.iterator(); i.hasNext();) {
-                LOGGER.debug("Pull harvest added to the urgent queue, url = " + i.next());
+            // Log success for every URL individually.
+            for (UrgentHarvestQueueItemDTO dto : dtos) {
+                LOGGER.debug("Pull harvest added to the urgent queue, url = " + dto.getUrl());
             }
         } catch (DAOException e) {
             throw new HarvestException(e.toString(), e);
@@ -103,9 +114,9 @@ public final class UrgentHarvestQueue {
     /**
      * Adds a push-harvest to the urgent queue. Since it is pushed, the content is already provided.
      *
-     * @param pushContent
+     * @param pushContent the push content
      * @param url URL to register it on
-     * @throws HarvestException
+     * @throws HarvestException the harvest exception
      */
     public static synchronized void addPushHarvest(String pushContent, String url) throws HarvestException {
 
@@ -122,9 +133,10 @@ public final class UrgentHarvestQueue {
     }
 
     /**
+     * Poll the urgent harvest queue, returning the top-most item and removing it as well.
      *
-     * @return UrgentHarvestQueueItemDTO
-     * @throws DAOException
+     * @return the top-most item
+     * @throws DAOException the DAO exception
      */
     public static synchronized UrgentHarvestQueueItemDTO poll() throws DAOException {
 
@@ -132,11 +144,25 @@ public final class UrgentHarvestQueue {
     }
 
     /**
+     * Returns true if the given URL is already in queue.
      *
-     * @return boolean
-     * @throws DAOException
+     * @param url The URL.
+     * @return boolean True/false.
+     * @throws DAOException In case of DAO error.
      */
-    public static synchronized boolean isInQueue(String url) {
+    public static synchronized boolean isInQueue(String url) throws DAOException {
         return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).isInQueue(url);
+    }
+
+    /**
+     * Returns true if the given URL requested by the given user name is already in queue.
+     *
+     * @param url The URL.
+     * @param userName The user name.
+     * @return boolean True/false.
+     * @throws DAOException In case of DAO error.
+     */
+    public static synchronized boolean isInQueue(String url, String userName) throws DAOException {
+        return DAOFactory.get().getDao(UrgentHarvestQueueDAO.class).isInQueue(url, userName);
     }
 }

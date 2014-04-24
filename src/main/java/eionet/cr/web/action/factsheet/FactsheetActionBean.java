@@ -436,12 +436,12 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @throws DAOException
      *             if query fails
      */
+    @SuppressWarnings("unchecked")
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
 
         // get the addible properties from session
 
         HttpSession session = getContext().getRequest().getSession();
-        @SuppressWarnings("unchecked")
         ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>) session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
 
         // if not in session, create them and add to session
@@ -583,8 +583,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return boolean
+     * @throws DAOException
      */
-    public boolean isCurrentlyHarvested() {
+    public boolean isCurrentlyHarvested() throws DAOException {
 
         return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentLoadedDatasets
                 .contains(uri));
@@ -642,6 +643,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      * @return the predicatePages
      */
+    @SuppressWarnings("unchecked")
     public Map<String, Integer> getPredicatePageNumbers() {
 
         if (predicatePageNumbers == null) {
@@ -790,7 +792,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getViewSourceActionBeanClass() {
+    public Class<ViewSourceActionBean> getViewSourceActionBeanClass() {
         return ViewSourceActionBean.class;
     }
 

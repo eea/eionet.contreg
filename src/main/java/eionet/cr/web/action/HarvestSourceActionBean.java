@@ -199,7 +199,7 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         if (harvestSource != null) {
             return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
         } else {
-            return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", null);
+            return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", (Object[]) null);
         }
     }
 
@@ -749,8 +749,9 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     /**
      *
      * @return boolean
+     * @throws DAOException
      */
-    public boolean isCurrentlyHarvested() {
+    public boolean isCurrentlyHarvested() throws DAOException {
         String uri = harvestSource == null ? null : harvestSource.getUrl();
         return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri));
     }

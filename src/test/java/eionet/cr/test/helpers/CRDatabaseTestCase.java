@@ -92,8 +92,9 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         List<String> turtleSeedFiles = getTurtleSeedFiles();
         List<String> n3SeedFiles = getN3SeedFiles();
 
-        // If at least one seed file given, clear triple store before proceeding to the loading.
-        if (CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
+        // If there is forced clearance of triplestore, or if there is at least one triplestore seed file given,
+        // then clear triple store before proceeding.
+        if (forceClearTriplesOnSetup() || CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
                 || CollectionUtils.isNotEmpty(turtleSeedFiles) || CollectionUtils.isNotEmpty(n3SeedFiles)) {
             rdfLoader.clearAllTriples();
         }
@@ -113,6 +114,16 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         for (String fileName : n3SeedFiles) {
             rdfLoader.loadIntoTripleStore(fileName, RDFFormat.N3);
         }
+    }
+
+    /**
+     * If this method returns true, the test setup will clear triple store regardless of whether there are any
+     * triplestore seed files to load. In this abstract class it always returns false, but subclasses may oveerride it.
+     *
+     * @return True/false as indicated above.
+     */
+    protected boolean forceClearTriplesOnSetup() {
+        return false;
     }
 
     /*
