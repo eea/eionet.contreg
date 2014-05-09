@@ -86,11 +86,19 @@ public class UrgentHarvestTest extends CRDatabaseTestCase {
     public void testUrgentHarvestUnicodeUrls() throws Exception {
 
         String url = "http://www.google.com/öö";
+
+        UrgentHarvestQueueDAO dao = DAOFactory.get().getDao(UrgentHarvestQueueDAO.class);
+        dao.removeUrl(url);
+        assertFalse("Didn't expect this URL in harvest queue: " + url, UrgentHarvestQueue.isInQueue(url));
+
         UrgentHarvestQueue.addPullHarvest(url, "enriko");
+        assertTrue("Expected this URL in harvest queue: " + url, UrgentHarvestQueue.isInQueue(url));
 
-        assertTrue(UrgentHarvestQueue.isInQueue(url));
-        UrgentHarvestQueue.poll();
-        assertFalse(UrgentHarvestQueue.isInQueue(url));
+        UrgentHarvestQueueItemDTO dto = UrgentHarvestQueue.poll();
+        assertNotNull("Expected non-null poll result", dto);
+        assertTrue("Expected poll-result to have this URL: " + url, url.equals(dto.getUrl()));
+
+        Thread.sleep(1000);
+        assertFalse("Didn't expect this URL in harvest queue any more: " + url, UrgentHarvestQueue.isInQueue(url));
     }
-
 }
