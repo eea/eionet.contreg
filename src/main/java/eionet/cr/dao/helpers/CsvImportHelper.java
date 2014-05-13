@@ -195,11 +195,11 @@ public class CsvImportHelper {
     /**
      * Iserts file metadata.
      *
-     * @param fileSize
+     * @param size
      * @param userName
      * @throws Exception
      */
-    public void insertFileMetadataAndSource(long fileSize, String userName) throws Exception {
+    public void insertFileMetadataAndSource(long size, String userName) throws Exception {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, userName));
@@ -207,8 +207,11 @@ public class CsvImportHelper {
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
+        // If long size can be converted to int without loss, then do so, otherwise remain true to long.
+        ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
+
         dao.insertUpdateSourceMetadata(fileUri, Predicates.RDF_TYPE, ObjectDTO.createResource(Subjects.CR_TABLE_FILE));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(fileSize));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, byteSize);
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
     }

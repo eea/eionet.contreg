@@ -35,6 +35,7 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -219,16 +220,18 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /**
      * A convenience method for checking if the given statement exists in the repository. The object is expected to be a literal.
-     * Graph is optional.
+     * Graph is optional. Datatype of the literal may be null in which case the literal is considered to have no datatype.
      *
      * @param subj The subject.
      * @param pred The predicate.
      * @param obj The literal object.
+     * @param datatype The literal's datatype, may be null in which case the literal is considered to have no datatype.
      * @param graph The graph.
      * @return True if statement exists, otherwise false.
      * @throws OpenRDFException When problems with querying the repository.
      */
-    protected boolean hasLiteralStatement(String subj, String pred, String obj, String... graph) throws OpenRDFException {
+    protected boolean hasLiteralStatement(String subj, String pred, String obj, URI datatype, String... graph)
+            throws OpenRDFException {
 
         if (repoConn == null) {
             throw new IllegalStateException("Expected the repository connection to be already created!");
@@ -239,7 +242,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         ValueFactory vf = repoConn.getValueFactory();
         org.openrdf.model.URI subjURI = StringUtils.isBlank(subj) ? null : vf.createURI(subj);
         org.openrdf.model.URI predURI = StringUtils.isBlank(pred) ? null : vf.createURI(pred);
-        Literal objLiteral = StringUtils.isBlank(obj) ? null : vf.createLiteral(obj);
+        Literal objLiteral =
+                StringUtils.isBlank(obj) ? null : (datatype == null ? vf.createLiteral(obj) : vf.createLiteral(obj, datatype));
 
         if (graph != null && graph.length > 0) {
 
@@ -312,10 +316,10 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
         boolean result = false;
         if (statement.length == 3) {
-            result = hasLiteralStatement(statement[0], statement[1], statement[2]);
+            result = hasLiteralStatement(statement[0], statement[1], statement[2], null);
         } else {
             String[] graphs = Arrays.copyOfRange(statement, 3, statement.length);
-            result = hasLiteralStatement(statement[0], statement[1], statement[2], graphs);
+            result = hasLiteralStatement(statement[0], statement[1], statement[2], null, graphs);
         }
         return result;
     }

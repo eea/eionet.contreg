@@ -67,8 +67,12 @@ public class UploadHarvest extends BaseHarvest {
         // assign fields
         this.file = file;
 
+        // If long size can be converted to int without loss, then do so, otherwise remain true to long.
+        long size = file.length();
+        ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
+
         // set source metadata already detectable right now
-        addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(file.length())));
+        addSourceMetadata(Predicates.CR_BYTE_SIZE, byteSize);
         addSourceMetadata(Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
         if (!StringUtils.isBlank(contentType)) {
             addSourceMetadata(Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(contentType));

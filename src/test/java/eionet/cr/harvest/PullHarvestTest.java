@@ -23,13 +23,20 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.XMLSchema;
 
+import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 
@@ -65,12 +72,25 @@ public class PullHarvestTest extends CRDatabaseTestCase {
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+            DAOFactory daoFactory = DAOFactory.get();
+            daoFactory.getDao(HarvestSourceDAO.class).addSource(source);
 
             PullHarvest harvest = new PullHarvest(url);
             harvest.execute();
             assertTrue(harvest.isSourceAvailable());
             assertEquals(12, harvest.getStoredTriplesCount());
+
+            SubjectDTO subject = daoFactory.getDao(HelperDAO.class).getSubject(url);
+            assertNotNull("Expected existing subject for " + url, subject);
+            assertEquals("Unexpected subject URI" + url, url, subject.getUri());
+
+            ObjectDTO byteSizeObj = subject.getObject(Predicates.CR_BYTE_SIZE);
+            assertNotNull("Expected existing object for " + Predicates.CR_BYTE_SIZE, byteSizeObj);
+
+            URI datatype = byteSizeObj.getDatatype();
+            assertNotNull("Expected object datatype", datatype);
+            assertEquals("Unexpected datatype", XMLSchema.INT.stringValue(), datatype.stringValue());
+            assertTrue("Unexpected byte size", NumberUtils.toInt(byteSizeObj.getValue(), -1) > 0);
         } finally {
             JettyUtil.close(server);
         }

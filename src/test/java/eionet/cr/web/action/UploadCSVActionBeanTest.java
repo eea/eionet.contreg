@@ -25,6 +25,8 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -33,6 +35,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
@@ -242,8 +245,8 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         String[] statement1 = {TEST_FOLDER_URI, Predicates.CR_HAS_FILE, TEST_FILE_URI};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement1), hasResourceStatement(statement1));
 
-        String[] statement2 = {TEST_FILE_URI, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize)};
-        assertTrue("Expected statement: " + ArrayUtils.toString(statement2), hasLiteralStatement(statement2));
+        boolean b = hasLiteralStatement(TEST_FILE_URI, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize), XMLSchema.INT);
+        assertTrue("Missing or unexpected value for " + Predicates.CR_BYTE_SIZE, b);
 
         String[] statement3 = {TEST_FILE_URI, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement3), hasResourceStatement(statement3));
@@ -253,6 +256,14 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
 
         String[] statement5 = {TEST_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
+
+        SubjectDTO testFileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
+        assertNotNull("Expected existing subject for " + TEST_FILE_URI, testFileSubject);
+        ObjectDTO byteSizeLiteral = testFileSubject.getObject(Predicates.CR_BYTE_SIZE);
+        assertNotNull("Expected a literal for " + Predicates.CR_BYTE_SIZE, byteSizeLiteral);
+        URI datatype = byteSizeLiteral.getDatatype();
+        assertNotNull("Expected a datatype for the value of " + Predicates.CR_BYTE_SIZE, datatype);
+        assertEquals("Unexpected datatype", XMLSchema.INT.stringValue(), datatype.stringValue());
     }
 
     /**

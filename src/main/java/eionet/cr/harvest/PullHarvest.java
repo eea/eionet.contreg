@@ -178,7 +178,10 @@ public class PullHarvest extends BaseHarvest {
                 addSourceMetadata(Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(contentType));
             }
 
-            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(file.length())));
+            // If long size can be converted to int without loss, then do so, otherwise remain true to long.
+            long size = file.length();
+            ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
+            addSourceMetadata(Predicates.CR_BYTE_SIZE, byteSize);
             addSourceMetadata(Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
 
             httpResponseCode = 0;
@@ -730,7 +733,7 @@ public class PullHarvest extends BaseHarvest {
             // content size
             int contentLength = urlConn.getContentLength();
             if (contentLength >= 0) {
-                addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(contentLength)));
+                addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(contentLength));
             }
         }
 
@@ -883,7 +886,7 @@ public class PullHarvest extends BaseHarvest {
             int bytesCopied = IOUtils.copy(inputStream, outputStream);
 
             // add number of bytes to source metadata, unless it's already there
-            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(bytesCopied)));
+            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(bytesCopied));
 
         } catch (IOException e) {
             FileDeletionJob.register(file);

@@ -25,6 +25,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.XMLSchema;
 
 import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
@@ -190,6 +191,7 @@ public class ObjectDTO implements Serializable {
      *
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return getValue();
     }
@@ -199,6 +201,7 @@ public class ObjectDTO implements Serializable {
      *
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object other) {
 
         if (this == other) {
@@ -218,6 +221,7 @@ public class ObjectDTO implements Serializable {
      *
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return getValue() == null ? 0 : getValue().hashCode();
     }
@@ -406,6 +410,26 @@ public class ObjectDTO implements Serializable {
      */
     public static ObjectDTO createLiteral(Object value) {
         return new ObjectDTO(value.toString(), true);
+    }
+
+    /**
+     * Utility method for constructing a literal with datatype set to {@link XMLSchema#INT}.
+     *
+     * @param value The value.
+     * @return The literal object.
+     */
+    public static ObjectDTO createLiteral(int value) {
+        return createLiteral(Integer.valueOf(value), XMLSchema.INT);
+    }
+
+    /**
+     * Utility method for constructing a literal with datatype set to {@link XMLSchema#LONG}.
+     *
+     * @param value The value.
+     * @return The literal object.
+     */
+    public static ObjectDTO createLiteral(long value) {
+        return createLiteral(Long.valueOf(value), XMLSchema.LONG);
     }
 
     /**
