@@ -104,6 +104,16 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         testFileSize = TEST_FILE.length();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#forceClearTriplesOnSetup()
+     */
+    @Override
+    protected boolean forceClearTriplesOnSetup() {
+        return true;
+    }
+
     /**
      * A test for testing two uploads/saves of one and the same file in a row in overwrite mode.
      * First upload/save is WITH data linking scripts, the second one is without.

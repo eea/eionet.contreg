@@ -57,6 +57,16 @@ public class PullHarvestTest extends CRDatabaseTestCase {
         return Arrays.asList("emptydb.xml");
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.test.helpers.CRDatabaseTestCase#forceClearTriplesOnSetup()
+     */
+    @Override
+    protected boolean forceClearTriplesOnSetup() {
+        return true;
+    }
+
     /**
      * @throws Exception
      *
@@ -89,6 +99,7 @@ public class PullHarvestTest extends CRDatabaseTestCase {
 
             URI datatype = byteSizeObj.getDatatype();
             assertNotNull("Expected object datatype", datatype);
+            // Although we expect xsd:integer, the Sesame driver wrongly returns xsd:int.
             assertEquals("Unexpected datatype", XMLSchema.INT.stringValue(), datatype.stringValue());
             assertTrue("Unexpected byte size", NumberUtils.toInt(byteSizeObj.getValue(), -1) > 0);
         } finally {

@@ -419,7 +419,7 @@ public class ObjectDTO implements Serializable {
      * @return The literal object.
      */
     public static ObjectDTO createLiteral(int value) {
-        return createLiteral(Integer.valueOf(value), XMLSchema.INT);
+        return createLiteral(Integer.valueOf(value), XMLSchema.INTEGER);
     }
 
     /**
@@ -429,7 +429,7 @@ public class ObjectDTO implements Serializable {
      * @return The literal object.
      */
     public static ObjectDTO createLiteral(long value) {
-        return createLiteral(Long.valueOf(value), XMLSchema.LONG);
+        return createLiteral(Long.valueOf(value), XMLSchema.INTEGER);
     }
 
     /**
