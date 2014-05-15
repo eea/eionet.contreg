@@ -58,10 +58,10 @@ listed for DirsAllowed in virtuoso.ini.
 3. Download, configure and build CR source code
 ****************************************************************************
 
-CR source code is kept in a Subversion (SVN) repository located at
-https://svn.eionet.europa.eu/repositories/Reportnet/cr3/trunk
+CR source code is kept in GitHub repository at
+https://github.com/eea/eionet.contreg
 
-Install an SVN client of your preference, and checkout CR source code into a directory
+Install a Git client of your choice, and clone CR source code into a directory
 that is denoted by CR_SOURCE_HOME in the below instructions.
 
 Before you can build CR source code, you need to set your environment specific properties.
