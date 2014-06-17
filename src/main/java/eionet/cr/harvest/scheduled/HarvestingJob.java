@@ -23,6 +23,7 @@ package eionet.cr.harvest.scheduled;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.rio.RDFParseException;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -59,24 +61,41 @@ import eionet.cr.web.security.CRUser;
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener {
 
-    /** */
-    public static final String NAME = HarvestingJob.class.getClass().getSimpleName();
+    /** Enum for the names of attributes used for propagating job state specifics across its runs. */
+    public enum JobStateAttrs {
+        /** The date-time of the job's last execution's finish. */
+        LAST_FINISH
+    };
 
-    /**
-     * Number of minutes in an hour.
-     */
-    private static final int MINUTES = 60;
-
-    /** */
+    /** Static logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(HarvestingJob.class);
 
-    /** */
+    /** Max number of urgent harvests executed per one interval. */
+    private static final int DEFAULT_URGENT_HARVEST_LIMIT = 20;
+
+    /** Simple name of this class. */
+    public static final String NAME = HarvestingJob.class.getSimpleName();
+
+    /** Number of minutes in an hour. */
+    private static final int MINUTES = 60;
+
+    /** Upper limit for the number of urgent harvests performed at one interval. */
+    public static final int URGENT_HARVEST_LIMIT = GeneralConfig.getIntProperty(
+            GeneralConfig.HARVESTER_URGENT_HARVESTS_PER_INTERVAL, DEFAULT_URGENT_HARVEST_LIMIT);
+
+    /** The batch harvesting queue as retrieved from database. */
     private static List<HarvestSourceDTO> batchQueue;
 
-    /** */
+    /** Hours when the batch harvesting should be active. */
     private static List<HourSpan> batchHarvestingHours;
+
+    /** Interval (in seconds) at which this job (i.e. represented by this class) runs. */
     private static Integer intervalSeconds;
-    private static Integer harvesterUpperLimit;
+
+    /** Number of sources that can be batch-harvested during one interval. */
+    private static Integer batchHarvestLimit;
+
+    /** Total number of minutes per day when the batch-harvesting is active. */
     private static Integer dailyActiveMinutes;
 
     /*
@@ -87,11 +106,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     @Override
     public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 
+        // Ensure that the job rests the configured amount of time after last run, before proceeding.
+        ensureRestingTime(jobExecContext);
+
         try {
-            // harvest urgent queue
+            // Harvest urgent queue.
             handleUrgentQueue();
 
-            // harvest batch queue
+            // Harvest batch queue.
             if (isBatchHarvestingEnabled()) {
                 handleBatchQueue();
             }
@@ -100,7 +122,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         } finally {
             // State that no harvest is currently queued.
             CurrentHarvests.setQueuedHarvest(null);
-            // reset batch-harvesting queue
+            // Reset batch-harvesting queue
             batchQueue = null;
         }
     }
@@ -115,10 +137,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             UrgentHarvestQueueItemDTO queueItem = null;
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
 
-                counter++;
-                if (counter == 50) {
+                if (counter++ == URGENT_HARVEST_LIMIT) {
                     // Just a security measure to avoid an infinite loop here.
-                    // So lets do max 50 urgent harvests at one time.
+                    LOGGER.info("Handled " + URGENT_HARVEST_LIMIT + " urgent harvests, resting until next interval");
                     break;
                 }
 
@@ -318,23 +339,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the upper limit on the number of sources that are harvested in each interval. The value is retrieved from the general
-     * configuration file.
+     * Returns the the number of sources that can be batch-harvested during one interval. The value is retrieved from the general
+     * configuration file. The default is 5.
      *
      * @return the upper limit
      */
-    public static Integer getHarvesterUpperLimit() {
+    public static Integer getBatchHarvestLimit() {
 
-        if (harvesterUpperLimit == null) {
-            String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT).trim();
-            if (upperLimitStr != null && upperLimitStr.length() > 0) {
-                harvesterUpperLimit = Integer.parseInt(upperLimitStr);
-            } else {
-                harvesterUpperLimit = new Integer(0);
-            }
+        if (batchHarvestLimit == null) {
+
+            int value = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT, 5);
+            batchHarvestLimit = Integer.valueOf(value);
         }
 
-        return harvesterUpperLimit;
+        return batchHarvestLimit;
     }
 
     /**
@@ -480,7 +498,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         try {
             int numOfSegments = getNumberOfSegments();
             Long numberOfSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
-            int upperLimit = getHarvesterUpperLimit();
+            int upperLimit = getBatchHarvestLimit();
 
             // Round up to 1 if there is something at all to harvest
             limit = (int) Math.ceil((double) numberOfSources / (double) numOfSegments);
@@ -557,5 +575,30 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    }
+
+    /**
+     * Ensure that the job rests the configured amount of time after last run, before proceeding.
+     *
+     * @param jobExecContext Job execution context as provided by Quartz.
+     */
+    private void ensureRestingTime(JobExecutionContext jobExecContext) {
+
+        JobDataMap jobDataMap = jobExecContext.getJobDetail().getJobDataMap();
+        Object o = jobDataMap.get(HarvestingJob.JobStateAttrs.LAST_FINISH.toString());
+
+        Date lastFinish = o instanceof Date ? (Date) o : null;
+        if (lastFinish != null) {
+
+            long lastFinishMillisAgo = Math.max((System.currentTimeMillis() - lastFinish.getTime()), 0L);
+            long millisToRest = (getIntervalSeconds().longValue() * 1000L) - lastFinishMillisAgo;
+            if (millisToRest > 0) {
+                try {
+                    Thread.sleep(millisToRest);
+                } catch (InterruptedException e) {
+                    LOGGER.warn("Resting interrupted: " + e);
+                }
+            }
+        }
     }
 }

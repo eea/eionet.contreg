@@ -52,8 +52,16 @@ public final class GeneralConfig {
     /** Property for the default harvest interval. */
     public static final String DEFAULT_HARVEST_INTERVAL = "harvester.defaultHarvestInterval";
 
+    /** Upper limit for the number of sources that are harvested in each interval. */
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
+
+    /** Upper limit for the number of urgent harvests performed at one interval. */
+    public static final String HARVESTER_URGENT_HARVESTS_PER_INTERVAL = "urgentHarvestsPerInterval";
+
+    /** Maximum content length of harvested sources. */
     public static final String HARVESTER_MAX_CONTENT_LENGTH = "harvester.maximumContentLength";
+
+    /** The timeout that harvester will feed into java.net.URLConnection's setConnectTimeout() and setReadTimeout(). */
     public static final String HARVESTER_HTTP_TIMEOUT = "harvester.httpConnection.timeout";
 
     /** */
@@ -242,12 +250,13 @@ public final class GeneralConfig {
         if (properties == null) {
             init();
         }
+
         String propValue = properties.getProperty(key);
         int value = defaultValue;
         if (propValue != null) {
             try {
-                value = Integer.valueOf(propValue);
-            } catch (Exception e) {
+                value = Integer.parseInt(propValue.trim());
+            } catch (NumberFormatException e) {
                 // Ignore exceptions resulting from string-to-integer conversion here.
             }
         }
