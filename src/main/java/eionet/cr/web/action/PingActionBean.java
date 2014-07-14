@@ -130,7 +130,7 @@ public class PingActionBean extends AbstractActionBean {
             } else if (create && new URL(uri).getRef() != null) {
                 errorCode = ERR_FRAGMENT_URL;
                 message = "URL with a fragment part not allowed, source cannot be created.";
-            } else if (create && URLUtil.isNotExisting(uri)) {
+            } else if (create && URLUtil.isNotExisting(uri, true)) {
                 errorCode = ERR_BROKEN_URL;
                 message = "Could not make a connection to this URL, source cannot be created.";
             } else {
