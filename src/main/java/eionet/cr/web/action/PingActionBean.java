@@ -81,7 +81,7 @@ public class PingActionBean extends AbstractActionBean {
 
     /** Template for the XML-messages to be sent as response to this API. */
     private static final String RESPONSE_XML = "<?xml version=\"1.0\"?>\r\n" + "<response>\r\n"
-            + "    <message>@message@</message>\r\n" + "    <flerror>@errorCode@</flerror>\r\n" + "</response>";
+            + "    <message>@message@</message>\r\n" + "    <flerror>@errorCode@</flerror>\r\n" + "</response>\r\n";
 
     /** Hosts allowed to use CR's ping API. May contain entries with wildcards. */
     private static final HashSet<String> PING_WHITELIST = getPingWhiteList();
@@ -120,6 +120,7 @@ public class PingActionBean extends AbstractActionBean {
             if (StringUtils.isBlank(uri)) {
                 errorCode = ERR_BLANK_URI;
                 message = "No URI given, no action taken.";
+                uri = ""; // Force it to be the empty string for logging
             } else if (!URLUtil.isURL(uri)) {
                 if (create) {
                     errorCode = ERR_INVALID_URL;
@@ -153,12 +154,12 @@ public class PingActionBean extends AbstractActionBean {
                     DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
                     doHarvest = true;
                 } else {
-                    message = "URL not in catalogue of sources, no action taken.";
+                    message = "URL not in catalogue of sources, no action taken: ";
                 }
 
                 if (doHarvest) {
                     UrgentHarvestQueue.addPullHarvest(uri, CRUser.PING_HARVEST.getUserName());
-                    message = "URL added to the urgent harvest queue: " + uri;
+                    message = "URL added to the urgent harvest queue.";
                 }
             }
         } catch (Exception e) {
@@ -166,7 +167,7 @@ public class PingActionBean extends AbstractActionBean {
             return new ErrorResolution(HttpURLConnection.HTTP_INTERNAL_ERROR);
         }
 
-        LOGGER.debug(message);
+        LOGGER.debug(message + " (" + uri + ")");
         String response = RESPONSE_XML.replace("@message@", message);
         response = response.replace("@errorCode@", String.valueOf(errorCode));
         return new StreamingResolution("text/xml", response);
