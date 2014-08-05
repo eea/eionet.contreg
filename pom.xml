@@ -10,7 +10,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <env>local</env>
         <javaVersion>1.6</javaVersion>
-        <sesame.openrdf.version>2.6.9</sesame.openrdf.version>
+        <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
     </properties>
 
@@ -32,17 +32,11 @@
         </repository>
         <repository>
             <id>eea</id>
-            <name>EAA Release Repository</name>
+            <name>EEA Release Repository</name>
             <url>http://archiva.eionet.europa.eu/repository/internal</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>sesame-repository</id>
-            <name>Sesame repository</name>
-            <layout>default</layout>
-            <url>http://repo.aduna-software.org/maven2/releases/</url>
         </repository>
         <repository>
             <id>maven2-repository.dev.java.net</id>
