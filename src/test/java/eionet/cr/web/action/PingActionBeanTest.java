@@ -1,24 +1,12 @@
 package eionet.cr.web.action;
 
-import java.util.List;
-
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.mortbay.jetty.Server;
-
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.dto.TripleDTO;
-import eionet.cr.harvest.PullHarvest;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.JettyUtil;
-import eionet.cr.test.helpers.RdfLoader;
 
 /**
  * Unit tests for the PING action bean.
@@ -193,7 +181,7 @@ public class PingActionBeanTest extends CRDatabaseTestCase {
         System.out.println(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message",
-                outputStr.contains("<message>URL not in catalogue of sources, no action taken.</message>"));
+                outputStr.contains("<message>URL not in catalogue of sources, no action taken:"));
         assertTrue("Unexpected error code", outputStr.contains("<flerror>0</flerror>"));
 
         // Test that source does not exist yet

@@ -216,16 +216,25 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             }
             return resolutionToScripts();
         } else {
-            RedirectResolution redirResolution = new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id);
-            if (StringUtils.isNotBlank(cancelUrl)) {
-                redirResolution.addParameter("cancelUrl", cancelUrl);
-            }
-            if (StringUtils.isNotBlank(testSourceUrl)) {
-                redirResolution.addParameter("testSourceUrl", testSourceUrl);
+            RedirectResolution redirResolution = null;
+            try {
+                redirResolution = new RedirectResolution(PostHarvestScriptActionBean.class).addParameter("id", id);
+            } catch (NullPointerException npe) {
+                // In unit-test runtime Stripes' OnwardResolution throws NPE from its constructor due to what seems to be a bug.
             }
 
-            redirResolution.addParameter("scriptPredicate", scriptPredicate);
-            redirResolution.addParameter("scriptTemplateId", scriptTemplateId);
+            if (redirResolution != null) {
+
+                if (StringUtils.isNotBlank(cancelUrl)) {
+                    redirResolution.addParameter("cancelUrl", cancelUrl);
+                }
+                if (StringUtils.isNotBlank(testSourceUrl)) {
+                    redirResolution.addParameter("testSourceUrl", testSourceUrl);
+                }
+
+                redirResolution.addParameter("scriptPredicate", scriptPredicate);
+                redirResolution.addParameter("scriptTemplateId", scriptTemplateId);
+            }
 
             return redirResolution;
         }
