@@ -48,19 +48,22 @@ public final class CsvImportUtil {
     }
 
     /**
-     * Harvests CSV/TSV file.
+     * Harvests a table file (i.e. a CSV/TSV file).
      *
-     * @param subject Subject data object of file location.
-     * @param uri file (Source/Graph) uri
-     * @param userName user who executed the harvest
-     * @return List of warning messages recieved from upload and post harvest scripts
-     * @throws Exception if harvest fails
+     * @param subject {@link SubjectDTO} representing the file to be harvested. Must not be null!
+     * @param userName User account name of the user requesting the harvest.
+     * @return List of warning messages received from upload and post harvest scripts.
+     * @throws Exception if harvest fails.
      */
-    public static List<String> harvestTableFile(SubjectDTO subject, String uri, String userName) throws Exception {
+    public static List<String> harvestTableFile(SubjectDTO subject, String userName) throws Exception {
+
+        if (subject == null) {
+            throw new IllegalArgumentException("The subject must not be null!");
+        }
 
         List<String> warningMessages = new ArrayList<String>();
 
-        String fileUri = uri;
+        String fileUri = subject.getUri();
         String fileLabel = subject.getObjectValue(Predicates.RDFS_LABEL);
         FileType fileType = FileType.valueOf(subject.getObjectValue(Predicates.CR_MEDIA_TYPE));
         String objectsType = subject.getObjectValue(Predicates.CR_OBJECTS_TYPE);
@@ -71,11 +74,12 @@ public final class CsvImportUtil {
         long fileSize = Long.parseLong(subject.getObjectValue(Predicates.CR_BYTE_SIZE));
         Collection<String> uniqueColumns = subject.getObjectValues(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
 
-        String folderUri = StringUtils.substringBeforeLast(uri, "/");
+        String folderUri = StringUtils.substringBeforeLast(fileUri, "/");
         String relativeFilePath = FolderUtil.extractPathInUserHome(fileUri);
+        relativeFilePath = StringUtils.replace(relativeFilePath, "%20", " ");
 
-        // Clear graph
-        DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(uri);
+        // Clear graph.
+        DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(fileUri);
 
         CsvImportHelper helper =
                 new CsvImportHelper(new ArrayList<String>(uniqueColumns), fileUri, fileLabel, fileType, objectsType, publisher,

@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
+    <ACLS/>
+    <ACL_ROWS/>
     <HARVEST/>
     <HARVEST_MESSAGE/>
     <HARVEST_SOURCE/>

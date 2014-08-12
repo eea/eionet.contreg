@@ -144,7 +144,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
         // Different action depending on the subject's type.
         if (isTableFile) {
             try {
-                List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subject, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }

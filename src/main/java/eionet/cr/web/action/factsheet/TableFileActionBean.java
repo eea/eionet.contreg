@@ -92,6 +92,9 @@ public class TableFileActionBean extends AbstractActionBean {
         boolean viewPermission = true;
         String aclPath = FolderUtil.extractAclPath(uri);
 
+        // In ACLs the spaces are not escaped.
+        aclPath = StringUtils.replace(aclPath, "%20", " ");
+
         viewPermission = CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true);
 
         if (!viewPermission) {

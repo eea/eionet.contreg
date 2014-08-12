@@ -85,6 +85,9 @@ import eionet.cr.web.util.tabs.TabElement;
 @UrlBinding("/folder.action")
 public class FolderActionBean extends AbstractActionBean implements Runnable {
 
+    /** Temporary space placeholder for some parsing below. */
+    private static final String TEMP_SPACE_REPLACEMENT = "---TEMP_SPACE_REPLACEMENT---";
+
     /** The current folder URI. */
     private String uri;
 
@@ -236,13 +239,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                 String oldUri = item.getUri();
 
                 String newUri = uri + "/";
-                String newName = StringUtils.replace(item.getNewName(), " ", "---TEMP_SPACE_REPLACEMENT---");
+                String newName = StringUtils.replace(item.getNewName(), " ", TEMP_SPACE_REPLACEMENT);
                 try {
                     newName = URLEncoder.encode(newName, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                newName = StringUtils.replace(newName, "---TEMP_SPACE_REPLACEMENT---", "%20");
+                newName = StringUtils.replace(newName, TEMP_SPACE_REPLACEMENT, "%20");
 
                 newUri += newName;
 
@@ -302,15 +305,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @throws SignOnException if deleting ACL fails
      */
     public Resolution delete() throws DAOException, SignOnException {
-        aclPath = FolderUtil.extractAclPath(uri);
 
-        // allow to view the folder by default if there is no ACL
-        // boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
-        //
-        // if (!actionAllowed) {
-        // addSystemMessage("Only authorized users can delete files.");
-        // return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        // }
+        aclPath = FolderUtil.extractAclPath(uri);
 
         if (itemsNotSelected()) {
             addSystemMessage("Select files or folders to delete.");
@@ -340,7 +336,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous()));
 
-        // Delete folders
+        // Delete folders.
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
 
@@ -355,7 +351,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
 
-        // Delete files
+        // Delete files.
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
                 String filePath = FolderUtil.extractPathInFolder(item.getUri());
@@ -400,9 +396,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        title = StringUtils.replace(title, " ", "---TEMP_SPACE_REPLACEMENT---");
+        title = StringUtils.replace(title, " ", TEMP_SPACE_REPLACEMENT);
         title = URLEncoder.encode(title, "UTF-8");
-        title = StringUtils.replace(title, "---TEMP_SPACE_REPLACEMENT---", "%20");
+
+        String titleSpacesUnescaped = StringUtils.replace(title, TEMP_SPACE_REPLACEMENT, " ");
+        title = StringUtils.replace(title, TEMP_SPACE_REPLACEMENT, "%20");
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (folderDAO.fileOrFolderExists(uri, title)) {
@@ -413,10 +411,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         String context = FolderUtil.folderContext(uri);
 
         folderDAO.createFolder(uri, title, label, context);
-        AccessController.addAcl(aclPath + "/" + title, getUserName(), title, true);
+        AccessController.addAcl(aclPath + "/" + titleSpacesUnescaped, getUserName(), titleSpacesUnescaped, true);
 
         if (FolderUtil.isProjectRootFolder(uri)) {
-            AccessController.addAcl(aclPath + "/" + title + "/bookmarks", getUserName(), "Bookmarks for " + title, true);
+            AccessController.addAcl(aclPath + "/" + titleSpacesUnescaped + "/bookmarks", getUserName(), "Bookmarks for "
+                    + titleSpacesUnescaped, true);
         }
 
         addSystemMessage("Folder created successfully.");
@@ -885,16 +884,24 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Deletes corresponding ACLs of the deleted items.
      *
-     * @param uris
-     *            array of URIs that are deleted
-     * @throws SignOnException
-     *             if delete ACLs files
+     * @param itemUris URIs of items whose ACLs are to be deleted.
+     * @throws SignOnException If problem with deleting ACLs.
      */
-    private void deleteAcls(List<String> uris) throws SignOnException {
-        for (String uriToDelete : uris) {
-            String aclP = FolderUtil.extractAclPath(uriToDelete);
-            if (AccessController.getAcls().containsKey(aclP)) {
-                AccessController.removeAcl(aclP);
+    @SuppressWarnings("rawtypes")
+    private void deleteAcls(List<String> itemUris) throws SignOnException {
+
+        for (String uri : itemUris) {
+
+            String aclPath = FolderUtil.extractAclPath(uri);
+            HashMap acls = AccessController.getAcls();
+            if (acls.containsKey(aclPath)) {
+                AccessController.removeAcl(aclPath);
+            } else {
+                // ACL names do NOT actually have the spaces escaped.
+                aclPath = StringUtils.replace(aclPath, "%20", " ");
+                if (acls.containsKey(aclPath)) {
+                    AccessController.removeAcl(aclPath);
+                }
             }
         }
     }

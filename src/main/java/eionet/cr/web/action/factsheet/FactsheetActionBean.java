@@ -197,7 +197,7 @@ public class FactsheetActionBean extends AbstractActionBean {
 
             // Special block for harvesting table files.
             try {
-                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDTO, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDTO, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }

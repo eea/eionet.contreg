@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -25,6 +26,7 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 
@@ -38,6 +40,7 @@ import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
+import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
@@ -56,20 +59,23 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
     public static final String TEST_USER_NAME = "somebody";
 
     /** The name of seeded CSV file we're testing. */
-    public static final String TEST_FILE_NAME = "USPresidents.csv";
+    public static final String TEST_FILE_NAME = "Presidents of USA.csv";
+
+    /** The name of seeded CSV file we're testing, spaces escaped */
+    public static final String TEST_FILE_NAME_ESCAPED = StringUtils.replace(TEST_FILE_NAME, " ", "%20");
 
     /** The URI of the virtual CR folder we're testing in. */
     public static final String TEST_FOLDER_URI = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
 
     /** The URI of the uploaded file we're testing. */
-    public static final String TEST_FILE_URI = TEST_FOLDER_URI + "/" + TEST_FILE_NAME;
+    public static final String TEST_FILE_URI = TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED;
 
     /** Abstract reference to the file under test. */
     public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI
-            + "/USPresidents.csv#> " + "SELECT * FROM <" + TEST_FOLDER_URI + "/USPresidents.csv> WHERE {"
+    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
+            + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED + "> WHERE {"
             + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
             + "    OPTIONAL { _:rec tableFile:President ?President } ."
             + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
@@ -79,8 +85,8 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
             + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts NOT used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI
-            + "/USPresidents.csv#> " + "SELECT * FROM <" + TEST_FOLDER_URI + "/USPresidents.csv> WHERE {"
+    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
+            + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED + "> WHERE {"
             + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
             + "    OPTIONAL { _:rec tableFile:President ?President } ."
             + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
@@ -173,6 +179,16 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
         dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
         doUploadSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
+
+        // Try harvesting the freshly uploaded file.
+        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
+        assertNotNull("Expected existing subject for " + TEST_FILE_URI, subject);
+        try {
+            List<String> harvestWarnings = CsvImportUtil.harvestTableFile(subject, "heinlja");
+            assertTrue("Was expecting no harvest warnings!", CollectionUtils.isEmpty(harvestWarnings));
+        } catch (Exception e) {
+            fail("Was not expecting this exception: " + e.toString());
+        }
     }
 
     /**
