@@ -118,15 +118,7 @@
             <a href="recentUploads.action">Recent uploads</a><br/>
             displays the latest content that CR has discovered, classified by certain content types.
         </li>
-        </ul>
-
-        <h2>Support</h2>
-        <p>
-        If you experience any problem using ${initParam.appDispName}, please let the Eionet Helpdesk know immediately.
-        The Helpdesk can be reached by phone on +37 2 508 4992 from Monday through Friday 9:00 to 17:00 CET.
-        You can also email the helpdesk at any time: <a href="mailto:helpdesk@eionet.europa.eu">helpdesk@eionet.europa.eu</a>.
-        Do not hesitate, we are here to help.
-        </p>
+    </ul>
 
     </stripes:layout-component>
 </stripes:layout-render>
