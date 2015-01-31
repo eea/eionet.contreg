@@ -34,6 +34,16 @@ public class PostHarvestScriptDTO {
         SOURCE, TYPE
     };
 
+    /** Enum for possible values of the harvest phase where the script should be run in. */
+    public enum Phase {
+
+        /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
+        PRE_PURGE,
+
+        /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
+        AFTER_NEW
+    };
+
     /** */
     private TargetType targetType;
     private String targetUrl;
@@ -44,6 +54,9 @@ public class PostHarvestScriptDTO {
     private boolean runOnce = true;
     private int id;
     private Date lastModified;
+
+    /** Harvest phase where the script should be run in. */
+    private Phase phase;
 
     /**
      * @return the active
@@ -174,6 +187,20 @@ public class PostHarvestScriptDTO {
     @Override
     public String toString() {
         return title;
+    }
+
+    /**
+     * @return the phase
+     */
+    public Phase getPhase() {
+        return phase;
+    }
+
+    /**
+     * @param phase the phase to set
+     */
+    public void setPhase(Phase phase) {
+        this.phase = phase;
     }
 
 

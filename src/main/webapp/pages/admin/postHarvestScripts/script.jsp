@@ -175,6 +175,16 @@ while (l--) {
                     </tr>
                     <tr>
                         <td style="vertical-align:top;padding-right:0.3em;text-align:right">
+                            <label for="phaseSelect" class="question">Phase:</label>
+                        </td>
+                        <td>
+                            <stripes:select name="phase" id="phaseSelect" value="${actionBean.phase}">
+                                <stripes:options-collection collection="${actionBean.possiblePhases}" value="name" label="label" />
+                            </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:top;padding-right:0.3em;text-align:right">
                             <label for="activeCheckbox" class="question">Active:</label>
                         </td>
                         <td>

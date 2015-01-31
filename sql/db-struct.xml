@@ -308,4 +308,11 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet author="heinlja" id="rev-18">
+        <comment>A field indicating the phase when the harvest script should be run.</comment>
+        <sql>
+            ALTER TABLE "post_harvest_script" ADD COLUMN "phase" varchar(32) NOT NULL default 'AFTER_NEW'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

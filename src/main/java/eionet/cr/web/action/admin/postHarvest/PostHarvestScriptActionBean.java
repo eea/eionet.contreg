@@ -24,6 +24,7 @@ package eionet.cr.web.action.admin.postHarvest;
 import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -43,6 +45,7 @@ import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.Phase;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.filestore.ScriptTemplateDaoImpl;
@@ -67,6 +70,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             + "}\n" + "WHERE {\n" + "  GRAPH ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
             + "    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n" + "  }\n" + "}";
 
+    /** The map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label. */
+    private static final Map<String, String> POSSIBLE_PHASES = createPossiblePhasesMap();
+
     /** The script id. */
     private int id;
 
@@ -87,6 +93,9 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
 
     /** Is the script activated? */
     private boolean active;
+
+    /** The script's phase. See {@link PostHarvestScriptDTO.Phase}. */
+    private PostHarvestScriptDTO.Phase phase;
 
     /** Should the script be run only once by the harvester? (alternative is to do until returned update count is 0). */
     private boolean runOnce = true;
@@ -137,7 +146,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     private String scriptTemplateId;
 
     /**
-     * ActionBean default handler
+     * ActionBean default handler.
      *
      * @return
      * @throws DAOException
@@ -154,6 +163,7 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
                 targetType = dto.getTargetType();
                 active = dto.isActive();
                 runOnce = dto.isRunOnce();
+                phase = dto.getPhase();
             }
         }
 
@@ -809,20 +819,78 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
         return typeAllDistinctPredicates;
     }
 
+    /**
+     * Gets the script predicate.
+     *
+     * @return the script predicate
+     */
     public String getScriptPredicate() {
         return scriptPredicate;
     }
 
+    /**
+     * Sets the script predicate.
+     *
+     * @param scriptPredicate the new script predicate
+     */
     public void setScriptPredicate(String scriptPredicate) {
         this.scriptPredicate = scriptPredicate;
     }
 
+    /**
+     * Gets the script template id.
+     *
+     * @return the script template id
+     */
     public String getScriptTemplateId() {
         return scriptTemplateId;
     }
 
+    /**
+     * Sets the script template id.
+     *
+     * @param scriptTemplateId the new script template id
+     */
     public void setScriptTemplateId(String scriptTemplateId) {
         this.scriptTemplateId = scriptTemplateId;
     }
 
+    /**
+     * @return the phase
+     */
+    public PostHarvestScriptDTO.Phase getPhase() {
+        return phase;
+    }
+
+    /**
+     * @param phase the phase to set
+     */
+    public void setPhase(PostHarvestScriptDTO.Phase phase) {
+        this.phase = phase;
+    }
+
+    /**
+     * Returns a map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label.
+     * @return
+     */
+    public Map<String, String> getPossiblePhases() {
+        return POSSIBLE_PHASES;
+    }
+
+    /**
+     * Create a map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label.
+     *
+     * @return The map.
+     */
+    private static Map<String, String> createPossiblePhasesMap() {
+
+        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+        Phase[] values = PostHarvestScriptDTO.Phase.values();
+        for (Phase phase : values) {
+            String name = phase.name();
+            String label = WordUtils.capitalize(name.toLowerCase()).replace('_', ' ');
+            map.put(name, label);
+        }
+        return map;
+    }
 }

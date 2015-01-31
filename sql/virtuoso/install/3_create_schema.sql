@@ -91,6 +91,7 @@ create table CR.cr3user.post_harvest_script
   active VARCHAR(1),
   run_once character NOT NULL DEFAULT 'Y',
   last_modified datetime,
+  phase varchar(32) NOT NULL default 'AFTER_NEW',
   PRIMARY KEY (post_harvest_script_id)
 );
 
