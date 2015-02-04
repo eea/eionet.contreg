@@ -24,7 +24,7 @@ package eionet.cr.web.action.admin.postHarvest;
 import static eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,6 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -69,9 +68,6 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
             + "INSERT INTO ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n" + "    ?s cr:tag `bif:lower(?o)`\n"
             + "}\n" + "WHERE {\n" + "  GRAPH ?" + PostHarvestScriptParser.HARVESTED_SOURCE_VARIABLE + " {\n"
             + "    ?s <http://www.eea.europa.eu/portal_types/Article#themes> ?o\n" + "  }\n" + "}";
-
-    /** The map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label. */
-    private static final Map<String, String> POSSIBLE_PHASES = createPossiblePhasesMap();
 
     /** The script id. */
     private int id;
@@ -211,10 +207,11 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     public Resolution save() throws DAOException {
 
         // If id given, do save by the given id, otherwise do addition of brand new script.
+        PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
         if (id > 0) {
-            DAOFactory.get().getDao(PostHarvestScriptDAO.class).save(id, title, script, active, runOnce);
+            dao.save(id, title, script, active, runOnce, phase);
         } else {
-            id = DAOFactory.get().getDao(PostHarvestScriptDAO.class).insert(targetType, targetUrl, title, script, active, runOnce);
+            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase);
         }
         addSystemMessage("Script successfully saved!");
 
@@ -870,27 +867,10 @@ public class PostHarvestScriptActionBean extends AbstractActionBean {
     }
 
     /**
-     * Returns a map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label.
-     * @return
+     * Returns a list of possible harvest phases.
+     * @return the list
      */
-    public Map<String, String> getPossiblePhases() {
-        return POSSIBLE_PHASES;
-    }
-
-    /**
-     * Create a map of possible harvest phases when a harvest script can be run. Key = phase name, Value = phase label.
-     *
-     * @return The map.
-     */
-    private static Map<String, String> createPossiblePhasesMap() {
-
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-        Phase[] values = PostHarvestScriptDTO.Phase.values();
-        for (Phase phase : values) {
-            String name = phase.name();
-            String label = WordUtils.capitalize(name.toLowerCase()).replace('_', ' ');
-            map.put(name, label);
-        }
-        return map;
+    public List<Phase> getPossiblePhases() {
+        return Arrays.asList(PostHarvestScriptDTO.Phase.values());
     }
 }

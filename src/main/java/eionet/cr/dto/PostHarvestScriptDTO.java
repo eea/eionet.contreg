@@ -29,19 +29,12 @@ import java.util.Date;
  */
 public class PostHarvestScriptDTO {
 
+    /** Default value for {@link PostHarvestScriptDTO.Phase}. */
+    public static final Phase DEFAULT_PHASE = Phase.AFTER_NEW;
+
     /** */
     public enum TargetType {
         SOURCE, TYPE
-    };
-
-    /** Enum for possible values of the harvest phase where the script should be run in. */
-    public enum Phase {
-
-        /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
-        PRE_PURGE,
-
-        /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
-        AFTER_NEW
     };
 
     /** */
@@ -203,5 +196,39 @@ public class PostHarvestScriptDTO {
         this.phase = phase;
     }
 
+    /** Enum for possible values of the harvest phase where the script should be run in. */
+    public enum Phase {
 
+        /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
+        AFTER_NEW("After harvesting new content"),
+
+        /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
+        PRE_PURGE("Before purging old content");
+
+        /** The enum's human friendly label. */
+        private String label;
+
+        /**
+         * Enum constructor.
+         * @param label
+         */
+        Phase(String label) {
+            this.label = label;
+        }
+
+        /**
+         * @return the label
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * Returns {@link Enum#name()} of this enum.
+         * @return the name
+         */
+        public String getName() {
+            return name();
+        }
+    };
 }

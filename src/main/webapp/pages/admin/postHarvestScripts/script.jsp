@@ -178,7 +178,10 @@ while (l--) {
                             <label for="phaseSelect" class="question">Phase:</label>
                         </td>
                         <td>
-                            <stripes:select name="phase" id="phaseSelect" value="${actionBean.phase}">
+                            <stripes:select name="phase" id="phaseSelect" value="${actionBean.phase.name}">
+                                <c:if test="${actionBean.id > 0 && actionBean.phase == null}">
+                                    <stripes:option label="-- unknown --" value="" selected="selected" disabled="disabled"/>
+                                </c:if>
                                 <stripes:options-collection collection="${actionBean.possiblePhases}" value="name" label="label" />
                             </stripes:select>
                         </td>

@@ -28,6 +28,7 @@ import java.util.Set;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.Phase;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Pair;
 
@@ -78,11 +79,12 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param title
      * @param script
      * @param active
-     * @param runOnce TODO
+     * @param runOnce
+     * @param phase
      * @return
      * @throws DAOException
      */
-    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
+    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce, Phase phase)
             throws DAOException;
 
     /**
@@ -91,10 +93,11 @@ public interface PostHarvestScriptDAO extends DAO {
      * @param title
      * @param script
      * @param active
-     * @param runOnce TODO
+     * @param runOnce
+     * @param phase
      * @throws DAOException
      */
-    void save(int id, String title, String script, boolean active, boolean runOnce) throws DAOException;
+    void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase) throws DAOException;
 
     /**
      *

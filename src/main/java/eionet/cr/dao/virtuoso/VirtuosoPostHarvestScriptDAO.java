@@ -41,6 +41,7 @@ import eionet.cr.dao.readers.PostHarvestScriptTestResultsReader;
 import eionet.cr.dao.util.PostHarvestScriptSet;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.Phase;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
@@ -68,7 +69,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
+            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, PHASE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -76,8 +77,8 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,LAST_MODIFIED) values "
-            + "(?,?,?,?,?,?,?,NOW())";
+            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,PHASE,LAST_MODIFIED) values "
+            + "(?,?,?,?,?,?,?,?,NOW())";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -170,14 +171,18 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     /**
      * @see eionet.cr.dao.PostHarvestScriptDAO#insert(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String,
-     *      java.lang.String, java.lang.String, boolean, boolean)
+     *      java.lang.String, java.lang.String, boolean, boolean, Phase)
      */
     @Override
-    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce)
-            throws DAOException {
+    public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce,
+            Phase phase) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
+
+        if (phase == null) {
+            phase = PostHarvestScriptDTO.DEFAULT_PHASE;
+        }
 
         Connection conn = null;
         try {
@@ -199,6 +204,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
             values.add(Integer.valueOf(position));
             values.add(YesNoBoolean.format(active));
             values.add(YesNoBoolean.format(runOnce));
+            values.add(phase.name());
 
             int result = SQLUtil.executeUpdateReturnAutoID(INSERT_SQL, values, conn);
             conn.commit();
@@ -212,16 +218,21 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
     }
 
     /**
-     * @see eionet.cr.dao.PostHarvestScriptDAO#save(int, String, String, boolean, boolean)
+     * @see eionet.cr.dao.PostHarvestScriptDAO#save(int, String, String, boolean, boolean, Phase)
      */
     @Override
-    public void save(int id, String title, String script, boolean active, boolean runOnce) throws DAOException {
+    public void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase) throws DAOException {
+
+        if (phase == null) {
+            phase = PostHarvestScriptDTO.DEFAULT_PHASE;
+        }
 
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(title);
         values.add(script);
         values.add(YesNoBoolean.format(active));
         values.add(YesNoBoolean.format(runOnce));
+        values.add(phase.name());
         values.add(Integer.valueOf(id));
 
         executeSQL(SAVE_SQL, values);
@@ -452,7 +463,7 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
      */
     @Override
     public List<Map<String, ObjectDTO>>
-    test(String constructQuery, TargetType targetType, String targetUrl, String harvestedSource) throws DAOException {
+            test(String constructQuery, TargetType targetType, String targetUrl, String harvestedSource) throws DAOException {
 
         if (StringUtils.isBlank(constructQuery)) {
             return new ArrayList<Map<String, ObjectDTO>>();
@@ -518,10 +529,17 @@ public class VirtuosoPostHarvestScriptDAO extends VirtuosoBaseDAO implements Pos
 
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.PostHarvestScriptDAO#addScripts(eionet.cr.dto.PostHarvestScriptDTO.TargetType, java.lang.String,
+     * java.util.List)
+     */
     @Override
     public void addScripts(TargetType targetType, String targetUrl, List<PostHarvestScriptDTO> scripts) throws DAOException {
         for (PostHarvestScriptDTO script : scripts) {
-            insert(targetType, targetUrl, script.getTitle(), script.getScript(), script.isActive(), script.isRunOnce());
+            insert(targetType, targetUrl, script.getTitle(), script.getScript(), script.isActive(), script.isRunOnce(),
+                    script.getPhase());
         }
 
     }

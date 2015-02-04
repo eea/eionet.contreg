@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import org.apache.commons.lang.StringUtils;
 
 import eionet.cr.dto.PostHarvestScriptDTO;
+import eionet.cr.dto.PostHarvestScriptDTO.Phase;
 import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
@@ -67,6 +68,12 @@ public class PostHarvestScriptDTOReader extends SQLResultSetBaseReader<PostHarve
         dto.setActive(YesNoBoolean.parse(rs.getString("ACTIVE")));
         dto.setRunOnce(YesNoBoolean.parse(rs.getString("RUN_ONCE")));
         dto.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
+
+        try {
+            dto.setPhase(Phase.valueOf(rs.getString("PHASE")));
+        } catch (Exception e) {
+            dto.setPhase(null);
+        }
 
         resultList.add(dto);
     }
