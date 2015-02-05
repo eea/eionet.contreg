@@ -19,7 +19,7 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.action.admin.postHarvest;
+package eionet.cr.web.action.admin.harvestscripts;
 
 import java.util.ArrayList;
 import java.util.Collection;

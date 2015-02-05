@@ -26,8 +26,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import eionet.cr.web.action.admin.postHarvest.HarvestScriptParser;
-import eionet.cr.web.action.admin.postHarvest.ScriptParseException;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
+import eionet.cr.web.action.admin.harvestscripts.ScriptParseException;
 
 
 /**

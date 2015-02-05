@@ -1,4 +1,4 @@
-package eionet.cr.web.action.admin.postHarvest;
+package eionet.cr.web.action.admin.harvestscripts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.web.action.admin.postHarvest.HarvestScriptsActionBean.ActionType;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.ActionType;
 
 /**
  * Common utility methods for handling Post Harvest Scripts.

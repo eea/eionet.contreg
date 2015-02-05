@@ -19,9 +19,9 @@
  *        Jaanus Heinlaid
  */
 
-package eionet.cr.web.action.admin.postHarvest;
+package eionet.cr.web.action.admin.harvestscripts;
 
-import static eionet.cr.web.action.admin.postHarvest.HarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
+import static eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.web.action.AbstractActionBean;
-import eionet.cr.web.action.admin.postHarvest.HarvestScriptsActionBean.ActionType;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.ActionType;
 import eionet.cr.web.util.ApplicationCache;
 
 /**

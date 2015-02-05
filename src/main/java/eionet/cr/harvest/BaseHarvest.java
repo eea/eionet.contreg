@@ -77,7 +77,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.xml.ConversionSchema;
 import eionet.cr.util.xml.ConversionSchema.Type;
-import eionet.cr.web.action.admin.postHarvest.HarvestScriptParser;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
 /**

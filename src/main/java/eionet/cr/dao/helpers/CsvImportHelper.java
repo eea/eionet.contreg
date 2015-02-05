@@ -66,7 +66,7 @@ import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.DataLinkingScript;
 import eionet.cr.web.action.UploadCSVActionBean.FileType;
-import eionet.cr.web.action.admin.postHarvest.HarvestScriptParser;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.util.CharsetToolkit;
 
 /**

@@ -14,6 +14,7 @@ import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.action.ActionBeanUtils;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
 
 /**
  * unit test for testing HarvestScriptActionBean.
