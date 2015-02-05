@@ -273,13 +273,17 @@ public abstract class BaseHarvest implements Harvest {
             // Clear the triples if sub-classes have requested so.
             // They should do that when the harvest failed in such a way that no previous content is to be left into the graph.
             if (clearTriples) {
+
+                // Run pre-purge scripts.
+                runHarvestScripts(Phase.PRE_PURGE);
+
                 LOGGER.debug("Purging the graph of " + getContextUrl());
                 DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(getContextUrl());
                 getContextSourceDTO().setStatements(0);
             }
 
-            // run post-harvest scripts
-            runPostHarvestScripts();
+            // Run post-harvest scripts.
+            runHarvestScripts(Phase.AFTER_NEW);
 
             // send harvest messages
             sendHarvestMessages();
@@ -339,15 +343,24 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Runs all post-harvest scripts relevant for this harvest.
+     *
+     * @param phase Only scripts meant for this phase will be run.
      */
-    private void runPostHarvestScripts() {
+    private void runHarvestScripts(Phase phase) {
 
-        if (getStoredTriplesCount() <= 0) {
-            LOGGER.info(loggerMsg("Ignoring post-harvest scripts, as no triples were harvested!"));
-            return;
+        if (phase == null) {
+            throw new IllegalArgumentException("Phase must not be specified!");
         }
 
-        LOGGER.debug(loggerMsg("Running post-harvest scripts"));
+        // If the phase is "after harvesting new content" and there was actually 0 triple harvested then don't continue.
+        if (Phase.AFTER_NEW.equals(phase)) {
+            if (getStoredTriplesCount() <= 0) {
+                LOGGER.info(loggerMsg("Ignoring post-harvest scripts, as no triples were harvested!"));
+                return;
+            }
+        }
+
+        LOGGER.debug(loggerMsg("Running \"" + phase.getShortLabel() + "\" scripts..."));
 
         RepositoryConnection conn = null;
         try {
@@ -357,12 +370,12 @@ public abstract class BaseHarvest implements Harvest {
 
             int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            List<HarvestScriptDTO> scripts = dao.listActive(null, null, Phase.AFTER_NEW);
+            List<HarvestScriptDTO> scripts = dao.listActive(null, null, phase);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), Phase.AFTER_NEW);
+            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), phase);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
@@ -372,22 +385,22 @@ public abstract class BaseHarvest implements Harvest {
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
 
-                scripts = dao.listActiveForTypes(distinctTypes, Phase.AFTER_NEW);
+                scripts = dao.listActiveForTypes(distinctTypes, phase);
                 totalScriptsFound += scripts.size();
                 runScripts(scripts, conn);
             }
 
             if (totalScriptsFound == 0) {
-                LOGGER.debug(loggerMsg("No active post-harvest scripts were found relevant for this source"));
+                LOGGER.debug(loggerMsg("No active \"" + phase.getShortLabel() + "\" scripts were found relevant for this source"));
             }
 
             // commit changes
             conn.commit();
         } catch (Exception e) {
             SesameUtil.rollback(conn);
-            addHarvestMessage("Error when running post-harvest scripts: " + e.getMessage(), HarvestMessageType.ERROR,
-                    Util.getStackTrace(e));
-            LOGGER.error(loggerMsg("Error when running post-harvest scripts: " + e.getMessage()), e);
+            addHarvestMessage("Error when running \"" + phase.getShortLabel() + "\" scripts: " + e.getMessage(),
+                    HarvestMessageType.ERROR, Util.getStackTrace(e));
+            LOGGER.error(loggerMsg("Error when running \"" + phase.getShortLabel() + "\" scripts: " + e.getMessage()), e);
         } finally {
             SesameUtil.close(conn);
         }

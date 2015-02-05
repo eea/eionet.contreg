@@ -61,11 +61,13 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String LIST_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? order by POSITION_NUMBER asc";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and PHASE=coalesce(?,PHASE) "
+            + "order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and ACTIVE='Y' order by POSITION_NUMBER asc";
+            + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=? and PHASE=coalesce(?,PHASE) and ACTIVE='Y' "
+            + "order by POSITION_NUMBER asc";
     private static final String LIST_ACTIVE_FOR_TYPES_SQL = "select * from POST_HARVEST_SCRIPT where "
-            + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and ACTIVE='Y' "
+            + "TARGET_SOURCE_URL is null and TARGET_TYPE_URL in (@types@) and PHASE=coalesce(?,PHASE) and ACTIVE='Y' "
             + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
@@ -119,6 +121,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(sourceUrl == null ? "" : sourceUrl);
         values.add(typeUrl == null ? "" : typeUrl);
+        values.add(phase == null ? null : phase.name());
 
         return executeSQL(LIST_SQL, values, new HarvestScriptDTOReader());
     }
@@ -135,6 +138,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(sourceUrl == null ? "" : sourceUrl);
         values.add(typeUrl == null ? "" : typeUrl);
+        values.add(phase == null ? null : phase.name());
 
         return executeSQL(LIST_ACTIVE_SQL, values, new HarvestScriptDTOReader());
     }
@@ -155,7 +159,12 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         String sql = LIST_ACTIVE_FOR_TYPES_SQL.replace("@types@", questionMarks);
-        return executeSQL(sql, types, new HarvestScriptDTOReader());
+
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.addAll(types);
+        values.add(phase);
+
+        return executeSQL(sql, values, new HarvestScriptDTOReader());
     }
 
     /**
@@ -170,8 +179,8 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#insert(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String,
-     *      java.lang.String, java.lang.String, boolean, boolean, Phase)
+     * @see eionet.cr.dao.HarvestScriptDAO#insert(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.lang.String,
+     *      java.lang.String, boolean, boolean, Phase)
      */
     @Override
     public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce,
@@ -317,8 +326,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#move(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.util.Set,
-     *      int)
+     * @see eionet.cr.dao.HarvestScriptDAO#move(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.util.Set, int)
      */
     @Override
     public void move(TargetType targetType, String targetUrl, Set<Integer> ids, int direction) throws DAOException {
@@ -337,6 +345,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(sourceUrl == null ? "" : sourceUrl);
         values.add(typeUrl == null ? "" : typeUrl);
+        values.add(null);
 
         Connection conn = null;
         try {
@@ -390,6 +399,9 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
                 }
             }
 
+            values = new ArrayList<Object>();
+            values.add(sourceUrl == null ? "" : sourceUrl);
+            values.add(typeUrl == null ? "" : typeUrl);
             values.add(0, Integer.valueOf(scriptSet.getMaxPosition()));
             SQLUtil.executeUpdate(INCREASE_POSITIONS_SQL, values, conn);
 
@@ -411,8 +423,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#exists(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String,
-     *      java.lang.String)
+     * @see eionet.cr.dao.HarvestScriptDAO#exists(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.lang.String)
      */
     @Override
     public boolean exists(TargetType targetType, String targetUrl, String title) throws DAOException {
@@ -458,8 +469,8 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#test(java.lang.String, eionet.cr.dto.HarvestScriptDTO.TargetType,
-     *      java.lang.String, java.lang.String)
+     * @see eionet.cr.dao.HarvestScriptDAO#test(java.lang.String, eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String,
+     *      java.lang.String)
      */
     @Override
     public List<Map<String, ObjectDTO>>

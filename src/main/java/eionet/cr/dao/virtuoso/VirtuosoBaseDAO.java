@@ -327,7 +327,7 @@ public abstract class VirtuosoBaseDAO {
     }
 
     /**
-     * helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
+     * Helper method to execute sql queries. Handles connection init, close. Wraps Exceptions into {@link DAOException}
      *
      * @param <T> - type of the returned object
      * @param sql - sql string
