@@ -23,6 +23,8 @@ package eionet.cr.dto;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  *
  * @author Jaanus Heinlaid
@@ -200,20 +202,24 @@ public class HarvestScriptDTO {
     public enum Phase {
 
         /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
-        AFTER_NEW("After harvesting new content"),
+        AFTER_NEW("After harvesting new content", "POST"),
 
         /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
-        PRE_PURGE("Before purging old content");
+        PRE_PURGE("Before purging old content", "PRE");
 
         /** The enum's human friendly label. */
         private String label;
+
+        /** The enum's human friendly acronym.*/
+        private String acronym;
 
         /**
          * Enum constructor.
          * @param label
          */
-        Phase(String label) {
+        Phase(String label, String acronym) {
             this.label = label;
+            this.acronym = acronym;
         }
 
         /**
@@ -229,6 +235,13 @@ public class HarvestScriptDTO {
          */
         public String getName() {
             return name();
+        }
+
+        /**
+         * @return the acronym
+         */
+        public String getAcronym() {
+            return StringUtils.isBlank(acronym) ? name() : acronym;
         }
     };
 }

@@ -101,7 +101,7 @@
 
         <c:if test="${fn:length(actionBean.scripts)>1}">
             <div class="advice-msg" style="clear:both;width:100%;margin-top:1em;">
-                Note: scripts will be executed in the below order. Use "Move up/down" buttons to change that.
+                Note: scripts of the same phase will be executed in the below order. Use "Move up/down" buttons to change the order.
             </div>
         </c:if>
 
@@ -127,6 +127,9 @@
                      </display:column>
                      <display:column style="width:3em;text-align:center" title='<span title="Indicates whether the script is currently turned off">Active</span>'>
                         <c:out value="${script.active ? 'Yes' : 'No'}"/>
+                     </display:column>
+                     <display:column style="text-align:center" title='<span title="Indicates the harvest phase when the script is to be run">Phase</span>'>
+                        <span title="${script.phase.label}"><c:out value="${script.phase.acronym}"/></span>
                      </display:column>
                      <display:column style="width:12em;text-align:center" title='<span title="Script last modification time">Last modified</span>'>
                         <c:out value="${script.lastModified}"/>
