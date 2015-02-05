@@ -63,9 +63,9 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -544,6 +544,8 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setCountUnavail(0);
 
         setClearTriples(true);
+        LOGGER.debug("Old harvested content will be removed, because of source unauthorized error!");
+
         setCleanAllPreviousSourceMetadata(false);
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
     }
@@ -567,22 +569,16 @@ public class PullHarvest extends BaseHarvest {
 
         // if permanent error, clean previously harvested metadata of this source,
         // and if not a priority source, clean all previously harvested content of this source too
-        int noOfStatements = getContextSourceDTO().getStatements();
         if (isPermanentError(responseCode)) {
 
             setCleanAllPreviousSourceMetadata(true);
             if (!getContextSourceDTO().isPrioritySource()) {
-                try {
-                    getHarvestSourceDAO().clearGraph(getContextUrl());
-                    noOfStatements = 0;
-                } catch (DAOException e) {
-                    LOGGER.error("Failed to delete previous content after permanent error", e);
-                }
+                setClearTriples(true);
+                LOGGER.debug("Old harvested content will be removed, because of permanent error on a non-priority source!");
             }
         }
 
         // update context source DTO with the results of this harvest
-        getContextSourceDTO().setStatements(noOfStatements);
         getContextSourceDTO().setLastHarvest(lastHarvest);
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
