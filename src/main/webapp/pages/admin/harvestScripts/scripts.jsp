@@ -5,14 +5,14 @@
         <li><a href="#">Operations</a>
             <ul>
             <li>
-                <stripes:link href="/admin/postHarvestScripts" event="search" title="Search scripts">
+                <stripes:link href="/admin/harvestScripts" event="search" title="Search scripts">
                     <c:out value="Search scripts"/>
                 </stripes:link>
             </li>
 
             <c:if test="${empty actionBean.targetType}">
                 <li>
-                     <stripes:link href="/admin/postHarvestScript" title="Create all-source script">
+                     <stripes:link href="/admin/harvestScript" title="Create all-source script">
                          <c:out value="Create script"/>
                      </stripes:link>
                 </li>
@@ -23,7 +23,7 @@
              <c:if test="${not empty actionBean.targetType}">
                  <c:if test="${empty actionBean.targetUrl}">
                      <li>
-                         <stripes:link href="/admin/postHarvestScript" title="Create ${fn:toLowerCase(actionBean.targetType)}-specific script">
+                         <stripes:link href="/admin/harvestScript" title="Create ${fn:toLowerCase(actionBean.targetType)}-specific script">
                              <c:out value="Create script"/>
                              <stripes:param name="targetType" value="${actionBean.targetType}"/>
                          </stripes:link>
@@ -35,7 +35,7 @@
 
             <c:if test="${actionBean.bulkPasteAvailable}">
                     <li>
-                        <stripes:link href="/admin/postHarvestScript" title="Paste scripts for another ${fn:toLowerCase(actionBean.bulkPasteTargetType)}">
+                        <stripes:link href="/admin/harvestScript" title="Paste scripts for another ${fn:toLowerCase(actionBean.bulkPasteTargetType)}">
                             <c:out value="Paste scripts to another ${fn:toLowerCase(actionBean.bulkPasteTargetType)}"/>
                             <stripes:param name="targetType" value="${actionBean.bulkPasteTargetType}"/>
                             <stripes:param name="backToTargetUrl" value="${actionBean.targetUrl}"/>
@@ -47,12 +47,12 @@
             <c:if test="${not empty actionBean.targetType}">
                  <c:if test="${not empty actionBean.targetUrl}">
                      <li>
-                        <stripes:link href="/admin/postHarvestScript" title="Create script for this ${fn:toLowerCase(actionBean.targetType)}">
+                        <stripes:link href="/admin/harvestScript" title="Create script for this ${fn:toLowerCase(actionBean.targetType)}">
                             <c:out value="Create script for this ${fn:toLowerCase(actionBean.targetType)}"/>
                             <stripes:param name="targetType" value="${actionBean.targetType}"/>
                             <stripes:param name="targetUrl" value="${actionBean.targetUrl}"/>
                         </stripes:link>
-                        <stripes:link href="/admin/postHarvestScript" title="Create script for another ${fn:toLowerCase(actionBean.targetType)}">
+                        <stripes:link href="/admin/harvestScript" title="Create script for another ${fn:toLowerCase(actionBean.targetType)}">
                             <c:out value="Create script for another ${fn:toLowerCase(actionBean.targetType)}"/>
                             <stripes:param name="targetType" value="${actionBean.targetType}"/>
                             <stripes:param name="backToTargetUrl" value="${actionBean.targetUrl}"/>
@@ -74,7 +74,7 @@
     <c:if test="${not empty actionBean.targetType}">
         <c:if test="${not empty actionBean.targets}">
             <div style="margin-top:3em">
-                <crfn:form id="targetsForm" action="/admin/postHarvestScripts" method="get">
+                <crfn:form id="targetsForm" action="/admin/harvestScripts" method="get">
                  <div>Displaying scripts of:</div>
          <div>
                  <stripes:select name="targetUrl" id="targetSelect" value="${actionBean.targetUrl}" onchange="this.form.submit();" size="10">
@@ -107,7 +107,7 @@
 
         <div style="float:left;width:100%;padding-top:1.2em;">
 
-            <crfn:form id="scriptsForm" action="/admin/postHarvestScripts" method="post">
+            <crfn:form id="scriptsForm" action="/admin/harvestScripts" method="post">
 
                 <display:table name="${actionBean.scripts}" class="datatable" id="script" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:80%">
 
@@ -120,7 +120,7 @@
                          <input type="checkbox" name="selectedIds" value="${script.id}" title="Select this script"/>
                      </display:column>
                      <display:column title='<span title="Title assigned to the script">Title</span>'>
-                      <stripes:link href="/admin/postHarvestScript" title="View, edit and test this script">
+                      <stripes:link href="/admin/harvestScript" title="View, edit and test this script">
                           <c:out value="${script.title}"/>
                           <stripes:param name="id" value="${script.id}"/>
                       </stripes:link>

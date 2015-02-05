@@ -38,13 +38,13 @@ import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
@@ -286,7 +286,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
      *
      * @return The class in question.
      */
-    public Class getPostHarvestScriptActionBeanClass() {
+    public Class<HarvestScriptActionBean> getHarvestScriptActionBeanClass() {
         return HarvestScriptActionBean.class;
     }
 
@@ -296,7 +296,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getPostHarvestScriptsActionBeanClass() {
+    public Class<HarvestScriptsActionBean> getHarvestScriptsActionBeanClass() {
         return HarvestScriptsActionBean.class;
     }
 

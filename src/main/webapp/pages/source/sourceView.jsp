@@ -24,8 +24,8 @@
                             </stripes:link>
                         </li>
                         <li>
-                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="Manage post-harvest scripts of this source">
-                                <c:out value="Manage post-harvest scripts"/>
+                            <stripes:link beanclass="${actionBean.harvestScriptsActionBeanClass.name}" title="Manage harvest scripts of this source">
+                                <c:out value="Manage harvest scripts"/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
                             </stripes:link>
@@ -151,7 +151,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Post-harvest scripts</th>
+                    <th scope="row">Harvest scripts</th>
                     <td>
                         <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
                             <c:out value="No scripts available for this source."/>
@@ -160,7 +160,7 @@
                             <c:out value="1 script available for this source."/>
                         </c:if>
                         <c:if test="${actionBean.noOfPostHarvestScripts > 1}">
-                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View post-harvest scripts of this source">
+                            <stripes:link beanclass="${actionBean.harvestScriptsActionBeanClass.name}" title="View harvest scripts of this source">
                                 <c:out value="${actionBean.noOfPostHarvestScripts} scripts available for this source."/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>

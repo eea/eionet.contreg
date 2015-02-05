@@ -46,7 +46,7 @@ import eionet.cr.web.security.CRUser;
  *
  * @author Jaanus Heinlaid
  */
-@UrlBinding("/admin/postHarvestScripts")
+@UrlBinding("/admin/harvestScripts")
 public class HarvestScriptsActionBean extends AbstractActionBean {
 
     /** Action type, indicating if scripts are cut or copied. */
@@ -59,13 +59,13 @@ public class HarvestScriptsActionBean extends AbstractActionBean {
     };
 
     /** JSP for scripts searching form. */
-    private static final String SEARCH_JSP = "/pages/admin/postHarvestScripts/searchScripts.jsp";
+    private static final String SEARCH_JSP = "/pages/admin/harvestScripts/searchScripts.jsp";
 
     /** JSP for displaying scripts of particular target type. Is contained by {@link #SCRIPTS_CONTAINER_JSP}. */
-    private static final String SCRIPTS_JSP = "/pages/admin/postHarvestScripts/scripts.jsp";
+    private static final String SCRIPTS_JSP = "/pages/admin/harvestScripts/scripts.jsp";
 
     /** The scripts/script container JSP. */
-    public static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/postHarvestScripts/scriptsContainer.jsp";
+    public static final String SCRIPTS_CONTAINER_JSP = "/pages/admin/harvestScripts/scriptsContainer.jsp";
 
     /** The script target type. */
     private TargetType targetType;

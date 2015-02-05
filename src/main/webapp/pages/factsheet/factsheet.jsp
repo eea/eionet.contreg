@@ -5,7 +5,7 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Resource properties">
 
     <stripes:layout-component name="head">
-    
+
         <script type="text/javascript">
 		// <![CDATA[
             ( function($) {
@@ -67,13 +67,13 @@
                             modal: true,
                             closeOnEscape: true
                         });
-                        
+
                         $("#harvestLink").click(function() {
                             $('#harvestDialog').dialog('option','width', 600);
                             $('#harvestDialog').dialog('open');
                             return true;
                         });
-                        
+
                         $('#harvestDialog').dialog({
                             autoOpen: false,
                             height: 200,
@@ -83,15 +83,15 @@
                             modal: true,
                             closeOnEscape: true
                         });
-                        
+
                     });
             } ) ( jQuery );
 // ]]>
         </script>
         </stripes:layout-component>
-        
+
         <stripes:layout-component name="contents">
-        
+
         <c:choose>
             <c:when test="${!actionBean.noCriteria}">
 
@@ -149,7 +149,7 @@
                                         </c:if>
                                         <c:if test="${actionBean.subjectIsType || (sourceReadActionsAllowed && actionBean.adminLoggedIn)}">
                                             <li>
-                                                <stripes:link class="link-plain" href="/admin/postHarvestScripts?targetType=${actionBean.subjectIsType ? 'TYPE' : 'SOURCE'}&targetUrl=${subjectUrl}">Post-harvest scripts</stripes:link>
+                                                <stripes:link class="link-plain" href="/admin/harvestScripts?targetType=${actionBean.subjectIsType ? 'TYPE' : 'SOURCE'}&targetUrl=${subjectUrl}">Harvest scripts</stripes:link>
                                             </li>
                                         </c:if>
                                         <c:if test="${sourceReadActionsAllowed && actionBean.adminLoggedIn && actionBean.harvestSourceDTO != null && actionBean.harvestSourceDTO.sparqlEndpoint == true}">
@@ -282,7 +282,7 @@
                             </div>
                         </c:if>
                         <div id="predObjValueDialog" title="Property value"></div>
-                        
+
                     </c:when>
 
                     <%-- The section that is displayed if the subject does not yet exist in the database, --%>
@@ -338,12 +338,12 @@
                         </c:choose>
                     </c:otherwise>
                 </c:choose>
-                
+
                 <div id="harvestDialog" title="Attempting harvest">
                 	<p>The harvest is being executed, please wait ...</p>
                 	<img src="${pageContext.request.contextPath}/images/wait.gif" alt="Loading ..."/>
                 </div>
-                
+
             </c:when>
             <c:otherwise>
                 <div>&nbsp;</div>

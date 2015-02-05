@@ -540,7 +540,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String DELETE_FROM_RULESET = "DB.DBA.rdfs_rule_set (?, ?, 1)";
 
     /** delete post harvest scripts of the source. */
-    private static final String DELETE_POST_HARVES_SCRIPTS = "DELETE FROM post_harvest_script WHERE target_source_url = ?";
+    private static final String DELETE_HARVEST_SCRIPTS = "DELETE FROM post_harvest_script WHERE target_source_url = ?";
 
     /**
      * Removes HARVEST_SOURCE records matching the given URLs + all related records in other tables.
@@ -565,12 +565,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         PreparedStatement sourcesDeleteStatement = null;
         PreparedStatement urgentQueueDeleteStatement = null;
         PreparedStatement rulesetDeleteStatement = null;
-        PreparedStatement postHarvestScriptsDeleteStatement = null;
+        PreparedStatement harvestScriptsDeleteStatement = null;
 
         try {
             sourcesDeleteStatement = conn.prepareStatement(DELETE_HARVEST_SOURCES);
             urgentQueueDeleteStatement = conn.prepareStatement(DELETE_FROM_URGENT_HARVEST_QUEUE);
-            postHarvestScriptsDeleteStatement = conn.prepareStatement(DELETE_POST_HARVES_SCRIPTS);
+            harvestScriptsDeleteStatement = conn.prepareStatement(DELETE_HARVEST_SCRIPTS);
 
             if (GeneralConfig.isUseInferencing()) {
                 rulesetDeleteStatement = conn.prepareStatement(DELETE_FROM_RULESET);
@@ -582,14 +582,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 sourcesDeleteStatement.setLong(1, urlHash);
                 urgentQueueDeleteStatement.setString(1, sourceUrl);
-                postHarvestScriptsDeleteStatement.setString(1, sourceUrl);
+                harvestScriptsDeleteStatement.setString(1, sourceUrl);
 
                 if (GeneralConfig.isUseInferencing()) {
                     rulesetDeleteStatement.setString(1, GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_CR_RULESET_NAME));
                     rulesetDeleteStatement.setString(2, sourceUrl);
                 }
 
-                postHarvestScriptsDeleteStatement.addBatch();
+                harvestScriptsDeleteStatement.addBatch();
                 sourcesDeleteStatement.addBatch();
                 urgentQueueDeleteStatement.addBatch();
                 if (GeneralConfig.isUseInferencing()) {
@@ -597,7 +597,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 }
             }
 
-            postHarvestScriptsDeleteStatement.executeBatch();
+            harvestScriptsDeleteStatement.executeBatch();
             sourcesDeleteStatement.executeBatch();
             urgentQueueDeleteStatement.executeBatch();
             if (GeneralConfig.isUseInferencing()) {
@@ -607,7 +607,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             SQLUtil.close(sourcesDeleteStatement);
             SQLUtil.close(urgentQueueDeleteStatement);
             SQLUtil.close(rulesetDeleteStatement);
-            SQLUtil.close(postHarvestScriptsDeleteStatement);
+            SQLUtil.close(harvestScriptsDeleteStatement);
         }
     }
 

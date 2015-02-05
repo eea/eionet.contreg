@@ -57,11 +57,11 @@ import eionet.cr.web.util.ApplicationCache;
  *
  * @author Jaanus Heinlaid
  */
-@UrlBinding("/admin/postHarvestScript")
+@UrlBinding("/admin/harvestScript")
 public class HarvestScriptActionBean extends AbstractActionBean {
 
     /** Default JSP to return to. */
-    private static final String SCRIPT_JSP = "/pages/admin/postHarvestScripts/script.jsp";
+    private static final String SCRIPT_JSP = "/pages/admin/harvestScripts/script.jsp";
 
     /** Default script to display to user. */
     private static final String DEFAULT_SCRIPT = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n\n"

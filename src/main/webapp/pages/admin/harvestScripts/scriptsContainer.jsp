@@ -4,7 +4,7 @@
 
 <%@page import="net.sourceforge.stripes.action.ActionBean"%>
 
-<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Post-harvest scripts">
+<stripes:layout-render name="/pages/common/template.jsp" pageTitle="Harvest scripts">
 
     <stripes:layout-component name="head">
 
@@ -49,7 +49,7 @@
 
     <stripes:layout-component name="contents">
 
-    <h1 style="padding-bottom:10px">Post-harvest scripts</h1>
+    <h1 style="padding-bottom:10px">Harvest scripts</h1>
 
     <c:choose>
         <c:when test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">

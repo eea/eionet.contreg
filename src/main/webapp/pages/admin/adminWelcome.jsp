@@ -15,7 +15,7 @@
                 <li><stripes:link href="/admin/harveststats">Last 100 harvest statistics</stripes:link></li>
                 <li><stripes:link href="/admin/nhus">Next harvest urgency score</stripes:link></li>
                 <li><stripes:link href="/admin/sourceBulkActions">Bulk add/delete/check sources</stripes:link></li>
-                <li><stripes:link href="/admin/postHarvestScripts">Post-harvest scripts</stripes:link></li>
+                <li><stripes:link href="/admin/harvestScripts">Harvest scripts</stripes:link></li>
                 <li><stripes:link href="/admin/endpointQueries.action">SPARQL endpoint harvest queries</stripes:link></li>
                 <li><stripes:link href="/admin/sourceDeletions.action">Monitor source deletions</stripes:link></li>
                 <li><stripes:link href="/admin/stagingDbs.action">Staging databases</stripes:link>&nbsp;<span style="color:#FF0000">(work in progress!)</span></li>

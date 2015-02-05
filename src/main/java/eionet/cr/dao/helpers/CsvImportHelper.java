@@ -413,8 +413,8 @@ public class CsvImportHelper {
         }
 
         // Retrieve the list of already stored post-harvest scripts.
-        HarvestScriptDAO postHarvestScriptDAO = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        List<HarvestScriptDTO> postHarvestScripts = postHarvestScriptDAO.list(HarvestScriptDTO.TargetType.SOURCE, fileUri);
+        HarvestScriptDAO harvestScriptDAO = DAOFactory.get().getDao(HarvestScriptDAO.class);
+        List<HarvestScriptDTO> harvestScripts = harvestScriptDAO.list(HarvestScriptDTO.TargetType.SOURCE, fileUri);
 
         // Loop over the given data-linking scripts, save each one as a post-harvest script in the database.
         for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
@@ -427,12 +427,12 @@ public class CsvImportHelper {
             String sparql = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
 
             String scriptTemplateName = scriptTemplate.getName();
-            int existingScriptId = getMatchingScriptId(postHarvestScripts, fileUri, scriptTemplateName);
+            int existingScriptId = getMatchingScriptId(harvestScripts, fileUri, scriptTemplateName);
             if (existingScriptId == 0) {
-                postHarvestScriptDAO.insert(HarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
+                harvestScriptDAO.insert(HarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
                         true, null);
             } else {
-                postHarvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null);
+                harvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null);
             }
         }
     }

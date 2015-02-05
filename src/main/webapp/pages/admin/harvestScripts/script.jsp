@@ -52,7 +52,7 @@
             There are ${fn:length(actionBean.clipBoardScripts)} script(s) in the clipboard:
             <c:forEach items="${actionBean.clipBoardScripts}" var="clipboardItem">
 
-                <stripes:link href="/admin/postHarvestScript">
+                <stripes:link href="/admin/harvestScript">
                     <c:out value="${clipboardItem.title}"/>
                     <stripes:param name="id" value="${actionBean.id}"/>
                     <stripes:param name="clipboardItemId" value="${clipboardItem.id}"/>
@@ -112,7 +112,7 @@
                             <display:setProperty name="paging.banner.onepage" value=""/>
 
                             <display:column  style="text-align:left" title='<span title="Title assigned to the script">Scripts at the clipboard</span>'>
-                                <stripes:link href="/admin/postHarvestScript" title="View, edit and test this script">
+                                <stripes:link href="/admin/harvestScript" title="View, edit and test this script">
                                     <c:out value="${script.title}"/>
                                     <stripes:param name="id" value="${script.id}"/>
                                 </stripes:link>

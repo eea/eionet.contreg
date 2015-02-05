@@ -35,7 +35,7 @@ public class UpToDateChecker {
     private HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
     /** Initialize DAO already here. */
-    private HarvestScriptDAO postHarvestScriptDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
+    private HarvestScriptDAO harvestScriptDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
     /** Initialize DAO already here. */
     private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
@@ -166,7 +166,7 @@ public class UpToDateChecker {
      * @throws DAOException If database access error happens.
      */
     boolean hasScriptsModified(String url, Date lastHarvest) throws DAOException {
-        return postHarvestScriptDao.isScriptsModified(lastHarvest, url);
+        return harvestScriptDao.isScriptsModified(lastHarvest, url);
     }
 
     /**
