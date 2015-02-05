@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
 
 /**
  *
@@ -26,7 +26,7 @@ public final class Tabs {
      */
     public static List<Tab> generate(TargetType targetType) {
 
-        String urlBinding = PostHarvestScriptsActionBean.class.getAnnotation(UrlBinding.class).value();
+        String urlBinding = HarvestScriptsActionBean.class.getAnnotation(UrlBinding.class).value();
         List<Tab> tabs = new ArrayList<Tab>();
         tabs.add(new Tab("All-source scripts", urlBinding, "Scripts to run for all sources", targetType == null));
         tabs.add(new Tab("Source-specific scripts", urlBinding + "?targetType=" + TargetType.SOURCE,

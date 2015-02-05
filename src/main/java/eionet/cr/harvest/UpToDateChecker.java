@@ -16,7 +16,7 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.URLUtil;
 
@@ -35,7 +35,7 @@ public class UpToDateChecker {
     private HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
     /** Initialize DAO already here. */
-    private PostHarvestScriptDAO postHarvestScriptDao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+    private HarvestScriptDAO postHarvestScriptDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
     /** Initialize DAO already here. */
     private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);

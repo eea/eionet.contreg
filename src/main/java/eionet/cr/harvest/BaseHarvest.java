@@ -57,13 +57,13 @@ import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
@@ -77,7 +77,7 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.xml.ConversionSchema;
 import eionet.cr.util.xml.ConversionSchema.Type;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
+import eionet.cr.web.action.admin.postHarvest.HarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 
 /**
@@ -351,16 +351,16 @@ public abstract class BaseHarvest implements Harvest {
         try {
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
-            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+            HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
             int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            List<PostHarvestScriptDTO> scripts = dao.listActive(null, null);
+            List<HarvestScriptDTO> scripts = dao.listActive(null, null);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, getContextUrl());
+            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl());
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
@@ -396,13 +396,13 @@ public abstract class BaseHarvest implements Harvest {
      * @param scriptDtos
      * @param conn
      */
-    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
+    private void runScripts(List<HarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
 
         if (scriptDtos == null || scriptDtos.isEmpty()) {
             return;
         }
 
-        for (PostHarvestScriptDTO scriptDto : scriptDtos) {
+        for (HarvestScriptDTO scriptDto : scriptDtos) {
             runScript(scriptDto, conn);
         }
     }
@@ -411,7 +411,7 @@ public abstract class BaseHarvest implements Harvest {
      * @param scriptDto
      * @param conn
      */
-    private void runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
+    private void runScript(HarvestScriptDTO scriptDto, RepositoryConnection conn) {
 
         TargetType targetType = scriptDto.getTargetType();
         String targetUrl = scriptDto.getTargetUrl();
@@ -419,7 +419,7 @@ public abstract class BaseHarvest implements Harvest {
         String title = scriptDto.getTitle();
         String scriptType = targetType == null ? "all-source" : targetType.toString().toLowerCase() + "-specific";
         String associatedType = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
-        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
+        String parsedQuery = HarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
 
         try {
             LOGGER.info(MessageFormat.format("Executing {0} script titled \"{1}\"", scriptType, title));

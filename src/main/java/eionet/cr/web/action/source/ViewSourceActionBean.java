@@ -40,19 +40,19 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.endpointquery.EndpointQueriesActionBean;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptActionBean;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean;
+import eionet.cr.web.action.admin.postHarvest.HarvestScriptActionBean;
+import eionet.cr.web.action.admin.postHarvest.HarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
@@ -100,7 +100,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
         } else {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
             noOfPostHarvestScripts =
-                    factory.getDao(PostHarvestScriptDAO.class).list(PostHarvestScriptDTO.TargetType.SOURCE, uri).size();
+                    factory.getDao(HarvestScriptDAO.class).list(HarvestScriptDTO.TargetType.SOURCE, uri).size();
             if (harvestSource != null) {
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
                 harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
@@ -287,7 +287,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
      * @return The class in question.
      */
     public Class getPostHarvestScriptActionBeanClass() {
-        return PostHarvestScriptActionBean.class;
+        return HarvestScriptActionBean.class;
     }
 
     /**
@@ -297,7 +297,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
      * @return
      */
     public Class getPostHarvestScriptsActionBeanClass() {
-        return PostHarvestScriptsActionBean.class;
+        return HarvestScriptsActionBean.class;
     }
 
     /**

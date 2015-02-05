@@ -65,7 +65,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -961,7 +961,7 @@ public class PullHarvest extends BaseHarvest {
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
+                        DAOFactory.get().getDao(HarvestScriptDAO.class)
                                 .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
