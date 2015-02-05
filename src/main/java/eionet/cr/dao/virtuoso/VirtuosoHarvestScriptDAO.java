@@ -108,10 +108,10 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             "select * from POST_HARVEST_SCRIPT where strcasestr(TITLE,?) >= 0 or strcasestr(SCRIPT,?) >= 0 order by TITLE";
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#list(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String)
+     * @see eionet.cr.dao.HarvestScriptDAO#list(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, Phase)
      */
     @Override
-    public List<HarvestScriptDTO> list(TargetType targetType, String targetUrl) throws DAOException {
+    public List<HarvestScriptDTO> list(TargetType targetType, String targetUrl, Phase phase) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -124,10 +124,10 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#listActive(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String)
+     * @see eionet.cr.dao.HarvestScriptDAO#listActive(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, Phase)
      */
     @Override
-    public List<HarvestScriptDTO> listActive(TargetType targetType, String targetUrl) throws DAOException {
+    public List<HarvestScriptDTO> listActive(TargetType targetType, String targetUrl, Phase phase) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -140,10 +140,10 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#listActiveForTypes(java.util.List)
+     * @see eionet.cr.dao.HarvestScriptDAO#listActiveForTypes(java.util.List, Phase)
      */
     @Override
-    public List<HarvestScriptDTO> listActiveForTypes(List<String> types) throws DAOException {
+    public List<HarvestScriptDTO> listActiveForTypes(List<String> types, Phase phase) throws DAOException {
 
         if (types == null || types.isEmpty()) {
             throw new IllegalArgumentException("Types must not be null or empty!");

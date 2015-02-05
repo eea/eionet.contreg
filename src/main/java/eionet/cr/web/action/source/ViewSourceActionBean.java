@@ -80,8 +80,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
     /** Harvest history. */
     private List<HarvestDTO> harvests;
 
-    /** Number of post-harvest scripts available for this source. */
-    private int noOfPostHarvestScripts;
+    /** Number of harvest scripts available for this source. */
+    private int noOfHarvestScripts;
 
     /** Is schema source. */
     private boolean schemaSource;
@@ -99,8 +99,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
             addCautionMessage("No request criteria specified!");
         } else {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
-            noOfPostHarvestScripts =
-                    factory.getDao(HarvestScriptDAO.class).list(HarvestScriptDTO.TargetType.SOURCE, uri).size();
+            noOfHarvestScripts =
+                    factory.getDao(HarvestScriptDAO.class).list(HarvestScriptDTO.TargetType.SOURCE, uri, null).size();
             if (harvestSource != null) {
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
                 harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
@@ -311,9 +311,9 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the noOfPostHarvestScripts
+     * @return the noOfHarvestScripts
      */
-    public int getNoOfPostHarvestScripts() {
-        return noOfPostHarvestScripts;
+    public int getNoOfHarvestScripts() {
+        return noOfHarvestScripts;
     }
 }

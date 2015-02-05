@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.Pair;
 
 /**
@@ -39,30 +39,36 @@ import eionet.cr.util.Pair;
 public interface HarvestScriptDAO extends DAO {
 
     /**
+     * Return a list of harvest scripts matching the below input criteria.
      *
-     * @param targetType
-     * @param targetUrl
-     * @return
-     * @throws DAOException
+     * @param targetType The {@link TargetType} that the returned scripts should match.
+     * @param targetUrl The target URL (depending on {@link TargetType}) that the returned scripts should match.
+     * @param phase The {@link Phase} that the returned scripts should match. If null, no phase criteria is applied!
+     * @return The list.
+     * @throws DAOException Any sort of error is wrapped into this one.
      */
-    List<HarvestScriptDTO> list(HarvestScriptDTO.TargetType targetType, String targetUrl) throws DAOException;
+    List<HarvestScriptDTO> list(HarvestScriptDTO.TargetType targetType, String targetUrl, Phase phase) throws DAOException;
 
     /**
+     * Same as {@link #list(TargetType, String, Phase)}, but only active scripts are returned.
      *
-     * @param targetType
-     * @param targetUrl
-     * @return
-     * @throws DAOException
+     * @param targetType The {@link TargetType} that the returned scripts should match.
+     * @param targetUrl The target URL (depending on {@link TargetType}) that the returned scripts should match.
+     * @param phase The {@link Phase} that the returned scripts should match. If null, no phase criteria is applied!
+     * @return The list.
+     * @throws DAOException Any sort of error is wrapped into this one.
      */
-    List<HarvestScriptDTO> listActive(HarvestScriptDTO.TargetType targetType, String targetUrl) throws DAOException;
+    List<HarvestScriptDTO> listActive(HarvestScriptDTO.TargetType targetType, String targetUrl, Phase phase) throws DAOException;
 
     /**
-     *
-     * @param types
+     * Return a list of active harvest scripts where type of target is {@link TargetType#TYPE} and target URL matched any of
+     * the given input list of strings.
+     * @param types URLs of types that the scripts should match.
+     * @param phase The {@link Phase} that the returned scripts should match. If null, no phase criteria is applied!
      * @return
      * @throws DAOException
      */
-    List<HarvestScriptDTO> listActiveForTypes(List<String> types) throws DAOException;
+    List<HarvestScriptDTO> listActiveForTypes(List<String> types, Phase phase) throws DAOException;
 
     /**
      *

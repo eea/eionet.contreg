@@ -55,15 +55,16 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.Phase;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.HarvestScriptDTO;
-import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
@@ -355,12 +356,12 @@ public abstract class BaseHarvest implements Harvest {
 
             int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            List<HarvestScriptDTO> scripts = dao.listActive(null, null);
+            List<HarvestScriptDTO> scripts = dao.listActive(null, null, Phase.AFTER_NEW);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl());
+            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), Phase.AFTER_NEW);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
@@ -370,7 +371,7 @@ public abstract class BaseHarvest implements Harvest {
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
 
-                scripts = dao.listActiveForTypes(distinctTypes);
+                scripts = dao.listActiveForTypes(distinctTypes, Phase.AFTER_NEW);
                 totalScriptsFound += scripts.size();
                 runScripts(scripts, conn);
             }
@@ -420,9 +421,11 @@ public abstract class BaseHarvest implements Harvest {
         String scriptType = targetType == null ? "all-source" : targetType.toString().toLowerCase() + "-specific";
         String associatedType = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
         String parsedQuery = HarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
+        Phase phase = scriptDto.getPhase();
+        String phaseShortLabel = phase == null ? "unknown phase" : phase.getShortLabel();
 
         try {
-            LOGGER.info(MessageFormat.format("Executing {0} script titled \"{1}\"", scriptType, title));
+            LOGGER.info(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
 
             int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
             if (updateCount > 0 && !scriptDto.isRunOnce()) {

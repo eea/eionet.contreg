@@ -102,7 +102,7 @@ public class HarvestScriptsActionBean extends AbstractActionBean {
         }
 
         if ((targetType == null && StringUtils.isBlank(targetUrl)) || (targetType != null && !StringUtils.isBlank(targetUrl))) {
-            scripts = DAOFactory.get().getDao(HarvestScriptDAO.class).list(targetType, targetUrl);
+            scripts = DAOFactory.get().getDao(HarvestScriptDAO.class).list(targetType, targetUrl, null);
         }
 
         return new ForwardResolution(SCRIPTS_CONTAINER_JSP);

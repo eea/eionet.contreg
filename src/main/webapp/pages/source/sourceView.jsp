@@ -153,15 +153,15 @@
                 <tr>
                     <th scope="row">Harvest scripts</th>
                     <td>
-                        <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
+                        <c:if test="${actionBean.noOfHarvestScripts == 0}">
                             <c:out value="No scripts available for this source."/>
                         </c:if>
-                        <c:if test="${actionBean.noOfPostHarvestScripts == 1}">
+                        <c:if test="${actionBean.noOfHarvestScripts == 1}">
                             <c:out value="1 script available for this source."/>
                         </c:if>
-                        <c:if test="${actionBean.noOfPostHarvestScripts > 1}">
+                        <c:if test="${actionBean.noOfHarvestScripts > 1}">
                             <stripes:link beanclass="${actionBean.harvestScriptsActionBeanClass.name}" title="View harvest scripts of this source">
-                                <c:out value="${actionBean.noOfPostHarvestScripts} scripts available for this source."/>
+                                <c:out value="${actionBean.noOfHarvestScripts} scripts available for this source."/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
                             </stripes:link>

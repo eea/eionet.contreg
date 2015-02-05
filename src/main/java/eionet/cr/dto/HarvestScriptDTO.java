@@ -202,16 +202,16 @@ public class HarvestScriptDTO {
     public enum Phase {
 
         /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
-        AFTER_NEW("After harvesting new content", "POST"),
+        AFTER_NEW("After harvesting new content", "After new"),
 
         /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
-        PRE_PURGE("Before purging old content", "PRE");
+        PRE_PURGE("Before purging old content", "Pre-purge");
 
         /** The enum's human friendly label. */
         private String label;
 
-        /** The enum's human friendly acronym.*/
-        private String acronym;
+        /** The enum's human friendly shortLabel.*/
+        private String shortLabel;
 
         /**
          * Enum constructor.
@@ -219,7 +219,7 @@ public class HarvestScriptDTO {
          */
         Phase(String label, String acronym) {
             this.label = label;
-            this.acronym = acronym;
+            this.shortLabel = acronym;
         }
 
         /**
@@ -238,10 +238,10 @@ public class HarvestScriptDTO {
         }
 
         /**
-         * @return the acronym
+         * @return the shortLabel
          */
-        public String getAcronym() {
-            return StringUtils.isBlank(acronym) ? name() : acronym;
+        public String getShortLabel() {
+            return StringUtils.isBlank(shortLabel) ? name() : shortLabel;
         }
     };
 }

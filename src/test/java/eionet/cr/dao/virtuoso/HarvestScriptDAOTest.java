@@ -73,7 +73,7 @@ public class HarvestScriptDAOTest extends CRDatabaseTestCase {
         postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null);
 
         assertTrue(postHarvestDao.exists(TargetType.SOURCE, targetUrl, title));
-        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl).size());
+        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null).size());
     }
 
     @Test
@@ -83,16 +83,16 @@ public class HarvestScriptDAOTest extends CRDatabaseTestCase {
         HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
         postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null);
 
-        List<HarvestScriptDTO> scriptsList = postHarvestDao.listActive(TargetType.SOURCE, targetUrl);
+        List<HarvestScriptDTO> scriptsList = postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null);
 
-        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl).size());
+        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null).size());
 
         HarvestScriptDTO script = scriptsList.get(0);
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(script.getId());
         postHarvestDao.activateDeactivate(ids);
 
-        assertEquals(0, postHarvestDao.listActive(TargetType.SOURCE, targetUrl).size());
+        assertEquals(0, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null).size());
     }
 
     @Test

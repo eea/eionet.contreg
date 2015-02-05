@@ -51,12 +51,13 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.HarvestScriptDAO;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
@@ -414,7 +415,7 @@ public class CsvImportHelper {
 
         // Retrieve the list of already stored post-harvest scripts.
         HarvestScriptDAO harvestScriptDAO = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        List<HarvestScriptDTO> harvestScripts = harvestScriptDAO.list(HarvestScriptDTO.TargetType.SOURCE, fileUri);
+        List<HarvestScriptDTO> harvestScripts = harvestScriptDAO.list(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
 
         // Loop over the given data-linking scripts, save each one as a post-harvest script in the database.
         for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
@@ -451,7 +452,7 @@ public class CsvImportHelper {
             conn.setAutoCommit(false);
             HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
-            List<HarvestScriptDTO> scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, fileUri);
+            List<HarvestScriptDTO> scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
 
             for (HarvestScriptDTO script : scripts) {
                 String warning = runScript(script, conn);
@@ -838,7 +839,7 @@ public class CsvImportHelper {
         ArrayList<DataLinkingScript> resultList = new ArrayList<DataLinkingScript>();
 
         HarvestScriptDAO scriptsDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        List<HarvestScriptDTO> existingScripts = scriptsDao.list(HarvestScriptDTO.TargetType.SOURCE, fileUri);
+        List<HarvestScriptDTO> existingScripts = scriptsDao.list(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
         if (CollectionUtils.isNotEmpty(existingScripts)) {
 
             List<ScriptTemplateDTO> scriptTemplates = new ScriptTemplateDaoImpl().getScriptTemplates();

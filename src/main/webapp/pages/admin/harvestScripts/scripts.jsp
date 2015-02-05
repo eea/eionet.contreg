@@ -129,7 +129,7 @@
                         <c:out value="${script.active ? 'Yes' : 'No'}"/>
                      </display:column>
                      <display:column style="text-align:center" title='<span title="Indicates the harvest phase when the script is to be run">Phase</span>'>
-                        <span title="${script.phase.label}"><c:out value="${script.phase.acronym}"/></span>
+                        <span title="${script.phase.label}"><c:out value="${script.phase.shortLabel}"/></span>
                      </display:column>
                      <display:column style="width:12em;text-align:center" title='<span title="Script last modification time">Last modified</span>'>
                         <c:out value="${script.lastModified}"/>
