@@ -202,7 +202,7 @@ public class HarvestScriptDTO {
     public enum Phase {
 
         /** The after-new phase, i.e. after the source's new content has been loaded into the triple store. */
-        AFTER_NEW("After harvesting new content", "After new"),
+        AFTER_NEW("After importing new content", "Post-import"),
 
         /** The pre-purge phase, i.e. before the source's old content is to be cleared in the triple store. */
         PRE_PURGE("Before purging old content", "Pre-purge");
