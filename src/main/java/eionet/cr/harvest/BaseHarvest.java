@@ -142,8 +142,8 @@ public abstract class BaseHarvest implements Harvest {
     /** If true, all previously present harvest source metadata should be purged from the triple store. */
     private boolean cleanAllPreviousSourceMetadata;
 
-    /** If true, all triples must be removed from the graph represented by the harvested source. */
-    private boolean clearTriples;
+    /** If true, all triples must be removed from the graph represented by the harvested source in the harvest-finish stage. */
+    private boolean clearTriplesInHarvestFinish;
 
     /** The number of triples stored during this harvest. This does NOT include the generated harvest source metadata! */
     private int storedTriplesCount;
@@ -272,7 +272,7 @@ public abstract class BaseHarvest implements Harvest {
         try {
             // Clear the triples if sub-classes have requested so.
             // They should do that when the harvest failed in such a way that no previous content is to be left into the graph.
-            if (clearTriples) {
+            if (clearTriplesInHarvestFinish) {
 
                 // Run pre-purge scripts.
                 runHarvestScripts(Phase.PRE_PURGE);
@@ -808,12 +808,12 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * Sets the clearTriples flag.
+     * Sets the clearTriplesInHarvestFinish flag.
      *
-     * @param clearTriples the clearTriples to set
+     * @param clearTriplesInHarvestFinish the clearTriplesInHarvestFinish to set
      */
-    protected void setClearTriples(boolean clearTriples) {
-        this.clearTriples = clearTriples;
+    protected void setClearTriplesInHarvestFinish(boolean clearTriples) {
+        this.clearTriplesInHarvestFinish = clearTriples;
     }
 
     /*
@@ -1136,8 +1136,8 @@ public abstract class BaseHarvest implements Harvest {
                     return loadFiles(Collections.singletonMap(processedFile, rdfLoader));
                 } else {
                     LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
-                    // If file couldn't be processed into RDF format, clear previously harvested content.
-                    getHarvestSourceDAO().clearGraph(getContextUrl());
+                    // File couldn't be processed into RDF, schedule its content deletion for the finish-harvest phase
+                    setClearTriplesInHarvestFinish(true);
                     return 0;
                 }
             } finally {
@@ -1189,6 +1189,9 @@ public abstract class BaseHarvest implements Harvest {
 
         HarvestSourceDAO dao = getHarvestSourceDAO();
         String url = getContextUrl();
+
+        // Run harvest scripts meant to be run before clearing the graph before loading new content.
+        runHarvestScripts(Phase.PRE_PURGE);
 
         int tripleCount = dao.loadContentFast(filesAndLoaders, url);
         return tripleCount;

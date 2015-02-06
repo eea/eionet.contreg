@@ -543,7 +543,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
 
-        setClearTriples(true);
+        setClearTriplesInHarvestFinish(true);
         LOGGER.debug("Old harvested content will be removed, because of source unauthorized error!");
 
         setCleanAllPreviousSourceMetadata(false);
@@ -573,7 +573,7 @@ public class PullHarvest extends BaseHarvest {
 
             setCleanAllPreviousSourceMetadata(true);
             if (!getContextSourceDTO().isPrioritySource()) {
-                setClearTriples(true);
+                setClearTriplesInHarvestFinish(true);
                 LOGGER.debug("Old harvested content will be removed, because of permanent error on a non-priority source!");
             }
         }
