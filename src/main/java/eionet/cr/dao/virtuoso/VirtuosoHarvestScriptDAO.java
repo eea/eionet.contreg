@@ -162,7 +162,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
 
         ArrayList<Object> values = new ArrayList<Object>();
         values.addAll(types);
-        values.add(phase);
+        values.add(phase == null ? null : phase.name());
 
         return executeSQL(sql, values, new HarvestScriptDTOReader());
     }
