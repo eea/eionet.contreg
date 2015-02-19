@@ -1,9 +1,10 @@
 /rebuild.sh
 /deploy.sh
-/deploy.bat
 /local.properties
-/rebuild.bat
 /target
 /.project
 /.classpath
 /.settings
+/*.iml
+/*.bat
+/.idea
