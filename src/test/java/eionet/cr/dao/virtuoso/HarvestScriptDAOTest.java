@@ -21,20 +21,19 @@
 
 package eionet.cr.dao.virtuoso;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
-import com.ibm.icu.util.Calendar;
-
+//import com.ibm.icu.util.Calendar;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  *

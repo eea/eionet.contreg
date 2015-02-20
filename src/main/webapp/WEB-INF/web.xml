@@ -246,15 +246,15 @@
         <url-pattern>/ping</url-pattern>
     </servlet-mapping>
 
-    <!--servlet>
+    <servlet>
         <servlet-name>rpcrouter</servlet-name>
-        <servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
+        <servlet-class>eionet.rpcserver.servlets.XmlRpcRouter</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>rpcrouter</servlet-name>
         <url-pattern>/rpcrouter</url-pattern>
-    </servlet-mapping-->
+    </servlet-mapping>
 
     <!-- AMP feed servlet -->
 
@@ -272,7 +272,7 @@
 
     <servlet>
         <servlet-name>RefreshTemplateServlet</servlet-name>
-        <servlet-class>eea.template.RefreshTemplateServlet</servlet-class>
+        <servlet-class>eionet.eea.template.RefreshTemplateServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>RefreshTemplateServlet</servlet-name>

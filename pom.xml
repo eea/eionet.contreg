@@ -21,7 +21,7 @@
     <!-- configuration of Maven repositories to be used -->
 
     <repositories>
-        <repository>
+        <!--repository>
             <id>project-local</id>
             <name>project-local repository</name>
             <layout>default</layout>
@@ -29,7 +29,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
+        </repository-->
         <repository>
             <id>archiva.internal</id>
             <name>Internal Release Repository</name>
@@ -51,6 +51,10 @@
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
+        </repository>
+        <repository>
+            <id>ldstack</id>
+            <url>http://mvn.linkeddata.org/content/groups/linkeddata.org/</url>
         </repository>
     </repositories>
 
@@ -352,10 +356,15 @@
             <version>1.1.2</version>
         </dependency>
         <dependency>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>jena</artifactId>
+            <version>2.6.4</version>
+        </dependency>
+        <!--dependency>
             <groupId>ARP</groupId>
             <artifactId>ARP2</artifactId>
             <version>alpha-1</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
@@ -366,11 +375,11 @@
             <artifactId>xmlParserAPIs</artifactId>
             <version>2.6.2</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>icu</groupId>
             <artifactId>icu4j</artifactId>
             <version>3.8.1</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>displaytag</groupId>
             <artifactId>displaytag</artifactId>
@@ -383,15 +392,15 @@
         </dependency-->
         <!-- Eionet dependencies -->
         <dependency>
-            <groupId>eionet</groupId>
+            <groupId>eionet.doc</groupId>
             <artifactId>documentation</artifactId>
             <version>1.5</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>eionet</groupId>
             <artifactId>qawcommons</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>eionet</groupId>
             <artifactId>acl</artifactId>
@@ -419,13 +428,18 @@
             <artifactId>xmlrpc</artifactId>
             <version>2.0.1</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>ws-commons-util</groupId>
+            <artifactId>ws-commons-util</artifactId>
+            <version>1.0.2</version>
+        </dependency-->
+        <dependency>
+            <groupId>org.apache.ws.commons.util</groupId>
             <artifactId>ws-commons-util</artifactId>
             <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>quartz</groupId>
+            <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>1.7.3</version>
         </dependency>
@@ -582,22 +596,27 @@
         <!-- end org.openrdf.sesame dependencies -->
 
         <dependency>
-            <groupId>virtuoso</groupId>
-            <artifactId>virt-sesame</artifactId>
-            <version>2.7.3</version>
+            <groupId>virtuoso.sesame2</groupId>
+            <artifactId>driver</artifactId>
+            <version>2.7.3-build1.12</version>
         </dependency>
         <dependency>
             <groupId>virtuoso</groupId>
-            <artifactId>virtjdbc</artifactId>
-            <version>4.x</version>
+            <artifactId>jdbc-driver</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>UserAgentUtils</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>1.2.4</version>
+        </dependency-->
+        <dependency>
+            <groupId>nl.bitwalker</groupId>
             <artifactId>UserAgentUtils</artifactId>
             <version>1.2.4</version>
         </dependency>
@@ -607,9 +626,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>eea</groupId>
+            <groupId>eionet</groupId>
             <artifactId>eea-template</artifactId>
-            <version>1.0</version>
+            <version>2.0</version>
         </dependency>
         <dependency>
             <groupId>rome</groupId>

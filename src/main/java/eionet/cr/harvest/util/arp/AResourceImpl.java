@@ -83,4 +83,9 @@ public class AResourceImpl implements AResource {
      */
     public void setUserData(Object obj) {
     }
+
+    @Override
+    public boolean hasNodeID() {
+        return false;
+    }
 }
