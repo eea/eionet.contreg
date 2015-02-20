@@ -23,30 +23,23 @@
  */
 package eionet.cr.web.action;
 
-import static eionet.cr.web.util.WebConstants.AFTER_LOGIN_EVENT;
-import static eionet.cr.web.util.WebConstants.LOGIN_ACTION;
-import static eionet.cr.web.util.WebConstants.LOGIN_EVENT;
-import static eionet.cr.web.util.WebConstants.LOGOUT_EVENT;
-import static eionet.cr.web.util.WebConstants.MAIN_PAGE_ACTION;
-import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
-import com.tee.uit.security.AuthMechanism;
-
+import eionet.acl.AuthMechanism;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import static eionet.cr.web.util.WebConstants.*;
 
 /**
  * Action bean that deals with user login/logout.

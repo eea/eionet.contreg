@@ -21,18 +21,7 @@
 
 package eionet.cr.web.action.factsheet;
 
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.tee.uit.security.SignOnException;
-
+import eionet.acl.SignOnException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -44,6 +33,14 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
 
 /**
  * Bookmarks tab on factsheet page.

@@ -246,7 +246,7 @@
         <url-pattern>/ping</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+    <!--servlet>
         <servlet-name>rpcrouter</servlet-name>
         <servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
     </servlet>
@@ -254,7 +254,7 @@
     <servlet-mapping>
         <servlet-name>rpcrouter</servlet-name>
         <url-pattern>/rpcrouter</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping-->
 
     <!-- AMP feed servlet -->
 

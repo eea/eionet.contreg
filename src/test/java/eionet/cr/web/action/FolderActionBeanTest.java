@@ -1,15 +1,6 @@
 package eionet.cr.web.action;
 
-import java.util.HashMap;
-
-import net.sourceforge.stripes.mock.MockHttpServletResponse;
-import net.sourceforge.stripes.mock.MockRoundtrip;
-import net.sourceforge.stripes.mock.MockServletContext;
-
-import org.apache.commons.lang.StringUtils;
-
-import com.tee.uit.security.AccessController;
-
+import eionet.acl.AccessController;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HelperDAO;
@@ -18,6 +9,12 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import net.sourceforge.stripes.mock.MockHttpServletResponse;
+import net.sourceforge.stripes.mock.MockRoundtrip;
+import net.sourceforge.stripes.mock.MockServletContext;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
 
 /**
  * For testing the {@link FolderActionBean}.

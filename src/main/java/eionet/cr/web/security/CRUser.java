@@ -20,25 +20,22 @@
  */
 package eionet.cr.web.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.tee.uit.security.AccessControlListIF;
-import com.tee.uit.security.AccessController;
-import com.tee.uit.security.AclNotFoundException;
-import com.tee.uit.security.SignOnException;
-
+import eionet.acl.AccessControlListIF;
+import eionet.acl.AccessController;
+import eionet.acl.AclNotFoundException;
+import eionet.acl.SignOnException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.WebConstants;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class represents authenticated user.

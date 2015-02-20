@@ -21,28 +21,7 @@
 
 package eionet.cr.web.action.factsheet;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringUtils;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-
-import com.tee.uit.security.SignOnException;
-
+import eionet.acl.SignOnException;
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -57,6 +36,24 @@ import eionet.cr.web.security.CRUser;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.Query;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Factsheet page for cr:TableFile type.

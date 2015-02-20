@@ -44,8 +44,8 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.tee.uit.security.AccessController;
-import com.tee.uit.security.SignOnException;
+import eionet.acl.AccessController;
+import eionet.acl.SignOnException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
