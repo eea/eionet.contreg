@@ -90,8 +90,26 @@ Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
 
+## 5. Unit tests
+For running unit tests a separate instance of Virtuoso has to be configured. This can be done as below:
+1. create a folder for test Virtuoso
 
-## 5. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
+2. copy  file *virtuoso.ini* from Virtuoso folder to the created folder
+
+3. Make adjustements in the copied file. At least *ServerPort* in sections *Parameters* and *HTTPServer* sections have to be changed
+
+4. Install the test server as another service as described in Virtuoso documentation.
+
+5. Create a user for tests CR_SOURCE_HOME/sql/virtuoso/unittest/1_create_testuser.sql
+
+(assuming the test server is running on port 1112)
+
+    shell> isql localhost:1112 -U dba -P password < 1_create_users.sql
+
+6. Add the test instance server parameters to *local.properties*
+
+
+## 6. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
 This step is required only if you configured CR to use EEA's  Central Authentication Service (CAS) in step 3.
 In other words: if you pointed edu.yale.its.tp.cas.client.filter.loginUrl and edu.yale.its.tp.cas.client.filter.validateUrl
@@ -118,7 +136,7 @@ This certificate will be added under alias "globalsignca28".
 
 d) Do steps b) and c) for GlobalSign-Domain-Validation-CA.crt as well.  Store it under the alias 'globalsigndomain14'.
 
-## 6. Deploy CR web application and run Tomcat
+## 7. Deploy CR web application and run Tomcat
 
 If the build went well, you shall have cr.war file in CR_SOURCE_HOME/target directory.
 Now all you have to do is to simply copy that file into Tomcat's webapps directory.
