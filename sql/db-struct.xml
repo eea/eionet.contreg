@@ -315,4 +315,30 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet author="lainekai" id="rev-19">
+        <preConditions onFail="MARK_RAN">
+            <customPrecondition className="eionet.cr.util.liquibase.VirtuosoIndexNotExists">
+                <param name="tableName" value="post_harvest_script" />
+                <param name="indexName" value="post_harvest_script_source_url"  />
+            </customPrecondition>
+        </preConditions>
+
+        <comment>Add missing indexes to post harvest script.</comment>
+        <sql>
+            CREATE INDEX post_harvest_script_source_url ON post_harvest_script (target_source_url)
+        </sql>
+    </changeSet>
+    <changeSet author="lainekai" id="rev-20">
+        <preConditions onFail="MARK_RAN">
+            <customPrecondition className="eionet.cr.util.liquibase.VirtuosoIndexNotExists">
+                <param name="tableName" value="post_harvest_script" />
+                <param name="indexName" value="post_harvest_script_type_uri"  />
+            </customPrecondition>
+        </preConditions>
+        <comment>Add missing indexes to post harvest script.</comment>
+        <sql>
+            CREATE INDEX post_harvest_script_type_uri ON post_harvest_script (target_type_url)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

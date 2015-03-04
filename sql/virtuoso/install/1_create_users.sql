@@ -12,9 +12,9 @@ GRANT execute ON rdfs_rule_set TO cr3user;
 USER_CREATE('cr3rouser', 'yyy', vector ('DAV_ENABLE',1));
 USER_GRANT_ROLE('cr3rouser','SPARQL_SELECT',0);
 
--- ---------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 -- Set default database (or 'qualifier' as known in Virtuoso terms) of CR users
--- ---------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 user_set_qualifier ('cr3user', 'CR');
 user_set_qualifier ('cr3rouser', 'CR');

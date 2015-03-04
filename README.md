@@ -90,18 +90,6 @@ Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
 
-Create the CR database schema:
-
-    shell> isql localhost:1111 -U dba -P password < 3_create_schema.sql
-
-Enforce CR's default inference rules:
-
-    shell> isql localhost:1111 -U dba -P password < 4_enforce_inferene_rules.sql
-
-Note that inference is something that is part of Semantic Web and helps CR to infer
-conclusions and new information from certain structured data statements, based on a certain
-ruleset. The above command imports CR's default ruleset. It downloads the ruleset from
-http://svn.eionet.europa.eu/projects/Reportnet/browser/cr3/trunk/src/main/webapp/ontologies/contreg.rdf?format=txt.
 
 ## 5. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
