@@ -2,6 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>virtuoso</groupId>
   <artifactId>virtjdbc</artifactId>
-  <version>4.0</version>
+  <version>4.1ssl</version>
 </project>
 
