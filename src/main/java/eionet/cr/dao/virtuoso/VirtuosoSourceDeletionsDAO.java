@@ -98,22 +98,20 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmtMark = conn.prepareStatement(MARK_FOR_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
-
             for (String sourceUrl : sourceUrls) {
 
                 addMarkingBatch(sourceUrl, pstmtInsert, pstmtMark);
                 if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                    updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                    executeMarkingBatch(pstmtInsert, pstmtMark);
                 }
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             conn.commit();
-            return updateCounter;
+            return batchCounter;
         } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
@@ -190,7 +188,6 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmtMark = sqlConn.prepareStatement(MARK_FOR_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
 
             TupleQuery tupleQuery = repoConn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
             tupleQueryResult = tupleQuery.evaluate();
@@ -202,9 +199,10 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                         Value firstColumnValue = bindingSet.iterator().next().getValue();
                         if (firstColumnValue instanceof URI) {
 
-                            addMarkingBatch(firstColumnValue.stringValue(), pstmtInsert, pstmtMark);
+                            String urlString = firstColumnValue.stringValue();
+                            addMarkingBatch(urlString, pstmtInsert, pstmtMark);
                             if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                                executeMarkingBatch(pstmtInsert, pstmtMark);
                             }
                         }
                     }
@@ -212,11 +210,11 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             sqlConn.commit();
-            return updateCounter;
+            return batchCounter;
 
         } catch (SQLException e) {
             SQLUtil.rollback(sqlConn);
