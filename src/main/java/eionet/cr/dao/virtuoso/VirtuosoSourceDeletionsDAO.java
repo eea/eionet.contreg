@@ -296,7 +296,6 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmt = conn.prepareStatement(CANCEL_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
 
             for (String sourceUrl : sourceUrls) {
 
@@ -304,24 +303,16 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                 pstmt.addBatch();
 
                 if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-
-                    int[] updateCounts = pstmt.executeBatch();
-                    for (int i = 0; i < updateCounts.length; i++) {
-                        updateCounter += updateCounts[i];
-                    }
+                    pstmt.executeBatch();
                 }
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-
-                int[] updateCounts = pstmt.executeBatch();
-                for (int i = 0; i < updateCounts.length; i++) {
-                    updateCounter += updateCounts[i];
-                }
+                pstmt.executeBatch();
             }
 
             conn.commit();
-            return updateCounter;
+            return batchCounter;
         } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
