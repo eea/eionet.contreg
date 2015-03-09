@@ -579,7 +579,7 @@
         <dependency>
             <groupId>virtuoso</groupId>
             <artifactId>virtjdbc</artifactId>
-            <version>4.x</version>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
