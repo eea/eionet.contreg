@@ -131,7 +131,17 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
         // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
         // remove after the "upload". But we shall need it once more for the second run of the upload/save chain.
         File backupFile = new File(TEST_FILE.getParentFile(), TEST_FILE.getName() + ".backup");
-        FileUtils.copyFile(TEST_FILE, backupFile);
+        if (TEST_FILE.exists()) {
+            if (!backupFile.exists()) {
+                FileUtils.copyFile(TEST_FILE, backupFile);
+            }
+        } else {
+            if (backupFile.exists()) {
+                FileUtils.copyFile(backupFile, TEST_FILE);
+            } else {
+                throw new IllegalStateException("Test seed file has gone and no backup file is present either!");
+            }
+        }
 
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
