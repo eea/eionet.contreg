@@ -43,7 +43,7 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
 
     /** SQL for marking a harvest source for background deletion. */
     private static final String MARK_FOR_DELETION_SQL =
-            "UPDATE harvest_source SET delete_requested=now() and delete_flag=1 where URL_HASH=?";
+            "UPDATE harvest_source SET delete_requested=now(), delete_flag=1 where URL_HASH=?";
 
     /** SQL for "softly" inserting a harvest source. "Softly" means that if source already exists, no errors thrown. */
     private static final String SOFT_INSERT_SOURCE =
@@ -68,7 +68,7 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
 
     /** SQL for removing a given URL from the deletion queue. */
     private static final String CANCEL_DELETION_SQL =
-            "UPDATE harvest_source SET delete_requested=NULL and delete_flag=0 where URL_HASH=?";
+            "UPDATE harvest_source SET delete_requested=NULL, delete_flag=0 where URL_HASH=?";
 
     /** SQL for picking the first source from the deletion queue. */
     private static final String PICK_FOR_DELETION_SQL = "SELECT TOP 1 url FROM harvest_source "
