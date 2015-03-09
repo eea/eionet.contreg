@@ -142,6 +142,7 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
                 throw new IllegalStateException("Test seed file has gone and no backup file is present either!");
             }
         }
+        testFileSize = TEST_FILE.length();
 
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
