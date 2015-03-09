@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 
+import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.NamespaceUtil;
 import eionet.cr.util.Util;
@@ -468,7 +469,11 @@ public class ObjectDTO implements Serializable {
             return value;
         } else {
             String displayValue = getDerviedLiteralValue();
-            return StringUtils.isBlank(displayValue) ? value : displayValue;
+            displayValue = StringUtils.isBlank(displayValue) ? value : displayValue;
+            if (displayValue != null && displayValue.startsWith(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX)) {
+                displayValue = StringUtils.substringAfter(displayValue, VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX);
+            }
+            return displayValue;
         }
     }
 
