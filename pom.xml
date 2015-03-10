@@ -43,10 +43,6 @@
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
-        <repository>
-            <id>ldstack</id>
-            <url>http://mvn.linkeddata.org/content/groups/linkeddata.org/</url>
-        </repository>
     </repositories>
 
     <distributionManagement>
@@ -542,13 +538,13 @@
         <!-- end org.openrdf.sesame dependencies -->
 
         <dependency>
-            <groupId>virtuoso.sesame2</groupId>
-            <artifactId>driver</artifactId>
-            <version>2.7.3-build1.12</version>
+            <groupId>virtuoso</groupId>
+            <artifactId>virt-sesame</artifactId>
+            <version>2.7.3</version>
         </dependency>
         <dependency>
             <groupId>virtuoso</groupId>
-            <artifactId>jdbc-driver</artifactId>
+            <artifactId>virtjdbc</artifactId>
             <version>4.0</version>
         </dependency>
         <dependency>
