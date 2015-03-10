@@ -90,20 +90,26 @@ Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
 
-Create the CR database schema:
+## 5. Unit tests
+For running unit tests a separate instance of Virtuoso has to be configured. This can be done as below:
+1. create a folder for test Virtuoso
 
-    shell> isql localhost:1111 -U dba -P password < 3_create_schema.sql
+2. copy  file *virtuoso.ini* from Virtuoso folder to the created folder
 
-Enforce CR's default inference rules:
+3. Make adjustements in the copied file. At least *ServerPort* in sections *Parameters* and *HTTPServer* sections have to be changed
 
-    shell> isql localhost:1111 -U dba -P password < 4_enforce_inferene_rules.sql
+4. Install the test server as another service as described in Virtuoso documentation.
 
-Note that inference is something that is part of Semantic Web and helps CR to infer
-conclusions and new information from certain structured data statements, based on a certain
-ruleset. The above command imports CR's default ruleset. It downloads the ruleset from
-http://svn.eionet.europa.eu/projects/Reportnet/browser/cr3/trunk/src/main/webapp/ontologies/contreg.rdf?format=txt.
+5. Create a user for tests CR_SOURCE_HOME/sql/virtuoso/unittest/1_create_testuser.sql
 
-## 5. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
+(assuming the test server is running on port 1112)
+
+    shell> isql localhost:1112 -U dba -P password < 1_create_users.sql
+
+6. Add the test instance server parameters to *local.properties*
+
+
+## 6. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
 This step is required only if you configured CR to use EEA's  Central Authentication Service (CAS) in step 3.
 In other words: if you pointed edu.yale.its.tp.cas.client.filter.loginUrl and edu.yale.its.tp.cas.client.filter.validateUrl
@@ -130,7 +136,7 @@ This certificate will be added under alias "globalsignca28".
 
 d) Do steps b) and c) for GlobalSign-Domain-Validation-CA.crt as well.  Store it under the alias 'globalsigndomain14'.
 
-## 6. Deploy CR web application and run Tomcat
+## 7. Deploy CR web application and run Tomcat
 
 If the build went well, you shall have cr.war file in CR_SOURCE_HOME/target directory.
 Now all you have to do is to simply copy that file into Tomcat's webapps directory.

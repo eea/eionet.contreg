@@ -1,12 +1,5 @@
 package eionet.cr.util.liquibase;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
-
 import liquibase.change.ChangeFactory;
 import liquibase.change.core.RawSQLChange;
 import liquibase.database.AbstractJdbcDatabase;
@@ -14,6 +7,14 @@ import liquibase.database.DatabaseConnection;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.sqlgenerator.SqlGeneratorFactory;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is a Virtuoso-specific extension of Liquibase's {@link AbstractJdbcDatabase}.
@@ -273,4 +274,58 @@ public class VirtuosoDatabase extends AbstractJdbcDatabase {
             }
         }
     }
+
+
+    /**
+     * Checks if index exists for a given table.
+     * @param tableName
+     * @param indexName
+     * @return
+     */
+    boolean indexExists(String tableName, String indexName) {
+
+        try {
+            ResultSet rs =  sqlConnMetaData.getIndexInfo("", getConnectionSchemaName(), tableName, false, true);
+
+            if (indexExistsInResultSet(rs, indexName)) {
+                return true;
+            }
+            
+            //there is a bug in virt-jdbc driver metadata:
+            //according to interface API *all* indexes should be returned if uniqueIndex=false
+            //inVirtuoso implementation the flag is put as a paramtere
+            //that is the reason getIndexInfo() is queried twice
+            rs =  sqlConnMetaData.getIndexInfo("", getConnectionSchemaName(), tableName, true, true);
+
+            if (indexExistsInResultSet(rs, indexName)) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            //ignore silently
+            e.printStackTrace(System.err);
+        }
+
+        return false;
+        
+    }
+
+    /**
+     * Loop resultset and check if index metadata is present.
+     * @param rs resultset
+     * @param indexName index name
+     * @return
+     * @throws java.sql.SQLException if looping fails.
+     */
+    private boolean indexExistsInResultSet(ResultSet rs, String indexName) throws SQLException{
+        while (rs.next()) {
+            String name = rs.getString("INDEX_NAME");
+            if (name.equalsIgnoreCase(indexName)) {
+                return true;
+            }
+        }
+        return false;        
+    }
+    
+    
 }
