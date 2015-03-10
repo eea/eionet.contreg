@@ -42,7 +42,8 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
     private static final int MARKING_BATCH_SIZE = 5000;
 
     /** SQL for marking a harvest source for background deletion. */
-    private static final String MARK_FOR_DELETION_SQL = "UPDATE harvest_source SET delete_requested=now() where URL_HASH=?";
+    private static final String MARK_FOR_DELETION_SQL =
+            "UPDATE harvest_source SET delete_requested=now(), delete_flag=1 where URL_HASH=?";
 
     /** SQL for "softly" inserting a harvest source. "Softly" means that if source already exists, no errors thrown. */
     private static final String SOFT_INSERT_SOURCE =
@@ -51,27 +52,27 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
 
     /** The SQL for returning the deletion queue. */
     private static final String GET_DELETION_QUEUE_SQL = "SELECT url AS LCOL, delete_requested AS RCOL FROM harvest_source "
-            + "WHERE delete_requested IS NOT NULL ORDER BY delete_requested, url";
+            + "WHERE delete_flag=1 ORDER BY delete_requested, url";
 
     /** The SQL for returning the deletion queue filtered. */
     private static final String GET_DELETION_QUEUE_FILTERED_SQL =
             "SELECT url AS LCOL, delete_requested AS RCOL FROM harvest_source "
-                    + "WHERE delete_requested IS NOT NULL AND url LIKE (?) ORDER BY delete_requested, url";
+                    + "WHERE delete_flag=1 AND url LIKE (?) ORDER BY delete_requested, url";
 
     /** The SQL for returning the size of deletion queue. */
-    private static final String GET_DELETION_QUEUE_SIZE_SQL =
-            "SELECT count(*) FROM harvest_source WHERE delete_requested IS NOT NULL";
+    private static final String GET_DELETION_QUEUE_SIZE_SQL = "SELECT count(*) FROM harvest_source WHERE delete_flag=1";
 
     /** The SQL for returning the size of deletion queue filtered. */
     private static final String GET_DELETION_QUEUE_SIZE_FILTERED_SQL = "SELECT count(*) FROM harvest_source "
-            + "WHERE delete_requested IS NOT NULL AND url LIKE (?)";
+            + "WHERE delete_flag=1 AND url LIKE (?)";
 
     /** SQL for removing a given URL from the deletion queue. */
-    private static final String CANCEL_DELETION_SQL = "UPDATE harvest_source SET delete_requested=NULL where URL_HASH=?";
+    private static final String CANCEL_DELETION_SQL =
+            "UPDATE harvest_source SET delete_requested=NULL, delete_flag=0 where URL_HASH=?";
 
     /** SQL for picking the first source from the deletion queue. */
-    private static final String PICK_FOR_DELETION_SQL = "SELECT TOP 1 url FROM harvest_source " +
-    		"WHERE delete_requested IS NOT NULL ORDER BY delete_requested, url";
+    private static final String PICK_FOR_DELETION_SQL = "SELECT TOP 1 url FROM harvest_source "
+            + "WHERE delete_flag=1 ORDER BY delete_requested, url";
 
     /*
      * (non-Javadoc)
@@ -97,22 +98,20 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmtMark = conn.prepareStatement(MARK_FOR_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
-
             for (String sourceUrl : sourceUrls) {
 
                 addMarkingBatch(sourceUrl, pstmtInsert, pstmtMark);
                 if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                    updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                    executeMarkingBatch(pstmtInsert, pstmtMark);
                 }
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             conn.commit();
-            return updateCounter;
+            return batchCounter;
         } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
@@ -189,7 +188,6 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmtMark = sqlConn.prepareStatement(MARK_FOR_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
 
             TupleQuery tupleQuery = repoConn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQuery);
             tupleQueryResult = tupleQuery.evaluate();
@@ -201,9 +199,10 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                         Value firstColumnValue = bindingSet.iterator().next().getValue();
                         if (firstColumnValue instanceof URI) {
 
-                            addMarkingBatch(firstColumnValue.stringValue(), pstmtInsert, pstmtMark);
+                            String urlString = firstColumnValue.stringValue();
+                            addMarkingBatch(urlString, pstmtInsert, pstmtMark);
                             if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-                                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                                executeMarkingBatch(pstmtInsert, pstmtMark);
                             }
                         }
                     }
@@ -211,11 +210,11 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-                updateCounter += executeMarkingBatch(pstmtInsert, pstmtMark);
+                executeMarkingBatch(pstmtInsert, pstmtMark);
             }
 
             sqlConn.commit();
-            return updateCounter;
+            return batchCounter;
 
         } catch (SQLException e) {
             SQLUtil.rollback(sqlConn);
@@ -297,7 +296,6 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
             pstmt = conn.prepareStatement(CANCEL_DELETION_SQL);
 
             int batchCounter = 0;
-            int updateCounter = 0;
 
             for (String sourceUrl : sourceUrls) {
 
@@ -305,24 +303,16 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                 pstmt.addBatch();
 
                 if (++batchCounter % MARKING_BATCH_SIZE == 0) {
-
-                    int[] updateCounts = pstmt.executeBatch();
-                    for (int i = 0; i < updateCounts.length; i++) {
-                        updateCounter += updateCounts[i];
-                    }
+                    pstmt.executeBatch();
                 }
             }
 
             if (batchCounter % MARKING_BATCH_SIZE != 0) {
-
-                int[] updateCounts = pstmt.executeBatch();
-                for (int i = 0; i < updateCounts.length; i++) {
-                    updateCounter += updateCounts[i];
-                }
+                pstmt.executeBatch();
             }
 
             conn.commit();
-            return updateCounter;
+            return batchCounter;
         } catch (SQLException e) {
             SQLUtil.rollback(conn);
             throw new DAOException(e.getMessage(), e);
