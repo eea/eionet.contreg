@@ -1729,9 +1729,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
                     LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
 
-                    // XOR the temporary and original graphs.
-                    LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
-                    synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
+                    if (tCount > 0) {
+                        // XOR the temporary and original graphs.
+                        LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
+                        synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
+                    }
                 }
 
             } catch (Exception e) {
