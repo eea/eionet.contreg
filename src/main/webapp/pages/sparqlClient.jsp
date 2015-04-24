@@ -150,7 +150,7 @@
                         $('form[name="mainForm"]').bind('submit', function() {
                             var queryLength = $('#queryText').val().length;
                             var $frm = $(this);
-                            var maxQueryLength = 6 * 1024;
+                            var maxQueryLength = 2 * 1024;
                             
                             if (queryLength > maxQueryLength) {
                                 $frm.attr('method', 'post');
