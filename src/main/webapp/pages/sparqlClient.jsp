@@ -155,8 +155,6 @@
                             if (queryLength > maxQueryLength) {
                                 $frm.attr('method', 'post');
                             }
-                            
-                            console.log($frm.attr('method'));
                         });
                     });
             } ) ( jQuery );
