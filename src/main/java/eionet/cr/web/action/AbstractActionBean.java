@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpSession;
 
+import eionet.cr.config.GeneralConfig;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Message;
@@ -339,7 +340,7 @@ public abstract class AbstractActionBean implements ActionBean {
      */
     public boolean isEeaTemplate() {
         boolean ret = false;
-        String use = getContext().getInitParameter("useEeaTemplate");
+        String use = GeneralConfig.getProperty("useEeaTemplate");
         if (!StringUtils.isBlank(use)) {
             ret = Boolean.valueOf(use).booleanValue();
         }

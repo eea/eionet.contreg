@@ -16,11 +16,6 @@
     </context-param>
 
     <context-param>
-        <param-name>useEeaTemplate</param-name>
-        <param-value>false</param-value>
-    </context-param>
-
-    <context-param>
         <param-name>templateCacheFolder</param-name>
         <param-value>${application.eea.template.folder}</param-value>
     </context-param>
