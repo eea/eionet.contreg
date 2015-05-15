@@ -107,7 +107,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String SEARCH_SQL =
-            "select * from POST_HARVEST_SCRIPT where strcasestr(TITLE,?) >= 0 or strcasestr(SCRIPT,?) >= 0 order by TITLE";
+            "select * from POST_HARVEST_SCRIPT where strcasestr(TITLE,?) >= 0 or strcasestr(cast (SCRIPT as varchar),?) >= 0 order by TITLE";
 
     /**
      * @see eionet.cr.dao.HarvestScriptDAO#list(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, Phase)
