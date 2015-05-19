@@ -138,8 +138,8 @@
                         </c:if>
                     </div>
                 </div>
-                <stripes:hidden name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
-                <stripes:hidden name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
+                <input type="hidden" name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
+                <input type="hidden" name="prevSbjSize" value="${actionBean.prevSbjSize}"/>
             </fieldset>
 
         </crfn:form>
