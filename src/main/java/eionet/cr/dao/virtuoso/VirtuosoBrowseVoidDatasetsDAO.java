@@ -21,16 +21,18 @@
 
 package eionet.cr.dao.virtuoso;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.VoidDatasetsReader;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.util.Bindings;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
 
 /**
  * Virtuoso-specific implementation of {@link BrowseVoidDatasetsDAO}.
@@ -45,7 +47,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
      * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findDatasets(java.util.List, java.util.List, java.lang.String)
      */
     @Override
-    public List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects, String titleSubstr)
+    public Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, PagingRequest pagingRequest, SortingRequest sortingRequest)
             throws DAOException {
 
         Bindings bindings = new Bindings();
@@ -94,8 +96,68 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append(" }\n");
         sb.append("} GROUP BY ?dataset ?label ?creator\n");
 
+        if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
+            sb.append("ORDER BY " + sortingRequest.getSortOrder().toSQL() + "(UCASE(str(?" + sortingRequest.getSortingColumnName() + ")))\n");
+        }
+        if (pagingRequest != null) {
+            sb.append("OFFSET " + pagingRequest.getOffset() + "\n");
+            sb.append("LIMIT " + pagingRequest.getItemsPerPage());
+        }
         List<VoidDatasetsResultRow> datasets = executeSPARQL(sb.toString(), bindings, new VoidDatasetsReader());
-        return datasets;
+
+        int rowCount = 0;
+        if (datasets != null && !datasets.isEmpty()) {
+            StringBuffer countQuery = new StringBuffer();
+            countQuery.append("PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#>\n");
+            countQuery.append("PREFIX dcterms: <http://purl.org/dc/terms/>\n");
+            countQuery.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
+            countQuery.append("PREFIX void: <http://rdfs.org/ns/void#>\n");
+            countQuery.append("\n");
+            countQuery.append("SELECT (COUNT(*) AS ?total)\n");
+            countQuery.append("WHERE {\n");
+            countQuery.append(" {\n");
+            countQuery.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects)\n");
+            countQuery.append("  WHERE {\n");
+            countQuery.append("   ?dataset a void:Dataset .\n");
+            if (StringUtils.isBlank(titleSubstr)) {
+                countQuery.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+            } else {
+                countQuery.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
+                bindings.setString("titleF", titleSubstr);
+            }
+            countQuery.append("   ?dataset dcterms:creator ?ucreator .\n");
+            countQuery.append("   ?ucreator rdfs:label ?creator .\n");
+
+            if (creators != null && !creators.isEmpty()) {
+                countQuery.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
+                for (int i = 0; i < creators.size(); i++) {
+                    bindings.setString("crt" + (i + 1), creators.get(i));
+                }
+            }
+
+            // Virtuoso behaves differently when there is only one subject in the set. Then the language code matters.
+            if (subjects != null && !subjects.isEmpty()) {
+                countQuery.append("  ?dataset dcterms:subject ?usubject .\n");
+                countQuery.append("  ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en',''))\n");
+                countQuery.append("  FILTER (STR(?subject) IN (").append(variablesCSV("sbj", subjects.size())).append("))\n");
+                for (int i = 0; i < subjects.size(); i++) {
+                    bindings.setString("sbj" + (i + 1), subjects.get(i));
+                }
+            } else {
+                countQuery.append("  OPTIONAL {?dataset dcterms:subject ?usubject .\n");
+                countQuery.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
+            }
+            countQuery.append("  }\n");
+            countQuery.append(" }\n");
+            countQuery.append(" }\n");
+           // countQuery.append("} GROUP BY ?dataset ?label ?creator\n");
+
+            rowCount =
+                    Integer.parseInt(executeUniqueResultSPARQL(countQuery.toString(), bindings, new SingleObjectReader<Object>())
+                            .toString());
+        }
+
+        return new Pair<Integer, List<VoidDatasetsResultRow>>(rowCount, datasets);
     }
 
     /*

@@ -144,7 +144,7 @@
 
         </crfn:form>
         <br/>
-        <display:table name="${actionBean.datasets}" class="sortable" id="dataset" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:98%;">
+        <display:table name="${actionBean.paginatedList}" class="sortable" id="dataset" sort="external" pagesize="${actionBean.resultListPageSize}" requestURI="${actionBean.urlBinding}" style="width:98%;">
 
             <display:setProperty name="paging.banner.item_name" value="dataset"/>
             <display:setProperty name="paging.banner.items_name" value="datasets"/>

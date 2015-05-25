@@ -17,26 +17,27 @@
  *
  * Contributor(s):
  *        jaanus
+ *        sofiageo
  */
 
 package eionet.cr.web.action;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.log4j.Logger;
 
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.util.CustomPaginatedList;
+import net.sourceforge.stripes.action.*;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Action bean that provides functions for browsing VoID (Vocabulary of Interlinked Datasets) datasets. Browsing done by two facets:
@@ -45,10 +46,16 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
  * @author jaanus
  */
 @UrlBinding("/browseDatasets.action")
-public class BrowseDatasetsActionBean extends AbstractActionBean {
+public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
 
     /** */
     private static final Logger LOGGER = Logger.getLogger(BrowseDatasetsActionBean.class);
+
+    /** Default size of the result list page. */
+    public static final int RESULT_LIST_PAGE_SIZE = 20;
+
+    /** Max number of rows where a paging request's offset can start from in Virtuoso. */
+    private static final int VIRTUOSO_MAX_PAGING_ROWS = 10000;
 
     /** Forward path to the JSP that handles the display and faceted browsing of VoID datasets. */
     private static final String BROWSE_DATASETS_JSP = "/pages/browseDatasets.jsp";
@@ -59,7 +66,10 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
     /** The subject (http://purl.org/dc/terms/subject) to search by. */
     private List<String> subject;
 
-    /** The found datasets. */
+    /** Paginated list object based on {@link #datasets} and fed into DisplayTag's table tag in JSP. */
+    private CustomPaginatedList<VoidDatasetsResultRow> paginatedList = new CustomPaginatedList<VoidDatasetsResultRow>();
+
+    /** The found datasets */
     private List<VoidDatasetsResultRow> datasets;
 
     /** The list of available creators (http://purl.org/dc/terms/creator) to search by. */
@@ -91,32 +101,58 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
     @DefaultHandler
     public Resolution defaultEvent() throws DAOException {
 
-        LOGGER.trace(" - ");
-        LOGGER.trace("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
+        try {
+            PagingRequest pagingRequest = PagingRequest.create(getPage(), RESULT_LIST_PAGE_SIZE);
+            SortingRequest sortingRequest = new SortingRequest(getSort(), eionet.cr.util.SortOrder.parse(getDir()));
 
-        BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
-        datasets = dao.findDatasets(creator, subject, titleFilter);
+            if (pagingRequest != null) {
+                boolean pageAllowed = isPageAllowed(pagingRequest);
+                if (!pageAllowed) {
+                    addCautionMessage("The requested page number exceeds the backend's maximum number of rows "
+                            + "that can be paged through! Please narrow your search by using the tabs and filter below.");
+                    return new RedirectResolution(getClass());
+                }
+            }
+            LOGGER.trace(" - ");
+            LOGGER.trace("Searching for VoID datasets, creators = " + creator + ", subjects = " + subject);
 
-        LOGGER.trace(datasets.size() + " datasets found!");
-        LOGGER.trace("Populating available creators and subjects");
+            BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
 
-        if (isCreatorsChanged()) {
-            LOGGER.trace("Creators changed");
-            availableSubjects = dao.findSubjects(creator);
-            // availableCreators = dao.findCreators(availableSubjects);
-            availableCreators = dao.findCreators(null);
-        } else if (isSubjectsChanged()) {
-            LOGGER.trace("Subjects changed");
-            availableCreators = dao.findCreators(subject);
-            // availableSubjects = dao.findSubjects(availableCreators);
-            availableSubjects = dao.findSubjects(null);
-        } else {
-            availableCreators = dao.findCreators(subject);
-            availableSubjects = dao.findSubjects(creator);
+            Pair<Integer, List<VoidDatasetsResultRow>> pair = null;
+            pair = dao.findDatasets(creator, subject, titleFilter, pagingRequest, sortingRequest);
+            int matchCount = 0;
+            if (pair != null) {
+                datasets = pair.getRight();
+                if (datasets == null) {
+                    datasets = new ArrayList<VoidDatasetsResultRow>();
+                }
+                matchCount = pair.getLeft() == null ? 0 : pair.getLeft().intValue();
+            }
+            paginatedList = new CustomPaginatedList<VoidDatasetsResultRow>(this, matchCount, datasets, RESULT_LIST_PAGE_SIZE);
+
+            LOGGER.trace(datasets.size() + " datasets found!");
+            LOGGER.trace("Populating available creators and subjects");
+
+            if (isCreatorsChanged()) {
+                LOGGER.trace("Creators changed");
+                availableSubjects = dao.findSubjects(creator);
+                // availableCreators = dao.findCreators(availableSubjects);
+                availableCreators = dao.findCreators(null);
+            } else if (isSubjectsChanged()) {
+                LOGGER.trace("Subjects changed");
+                availableCreators = dao.findCreators(subject);
+                // availableSubjects = dao.findSubjects(availableCreators);
+                availableSubjects = dao.findSubjects(null);
+            } else {
+                availableCreators = dao.findCreators(subject);
+                availableSubjects = dao.findSubjects(creator);
+            }
+
+            beforeRender();
+            return new ForwardResolution(BROWSE_DATASETS_JSP);
+        } catch (DAOException exception) {
+            throw new RuntimeException("error in search", exception);
         }
-
-        beforeRender();
-        return new ForwardResolution(BROWSE_DATASETS_JSP);
     }
 
     /**
@@ -161,6 +197,50 @@ public class BrowseDatasetsActionBean extends AbstractActionBean {
     private boolean isSubjectsChanged() {
         int sbjSize = subject == null ? 0 : subject.size();
         return sbjSize != prevSbjSize;
+    }
+
+    /**
+     * Checks if Virtuoso is capable of handling the given paging request.
+     * Virtuoso allows to page no more than 10000 rows. So if the given paging reuqest is such that the offset would start after
+     * 10000 then Virtuoso will throw an error like this:
+     * SR353: Sorted TOP clause specifies more than 361110 rows to sort. Only 10000 are allowed.
+     * Either decrease the offset and/or row count or use a scrollable cursor.
+     *
+     * So the idea of this function is to check whether the given paging request's offset will be <= 10000 rows.
+     * Returns true if yes, otherwise returns false.
+     *
+     * @param pagingRequest The paging request to check.
+     * @return Boolean as indicated above.
+     */
+    private boolean isPageAllowed(PagingRequest pagingRequest) {
+
+        if (pagingRequest == null) {
+            return false;
+        }
+
+        int pageNumber = pagingRequest.getPageNumber();
+        int itemsPerPage = pagingRequest.getItemsPerPage();
+
+        int rowCount = pageNumber * itemsPerPage;
+        return rowCount <= VIRTUOSO_MAX_PAGING_ROWS;
+    }
+
+    /**
+     * Dynamic getter for {@link #RESULT_LIST_PAGE_SIZE}.
+     *
+     * @return The value.
+     */
+    public int getResultListPageSize() {
+        return RESULT_LIST_PAGE_SIZE;
+    }
+
+    /**
+     * Gets the paginated list.
+     *
+     * @return the paginated list
+     */
+    public CustomPaginatedList<VoidDatasetsResultRow> getPaginatedList() {
+        return paginatedList;
     }
 
     /**

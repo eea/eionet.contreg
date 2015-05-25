@@ -21,9 +21,12 @@
 
 package eionet.cr.dao;
 
-import java.util.List;
-
 import eionet.cr.dao.util.VoidDatasetsResultRow;
+import eionet.cr.util.Pair;
+import eionet.cr.util.SortingRequest;
+import eionet.cr.util.pagination.PagingRequest;
+
+import java.util.List;
 
 /**
  * An interface for the DAO that provides functions for the faceted browsing of VoID datasets.
@@ -39,10 +42,12 @@ public interface BrowseVoidDatasetsDAO extends DAO {
      * @param creators The given creators.
      * @param subjects The given subjects.
      * @param titleSubstr Substring of dcterms:title to search by.
-     * @return Matching datasets.
+     * @param pagingRequest
+     * @param sortingRequest
+     * @return Pair of total rows number and matching datasets
      * @throws DAOException If database error happens.
      */
-    List<VoidDatasetsResultRow> findDatasets(List<String> creators, List<String> subjects, String titleSubstr) throws DAOException;
+    Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * Finds all distinct creators (http://purl.org/dc/terms/creator) of VoID datasets whose subjects
