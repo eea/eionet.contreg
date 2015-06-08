@@ -252,45 +252,63 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public Resolution bookmark() throws DAOException {
-
         setDefaultAndNamedGraphs();
-
         CRUser user = getUser();
-        String requestMethod = getContext().getRequest().getMethod();
-
         userProjects = FolderUtil.getUserAccessibleProjectFolderNames(user, "i");
 
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
-        } else if (StringUtils.isBlank(query)) {
+        } 
+        else if (StringUtils.isBlank(query)) {
             addGlobalValidationError("Query is missing!");
-        } else if (requestMethod.equalsIgnoreCase("get")) {
+        }  
+        else {
             return new ForwardResolution(BOOKMARK_PAGE);
-        } else if (StringUtils.isBlank(bookmarkName)) {
+        }
+
+        return new ForwardResolution(FORM_PAGE);
+    }
+    
+    public Resolution saveBookmark() throws DAOException {
+        setDefaultAndNamedGraphs();
+        CRUser user = getUser();
+        
+        if (user == null) {
+            addWarningMessage("Cannot bookmark for anonymous user!");
+        }
+        else if (StringUtils.isBlank(query)) {
+            addGlobalValidationError("Query is missing!");
+        }
+        else if (StringUtils.isBlank(bookmarkName)) {
             addGlobalValidationError("Bookmark name is missing!");
-        } else {
+        }
+        else {
             if (bookmarkFolder != null && bookmarkFolder.equals(SHARED_BOOKMARKS_FOLDER)) {
                 if (!isSharedBookmarkPrivilege()) {
                     addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
                     return new ForwardResolution(FORM_PAGE);
                 }
+                
                 storeSharedBookmark();
                 // store to project folder
-            } else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
+            } 
+            else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
                 // bookmarkFolder = project name
                 if (!hasProjectPrivilege(bookmarkFolder)) {
                     addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
                     return new ForwardResolution(FORM_PAGE);
                 }
+                
                 storeProjectBookmark();
-            } else {
+            } 
+            else {
                 storePersonalBookmark();
             }
             // log and display message about successful operation
             addSystemMessage("Successfully bookmarked query: " + bookmarkName);
             selectedBookmarkName = bookmarkName;
         }
-
+        
         return new ForwardResolution(FORM_PAGE);
     }
 

@@ -47,7 +47,7 @@
           <br />
         </c:if>
 
-        <stripes:submit name="bookmark" value="Save" />
+        <stripes:submit name="saveBookmark" value="Save" />
         <br /> <span class="input-hint">Hint: use existing query's name to overwrite it</span>
 
         <stripes:hidden name="query" value="${actionBean.query}" />
