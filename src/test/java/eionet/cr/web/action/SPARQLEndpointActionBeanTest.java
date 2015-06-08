@@ -24,6 +24,8 @@ import org.openrdf.rio.turtle.TurtleParser;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.test.helpers.SimpleStatementRecorder;
+import eionet.cr.web.security.CRUser;
+import eionet.cr.web.util.WebConstants;
 
 /**
  * Tests for SPARQL endpoint action bean.
@@ -147,6 +149,20 @@ public class SPARQLEndpointActionBeanTest extends CRDatabaseTestCase {
         testConstructQuery("text/plain");
     }
 
+    @Test
+    public void testCreateLargeBookmark() throws Exception {
+        MockServletContext ctx = ActionBeanUtils.getServletContext();
+        MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
+        trip.getRequest().setMethod("POST");
+        trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("user"));
+        trip.setParameter("saveBookmark", StringUtils.EMPTY);
+        trip.setParameter("bookmarkName", "Huge query");
+        trip.setParameter("query", this.createLargeDummySparqlQuery());
+        trip.execute();
+        
+        assertEquals(0, trip.getValidationErrors().size());
+    }
+    
     /**
      * Create and return new instance of {@link RDFParserBase} for the given MIME type.
      * Inject given {@link RDFHandler} to the parser's {@link RDFParserBase#setRDFHandler(RDFHandler)} method.
@@ -251,5 +267,19 @@ public class SPARQLEndpointActionBeanTest extends CRDatabaseTestCase {
 
         boolean hasStatement = recorder.hasStatement(subject, predicate, object);
         assertTrue("Was expecting this triple in the output:  " + subject + "  " + predicate + "  " + object, hasStatement);
+    }
+    
+    private String createLargeDummySparqlQuery() {
+        StringBuilder sb = new StringBuilder();
+        
+        for (int line = 0; line < 100; line++) {
+            for (int i = 0; i < 10; i++) {
+                sb.append('#');
+            }
+            
+            sb.append(" ");
+        }
+        
+        return sb.toString();
     }
 }
