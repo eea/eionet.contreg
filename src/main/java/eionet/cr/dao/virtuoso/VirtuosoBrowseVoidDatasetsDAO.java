@@ -47,7 +47,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
      * @see eionet.cr.dao.BrowseVoidDatasetsDAO#findDatasets(java.util.List, java.util.List, java.lang.String)
      */
     @Override
-    public Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, PagingRequest pagingRequest, SortingRequest sortingRequest)
+    public Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, boolean harvestedCheck, PagingRequest pagingRequest, SortingRequest sortingRequest)
             throws DAOException {
 
         Bindings bindings = new Bindings();
@@ -58,20 +58,28 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
         sb.append("PREFIX void: <http://rdfs.org/ns/void#>\n");
         sb.append("\n");
-        sb.append("SELECT ?dataset ?label ?creator ?subjects\n");
+        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects sql:sample(?imported) AS ?imported\n");
         sb.append("WHERE {\n");
         sb.append(" {\n");
-        sb.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects)\n");
+        sb.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subject) bound(?refreshed) AS ?imported\n");
         sb.append("  WHERE {\n");
-        sb.append("   ?dataset a void:Dataset .\n");
+        sb.append("   ?dataset a void:Dataset ;\n");
+        sb.append("     dcterms:title ?label;\n");
+        sb.append("     dcterms:creator ?ucreator .\n");
+        sb.append("OPTIONAL { ?dataset void:dataDump _:dump.\n"
+            + "_:dump cr:lastRefreshed ?refreshed }");
+        sb.append("   ?ucreator rdfs:label ?creator \n");
+
         if (StringUtils.isBlank(titleSubstr)) {
-            sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+            sb.append("FILTER (LANG(?label) IN ('en',''))\n");
         } else {
-            sb.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
+            sb.append("FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
             bindings.setString("titleF", titleSubstr);
         }
-        sb.append("   ?dataset dcterms:creator ?ucreator .\n");
-        sb.append("   ?ucreator rdfs:label ?creator .\n");
+
+        if (harvestedCheck) {
+            sb.append("FILTER (bound(?refreshed))\n");
+        }
 
         if (creators != null && !creators.isEmpty()) {
             sb.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
@@ -95,6 +103,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("  }\n");
         sb.append(" }\n");
         sb.append("} GROUP BY ?dataset ?label ?creator\n");
+        sb.append("ORDER BY DESC(?imported) ?dataset\n");
 
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             sb.append("ORDER BY " + sortingRequest.getSortOrder().toSQL() + "(UCASE(str(?" + sortingRequest.getSortingColumnName() + ")))\n");
@@ -116,17 +125,19 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             countQuery.append("SELECT (COUNT(*) AS ?total)\n");
             countQuery.append("WHERE {\n");
             countQuery.append(" {\n");
-            countQuery.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects)\n");
+            countQuery.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects) bound(?refreshed) AS ?imported\n");
             countQuery.append("  WHERE {\n");
-            countQuery.append("   ?dataset a void:Dataset .\n");
+            countQuery.append("   ?dataset a void:Dataset ;\n");
+            countQuery.append("     dcterms:title ?label;\n");
+            countQuery.append("     dcterms:creator ?ucreator .\n");
+            countQuery.append("   ?ucreator rdfs:label ?creator .\n");
+
             if (StringUtils.isBlank(titleSubstr)) {
-                countQuery.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en',''))\n");
+                countQuery.append("   FILTER (LANG(?label) IN ('en',''))\n");
             } else {
-                countQuery.append("   ?dataset dcterms:title ?label FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
+                countQuery.append("   FILTER (LANG(?label) IN ('en','') && regex(?label, ?titleF, \"i\"))\n");
                 bindings.setString("titleF", titleSubstr);
             }
-            countQuery.append("   ?dataset dcterms:creator ?ucreator .\n");
-            countQuery.append("   ?ucreator rdfs:label ?creator .\n");
 
             if (creators != null && !creators.isEmpty()) {
                 countQuery.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");

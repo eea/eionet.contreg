@@ -47,7 +47,7 @@ public interface BrowseVoidDatasetsDAO extends DAO {
      * @return Pair of total rows number and matching datasets
      * @throws DAOException If database error happens.
      */
-    Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
+    Pair<Integer, List<VoidDatasetsResultRow>> findDatasets(List<String> creators, List<String> subjects, String titleSubstr, boolean harvestedCheck, PagingRequest pagingRequest, SortingRequest sortingRequest) throws DAOException;
 
     /**
      * Finds all distinct creators (http://purl.org/dc/terms/creator) of VoID datasets whose subjects

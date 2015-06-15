@@ -91,6 +91,9 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
     /** The substring that dcterms:title should contain if specified by user. */
     private String titleFilter;
 
+    /** The facet option to show only harvested sources **/
+    private boolean harvestedCheck;
+
     /**
      *
      * @return
@@ -117,7 +120,7 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
             BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
 
             Pair<Integer, List<VoidDatasetsResultRow>> pair = null;
-            pair = dao.findDatasets(creator, subject, titleFilter, pagingRequest, sortingRequest);
+            pair = dao.findDatasets(creator, subject, titleFilter, harvestedCheck, pagingRequest, sortingRequest);
             int matchCount = 0;
             if (pair != null) {
                 datasets = pair.getRight();
@@ -393,4 +396,15 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
     public void setTitleFilter(String titleFilter) {
         this.titleFilter = titleFilter;
     }
+
+    /**
+     * @return true or false for already harvested state
+     */
+    public boolean getHarvestedCheck() { return harvestedCheck; }
+
+    /**
+     * @param harvestedCheck set harvested state check true or false
+     */
+    public void setHarvestedCheck(boolean harvestedCheck) { this.harvestedCheck = harvestedCheck; }
+
 }

@@ -62,6 +62,9 @@
             <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
             <stripes:submit name="filter" value="Filter"/>
 
+            <stripes:label for="harvestedCheck" class="question">Already Harvested</stripes:label>&nbsp;
+            <input type="checkbox" id="harvestedCheck" name="harvestedCheck" title="Show already harvested datasets" onclick="return submitFiltersForm();" ${actionBean.harvestedCheck ? 'checked="checked"' : ''}}/>
+
             <fieldset style="margin-top:10px">
                 <legend>Filters</legend>
                 <div style="float:left;width:49%">
