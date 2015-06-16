@@ -58,12 +58,16 @@
 
         <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post" style="margin-top:20px">
 
-            <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
-            <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
-            <stripes:submit name="filter" value="Filter"/>
+            <div>
+                <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
+                <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
+                <stripes:submit name="filter" value="Filter"/>
+            </div>
 
-            <stripes:label for="harvestedCheck" class="question">Already Harvested</stripes:label>&nbsp;
-            <input type="checkbox" id="harvestedCheck" name="harvestedCheck" title="Show already harvested datasets" onclick="return submitFiltersForm();" ${actionBean.harvestedCheck ? 'checked="checked"' : ''}}/>
+            <div style="margin-top:10px">
+                <stripes:label for="harvestedCheck" class="question">Already Harvested</stripes:label>&nbsp;
+                <input type="checkbox" id="harvestedCheck" name="harvestedCheck" title="Show already harvested datasets" onclick="return submitFiltersForm();" ${actionBean.harvestedCheck ? 'checked="checked"' : ''}}/>
+            </div>
 
             <fieldset style="margin-top:10px">
                 <legend>Filters</legend>

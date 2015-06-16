@@ -58,17 +58,14 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
         sb.append("PREFIX void: <http://rdfs.org/ns/void#>\n");
         sb.append("\n");
-        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects sql:sample(?imported) AS ?imported\n");
-        sb.append("WHERE {\n");
-        sb.append(" {\n");
-        sb.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subject) bound(?refreshed) AS ?imported\n");
+        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects min(xsd:int(bound(?refreshed))) AS ?imported\n");
         sb.append("  WHERE {\n");
         sb.append("   ?dataset a void:Dataset ;\n");
-        sb.append("     dcterms:title ?label;\n");
+        sb.append("     dcterms:title ?label ;\n");
         sb.append("     dcterms:creator ?ucreator .\n");
         sb.append("OPTIONAL { ?dataset void:dataDump _:dump.\n"
-            + "_:dump cr:lastRefreshed ?refreshed }");
-        sb.append("   ?ucreator rdfs:label ?creator \n");
+            + "_:dump cr:lastRefreshed ?refreshed }\n");
+        sb.append("?ucreator rdfs:label ?creator \n");
 
         if (StringUtils.isBlank(titleSubstr)) {
             sb.append("FILTER (LANG(?label) IN ('en',''))\n");
@@ -100,13 +97,12 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             sb.append("  OPTIONAL {?dataset dcterms:subject ?usubject .\n");
             sb.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
         }
-        sb.append("  }\n");
-        sb.append(" }\n");
         sb.append("} GROUP BY ?dataset ?label ?creator\n");
-        sb.append("ORDER BY DESC(?imported) ?dataset\n");
-
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             sb.append("ORDER BY " + sortingRequest.getSortOrder().toSQL() + "(UCASE(str(?" + sortingRequest.getSortingColumnName() + ")))\n");
+        }
+        else {
+            sb.append("ORDER BY DESC(?imported) ?dataset\n");
         }
         if (pagingRequest != null) {
             sb.append("OFFSET " + pagingRequest.getOffset() + "\n");
@@ -125,7 +121,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             countQuery.append("SELECT (COUNT(*) AS ?total)\n");
             countQuery.append("WHERE {\n");
             countQuery.append(" {\n");
-            countQuery.append(" SELECT ?dataset ?label ?creator (str(sql:sample(?subject)) AS ?subjects) bound(?refreshed) AS ?imported\n");
+            countQuery.append(" SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects min(xsd:int(bound(?refreshed))) AS ?imported\n");
             countQuery.append("  WHERE {\n");
             countQuery.append("   ?dataset a void:Dataset ;\n");
             countQuery.append("     dcterms:title ?label;\n");
