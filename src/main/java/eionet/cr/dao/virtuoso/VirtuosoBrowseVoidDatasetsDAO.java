@@ -97,7 +97,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             sb.append("  OPTIONAL {?dataset dcterms:subject ?usubject .\n");
             sb.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
         }
-        sb.append("} GROUP BY ?dataset ?label ?creator\n");
+        sb.append("} GROUP BY ?dataset ?label ?creator ?subjects\n");
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             sb.append("ORDER BY " + sortingRequest.getSortOrder().toSQL() + "(UCASE(str(?" + sortingRequest.getSortingColumnName() + ")))\n");
         }
