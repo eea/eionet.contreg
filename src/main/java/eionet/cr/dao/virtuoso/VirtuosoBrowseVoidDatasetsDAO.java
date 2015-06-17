@@ -135,6 +135,10 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
                 bindings.setString("titleF", titleSubstr);
             }
 
+            if (harvestedCheck) {
+                countQuery.append("  FILTER (bound(?refreshed))\n");
+            }
+
             if (creators != null && !creators.isEmpty()) {
                 countQuery.append("  FILTER (?creator IN (").append(variablesCSV("crt", creators.size())).append("))\n");
                 for (int i = 0; i < creators.size(); i++) {
