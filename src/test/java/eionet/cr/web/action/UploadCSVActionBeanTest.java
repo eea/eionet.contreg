@@ -449,4 +449,30 @@ public class UploadCSVActionBeanTest extends CRDatabaseTestCase {
             return validationErrors;
         }
     }
+
+    /**
+     * Tests if a 404 error is returned if the folderuri is empty
+     * @throws Exception Any sort of error that happens.
+     */
+    public void testUploadWithEmptyFolderURI() throws Exception {
+
+        // Prepare the servlet context mock + Stripes action bean roundtrip.
+        MockServletContext ctx = createContextMock();
+        MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
+
+        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by MyActionBeanPropertyBinder
+        // that has already been injected into the servlet context mock obtained above.
+        HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
+        FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
+        richTypeRequestParams.put("fileBean", fileBean);
+        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
+
+        // Execute the event.
+        trip.execute();
+
+        // Assert the returned HTTP code.
+        UploadCSVActionBean actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
+        MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
+        assertEquals(404, response.getStatus());
+    }
 }
