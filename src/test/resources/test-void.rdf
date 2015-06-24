@@ -1,0 +1,413 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:cr="http://cr.eionet.europa.eu/ontologies/contreg.rdf#" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:dctype="http://purl.org/dc/dcmitype/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:void="http://rdfs.org/ns/void#" xmlns:skos="http://www.w3.org/2004/02/skos/core#" xmlns:cc="http://creativecommons.org/ns#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xml:base="http://rdfdata.eionet.europa.eu/eurostat/void.rdf"><void:DatasetDescription rdf:about=""><rdfs:label>All Eurostat's SDMX datasets in the catalogue converted to RDF</rdfs:label><dcterms:creator rdf:resource="http://www.eionet.europa.eu/users/roug"/></void:DatasetDescription><dcat:Catalog rdf:ID="DCATCatalog"><dcterms:title>All Eurostat's SDMX datasets</dcterms:title><rdfs:label>All Eurostat's SDMX datasets</rdfs:label><dcterms:publisher rdf:resource="#Eurostat"/><foaf:homepage rdf:resource="http://epp.eurostat.ec.europa.eu/portal/page/portal/statistics/search_database"/><dcat:themeTaxonomy rdf:resource="#TOC"/></dcat:Catalog><foaf:Organization rdf:ID="Eurostat"><foaf:name>Eurostat</foaf:name><rdfs:label>Eurostat</rdfs:label><foaf:homepage rdf:resource="http://epp.eurostat.ec.europa.eu/portal/page/portal/eurostat/home/"/><skos:exactMatch rdf:resource="http://dbpedia.org/resource/Eurostat"/><skos:exactMatch rdf:resource="http://publications.europa.eu/resource/authority/corporate-body/ESTAT"/></foaf:Organization><!-- Declaration of the formats that data is exported in --><dcterms:MediaType rdf:ID="MT-sdmx"><rdfs:label>SDMX – Statistical Data and Metadata Exchange</rdfs:label><rdfs:seeAlso rdf:resource="http://sdmx.org/"/><owl:sameAs rdf:resource="http://dbpedia.org/resource/SDMX"/></dcterms:MediaType><dcterms:MediaType rdf:ID="MT-dft"><rdfs:label>DFT file</rdfs:label><rdfs:comment>DFT files are intended to efficiently store data organised as multi-dimensional tables.</rdfs:comment></dcterms:MediaType><dcterms:MediaType rdf:ID="MT-tsv"><rdfs:label>TSV – Tab-separated values</rdfs:label><rdfs:comment>‘TSV’ files are flat files that include a ‘tab delimited’ sequence of values in each line instead of
+      one value per line/record.</rdfs:comment></dcterms:MediaType><skos:ConceptScheme rdf:ID="TOC"><rdfs:label>Eurostat dataset themes</rdfs:label><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><skos:hasTopConcept rdf:resource="#data"/><skos:hasTopConcept rdf:resource="#tb"/><skos:hasTopConcept rdf:resource="#tb_eu"/><skos:hasTopConcept rdf:resource="#cc"/></skos:ConceptScheme>
+  <skos:Concept rdf:about="#data"><rdfs:label>Database by themes</rdfs:label><skos:prefLabel xml:lang="en">Database by themes</skos:prefLabel><skos:prefLabel xml:lang="fr">Base de données par thèmes</skos:prefLabel><skos:prefLabel xml:lang="de">Datenbank nach Themen</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#general"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#economy"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#popul"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#icts"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#agric"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#external"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#transp"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#envir"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#science"><skos:broader rdf:resource="#data"/></rdf:Description></skos:narrower></skos:Concept>
+      <skos:Concept rdf:about="#general"><rdfs:label>General and regional statistics</rdfs:label><skos:prefLabel xml:lang="en">General and regional statistics</skos:prefLabel><skos:prefLabel xml:lang="fr">Statistiques générales et régionales</skos:prefLabel><skos:prefLabel xml:lang="de">Allgemeine und Regionalstatistiken</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#euroind"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_typ"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#degurb"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#urb"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_nat"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#lan"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#noneu"><skos:broader rdf:resource="#general"/></rdf:Description></skos:narrower></skos:Concept>
+          <skos:Concept rdf:about="#euroind"><rdfs:label>European and national indicators for short-term analysis</rdfs:label><skos:prefLabel xml:lang="en">European and national indicators for short-term analysis</skos:prefLabel><skos:prefLabel xml:lang="fr">Indicateurs européens et nationaux pour l'analyse à court terme</skos:prefLabel><skos:prefLabel xml:lang="de">Europäische und nationale Indikatoren für konjunkturelle Analysen</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_bcs"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_bp"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_cp"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_et"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_is"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_lm"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_mf"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_qna"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_hp"><skos:broader rdf:resource="#euroind"/></rdf:Description></skos:narrower></skos:Concept>
+              <skos:Concept rdf:about="#ei_bcs"><rdfs:label>Business and consumer surveys (source: DG ECFIN)</rdfs:label><skos:prefLabel xml:lang="en">Business and consumer surveys (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de conjoncture et de consommation (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="de">Konjunktur- und Verbrauchererhebungen (Quelle: DG ECFIN)</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_bcs_cs"><skos:broader rdf:resource="#ei_bcs"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_bcs_bs"><skos:broader rdf:resource="#ei_bcs"/></rdf:Description></skos:narrower></skos:Concept>
+                  <skos:Concept rdf:about="#ei_bcs_cs"><rdfs:label>Consumer surveys (source: DG ECFIN)</rdfs:label><skos:prefLabel xml:lang="en">Consumer surveys (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de consommation (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="de">Verbrauchererhebungen (Quelle: DG ECFIN)</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                      
+                      
+                    
+                  <skos:Concept rdf:about="#ei_bcs_bs"><rdfs:label>Business surveys (source: DG ECFIN)</rdfs:label><skos:prefLabel xml:lang="en">Business surveys (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de la conjoncture (source: DG ECFIN)</skos:prefLabel><skos:prefLabel xml:lang="de">Konjunkturerhebungen (Quelle: DG ECFIN)</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_bcs_r1"><skos:broader rdf:resource="#ei_bcs_bs"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_bcs_r2"><skos:broader rdf:resource="#ei_bcs_bs"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_bcs_bc"><skos:broader rdf:resource="#ei_bcs_bs"/></rdf:Description></skos:narrower></skos:Concept>
+                      <skos:Concept rdf:about="#ei_bcs_r1"><rdfs:label>Business surveys - NACE Rev. 1.1</rdfs:label><skos:prefLabel xml:lang="en">Business surveys - NACE Rev. 1.1</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de conjoncture - NACE Rév. 1.1</skos:prefLabel><skos:prefLabel xml:lang="de">Konjunkturerhebungen - NACE Rev. 1.1</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                        
+                      <skos:Concept rdf:about="#ei_bcs_r2"><rdfs:label>Business surveys - NACE Rev. 2</rdfs:label><skos:prefLabel xml:lang="en">Business surveys - NACE Rev. 2</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de conjoncture - NACE Rév. 2</skos:prefLabel><skos:prefLabel xml:lang="de">Konjunkturerhebungen - NACE Rev. 2</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                        
+                      <skos:Concept rdf:about="#ei_bcs_bc"><rdfs:label>Business surveys - back-cast</rdfs:label><skos:prefLabel xml:lang="en">Business surveys - back-cast</skos:prefLabel><skos:prefLabel xml:lang="fr">Enquêtes de conjoncture - séries rétropolées</skos:prefLabel><skos:prefLabel xml:lang="de">Konjunkturerhebungen - zurückreichende Schätzungen</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                          
+                          
+                          
+                          
+                        
+                    
+                
+              <skos:Concept rdf:about="#ei_bp"><rdfs:label>Balance of payments</rdfs:label><skos:prefLabel xml:lang="en">Balance of payments</skos:prefLabel><skos:prefLabel xml:lang="fr">Balance des paiements</skos:prefLabel><skos:prefLabel xml:lang="de">Zahlungsbilanz</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_bp_6"><skos:broader rdf:resource="#ei_bp"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_bp_5"><skos:broader rdf:resource="#ei_bp"/></rdf:Description></skos:narrower></skos:Concept>
+                  <skos:Concept rdf:about="#ei_bp_6"><rdfs:label>Balance of payments - BPM6</rdfs:label><skos:prefLabel xml:lang="en">Balance of payments - BPM6</skos:prefLabel><skos:prefLabel xml:lang="fr">Balance des paiements - MBP6</skos:prefLabel><skos:prefLabel xml:lang="de">Zahlungsbilanz - BPM6</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                      
+                      
+                      
+                      
+                      
+                    
+                  <skos:Concept rdf:about="#ei_bp_5"><rdfs:label>Balance of payments - BPM5</rdfs:label><skos:prefLabel xml:lang="en">Balance of payments - BPM5</skos:prefLabel><skos:prefLabel xml:lang="fr">Balance des paiements - MBP5</skos:prefLabel><skos:prefLabel xml:lang="de">Zahlungsbilanz - BPM5</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                      
+                      
+                      
+                      
+                      
+                    
+                
+              <skos:Concept rdf:about="#ei_cp"><rdfs:label>Consumer prices</rdfs:label><skos:prefLabel xml:lang="en">Consumer prices</skos:prefLabel><skos:prefLabel xml:lang="fr">Prix à la consommation</skos:prefLabel><skos:prefLabel xml:lang="de">Verbraucherpreise</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                
+              <skos:Concept rdf:about="#ei_et"><rdfs:label>International trade</rdfs:label><skos:prefLabel xml:lang="en">International trade</skos:prefLabel><skos:prefLabel xml:lang="fr">Commerce international</skos:prefLabel><skos:prefLabel xml:lang="de">Internationaler Handel</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                  
+                  
+                  
+                
+              <skos:Concept rdf:about="#ei_is"><rdfs:label>Industry, trade and services</rdfs:label><skos:prefLabel xml:lang="en">Industry, trade and services</skos:prefLabel><skos:prefLabel xml:lang="fr">Industrie, commerce et services</skos:prefLabel><skos:prefLabel xml:lang="de">Industrie, Handel und Dienstleistungen</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                
+              <skos:Concept rdf:about="#ei_lm"><rdfs:label>Labour market</rdfs:label><skos:prefLabel xml:lang="en">Labour market</skos:prefLabel><skos:prefLabel xml:lang="fr">Marché du travail</skos:prefLabel><skos:prefLabel xml:lang="de">Arbeitsmarkt</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                  
+                  
+                  
+                
+              <skos:Concept rdf:about="#ei_mf"><rdfs:label>Monetary and financial indicators</rdfs:label><skos:prefLabel xml:lang="en">Monetary and financial indicators</skos:prefLabel><skos:prefLabel xml:lang="fr">Indicateurs monétaires et financiers</skos:prefLabel><skos:prefLabel xml:lang="de">Monetäre und finanzielle Indikatoren</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                  
+                  
+                
+              <skos:Concept rdf:about="#ei_qna"><rdfs:label>National accounts</rdfs:label><skos:prefLabel xml:lang="en">National accounts</skos:prefLabel><skos:prefLabel xml:lang="fr">Comptes nationaux</skos:prefLabel><skos:prefLabel xml:lang="de">Volkswirtschaftliche Gesamtrechnungen</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_qna_e10"><skos:broader rdf:resource="#ei_qna"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_qna_e95"><skos:broader rdf:resource="#ei_qna"/></rdf:Description></skos:narrower></skos:Concept>
+                  <skos:Concept rdf:about="#ei_qna_e10"><rdfs:label>National accounts - ESA 2010</rdfs:label><skos:prefLabel xml:lang="en">National accounts - ESA 2010</skos:prefLabel><skos:prefLabel xml:lang="fr">Comptes nationaux - SEC 2010</skos:prefLabel><skos:prefLabel xml:lang="de">Volkswirtschaftliche Gesamtrechnungen - ESVG 2010</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_namq_10_ma"><skos:broader rdf:resource="#ei_qna_e10"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_namq_10_bbr"><skos:broader rdf:resource="#ei_qna_e10"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_nasq_10"><skos:broader rdf:resource="#ei_qna_e10"/></rdf:Description></skos:narrower><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#nama_10_gdp"/></skos:Concept>
+                      <void:Dataset rdf:about="#nama_10_gdp"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_qna_e10"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=nama_10_gdp"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/nama_10_gdp.rdf.gz"/>
+                        <rdfs:label>GDP and main components (output, expenditure and income)</rdfs:label><dcterms:title xml:lang="en">GDP and main components (output, expenditure and income)</dcterms:title>
+                        <dcterms:title xml:lang="fr">PIB et principaux composants (production, dépenses et revenu)</dcterms:title>
+                        <dcterms:title xml:lang="de">BIP und Hauptkomponenten (Produktionswert, Ausgaben und Einkommen)</dcterms:title>
+                        <skos:notation>nama_10_gdp</skos:notation>
+                        <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-11</dcterms:modified>
+                        
+                        <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1975</dataStart>
+                        <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2014</dataEnd>
+                        <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">391166</void:entities>
+                        
+                        
+                        
+                        
+                        
+                        
+                        <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                        <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                        <dcat:distribution><dcat:Distribution rdf:about="#nama_10_gdp-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nama_10_gdp.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                        <dcat:distribution><dcat:Distribution rdf:about="#nama_10_gdp-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nama_10_gdp.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                      <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#nama_10_gdp"/></rdf:Description>
+                      <skos:Concept rdf:about="#ei_namq_10_ma"><rdfs:label>Main GDP aggregates</rdfs:label><skos:prefLabel xml:lang="en">Main GDP aggregates</skos:prefLabel><skos:prefLabel xml:lang="fr">Principaux agrégats du PIB</skos:prefLabel><skos:prefLabel xml:lang="de">Hauptaggregate des BIP</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_gdp"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_fcs"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_exi"/></skos:Concept>
+                          <void:Dataset rdf:about="#namq_10_gdp"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_ma"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_gdp"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_gdp.rdf.gz"/>
+                            <rdfs:label>GDP and main components (output, expenditure and income)</rdfs:label><dcterms:title xml:lang="en">GDP and main components (output, expenditure and income)</dcterms:title>
+                            <dcterms:title xml:lang="fr">PIB et principaux composants (production, dépenses et revenu)</dcterms:title>
+                            <dcterms:title xml:lang="de">BIP und Hauptkomponenten (Produktionswert, Ausgaben und Einkommen)</dcterms:title>
+                            <skos:notation>namq_10_gdp</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-12</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1975Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2908130</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_gdp-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_gdp.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_gdp-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_gdp.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_gdp"/></rdf:Description>
+                          <void:Dataset rdf:about="#namq_10_fcs"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_ma"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_fcs"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_fcs.rdf.gz"/>
+                            <rdfs:label>Final consumption aggregates</rdfs:label><dcterms:title xml:lang="en">Final consumption aggregates</dcterms:title>
+                            <dcterms:title xml:lang="fr">Principaux agrégats de la consommation finale par durabilité</dcterms:title>
+                            <dcterms:title xml:lang="de">Hauptaggregate des letzten Verbrauchs nach Dauerhaftigkeit</dcterms:title>
+                            <skos:notation>namq_10_fcs</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-12</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1978Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">237053</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_fcs-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_fcs.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_fcs-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_fcs.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_fcs"/></rdf:Description>
+                          <void:Dataset rdf:about="#namq_10_exi"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_ma"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_exi"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_exi.rdf.gz"/>
+                            <rdfs:label>Exports and imports by Member States of the EU/third countries</rdfs:label><dcterms:title xml:lang="en">Exports and imports by Member States of the EU/third countries</dcterms:title>
+                            <dcterms:title xml:lang="fr">Exportations et importations vers/de pays de l'UE/pays tiers</dcterms:title>
+                            <dcterms:title xml:lang="de">Exporte und Importe nach EU-Ländern/Drittländern</dcterms:title>
+                            <skos:notation>namq_10_exi</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-11</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1980Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">154926</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_exi-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_exi.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_exi-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_exi.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_exi"/></rdf:Description>
+                        
+                      <skos:Concept rdf:about="#ei_namq_10_bbr"><rdfs:label>Basic breakdowns of main GDP aggregates and employment (by industry and assets)</rdfs:label><skos:prefLabel xml:lang="en">Basic breakdowns of main GDP aggregates and employment (by industry and assets)</skos:prefLabel><skos:prefLabel xml:lang="fr">Ventilations principales des agrégats du PIB et de l'emploi (par industrie et type d'actif)</skos:prefLabel><skos:prefLabel xml:lang="de">Hauptgliederung der Aggregate des BIP und der Erwerbstätigkeit (nach Industrie und Anlagegütern)</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_a10"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_an6"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#namq_10_a10_e"/></skos:Concept>
+                          <void:Dataset rdf:about="#namq_10_a10"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_bbr"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_a10"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_a10.rdf.gz"/>
+                            <rdfs:label>Gross value added and income A*10 industry breakdowns</rdfs:label><dcterms:title xml:lang="en">Gross value added and income A*10 industry breakdowns</dcterms:title>
+                            <dcterms:title xml:lang="fr">Valeur ajoutée brute et du revenu par A*10 branches</dcterms:title>
+                            <dcterms:title xml:lang="de">Bruttoinlandsprodukt und Einkommen nach A*10 Wirtschaftsbereichen</dcterms:title>
+                            <skos:notation>namq_10_a10</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-12</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1975Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2201438</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_a10-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_a10.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_a10-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_a10.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_a10"/></rdf:Description>
+                          <void:Dataset rdf:about="#namq_10_an6"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_bbr"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_an6"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_an6.rdf.gz"/>
+                            <rdfs:label>Gross fixed capital formation with AN_F6 asset breakdowns</rdfs:label><dcterms:title xml:lang="en">Gross fixed capital formation with AN_F6 asset breakdowns</dcterms:title>
+                            <dcterms:title xml:lang="fr">Formation brute de capital fixe par AN_F6 types d'actifs</dcterms:title>
+                            <dcterms:title xml:lang="de">Bruttoanlageinvestitionen nach AN_F6 Anlagearten</dcterms:title>
+                            <skos:notation>namq_10_an6</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-12</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1975Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">883805</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_an6-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_an6.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_an6-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_an6.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_an6"/></rdf:Description>
+                          <void:Dataset rdf:about="#namq_10_a10_e"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_namq_10_bbr"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=namq_10_a10_e"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/namq_10_a10_e.rdf.gz"/>
+                            <rdfs:label>Employment A*10 industry breakdowns</rdfs:label><dcterms:title xml:lang="en">Employment A*10 industry breakdowns</dcterms:title>
+                            <dcterms:title xml:lang="fr">Emploi par A*10 branches</dcterms:title>
+                            <dcterms:title xml:lang="de">Erwerbstätigkeit nach A*10 Wirtschaftsbereichen</dcterms:title>
+                            <skos:notation>namq_10_a10_e</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-12</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1980Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1727228</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ei_qna_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ei_qna_esms"><rdfs:label>ESMS Metadata: ei_qna_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_a10_e-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_a10_e.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#namq_10_a10_e-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/namq_10_a10_e.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#namq_10_a10_e"/></rdf:Description>
+                        
+                      <skos:Concept rdf:about="#ei_nasq_10"><rdfs:label>Quarterly sector accounts (ESA 2010)</rdfs:label><skos:prefLabel xml:lang="en">Quarterly sector accounts (ESA 2010)</skos:prefLabel><skos:prefLabel xml:lang="fr">Comptes sectoriels trimestriels (SEC 2010)</skos:prefLabel><skos:prefLabel xml:lang="de">Vierteljährliche Sektorkonten (ESVG 2010)</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#nasq_10_ki"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#nasq_10_nf_tr"/></skos:Concept>
+                          <void:Dataset rdf:about="#nasq_10_ki"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_nasq_10"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=nasq_10_ki"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/nasq_10_ki.rdf.gz"/>
+                            <rdfs:label>Key indicators</rdfs:label><dcterms:title xml:lang="en">Key indicators</dcterms:title>
+                            <dcterms:title xml:lang="fr">Principaux indicateurs</dcterms:title>
+                            <dcterms:title xml:lang="de">Schlüsselindikatoren</dcterms:title>
+                            <skos:notation>nasq_10_ki</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-05</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1999Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2014Q4</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5930</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/nasq_10_nf_tr_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#nasq_10_nf_tr_esms"><rdfs:label>ESMS Metadata: nasq_10_nf_tr_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#nasq_10_ki-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nasq_10_ki.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#nasq_10_ki-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nasq_10_ki.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#nasq_10_ki"/></rdf:Description>
+                          <void:Dataset rdf:about="#nasq_10_nf_tr"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#ei_nasq_10"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=nasq_10_nf_tr"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/nasq_10_nf_tr.rdf.gz"/>
+                            <rdfs:label>Non-financial transactions</rdfs:label><dcterms:title xml:lang="en">Non-financial transactions</dcterms:title>
+                            <dcterms:title xml:lang="fr">Opérations non financières</dcterms:title>
+                            <dcterms:title xml:lang="de">Nichtfinanzielle Transaktionen</dcterms:title>
+                            <skos:notation>nasq_10_nf_tr</skos:notation>
+                            <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-04</dcterms:modified>
+                            
+                            <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">1980Q1</dataStart>
+                            <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2015Q1</dataEnd>
+                            <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1223443</void:entities>
+                            
+                            
+                            
+                            
+                            
+                            
+                            <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/nasq_10_nf_tr_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                            <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#nasq_10_nf_tr_esms"><rdfs:label>ESMS Metadata: nasq_10_nf_tr_esms</rdfs:label></rdf:Description></esms>
+                            <dcat:distribution><dcat:Distribution rdf:about="#nasq_10_nf_tr-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nasq_10_nf_tr.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                            <dcat:distribution><dcat:Distribution rdf:about="#nasq_10_nf_tr-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/nasq_10_nf_tr.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                          <cr:tag>national accounts</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#nasq_10_nf_tr"/></rdf:Description>
+                        
+                    
+                  <skos:Concept rdf:about="#ei_qna_e95"><rdfs:label>National accounts - ESA 1995</rdfs:label><skos:prefLabel xml:lang="en">National accounts - ESA 1995</skos:prefLabel><skos:prefLabel xml:lang="fr">Comptes nationaux - SEC 1995</skos:prefLabel><skos:prefLabel xml:lang="de">Volkswirtschaftliche Gesamtrechnungen - ESVG 1995</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#ei_qna_r1"><skos:broader rdf:resource="#ei_qna_e95"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_qna_r2"><skos:broader rdf:resource="#ei_qna_e95"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#ei_qna_sect"><skos:broader rdf:resource="#ei_qna_e95"/></rdf:Description></skos:narrower></skos:Concept>
+                      <skos:Concept rdf:about="#ei_qna_r1"><rdfs:label>Aggregates by branch - NACE Rev. 1.1</rdfs:label><skos:prefLabel xml:lang="en">Aggregates by branch - NACE Rev. 1.1</skos:prefLabel><skos:prefLabel xml:lang="fr">Agrégats par branche - NACE Rév. 1.1</skos:prefLabel><skos:prefLabel xml:lang="de">Aggregate nach Wirtschaftsbereich - NACE Rev. 1.1</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                        
+                      <skos:Concept rdf:about="#ei_qna_r2"><rdfs:label>Aggregates by branch - NACE Rev. 2</rdfs:label><skos:prefLabel xml:lang="en">Aggregates by branch - NACE Rev. 2</skos:prefLabel><skos:prefLabel xml:lang="fr">Agrégats par branche - NACE Rév. 2</skos:prefLabel><skos:prefLabel xml:lang="de">Aggregate nach Wirtschaftsbereich - NACE Rev. 2</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                          
+                        
+                      <skos:Concept rdf:about="#ei_qna_sect"><rdfs:label>Quarterly Sector Accounts</rdfs:label><skos:prefLabel xml:lang="en">Quarterly Sector Accounts</skos:prefLabel><skos:prefLabel xml:lang="fr">Comptes de secteurs trimestriels</skos:prefLabel><skos:prefLabel xml:lang="de">Vierteljährliche Sektorkonten</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                          
+                          
+                        
+                    
+                
+              <skos:Concept rdf:about="#ei_hp"><rdfs:label>Housing price statistics</rdfs:label><skos:prefLabel xml:lang="en">Housing price statistics</skos:prefLabel><skos:prefLabel xml:lang="fr">Statistiques des prix des logements</skos:prefLabel><skos:prefLabel xml:lang="de">Hauspreisstatistik</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/></skos:Concept>
+                  
+                
+            
+          <skos:Concept rdf:about="#reg"><rdfs:label>Regional statistics by NUTS classification</rdfs:label><skos:prefLabel xml:lang="en">Regional statistics by NUTS classification</skos:prefLabel><skos:prefLabel xml:lang="fr">Statistiques régionales par classification NUTS</skos:prefLabel><skos:prefLabel xml:lang="de">Regionalstatistiken nach NUTS Klassifikation</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#reg_agr"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_dem"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_eco10"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_eco"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_educ"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_sct"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_sbs"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_bd"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_hlth"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_tour"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_tran"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_lmk"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_lcs"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_isoc"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_env"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ilc"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_crim"><skos:broader rdf:resource="#reg"/></rdf:Description></skos:narrower></skos:Concept>
+              <skos:Concept rdf:about="#reg_agr"><rdfs:label>Regional agriculture statistics</rdfs:label><skos:prefLabel xml:lang="en">Regional agriculture statistics</skos:prefLabel><skos:prefLabel xml:lang="fr">Statistiques agricoles régionales</skos:prefLabel><skos:prefLabel xml:lang="de">Regionale Agrarstatistiken</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#reg_aei"><skos:broader rdf:resource="#reg_agr"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef"><skos:broader rdf:resource="#reg_agr"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_apro"><skos:broader rdf:resource="#reg_agr"/></rdf:Description></skos:narrower><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#agr_r_accts"/></skos:Concept>
+                  <skos:Concept rdf:about="#reg_aei"><rdfs:label>Agri-environmental indicators</rdfs:label><skos:prefLabel xml:lang="en">Agri-environmental indicators</skos:prefLabel><skos:prefLabel xml:lang="fr">Indicateurs agroenvironnementaux</skos:prefLabel><skos:prefLabel xml:lang="de">Agrarumweltindikatoren</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#aei_fm_ms"/></skos:Concept>
+                      <void:Dataset rdf:about="#aei_fm_ms"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#reg_aei"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=aei_fm_ms"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/aei_fm_ms.rdf.gz"/>
+                        <rdfs:label>Manure storage facilities by NUTS 3 regions</rdfs:label><cr:tag>nuts3</cr:tag><dcterms:title xml:lang="en">Manure storage facilities by NUTS 3 regions</dcterms:title>
+                        <dcterms:title xml:lang="fr">Equipements pour le stockage des effluents d'élevage par région NUTS 3</dcterms:title>
+                        <dcterms:title xml:lang="de">Lagereinrichtung für Wirtschaftsdünger tierischer Herkunft nach NUTS-3-Regionen</dcterms:title>
+                        <skos:notation>aei_fm_ms</skos:notation>
+                        <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-06-11</dcterms:modified>
+                        
+                        <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2000</dataStart>
+                        <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2003</dataEnd>
+                        <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11872</void:entities>
+                        
+                        
+                        
+                        
+                        
+                        
+                        <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/aei_fm_ms_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                        <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#aei_fm_ms_esms"><rdfs:label>ESMS Metadata: aei_fm_ms_esms</rdfs:label></rdf:Description></esms>
+                        <dcat:distribution><dcat:Distribution rdf:about="#aei_fm_ms-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/aei_fm_ms.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                        <dcat:distribution><dcat:Distribution rdf:about="#aei_fm_ms-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/aei_fm_ms.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                      </void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#aei_fm_ms"/></rdf:Description>
+                    
+                  <skos:Concept rdf:about="#reg_ef"><rdfs:label>Structure of agricultural holdings</rdfs:label><skos:prefLabel xml:lang="en">Structure of agricultural holdings</skos:prefLabel><skos:prefLabel xml:lang="fr">Structure des exploitations agricoles</skos:prefLabel><skos:prefLabel xml:lang="de">Struktur landwirtschaftlicher Betriebe</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#reg_ef_2010"><skos:broader rdf:resource="#reg_ef"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef_h"><skos:broader rdf:resource="#reg_ef"/></rdf:Description></skos:narrower></skos:Concept>
+                      <skos:Concept rdf:about="#reg_ef_2010"><rdfs:label>Structure of agricultural holdings 2010</rdfs:label><skos:prefLabel xml:lang="en">Structure of agricultural holdings 2010</skos:prefLabel><skos:prefLabel xml:lang="fr">Structure des exploitations agricoles 2010</skos:prefLabel><skos:prefLabel xml:lang="de">Struktur landwirtschaftlicher Betriebe 2010</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><skos:narrower><rdf:Description rdf:about="#reg_ef_kv"><skos:broader rdf:resource="#reg_ef_2010"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef_po"><skos:broader rdf:resource="#reg_ef_2010"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef_ols"><skos:broader rdf:resource="#reg_ef_2010"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef_molf"><skos:broader rdf:resource="#reg_ef_2010"/></rdf:Description></skos:narrower><skos:narrower><rdf:Description rdf:about="#reg_ef_pm"><skos:broader rdf:resource="#reg_ef_2010"/></rdf:Description></skos:narrower></skos:Concept>
+                          <skos:Concept rdf:about="#reg_ef_kv"><rdfs:label>Key farm variables</rdfs:label><skos:prefLabel xml:lang="en">Key farm variables</skos:prefLabel><skos:prefLabel xml:lang="fr">Variables clés sur les exploitations agricoles</skos:prefLabel><skos:prefLabel xml:lang="de">Wichtige variablen landwirtschaftlicher Betriebe</skos:prefLabel><skos:inScheme rdf:resource="#TOC"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#ef_kvaareg"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#ef_kvecsleg"/><hasDataset xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#" rdf:resource="#ef_kvftreg"/></skos:Concept>
+                              <void:Dataset rdf:about="#ef_kvaareg"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#reg_ef_kv"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=ef_kvaareg"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/ef_kvaareg.rdf.gz"/>
+                                <rdfs:label>Key farm variables: area, livestock (LSU), labour force and standard output (SO) by agricultural size of farm (UAA), legal status of holding and NUTS 2 regions</rdfs:label><cr:tag>nuts2</cr:tag><dcterms:title xml:lang="en">Key farm variables: area, livestock (LSU), labour force and standard output (SO) by agricultural size of farm (UAA), legal status of holding and NUTS 2 regions</dcterms:title>
+                                <dcterms:title xml:lang="fr">Variables clés sur les exploitations agricoles: superficies, cheptel (UGB), main d'oeuvre et production standard (PS) selon la taille de l'exploitation en SAU et la personnalité juridique de l'exploitation et par région NUTS 2</dcterms:title>
+                                <dcterms:title xml:lang="de">Wichtige Variablen: Flächen, Viehbestand (GVE), Arbeitskräfte (SO) nach landwirtschaftlicher Fläche, Rechtsform und NUTS-2-Regionen</dcterms:title>
+                                <skos:notation>ef_kvaareg</skos:notation>
+                                <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-02</dcterms:modified>
+                                
+                                <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2005</dataStart>
+                                <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2013</dataEnd>
+                                <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">185931</void:entities>
+                                
+                                
+                                
+                                
+                                
+                                
+                                <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ef_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                                <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ef_esms"><rdfs:label>ESMS Metadata: ef_esms</rdfs:label></rdf:Description></esms>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvaareg-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvaareg.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvaareg-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvaareg.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                              <cr:tag>agriculture holdings</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#ef_kvaareg"/></rdf:Description>
+                              <void:Dataset rdf:about="#ef_kvecsleg"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#reg_ef_kv"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=ef_kvecsleg"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/ef_kvecsleg.rdf.gz"/>
+                                <rdfs:label>Key variables: area, livestock (LSU), labour force and standard output (SO) by economic size of farm (SO in Euro), legal status of holding and NUTS 2 regions</rdfs:label><cr:tag>nuts2</cr:tag><dcterms:title xml:lang="en">Key variables: area, livestock (LSU), labour force and standard output (SO) by economic size of farm (SO in Euro), legal status of holding and NUTS 2 regions</dcterms:title>
+                                <dcterms:title xml:lang="fr">Variables clés sur les exploitations agricoles: superficies, cheptel (UGB), main d'oeuvre et production standard (PS) selon la dimension économique (PS en Euro) et la personnalité juridique de l'exploitation et par région NUTS 2</dcterms:title>
+                                <dcterms:title xml:lang="de">Wichtige Variablen: Flächen, Viehbestand (GVE), Arbeitskräfte und Standardoutput(SO) nach wirtschaftlicher Betriebsgröße (SO in Euro), Rechtsform und NUTS-2-Regionen</dcterms:title>
+                                <skos:notation>ef_kvecsleg</skos:notation>
+                                <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-02</dcterms:modified>
+                                
+                                <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2005</dataStart>
+                                <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2013</dataEnd>
+                                <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">238020</void:entities>
+                                
+                                
+                                
+                                
+                                
+                                
+                                <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ef_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                                <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ef_esms"><rdfs:label>ESMS Metadata: ef_esms</rdfs:label></rdf:Description></esms>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvecsleg-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvecsleg.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvecsleg-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvecsleg.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                              <cr:tag>agriculture holdings</cr:tag></void:Dataset><rdf:Description rdf:about="#DCATCatalog"><dcat:dataset rdf:resource="#ef_kvecsleg"/></rdf:Description>
+                              <void:Dataset rdf:about="#ef_kvftreg"><rdf:type rdf:resource="http://www.w3.org/ns/dcat#Dataset"/><dcterms:creator rdf:resource="#Eurostat"/><dcterms:publisher rdf:resource="#Eurostat"/><cc:license rdf:resource="http://creativecommons.org/licenses/by/3.0/lu/"/><cc:morePermissions rdf:resource="http://ec.europa.eu/geninfo/copyright_en.htm"/><dcterms:subject rdf:resource="#reg_ef_kv"/><foaf:isPrimaryTopicOf rdf:resource="http://appsso.eurostat.ec.europa.eu/nui/show.do?lang=en&amp;dataset=ef_kvftreg"/><void:dataDump rdf:resource="http://rdfdata.eionet.europa.eu/eurostat/data/ef_kvftreg.rdf.gz"/>
+                                <rdfs:label>Key variables: area, livestock (LSU), labour force and standard output (SO) by type of farming (2-digit) and NUTS 2 regions</rdfs:label><cr:tag>nuts2</cr:tag><dcterms:title xml:lang="en">Key variables: area, livestock (LSU), labour force and standard output (SO) by type of farming (2-digit) and NUTS 2 regions</dcterms:title>
+                                <dcterms:title xml:lang="fr">Variables clés sur les exploitations agricoles: superficies, cheptel (UGB), main d'oeuvre et production standard (PS) selon l'orientation technico-économique (2 chiffres) et par région NUTS 2</dcterms:title>
+                                <dcterms:title xml:lang="de">Wichtige Variablen: Flächen, Viehbestand (GVE), Arbeitskräfte und Standardoutput (SO) nach betriebswirtschaftlicher Ausrichtung (2-stellig) und NUTS-2-Regionen</dcterms:title>
+                                <skos:notation>ef_kvftreg</skos:notation>
+                                <dcterms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-02</dcterms:modified>
+                                
+                                <dataStart xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2005</dataStart>
+                                <dataEnd xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#">2013</dataEnd>
+                                <void:entities rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">175973</void:entities>
+                                
+                                
+                                
+                                
+                                
+                                
+                                <metadata xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><dctype:Text rdf:about="http://ec.europa.eu/eurostat/cache/metadata/en/ef_esms.htm"><rdfs:label>Metadata as HTML web page</rdfs:label></dctype:Text></metadata>
+                                <esms xmlns="http://rdfdata.eionet.europa.eu/eurostat/property#"><rdf:Description rdf:about="metadata/esms.rdf#ef_esms"><rdfs:label>ESMS Metadata: ef_esms</rdfs:label></rdf:Description></esms>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvftreg-tsv"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvftreg.tsv.gz"/><rdfs:label>Download file in tsv format</rdfs:label><dcterms:format rdf:resource="#MT-tsv"/></dcat:Distribution></dcat:distribution>
+                                <dcat:distribution><dcat:Distribution rdf:about="#ef_kvftreg-sdmx"><dcat:downloadURL rdf:resource="http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?file=data/ef_kvftreg.sdmx.zip"/><rdfs:label>Download file in sdmx format</rdfs:label><dcterms:format rdf:resource="#MT-sdmx"/></dcat:Distribution></dcat:distribution>
+                              <cr:tag>agriculture holdings</cr:tag></void:Dataset></rdf:RDF>

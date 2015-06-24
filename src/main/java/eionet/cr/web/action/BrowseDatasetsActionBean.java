@@ -30,20 +30,18 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.sparqlClient.helpers.QueryCachedMap;
 import eionet.cr.web.util.CustomPaginatedList;
 import net.sourceforge.stripes.action.*;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Action bean that provides functions for browsing VoID (Vocabulary of Interlinked Datasets) datasets. Browsing done by two facets:
  * dct:creator and dct:subject, where "dct" stands for DublinCore Terms (http://purl.org/dc/terms/).
  *
- * @author jaanus
+ * @author jaanus, George Sofianos
  */
 @UrlBinding("/browseDatasets.action")
 public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
@@ -93,6 +91,9 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
     /** The substring that dcterms:title should contain if specified by user. */
     private String titleFilter;
 
+    /** The facet option to show only harvested sources **/
+    private boolean harvestedCheck;
+
     /**
      *
      * @return
@@ -119,7 +120,7 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
             BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
 
             Pair<Integer, List<VoidDatasetsResultRow>> pair = null;
-            pair = dao.findDatasets(creator, subject, titleFilter, pagingRequest, sortingRequest);
+            pair = dao.findDatasets(creator, subject, titleFilter, harvestedCheck, pagingRequest, sortingRequest);
             int matchCount = 0;
             if (pair != null) {
                 datasets = pair.getRight();
@@ -133,20 +134,58 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
             LOGGER.trace(datasets.size() + " datasets found!");
             LOGGER.trace("Populating available creators and subjects");
 
+            // create a buffer to keep the last (n) keys
+            Map availableCreatorsMap = (Map) getSession().getAttribute("availableCreatorsMap");
+            Map availableSubjectsMap = (Map) getSession().getAttribute("availableSubjectsMap");
+
+            // create session available data, simulating a simple cache
+            if (availableCreatorsMap == null) {
+                availableCreatorsMap = new QueryCachedMap<List<String>, List<String>>();
+            }
+            if (availableSubjectsMap == null) {
+                availableSubjectsMap = new QueryCachedMap<List<String>, List<String>>();
+            }
+
             if (isCreatorsChanged()) {
                 LOGGER.trace("Creators changed");
-                availableSubjects = dao.findSubjects(creator);
-                // availableCreators = dao.findCreators(availableSubjects);
-                availableCreators = dao.findCreators(null);
+
+                if (!availableSubjectsMap.containsKey(creator)) {
+                    availableSubjectsMap.put(creator,dao.findSubjects(creator));
+                }
+
+                if (!availableCreatorsMap.containsKey(null)) {
+                    availableCreatorsMap.put(null,dao.findCreators(null));
+                }
+                availableCreators = (List) availableCreatorsMap.get(null);
+                availableSubjects = (List) availableSubjectsMap.get(creator);
+
             } else if (isSubjectsChanged()) {
                 LOGGER.trace("Subjects changed");
-                availableCreators = dao.findCreators(subject);
-                // availableSubjects = dao.findSubjects(availableCreators);
-                availableSubjects = dao.findSubjects(null);
+
+                if (!availableCreatorsMap.containsKey(subject)) {
+                    availableCreatorsMap.put(subject,dao.findCreators(subject));
+                }
+
+                if (!availableSubjectsMap.containsKey(null)) {
+                    availableSubjectsMap.put(null,dao.findSubjects(null));
+                }
+                availableCreators = (List) availableCreatorsMap.get(subject);
+                availableSubjects = (List) availableSubjectsMap.get(null);
+
             } else {
-                availableCreators = dao.findCreators(subject);
-                availableSubjects = dao.findSubjects(creator);
+                if (!availableCreatorsMap.containsKey(subject)) {
+                    availableCreatorsMap.put(subject,dao.findCreators(subject));
+                }
+
+                if (!availableSubjectsMap.containsKey(creator)) {
+                    availableSubjectsMap.put(creator,dao.findSubjects(creator));
+                }
+                availableCreators = (List) availableCreatorsMap.get(subject);
+                availableSubjects = (List) availableSubjectsMap.get(creator);
             }
+
+            getSession().setAttribute("availableCreatorsMap", availableCreatorsMap);
+            getSession().setAttribute("availableSubjectsMap", availableSubjectsMap);
 
             beforeRender();
             return new ForwardResolution(BROWSE_DATASETS_JSP);
@@ -357,4 +396,15 @@ public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
     public void setTitleFilter(String titleFilter) {
         this.titleFilter = titleFilter;
     }
+
+    /**
+     * @return true or false for already harvested state
+     */
+    public boolean getHarvestedCheck() { return harvestedCheck; }
+
+    /**
+     * @param harvestedCheck set harvested state check true or false
+     */
+    public void setHarvestedCheck(boolean harvestedCheck) { this.harvestedCheck = harvestedCheck; }
+
 }
