@@ -38,19 +38,14 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.FileUploadEncoding;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -64,6 +59,7 @@ import java.util.Map;
  * CSV upload action bean.
  *
  * @author Jaanus Heinlaid
+ * @author George Sofianos
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
@@ -179,6 +175,10 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution init() {
+        if (folderUri == null) {
+            addSystemMessage("You need to have a folder selected before uploading a file.");
+            return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND);
+        }
         if (!uploadAllowed()) {
             addSystemMessage("No permission to upload CSV/TSV file.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);

@@ -172,6 +172,13 @@
     <listener>
         <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
     </listener>
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Errors -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/pages/common/pagenotfound.jsp</location>
+    </error-page>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
