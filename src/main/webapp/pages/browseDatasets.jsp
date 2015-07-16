@@ -56,7 +56,7 @@
 
         <h1>Browse VoID datasets</h1>
 
-        <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post" style="margin-top:20px">
+        <crfn:form id="filtersForm" beanclass="${actionBean['class'].name}" method="post" style="margin-top:20px">
 
             <div>
                 <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;

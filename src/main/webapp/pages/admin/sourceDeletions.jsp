@@ -47,7 +47,7 @@
 
             <div style="width:100%;padding-top:10px">
 
-                <stripes:form id="deletionQueueForm" method="post" beanclass="${actionBean.class.name}">
+                <stripes:form id="deletionQueueForm" method="post" beanclass="${actionBean['class'].name}">
 
                     <div style="margin-bottom:10px">
 	                    <stripes:label for="filterText" class="question">URL filter:</stripes:label>

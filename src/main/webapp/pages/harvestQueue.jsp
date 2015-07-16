@@ -93,7 +93,7 @@
                             </c:if>
                         </c:forEach>
 
-                        <crfn:form id="resultSetForm" beanclass="${actionBean.class.name}" method="post">
+                        <crfn:form id="resultSetForm" beanclass="${actionBean['class'].name}" method="post">
 
                             <display:table name="${actionBean.urgentQueue}" class="sortable" pagesize="20" sort="list" id="queueItem" htmlId="queueItems" requestURI="${actionBean.urlBinding}" style="width:100%">
 

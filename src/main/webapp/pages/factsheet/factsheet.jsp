@@ -131,7 +131,7 @@
                                         </c:if>
                                         <c:if test="${harvestAllowed && !actionBean.compiledDataset}">
                                             <li>
-                                                <stripes:url beanclass="${actionBean.class.name}" event="harvest" var="harvestUrl">
+                                                <stripes:url beanclass="${actionBean['class'].name}" event="harvest" var="harvestUrl">
                                                     <stripes:param name="uri" value="${actionBean.uri}"/>
                                                 </stripes:url>
                                                 <a id="harvestLink" href="${harvestUrl}">Harvest</a>
@@ -299,7 +299,7 @@
                                                 <ul>
                                                     <c:if test="${actionBean.currentlyHarvested==false}">
                                                         <li>
-                                                            <stripes:url beanclass="${actionBean.class.name}" event="harvest" var="harvestUrl">
+                                                            <stripes:url beanclass="${actionBean['class'].name}" event="harvest" var="harvestUrl">
                                                     			<stripes:param name="uri" value="${actionBean.uri}"/>
                                                 			</stripes:url>
                                                 			<a id="harvestLink" href="${harvestUrl}">Harvest</a>

@@ -39,7 +39,7 @@
         <%-- The form --%>
 
         <div style="padding-top:20px">
-            <crfn:form id="form1" beanclass="${actionBean.class.name}" method="post">
+            <crfn:form id="form1" beanclass="${actionBean['class'].name}" method="post">
                 <fieldset>
                     <legend style="font-weight:bold">The query:</legend>
                     <pre style="font-size:0.75em;max-height:130px;overflow:auto"><c:out value="${actionBean.queryConf.query}" /></pre>

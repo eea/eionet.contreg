@@ -5,15 +5,15 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="SPARQL endpoint harvest query">
 
     <stripes:layout-component name="head">
-    
+
         <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
-        
+
         <script type="text/javascript">
         // <![CDATA[
             ( function($) {
                 $(document).ready(
                     function(){
-                        
+
                         // Open prefixes dialog
                         $("#prefixesLink").click(function() {
                             $('#prefixesDialog').dialog('open');
@@ -31,7 +31,7 @@
                             $('#prefixesDialog').dialog("close");
                             return true;
                         });
-                        
+
                         // The handling of useful namespace clicks
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
@@ -83,7 +83,7 @@
         <%-- The section that displays the query's properties, editable or not, depending on the event. --%>
 
         <div style="margin-top:20px">
-            <crfn:form id="queryForm" beanclass="${actionBean.class.name}" method="post" focus="first">
+            <crfn:form id="queryForm" beanclass="${actionBean['class'].name}" method="post" focus="first">
                 <table>
                     <tr>
                         <td>
@@ -200,11 +200,11 @@
                 </c:if>
             </c:if>
         </div>
-        
+
         <%-- The "Useful namesoaces" dialog, hidden by default --%>
-            
+
 	    <div id="prefixesDialog" title="Useful namespaces">
-	        
+
 	        <c:if test="${empty actionBean.usefulNamespaces}">
 	            <p>None found!</p>
 	        </c:if>
@@ -216,7 +216,7 @@
 	            </ul>
 	        </c:if>
 	        <button id="closePrefixesDialog">Close</button>
-	        
+
 	    </div>
 
     </stripes:layout-component>

@@ -54,7 +54,7 @@
                             </c:when>
                             <c:otherwise>
                                 <li>
-                                    <stripes:link beanclass="${actionBean.class.name}">
+                                    <stripes:link beanclass="${actionBean['class'].name}">
                                         <c:out value="${sourceType.title}"/>
                                         <stripes:param name="type" value="${sourceType}"/>
                                         <stripes:param name="searchString" value="${actionBean.searchString}"/>
