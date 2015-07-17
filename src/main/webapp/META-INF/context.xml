@@ -7,7 +7,7 @@
                 auth="Container"
                 type="javax.sql.DataSource"
                 description="Connection used by the harvester"
-                maxActive="10"
+                maxActive="40"
                 maxIdle="10"
                 maxWait="10000"
                 username="${virtuoso.db.usr}"
