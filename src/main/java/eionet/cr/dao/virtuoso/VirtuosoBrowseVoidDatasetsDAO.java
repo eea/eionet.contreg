@@ -58,7 +58,10 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
         sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n");
         sb.append("PREFIX void: <http://rdfs.org/ns/void#>\n");
         sb.append("\n");
-        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects min(xsd:int(bound(?refreshed))) AS ?imported\n");
+        sb.append("SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects ?imported \n");
+        sb.append("WHERE {\n");
+        sb.append("{\n");
+        sb.append("SELECT ?dataset ?label ?creator ?subject min(xsd:int(bound(?refreshed))) AS ?imported\n");
         sb.append("  WHERE {\n");
         sb.append("   ?dataset a void:Dataset ;\n");
         sb.append("     dcterms:title ?label ;\n");
@@ -97,7 +100,7 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             sb.append("  OPTIONAL {?dataset dcterms:subject ?usubject .\n");
             sb.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
         }
-        sb.append("} GROUP BY ?dataset ?label ?creator ?subjects\n");
+        sb.append("} GROUP BY ?dataset ?label ?creator ?subject\n");
         if (sortingRequest != null && sortingRequest.getSortingColumnName() != null) {
             sb.append("ORDER BY " + sortingRequest.getSortOrder().toSQL() + "(UCASE(str(?" + sortingRequest.getSortingColumnName() + ")))\n");
         }
@@ -108,6 +111,8 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             sb.append("OFFSET " + pagingRequest.getOffset() + "\n");
             sb.append("LIMIT " + pagingRequest.getItemsPerPage());
         }
+        sb.append("}\n");
+        sb.append("}\n");
         List<VoidDatasetsResultRow> datasets = executeSPARQL(sb.toString(), bindings, new VoidDatasetsReader());
 
         int rowCount = 0;
@@ -121,7 +126,10 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
             countQuery.append("SELECT (COUNT(*) AS ?total)\n");
             countQuery.append("WHERE {\n");
             countQuery.append(" {\n");
-            countQuery.append(" SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects min(xsd:int(bound(?refreshed))) AS ?imported\n");
+            countQuery.append(" SELECT ?dataset ?label ?creator sql:group_concat(?subject,', ') AS ?subjects ?imported \n");
+            countQuery.append("  WHERE {\n");
+            countQuery.append(" {\n");
+            countQuery.append("SELECT ?dataset ?label ?creator ?subject min(xsd:int(bound(?refreshed))) AS ?imported \n");
             countQuery.append("  WHERE {\n");
             countQuery.append("   ?dataset a void:Dataset ;\n");
             countQuery.append("     dcterms:title ?label;\n");
@@ -159,6 +167,8 @@ public class VirtuosoBrowseVoidDatasetsDAO extends VirtuosoBaseDAO implements Br
                 countQuery.append("           ?usubject rdfs:label ?subject FILTER (LANG(?subject) IN ('en','')) }\n");
             }
             countQuery.append("  }\n");
+            countQuery.append(" }\n");
+            countQuery.append(" }\n");
             countQuery.append(" }\n");
             countQuery.append(" }\n");
            // countQuery.append("} GROUP BY ?dataset ?label ?creator\n");
