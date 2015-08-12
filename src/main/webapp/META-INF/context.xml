@@ -13,7 +13,11 @@
                 username="${virtuoso.db.usr}"
                 password="${virtuoso.db.pwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
-                url="${virtuoso.db.url}">
+                url="${virtuoso.db.url}"
+                removeAbandoned="true"
+                removeAbandonedTimeout="60"
+                logAbandoned="true"
+                >
     </Resource>
 
     <Resource name="jdbc/readOnlyRepo"
