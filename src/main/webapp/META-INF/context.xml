@@ -3,6 +3,7 @@
 
     <Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr3." />
 
+    <!-- This configuration assumes Apache DBCP is used. Tomcat DBCP has different parameters -->
     <Resource name="jdbc/readWriteRepo"
                 auth="Container"
                 type="javax.sql.DataSource"
@@ -14,9 +15,10 @@
                 password="${virtuoso.db.pwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}"
-                removeAbandoned="true"
-                removeAbandonedTimeout="60"
-                logAbandoned="true"
+                removeAbandonedOnMaintenance="true"
+                removeAbandonedTimeout="300"
+                timeBetweenEvictionRunsMillis="300000"
+                logAbandoned="false"
                 >
     </Resource>
 
@@ -25,15 +27,12 @@
                 type="javax.sql.DataSource"
                 description="Connection for READ-ONLY queries (sparql endpoint, factsheets)"
                 maxActive="40"
-                maxIdle="30"
+                maxIdle="10"
                 maxWait="10000"
                 username="${virtuoso.db.rousr}"
                 password="${virtuoso.db.ropwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}"
-                removeAbandoned="true"
-                removeAbandonedTimeout="60"
-                logAbandoned="true"
                 >
     </Resource>
 
