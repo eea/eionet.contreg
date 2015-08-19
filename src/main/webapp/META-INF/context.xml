@@ -3,7 +3,9 @@
 
     <Logger className="org.apache.catalina.logger.FileLogger" timestamp="true" suffix=".txt" prefix="cr3." />
 
-    <!-- This configuration assumes Apache DBCP is used. Tomcat DBCP has different parameters -->
+    <!-- This configuration assumes Apache Commons DBCP is used. Tomcat DBCP has different parameters
+         removeAbandoned is for version 1, removeAbandonedOnMaintenance is for version 2.
+     -->
     <Resource name="jdbc/readWriteRepo"
                 auth="Container"
                 type="javax.sql.DataSource"
@@ -15,6 +17,7 @@
                 password="${virtuoso.db.pwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}"
+                removeAbandoned="true"
                 removeAbandonedOnMaintenance="true"
                 removeAbandonedTimeout="300"
                 timeBetweenEvictionRunsMillis="300000"
