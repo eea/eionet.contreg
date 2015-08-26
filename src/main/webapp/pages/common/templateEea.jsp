@@ -16,6 +16,7 @@
 
         <link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen"/>
         <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="<c:url value="/css/eea.css"/>" media="screen"/>
         <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 
         <link type="text/css" href="<c:url value="/css/smoothness/jquery-ui-1.8.16.custom.css" />" rel="stylesheet" />
@@ -36,9 +37,10 @@
         <crfn:template file="required_head.html"/>
     </head>
     <body>
-        <div id="visual-portal-wrapper">
-
+    
         <crfn:template file="header.html"/>
+        
+        <div id="visual-portal-wrapper">
 
         <!-- The wrapper div. It contains the three columns. -->
         <div id="portal-columns" class="visualColumnHideTwo">
@@ -170,8 +172,11 @@
             <div class="visualClear"><!-- --></div>
         </div>
         <!-- end column wrapper -->
-        <crfn:template file="footer.html"/>
+        
         </div>
+        
+        <crfn:template file="footer.html"/>
+        
     </body>
 </html>
 </stripes:layout-definition>
