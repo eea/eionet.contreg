@@ -98,13 +98,13 @@
                                 <c:when test="${actionBean.homeContext}">
                                     <c:choose>
                                         <c:when test="${actionBean.userAuthorized || actionBean.showPublic}" >
-                                            <div id="tabbedmenu">
+                                            <div class="tabbedmenu" id="tabbedmenu">
                                                 <ul>
                                                     <c:forEach items="${actionBean.tabs}" var="tab">
                                                         <c:if test="${actionBean.userAuthorized || tab.showPublic == actionBean.showpublicYes }" >
                                                             <c:choose>
                                                                   <c:when test="${actionBean.section == tab.tabType}" >
-                                                                    <li id="currenttab"><span><c:out value="${tab.title}"/></span></li>
+                                                                    <li id="currenttab"><a class="current"><c:out value="${tab.title}"/></a></li>
                                                                 </c:when>
                                                                 <c:otherwise>
                                                                     <li>

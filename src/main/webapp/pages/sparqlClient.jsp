@@ -335,7 +335,7 @@ while (l--) {
                 </div>
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">
-                        <label for="format" class="question" style="width: 200px;">Output format:</label>
+                        <label for="format" class="question">Output format:</label>
                         <stripes:select name="format" id="format">
                             <stripes:option value="text/html" label="HTML" />
                             <stripes:option value="text/html+" label="HTML+" />

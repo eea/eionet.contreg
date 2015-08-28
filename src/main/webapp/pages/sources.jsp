@@ -45,12 +45,12 @@
                     </c:if>
                 </div>
             </crfn:form>
-            <div id="tabbedmenu">
+            <div class="tabbedmenu" id="tabbedmenu">
                 <ul>
                     <c:forEach items="${actionBean.sourceTypes}" var="sourceType">
                         <c:choose>
                             <c:when test="${actionBean.type eq sourceType}" >
-                                <li id="currenttab"><span><c:out value="${sourceType.title}"/></span></li>
+                                <li id="currenttab"><a class="current"><c:out value="${sourceType.title}"/></a></li>
                             </c:when>
                             <c:otherwise>
                                 <li>

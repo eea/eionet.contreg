@@ -59,12 +59,12 @@
 
         </div>
 
-        <div id="tabbedmenu">
+        <div class="tabbedmenu" id="tabbedmenu">
             <ul>
                 <c:forEach items="${actionBean.queueTypes}" var="loopQueueType">
                     <c:choose>
                           <c:when test="${actionBean.queueType==loopQueueType.queueType}" >
-                            <li id="currenttab"><span><c:out value="${loopQueueType.title}"/></span></li>
+                            <li id="currenttab"><a class="current"><c:out value="${loopQueueType.title}"/></a></li>
                         </c:when>
                         <c:otherwise>
                             <li>

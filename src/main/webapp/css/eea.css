@@ -1,4 +1,4 @@
-/* This style is for Semantic Data Service (SDS) new layout*/
+/* This style is for Semantic Data Service (SDS) new layout  */
 
 #region-content div.documentActions {
     display: none;
@@ -21,5 +21,10 @@ div#visual-column-wrapper #portal-column-one {
     width: 190px;
     overflow: hidden;
     position: relative;
+}
+
+/* Type Search page */
+#portal-columns .btn-block {
+    display: block !important;
 }
 
