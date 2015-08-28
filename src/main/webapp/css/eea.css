@@ -1,0 +1,25 @@
+/* This style is for Semantic Data Service (SDS) new layout*/
+
+#region-content div.documentActions {
+    display: none;
+}
+
+div#visual-column-wrapper #portal-column-content {
+    width: 100%;
+    float: right;
+    margin-left: -190px;
+}
+
+div#visual-column-wrapper #content {
+    height: 100%;
+    margin: 0 0 0 190px;
+    padding-left: 1.3em;
+}
+
+div#visual-column-wrapper #portal-column-one {
+    float: left;
+    width: 190px;
+    overflow: hidden;
+    position: relative;
+}
+
