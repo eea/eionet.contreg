@@ -28,3 +28,10 @@ div#visual-column-wrapper #portal-column-one {
     display: block !important;
 }
 
+/* This is for the Operations button from top-right of page */
+#dropdown-operations li a:visited, #dropdown-operations li a:hover {
+    color: #fff !important;
+}
+#dropdown-operations li ul {
+    margin: 0;
+}
