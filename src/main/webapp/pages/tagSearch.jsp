@@ -53,7 +53,7 @@
         A <strong>tag</strong> is a non-hierarchical keyword or term assigned to a piece of information (such as an Internet bookmark, digital image, or computer file). This kind of metadata  helps describe an item and allows it to be found again by browsing or searching. Tags are generally chosen informally and personally by the item's creator or by its viewer.
         <strong>Tag cloud</strong> is a list of tags where size reflects popularity.
     </p>
-    <crfn:form action="/tagSearch.action" method="get">
+    <crfn:form action="/tagSearch.action" method="get" class="tag-search-form">
         <stripes:label for="tagText" class="question">
             <c:choose>
                 <c:when test="${empty actionBean.selectedTags}">Tag</c:when>
