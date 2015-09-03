@@ -27,7 +27,7 @@
         <stripes:layout-render name="/pages/tagcloud.jsp" />
     </div>
     <div class="action-box">
-        <h2>Recently discovered files</h2>
+        <h3>Recently discovered files</h3>
         <c:choose>
             <c:when test="${empty actionBean.recentFiles}">
                 <p class="system-msg">No recently discovered files found</p>

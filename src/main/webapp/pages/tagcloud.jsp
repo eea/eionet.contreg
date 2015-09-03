@@ -1,6 +1,6 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 <stripes:layout-definition>
-    <h2><a href="tagSearch.action" title="Tag search">Tag cloud</a></h2>
+    <h3><a href="tagSearch.action" title="Tag search">Tag cloud</a></h3>
     <div id ="cloud">
     <c:choose>
         <c:when test="${empty actionBean.tagCloud}">
