@@ -1,6 +1,7 @@
 /* This style is for Semantic Data Service (SDS) new layout  */
 
-input[type='text'] {
+input[type='text'], input[type='password'],
+#content form select, textarea {
     padding: 5px;
     font-size: 1.2em;
 }
@@ -72,10 +73,26 @@ div#visual-column-wrapper #portal-column-one {
 .formtable tr td {
     vertical-align: middle;
 }
+#region-content table.listing {
+    display: table !important;
+    width: 100%;
+}
+#resourcesResultList th a,
+#resourcesResultList th a:hover {
+    color: #fff !important;
+}
+#region-content .listingBar .listingPrevious,
+#region-content .listingBar .next {
+    min-width: initial;
+}
 
 /* Type Search page */
 #portal-columns .btn-block {
     display: block !important;
+}
+#region-content div fieldset {
+    border: none;
+    border-style: none;
 }
 
 /* Tag search page */
@@ -94,11 +111,43 @@ label.question {
     border: none;
     border-stlye: none;
 }
+#dataset thead th a,
+#dataset thead th a:hover {
+    color: #fff !important;
+}
+
+/* SPARQL endpoint page */
+#listItem thead th a,
+#listItem thead th a:hover {
+    color: #fff !important;
+}
+
+/* Harvest queue page */
+#harvestSource th a,
+#harvestSource th a:hover
+#queueItems thead th a,
+#queueItems thead th a:hover {
+    color: #fff !important;
+}
 
 /* For the Operations button from top-right of page */
-#dropdown-operations li a:visited, #dropdown-operations li a:hover {
+#dropdown-operations a:visited, 
+#dropdown-operations > li a:hover {
+    color: #fff !important;
+}
+#dropdown-operations li ul li a:link, #dropdown-operations li ul li a:visited {
     color: #fff !important;
 }
 #dropdown-operations li ul {
     margin: 0;
 }
+
+#wizard form table {
+    display: table;
+    width: 100%;
+}
+#registratioinslist th a,
+#registratioinslist th a:hover {
+    color: #fff !important;
+}
+

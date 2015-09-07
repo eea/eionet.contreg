@@ -2,12 +2,12 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ attribute name="tabs" required="true" type="java.util.ArrayList" %>
 
-<div id="tabbedmenu">
+<div id="tabbedmenu" class="tabbedmenu">
     <ul>
     <c:forEach items="${tabs}" var="tab">
         <c:choose>
             <c:when test="${tab.selected}">
-                <li id="currenttab"><span><c:out value="${tab.title}" /></span></li>
+                <li id="currenttab"><a class="current"><c:out value="${tab.title}" /></a></li>
             </c:when>
             <c:otherwise>
                 <li>

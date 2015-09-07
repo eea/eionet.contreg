@@ -155,8 +155,10 @@
 
             <display:setProperty name="paging.banner.item_name" value="dataset"/>
             <display:setProperty name="paging.banner.items_name" value="datasets"/>
-            <display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
-            <display:setProperty name="paging.banner.onepage" value=""/>
+	    <div class="listingBar">
+        	<display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
+        	<display:setProperty name="paging.banner.onepage" value=""/>
+	    </div>
 
             <display:column title='<span title="Title or label of the dataset, either supplied or derived from dataset URI.">Title</span>' sortable="true" sortProperty="label" style="width:50%;">
                 <stripes:link beanclass="${actionBean.factsheetActionBeanClass.name}" title="Go to the dataset factsheet">
