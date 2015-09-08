@@ -17,7 +17,7 @@ found at their websites.
 
 The necessary versions are as follows:
 
-* Java 1.6 or higher
+* Java 1.6 or 1.7 ( higher versions are not recommended due to incompatibility )
 * Maven 3.0.5 or higher
 * Tomcat 5.5 or higher
 
