@@ -142,6 +142,7 @@ label.question {
     margin: 0;
 }
 
+/* Misc */
 #wizard form table {
     display: table;
     width: 100%;
@@ -150,4 +151,9 @@ label.question {
 #registratioinslist th a:hover {
     color: #fff !important;
 }
-
+#region-content table.listing th a:link {
+    display: inline-block;
+}
+#region-content table.listing thead th {
+    text-align: center;
+}
