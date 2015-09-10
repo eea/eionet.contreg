@@ -127,7 +127,7 @@ label.question {
 
 /* Harvest queue page */
 #harvestSource th a,
-#harvestSource th a:hover
+#harvestSource th a:hover,
 #queueItems thead th a,
 #queueItems thead th a:hover {
     color: #fff !important;
@@ -139,7 +139,7 @@ label.question {
     color: #fff !important;
 }
 #dropdown-operations li ul li a:link, #dropdown-operations li ul li a:visited {
-    color: #fff !important;
+    color: #000 !important;
 }
 #dropdown-operations li ul {
     margin: 0;
