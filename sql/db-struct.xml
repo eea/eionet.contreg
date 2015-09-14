@@ -340,12 +340,20 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
             CREATE INDEX post_harvest_script_type_uri ON post_harvest_script (target_type_url)
         </sql>
     </changeSet>
-    
+
     <changeSet author="heinlja" id="rev-21">
         <comment>Helper flag for understanding if a harvest source is marked for deletion or not (1=yes, 0=no)</comment>
         <sql>
             ALTER TABLE "harvest_source"
             ADD COLUMN "delete_flag" SMALLINT DEFAULT 0
+        </sql>
+    </changeSet>
+
+    <changeSet id="rev-22" author="sofiageo">
+        <comment>A field indicating when the content was last modified</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "last_modified" DATETIME
         </sql>
     </changeSet>
 

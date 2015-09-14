@@ -32,6 +32,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 /**
  *
  * @author altnyris
+ * @author George Sofianos
  *
  */
 public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSourceDTO> {
@@ -53,6 +54,7 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
         harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
         harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
+        harvestSourceDTO.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
         harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
         harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
         harvestSourceDTO.setMediaType(rs.getString("MEDIA_TYPE"));
