@@ -1665,9 +1665,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
         URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
 
-        String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
-        URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
-
         int triplesLoaded = 0;
         boolean wasOrigEmpty = false;
         try {
@@ -1731,11 +1728,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
                     LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
 
-                    if (tCount > 0) {
-                        // XOR the temporary and original graphs.
-                        LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
-                        synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
-                    }
+                    // XOR the temporary and original graphs.
+                    LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
+                    synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
                 }
 
             } catch (Exception e) {
