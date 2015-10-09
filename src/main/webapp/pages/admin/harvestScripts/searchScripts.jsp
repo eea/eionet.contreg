@@ -39,7 +39,7 @@
                         <stripes:param name="id" value="${script.id}"/>
                     </stripes:link>
                 </display:column>
-                <display:column title='<span title="Source or type to which the script is specific, empty if all-source script">Specific to</span>' style="width:60%">
+                <display:column title='<span title="Source or type to which the script is specific, empty if all-source script">Specific to</span>' style="width:40%">
                     <c:if test="${not empty script.targetType}">
                         <stripes:link href="/admin/harvestScripts" title="List scripts of this target ${fn:toLowerCase(script.targetType)}" style="font-size:0.85em">
                             <c:out value="${script.targetUrl}"/>
@@ -52,6 +52,9 @@
                             <c:out value="All sources"/>
                         </stripes:link>
                     </c:if>
+                </display:column>
+                <display:column title='<span title="Script last modification time">Last modified</span>' style="width:20%" sortProperty="lastModified" sortable="true">
+                    <c:out value="${script.lastModified}"/>
                 </display:column>
 
             </display:table>
