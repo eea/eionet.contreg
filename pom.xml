@@ -8,6 +8,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <env>local</env>
         <javaVersion>1.6</javaVersion>
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
@@ -101,6 +102,7 @@
                 <configuration>
                     <!-- Disable JVM assertions when running surefire. Prevents from false JUnit assertion errors. -->
                     <enableAssertions>false</enableAssertions>
+                    <skipTests>false</skipTests>
                 </configuration>
             </plugin>
 
@@ -193,6 +195,7 @@
 
             <!-- Liquibase Maven plugin for database refactoring. -->
 
+            <!--
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
@@ -216,6 +219,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
         </plugins>
 
@@ -669,4 +673,185 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <profiles>
+        
+        <profile>
+          <id>it</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+          </activation>
+          <properties>
+            <!-- Database configurations -->
+            <env>unittest</env>
+            <database.port>1112</database.port>
+          </properties>
+
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.jolokia</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.13.4</version>
+                <configuration>
+                  <verbose>true</verbose>
+                  <logDate>default</logDate>
+                  <autoPull>true</autoPull>
+                  <images>
+                    <image>
+                      <alias>service</alias>
+                      <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}</name>
+                      <!-- <registry>dockerrepo.eionet.europa.eu:5000</registry> -->
+                      <build>
+                        <from>tomcat:6</from>
+                        <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
+                        <tags>
+                          <tag>latest</tag>
+                          <tag>${project.version}</tag>
+                        </tags>
+                        <assembly>
+                          <descriptor>assembly.xml</descriptor>
+                        </assembly>
+                        <env>
+                          <CATALINA_OPTS>-Djava.security.egd=file:/dev/./urandom</CATALINA_OPTS>
+                          <KEYSTORE_PASS>changeit</KEYSTORE_PASS>
+                        </env>
+			<volumes>
+                          <volume>/config</volume>
+                          <volume>/usr/local/tomcat/acl</volume>
+			</volumes>
+                        <runCmds>
+                          <run>rm -rf /usr/local/tomcat/webapps/*</run>
+                          <run>cp -r /maven/tomcat /usr/local</run>
+                          <!--<run>rm -f $CATALINA_HOME/conf/logging.properties</run>-->
+                        </runCmds>
+                        <ports>
+                          <port>8080</port>
+                          <port>8009</port>
+                        </ports>
+                        <!-- <cmd>catalina.sh run</cmd> -->
+                      </build>
+
+                      <run>
+                        <hostname>contreg</hostname>
+			<volumes>
+			  <bind>
+			    <volume>${project.basedir}/target/classes/acl:/usr/local/tomcat/acl</volume>
+			  </bind>
+			</volumes>
+                        <ports>
+                          <port>tomcat.port:8080</port>
+                        </ports>
+                        <links>
+                          <link>database:database</link>
+                        </links>
+                        <wait>
+                          <http>
+                            <!-- Check for this URL to return a 200 return code .... -->
+                            <url>http://${docker.host.address}:${tomcat.port}/</url>
+                          </http>
+                          <!-- ... but at max 40 seconds -->
+                          <time>40000</time>
+                        </wait>
+                        <log>
+                          <prefix>TC</prefix>
+                          <color>cyan</color>
+                        </log>
+                      </run>
+                    </image>
+
+                    <!-- This image is rebuilt every time. It is not suitable for persistent data -->
+                    <image>
+                      <alias>database</alias>
+                      <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}-db</name>
+                      <build>
+                        <from>tenforce/virtuoso</from> <!-- https://hub.docker.com/r/tenforce/virtuoso/ -->
+                        <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
+                        <tags>
+                          <tag>latest</tag>
+                          <tag>${project.version}</tag>
+                        </tags>
+                        <assembly>
+                          <descriptor>assembly-db.xml</descriptor>
+                        </assembly>
+                        <env>
+                          <VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>
+                          <SPARQL_UPDATE>true</SPARQL_UPDATE>
+                        </env>
+                        <runCmds>
+                          <run>cat /maven/1_create_users.sql >/sql-query.sql</run>
+                        </runCmds>
+                        <ports>
+                          <port>1111</port>
+                          <port>8890</port>
+                        </ports>
+                      </build>
+                      <run>
+                      <!--
+			<volumes>
+			  <bind>
+			    <volume>${project.basedir}/data:/var/lib/virtuoso/db</volume>
+			  </bind>
+			</volumes>
+                      -->
+                        <ports>
+                          <port>database.port:1111</port>
+                        </ports>
+                        <wait>
+                          <log>Server online at 1111</log>
+                          <time>30000</time>
+                        </wait>
+                        <log>
+                          <prefix>DB</prefix>
+                          <color>blue</color>
+                        </log>
+                      </run>
+                    </image>
+                  </images>
+                </configuration>
+
+                <!-- Hooking into the lifecycle -->
+                <executions>
+                  <execution>
+                    <id>start</id>
+                    <phase>pre-integration-test</phase>
+                    <goals>
+                      <goal>build</goal>
+                      <goal>start</goal>
+                    </goals>
+                  </execution>
+                  <execution>
+                    <id>stop</id>
+                    <phase>post-integration-test</phase>
+                    <goals>
+                      <goal>stop</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                  <systemPropertyVariables>
+                    <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
+                    <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
+                  </systemPropertyVariables>
+                </configuration>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>integration-test</goal>
+                      <goal>verify</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+
+            </plugins>
+          </build>
+        </profile>
+    </profiles>
 </project>

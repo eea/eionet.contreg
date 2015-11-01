@@ -3,7 +3,7 @@ package eionet.cr.dao.virtuoso;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class ExporterDAOTest extends VirtuosoExporterDAO {
      */
     @Test
     public void testGetQuery() {
-        HashMap<String, String> filters = new HashMap<String, String>();
+        LinkedHashMap<String, String> filters = new LinkedHashMap<String, String>();
         filters.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://rod.eionet.europa.eu/schema.rdf#Obligation");
         filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
         List<String> selectedPredicates = new ArrayList<String>();

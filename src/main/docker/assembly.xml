@@ -1,0 +1,37 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+<!-- This is the way to add files into the image -->
+  <!--
+  <files>
+    <file>
+      <source>src/main/docker/server.xml</source>
+      <outputDirectory>tomcat/conf</outputDirectory>
+      <destName>server.xml</destName>
+    </file>
+    <file>
+      <source>../../ServerConfiguration/log4j/tomcat-juli.jar</source>
+      <outputDirectory>tomcat/bin</outputDirectory>
+      <destName>tomcat-juli.jar</destName>
+    </file>
+    <file>
+      <source>../../ServerConfiguration/log4j/log4j.properties</source>
+      <outputDirectory>tomcat/lib</outputDirectory>
+      <destName>log4j.properties</destName>
+    </file>
+
+  </files>
+-->
+  <dependencySets>
+    <!-- Inject the war file into the image at /maven -->
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <includes>
+        <include>eionet.cr:cr3</include>
+      </includes>
+      <outputDirectory>tomcat/webapps</outputDirectory>
+      <outputFileNameMapping>ROOT.war</outputFileNameMapping>
+    </dependencySet>
+  </dependencySets>
+</assembly>
