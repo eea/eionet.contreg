@@ -8,6 +8,11 @@
       <outputDirectory>.</outputDirectory>
       <destName>1_create_users.sql</destName>
     </file>
+    <file>
+      <source>src/main/docker/virtuoso.ini</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>virtuoso.ini</destName>
+    </file>
   </files>
 
 </assembly>

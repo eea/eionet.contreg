@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.action.Message;
+import net.sourceforge.stripes.action.SimpleMessage;
 import net.sourceforge.stripes.controller.DefaultActionBeanPropertyBinder;
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
@@ -268,6 +270,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         UploadCSVActionBean actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
         MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
         assertEquals(200, response.getStatus());
+        //assertFalse(anyMessages(actionBean));
 
         // Assert that the file was created in CR filestore.
         File storedFile = FileStore.getByUri(TEST_FILE_URI);
@@ -388,6 +391,23 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         ctx.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
 
         return ctx;
+    }
+
+    /**
+     * Helper method to check if there were any messages for the user.
+     */
+    private boolean anyMessages(ActionBean aBean) {
+        String[] queues = { "systemMessages", "cautionMessages", "warningMessages" };
+
+        boolean foundOne = false;
+        for (String queue : queues) {
+            List<Message> messages = aBean.getContext().getMessages(queue);
+            for (Message message : messages) {
+                foundOne = true;
+                System.out.println(queue + ": " + message.getMessage(null));
+            }
+        }
+        return foundOne;
     }
 
     /**

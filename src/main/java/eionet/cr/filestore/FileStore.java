@@ -274,6 +274,7 @@ public final class FileStore {
 
         File file = new File(userDir, relativePath);
         if (!file.exists() || !file.isFile()) {
+            LOGGER.debug("File not found: " + file.getAbsolutePath());
             return null;
         } else {
             return file;

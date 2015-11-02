@@ -170,6 +170,8 @@
                                 <loadproperties srcFile="${env}.properties"/>
                                 <!-- Ensure that the "harvester.tempFileDir" directory exists. -->
                                 <mkdir dir="${harvester.tempFileDir}"/>
+                                <!-- Ensure that the "filestore.path" directory exists. -->
+                                <mkdir dir="${filestore.path}"/>
                                 <!-- Ensure that the "application.acl.folder" directory exists. -->
                                 <mkdir dir="${application.acl.folder}"/>
                                 <!-- Copy files from acl directory into "application.acl.folder", unless they already exist in the latter. -->
@@ -718,7 +720,7 @@
                         </env>
 			<volumes>
                           <volume>/config</volume>
-                          <volume>/usr/local/tomcat/acl</volume>
+                          <volume>/usr/local/tomcat/target</volume>
 			</volumes>
                         <runCmds>
                           <run>rm -rf /usr/local/tomcat/webapps/*</run>
@@ -736,7 +738,8 @@
                         <hostname>contreg</hostname>
 			<volumes>
 			  <bind>
-			    <volume>${project.basedir}/target/classes/acl:/usr/local/tomcat/acl</volume>
+			    <volume>${project.basedir}/target:/usr/local/tomcat/target</volume>
+                            <volume>/etc/localtime:/etc/localtime:ro</volume>
 			  </bind>
 			</volumes>
                         <ports>
@@ -775,10 +778,14 @@
                           <descriptor>assembly-db.xml</descriptor>
                         </assembly>
                         <env>
-                          <VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>
+                          <!--<VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>-->
                           <SPARQL_UPDATE>true</SPARQL_UPDATE>
                         </env>
+			<volumes>
+                          <volume>/var/lib/virtuoso/db/target</volume>
+			</volumes>
                         <runCmds>
+                          <run>cp /maven/virtuoso.ini /virtuoso.ini</run>
                           <run>cat /maven/1_create_users.sql >/sql-query.sql</run>
                         </runCmds>
                         <ports>
@@ -787,13 +794,12 @@
                         </ports>
                       </build>
                       <run>
-                      <!--
 			<volumes>
 			  <bind>
-			    <volume>${project.basedir}/data:/var/lib/virtuoso/db</volume>
+			    <volume>${project.basedir}/target:/var/lib/virtuoso/db/target</volume>
+                            <volume>/etc/localtime:/etc/localtime:ro</volume>
 			  </bind>
 			</volumes>
-                      -->
                         <ports>
                           <port>database.port:1111</port>
                         </ports>
