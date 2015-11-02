@@ -90,8 +90,15 @@ Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
 
-## 5. Unit tests
-For running unit tests a separate instance of Virtuoso has to be configured. This can be done as below:
+## 5. Integration tests
+For running unit tests a separate instance of Virtuoso has to be configured. If you have Docker available you can do:
+```
+mvn -Pit clean verify
+```
+The integration test will start up a virtuoso database on port 1112, then the application in Tomcat. The application will run the Liquibase scripts on the database, and then the integration tests will be run by the Maven program - not from the instance of Tomcat or Virtuoso.
+
+Otherwise this can be done manually as below:
+
 1. create a folder for test Virtuoso
 
 2. copy  file *virtuoso.ini* from Virtuoso folder to the created folder
