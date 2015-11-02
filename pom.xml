@@ -206,34 +206,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Liquibase Maven plugin for database refactoring. -->
-
-            <!--
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.0.4</version>
-                <configuration>
-                    <propertyFile>target/classes/liquibase.properties</propertyFile>
-                    <changeLogFile>sql/db-struct.xml</changeLogFile>
-                    <databaseClass>eionet.cr.util.liquibase.VirtuosoDatabase</databaseClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>Update test database</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <skip>${maven.test.skip}</skip>
-                            <propertyFile>target/test-classes/liquibase.properties</propertyFile>
-                        </configuration>
-                        <goals>
-                            <goal>update</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-
         </plugins>
 
         <!-- filters for src/main/resources and src/test/resources -->
@@ -854,6 +826,68 @@
                 <configuration>
                   <systemPropertyVariables>
                     <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
+                    <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
+                  </systemPropertyVariables>
+                </configuration>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>integration-test</goal>
+                      <goal>verify</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+
+            </plugins>
+          </build>
+        </profile>
+
+        <profile>
+          <id>manualit</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+          </activation>
+          <properties>
+            <env>unittest</env>
+            <database.port>1112</database.port>
+          </properties>
+
+          <build>
+            <plugins>
+              <!-- Liquibase Maven plugin for database refactoring. -->
+
+              <plugin>
+                  <groupId>org.liquibase</groupId>
+                  <artifactId>liquibase-maven-plugin</artifactId>
+                  <version>3.0.4</version>
+                  <configuration>
+                      <propertyFile>target/classes/liquibase.properties</propertyFile>
+                      <changeLogFile>sql/db-struct.xml</changeLogFile>
+                      <databaseClass>eionet.cr.util.liquibase.VirtuosoDatabase</databaseClass>
+                  </configuration>
+                  <executions>
+                      <execution>
+                          <id>Update test database</id>
+                          <phase>pre-integration-test</phase>
+                          <configuration>
+                              <skip>${maven.test.skip}</skip>
+                              <propertyFile>target/test-classes/liquibase.properties</propertyFile>
+                          </configuration>
+                          <goals>
+                              <goal>dropAll</goal>
+                              <goal>update</goal>
+                          </goals>
+                      </execution>
+                  </executions>
+              </plugin>
+
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                  <systemPropertyVariables>
                     <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
                   </systemPropertyVariables>
                 </configuration>

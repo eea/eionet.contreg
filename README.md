@@ -115,6 +115,7 @@ Otherwise this can be done manually as below:
 
 6. Add the test instance server parameters to *local.properties*
 
+7. Run `mvn -Pmanualit clean verify`
 
 ## 6. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
