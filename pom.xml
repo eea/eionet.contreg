@@ -853,6 +853,14 @@
             <database.port>1112</database.port>
           </properties>
 
+          <dependencies>
+            <dependency>
+                <groupId>eionet</groupId>
+                <artifactId>virtliquibase</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+          </dependencies>
+
           <build>
             <plugins>
               <!-- Liquibase Maven plugin for database refactoring. -->
@@ -864,7 +872,7 @@
                   <configuration>
                       <propertyFile>target/classes/liquibase.properties</propertyFile>
                       <changeLogFile>sql/db-struct.xml</changeLogFile>
-                      <databaseClass>eionet.cr.util.liquibase.VirtuosoDatabase</databaseClass>
+                      <databaseClass>eionet.liquibase.VirtuosoDatabase</databaseClass>
                   </configuration>
                   <executions>
                       <execution>
