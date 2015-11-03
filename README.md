@@ -19,7 +19,7 @@ The necessary versions are as follows:
 
 * Java 1.6 or 1.7 ( higher versions are not recommended due to incompatibility )
 * Maven 3.0.5 or higher
-* Tomcat 5.5 or higher
+* Tomcat 6.0 or higher
 
 ## 2. Download and install Virtuoso
 
@@ -63,7 +63,11 @@ Now you are ready to build your CR code. It is built with Maven.
 The following command assumes that Maven's executable (mvn) is on the command path,
 and that it is run while being in CR_SOURCE_HOME directory:
 
-    shell> mvn -Dmaven.test.skip=true clean install
+    shell> mvn clean install
+
+### 3.1 Unit tests
+
+When you ran the above command you probably noticed that it ran the unit tests. These are designed to not require any external assets such as a database, mail server etc. It is safe to run them. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
 
 ## 4. Import CR database creation scripts
 
@@ -92,9 +96,9 @@ Set up the triple store's full text indexing
 
 ## 5. Integration tests
 For running unit tests a separate instance of Virtuoso has to be configured. If you have Docker available you can do:
-```
-mvn -Pit clean verify
-```
+
+    shell> mvn -Pit clean verify
+
 The integration test will start up a virtuoso database on port 1112, then the application in Tomcat. The application will run the Liquibase scripts on the database, and then the integration tests will be run by the Maven program - not from the instance of Tomcat or Virtuoso.
 
 Otherwise this can be done manually as below:
@@ -116,6 +120,8 @@ Otherwise this can be done manually as below:
 6. Add the test instance server parameters to *local.properties*
 
 7. Run `mvn -Pmanualit clean verify`
+
+Not all integration tests are working at the moment.
 
 ## 6. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
