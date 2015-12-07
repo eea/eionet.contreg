@@ -21,16 +21,16 @@
 
 package eionet.cr.dao.readers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
+import org.apache.commons.lang.StringUtils;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -74,7 +74,15 @@ public class HarvestScriptDTOReader extends SQLResultSetBaseReader<HarvestScript
         } catch (Exception e) {
             dto.setPhase(null);
         }
+         
+        try {
+            dto.setType(HarvestScriptType.valueOf(rs.getString("TYPE")));
+        } catch (Exception e) {
+            //TODO error logging
+            dto.setType(null);
+        }
 
+        dto.setServiceUrl(rs.getString("SERVICE_URL"));
         resultList.add(dto);
     }
 

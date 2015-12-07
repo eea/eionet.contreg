@@ -349,4 +349,16 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet author="lainekai" id="rev-22">
+        <comment>Harvest script type</comment>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "type" VARCHAR DEFAULT 'POST_HARVEST'
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "service_url" VARCHAR
+        </sql>
+
+    </changeSet>
 </databaseChangeLog>

@@ -21,9 +21,10 @@
 
 package eionet.cr.dto;
 
-import java.util.Date;
-
+import eionet.cr.dto.enums.HarvestScriptType;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.Date;
 
 /**
  *
@@ -52,6 +53,15 @@ public class HarvestScriptDTO {
 
     /** Harvest phase where the script should be run in. */
     private Phase phase;
+    
+    /** harvest script type. */
+    private HarvestScriptType type;
+
+    /**
+     * url of the external service.
+     * used for "push" scripts
+     */
+    private String serviceUrl;
 
     /**
      * @return the active
@@ -191,11 +201,27 @@ public class HarvestScriptDTO {
         return phase;
     }
 
+    public HarvestScriptType getType() {
+        return type;
+    }
+
+    public void setType(HarvestScriptType type) {
+        this.type = type;
+    }
+
     /**
      * @param phase the phase to set
      */
     public void setPhase(Phase phase) {
         this.phase = phase;
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
+    }
+
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
     }
 
     /** Enum for possible values of the harvest phase where the script should be run in. */
@@ -212,6 +238,7 @@ public class HarvestScriptDTO {
 
         /** The enum's human friendly shortLabel.*/
         private String shortLabel;
+
 
         /**
          * Enum constructor.

@@ -30,6 +30,7 @@ import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.util.Pair;
 
 /**
@@ -87,23 +88,27 @@ public interface HarvestScriptDAO extends DAO {
      * @param active
      * @param runOnce
      * @param phase
+     * @param type harvest script type
+     * @param serviceUrl URL for external services
      * @return
      * @throws DAOException
      */
-    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce, Phase phase)
-            throws DAOException;
+    int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce, Phase phase,
+            HarvestScriptType type, String serviceUrl) throws DAOException;
 
     /**
-     *
+     * saves the harvest script.
      * @param id
      * @param title
      * @param script
      * @param active
      * @param runOnce
      * @param phase
+     * @param type harvest script typoe
+     * @param serviceUrl service url if an external service is used
      * @throws DAOException
      */
-    void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase) throws DAOException;
+    void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase, HarvestScriptType type, String serviceUrl) throws DAOException;
 
     /**
      *

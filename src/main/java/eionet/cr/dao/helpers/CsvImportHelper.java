@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import eionet.cr.dto.enums.HarvestScriptType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -431,9 +432,10 @@ public class CsvImportHelper {
             int existingScriptId = getMatchingScriptId(harvestScripts, fileUri, scriptTemplateName);
             if (existingScriptId == 0) {
                 harvestScriptDAO.insert(HarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
-                        true, null);
+                        true, null, HarvestScriptType.POST_HARVEST, null);
             } else {
-                harvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null);
+                harvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null, 
+                        HarvestScriptType.POST_HARVEST, null);
             }
         }
     }

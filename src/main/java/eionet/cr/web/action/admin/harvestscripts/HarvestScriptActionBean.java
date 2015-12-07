@@ -21,22 +21,6 @@
 
 package eionet.cr.web.action.admin.harvestscripts;
 
-import static eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
@@ -47,10 +31,25 @@ import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.ScriptTemplateDTO;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.ActionType;
 import eionet.cr.web.util.ApplicationCache;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.SCRIPTS_CONTAINER_JSP;
 
 /**
  * Action bean for dealing with a post-harvest script.
@@ -92,6 +91,10 @@ public class HarvestScriptActionBean extends AbstractActionBean {
 
     /** The script's phase. See {@link HarvestScriptDTO.Phase}. */
     private HarvestScriptDTO.Phase phase;
+    
+    private HarvestScriptType type;
+    
+    private String serviceUrl;
 
     /** Should the script be run only once by the harvester? (alternative is to do until returned update count is 0). */
     private boolean runOnce = true;
@@ -160,6 +163,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
                 active = dto.isActive();
                 runOnce = dto.isRunOnce();
                 phase = dto.getPhase();
+                type = dto.getType();
+                serviceUrl = dto.getServiceUrl();
             }
         }
 
@@ -209,9 +214,9 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         // If id given, do save by the given id, otherwise do addition of brand new script.
         HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
         if (id > 0) {
-            dao.save(id, title, script, active, runOnce, phase);
+            dao.save(id, title, script, active, runOnce, phase, type, serviceUrl);
         } else {
-            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase);
+            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase, type, serviceUrl);
         }
         addSystemMessage("Script successfully saved!");
 
@@ -872,5 +877,29 @@ public class HarvestScriptActionBean extends AbstractActionBean {
      */
     public List<Phase> getPossiblePhases() {
         return Arrays.asList(HarvestScriptDTO.Phase.values());
+    }
+
+    /**
+     * Returns a list of possible harvest script types.
+     * @return the list
+     */
+    public List<HarvestScriptType> getPossibleTypes() {
+        return Arrays.asList(HarvestScriptType.values());
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
+    }
+
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
+    }
+
+    public HarvestScriptType getType() {
+        return type;
+    }
+
+    public void setType(HarvestScriptType type) {
+        this.type = type;
     }
 }

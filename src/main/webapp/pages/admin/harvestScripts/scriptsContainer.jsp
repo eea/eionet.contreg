@@ -11,37 +11,49 @@
         <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
 
         <script type="text/javascript">
-        // <![CDATA[
+            // <![CDATA[
             ( function($) {
                 $(document).ready(
-                    function(){
+                        function(){
 
-                    	// Open prefixes dialog
-                        $("#prefixesLink").click(function() {
-                            $('#prefixesDialog').dialog('open');
-                            return false;
-                        });
 
-                        // Prefixes dialog setup
-                        $('#prefixesDialog').dialog({
-                            autoOpen: false,
-                            width: 600
-                        });
+                            $("#scriptTypeSelect").change(function() {
+                                if($(this).val() !='PUSH') {
+                                    $("#serviceUrlText").val('');
+                                    $("#serviceUrlSpan").hide();
+                                } else {
+                                    $("#serviceUrlSpan").show();
+                                    $("#serviceUrlText").focus();
+                                }
+                                return false;
+                            });
 
-                        // Close prefixes dialog
-                        $("#closePrefixesDialog").click(function() {
-                            $('#prefixesDialog').dialog("close");
-                            return true;
-                        });
+                            // Open prefixes dialog
+                            $("#prefixesLink").click(function() {
+                                $('#prefixesDialog').dialog('open');
+                                return false;
+                            });
 
-                    	// The handling of useful namespace clicks
-                        <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
+                            // Prefixes dialog setup
+                            $('#prefixesDialog').dialog({
+                                autoOpen: false,
+                                width: 600
+                            });
+
+                            // Close prefixes dialog
+                            $("#closePrefixesDialog").click(function() {
+                                $('#prefixesDialog').dialog("close");
+                                return true;
+                            });
+
+                            // The handling of useful namespace clicks
+                            <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                             $("#prefix${usefulNamespacesLoop.index}").click(function() {
                                 return handlePrefixClick("PREFIX ${usefulNamespace.key}: <${fn:escapeXml(usefulNamespace.value)}>");
                             });
-                        </c:forEach>
+                            </c:forEach>
 
-                    });
+                        });
             } ) ( jQuery );
             // ]]>
         </script>
@@ -49,27 +61,27 @@
 
     <stripes:layout-component name="contents">
 
-    <h1 style="padding-bottom:10px">Harvest scripts</h1>
+        <h1 style="padding-bottom:10px">Harvest scripts</h1>
 
-    <c:choose>
-        <c:when test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
-            <div id="tabbedmenu">
-                <ul>
-                    <c:forEach items="${actionBean.tabs}" var="tab">
-                        <li <c:if test="${tab.selected}">id="currenttab"</c:if>>
-                            <stripes:link href="${tab.href}" title="${tab.hint}"><c:out value="${tab.title}"/></stripes:link>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </div>
+        <c:choose>
+            <c:when test="${not empty sessionScope.crUser && sessionScope.crUser.administrator}">
+                <div id="tabbedmenu">
+                    <ul>
+                        <c:forEach items="${actionBean.tabs}" var="tab">
+                            <li <c:if test="${tab.selected}">id="currenttab"</c:if>>
+                                <stripes:link href="${tab.href}" title="${tab.hint}"><c:out value="${tab.title}"/></stripes:link>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </div>
 
-      <stripes:layout-render name="${actionBean.pageToRender}"/>
+                <stripes:layout-render name="${actionBean.pageToRender}"/>
 
-        </c:when>
-        <c:otherwise>
-            <div class="error-msg">Access not allowed!</div>
-        </c:otherwise>
-    </c:choose>
+            </c:when>
+            <c:otherwise>
+                <div class="error-msg">Access not allowed!</div>
+            </c:otherwise>
+        </c:choose>
     </stripes:layout-component>
 
 </stripes:layout-render>

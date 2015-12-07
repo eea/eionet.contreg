@@ -27,6 +27,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Test;
 
@@ -69,7 +70,7 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf#Delivery";
         String title = "Post harvest script";
         HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null);
+        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST, null);
 
         assertTrue(postHarvestDao.exists(TargetType.SOURCE, targetUrl, title));
         assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null).size());
@@ -80,7 +81,7 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf#Delivery";
         String title = "Post harvest script";
         HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null);
+        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST, null);
 
         List<HarvestScriptDTO> scriptsList = postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null);
 
@@ -100,7 +101,8 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         String title1 = "Post harvest script 1";
         String title2 = "Post harvest script 2";
         HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title1, script, true, false, null);
+        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title1, script, true, false, null, 
+                HarvestScriptType.POST_HARVEST, null);
 
         // There must definitely be no script newer than two days in the future.
         Calendar cal = Calendar.getInstance();
@@ -116,7 +118,8 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         // then the moment we started sleeping.
         Calendar calNow = Calendar.getInstance();
         Thread.sleep(1000);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title2, script2, true, false, null);
+        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title2, script2, true, false, null, 
+                HarvestScriptType.POST_HARVEST, null);
         assertTrue(postHarvestDao.isScriptsModified(calNow.getTime(), targetUrl));
     }
 }

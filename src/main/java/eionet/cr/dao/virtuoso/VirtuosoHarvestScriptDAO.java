@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eionet.cr.dto.enums.HarvestScriptType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.openrdf.repository.RepositoryConnection;
@@ -71,7 +72,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, PHASE=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
+            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, PHASE=?, TYPE=?, SERVICE_URL=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -79,8 +80,8 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,PHASE,LAST_MODIFIED) values "
-            + "(?,?,?,?,?,?,?,?,NOW())";
+            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,PHASE,TYPE, SERVICE_URL,LAST_MODIFIED) values "
+            + "(?,?,?,?,?,?,?,?,?,?,NOW())";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -180,11 +181,11 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
 
     /**
      * @see eionet.cr.dao.HarvestScriptDAO#insert(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.lang.String,
-     *      java.lang.String, boolean, boolean, Phase)
+     *      java.lang.String, boolean, boolean, Phase,HarvestScriptType, String)
      */
     @Override
     public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce,
-            Phase phase) throws DAOException {
+            Phase phase, HarvestScriptType type, String serviceUrl) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -214,6 +215,8 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             values.add(YesNoBoolean.format(active));
             values.add(YesNoBoolean.format(runOnce));
             values.add(phase.name());
+            values.add(type.name());
+            values.add(serviceUrl);
 
             int result = SQLUtil.executeUpdateReturnAutoID(INSERT_SQL, values, conn);
             conn.commit();
@@ -227,10 +230,11 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#save(int, String, String, boolean, boolean, Phase)
+     * @see eionet.cr.dao.HarvestScriptDAO#save(int, String, String, boolean, boolean, Phase,HarvestScriptType, String)
      */
     @Override
-    public void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase) throws DAOException {
+    public void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase, HarvestScriptType type, 
+            String serviceUrl) throws DAOException {
 
         if (phase == null) {
             phase = HarvestScriptDTO.DEFAULT_PHASE;
@@ -242,6 +246,10 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         values.add(YesNoBoolean.format(active));
         values.add(YesNoBoolean.format(runOnce));
         values.add(phase.name());
+        values.add(type.name());
+        values.add(serviceUrl);
+        
+        //id
         values.add(Integer.valueOf(id));
 
         executeSQL(SAVE_SQL, values);
@@ -550,7 +558,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     public void addScripts(TargetType targetType, String targetUrl, List<HarvestScriptDTO> scripts) throws DAOException {
         for (HarvestScriptDTO script : scripts) {
             insert(targetType, targetUrl, script.getTitle(), script.getScript(), script.isActive(), script.isRunOnce(),
-                    script.getPhase());
+                    script.getPhase(), script.getType(), script.getServiceUrl());
         }
 
     }
