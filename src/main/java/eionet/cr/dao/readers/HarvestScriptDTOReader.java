@@ -82,7 +82,7 @@ public class HarvestScriptDTOReader extends SQLResultSetBaseReader<HarvestScript
             dto.setType(null);
         }
 
-        dto.setServiceUrl(rs.getString("SERVICE_URL"));
+        dto.setExternalServiceId(rs.getInt("EXTERNAL_SERVICE_ID"));
         resultList.add(dto);
     }
 

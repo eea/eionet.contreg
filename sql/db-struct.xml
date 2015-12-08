@@ -350,14 +350,29 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
     </changeSet>
 
     <changeSet author="lainekai" id="rev-22">
-        <comment>Harvest script type</comment>
+        <comment>Harvest script type and external service for push services</comment>
+        <sql>
+            create table "external_service"
+            (
+            "service_id" INTEGER IDENTITY,
+            "service_url" VARCHAR(255),
+            "secure_token" VARCHAR(20),
+            PRIMARY KEY ("service_id")
+            )
+        </sql>
+        
         <sql>
             ALTER TABLE "post_harvest_script"
             ADD COLUMN "type" VARCHAR DEFAULT 'POST_HARVEST'
         </sql>
         <sql>
             ALTER TABLE "post_harvest_script"
-            ADD COLUMN "service_url" VARCHAR
+            ADD COLUMN "external_service_id" INTEGER IDENTITY
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD FOREIGN KEY ("external_service_id")
+            REFERENCES "external_service" ("service_id") ON DELETE CASCADE
         </sql>
 
     </changeSet>

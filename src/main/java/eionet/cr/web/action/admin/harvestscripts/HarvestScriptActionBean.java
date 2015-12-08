@@ -25,6 +25,8 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.virtuoso.ExternalServiceDAO;
+import eionet.cr.dto.ExternalServiceDTO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
@@ -94,7 +96,7 @@ public class HarvestScriptActionBean extends AbstractActionBean {
     
     private HarvestScriptType type;
     
-    private String serviceUrl;
+    private Integer externalServiceId;
 
     /** Should the script be run only once by the harvester? (alternative is to do until returned update count is 0). */
     private boolean runOnce = true;
@@ -164,7 +166,7 @@ public class HarvestScriptActionBean extends AbstractActionBean {
                 runOnce = dto.isRunOnce();
                 phase = dto.getPhase();
                 type = dto.getType();
-                serviceUrl = dto.getServiceUrl();
+                externalServiceId = dto.getExternalServiceId();
             }
         }
 
@@ -214,9 +216,9 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         // If id given, do save by the given id, otherwise do addition of brand new script.
         HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
         if (id > 0) {
-            dao.save(id, title, script, active, runOnce, phase, type, serviceUrl);
+            dao.save(id, title, script, active, runOnce, phase, type, externalServiceId);
         } else {
-            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase, type, serviceUrl);
+            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase, type, externalServiceId);
         }
         addSystemMessage("Script successfully saved!");
 
@@ -410,6 +412,10 @@ public class HarvestScriptActionBean extends AbstractActionBean {
 
         if (StringUtils.isBlank(script)) {
             addGlobalValidationError("Script must not be blank!");
+        }
+        
+        if (HarvestScriptType.PUSH.equals(type) && externalServiceId == null) {
+            addGlobalValidationError("Please select an external service!");
         }
 
         getContext().setSourcePageResolution(new ForwardResolution(SCRIPTS_CONTAINER_JSP));
@@ -878,6 +884,10 @@ public class HarvestScriptActionBean extends AbstractActionBean {
     public List<Phase> getPossiblePhases() {
         return Arrays.asList(HarvestScriptDTO.Phase.values());
     }
+    
+    public List<ExternalServiceDTO> getExternalServices() throws DAOException {
+        return DAOFactory.get().getDao(ExternalServiceDAO.class).getExternalServices();
+    }
 
     /**
      * Returns a list of possible harvest script types.
@@ -887,12 +897,12 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         return Arrays.asList(HarvestScriptType.values());
     }
 
-    public String getServiceUrl() {
-        return serviceUrl;
+    public Integer getExternalServiceId() {
+        return externalServiceId;
     }
 
-    public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
+    public void setExternalServiceId(Integer externalServiceId) {
+        this.externalServiceId = externalServiceId;
     }
 
     public HarvestScriptType getType() {

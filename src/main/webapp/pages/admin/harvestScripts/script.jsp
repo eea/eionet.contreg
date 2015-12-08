@@ -183,7 +183,15 @@
                             </stripes:select> </span>
                             <span id="serviceUrlSpan" style="${actionBean.type.name != 'PUSH' ? 'display: none' : 'display: inline'}">
                             <label for="serviceUrlText" class="required question">Service url:</label>
-                            <stripes:text name="serviceUrl" id="serviceUrlText" size="46"/></span>
+                            <!--stripes:text name="serviceUrl" id="serviceUrlText" size="46"/></span-->
+
+                            <stripes:select name="externalServiceId" value="${actionBean.externalServiceId}" id="serviceSelect">
+                                <stripes:option value="" label=""/>
+                                <c:forEach items="${actionBean.externalServices}" var="service">
+                                    <stripes:option value="${service.serviceId}" label="${service.serviceUrl}"/>
+                                </c:forEach>
+                            </stripes:select>
+                            
 
                         </td>
 

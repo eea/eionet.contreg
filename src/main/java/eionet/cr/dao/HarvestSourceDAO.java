@@ -591,7 +591,7 @@ public interface HarvestSourceDAO extends DAO {
     /**
      * Returns a list of all distinct predicates available for specified type
      *
-     * @param sourceUri
+     * @param typeUri
      * @return
      * @throws DAOException
      */

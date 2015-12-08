@@ -1,8 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAO;
@@ -13,9 +10,9 @@ import eionet.cr.dao.ExporterDAO;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.ReviewsDAO;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dao.SourceDeletionsDAO;
@@ -24,6 +21,9 @@ import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dao.TagsDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.UserHomeDAO;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -68,6 +68,7 @@ public final class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(StagingDatabaseDAO.class, VirtuosoStagingDatabaseDAO.class);
         registeredDaos.put(EndpointHarvestQueryDAO.class, VirtuosoEndpointHarvestQueryDAO.class);
         registeredDaos.put(SourceDeletionsDAO.class, VirtuosoSourceDeletionsDAO.class);
+        registeredDaos.put(ExternalServiceDAO.class, ExternalServiceDAO.class);
     }
 
     /**

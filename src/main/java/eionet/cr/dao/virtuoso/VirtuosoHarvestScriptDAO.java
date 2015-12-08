@@ -21,20 +21,6 @@
 
 package eionet.cr.dao.virtuoso;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import eionet.cr.dto.enums.HarvestScriptType;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.openrdf.repository.RepositoryConnection;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.readers.HarvestScriptDTOReader;
@@ -44,6 +30,7 @@ import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Pair;
 import eionet.cr.util.YesNoBoolean;
@@ -53,6 +40,18 @@ import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.openrdf.repository.RepositoryConnection;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -72,7 +71,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             + "order by TARGET_TYPE_URL asc, POSITION_NUMBER asc";
     /** */
     private static final String SAVE_SQL = "update POST_HARVEST_SCRIPT "
-            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, PHASE=?, TYPE=?, SERVICE_URL=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
+            + "set TITLE=?, SCRIPT=?, ACTIVE=?, RUN_ONCE=?, PHASE=?, TYPE=?, EXTERNAL_SERVICE_ID=?, LAST_MODIFIED=NOW() where POST_HARVEST_SCRIPT_ID=?";
     /** */
     private static final String DELETE_SQL = "delete from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
     /** */
@@ -80,7 +79,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             + "coalesce(TARGET_SOURCE_URL,'')=? and coalesce(TARGET_TYPE_URL,'')=?";
     /** */
     private static final String INSERT_SQL = "insert into POST_HARVEST_SCRIPT "
-            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,PHASE,TYPE, SERVICE_URL,LAST_MODIFIED) values "
+            + "(TARGET_SOURCE_URL,TARGET_TYPE_URL,TITLE,SCRIPT,POSITION_NUMBER,ACTIVE,RUN_ONCE,PHASE,TYPE, EXTERNAL_SERVICE_ID,LAST_MODIFIED) values "
             + "(?,?,?,?,?,?,?,?,?,?,NOW())";
     /** */
     private static final String FETCH_SQL = "select * from POST_HARVEST_SCRIPT where POST_HARVEST_SCRIPT_ID=?";
@@ -181,11 +180,11 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
 
     /**
      * @see eionet.cr.dao.HarvestScriptDAO#insert(eionet.cr.dto.HarvestScriptDTO.TargetType, java.lang.String, java.lang.String,
-     *      java.lang.String, boolean, boolean, Phase,HarvestScriptType, String)
+     *      java.lang.String, boolean, boolean, Phase,HarvestScriptType, java.lang.Integer)
      */
     @Override
     public int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce,
-            Phase phase, HarvestScriptType type, String serviceUrl) throws DAOException {
+            Phase phase, HarvestScriptType type, Integer serviceId) throws DAOException {
 
         String sourceUrl = targetType != null && targetType.equals(TargetType.SOURCE) ? targetUrl : null;
         String typeUrl = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
@@ -216,7 +215,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
             values.add(YesNoBoolean.format(runOnce));
             values.add(phase.name());
             values.add(type.name());
-            values.add(serviceUrl);
+            values.add(serviceId);
 
             int result = SQLUtil.executeUpdateReturnAutoID(INSERT_SQL, values, conn);
             conn.commit();
@@ -230,11 +229,11 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#save(int, String, String, boolean, boolean, Phase,HarvestScriptType, String)
+     * @see eionet.cr.dao.HarvestScriptDAO#save(int, String, String, boolean, boolean, Phase,HarvestScriptType, java.lang.Integer)
      */
     @Override
     public void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase, HarvestScriptType type, 
-            String serviceUrl) throws DAOException {
+            Integer serviceId) throws DAOException {
 
         if (phase == null) {
             phase = HarvestScriptDTO.DEFAULT_PHASE;
@@ -247,7 +246,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
         values.add(YesNoBoolean.format(runOnce));
         values.add(phase.name());
         values.add(type.name());
-        values.add(serviceUrl);
+        values.add(serviceId);
         
         //id
         values.add(Integer.valueOf(id));
@@ -256,7 +255,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * @see eionet.cr.dao.HarvestScriptDAO#delete(eionet.cr.dto.HarvestScriptDTO)
+     * @see eionet.cr.dao.HarvestScriptDAO#delete(List<Integer>)
      */
     @Override
     public void delete(List<Integer> ids) throws DAOException {
@@ -558,7 +557,7 @@ public class VirtuosoHarvestScriptDAO extends VirtuosoBaseDAO implements Harvest
     public void addScripts(TargetType targetType, String targetUrl, List<HarvestScriptDTO> scripts) throws DAOException {
         for (HarvestScriptDTO script : scripts) {
             insert(targetType, targetUrl, script.getTitle(), script.getScript(), script.isActive(), script.isRunOnce(),
-                    script.getPhase(), script.getType(), script.getServiceUrl());
+                    script.getPhase(), script.getType(), script.getExternalServiceId());
         }
 
     }
