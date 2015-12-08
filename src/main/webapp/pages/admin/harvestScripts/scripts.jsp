@@ -128,8 +128,13 @@
                      <display:column style="width:3em;text-align:center" title='<span title="Indicates whether the script is currently turned off">Active</span>'>
                         <c:out value="${script.active ? 'Yes' : 'No'}"/>
                      </display:column>
+                    <display:column style="width:10em;text-align:center" title='<span title="Type of the harvest script">Type</span>'>
+                        <span title="${script.type.label}"><c:out value="${script.type.shortLabel}"/></span>
+                    </display:column>
                      <display:column style="text-align:center" title='<span title="Indicates the harvest phase when the script is to be run">Phase</span>'>
-                        <span title="${script.phase.label}"><c:out value="${script.phase.shortLabel}"/></span>
+                        <c:if test="${script.type != 'PUSH'}"> 
+                            <span title="${script.phase.label}"><c:out value="${script.phase.shortLabel}"/></span>
+                        </c:if>
                      </display:column>
                      <display:column style="width:12em;text-align:center" title='<span title="Script last modification time">Last modified</span>'>
                         <c:out value="${script.lastModified}"/>
