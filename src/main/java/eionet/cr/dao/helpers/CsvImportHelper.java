@@ -454,7 +454,8 @@ public class CsvImportHelper {
             conn.setAutoCommit(false);
             HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
-            List<HarvestScriptDTO> scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
+            List<HarvestScriptDTO> scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW, 
+                    HarvestScriptType.POST_HARVEST);
 
             for (HarvestScriptDTO script : scripts) {
                 String warning = runScript(script, conn);

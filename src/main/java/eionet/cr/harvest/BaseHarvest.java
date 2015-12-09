@@ -56,6 +56,7 @@ import eionet.cr.util.xml.ConversionSchema.Type;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
@@ -336,7 +337,7 @@ public abstract class BaseHarvest implements Harvest {
             if (clearTriplesInHarvestFinish) {
 
                 // Run pre-purge scripts.
-                runHarvestScripts(Phase.PRE_PURGE);
+                runHarvestScripts(Phase.PRE_PURGE, HarvestScriptType.POST_HARVEST);
 
                 LOGGER.debug("Purging the graph of " + getContextUrl());
                 DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(getContextUrl());
@@ -344,7 +345,11 @@ public abstract class BaseHarvest implements Harvest {
             }
 
             // Run post-harvest scripts.
-            runHarvestScripts(Phase.AFTER_NEW);
+            runHarvestScripts(Phase.AFTER_NEW, HarvestScriptType.POST_HARVEST);
+
+
+            // Run Push scripts.
+            runHarvestScripts(null, HarvestScriptType.PUSH);
 
             // send harvest messages
             sendHarvestMessages();
@@ -407,21 +412,22 @@ public abstract class BaseHarvest implements Harvest {
      *
      * @param phase Only scripts meant for this phase will be run.
      */
-    private void runHarvestScripts(Phase phase) {
+    private void runHarvestScripts(Phase phase, HarvestScriptType type) {
 
-        if (phase == null) {
-            throw new IllegalArgumentException("Phase must not be specified!");
+        if (phase == null && HarvestScriptType.POST_HARVEST.equals(type)) {
+            throw new IllegalArgumentException("Phase must be specified for post-harvest scripts!");
         }
 
         // If the phase is "after harvesting new content" and there was actually 0 triple harvested then don't continue.
-        if (Phase.AFTER_NEW.equals(phase)) {
+        if (Phase.AFTER_NEW.equals(phase) || HarvestScriptType.PUSH.equals(type)) {
             if (getStoredTriplesCount() <= 0) {
-                LOGGER.info(loggerMsg("Ignoring post-harvest scripts, as no triples were harvested!"));
+                LOGGER.info(loggerMsg("Ignoring harvest scripts, as no triples were harvested!"));
                 return;
             }
         }
 
-        LOGGER.debug(loggerMsg("Running \"" + phase.getShortLabel() + "\" scripts..."));
+        String dbgLabel = type.getShortLabel() + (phase != null ? " " + phase.getShortLabel() : "");
+        LOGGER.debug(loggerMsg("Running \"" + dbgLabel  + "\" scripts..."));
 
         RepositoryConnection conn = null;
         try {
@@ -431,12 +437,12 @@ public abstract class BaseHarvest implements Harvest {
 
             int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            List<HarvestScriptDTO> scripts = dao.listActive(null, null, phase);
+            List<HarvestScriptDTO> scripts = dao.listActive(null, null, phase, type);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), phase);
+            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), phase, type);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
@@ -446,20 +452,20 @@ public abstract class BaseHarvest implements Harvest {
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
 
-                scripts = dao.listActiveForTypes(distinctTypes, phase);
+                scripts = dao.listActiveForTypes(distinctTypes, phase, type);
                 totalScriptsFound += scripts.size();
                 runScripts(scripts, conn);
             }
 
             if (totalScriptsFound == 0) {
-                LOGGER.debug(loggerMsg("No active \"" + phase.getShortLabel() + "\" scripts were found relevant for this source"));
+                LOGGER.debug(loggerMsg("No active \"" + dbgLabel  + "\" scripts were found relevant for this source"));
             }
 
             // commit changes
             conn.commit();
         } catch (Exception e) {
             SesameUtil.rollback(conn);
-            addHarvestMessage("Error when running \"" + phase.getShortLabel() + "\" scripts: " + e.getMessage(),
+            addHarvestMessage("Error when running \"" + dbgLabel  + "\" scripts: " + e.getMessage(),
                     HarvestMessageType.ERROR, Util.getStackTrace(e));
             LOGGER.error(loggerMsg("Error when running \"" + phase.getShortLabel() + "\" scripts: " + e.getMessage()), e);
         } finally {
@@ -524,7 +530,7 @@ public abstract class BaseHarvest implements Harvest {
 
         PostMethod post = null;
         try {
-            //export SONSTRUCT result to a temp file
+            //export CONSTRUCT result to a temp file
             String fileName = System.getProperty("java.io.tmpdir") + File.separator + scriptDto.getId() + "_output.rdf";
             writer = new FileWriter(fileName);
             RDFHandler rdfxmlWriter = new RDFXMLWriter(writer);
@@ -544,10 +550,16 @@ public abstract class BaseHarvest implements Harvest {
             post = new PostMethod(url);
             post.setRequestEntity(new InputStreamRequestEntity(new FileInputStream(file), file.length()));
             post.setRequestHeader("Content-type", "application/rdf+xml; charset=utf-8");
+            
+            //FIXME - actual apikey param
             post.setRequestHeader("X-DD-APY-Key", serviceDTO.getSecureToken());
 
             HttpClient httpclient = new HttpClient();
-            httpclient.executeMethod(post);
+            int status = httpclient.executeMethod(post);
+            
+            if (HttpStatus.SC_OK != status) {
+                throw  new HarvestException("Unsuccessful response code from the remote service " + status);
+            }
 
 
         } finally {
@@ -1311,7 +1323,7 @@ public abstract class BaseHarvest implements Harvest {
         String url = getContextUrl();
 
         // Run harvest scripts meant to be run before clearing the graph before loading new content.
-        runHarvestScripts(Phase.PRE_PURGE);
+        runHarvestScripts(Phase.PRE_PURGE, HarvestScriptType.POST_HARVEST);
 
         int tripleCount = dao.loadContentFast(filesAndLoaders, url);
         return tripleCount;
