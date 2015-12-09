@@ -374,6 +374,9 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
             ADD FOREIGN KEY ("external_service_id")
             REFERENCES "external_service" ("service_id") ON DELETE CASCADE
         </sql>
-
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "external_service_params" VARCHAR(255)
+        </sql>
     </changeSet>
 </databaseChangeLog>

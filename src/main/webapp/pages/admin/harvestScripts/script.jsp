@@ -178,38 +178,46 @@
                             <label for="scriptTypeSelect" class="required question">Script type:</label>
                         </td>
                         <td>
-                            <span><stripes:select name="type" id="scriptTypeSelect" value="${actionBean.type.name}">
+                            <stripes:select name="type" id="scriptTypeSelect" value="${actionBean.type.name}">
                                 <stripes:options-collection collection="${actionBean.possibleTypes}" value="name" label="label" />
-                            </stripes:select> </span>
-                            <span id="serviceUrlSpan" style="${actionBean.type.name != 'PUSH' ? 'display: none' : 'display: inline'}">
-                            <label for="serviceUrlText" class="required question">Service url:</label>
-                            <!--stripes:text name="serviceUrl" id="serviceUrlText" size="46"/></span-->
-
-                            <stripes:select name="externalServiceId" value="${actionBean.externalServiceId}" id="serviceSelect">
-                                <stripes:option value="" label=""/>
-                                <c:forEach items="${actionBean.externalServices}" var="service">
-                                    <stripes:option value="${service.serviceId}" label="${service.serviceUrl}"/>
-                                </c:forEach>
                             </stripes:select>
-                            
-
                         </td>
 
                     </tr>
 
+                    
                     <tr>
                         <td style="vertical-align:top;padding-right:0.3em;text-align:right">
-                            <label for="phaseSelect" class="question">Phase:</label>
+                            <span id="serviceLabelSpan" style="${actionBean.type.name != 'PUSH' ? 'display: none' : 'display: inline'}">
+                                <label for="serviceSelect" class="required question">Service:</label>
+                            </span>
+                            <span id="phaseLabelSpan" style="${actionBean.type.name == 'PUSH' ? 'display: none' : 'display: inline'}">
+                                <label for="phaseSelect" class="question">Phase:</label>
+                            </span>
                         </td>
+
                         <td>
-                            <stripes:select name="phase" id="phaseSelect" value="${actionBean.phase.name}">
-                                <c:if test="${actionBean.id > 0 && actionBean.phase == null}">
-                                    <stripes:option label="-- unknown --" value="" selected="selected" disabled="disabled"/>
-                                </c:if>
-                                <stripes:options-collection collection="${actionBean.possiblePhases}" value="name" label="label" />
-                            </stripes:select>
+                            <span id="serviceSpan" style="${actionBean.type.name != 'PUSH' ? 'display: none' : 'display: inline'}">
+                                <stripes:select name="externalServiceId" value="${actionBean.externalServiceId}" id="serviceSelect">
+                                    <stripes:option value="" label=""/>
+                                    <c:forEach items="${actionBean.externalServices}" var="service">
+                                        <stripes:option value="${service.serviceId}" label="${service.serviceUrl}"/>
+                                    </c:forEach>
+                                </stripes:select>
+                                <label for="serviceSelect" class="question">Parameters:</label>
+                                <stripes:text name="externalServiceParams" id="serviceParamsText" size="50"/>
+                            </span>
+                            <span id="phaseSpan" style="${actionBean.type.name == 'PUSH' ? 'display: none' : 'display: inline'}">
+                                <stripes:select name="phase" id="phaseSelect" value="${actionBean.phase.name}">
+                                    <c:if test="${actionBean.id > 0 && actionBean.phase == null}">
+                                        <stripes:option label="-- unknown --" value="" selected="selected" disabled="disabled"/>
+                                    </c:if>
+                                    <stripes:options-collection collection="${actionBean.possiblePhases}" value="name" label="label" />
+                                </stripes:select>
+                            </span>
                         </td>
                     </tr>
+                        
                     <tr>
                         <td style="vertical-align:top;padding-right:0.3em;text-align:right">
                             <label for="activeCheckbox" class="question">Active:</label>

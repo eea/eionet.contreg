@@ -19,11 +19,23 @@
 
                             $("#scriptTypeSelect").change(function() {
                                 if($(this).val() !='PUSH') {
-                                    $("#serviceUrlText").val('');
-                                    $("#serviceUrlSpan").hide();
+                                    $("#serviceSelect").val('');
+                                    $("#serviceParamsText").val('');
+
+                                    $("#serviceLabelSpan").hide();
+                                    $("#serviceSpan").hide();
+
+                                    $("#phaseLabelSpan").show();
+                                    $("#phaseSpan").show();
+                                    
+                                    
                                 } else {
-                                    $("#serviceUrlSpan").show();
-                                    $("#serviceUrlText").focus();
+                                    $("#serviceLabelSpan").show();
+                                    $("#serviceSpan").show();
+
+                                    $("#phaseLabelSpan").hide();
+                                    $("#phaseSpan").hide();
+
                                 }
                                 return false;
                             });

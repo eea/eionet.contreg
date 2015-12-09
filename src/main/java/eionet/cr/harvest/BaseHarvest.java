@@ -24,6 +24,7 @@ package eionet.cr.harvest;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
@@ -39,14 +40,18 @@ import java.util.Set;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
+import eionet.cr.dto.enums.HarvestScriptType;
+import eionet.cr.web.util.RDFGenerator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -88,34 +93,54 @@ import eionet.cr.web.security.CRUser;
  */
 public abstract class BaseHarvest implements Harvest {
 
-    /** Static logger for this class. */
+    /**
+     * Static logger for this class.
+     */
     private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
 
-    /** No of latest harvests whose history is kept in the database. Used in houskeeping. */
+    /**
+     * No of latest harvests whose history is kept in the database. Used in houskeeping.
+     */
     protected static final int NO_OF_LAST_HARVESTS_PRESERVED = 10;
 
-    /** Default harvesting timeout (36 hours = 129600000 ms) if no last harvest duration could be detected. */
+    /**
+     * Default harvesting timeout (36 hours = 129600000 ms) if no last harvest duration could be detected.
+     */
     protected static final int DEFAULT_HARVEST_TIMEOUT = 129600000;
 
-    /** Minimum possible harvest timeout (10 min = 600000 ms). */
+    /**
+     * Minimum possible harvest timeout (10 min = 600000 ms).
+     */
     protected static final int MINIMUM_HARVEST_TIMEOUT = 600000;
 
-    /** A harvest is expected to take no more than the duration of last harvest multiplied by this constnat. */
+    /**
+     * A harvest is expected to take no more than the duration of last harvest multiplied by this constnat.
+     */
     protected static final double HARVEST_TIMEOUT_MULTIPLIER = 1.2;
 
-    /** Text/plain content type. */
+    /**
+     * Text/plain content type.
+     */
     protected static final String CONTENT_TYPE_TEXT = "text/plain";
 
-    /** Turtle file extension. */
+    /**
+     * Turtle file extension.
+     */
     protected static final String EXT_TTL = "ttl";
 
-    /** N3 file extension. */
+    /**
+     * N3 file extension.
+     */
     protected static final String EXT_N3 = "n3";
 
-    /** N-Triples file extension. */
+    /**
+     * N-Triples file extension.
+     */
     protected static final String EXT_NTRIPLES = "nt";
 
-    /** container for redirected source DTOs. */
+    /**
+     * container for redirected source DTOs.
+     */
     protected final List<HarvestSourceDTO> redirectedHarvestSources = new ArrayList<HarvestSourceDTO>();
 
     /** */
@@ -124,65 +149,102 @@ public abstract class BaseHarvest implements Harvest {
     private final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
     private final HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
 
-    /** The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled. */
+    /**
+     * The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled.
+     */
     private String contextUrl;
 
-    /** The harvest source DTO object mnatching the {@link #contextUrl}. */
+    /**
+     * The harvest source DTO object mnatching the {@link #contextUrl}.
+     */
     private HarvestSourceDTO contextSourceDTO;
 
-    /** The metadata of the currently harvest source as in triple store. */
+    /**
+     * The metadata of the currently harvest source as in triple store.
+     */
     private SubjectDTO sourceMetadata;
 
-    /** The current harvest's ID, assigned at the harvest's start. */
+    /**
+     * The current harvest's ID, assigned at the harvest's start.
+     */
     private int harvestId;
 
-    /** List of messages collected during the harvest and saved into the DB. */
+    /**
+     * List of messages collected during the harvest and saved into the DB.
+     */
     private List<HarvestMessageDTO> harvestMessages = new ArrayList<HarvestMessageDTO>();
 
-    /** If true, all previously present harvest source metadata should be purged from the triple store. */
+    /**
+     * If true, all previously present harvest source metadata should be purged from the triple store.
+     */
     private boolean cleanAllPreviousSourceMetadata;
 
-    /** If true, all triples must be removed from the graph represented by the harvested source in the harvest-finish stage. */
+    /**
+     * If true, all triples must be removed from the graph represented by the harvested source in the harvest-finish stage.
+     */
     private boolean clearTriplesInHarvestFinish;
 
-    /** The number of triples stored during this harvest. This does NOT include the generated harvest source metadata! */
+    /**
+     * The number of triples stored during this harvest. This does NOT include the generated harvest source metadata!
+     */
     private int storedTriplesCount;
 
-    /** True if the current harvest was initiated by the user (as opposed to batch harvester in the background) . */
+    /**
+     * True if the current harvest was initiated by the user (as opposed to batch harvester in the background) .
+     */
     protected boolean isOnDemandHarvest;
 
-    /** The user who initiated the current harvest (if this is is an on-edmand harvest). */
+    /**
+     * The user who initiated the current harvest (if this is is an on-edmand harvest).
+     */
     private String harvestUser;
 
-    /** Last harvest duration in milliseconds. */
+    /**
+     * Last harvest duration in milliseconds.
+     */
     private long lastHarvestDuration;
 
-    /** True if a fatal error occurred during this harvest, otherwise false. */
+    /**
+     * True if a fatal error occurred during this harvest, otherwise false.
+     */
     protected boolean isFatalErrorOccured = false;
 
-    /** HTTP response code returned from the harvest source. */
+    /**
+     * HTTP response code returned from the harvest source.
+     */
     protected int httpResponseCode;
 
-    /** The timeout value of this harvest. Initialized at first access to the getter. */
+    /**
+     * The timeout value of this harvest. Initialized at first access to the getter.
+     */
     private Integer timeout;
 
-    /** Harvest status classifier for started and on-going harvests. */
+    /**
+     * Harvest status classifier for started and on-going harvests.
+     */
     public static final String STATUS_STARTED = "started";
 
-    /** Harvest status classifier for properly finished harvests. */
+    /**
+     * Harvest status classifier for properly finished harvests.
+     */
     public static final String STATUS_FINISHED = "finished";
 
-    /** Harvest status classifier for abandoned (e.g. killed by Tomcat restart) harvests. */
+    /**
+     * Harvest status classifier for abandoned (e.g. killed by Tomcat restart) harvests.
+     */
     public static final String STATUS_ABANDONED = "abandoned";
 
-    /** Classifier for indicating harvests where the content is being pulled from the source. */
+    /**
+     * Classifier for indicating harvests where the content is being pulled from the source.
+     */
     public static final String TYPE_PULL = "pull";
 
-    /** Classifier for indicating harvests where the content is being pushed by the source. */
+    /**
+     * Classifier for indicating harvests where the content is being pushed by the source.
+     */
     public static final String TYPE_PUSH = "push";
 
     /**
-     *
      * Class constructor.
      *
      * @param contextUrl
@@ -194,7 +256,6 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     *
      * @param contextSourceDTO
      */
     protected BaseHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -235,7 +296,6 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * @throws HarvestException
-     *
      */
     private void startHarvest() throws HarvestException {
 
@@ -257,13 +317,11 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     *
      * @throws HarvestException
      */
     protected abstract void doHarvest() throws HarvestException;
 
     /**
-     *
      * @param dontThrowException
      * @throws HarvestException
      */
@@ -407,7 +465,6 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     *
      * @param scriptDtos
      * @param conn
      */
@@ -441,20 +498,11 @@ public abstract class BaseHarvest implements Harvest {
         try {
             LOGGER.info(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
 
-            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
-            if (updateCount > 0 && !scriptDto.isRunOnce()) {
-                // run maximum 100 times
-                LOGGER.debug("Script's update count was " + updateCount
-                        + ", running it until the count becomes 0, or no more than 100 times ...");
-                int i = 0;
-                int totalUpdateCount = updateCount;
-                for (; updateCount > 0 && i < 100; i++) {
-                    updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
-                    totalUpdateCount += updateCount;
-                }
-                LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
-            } else {
-                LOGGER.debug("Script's update count was " + updateCount);
+            //post-harvest
+            if (scriptDto.getType().name().equals(HarvestScriptType.POST_HARVEST.name())) {
+                runPostHarvestScript(parsedQuery, conn, scriptDto);
+            } else if (scriptDto.getType().name().equals(HarvestScriptType.PUSH.name())) {
+                runPushScript(parsedQuery, conn, scriptDto);
             }
         } catch (Exception e) {
             String message =
@@ -464,6 +512,57 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
+    }
+
+    private void runPushScript(String parsedQuery, RepositoryConnection conn, HarvestScriptDTO scriptDto)
+        throws  Exception {
+        FileWriter writer = null;
+        String fileName = null;
+        try {
+            //construct to file
+            fileName = System.getProperty("java.io.tmpdir") + File.separator + scriptDto.getId() + "_output.rdf";
+            writer = new FileWriter(fileName);
+            RDFHandler rdfxmlWriter = new RDFXMLWriter(writer);
+            SesameUtil.exportGraphQuery(parsedQuery, rdfxmlWriter, conn, null);
+            
+            
+            
+         
+        } finally {
+            IOUtils.closeQuietly(writer);
+            if (fileName != null) {
+                File file = new File(fileName);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+        }
+
+    }
+    
+    private void runPostHarvestScript(String parsedQuery, RepositoryConnection conn, HarvestScriptDTO scriptDto)
+        throws  Exception {
+        int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
+        if (updateCount > 0 && !scriptDto.isRunOnce()) {
+            // run maximum 100 times
+            LOGGER.debug("Script's update count was " + updateCount
+                    + ", running it until the count becomes 0, or no more than 100 times ...");
+            int i = 0;
+            int totalUpdateCount = updateCount;
+            for (; updateCount > 0 && i < 100; i++) {
+                updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
+                totalUpdateCount += updateCount;
+            }
+            LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
+        } else {
+            LOGGER.debug("Script's update count was " + updateCount);
+        }
+        
+    }
+
+    private void runPushScript() {
+
+
     }
 
     /**

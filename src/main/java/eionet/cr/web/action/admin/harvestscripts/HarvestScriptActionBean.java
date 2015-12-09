@@ -97,6 +97,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
     private HarvestScriptType type;
     
     private Integer externalServiceId;
+    
+    private String externalServiceParams;
 
     /** Should the script be run only once by the harvester? (alternative is to do until returned update count is 0). */
     private boolean runOnce = true;
@@ -167,6 +169,7 @@ public class HarvestScriptActionBean extends AbstractActionBean {
                 phase = dto.getPhase();
                 type = dto.getType();
                 externalServiceId = dto.getExternalServiceId();
+                externalServiceParams = dto.getExternalServiceParams();
             }
         }
 
@@ -216,9 +219,10 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         // If id given, do save by the given id, otherwise do addition of brand new script.
         HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
         if (id > 0) {
-            dao.save(id, title, script, active, runOnce, phase, type, externalServiceId);
+            dao.save(id, title, script, active, runOnce, phase, type, externalServiceId, externalServiceParams);
         } else {
-            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase, type, externalServiceId);
+            id = dao.insert(targetType, targetUrl, title, script, active, runOnce, phase, type, externalServiceId, 
+                    externalServiceParams);
         }
         addSystemMessage("Script successfully saved!");
 
@@ -903,6 +907,14 @@ public class HarvestScriptActionBean extends AbstractActionBean {
 
     public void setExternalServiceId(Integer externalServiceId) {
         this.externalServiceId = externalServiceId;
+    }
+
+    public String getExternalServiceParams() {
+        return externalServiceParams;
+    }
+
+    public void setExternalServiceParams(String externalServiceParams) {
+        this.externalServiceParams = externalServiceParams;
     }
 
     public HarvestScriptType getType() {

@@ -432,10 +432,10 @@ public class CsvImportHelper {
             int existingScriptId = getMatchingScriptId(harvestScripts, fileUri, scriptTemplateName);
             if (existingScriptId == 0) {
                 harvestScriptDAO.insert(HarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
-                        true, null, HarvestScriptType.POST_HARVEST, null);
+                        true, null, HarvestScriptType.POST_HARVEST, null, null);
             } else {
                 harvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null, 
-                        HarvestScriptType.POST_HARVEST, null);
+                        HarvestScriptType.POST_HARVEST, null, null);
             }
         }
     }

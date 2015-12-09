@@ -90,11 +90,12 @@ public interface HarvestScriptDAO extends DAO {
      * @param phase
      * @param type harvest script type
      * @param serviceId External service id
+     * @param externalServiceParams params for the external service url*
      * @return
      * @throws DAOException
      */
     int insert(TargetType targetType, String targetUrl, String title, String script, boolean active, boolean runOnce, Phase phase,
-            HarvestScriptType type, Integer serviceId) throws DAOException;
+            HarvestScriptType type, Integer serviceId, String externalServiceParams) throws DAOException;
 
     /**
      * saves the harvest script.
@@ -106,9 +107,11 @@ public interface HarvestScriptDAO extends DAO {
      * @param phase
      * @param type harvest script typoe
      * @param serviceId external service id
+     * @param externalServiceParams params for the external service url
      * @throws DAOException
      */
-    void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase, HarvestScriptType type, Integer serviceId) throws DAOException;
+    void save(int id, String title, String script, boolean active, boolean runOnce, Phase phase, HarvestScriptType type, 
+            Integer serviceId, String externalServiceParams) throws DAOException;
 
     /**
      *

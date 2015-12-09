@@ -62,6 +62,8 @@ public class HarvestScriptDTO {
      * used for "push" scripts
      */
     private Integer externalServiceId;
+    
+    private String externalServiceParams; 
 
     /**
      * @return the active
@@ -222,6 +224,14 @@ public class HarvestScriptDTO {
 
     public void setExternalServiceId(Integer externalServiceId) {
         this.externalServiceId = externalServiceId;
+    }
+
+    public String getExternalServiceParams() {
+        return externalServiceParams;
+    }
+
+    public void setExternalServiceParams(String externalServiceParams) {
+        this.externalServiceParams = externalServiceParams;
     }
 
     /** Enum for possible values of the harvest phase where the script should be run in. */
