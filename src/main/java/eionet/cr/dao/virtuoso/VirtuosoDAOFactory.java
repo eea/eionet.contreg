@@ -7,6 +7,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.DeliveryFilterDAO;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.ExternalServiceDAO;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
@@ -68,7 +69,7 @@ public final class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(StagingDatabaseDAO.class, VirtuosoStagingDatabaseDAO.class);
         registeredDaos.put(EndpointHarvestQueryDAO.class, VirtuosoEndpointHarvestQueryDAO.class);
         registeredDaos.put(SourceDeletionsDAO.class, VirtuosoSourceDeletionsDAO.class);
-        registeredDaos.put(ExternalServiceDAO.class, ExternalServiceDAO.class);
+        registeredDaos.put(ExternalServiceDAO.class, VirtuosoExternalServiceDAO.class);
     }
 
     /**

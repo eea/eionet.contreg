@@ -15,4 +15,12 @@ public interface ExternalServiceDAO extends DAO {
      * @throws DAOException if query fails
      */
     List<ExternalServiceDTO> getExternalServices() throws DAOException;
+
+    /**
+     * returns the service with the given ID.
+     * @param id service id
+     * @return Service DTO
+     * @throws DAOException if db query fails
+     */
+    ExternalServiceDTO fetch(Integer id) throws DAOException;
 }

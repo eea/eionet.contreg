@@ -21,6 +21,57 @@
 
 package eionet.cr.harvest;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.ExternalServiceDAO;
+import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.HarvestScriptDAO;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dto.ExternalServiceDTO;
+import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestMessageDTO;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.Phase;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.enums.HarvestScriptType;
+import eionet.cr.harvest.load.ContentLoader;
+import eionet.cr.harvest.load.FeedFormatLoader;
+import eionet.cr.harvest.load.RDFFormatLoader;
+import eionet.cr.harvest.util.HarvestMessageType;
+import eionet.cr.harvest.util.RDFMediaTypes;
+import eionet.cr.util.EMailSender;
+import eionet.cr.util.FileDeletionJob;
+import eionet.cr.util.Util;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.util.xml.ConversionSchema;
+import eionet.cr.util.xml.ConversionSchema.Type;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
+import eionet.cr.web.security.CRUser;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.xml.sax.SAXException;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,55 +87,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-
-import eionet.cr.dto.enums.HarvestScriptType;
-import eionet.cr.web.util.RDFGenerator;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
-import org.xml.sax.SAXException;
-
-import eionet.cr.common.Predicates;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestScriptDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.HarvestScriptDTO;
-import eionet.cr.dto.HarvestScriptDTO.Phase;
-import eionet.cr.dto.HarvestScriptDTO.TargetType;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.harvest.load.ContentLoader;
-import eionet.cr.harvest.load.FeedFormatLoader;
-import eionet.cr.harvest.load.RDFFormatLoader;
-import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.harvest.util.RDFMediaTypes;
-import eionet.cr.util.EMailSender;
-import eionet.cr.util.FileDeletionJob;
-import eionet.cr.util.Util;
-import eionet.cr.util.sesame.SesameUtil;
-import eionet.cr.util.sql.SingleObjectReader;
-import eionet.cr.util.xml.ConversionSchema;
-import eionet.cr.util.xml.ConversionSchema.Type;
-import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
-import eionet.cr.web.security.CRUser;
 
 /**
  * Base abstract class for harvest-performing classes.
@@ -148,6 +150,7 @@ public abstract class BaseHarvest implements Harvest {
     private final HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
     private final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
     private final HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
+    private final ExternalServiceDAO externalServiceDAO = DAOFactory.get().getDao(ExternalServiceDAO.class);
 
     /**
      * The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled.
@@ -517,24 +520,43 @@ public abstract class BaseHarvest implements Harvest {
     private void runPushScript(String parsedQuery, RepositoryConnection conn, HarvestScriptDTO scriptDto)
         throws  Exception {
         FileWriter writer = null;
-        String fileName = null;
+        File file = null;
+
+        PostMethod post = null;
         try {
-            //construct to file
-            fileName = System.getProperty("java.io.tmpdir") + File.separator + scriptDto.getId() + "_output.rdf";
+            //export SONSTRUCT result to a temp file
+            String fileName = System.getProperty("java.io.tmpdir") + File.separator + scriptDto.getId() + "_output.rdf";
             writer = new FileWriter(fileName);
             RDFHandler rdfxmlWriter = new RDFXMLWriter(writer);
             SesameUtil.exportGraphQuery(parsedQuery, rdfxmlWriter, conn, null);
             
+            file = new File(fileName);
+
+            //make POST
+            ExternalServiceDTO serviceDTO = externalServiceDAO.fetch(scriptDto.getExternalServiceId());
+            String url = serviceDTO.getServiceUrl();
             
-            
-         
+            if (StringUtils.isNotBlank(scriptDto.getExternalServiceParams())) {
+                url += scriptDto.getExternalServiceParams();
+            }
+
+
+            post = new PostMethod(url);
+            post.setRequestEntity(new InputStreamRequestEntity(new FileInputStream(file), file.length()));
+            post.setRequestHeader("Content-type", "application/rdf+xml; charset=utf-8");
+            post.setRequestHeader("X-DD-APY-Key", serviceDTO.getSecureToken());
+
+            HttpClient httpclient = new HttpClient();
+            httpclient.executeMethod(post);
+
+
         } finally {
             IOUtils.closeQuietly(writer);
-            if (fileName != null) {
-                File file = new File(fileName);
-                if (file.exists()) {
-                    file.delete();
-                }
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+            if (post != null) {
+                post.releaseConnection();
             }
         }
 
@@ -909,7 +931,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Sets the clearTriplesInHarvestFinish flag.
      *
-     * @param clearTriplesInHarvestFinish the clearTriplesInHarvestFinish to set
+     * @param clearTriples the clearTriplesInHarvestFinish to set
      */
     protected void setClearTriplesInHarvestFinish(boolean clearTriples) {
         this.clearTriplesInHarvestFinish = clearTriples;
@@ -934,7 +956,6 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      *
-     * @param message
      * @param throwable
      */
     private void sendFinishingError(Throwable throwable) {

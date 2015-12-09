@@ -23,9 +23,9 @@ package eionet.cr.web.action.admin.harvestscripts;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.ExternalServiceDAO;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.virtuoso.ExternalServiceDAO;
 import eionet.cr.dto.ExternalServiceDTO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
