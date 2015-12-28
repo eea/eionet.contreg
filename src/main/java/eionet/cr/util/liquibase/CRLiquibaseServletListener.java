@@ -7,6 +7,8 @@ import liquibase.integration.servlet.LiquibaseServletListener;
 
 import org.apache.log4j.Logger;
 
+import eionet.liquibase.VirtuosoDatabase;
+
 /**
  * An extension of {@link LiquibaseServletListener} to be instantiated from <listener> tag of web.xml.
  *
@@ -30,7 +32,7 @@ public class CRLiquibaseServletListener extends LiquibaseServletListener {
 
         LOGGER.info("Initializing " + getClass().getSimpleName());
 
-        DatabaseFactory.getInstance().register(new VirtuosoDatabase());
+        DatabaseFactory.getInstance().register(new eionet.liquibase.VirtuosoDatabase());
         super.contextInitialized(servletContextEvent);
     }
 }
