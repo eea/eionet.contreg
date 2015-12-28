@@ -889,7 +889,7 @@
                               <propertyFile>target/test-classes/liquibase.properties</propertyFile>
                           </configuration>
                           <goals>
-                              <goal>dropAll</goal>
+                              <!-- <goal>dropAll</goal> -->
                               <goal>update</goal>
                           </goals>
                       </execution>
@@ -902,7 +902,7 @@
                 <version>2.18.1</version>
                 <configuration>
                   <systemPropertyVariables>
-                    <db.url>jdbc:virtuoso://localhost:1111/charset=UTF-8/log_enable=2/DATABASE=CRTEST</db.url>
+                    <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
                   </systemPropertyVariables>
                 </configuration>
                 <executions>
