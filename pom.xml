@@ -889,7 +889,9 @@
                               <propertyFile>target/test-classes/liquibase.properties</propertyFile>
                           </configuration>
                           <goals>
-                              <!-- <goal>dropAll</goal> -->
+                              <!-- The "dropAll" goal is not yet supported by the liquibase-virtuoso plugin.
+                              <goal>dropAll</goal>
+                              -->
                               <goal>update</goal>
                           </goals>
                       </execution>
