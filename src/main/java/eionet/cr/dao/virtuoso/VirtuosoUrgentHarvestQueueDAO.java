@@ -30,6 +30,8 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
@@ -46,6 +48,9 @@ import eionet.cr.web.security.CRUser;
 public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements UrgentHarvestQueueDAO {
 
     /** */
+    private static final Logger LOGGER = Logger.getLogger(VirtuosoUrgentHarvestQueueDAO.class);
+
+    /** */
     private static final String ADD_PULL_HARVEST_SQL =
             "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\", USERNAME) VALUES (?,NOW(),?)";
     /** */
@@ -59,7 +64,8 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /** */
     private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE "
-            + "where URL=? and datediff('second', \"TIMESTAMP\", ?) = 0";
+            + "where URL=? and substring(cast(\"TIMESTAMP\" as varchar), 1, 19)=?";
+
 
     /** SQL for removing occurrences of a given URL from urgent harvest queue table. */
     private static final String REMOVE_URL_SQL = "delete from URGENT_HARVEST_QUEUE where URL=?";
@@ -166,8 +172,18 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
             conn = getSQLConnection();
             UrgentHarvestQueueItemDTO queueItem = peek(conn);
             if (queueItem != null) {
-                deleteQueueItem(queueItem, conn);
+
+                int updateCount = deleteQueueItem(queueItem, conn);
+                if (updateCount <= 0) {
+                    LOGGER.error("Failed to delete urgent harvest queue item (attempting deletion of all queue items with this URL): "
+                            + queueItem.toString());
+                    updateCount = deleteAllQueueItems(queueItem.getUrl(), conn);
+                    if (updateCount <= 0) {
+                        throw new DAOException("Failed to delete any queue items with this URL: " + queueItem.getUrl());
+                    }
+                }
             }
+
             return queueItem;
 
         } catch (Exception e) {
@@ -201,13 +217,27 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      * @param queueItem The queue item to delete.
      * @throws SQLException if SQL error
      */
-    private static void deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
+    private static int deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
 
         List<Object> values = new ArrayList<Object>();
         values.add(queueItem.getUrl());
-        values.add(queueItem.getTimeAdded());
+        values.add(DateFormatUtils.format(queueItem.getTimeAdded(), "yyyy-MM-dd HH:mm:ss"));
 
-        SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+        return SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+    }
+
+    /**
+     *
+     * @param url
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    private static int deleteAllQueueItems(String url, Connection conn) throws SQLException {
+
+        List<Object> values = new ArrayList<Object>();
+        values.add(url);
+        return SQLUtil.executeUpdate("delete from URGENT_HARVEST_QUEUE where URL=?", values, conn);
     }
 
     /*

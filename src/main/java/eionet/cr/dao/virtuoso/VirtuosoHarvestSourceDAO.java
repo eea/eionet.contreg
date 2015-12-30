@@ -14,8 +14,10 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import java.util.Map.Entry;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -936,7 +939,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String UPDATE_SOURCE_HARVEST_FINISHED_SQL =
-            "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?,"
+            "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=forget_timezone(?), INTERVAL_MINUTES=?,"
                     + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? "
                     + "where URL_HASH=?";
 
@@ -954,11 +957,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             throw new IllegalArgumentException("Source URL must not be null!");
         }
 
+        Date lastHarvestDate = sourceDTO.getLastHarvest() == null ? new Date() : sourceDTO.getLastHarvest();
+        lastHarvestDate = DateUtils.truncate(lastHarvestDate, Calendar.SECOND);
+
         ArrayList<Object> values = new ArrayList<Object>();
         values.add(sourceDTO.getEmails());
         values.add(sourceDTO.getStatements() == null ? (int) 0 : sourceDTO.getStatements());
         values.add(sourceDTO.getCountUnavail() == null ? (int) 0 : sourceDTO.getCountUnavail());
-        values.add(sourceDTO.getLastHarvest() == null ? null : new Timestamp(sourceDTO.getLastHarvest().getTime()));
+        values.add(new Timestamp(lastHarvestDate.getTime()));
         values.add(sourceDTO.getIntervalMinutes() == null ? (int) 0 : sourceDTO.getIntervalMinutes());
         values.add(YesNoBoolean.format(sourceDTO.isLastHarvestFailed()));
         values.add(YesNoBoolean.format(sourceDTO.isPrioritySource()));
