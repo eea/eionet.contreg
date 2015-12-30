@@ -7,23 +7,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpServletRequest;
 
 import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.Message;
-import net.sourceforge.stripes.action.SimpleMessage;
-import net.sourceforge.stripes.controller.DefaultActionBeanPropertyBinder;
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-import net.sourceforge.stripes.util.bean.BeanUtil;
-import net.sourceforge.stripes.validation.ValidationErrors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -53,9 +45,6 @@ import eionet.cr.web.security.CRUser;
  * @author Jaanus
  */
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
-
-    /** Name for the request attribute via which we inject rich-type (e.g. file bean) request parameters for the action bean. */
-    public static final String RICH_TYPE_REQUEST_PARAMS_ATTR_NAME = "RICH_TYPE_REQUEST_PARAMS";
 
     /** The name of user whose folder we're testing in. */
     public static final String TEST_USER_NAME = "somebody";
@@ -250,12 +239,12 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
-        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by MyActionBeanPropertyBinder
+        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
         // that has already been injected into the servlet context mock obtained above.
         HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
         FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
         richTypeRequestParams.put("fileBean", fileBean);
-        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
+        trip.getRequest().setAttribute(CRActionBeanPropertyBinder.RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         // Prepare simple string-based request parameters.
         trip.setParameter("folderUri", TEST_FOLDER_URI);
@@ -325,7 +314,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
             richTypeRequestParams.put("dataLinkingScripts", dataLinkingScripts);
         }
         richTypeRequestParams.put("uniqueColumns", Collections.singletonList("Presidency"));
-        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
+        trip.getRequest().setAttribute(CRActionBeanPropertyBinder.RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
             trip.setParameter("addDataLinkingScripts", "true");
@@ -385,8 +374,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
         filterParams.put("Interceptor.Classes", "eionet.cr.web.interceptor.ActionEventInterceptor");
         filterParams.put("ActionBeanContext.Class", "eionet.cr.web.action.CRTestActionBeanContext");
-        filterParams.put("ActionBeanPropertyBinder.Class",
-                "eionet.cr.web.action.UploadCSVActionBeanTest$MyActionBeanPropertyBinder");
+        filterParams.put("ActionBeanPropertyBinder.Class", "eionet.cr.web.action.CRActionBeanPropertyBinder");
         ctx.addFilter(StripesFilter.class, "StripesFilter", filterParams);
         ctx.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
 
@@ -425,52 +413,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     }
 
     /**
-     * Extension of {@link DefaultActionBeanPropertyBinder} in order to directly inject the proper file bean.
-     *
-     * @author Jaanus
-     */
-    public static class MyActionBeanPropertyBinder extends DefaultActionBeanPropertyBinder {
-
-        /**
-         * Default constructor.
-         */
-        public MyActionBeanPropertyBinder() {
-            super();
-        }
-
-        /*
-         * (non-Javadoc)
-         *
-         * @see net.sourceforge.stripes.controller.DefaultActionBeanPropertyBinder#bind(net.sourceforge.stripes.action.ActionBean,
-         * net.sourceforge.stripes.action.ActionBeanContext, boolean)
-         */
-        @Override
-        public ValidationErrors bind(ActionBean bean, ActionBeanContext context, boolean validate) {
-
-            ValidationErrors validationErrors = super.bind(bean, context, validate);
-
-            if (bean != null && context != null) {
-                HttpServletRequest request = context.getRequest();
-                if (request != null) {
-                    Object o = request.getAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME);
-                    if (o instanceof HashMap<?, ?>) {
-                        @SuppressWarnings("unchecked")
-                        HashMap<String, Object> richTypeRequestParams = (HashMap<String, Object>) o;
-                        for (Entry<String, Object> entry : richTypeRequestParams.entrySet()) {
-
-                            String paramName = entry.getKey();
-                            Object paramValue = entry.getValue();
-                            BeanUtil.setPropertyValue(paramName, bean, paramValue);
-                        }
-                    }
-                }
-            }
-
-            return validationErrors;
-        }
-    }
-
-    /**
      * Tests if a 404 error is returned if the folderuri is empty
      * @throws Exception Any sort of error that happens.
      */
@@ -480,12 +422,12 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         MockServletContext ctx = createContextMock();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
-        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by MyActionBeanPropertyBinder
+        // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
         // that has already been injected into the servlet context mock obtained above.
         HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
         FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
         richTypeRequestParams.put("fileBean", fileBean);
-        trip.getRequest().setAttribute(RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
+        trip.getRequest().setAttribute(CRActionBeanPropertyBinder.RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         // Execute the event.
         trip.execute();

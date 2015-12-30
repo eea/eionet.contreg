@@ -1,9 +1,55 @@
 package eionet.cr.web.action;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.validation.ValidationMethod;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.BooleanQuery;
+import org.openrdf.query.GraphQuery;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.Query;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.n3.N3WriterFactory;
+import org.openrdf.rio.ntriples.NTriplesWriterFactory;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.turtle.TurtleWriterFactory;
+
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.*;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.FolderDAO;
+import eionet.cr.dao.HarvestSourceDAO;
+import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -17,31 +63,14 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.sparqlClient.helpers.*;
+import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
+import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
+import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
-import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.validation.ValidationMethod;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.*;
-import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.n3.N3WriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.*;
 
 /**
  *
@@ -258,21 +287,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
-        } 
+        }
         else if (StringUtils.isBlank(query)) {
             addGlobalValidationError("Query is missing!");
-        }  
+        }
         else {
             return new ForwardResolution(BOOKMARK_PAGE);
         }
 
         return new ForwardResolution(FORM_PAGE);
     }
-    
+
     public Resolution saveBookmark() throws DAOException {
         setDefaultAndNamedGraphs();
         CRUser user = getUser();
-        
+
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
         }
@@ -288,19 +317,19 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
                     return new ForwardResolution(FORM_PAGE);
                 }
-                
+
                 storeSharedBookmark();
                 // store to project folder
-            } 
+            }
             else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
                 // bookmarkFolder = project name
                 if (!hasProjectPrivilege(bookmarkFolder)) {
                     addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
                     return new ForwardResolution(FORM_PAGE);
                 }
-                
+
                 storeProjectBookmark();
-            } 
+            }
             else {
                 storePersonalBookmark();
             }
@@ -308,7 +337,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             addSystemMessage("Successfully bookmarked query: " + bookmarkName);
             selectedBookmarkName = bookmarkName;
         }
-        
+
         return new ForwardResolution(FORM_PAGE);
     }
 
@@ -471,15 +500,20 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = executeSparqlQuery(false);
 
         if (isAdminPrivilege()) {
-            String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
-            if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
-                DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
+            if (result != null) {
 
-                addSystemMessage(result.getRows().size() + " sources scheduled for urgent batch harvest!");
-                LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
+                String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
+                if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
+
+                    addSystemMessage(result.getRows().size() + " sources scheduled for urgent batch harvest!");
+                    LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
+                } else {
+                    addGlobalValidationError(resultValidation);
+                    LOGGER.info("Sparql endpoint add bulk sources validation error: " + resultValidation);
+                }
             } else {
-                addGlobalValidationError(resultValidation);
-                LOGGER.info("Sparql endpoint add bulk sources validation error: " + resultValidation);
+                addWarningMessage("No query results to add sources from!");
             }
         } else {
             addGlobalValidationError(VALIDATION_ERROR_MUST_BE_ADMINISTRATOR);

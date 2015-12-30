@@ -1,7 +1,9 @@
 package eionet.cr.web.action;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,6 +12,7 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.validation.ValidationError;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -18,7 +21,9 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
+import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
+import eionet.cr.web.sparqlClient.helpers.ResultValue;
 
 /**
  *
@@ -111,9 +116,9 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         SPARQLEndpointActionBeanMock bean = trip.getActionBean(SPARQLEndpointActionBeanMock.class);
 
         List<ValidationError> messages = bean.getContext().getValidationErrors().get(GLOBAL_ERROR);
+        String message = CollectionUtils.isEmpty(messages) ? null : messages.get(0).getMessage(Locale.ENGLISH);
 
-        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS,
-                messages.get(0).getMessage(Locale.ENGLISH));
+        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS, message);
     }
 
     /**
@@ -138,7 +143,9 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         trip.execute("executeAddSources");
 
         SPARQLEndpointActionBeanMock bean = trip.getActionBean(SPARQLEndpointActionBeanMock.class);
-        int size = bean.getResult().getRows().size();
+        QueryResult beanResult = bean.getResult();
+        ArrayList<HashMap<String, ResultValue>> resultRows = beanResult == null ? null : beanResult.getRows();
+        int size = resultRows == null ? 0 : resultRows.size();
         assertEquals(3, size);
     }
 
@@ -161,7 +168,8 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         SPARQLEndpointActionBeanMock bean = trip.getActionBean(SPARQLEndpointActionBeanMock.class);
 
         List<ValidationError> messages = bean.getContext().getValidationErrors().get(GLOBAL_ERROR);
-        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY, messages.get(0).getMessage(Locale.ENGLISH));
+        String message = CollectionUtils.isEmpty(messages) ? null : messages.get(0).getMessage(Locale.ENGLISH);
+        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY, message);
     }
 
     /**

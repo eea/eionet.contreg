@@ -903,6 +903,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                  <enableAssertions>false</enableAssertions>
                   <systemPropertyVariables>
                     <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
                   </systemPropertyVariables>

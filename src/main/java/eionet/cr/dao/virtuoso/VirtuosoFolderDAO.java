@@ -185,11 +185,8 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
             repoConn.commit();
             sqlConn.commit();
 
-        } catch (OpenRDFException e) {
+        } catch (Exception e) {
             SesameUtil.rollback(repoConn);
-            throw new DAOException(e.getMessage(), e);
-        } catch (SQLException e) {
-            SQLUtil.rollback(sqlConn);
             throw new DAOException(e.getMessage(), e);
         } finally {
             SQLUtil.close(sqlConn);
