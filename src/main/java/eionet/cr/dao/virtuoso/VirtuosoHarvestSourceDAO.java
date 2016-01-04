@@ -137,7 +137,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + "  FILTER (!bif:exists((select (1) where {graph <%perm_graph%> {?s ?p ?o}})))\n" + "}";
 
     /** */
-    private static final int BATCH_CHUNK_SIZE = 5000;
+    private static final int BULK_INSERT_BATCH_SIZE = 5000;
 
     /*
      * (non-Javadoc)
@@ -364,18 +364,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
     }
 
-    /**
-     * Insert a record into the the table of harvest sources in VirtuosoSQL syntax. INSERT SOFT means that if such source already
-     * exists then don't insert (like MySQL INSERT IGNORE)
-     */
+    /** INSERT SOFT means that if such source already exists then just don't insert it and don't throw any errors. */
     private static final String ADD_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
                     + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL) VALUES (?,?,?,NOW(),?,?,?,?,?,0)";
 
-    private static final String UPDATE_BULK_SOURCE_LAST_HARVEST =
-            "update HARVEST_SOURCE set LAST_HARVEST=stringdate('2000-01-01') where URL_HASH=?";
+    /** */
     private static final String INSERT_BULK_SOURCE =
-            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES) VALUES (?,?,NOW(),?)";
+            "insert soft HARVEST_SOURCE (URL,URL_HASH,TIME_CREATED,INTERVAL_MINUTES,LAST_HARVEST) VALUES (?,?,NOW(),?,stringdate('2000-01-01'))";
 
     /**
      * Adds all sources found by a Sparql query
@@ -401,58 +397,43 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             return;
         }
 
+        int counter = 0;
         Connection conn = null;
+        PreparedStatement insertSourceStmt = null;
         try {
-            // execute the insert statement
             conn = getSQLConnection();
-
-            PreparedStatement insertAndUpdate = null;
-            PreparedStatement updateLastHarvest = null;
-
-            insertAndUpdate = conn.prepareStatement(INSERT_BULK_SOURCE);
-            updateLastHarvest = conn.prepareStatement(UPDATE_BULK_SOURCE_LAST_HARVEST);
-
-            int counter = 0;
-            int batchDivideCounter = 0;
+            insertSourceStmt = conn.prepareStatement(INSERT_BULK_SOURCE);
 
             for (Map<String, ResultValue> row : queryResult.getRows()) {
 
                 String resultValue = row.get(firstColumn).getValue();
                 String source = eionet.cr.util.URLUtil.escapeIRI(resultValue);
                 if (URLUtil.isURL(source)) {
-                    insertAndUpdate.setString(1, source);
-                    insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
-                    insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
-                    insertAndUpdate.addBatch();
 
-                    updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(source)));
-                    updateLastHarvest.addBatch();
+                    insertSourceStmt.setString(1, source);
+                    insertSourceStmt.setLong(2, Hashes.spoHash(source));
+                    insertSourceStmt.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
+                    insertSourceStmt.addBatch();
 
                     counter++;
-                    batchDivideCounter++;
                 }
 
-                // If the batch is becoming too large, execute, clear and add new rows in a separate cycle.
-                if (batchDivideCounter == BATCH_CHUNK_SIZE) {
-                    insertAndUpdate.executeBatch();
-                    updateLastHarvest.executeBatch();
-                    insertAndUpdate.clearBatch();
-                    updateLastHarvest.clearBatch();
-                    batchDivideCounter = 0;
-
-                    LOGGER.info("Added/updated a batch of " + BATCH_CHUNK_SIZE + " bulk sources from Sparql endpoint query.");
+                // Execute batch if it's reached the bulk insert batch size.
+                if (counter % BULK_INSERT_BATCH_SIZE == 0) {
+                    insertSourceStmt.executeBatch();
                 }
-
             }
 
-            insertAndUpdate.executeBatch();
-            updateLastHarvest.executeBatch();
+            if (counter % BULK_INSERT_BATCH_SIZE != 0) {
+                insertSourceStmt.executeBatch();
+            }
 
             LOGGER.info("Added/updated a total of " + counter + " bulk sources from Sparql endpoint query.");
 
         } catch (SQLException e) {
             throw new DAOException(e.getMessage(), e);
         } finally {
+            SQLUtil.close(insertSourceStmt);
             SQLUtil.close(conn);
         }
     }

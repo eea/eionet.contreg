@@ -1,12 +1,14 @@
 package eionet.cr.web.action.admin.postHarvest;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -54,14 +56,28 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         try {
             ids.add(id);
             HarvestScriptDTO savedScript = dao.getScriptsByIds(ids).get(0);
+            assertNotNull("Expected a saved script!", savedScript);
+
             assertEquals(title, savedScript.getTitle());
             assertEquals(HarvestScriptDTO.TargetType.TYPE, savedScript.getTargetType());
             assertEquals("http://targeturl.com", savedScript.getTargetUrl());
+
+            Date lastModified = savedScript.getLastModified();
+            assertNotNull("Expected a non-null last-modified-date", lastModified);
+
+            // Note: this may fail if executed right in the second of day-changing, but we'll suffice to that right now.
+            assertEquals("Unexpected last-modified date", DateFormatUtils.format(new Date(), "yyyy-MM-dd"),
+                    DateFormatUtils.format(lastModified, "yyyy-MM-dd"));
         } finally {
             // Delete inserted script.
-            dao.delete(ids);
+            try {
+                dao.delete(ids);
+            } catch (Exception e) {
+                // Ignore deliberately.
+            }
         }
-        // Test if test source url is present and correct after redirect.
+
+        // Test if test source URL is present and correct after redirect.
         if (resolution != null) {
             assertTrue(resolution.getParameters().containsKey("testSourceUrl"));
             Object[] testUrlArr = (Object[]) (resolution.getParameters().get("testSourceUrl"));

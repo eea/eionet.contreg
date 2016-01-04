@@ -13,13 +13,13 @@ import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.validation.ValidationError;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
@@ -71,12 +71,17 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
 
         SPARQLEndpointActionBeanMock bean = trip.getActionBean(SPARQLEndpointActionBeanMock.class);
 
-        // http response code = 200
+        // HTTP response code = 200.
         MockHttpServletResponse response = (MockHttpServletResponse) bean.getContext().getResponse();
         assertEquals(200, response.getStatus());
-        assertEquals(3, bean.getResult().getRows().size());
-        assertEquals("http://www.eea.europa.eu/data-and-maps/data/waterbase-groundwater-6/tables-metadata", bean.getResult()
-                .getRows().get(0).get("s").toString());
+
+        QueryResult beanResult = bean.getResult();
+        ArrayList<HashMap<String, ResultValue>> resultRows = beanResult == null ? null : beanResult.getRows();
+        int resultRowsSize = resultRows == null ? 0 : resultRows.size();
+        assertEquals(3, resultRowsSize);
+
+        String firstSubject = resultRowsSize > 0 ? resultRows.get(0).get("s").toString() : null;
+        assertEquals("http://www.eea.europa.eu/data-and-maps/data/waterbase-groundwater-6/tables-metadata", firstSubject);
 
         HarvestSourceDTO source =
                 DAOFactory
@@ -84,13 +89,15 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
                 .getDao(HarvestSourceDAO.class)
                 .getHarvestSourceByUrl(
                         "http://www.eea.europa.eu/data-and-maps/data/waterbase-groundwater-6/tables-metadata");
+        assertNotNull("Expected harvest source not to be null!", source);
 
-        assertEquals(false, source.getTimeCreated() == source.getLastHarvest());
-        Date currentDate = new Date();
-        String today = Util.dateToString(currentDate, "yyyy-MM-dd");
+        Date timeCreated = source.getTimeCreated();
+        Date lastHarvest = source.getLastHarvest();
+        assertFalse("Expected non-equal creation and last harvest times of the source", timeCreated == lastHarvest);
 
-        assertEquals(today, Util.dateToString(source.getTimeCreated(), "yyyy-MM-dd"));
-        assertEquals("2000-01-01", Util.dateToString(source.getLastHarvest(), "yyyy-MM-dd"));
+        String todaysDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+        assertEquals("Expected source creation date to equal today's", todaysDate, DateFormatUtils.format(timeCreated, "yyyy-MM-dd"));
+        assertEquals("Unexpected last harvest date", "2000-01-01", DateFormatUtils.format(lastHarvest, "yyyy-MM-dd"));
     }
 
     /**
@@ -118,7 +125,8 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         List<ValidationError> messages = bean.getContext().getValidationErrors().get(GLOBAL_ERROR);
         String message = CollectionUtils.isEmpty(messages) ? null : messages.get(0).getMessage(Locale.ENGLISH);
 
-        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS, message);
+        String expectedMessage = QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
+        assertEquals("Message", expectedMessage, message);
     }
 
     /**
@@ -146,7 +154,7 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         QueryResult beanResult = bean.getResult();
         ArrayList<HashMap<String, ResultValue>> resultRows = beanResult == null ? null : beanResult.getRows();
         int size = resultRows == null ? 0 : resultRows.size();
-        assertEquals(3, size);
+        assertEquals("Result rows size", 3, size);
     }
 
     /**
@@ -169,7 +177,9 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
 
         List<ValidationError> messages = bean.getContext().getValidationErrors().get(GLOBAL_ERROR);
         String message = CollectionUtils.isEmpty(messages) ? null : messages.get(0).getMessage(Locale.ENGLISH);
-        assertEquals(QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY, message);
+
+        String expectedMessage = QueryResultValidator.PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY;
+        assertEquals("Message", expectedMessage, message);
     }
 
     /**
@@ -191,7 +201,9 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
         SPARQLEndpointActionBean bean = trip.getActionBean(SPARQLEndpointActionBean.class);
 
         List<ValidationError> messages = bean.getContext().getValidationErrors().get(GLOBAL_ERROR);
-        assertEquals(SPARQLEndpointActionBean.VALIDATION_ERROR_MUST_BE_ADMINISTRATOR, messages.get(0).getMessage(Locale.ENGLISH));
-    }
+        String message = CollectionUtils.isEmpty(messages) ? null : messages.get(0).getMessage(Locale.ENGLISH);
 
+        String expectedMessage = SPARQLEndpointActionBean.VALIDATION_ERROR_MUST_BE_ADMINISTRATOR;
+        assertEquals("Message", expectedMessage, message);
+    }
 }
