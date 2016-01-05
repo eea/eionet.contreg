@@ -337,6 +337,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing connection", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }
@@ -352,6 +355,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing statement", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }
@@ -367,6 +373,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing result set", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }
