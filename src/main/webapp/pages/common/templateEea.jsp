@@ -54,22 +54,9 @@
                             <a name="documentContent"></a>
                             <div class="documentActions">
                                 <h5 class="hiddenStructure">Document Actions</h5>
-                                   <ul>
-                                    <li>
-                                          <a href="javascript:this.print();">
-                                              <img src="http://webservices.eea.europa.eu/templates/print_icon.gif"
-                                              alt="Print this page" title="Print this page" />
-                                          </a>
-                                     </li>
-                                    <li>
-                                          <a href="javascript:toggleFullScreenMode();">
-                                              <img src="http://webservices.eea.europa.eu/templates/fullscreenexpand_icon.gif"
-                                            alt="Toggle full screen mode" title="Toggle full screen mode" />
-                                          </a>
-                                    </li>
-                                  </ul>
-                               </div>
-                           <!--  validation errors -->
+                                <!-- document actions are added here if needed -->
+                            </div>
+                            <!--  validation errors -->
                             <stripes:errors/>
 
                             <!--  messages -->
