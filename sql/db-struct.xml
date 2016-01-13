@@ -356,7 +356,9 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
             (
             "service_id" INTEGER IDENTITY,
             "service_url" VARCHAR(255),
-            "secure_token" VARCHAR(20),
+            "service_type" VARCHAR(50),
+            "secure_token" VARCHAR(255),
+            "user_name" VARCHAR(50),
             PRIMARY KEY ("service_id")
             )
         </sql>
