@@ -1,6 +1,7 @@
 package eionet.cr.dao.readers;
 
 import eionet.cr.dto.ExternalServiceDTO;
+import eionet.cr.dto.enums.ExternalServiceType;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 import java.sql.ResultSet;
@@ -17,6 +18,8 @@ public class ExternalServiceDTOReader  extends SQLResultSetBaseReader<ExternalSe
         externalServiceDTO.setServiceId(new Integer(rs.getInt("SERVICE_ID")));
         externalServiceDTO.setServiceUrl(rs.getString("SERVICE_URL"));
         externalServiceDTO.setSecureToken(rs.getString("SECURE_TOKEN"));
+        externalServiceDTO.setServiceType(ExternalServiceType.valueOf(rs.getString("SERVICE_TYPE")));
+        externalServiceDTO.setUserId(rs.getString("USER_NAME"));
 
         resultList.add(externalServiceDTO);
     }

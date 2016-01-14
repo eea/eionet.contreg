@@ -44,6 +44,8 @@ import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
+import eionet.cr.harvest.service.ExternalService;
+import eionet.cr.harvest.service.ExternalServiceFactory;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.EMailSender;
@@ -57,7 +59,6 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.security.CRUser;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -540,22 +541,13 @@ public abstract class BaseHarvest implements Harvest {
 
             //make POST
             ExternalServiceDTO serviceDTO = externalServiceDAO.fetch(scriptDto.getExternalServiceId());
-            String url = serviceDTO.getServiceUrl();
-            
-            if (StringUtils.isNotBlank(scriptDto.getExternalServiceParams())) {
-                url += scriptDto.getExternalServiceParams();
-            }
 
-
-            post = new PostMethod(url);
-            post.setRequestEntity(new InputStreamRequestEntity(new FileInputStream(file), file.length()));
-            post.setRequestHeader("Content-type", "application/rdf+xml; charset=utf-8");
-            
-            //FIXME - actual apikey param
-            post.setRequestHeader("X-DD-APY-Key", serviceDTO.getSecureToken());
+            ExternalService service = ExternalServiceFactory.getService(serviceDTO.getServiceType());
+            post = service.buildPost(serviceDTO, scriptDto, file);
 
             HttpClient httpclient = new HttpClient();
             int status = httpclient.executeMethod(post);
+            LOGGER.info("Push service returned HTTP code " + status);
             
             if (HttpStatus.SC_OK != status) {
                 throw  new HarvestException("Unsuccessful response code from the remote service " + status);
