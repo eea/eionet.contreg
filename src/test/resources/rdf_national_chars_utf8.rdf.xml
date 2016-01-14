@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cd="http://www.recshop.fake/cd#">
 
 <rdf:Description rdf:about="http://www.recshop.fake/cd/CD_title_1">
@@ -8,7 +8,7 @@
   <cd:company>Cømpany</cd:company>
   <cd:price>10.90</cd:price>
   <cd:year>1985</cd:year>
-  
+
 </rdf:Description>
 
 <rdf:Description rdf:about="http://www.recshop.fake/cd/CD_title_2">
@@ -19,4 +19,4 @@
   <cd:year>1988</cd:year>
 </rdf:Description>
 
-</rdf:RDF> 
+</rdf:RDF>

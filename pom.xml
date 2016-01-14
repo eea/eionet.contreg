@@ -599,6 +599,12 @@
             <version>3.0.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>eionet</groupId>
+            <artifactId>virtliquibase</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- TEST dependencies -->
 
         <dependency>
@@ -660,7 +666,7 @@
     </reporting>
 
     <profiles>
-        
+
         <profile>
           <id>it</id>
           <activation>
@@ -883,7 +889,9 @@
                               <propertyFile>target/test-classes/liquibase.properties</propertyFile>
                           </configuration>
                           <goals>
+                              <!-- The "dropAll" goal is not yet supported by the liquibase-virtuoso plugin.
                               <goal>dropAll</goal>
+                              -->
                               <goal>update</goal>
                           </goals>
                       </execution>
@@ -895,8 +903,9 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
+                  <enableAssertions>false</enableAssertions>
                   <systemPropertyVariables>
-                    <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
+                    <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
                   </systemPropertyVariables>
                 </configuration>
                 <executions>

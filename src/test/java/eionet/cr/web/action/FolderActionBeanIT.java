@@ -1,5 +1,13 @@
 package eionet.cr.web.action;
 
+import java.util.HashMap;
+
+import net.sourceforge.stripes.mock.MockHttpServletResponse;
+import net.sourceforge.stripes.mock.MockRoundtrip;
+import net.sourceforge.stripes.mock.MockServletContext;
+
+import org.apache.commons.lang.StringUtils;
+
 import eionet.acl.AccessController;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -9,12 +17,6 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
-import net.sourceforge.stripes.mock.MockHttpServletResponse;
-import net.sourceforge.stripes.mock.MockRoundtrip;
-import net.sourceforge.stripes.mock.MockServletContext;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.HashMap;
 
 /**
  * For testing the {@link FolderActionBean}.
@@ -72,6 +74,7 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, USER);
         trip.setParameter("uri", PARENT_FOLDER_URI);
         trip.setParameter("title", SUB_FOLDER_NAME);
+        trip.setParameter("label", SUB_FOLDER_NAME);
         trip.setParameter("createFolder", StringUtils.EMPTY);
         trip.execute();
         FolderActionBean bean = trip.getActionBean(FolderActionBean.class);

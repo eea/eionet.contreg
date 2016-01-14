@@ -317,7 +317,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
 
     <changeSet author="lainekai" id="rev-19">
         <preConditions onFail="MARK_RAN">
-            <customPrecondition className="eionet.cr.util.liquibase.VirtuosoIndexNotExists">
+            <customPrecondition className="eionet.liquibase.VirtuosoIndexNotExists">
                 <param name="tableName" value="post_harvest_script" />
                 <param name="indexName" value="post_harvest_script_source_url"  />
             </customPrecondition>
@@ -330,7 +330,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
     </changeSet>
     <changeSet author="lainekai" id="rev-20">
         <preConditions onFail="MARK_RAN">
-            <customPrecondition className="eionet.cr.util.liquibase.VirtuosoIndexNotExists">
+            <customPrecondition className="eionet.liquibase.VirtuosoIndexNotExists">
                 <param name="tableName" value="post_harvest_script" />
                 <param name="indexName" value="post_harvest_script_type_uri"  />
             </customPrecondition>
@@ -340,7 +340,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
             CREATE INDEX post_harvest_script_type_uri ON post_harvest_script (target_type_url)
         </sql>
     </changeSet>
-    
+
     <changeSet author="heinlja" id="rev-21">
         <comment>Helper flag for understanding if a harvest source is marked for deletion or not (1=yes, 0=no)</comment>
         <sql>

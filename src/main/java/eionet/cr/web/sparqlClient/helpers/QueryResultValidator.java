@@ -14,8 +14,7 @@ public class QueryResultValidator {
 
     public static final String PROPER_BULK_SOURCE_OK = "ok";
     public static final String PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY = "Query did not return any results.";
-    public static final String PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS =
-            "Query results first column includes results that are not URIs.";
+    public static final String PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS = "Query results first column includes results that are not URIs.";
 
     /**
      * Validates whether the Sparql query result returned is proper for sources
@@ -45,7 +44,6 @@ public class QueryResultValidator {
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
                 }
-
             }
         }
 

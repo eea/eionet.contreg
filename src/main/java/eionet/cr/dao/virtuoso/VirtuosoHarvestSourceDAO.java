@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -68,7 +69,7 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
 /**
  * Methods operating with harvest sources. Implementation for Virtuoso.
  *
- * @author kaido
+ * @author jaanus
  */
 
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
@@ -383,6 +384,20 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public void addBulkSourcesFromSparql(QueryResult queryResult) throws DAOException {
 
+        if (queryResult == null) {
+            return;
+        }
+
+        ArrayList<Map<String, Object>> columns = queryResult.getCols();
+        if (CollectionUtils.isEmpty(columns)) {
+            return;
+        }
+
+        String firstColumn = (String) columns.get(0).get("property");
+        if (StringUtils.isBlank(firstColumn)) {
+            return;
+        }
+
         Connection conn = null;
         try {
             // execute the insert statement
@@ -396,8 +411,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
             int counter = 0;
             int batchDivideCounter = 0;
-
-            String firstColumn = (String) queryResult.getCols().get(0).get("property");
 
             for (Map<String, ResultValue> row : queryResult.getRows()) {
 
