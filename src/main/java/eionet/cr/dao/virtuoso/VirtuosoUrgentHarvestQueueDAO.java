@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
@@ -59,7 +60,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /** */
     private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE "
-            + "where URL=? and datediff('second', \"TIMESTAMP\", ?) = 0";
+            + "where URL=? and substring(cast(\"TIMESTAMP\" as varchar), 1, 19)=?";
 
     /** SQL for removing occurrences of a given URL from urgent harvest queue table. */
     private static final String REMOVE_URL_SQL = "delete from URGENT_HARVEST_QUEUE where URL=?";
@@ -201,13 +202,17 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      * @param queueItem The queue item to delete.
      * @throws SQLException if SQL error
      */
-    private static void deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
+    private static int deleteQueueItem(UrgentHarvestQueueItemDTO item, Connection conn) throws SQLException {
+
+        if (item == null || StringUtils.isBlank(item.getUrl()) || item.getTimeAdded() == null) {
+            return 0;
+        }
 
         List<Object> values = new ArrayList<Object>();
-        values.add(queueItem.getUrl());
-        values.add(queueItem.getTimeAdded());
+        values.add(item.getUrl());
+        values.add(DateFormatUtils.format(item.getTimeAdded(), "yyyy-MM-dd HH:mm:ss"));
 
-        SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+        return SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
     }
 
     /*

@@ -753,7 +753,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /** */
-    private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
+    private static final String GET_SOURCES_BY_URL_SQL = "select "
+            + "url, harvest_source_id, "
+            + "url_hash, emails, time_created, statements, count_unavail,"
+            + "cast(\"last_harvest\" as varchar) as last_harvest,interval_minutes,source,"
+            + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag "
+            + " from HARVEST_SOURCE where URL_HASH=?";
+    //private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
     /*
      * (non-Javadoc)
