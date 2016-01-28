@@ -26,7 +26,7 @@ public class DataDictService implements ExternalService {
     /**
      * Audience param for the external service.
      */
-    private final String DD_SERVICE_AUDIENCE = "ContentRegistry";
+    private final String DD_SERVICE_AUDIENCE = "DataDictionary";
 
     /**
      * Default timeout for the encryption hash in minutes. 
