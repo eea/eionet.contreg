@@ -29,6 +29,7 @@ import java.util.Date;
 
 /**
  * @author altnyris
+ * @author George Sofianos
  *
  */
 public class HarvestSourceDTO implements Serializable, Cloneable {
@@ -49,6 +50,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     private Integer statements;
     private Integer countUnavail;
     private Date lastHarvest;
+    private Date lastModified;
     private boolean lastHarvestFailed;
     private Integer intervalMinutes;
     private Long urlHash;
@@ -205,6 +207,15 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      *
      * @see java.lang.Object#toString()
      */
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
     @Override
     public String toString() {
         return new StringBuffer().append("Harvest source ").append(url).toString();

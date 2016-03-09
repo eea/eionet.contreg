@@ -89,6 +89,7 @@ import eionet.cr.util.xml.ConversionsParser;
  * Performs a pull-harvest.
  *
  * @author Jaanus Heinlaid
+ * @author George Sofianos
  */
 public class PullHarvest extends BaseHarvest {
 
@@ -496,6 +497,9 @@ public class PullHarvest extends BaseHarvest {
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
         getContextSourceDTO().setLastHarvest(new Date());
+        if (urlConn.getLastModified() > 0) {
+            getContextSourceDTO().setLastModified(new Date(urlConn.getLastModified()));
+        }
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
@@ -946,27 +950,27 @@ public class PullHarvest extends BaseHarvest {
         if (isOnDemandHarvest == false && getContextSourceDTO().isLastHarvestFailed() == false) {
 
             // "If-Modified-Since" will be compared to this URL's last harvest
-            Date lastHarvestDate = getContextSourceDTO().getLastHarvest();
-            long lastHarvest = lastHarvestDate == null ? 0L : lastHarvestDate.getTime();
-            if (lastHarvest > 0) {
+            Date lastModifiedDate = getContextSourceDTO().getLastModified();
+            long lastModified = lastModifiedDate == null ? 0L : lastModifiedDate.getTime();
+            if (lastModified > 0) {
 
                 // Check if this URL has a conversion stylesheet, and if the latter has been modified since last harvest.
                 String conversionStylesheetUrl = getConversionStylesheetUrl(getHelperDAO(), sanitizedUrl);
                 boolean hasConversion = StringUtils.isNotBlank(conversionStylesheetUrl);
-                boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
+                boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastModified);
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
                         DAOFactory.get().getDao(HarvestScriptDAO.class)
-                                .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                                .isScriptsModified(lastModifiedDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
                 // harvest, we surely want to get the content again and run the conversion or script on the content, regardless of
                 // when the content itself was last modified.
                 if (!hasModifiedConversion && !scriptsModified) {
-                    LOGGER.debug(loggerMsg("Using if-modified-since, compared to last harvest " + formatDate(lastHarvestDate)));
-                    connection.setIfModifiedSince(lastHarvest);
+                    LOGGER.debug(loggerMsg("Using if-modified-since, compared to last successful harvest " + formatDate(lastModifiedDate)));
+                    connection.setIfModifiedSince(lastModified);
                 }
             }
         }

@@ -91,6 +91,19 @@
                     </td>
                 </tr>
                 <tr>
+                    <th scope="row">Last modified</th>
+                    <td>
+                        <c:choose>
+                            <c:when test="${empty actionBean.harvestSource.lastModified}">
+                                <c:out value="hasn't been harvested yet"/>
+                            </c:when>
+                            <c:otherwise>
+                                <fmt:formatDate value="${actionBean.harvestSource.lastModified}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row">Last harvest</th>
                     <td>
                         <c:choose>

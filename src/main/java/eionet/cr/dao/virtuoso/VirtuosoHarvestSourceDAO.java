@@ -70,6 +70,7 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
  * Methods operating with harvest sources. Implementation for Virtuoso.
  *
  * @author jaanus
+ * @author George Sofianos
  */
 
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
@@ -943,7 +944,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String UPDATE_SOURCE_HARVEST_FINISHED_SQL =
             "update HARVEST_SOURCE set EMAILS=?, STATEMENTS=?, COUNT_UNAVAIL=?, LAST_HARVEST=?, INTERVAL_MINUTES=?,"
-                    + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=? "
+                    + " LAST_HARVEST_FAILED=?, PRIORITY_SOURCE=?, SOURCE_OWNER=?, PERMANENT_ERROR=?, LAST_HARVEST_ID=?, LAST_MODIFIED=? "
                     + "where URL_HASH=?";
 
     /*
@@ -971,6 +972,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         values.add(sourceDTO.getOwner());
         values.add(YesNoBoolean.format(sourceDTO.isPermanentError()));
         values.add(sourceDTO.getLastHarvestId());
+        values.add(sourceDTO.getLastModified());
         values.add(Hashes.spoHash(sourceDTO.getUrl()));
 
         Connection conn = null;
