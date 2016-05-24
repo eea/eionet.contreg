@@ -182,15 +182,6 @@ public final class Util {
     }
 
     /**
-     *
-     * @return String
-     */
-    public static String currentDateAsString() {
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return sf.format(new java.util.Date());
-    }
-
-    /**
      * Constant equals to 1000.
      */
     private static final int MILLISECONDS_COUNT_IN_SECOND = 1000;

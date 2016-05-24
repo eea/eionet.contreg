@@ -45,7 +45,7 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     private Integer encodingSchemes;
     private Integer totalStatements;
     private Integer litObjStatements;
-    private String dateString;
+    private Date date;
 
     /** HTTP response code. */
     private int responseCode;
@@ -212,20 +212,6 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
         this.encodingSchemes = encodingSchemes;
     }
 
-    /**
-     * @return the dateString
-     */
-    public String getDateString() {
-        return dateString;
-    }
-
-    /**
-     * @param dateString the dateString to set
-     */
-    public void setDateString(String dateString) {
-        this.dateString = dateString;
-    }
-
     /** HTTP Response Code output.
      * @return HTTP Response Code String representation
      */
@@ -255,5 +241,13 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
      */
     public boolean isAbandoned() {
         return BaseHarvest.STATUS_ABANDONED.equals(this.status);
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
