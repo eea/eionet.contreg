@@ -210,7 +210,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
             StringBuffer deleteSql = new StringBuffer();
             deleteSql.append("DELETE FROM harvest AS h ");
             deleteSql.append("WHERE h.harvest_source_id = ? ");
-            deleteSql.append("AND h.started < ?");
+            deleteSql.append("AND h.started = ?");
 
             while(list.size() > preserveRecent) {
                 HarvestDTO dto = list.remove(0);
