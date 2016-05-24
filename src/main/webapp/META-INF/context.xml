@@ -13,7 +13,15 @@
                 username="${virtuoso.db.usr}"
                 password="${virtuoso.db.pwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
-                url="${virtuoso.db.url}">
+                url="${virtuoso.db.url}"
+                validationQuery="select 1"
+                validationQueryTimeout="2"
+                removeAbandoned="true"
+                removeAbandonedOnMaintenance="true"
+                removeAbandonedTimeout="300"
+                timeBetweenEvictionRunsMillis="300000"
+                logAbandoned="false"
+                >
     </Resource>
 
     <Resource name="jdbc/readOnlyRepo"
@@ -23,6 +31,8 @@
                 maxActive="40"
                 maxIdle="30"
                 maxWait="10000"
+                validationQuery="select 1"
+                validationQueryTimeout="2"
                 username="${virtuoso.db.rousr}"
                 password="${virtuoso.db.ropwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
