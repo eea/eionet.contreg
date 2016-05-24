@@ -2096,32 +2096,30 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private void loadRdfFile(File file, RDFFormat rdfFormat, Connection conn, String baseUri, String contextUri)
             throws SQLException {
 
-        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open(?), ?, ?)";
+        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + file.toString() + "'), '" + baseUri + "', '" + contextUri + "')";
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
             if (rdfFormat.equals(RDFFormat.TRIG)) {
                 // For TriG format we must raise the flag 256 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 256)";
+                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 256)";
             } else if (rdfFormat.equals(RDFFormat.NQUADS)) {
                 // For N-Quads format we must raise the flag 512 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 512)";
+                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 512)";
             } else {
                 // No flags for other cases.
-                sql = "DB.DBA.TTLP(file_open(?), ?, ?, 0)";
+                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 0)";
             }
         }
 
-        LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql, baseUri));
+        LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql + "("+ file.toString() + "," + contextUri +")", baseUri));
 
-        PreparedStatement pstmt = null;
+        Statement s = null;
         try {
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, file.toString());
-            pstmt.setString(2, baseUri);
-            pstmt.setString(3, contextUri);
-            pstmt.execute();
+            s = conn.createStatement();
+            s.execute(sql);
+            s.close();
         } finally {
-            SQLUtil.close(pstmt);
+            SQLUtil.close(s);
         }
     }
 
