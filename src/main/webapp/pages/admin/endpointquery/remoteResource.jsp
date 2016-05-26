@@ -31,7 +31,7 @@
                     </display:column>
                     <display:column title="Value">
                         <c:choose>
-                            <c:when test="${fn:contains(statement.object.class.name, 'Literal')}">
+                            <c:when test="${crfn:contains(statement.object['class'].name, 'Literal')}">
                                 <c:out value="${statement.object.label}"/>
                             </c:when>
                             <c:otherwise>

@@ -208,7 +208,7 @@
         </description>
         <name>subjectHasPredicateObject</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
-        <function-signature>java.lang.String subjectHasPredicateObject(eionet.cr.dto.SubjectDTO, java.util.Set, java.lang.String)</function-signature>
+        <function-signature>boolean subjectHasPredicateObject(eionet.cr.dto.SubjectDTO, java.util.Set, java.lang.String)</function-signature>
         <example>
             ${subjectHasPredicateObject(subjectDTO, predicateSet, objectValue)}
         </example>
@@ -219,7 +219,7 @@
         </description>
         <name>isSourceToAny</name>
         <function-class>eionet.cr.web.util.JstlFunctions</function-class>
-        <function-signature>java.lang.String isSourceToAny(long, java.util.Collection)</function-signature>
+        <function-signature>boolean isSourceToAny(long, java.util.Collection)</function-signature>
         <example>
             ${isSourceToAny(objectHash, collectionOfObjects)}
         </example>
@@ -423,7 +423,7 @@
             contains the given object (i.e. the second input parameter).
         </description>
         <name>contains</name>
-        <function-class>eionet.web.util.JstlFunctions</function-class>
+        <function-class>eionet.cr.web.util.JstlFunctions</function-class>
         <function-signature>boolean contains(java.lang.Object, java.lang.Object)</function-signature>
         <example>
         </example>
