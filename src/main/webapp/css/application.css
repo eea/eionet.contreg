@@ -642,3 +642,7 @@ table.datatable tr.even {
 #listItem.datatable td {
     white-space: pre-wrap;
 }
+
+#predObjValueDialog {
+    white-space: pre-wrap;
+}
