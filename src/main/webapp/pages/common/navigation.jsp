@@ -6,14 +6,8 @@
     <ul>
         <li><a href="${pageContext.request.contextPath}/documentation">Help and documentation</a></li>
         <li><a href="${pageContext.request.contextPath}/simpleSearch.action">Simple search</a></li>
-        <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/mergedeliveries", "v")}'>
-            <c:if test="${initParam.enableEEAFunctionality}">
-               <li><a href="${pageContext.request.contextPath}/deliverySearch.action">Merge deliveries</a></li>
-            </c:if>
-        </c:if>
         <li><a href="${pageContext.request.contextPath}/customSearch.action">Custom search</a></li>
         <li><a href="${pageContext.request.contextPath}/typeSearch.action">Type search</a></li>
-        <li><a href="${pageContext.request.contextPath}/tagSearch.action">Tag search</a></li>
         <li><a href="${pageContext.request.contextPath}/recentUploads.action">Recent uploads</a></li>
         <li><a href="${pageContext.request.contextPath}/browseDatasets.action">Browse datasets</a></li>
         <li><a href="${pageContext.request.contextPath}/sparql">SPARQL endpoint</a></li>
@@ -25,7 +19,6 @@
             <li><a href="${pageContext.request.contextPath}/admin" title="Administrative activities">Admin actions</a></li>
         </c:if>
         <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/registrations", "u")}'>
-            <li><a href="${pageContext.request.contextPath}/registerUrl.action">URL registration</a></li>
             <%-- We're sure that session has user, because we assume anonymous users --%>
             <%-- don't have permissions in "/registrations" ACL.                     --%>
             <li><a href="${pageContext.request.contextPath}/view.action?uri=${fn:escapeXml(sessionScope.crUser.homeUri)}">My home</a></li>
