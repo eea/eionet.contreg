@@ -389,4 +389,12 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         ADD COLUMN "last_modified" DATETIME
       </sql>
     </changeSet>
+
+    <changeSet id="rev-24" author="miahi">
+        <comment>Removed the identity flag on post_harvest_script.external_service_id </comment>
+        <sql>ALTER TABLE "post_harvest_script"
+            DROP COLUMN "external_service_id"</sql>
+        <sql>ALTER TABLE "post_harvest_script"
+            ADD COLUMN "external_service_id" INTEGER</sql>
+    </changeSet>
 </databaseChangeLog>
