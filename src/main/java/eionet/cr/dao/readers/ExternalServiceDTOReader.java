@@ -18,7 +18,9 @@ public class ExternalServiceDTOReader  extends SQLResultSetBaseReader<ExternalSe
         externalServiceDTO.setServiceId(new Integer(rs.getInt("SERVICE_ID")));
         externalServiceDTO.setServiceUrl(rs.getString("SERVICE_URL"));
         externalServiceDTO.setSecureToken(rs.getString("SECURE_TOKEN"));
-        externalServiceDTO.setServiceType(ExternalServiceType.valueOf(rs.getString("SERVICE_TYPE")));
+        if(rs.getString("SERVICE_TYPE") != null) {
+            externalServiceDTO.setServiceType(ExternalServiceType.valueOf(rs.getString("SERVICE_TYPE")));
+        }
         externalServiceDTO.setUserId(rs.getString("USER_NAME"));
 
         resultList.add(externalServiceDTO);
