@@ -99,7 +99,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     + "WHERE (H.HTTP_CODE <> 401 OR H.HTTP_CODE IS NULL) "
                     + "AND LAST_HARVEST_FAILED = 'Y' AND URL LIKE(?) AND delete_requested is null";
     /** */
-    private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL >= "
+    private static final String GET_HARVEST_SOURCES_UNAVAIL_SQL = "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE COUNT_UNAVAIL >= "
             + HarvestSourceDTO.COUNT_UNAVAIL_THRESHOLD + " AND delete_requested is null";
     /** */
     private static final String SEARCH_HARVEST_SOURCES_UNAVAIL_SQL =
