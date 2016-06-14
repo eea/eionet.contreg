@@ -144,6 +144,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     private String objectMD5;
     private String graphUri;
 
+    /** Parameter for formatting or not the result as html (replacing \n with <br/>, " " with &nbsp;) - fix for Firefox copy/paste bug */
+    private String preformat;
+
     /** */
     private List<DatasetDTO> userCompiledDatasets;
 
@@ -736,6 +739,9 @@ public class FactsheetActionBean extends AbstractActionBean {
             value = "Found no value!";
         } else {
             value = StringEscapeUtils.escapeXml(value);
+            if(!StringUtils.isBlank(preformat)) {
+                value = Util.escapeHtmlNbsp(value);
+            }
         }
         return new StreamingResolution("text/html", value);
     }
@@ -820,4 +826,11 @@ public class FactsheetActionBean extends AbstractActionBean {
         return harvestSourceDTO;
     }
 
+    public String getPreformat() {
+        return preformat;
+    }
+
+    public void setPreformat(String preformat) {
+        this.preformat = preformat;
+    }
 }

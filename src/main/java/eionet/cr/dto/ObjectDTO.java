@@ -497,4 +497,12 @@ public class ObjectDTO implements Serializable {
     public void setObjectMD5(String objectMD5) {
         this.objectMD5 = objectMD5;
     }
+
+    /**
+     * Returns the html-formatted value (fix for Firefox copy/paste bug)
+     * @return
+     */
+    public String getHtmlValue(){
+        return Util.escapeHtmlNbsp(getValue());
+    }
 }

@@ -916,4 +916,17 @@ public final class Util {
             return null;
         }
     }
+
+    /**
+     * Escapes HTML and replaces spaces with nbsp
+     * @param s
+     * @return
+     */
+    public static String escapeHtmlNbsp(String s) {
+        if(!StringUtils.isBlank(s)) {
+            s = escapeHtml(s);
+            s = s.replaceAll(" ", "&nbsp;");
+        }
+        return s;
+    }
 }
