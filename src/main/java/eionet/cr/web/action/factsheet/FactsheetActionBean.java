@@ -738,9 +738,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         if (StringUtils.isBlank(value)) {
             value = "Found no value!";
         } else {
-            value = StringEscapeUtils.escapeXml(value);
             if(!StringUtils.isBlank(preformat)) {
                 value = Util.escapeHtmlNbsp(value);
+            } else {
+                value = StringEscapeUtils.escapeXml(value);
             }
         }
         return new StreamingResolution("text/html", value);
