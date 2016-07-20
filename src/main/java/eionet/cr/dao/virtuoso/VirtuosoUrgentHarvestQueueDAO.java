@@ -204,10 +204,8 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     private static void deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
 
         List<Object> values = new ArrayList<Object>();
-        values.add(queueItem.getUrl());
-        values.add(queueItem.getTimeAdded());
-
-        SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+        values.add(queueItem.getItemId());
+        SQLUtil.executeUpdate(REMOVE_ITEM_SQL, values, conn);
     }
 
     /*
