@@ -23,18 +23,19 @@ package eionet.cr.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
+ * @author Jaanus Heinlaid
  *
  */
-public class UtilTest extends TestCase {
-
-    // TODO some tests to be added, a method-less TestCase causes an error in JUnit
+public class UtilTest {
 
     @Test
     public void test_toCSV() throws Exception {
@@ -129,5 +130,18 @@ public class UtilTest extends TestCase {
         assertNotNull(Util.getBOM("UTF-8"));
         assertNotNull(Util.getBOM("utf-16le"));
 
+    }
+
+    @Test
+    public void testWildcardMatching() {
+        assertTrue(Util.wildCardMatch("www.eea.europa.eu", "www.eea.europa.eu"));
+        assertTrue(Util.wildCardMatch("www.eea.europa.eu", "*.eea.europa.eu"));
+        assertTrue(Util.wildCardMatch("192.168.1.99", "192.168.1.*"));
+        assertTrue(Util.wildCardMatch("172.17.0.4", "172.17.*"));
+        assertTrue(Util.wildCardMatch("172.17.0.4", "172.17.*.*"));
+        assertTrue(Util.wildCardMatch("www.eea.europa.eu", "*.*.europa.eu"));
+        assertTrue(Util.wildCardMatch("www.eea.europa.eu", "*.europa.eu"));
+
+        assertFalse(Util.wildCardMatch("172.99.0.4", "172.17.*"));
     }
 }
