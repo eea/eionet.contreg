@@ -1,7 +1,5 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<%@page import="eionet.cr.web.util.BaseUrl"%>
-
 <stripes:layout-definition>
     <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 
@@ -12,7 +10,6 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="initial-scale=1.0" />
             <meta name="Publisher" content="EEA, The European Environment Agency" />
-            <base href="<%= BaseUrl.getBaseUrl(request) %>/"/>
 
             <title>${initParam.appDispName} - ${pageTitle}</title>
 

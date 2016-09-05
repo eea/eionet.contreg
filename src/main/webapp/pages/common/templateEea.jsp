@@ -1,7 +1,5 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<%@page import="eionet.cr.web.util.BaseUrl"%>
-
 <stripes:layout-definition>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -10,7 +8,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="initial-scale=1.0" />
         <meta name="Publisher" content="EEA, The European Environment Agency" />
-        <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
 
         <title>${initParam.appDispName} - ${pageTitle}</title>
 
