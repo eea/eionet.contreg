@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
@@ -57,11 +56,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
 
     /** */
     private static final String PEEK_SQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
-
-    /** */
-    private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE "
-            + "where URL=? and substring(cast(\"TIMESTAMP\" as varchar), 1, 19)=?";
-
+    
     /** SQL for removing occurrences of a given URL from urgent harvest queue table. */
     private static final String REMOVE_URL_SQL = "delete from URGENT_HARVEST_QUEUE where URL=?";
 
@@ -209,10 +204,9 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
         }
 
         List<Object> values = new ArrayList<Object>();
-        values.add(item.getUrl());
-        values.add(DateFormatUtils.format(item.getTimeAdded(), "yyyy-MM-dd HH:mm:ss"));
+        values.add(item.getItemId());
 
-        return SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+        return SQLUtil.executeUpdate(REMOVE_ITEM_SQL, values, conn);
     }
 
     /*

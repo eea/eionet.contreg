@@ -108,7 +108,7 @@ public class PingActionBean extends AbstractActionBean {
         String ip = request.getRemoteAddr();
         String host = processClientHostName(request.getRemoteHost(), ip);
         if (!isTrustedRequester(host, ip)) {
-            LOGGER.debug("Client denied: host = " + host + ", IP = " + ip);
+            LOGGER.info("Client denied: host = " + host + ", IP = " + ip);
             return new ErrorResolution(HttpURLConnection.HTTP_FORBIDDEN, "Client host denied!");
         }
 
