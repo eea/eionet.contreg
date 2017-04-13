@@ -166,3 +166,28 @@ that the <Connector> tag in Tomcat's server.xml has the following attributes:
 
 Once Tomcat is running, open CR in the browser. It's application context path is /cr,
 unless you renamed cr.war to something else or you chose to deploy CR into a virtual host.
+
+
+## 8. Overriding settings by environment variables (Docker)
+
+All the settings in *cr.properties* (that are usually filled at build time using *local.properties* as source) can be overriden by environment variables, using the following rules:
+
+1. The env variable must start with *CR_*
+2. After CR_ the variable name continues with the property name from *cr.properties*, but the dots must be replaced by underscores (as OS vars with dots are not permitted)
+3. The variable name is not case-sensitive 
+4. The setting MUST still exist in *cr.properties* (otherwise you can have identification problems because of case sensitivity)
+5. The property names in *cr.properties* may be different than the ones in *local.properties*, so make sure you use the names from *cr.properties* in the environment variables.
+
+Sample: to override *application.displayName* you can use the following environment variables:
+
+    CR_APPLICATION_DISPLAYNAME = NewApplication
+
+or
+
+    CR_application_displayName = NewApplication
+
+Using both styles is not an issue, but using both styles with the same property and different values may cause problems, as the evaluation order is not guaranteed.
+
+For debug purposes, the application will report at startup the settings that are overriden, like this:
+
+    Setting harvester.tempFileDir overridden by ENV variable (old value /var/tmp, new value /var/tmp/cr)
