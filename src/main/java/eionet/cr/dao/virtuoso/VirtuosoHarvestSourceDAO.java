@@ -1754,6 +1754,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                         // XOR the temporary and original graphs.
                         LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
                         synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
+                    } else {
+                        clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph since TEMP graph is empty", true);
                     }
                 }
 

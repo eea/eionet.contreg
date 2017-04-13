@@ -114,7 +114,7 @@
         </init-param>
         <init-param>
             <param-name>FileUpload.MaximumPostSize</param-name>
-            <param-value>35000000</param-value>
+            <param-value>50000000</param-value>
         </init-param>
 
     </filter>
