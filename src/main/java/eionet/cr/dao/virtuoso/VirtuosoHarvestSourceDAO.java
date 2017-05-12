@@ -368,7 +368,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     private static final String ADD_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
-                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL) VALUES (?,?,?,NOW(),?,?,?,?,?,0)";
+                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL, IS_INTERVAL_DYNAMIC) VALUES (?,?,?,NOW(),?,?,?,?,?,0,?)";
 
     private static final String UPDATE_BULK_SOURCE_LAST_HARVEST =
             "update HARVEST_SOURCE set LAST_HARVEST=stringdate('2000-01-01') where URL_HASH=?";
@@ -509,6 +509,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
             ps.setString(7, source.getMediaType());
             ps.setString(8, YesNoBoolean.format(source.isSparqlEndpoint()));
+            ps.setString(9, YesNoBoolean.format(source.isIntervalDynamic()));
 
             ps.executeUpdate();
             ps = conn.prepareStatement("select identity_value()");
@@ -758,7 +759,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + "url, harvest_source_id, "
             + "url_hash, emails, time_created, statements, count_unavail,"
             + "cast(\"last_harvest\" as varchar) as last_harvest,interval_minutes,source, last_modified,"
-            + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag "
+            + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag, is_interval_dynamic "
             + " from HARVEST_SOURCE where URL_HASH=?";
     //private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
@@ -777,9 +778,15 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /** */
-    private static final String GET_NEXT_SCHEDULED_SOURCES_SQL = "select top <limit> * from HARVEST_SOURCE where"
-            + " COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 and <seconds_since_last_harvest> >= <harvest_interval_seconds>"
-            + " order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc";
+    private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
+            "select top <limit> * from HARVEST_SOURCE " +
+            "where COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 " +
+            "and <seconds_since_last_harvest> >= " +
+            "(case " +
+                    "when IS_INTERVAL_DYNAMIC = 'Y' then <dynamic_harvest_interval> " +
+                    "else <harvest_interval_seconds> " +
+            "end)" +
+            "order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc ";
 
     /** */
     private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
@@ -788,6 +795,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
+
+    /** */
+    private static final String DYNAMIC_HARVEST_INTERVAL =
+            "(CASE " +
+                "WHEN datediff('second', time_created, now()) <= 10*24*60*60 " +
+                    "THEN 1*24*60*60 " +
+                "WHEN datediff('second', time_created, now()) > 10*24*60*60 AND datediff('second', time_created, now()) <= 30*24*60*60" +
+                    "THEN 5*24*60*60 " +
+                "ELSE 182.5*24*60*60" +
+            "END)";
 
     /*
      * (non-Javadoc)
@@ -804,6 +821,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limit>", String.valueOf(limit));
         query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
         query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
+        query = query.replace("<dynamic_harvest_interval>", DYNAMIC_HARVEST_INTERVAL);
         return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
     }
 

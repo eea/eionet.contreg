@@ -389,4 +389,12 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         ADD COLUMN "last_modified" DATETIME
       </sql>
     </changeSet>
+
+    <changeSet author="tourikas" id="rev-24">
+        <comment>A field indicating whether harvest interval should be calculated dynamically or is a static value</comment>
+        <addColumn schemaName="dba" tableName="harvest_source">
+            <column name="is_interval_dynamic" type="varchar(1)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

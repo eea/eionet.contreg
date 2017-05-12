@@ -18,6 +18,11 @@
                             return true;
                         });
 
+                        $('#isIntervalDynamic').click(function() {
+                            setHarvestIntervalVisibility();
+                            return true;
+                        })
+
                         function setAuthRowVisibility(){
                             if($('#chkAuthenticated').is(':checked')) {
                                 $('#usernameRow').show();
@@ -28,7 +33,17 @@
                             }
                         }
 
+                        function setHarvestIntervalVisibility() {
+                            if ( $('#isIntervalDynamic').is(':checked') ) {
+                                $('#harvestIntervalRow').hide();
+                            }
+                            else {
+                                $('#harvestIntervalRow').show();
+                            }
+                        }
+
                         setAuthRowVisibility();
+                        setHarvestIntervalVisibility;
                     });
             } ) ( jQuery );
             // ]]>
@@ -47,7 +62,7 @@
                         <td><label class="question" for="emails">E-mails</label></td>
                         <td><stripes:text id="emails" name="harvestSource.emails" size="80"/></td>
                     </tr>
-                    <tr>
+                    <tr id="harvestIntervalRow">
                         <td><label class="question" for="interval">Harvest interval</label></td>
                         <td>
                             <stripes:text id="interval" name="harvestSource.intervalMinutes" size="10" value="6"/>
@@ -65,6 +80,12 @@
                                 <stripes:option value="${type}" label="${type}"/>
                             </c:forEach>
                             </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label class="question" for="isIntervalDynamic">Is Interval dynamic?</label></td>
+                        <td>
+                            <stripes:checkbox name="harvestSource.intervalDynamic" id="isIntervalDynamic"/>
                         </td>
                     </tr>
                     <tr>

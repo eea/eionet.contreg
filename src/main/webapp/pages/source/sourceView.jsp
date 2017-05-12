@@ -81,6 +81,9 @@
                     <th scope="row">Harvest interval</th>
                     <td>
                         <c:choose>
+                            <c:when test="${actionBean.harvestSource.intervalDynamic}">
+                                <c:out value="Dynamic"/>
+                            </c:when>
                             <c:when test="${empty actionBean.harvestSource.intervalMinutes || actionBean.harvestSource.intervalMinutes<=0}">
                                 <c:out value="not to be batch-harvested"/>
                             </c:when>

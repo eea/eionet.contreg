@@ -52,6 +52,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     private Date lastHarvest;
     private Date lastModified;
     private boolean lastHarvestFailed;
+    private boolean isIntervalDynamic;
     private Integer intervalMinutes;
     private Long urlHash;
     private boolean prioritySource;
@@ -398,5 +399,13 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isIntervalDynamic() {
+        return isIntervalDynamic;
+    }
+
+    public void setIntervalDynamic(boolean intervalDynamic) {
+        isIntervalDynamic = intervalDynamic;
     }
 }
