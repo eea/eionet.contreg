@@ -79,11 +79,6 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
             harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(isSparqlEndpointStr));
         }
 
-        String isIntervalDynamicStr = rs.getString("IS_INTERVAL_DYNAMIC");
-        if (StringUtils.isNotBlank(isIntervalDynamicStr)) {
-            harvestSourceDTO.setIntervalDynamic(YesNoBoolean.parse(isIntervalDynamicStr));
-        }
-
         resultList.add(harvestSourceDTO);
     }
 }

@@ -781,12 +781,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
             "select top <limit> * from HARVEST_SOURCE " +
             "where COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 " +
-            "and <seconds_since_last_harvest> >= " +
-            "(case " +
-                    "when IS_INTERVAL_DYNAMIC = 'Y' then <dynamic_harvest_interval> " +
-                    "else <harvest_interval_seconds> " +
-            "end)" +
-            "order by (<seconds_since_last_harvest> / <harvest_interval_seconds>) desc ";
+            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> ";
 
     /** */
     private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
@@ -795,16 +790,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
-
-    /** */
-    private static final String DYNAMIC_HARVEST_INTERVAL =
-            "(CASE " +
-                "WHEN datediff('second', time_created, now()) <= 10*24*60*60 " +
-                    "THEN 1*24*60*60 " +
-                "WHEN datediff('second', time_created, now()) > 10*24*60*60 AND datediff('second', time_created, now()) <= 30*24*60*60" +
-                    "THEN 5*24*60*60 " +
-                "ELSE 182.5*24*60*60" +
-            "END)";
 
     /*
      * (non-Javadoc)
@@ -821,7 +806,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limit>", String.valueOf(limit));
         query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
         query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
-        query = query.replace("<dynamic_harvest_interval>", DYNAMIC_HARVEST_INTERVAL);
         return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
     }
 

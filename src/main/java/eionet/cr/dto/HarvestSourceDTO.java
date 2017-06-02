@@ -408,4 +408,31 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     public void setIntervalDynamic(boolean intervalDynamic) {
         isIntervalDynamic = intervalDynamic;
     }
+
+    /**
+     * Calculate the new interval by increasing the previous one by a day in minutes.
+     */
+    public void calculateNewInterval() {
+        calculateNewInterval(true);
+    }
+
+    /**
+     * Calculate the new interval by increasing the previous one by a day (in minutes).
+     * In case of success==false keep same interval or set to 1 day (in minutes) if null.
+     * @param success
+     */
+    public void calculateNewInterval(boolean success) {
+        if (success)
+            intervalMinutes = (intervalMinutes != null) ? intervalMinutes + (24 * 60) : 1440;
+        else
+            intervalMinutes = (intervalMinutes != null && intervalMinutes > 0) ? intervalMinutes : 1440;
+    }
+
+    /**
+     * Set the interval to 0
+     */
+    public void resetInterval() {
+        intervalMinutes = 0;
+    }
+
 }

@@ -503,6 +503,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
         // add source metadata resulting from this harvest
         addSourceMetadata(urlConn, 0, null, null);
@@ -525,6 +526,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
         // since the server returned source-not-modified, we're keeping the old metadata,
         // but still updating the cr:lastRefreshed
@@ -546,6 +548,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
         setClearTriplesInHarvestFinish(true);
         LOGGER.debug("Old harvested content will be removed, because of source unauthorized error!");
@@ -587,6 +590,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
         getContextSourceDTO().setCountUnavail(countUnavail);
+        getContextSourceDTO().calculateNewInterval(false);
 
         // save same error parameters to parent sources where this source was redirected from
         handleRedirectedHarvestDTOs(lastHarvest, responseCode, sourceNotAvailable);
@@ -787,6 +791,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setStatements(0);
         getContextSourceDTO().setLastHarvestId(getHarvestId());
+        getContextSourceDTO().calculateNewInterval();
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update current harvest to finished, set its count of harvested triples to 0
@@ -820,7 +825,8 @@ public class PullHarvest extends BaseHarvest {
             // (no null-checking, i.e. assuming the context source already exists)
             redirectedToSourceDTO = getContextSourceDTO().clone();
 
-            // set the redirected-to source's url, creation time and last harvest time
+            // reset interval minutes and set the redirected-to source's url, creation time and last harvest time
+            redirectedToSourceDTO.resetInterval();
             redirectedToSourceDTO.setUrl(redirectedToUrl);
             redirectedToSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(redirectedToUrl)));
             redirectedToSourceDTO.setTimeCreated(redirectionSeen);

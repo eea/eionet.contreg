@@ -62,17 +62,6 @@
                         <td><label class="question" for="emails">E-mails</label></td>
                         <td><stripes:text id="emails" name="harvestSource.emails" size="80"/></td>
                     </tr>
-                    <tr id="harvestIntervalRow">
-                        <td><label class="question" for="interval">Harvest interval</label></td>
-                        <td>
-                            <stripes:text id="interval" name="harvestSource.intervalMinutes" size="10" value="6"/>
-                            <stripes:select name="intervalMultiplier" value="10080">
-                                <c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier">
-                                    <stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>
-                                </c:forEach>
-                            </stripes:select>
-                        </td>
-                    </tr>
                     <tr>
                         <td><label class="question" for="mediaType">Media type</label></td>
                         <td><stripes:select id="mediaType" name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}">
@@ -80,18 +69,6 @@
                                 <stripes:option value="${type}" label="${type}"/>
                             </c:forEach>
                             </stripes:select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label class="question" for="isIntervalDynamic">Is Interval dynamic?</label></td>
-                        <td>
-                            <stripes:checkbox name="harvestSource.intervalDynamic" id="isIntervalDynamic"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label class="question" for="priority">Is "Priority" source</label></td>
-                        <td>
-                            <stripes:checkbox name="harvestSource.prioritySource" id="priority"/>
                         </td>
                     </tr>
                     <tr>

@@ -96,10 +96,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     private List<TripleDTO> sampleTriples;
 
     /** The interval multiplier. */
-    private int intervalMultiplier;
+//    private int intervalMultiplier;
 
     /** The interval multipliers. */
-    private static LinkedHashMap<Integer, String> intervalMultipliers;
+//    private static LinkedHashMap<Integer, String> intervalMultipliers;
 
     /** The Constant tabs. */
     private static final List<Pair<String, String>> tabs;
@@ -149,11 +149,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         tabs.add(new Pair<String, String>("sampleTriples", "Sample triples"));
         tabs.add(new Pair<String, String>("history", "History"));
 
-        intervalMultipliers = new LinkedHashMap<Integer, String>();
-        intervalMultipliers.put(new Integer(1), "minutes");
-        intervalMultipliers.put(new Integer(60), "hours");
-        intervalMultipliers.put(new Integer(1440), "days");
-        intervalMultipliers.put(new Integer(10080), "weeks");
+//        intervalMultipliers = new LinkedHashMap<Integer, String>();
+//        intervalMultipliers.put(new Integer(1), "minutes");
+//        intervalMultipliers.put(new Integer(60), "hours");
+//        intervalMultipliers.put(new Integer(1440), "days");
+//        intervalMultipliers.put(new Integer(10080), "weeks");
 
         MEDIA_TYPES = new ArrayList<String>();
         MEDIA_TYPES.add(null);
@@ -601,16 +601,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         }
                     }
 
-                    Integer intervalMinutes = harvestSource.getIntervalMinutes();
-                    if (intervalMinutes != null) {
-                        if (intervalMinutes.intValue() < 0 || intervalMultiplier < 0) {
-                            addGlobalValidationError(new SimpleError("Harvest interval must be >= 0"));
-                        } else {
-                            harvestSource.setIntervalMinutes(Integer.valueOf(intervalMinutes.intValue() * intervalMultiplier));
-                        }
-                    } else {
-                        harvestSource.setIntervalMinutes(Integer.valueOf(0));
+                    if (harvestSource.getIntervalMinutes() == null) {
+                        harvestSource.resetInterval();
                     }
+
                 } catch (MalformedURLException e) {
                     addGlobalValidationError(new SimpleError("Invalid URL!"));
                 }
@@ -631,26 +625,26 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      * @param intervalMultiplier
      *            the intervalMultiplier to set
      */
-    public void setIntervalMultiplier(int intervalMultiplier) {
-        this.intervalMultiplier = intervalMultiplier;
-    }
+//    public void setIntervalMultiplier(int intervalMultiplier) {
+//        this.intervalMultiplier = intervalMultiplier;
+//    }
 
     /**
      *
      * @return Map<Integer,String>
      */
-    public Map<Integer, String> getIntervalMultipliers() {
-
-        return intervalMultipliers;
-    }
+//    public Map<Integer, String> getIntervalMultipliers() {
+//
+//        return intervalMultipliers;
+//    }
 
     /**
      *
      * @return int
      */
-    public int getSelectedIntervalMultiplier() {
-        return getIntervalMultipliers().keySet().iterator().next().intValue();
-    }
+//    public int getSelectedIntervalMultiplier() {
+//        return getIntervalMultipliers().keySet().iterator().next().intValue();
+//    }
 
     /**
      *
