@@ -38,14 +38,13 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
     private static final Logger LOGGER = Logger.getLogger(SourceDeletionJob.class);
 
     /** This job's running interval in milliseconds. Default is every 20000 ms, i.e. every 20 seconds. */
-    public static final int INTERVAL_MILLIS = GeneralConfig.getTimePropertyMilliseconds(
-            GeneralConfig.SOURCE_DELETION_JOB_INTERVAL, 20000);
+    public static int INTERVAL_MILLIS;
 
     /** Hours when the job should be active. */
-    public static final HashSet<Integer> ACTIVE_HOURS = getConfiguredActiveHours();
+    public static HashSet<Integer> ACTIVE_HOURS;
 
     /** Number of sources that the job should delete during one run. Default is 20. */
-    private static final int BATCH_SIZE = GeneralConfig.getIntProperty(GeneralConfig.SOURCE_DELETION_JOB_BATCH_SIZE, 20);
+    private static int BATCH_SIZE;
 
     /** Simple name of this class. */
     private static final String CLASS_SIMPLE_NAME = SourceDeletionJob.class.getSimpleName();
@@ -57,6 +56,10 @@ public class SourceDeletionJob implements StatefulJob, ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent contextEvent) {
+
+        ACTIVE_HOURS = getConfiguredActiveHours();
+        BATCH_SIZE = GeneralConfig.getIntProperty(GeneralConfig.SOURCE_DELETION_JOB_BATCH_SIZE, 20);
+        INTERVAL_MILLIS = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.SOURCE_DELETION_JOB_INTERVAL, 20000);
 
         JobDetail jobDetails = new JobDetail(CLASS_SIMPLE_NAME, getClass().getName(), getClass());
         Exception exception = null;

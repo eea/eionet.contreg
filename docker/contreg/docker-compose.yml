@@ -1,0 +1,40 @@
+##
+# @author Thanos Tourikas
+##
+
+version: '2'
+services:
+
+  virtuoso:
+#    image: ervis/virtuoso:latest
+    image: tourikas/virtuoso:latest
+#    environment:
+#      DBA_PASSWORD: "dba"
+    volumes:
+      - ./data:/data
+    ports:
+      - "1111:1111"
+
+  ## TOMCAT SERVICE
+  tomcat:
+    image: tourikas/contreg:latest
+#    environment:
+#      CATALINA_OPTS: "-Dvirtuoso.db.url=jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR -Dvirtuoso.db.drv=virtuoso.jdbc3.Driver -Dvirtuoso.db.usr=dba -Dvirtuoso.db.pwd=dba"
+#      virtuoso.db.url: "jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR"
+#      virtuoso.db.drv: "virtuoso.jdbc3.Driver"
+#      virtuoso.db.usr: "dba"
+#      virtuoso.db.pwd: "dba"
+#      driver: "virtuoso.jdbc4.Driver"
+#      url: "jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR"
+#      username: "dba"
+#      password: "dba"
+    env_file: docker.env
+    ports:
+      - "8080:8080"
+    links:
+      - virtuoso
+    volumes_from:
+      - virtuoso
+#    labels:
+#      io.rancher.container.pull_image: always
+#      io.rancher.sidekicks: data-xmlconv, scpserver

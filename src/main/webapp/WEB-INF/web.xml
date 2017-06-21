@@ -32,7 +32,7 @@
 
     <!-- Liquibase configuration -->
 
-    <context-param>
+<!--    <context-param>
         <param-name>liquibase.changelog</param-name>
         <param-value>sql/db-struct.xml</param-value>
     </context-param>
@@ -50,7 +50,19 @@
     <context-param>
         <param-name>liquibase.contexts</param-name>
         <param-value>production</param-value>
+    </context-param>-->
+
+    <!-- Spring configuration -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:spring-context.xml
+        </param-value>
     </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- filters -->
@@ -148,9 +160,9 @@
     <listener>
         <listener-class>eionet.cr.web.util.StartupAntRunner</listener-class>
     </listener>
-    <listener>
-        <listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>
-    </listener>
+    <!--<listener>-->
+        <!--<listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>-->
+    <!--</listener>-->
     <listener>
         <listener-class>eionet.cr.web.util.AbandonedHarvestsMarker</listener-class>
     </listener>
@@ -172,6 +184,7 @@
     <listener>
         <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
     </listener>
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Errors -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -183,13 +196,11 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <!-- StripesDispatcher -->
-
     <servlet>
         <servlet-name>StripesDispatcher</servlet-name>
         <servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>

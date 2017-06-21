@@ -54,8 +54,7 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
     private static final Logger LOGGER = Logger.getLogger(FileDeletionJob.class);
 
     /** */
-    private static final long RUNNING_INTERVAL_MS = GeneralConfig.getTimePropertyMilliseconds(
-            GeneralConfig.FILE_DELETION_JOB_INTERVAL, 20000);
+    private static long RUNNING_INTERVAL_MS;
 
     /** */
     private static final Collection<File> QUEUED_FILES = Collections.synchronizedSet(new HashSet<File>());
@@ -70,6 +69,8 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+
+        RUNNING_INTERVAL_MS = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.FILE_DELETION_JOB_INTERVAL, 20000);
 
         Class<FileDeletionJob> clazz = FileDeletionJob.class;
         JobDetail jobDetails = new JobDetail(clazz.getSimpleName(), clazz.getName(), clazz);

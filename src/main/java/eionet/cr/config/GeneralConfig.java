@@ -20,10 +20,12 @@
  */
 package eionet.cr.config;
 
-import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.Properties;
 
+import eionet.cr.spring.SpringApplicationContext;
+import eionet.propertyplaceholderresolver.CircularReferenceException;
+import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
+import eionet.propertyplaceholderresolver.UnresolvedPropertyException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
@@ -166,7 +168,9 @@ public final class GeneralConfig {
     private static Log logger = LogFactory.getLog(GeneralConfig.class);
 
     /** */
-    private static Properties properties = null;
+    private static Properties properties;
+    private static ConfigurationPropertyResolver propertyResolver;
+
 
     /**
      * Hide utility class constructor.
@@ -176,23 +180,23 @@ public final class GeneralConfig {
     }
 
     /** */
-    private static void init() {
-        properties = new Properties();
-        try {
-            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
-
-            loadEnvProperties(properties, "CR_");
-
-            // trim all the values (i.e. we don't allow preceding or trailing
-            // white space in property values)
-            for (Entry<Object, Object> entry : properties.entrySet()) {
-                entry.setValue(entry.getValue().toString().trim());
-            }
-
-        } catch (IOException e) {
-            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
-        }
-    }
+//    private static void init() {
+//        properties = new Properties();
+//        try {
+//            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+//
+//            loadEnvProperties(properties, "CR_");
+//
+//            // trim all the values (i.e. we don't allow preceding or trailing
+//            // white space in property values)
+//            for (Entry<Object, Object> entry : properties.entrySet()) {
+//                entry.setValue(entry.getValue().toString().trim());
+//            }
+//
+//        } catch (IOException e) {
+//            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+//        }
+//    }
 
     /**
      * Loads all the environment variables starting with startsWith in the given Properties object.
@@ -200,34 +204,34 @@ public final class GeneralConfig {
      * @param properties
      * @param startsWith
      */
-    private static void loadEnvProperties(Properties properties, String startsWith) {
-        for(String envKey : System.getenv().keySet()) {
-            if(envKey.startsWith(startsWith)) {
-                String key = envKey.replace(startsWith, "").replaceAll("_", ".");
-                boolean found = false;
-
-                // tries to match the environment var with an already configured setting (case insensitive)
-                for(Object propKeyObj : properties.keySet()) {
-                    if(propKeyObj instanceof String) {
-                        String propKey = (String) propKeyObj;
-                        String oldValue = properties.getProperty(propKey);
-                        if(key.equalsIgnoreCase(propKey)) {
-                            properties.setProperty(propKey, System.getenv(envKey));
-                            found = true;
-                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
-                            break;
-                        }
-                    }
-                }
-
-                // if the match failed, adds it as it is
-                if(!found) {
-                    properties.setProperty(key, System.getenv(envKey));
-                    System.out.println("Setting " + key + " added from ENV variable");
-                }
-            }
-        }
-    }
+//    private static void loadEnvProperties(Properties properties, String startsWith) {
+//        for(String envKey : System.getenv().keySet()) {
+//            if(envKey.startsWith(startsWith)) {
+//                String key = envKey.replace(startsWith, "").replaceAll("_", ".");
+//                boolean found = false;
+//
+//                // tries to match the environment var with an already configured setting (case insensitive)
+//                for(Object propKeyObj : properties.keySet()) {
+//                    if(propKeyObj instanceof String) {
+//                        String propKey = (String) propKeyObj;
+//                        String oldValue = properties.getProperty(propKey);
+//                        if(key.equalsIgnoreCase(propKey)) {
+//                            properties.setProperty(propKey, System.getenv(envKey));
+//                            found = true;
+//                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//                // if the match failed, adds it as it is
+//                if(!found) {
+//                    properties.setProperty(key, System.getenv(envKey));
+//                    System.out.println("Setting " + key + " added from ENV variable");
+//                }
+//            }
+//        }
+//    }
 
     /**
      *
@@ -237,10 +241,33 @@ public final class GeneralConfig {
     public static synchronized String getProperty(String key) {
 
         if (properties == null) {
-            init();
+            properties = new Properties();
+        }
+        if (propertyResolver == null) {
+            propertyResolver = SpringApplicationContext.getBean("configurationPropertyResolver");
         }
 
-        return properties.getProperty(key);
+        String value = "";
+        if (properties.containsKey(key)) {
+            value = properties.getProperty(key);
+        }
+        else {
+            try {
+                value = propertyResolver.resolveValue(key);
+            } catch (UnresolvedPropertyException e) {
+//            e.printStackTrace();
+            } catch (CircularReferenceException e) {
+//            e.printStackTrace();
+            }
+            properties.put(key, value);
+        }
+
+        return value != null && !value.isEmpty() ? value : null;
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        return properties.getProperty(key);
     }
 
     /**
@@ -251,26 +278,22 @@ public final class GeneralConfig {
      */
     public static synchronized String getProperty(String key, String defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
 
-        return properties.getProperty(key, defaultValue);
+        String value = getProperty(key);
+        return value == null ? defaultValue : value;
+
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        return properties.getProperty(key, defaultValue);
     }
 
     /**
      *
      */
     public static synchronized boolean isPropertySet(String key) {
-        if (properties == null) {
-            init();
-        }
-
-        if (properties.getProperty(key) == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return getProperty(key) == null ? false : true;
     }
 
     /**
@@ -284,11 +307,13 @@ public final class GeneralConfig {
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        String propValue = properties.getProperty(key);
 
-        String propValue = properties.getProperty(key);
+        String propValue = getProperty(key);
         int value = defaultValue;
         if (propValue != null) {
             try {
@@ -310,13 +335,14 @@ public final class GeneralConfig {
      */
     public static synchronized Integer getTimePropertyMilliseconds(final String key, Integer defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
+//        if (properties == null) {
+//            init();
+//        }
 
         int coeficient = 1;
 
-        String propValue = properties.getProperty(key);
+//        String propValue = properties.getProperty(key);
+        String propValue = getProperty(key);
         Integer value = defaultValue;
 
         if (propValue != null) {
@@ -399,9 +425,9 @@ public final class GeneralConfig {
      */
     public static synchronized Properties getProperties() {
 
-        if (properties == null) {
-            init();
-        }
+//        if (properties == null) {
+//            init();
+//        }
 
         return properties;
     }

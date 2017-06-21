@@ -9,11 +9,15 @@ import org.junit.Test;
 
 import eionet.cr.util.export.XlsExporter;
 import eionet.cr.util.export.XmlExporter;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS ExporterTest
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/spring-context-test.xml")
 public class ExporterTest extends TestCase {
 
     @Test

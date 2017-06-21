@@ -22,17 +22,24 @@ package eionet.cr.util;
 
 import junit.framework.TestCase;
 import eionet.cr.config.GeneralConfig;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author altnyris
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/spring-context-test.xml")
 public class FolderUtilTest extends TestCase {
 
     /**
      *
      */
+    @Test
     public void testIsUserHomeUri() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -54,6 +61,7 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testExtarctUserName() {
 
         try {
@@ -79,6 +87,7 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testIsUserReservedUri() {
 
         try {
@@ -100,6 +109,7 @@ public class FolderUtilTest extends TestCase {
         }
     }
 
+    @Test
     public void testExtractAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -108,6 +118,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("/abc/cba", aclPath);
     }
 
+    @Test
     public void testExtractProcectAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -116,6 +127,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("/project/aux/poux", aclPath);
     }
 
+    @Test
     public void testEmtpyProcectAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -124,6 +136,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("", aclPath);
     }
 
+    @Test
     public void testExtractParentFolderUri() {
         assertEquals("http://aa.bb.com/level1/level2/level3", FolderUtil.extractParentFolderUri("http://aa.bb.com/level1/level2/level3/somethingattheen"));
     }

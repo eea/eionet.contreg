@@ -38,7 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import edu.yale.its.tp.cas.client.filter.CASFilter;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.web.util.CrCasFilterConfig;
+import eionet.cr.web.util.CrCasFilterConfigNew;
 
 /**
  *
@@ -58,12 +60,12 @@ public class EionetCASFilter extends CASFilter {
      */
     public void init(FilterConfig config) throws ServletException {
 
-        CrCasFilterConfig filterConfig = CrCasFilterConfig.getInstance(config);
+//        CrCasFilterConfig filterConfig = CrCasFilterConfig.getInstance(config);
 
-        casLoginUrl = filterConfig.getInitParameter(CASFilter.LOGIN_INIT_PARAM);
-        serverName = filterConfig.getInitParameter(CASFilter.SERVERNAME_INIT_PARAM);
+        casLoginUrl = GeneralConfig.getProperty(CASFilter.LOGIN_INIT_PARAM);
+        serverName = GeneralConfig.getProperty(CASFilter.SERVERNAME_INIT_PARAM);
 
-        super.init(filterConfig);
+        super.init(new CrCasFilterConfigNew());
     }
 
     /*

@@ -80,8 +80,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     private static final int MINUTES = 60;
 
     /** Upper limit for the number of urgent harvests performed at one interval. */
-    public static final int URGENT_HARVEST_LIMIT = GeneralConfig.getIntProperty(
-            GeneralConfig.HARVESTER_URGENT_HARVESTS_PER_INTERVAL, DEFAULT_URGENT_HARVEST_LIMIT);
+    public static int URGENT_HARVEST_LIMIT;
 
     /** The batch harvesting queue as retrieved from database. */
     private static List<HarvestSourceDTO> batchQueue;
@@ -551,6 +550,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+
+        URGENT_HARVEST_LIMIT = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_URGENT_HARVESTS_PER_INTERVAL, DEFAULT_URGENT_HARVEST_LIMIT);
 
         try {
             JobDetail jobDetails = new JobDetail(HarvestingJob.NAME, JobScheduler.class.getName(), HarvestingJob.class);
