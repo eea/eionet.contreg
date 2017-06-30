@@ -20,17 +20,34 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import au.com.bytecode.opencsv.CSVReader;
+import eionet.acl.AccessController;
+import eionet.cr.common.Predicates;
+import eionet.cr.dao.*;
+import eionet.cr.dao.helpers.CsvImportHelper;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.filestore.FileStore;
+import eionet.cr.util.FolderUtil;
+import eionet.cr.web.action.DataLinkingScript;
+import eionet.cr.web.action.UploadCSVActionBean;
+import eionet.cr.web.action.factsheet.FolderActionBean;
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.openrdf.rio.RDFParseException;
@@ -42,9 +59,6 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.CurrentHarvests;
@@ -117,6 +131,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             if (isBatchHarvestingEnabled()) {
                 handleBatchQueue();
             }
+
+            handleOnlineCsvTsv();
         } catch (Exception e) {
             throw new JobExecutionException(e.toString(), e);
         } finally {
@@ -253,6 +269,169 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
+     * @return List<HarvestSourceDTO
+     * @throws DAOException
+     */
+    private void handleOnlineCsvTsv() throws DAOException {
+        List<HarvestSourceDTO> nextScheduledSources = getNextScheduledOnlineCsvTsv();
+
+        for (HarvestSourceDTO sourceDTO : nextScheduledSources) {
+
+            String fileName = null;
+            String fileUri = null;
+            FileBean fileBean = null;
+            String fileTypeStr = sourceDTO.getUrl().split("\\.")[sourceDTO.getUrl().split("\\.").length - 1];
+            UploadCSVActionBean.FileType fileType = fileTypeStr.equalsIgnoreCase("csv") ? UploadCSVActionBean.FileType.CSV : UploadCSVActionBean.FileType.TSV;
+            String folderUri = sourceDTO.getUrl().substring(0, sourceDTO.getUrl().lastIndexOf("/"));
+            String username = folderUri.split("/")[folderUri.split("/").length - 1];
+            try {
+                URL website = new URL(sourceDTO.getCsvTsvUrl());
+                fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+                String tempFilePath = folderUri + "/temp/" + fileName;
+                File tempFile = new File(tempFilePath);
+                tempFile.getParentFile().mkdirs();
+                tempFile.createNewFile();
+                ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+                fileBean = new FileBean(tempFile, "text/plain", fileName);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (fileBean == null) {
+                continue;
+            }
+
+            fileName = fileBean.getFileName();
+            String fileRelativePath = "/" + fileName;
+            FileStore fileStore = FileStore.getInstance(folderUri);
+            SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
+
+            List<String> uniqueColumns = new ArrayList<String>();
+            String fileLabel = fileSubject.getObjectValue(Predicates.RDFS_LABEL);
+            String objectsType = fileSubject.getObjectValue(Predicates.CR_OBJECTS_TYPE);
+            String publisher = fileSubject.getObjectValue(Predicates.DCTERMS_PUBLISHER);
+            String attribution = fileSubject.getObjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
+            String source = fileSubject.getObjectValue(Predicates.DCTERMS_SOURCE);
+            Collection<String> coll = fileSubject.getObjectValues(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
+            if (coll != null && !coll.isEmpty()) {
+                uniqueColumns.addAll(coll);
+            }
+            String license = fileSubject.getObjectValue(Predicates.DCTERMS_LICENSE);
+            if (StringUtils.isBlank(license)) {
+                license = fileSubject.getObjectValue(Predicates.DCTERMS_RIGHTS);
+            }
+
+            CsvImportHelper helper =
+                    new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution, source);
+
+            // Get already existing data-linking scripts for this file URI, as we need to remember them before overwrite.
+            List<DataLinkingScript> dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels(fileUri, fileRelativePath, username, fileType));
+
+            FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+
+            String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+            // Delete existing data
+            folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
+            fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + fileName));
+
+            try {
+                // Save the file into user's file-store.
+                long fileSize = fileBean.getSize();
+                fileStore.addByMoving(folderUri, true, fileBean);
+
+                // Detect charset and convert the file to UTF-8
+                Charset detectedCharset = helper.detectCSVencoding(folderUri, fileRelativePath, username);
+                if (detectedCharset == null) {
+                    fileStore.delete(fileRelativePath);
+                    LOGGER.error("Cannot detect Charset");
+                } else if (!detectedCharset.toString().startsWith("UTF")) {
+                    fileStore.changeFileEncoding(fileRelativePath, detectedCharset, Charset.forName("UTF-8"));
+                }
+
+                // Store file as new source, but don't harvest it
+                helper.insertFileMetadataAndSource(fileSize, username, true, sourceDTO.getIntervalMinutes(), sourceDTO.getCsvTsvUrl());
+
+                // Add metadata about user folder update
+                helper.linkFileToFolder(folderUri, username);
+
+                // Save
+                CSVReader csvReader = null;
+                try {
+
+                    // The file was encoded to UTF-8 or UTF-* after upload
+                    csvReader = helper.createCSVReader(folderUri, fileRelativePath, username, true);
+                    if (csvReader == null) {
+                        throw new IllegalStateException("No CSV reader successfully created!");
+                    }
+
+                    helper.extractObjects(csvReader);
+                    helper.saveWizardInputs();
+
+                    // Save data-linking scripts, if any added.
+                    try {
+                        LOGGER.debug("Saving data-linking scripts for " + fileUri);
+                        helper.saveDataLinkingScripts(dataLinkingScripts);
+                    } catch (DAOException e) {
+                        LOGGER.error("Failed to add data linking script", e);
+                    }
+
+                    // Run all post-harvest scripts specific to this source (i.e. to this uploaded file).
+                    // This will run both the data data-linking scripts saved in the previous block, plus any that existed already.
+                    try {
+                        LOGGER.debug("Running all source-specific post-harvest scripts of " + fileUri);
+                        List<String> warnings = helper.runScripts();
+                        if (warnings.size() > 0) {
+                            for (String w : warnings) {
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to run data linking scripts", e);
+                    }
+
+                    // Finally, make sure that the file has the correct number of harvested statements in its predicates.
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
+
+                } catch (Exception e) {
+                    LOGGER.error("Exception while processing the uploaded file:", e);
+                } finally {
+                    try {
+                        helper.generateAndStoreTableFileQuery();
+                    } catch (Exception e2) {
+                        LOGGER.error("Failed to generate SPARQL query", e2);
+                    }
+                    CsvImportHelper.close(csvReader);
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Error while reading the file: ", e);
+            }
+        }
+
+    }
+
+    /**
+     * Singleton getter for column labels.
+     *
+     * @return
+     */
+    public List<String> getColumnLabels(String folderUri, String fileUri, String username, UploadCSVActionBean.FileType fileType) {
+        try {
+            List<String> columnLabels = CsvImportHelper.extractColumnLabels(folderUri, fileUri, username, fileType);
+            return columnLabels;
+        } catch (Exception e) {
+            LOGGER.error("Exception while reading uploaded file:", e);
+            return new ArrayList<String>();
+        }
+    }
+
+    /**
      *
      * @return List<HarvestSourceDTO>
      * @throws DAOException
@@ -261,6 +440,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         if (isBatchHarvestingEnabled()) {
             return DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
+        } else {
+            return new ArrayList<HarvestSourceDTO>();
+        }
+    }
+
+    /**
+     *
+     * @return List<HarvestSourceDTO>
+     * @throws DAOException
+     */
+    public static List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv() throws DAOException {
+
+        if (isBatchHarvestingEnabled()) {
+            return DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledOnlineCsvTsv(getSourcesLimitForInterval());
         } else {
             return new ArrayList<HarvestSourceDTO>();
         }
