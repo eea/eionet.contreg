@@ -31,7 +31,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 
 /**
  *
- * @author altnyrisio6972513864
+ * @author altnyris
  * @author George Sofianos
  *
  */

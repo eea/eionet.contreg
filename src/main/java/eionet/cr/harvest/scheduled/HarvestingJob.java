@@ -288,7 +288,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 URL website = new URL(sourceDTO.getCsvTsvUrl());
                 fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
                 fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
-                String tempFilePath = folderUri + "/temp/" + fileName;
+                String tempFilePath = folderUri + "/temp/" + StringUtils.replace(fileName, " ", "%20");
                 File tempFile = new File(tempFilePath);
                 tempFile.getParentFile().mkdirs();
                 tempFile.createNewFile();
@@ -296,11 +296,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 FileOutputStream fos = new FileOutputStream(tempFile);
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 
-                fileBean = new FileBean(tempFile, "text/plain", fileName);
+                fileBean = new FileBean(tempFile, "text/plain", StringUtils.replace(fileName, " ", "%20"));
             } catch (MalformedURLException e) {
+                LOGGER.error("Cannot get URL");
                 e.printStackTrace();
+                throw new DAOException(e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new DAOException(e.getMessage());
             }
 
             if (fileBean == null) {
@@ -308,7 +311,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             }
 
             fileName = fileBean.getFileName();
-            String fileRelativePath = "/" + fileName;
+            String fileRelativePath = "/" + StringUtils.replace(fileName, " ", "%20");
             FileStore fileStore = FileStore.getInstance(folderUri);
             SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
 
@@ -339,7 +342,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             // Delete existing data
             folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
             DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
-            fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + fileName));
+            fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + StringUtils.replace(fileName, " ", "%20")));
 
             try {
                 // Save the file into user's file-store.
