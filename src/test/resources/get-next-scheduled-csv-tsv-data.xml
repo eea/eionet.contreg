@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+<!--<harvest_source harvest_source_id="6" url="http://127.0.0.1:8080/cr3/home/tourikas/download.csv" time_created="2017-07-04 16:00:02" csv_tsv_url="https://www.eea.europa.eu/data-and-maps/daviz/sds/tourism-overnights-per-season/download.csv" count_unavail="0" url_hash="-4591620959060771800" />-->
+<!--<harvest_source harvest_source_id="7" url="http://127.0.0.1:8080/cr3/home/tourikas/download.csv" time_created="2017-07-04 16:00:02" last_harvest="" interval_minutes="60" is_online_csv_tsv="Y" csv_tsv_url="https://www.eea.europa.eu/data-and-maps/daviz/sds/tourism-overnights-per-season/download.csv" count_unavail="0" url_hash="-4591620959060771801" />-->
+<!--<harvest_source harvest_source_id="8" url="http://127.0.0.1:8080/cr3/home/tourikas/download.csv" time_created="2017-07-04 16:00:02" last_harvest="now()" interval_minutes="60" is_online_csv_tsv="Y" csv_tsv_url="https://www.eea.europa.eu/data-and-maps/daviz/sds/tourism-overnights-per-season/download.csv" count_unavail="0" url_hash="-4591620959060771802" />-->
+<harvest_source harvest_source_id="1" url="http://127.0.0.1:8080/cr3/home/tourikas/download.csv" time_created="2017-07-04 16:00:02" last_harvest="2017-07-04 16:01:02" interval_minutes="60" is_online_csv_tsv="Y" csv_tsv_url="https://www.eea.europa.eu/data-and-maps/daviz/sds/tourism-overnights-per-season/download.csv" count_unavail="0" url_hash="-4591620959060771803" />
+</dataset>

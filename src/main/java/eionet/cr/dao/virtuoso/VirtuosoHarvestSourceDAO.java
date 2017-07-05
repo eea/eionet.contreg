@@ -817,10 +817,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see eionet.cr.dao.HarvestSourceDAO#getNextScheduledSources(int)
+     * @param limit
+     *            - max number of sources to return.
+     * @return
+     * @throws DAOException
      */
     @Override
     public List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv(int limit) throws DAOException {

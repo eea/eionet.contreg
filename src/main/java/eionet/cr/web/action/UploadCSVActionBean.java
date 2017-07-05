@@ -46,10 +46,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -227,15 +224,20 @@ public class UploadCSVActionBean extends AbstractActionBean {
                 File tempFile = new File(tempFilePath);
                 tempFile.getParentFile().mkdirs();
                 tempFile.createNewFile();
+
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
                 FileOutputStream fos = new FileOutputStream(tempFile);
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 
                 fileBean = new FileBean(tempFile, "text/plain", fileName);
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                LOGGER.error("Malformed URL", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("IOException when creating local file from online source.", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
             }
         }
 

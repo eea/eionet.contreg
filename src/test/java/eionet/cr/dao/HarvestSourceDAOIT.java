@@ -143,4 +143,12 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
         assertEquals("http://rod.eionet.europa.eu/countries", source.getUrl());
 
     }
+
+    @Test
+    public void testGetNextScheduledOnlineCsvTsv() throws Exception {
+
+        List<HarvestSourceDTO> sources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledOnlineCsvTsv(1);
+        assertEquals(1, sources.size());
+        assertEquals(9, sources.get(0).getSourceId().intValue());
+    }
 }
