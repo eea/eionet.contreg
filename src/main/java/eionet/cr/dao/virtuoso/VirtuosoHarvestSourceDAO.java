@@ -828,7 +828,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     public List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv(int limit) throws DAOException {
 
         if (limit < 1) {
-            throw new IllegalArgumentException("Limit must be >=1 ");
+            throw new IllegalArgumentException("Limit must be >=1");
         }
 
         String query = GET_NEXT_SCHEDULED_ONLINE_SOURCES_SQL.replace("<limit>", String.valueOf(limit));

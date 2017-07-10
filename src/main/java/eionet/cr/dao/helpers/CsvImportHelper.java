@@ -206,16 +206,7 @@ public class CsvImportHelper {
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, userName));
 
-        String mediaType = fileType.toString();
-        String lastModified = Util.virtuosoDateToString(new Date());
-
-        // If long size can be converted to int without loss, then do so, otherwise remain true to long.
-        ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
-
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.RDF_TYPE, ObjectDTO.createResource(Subjects.CR_TABLE_FILE));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, byteSize);
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
+        insertFileMetadataAndSourceHelper(dao, size);
     }
 
     /**
@@ -233,6 +224,16 @@ public class CsvImportHelper {
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, interval, userName, isOnlineCsvTsv, csvUrl));
 
+        insertFileMetadataAndSourceHelper(dao, size);
+    }
+
+    /**
+     *
+     * @param dao
+     * @param size
+     * @throws Exception
+     */
+    public void insertFileMetadataAndSourceHelper(HarvestSourceDAO dao, long size) throws Exception {
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
@@ -244,6 +245,7 @@ public class CsvImportHelper {
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
     }
+
 
     /**
      * Adds reference of the file to the given parent folder.

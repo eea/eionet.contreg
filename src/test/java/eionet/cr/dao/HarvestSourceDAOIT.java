@@ -23,12 +23,17 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.rules.ExpectedException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
@@ -87,7 +92,7 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
                 DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
         assertNotNull(result);
         assertNotNull(result.getRight());
-        assertEquals(5, result.getRight().size());
+        assertEquals(8, result.getRight().size());
     }
 
     @Test
@@ -151,4 +156,16 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
         assertEquals(1, sources.size());
         assertEquals(9, sources.get(0).getSourceId().intValue());
     }
+
+    @Test
+    public void testGetNextScheduleOnlineCsvTsvException() throws Exception {
+
+        try {
+            DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledOnlineCsvTsv(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Limit must be >=1"));
+        }
+    }
+
 }
