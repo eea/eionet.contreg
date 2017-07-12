@@ -10,6 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import eionet.cr.spring.SpringApplicationContext;
 import org.apache.log4j.Logger;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -112,11 +113,7 @@ public final class SesameConnectionProvider {
      * @return the readWriteDataSource
      */
     private static synchronized DataSource getReadWriteDataSource() {
-
-        if (readWriteDataSource == null) {
-            readWriteDataSource = lookupDataSource(READWRITE_DATASOURCE_NAME);
-        }
-        return readWriteDataSource;
+        return SpringApplicationContext.getBean("dataSource");
     }
 
     /**
