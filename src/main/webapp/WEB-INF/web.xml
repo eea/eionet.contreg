@@ -8,11 +8,11 @@
     <!-- context parameters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <display-name>${application.displayName}</display-name>
+    <display-name>${config.application.displayName}</display-name>
 
     <context-param>
         <param-name>appDispName</param-name>
-        <param-value>${application.displayName}</param-value>
+        <param-value>${config.application.displayName}</param-value>
     </context-param>
 
     <context-param>
@@ -145,13 +145,22 @@
 
     <filter>
         <filter-name>CAS Filter</filter-name>
-        <filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>
+        <filter-class>eionet.cr.web.filters.cas.EionetCASFilter</filter-class>
     </filter>
 
     <filter-mapping>
         <filter-name>CAS Filter</filter-name>
         <url-pattern>/login</url-pattern>
     </filter-mapping>
+    <!--<filter>-->
+        <!--<filter-name>CAS Filter</filter-name>-->
+        <!--<filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>-->
+    <!--</filter>-->
+
+    <!--<filter-mapping>-->
+        <!--<filter-name>CAS Filter</filter-name>-->
+        <!--<url-pattern>/login</url-pattern>-->
+    <!--</filter-mapping>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- listeners -->

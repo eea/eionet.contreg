@@ -5,36 +5,27 @@
 version: '2'
 services:
 
+  ## VIRTUOSO SERVICE
   virtuoso:
-#    image: ervis/virtuoso:latest
-    image: tourikas/virtuoso:latest
-#    environment:
-#      DBA_PASSWORD: "dba"
+    image: tourikas/virtuoso:2017-07-17T1338
     volumes:
-      - ./data:/data
+#      - /home/ato/Devel/deploy/app/contreg/virtuoso:/data
+#      - /home/ato/Devel/deploy/app/contreg:/contreg
+      - virtuoso:/data
+      - contreg:/contreg
     ports:
       - "1111:1111"
 
-  ## TOMCAT SERVICE
-  tomcat:
-    image: tourikas/contreg:latest
-#    environment:
-#      CATALINA_OPTS: "-Dvirtuoso.db.url=jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR -Dvirtuoso.db.drv=virtuoso.jdbc3.Driver -Dvirtuoso.db.usr=dba -Dvirtuoso.db.pwd=dba"
-#      virtuoso.db.url: "jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR"
-#      virtuoso.db.drv: "virtuoso.jdbc3.Driver"
-#      virtuoso.db.usr: "dba"
-#      virtuoso.db.pwd: "dba"
-#      driver: "virtuoso.jdbc4.Driver"
-#      url: "jdbc:virtuoso://virtuoso:1111/charset=UTF-8/log_enable=2/DATABASE=CR"
-#      username: "dba"
-#      password: "dba"
+  ## CONTREG SERVICE
+  contreg:
+    image: tourikas/contreg:2017-07-17T1505
     env_file: docker.env
-    ports:
-      - "8080:8080"
+#    ports:
+#      - "8080:8080"
     links:
       - virtuoso
-    volumes_from:
-      - virtuoso
-#    labels:
-#      io.rancher.container.pull_image: always
-#      io.rancher.sidekicks: data-xmlconv, scpserver
+#    volumes_from:
+#      - virtuoso
+    volumes:
+#      - /home/ato/Devel/deploy/app/contreg:/contreg
+      - contreg:/contreg

@@ -25,10 +25,11 @@ package eionet.cr.web.context;
 
 import static eionet.cr.web.util.WebConstants.LAST_ACTION_URL_SESSION_ATTR;
 import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
+
+import eionet.cr.web.filters.cas.EionetCASFilter;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.security.EionetCASFilter;
 
 /**
  * Extension of stripes ActionBeanContext.
