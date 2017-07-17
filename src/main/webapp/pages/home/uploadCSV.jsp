@@ -61,7 +61,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required" for="fileInput">File</label></td>
+                                    <td>
+                                        <label class="question" for="fileURL" title="URL of CSV/TSV file.">Online Source</label>
+                                    </td>
+                                    <td><stripes:text name="fileURL" id="fileURL" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label class="question" for="fileInput">File</label></td>
                                     <td><stripes:file name="fileBean" id="fileInput" size="30" /></td>
                                 </tr>
                                 <tr>
@@ -75,6 +81,17 @@
                                             <c:forEach var="col" items="${actionBean.fileEncodings}">
                                                 <stripes:option value="${col.key}" label="${col.value}" />
                                             </c:forEach>
+                                        </stripes:select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label class="question" for="intervalSelect" title="">Re-harvest Interval</label></td>
+                                    <td>
+                                        <stripes:select name="interval" id="intervalSelect" style="width: 350px;">
+                                            <stripes:option value="0" label="Once" />
+                                            <stripes:option value="60" label="Hourly" />
+                                            <stripes:option value="1440" label="Daily" />
+                                            <stripes:option value="10080" label="Weekly" />
                                         </stripes:select>
                                     </td>
                                 </tr>

@@ -390,4 +390,20 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
       </sql>
     </changeSet>
 
+    <changeSet id="rev-24" author="thanostourikas">
+        <comment>A field indicating whether the source is a CSV/TSV downloaded file.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "is_online_csv_tsv" VARCHAR(1)
+        </sql>
+    </changeSet>
+
+    <changeSet id="rev-25" author="thanostourikas">
+        <comment>A field indicating the online source of CSV/TSV.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "csv_tsv_url" VARCHAR(255)
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

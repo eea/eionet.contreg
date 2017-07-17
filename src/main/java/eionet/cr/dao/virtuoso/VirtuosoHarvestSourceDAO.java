@@ -368,7 +368,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      */
     private static final String ADD_SOURCE_SQL =
             "insert soft HARVEST_SOURCE (URL, URL_HASH,EMAILS, TIME_CREATED, INTERVAL_MINUTES, PRIORITY_SOURCE, SOURCE_OWNER, "
-                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL) VALUES (?,?,?,NOW(),?,?,?,?,?,0)";
+                    + "MEDIA_TYPE, IS_SPARQL_ENDPOINT, COUNT_UNAVAIL, IS_ONLINE_CSV_TSV, CSV_TSV_URL) VALUES (?,?,?,NOW(),?,?,?,?,?,0,?,?)";
 
     private static final String UPDATE_BULK_SOURCE_LAST_HARVEST =
             "update HARVEST_SOURCE set LAST_HARVEST=stringdate('2000-01-01') where URL_HASH=?";
@@ -509,6 +509,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
             ps.setString(7, source.getMediaType());
             ps.setString(8, YesNoBoolean.format(source.isSparqlEndpoint()));
+            ps.setString(9, YesNoBoolean.format(source.isOnlineCsvTsv()));
+            ps.setString(10, source.getCsvTsvUrl());
 
             ps.executeUpdate();
             ps = conn.prepareStatement("select identity_value()");
@@ -758,7 +760,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + "url, harvest_source_id, "
             + "url_hash, emails, time_created, statements, count_unavail,"
             + "cast(\"last_harvest\" as varchar) as last_harvest,interval_minutes,source, last_modified,"
-            + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag "
+            + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag, is_online_csv_tsv, csv_tsv_url "
             + " from HARVEST_SOURCE where URL_HASH=?";
     //private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
@@ -780,7 +782,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
             "select top <limit> * from HARVEST_SOURCE " +
             "where COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 " +
-            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> ";
+            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> " +
+            "and ( IS_ONLINE_CSV_TSV IS NULL or IS_ONLINE_CSV_TSV = 'N' ) ";
 
     /** */
     private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
@@ -789,6 +792,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
+
+    private static final String GET_NEXT_SCHEDULED_ONLINE_SOURCES_SQL =
+            "select top <limit> * from HARVEST_SOURCE " +
+            "where IS_ONLINE_CSV_TSV = 'Y' " +
+            "and INTERVAL_MINUTES > 0 " +
+            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> ";
 
     /*
      * (non-Javadoc)
@@ -803,6 +812,26 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         String query = GET_NEXT_SCHEDULED_SOURCES_SQL.replace("<limit>", String.valueOf(limit));
+        query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
+        query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
+        return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
+    }
+
+    /**
+     *
+     * @param limit
+     *            - max number of sources to return.
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv(int limit) throws DAOException {
+
+        if (limit < 1) {
+            throw new IllegalArgumentException("Limit must be >=1");
+        }
+
+        String query = GET_NEXT_SCHEDULED_ONLINE_SOURCES_SQL.replace("<limit>", String.valueOf(limit));
         query = query.replace("<seconds_since_last_harvest>", SECONDS_SINCE_LAST_HARVEST_EXPR);
         query = query.replace("<harvest_interval_seconds>", HARVEST_INTERVAL_SECONDS_EXPR);
         return executeSQL(query, Collections.EMPTY_LIST, new HarvestSourceDTOReader());
