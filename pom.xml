@@ -5,6 +5,10 @@
     <groupId>eionet.cr</groupId>
     <artifactId>cr3</artifactId>
     <packaging>war</packaging>
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,6 +17,7 @@
         <javaVersion>1.6</javaVersion>
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
+        <spring.version>4.2.6.RELEASE</spring.version>
     </properties>
 
     <version>1.0-SNAPSHOT</version>
@@ -120,7 +125,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>2.6</version>
                 <configuration>
                     <filters>
                         <filter>${basedir}/${env}.properties</filter>
@@ -133,6 +138,11 @@
                             <includes>
                                 <include>context.xml</include>
                             </includes>
+                        </resource>
+                        <resource>
+                            <filtering>false</filtering>
+                            <directory>${basedir}/src/main/resources</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                         <resource>
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
@@ -162,35 +172,82 @@
             </plugin>
 
             <!-- Run Ant for various preparation tasks, declared in build.xml -->
-
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-local-properties</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/${env}.properties"
+                                      toFile="${project.build.directory}/classes/env.properties" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pre-test</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.directory}/test-classes/xsl" />
+                                <mkdir dir="${project.build.directory}/test-classes/tmp" />
+                                <mkdir dir="${project.build.directory}/test-classes/queries" />
+                                <mkdir dir="${project.build.directory}/test-classes/xmlfile" />
+                                <mkdir dir="${project.build.directory}/test-classes/schema" />
+                                <copy todir="${project.build.directory}/test-classes/WEB-INF">
+                                    <fileset dir="src/main/webapp/WEB-INF" />
+                                </copy>
+                                <copy todir="${project.build.directory}/test-classes/acl">
+                                    <fileset dir="acl" />
+                                </copy>
+                                <copy file="${basedir}/${env}.properties"
+                                      toFile="${project.build.directory}/test-classes/env.properties" />
+                                <copy todir="${project.build.directory}/test-classes/sql">
+                                    <fileset dir="sql" />
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
 
-                    <!-- Pre-test preparations -->
+                    &lt;!&ndash; Pre-test preparations &ndash;&gt;
 
                     <execution>
                         <id>pre-test</id>
                         <phase>process-test-classes</phase>
                         <configuration>
                             <target unless="maven.test.skip">
-                                <!-- Load build properties. -->
+                                &lt;!&ndash; Load build properties. &ndash;&gt;
                                 <loadproperties srcFile="${env}.properties"/>
-                                <!-- Ensure that the "harvester.tempFileDir" directory exists. -->
+                                &lt;!&ndash; Ensure that the "harvester.tempFileDir" directory exists. &ndash;&gt;
                                 <mkdir dir="${harvester.tempFileDir}"/>
-                                <!-- Ensure that the "filestore.path" directory exists. -->
+                                &lt;!&ndash; Ensure that the "filestore.path" directory exists. &ndash;&gt;
                                 <mkdir dir="${filestore.path}"/>
-                                <!-- Ensure that the "application.acl.folder" directory exists. -->
+                                &lt;!&ndash; Ensure that the "application.acl.folder" directory exists. &ndash;&gt;
                                 <mkdir dir="${application.acl.folder}"/>
-                                <!-- Copy files from acl directory into "application.acl.folder", unless they already exist in the latter. -->
+                                &lt;!&ndash; Copy files from acl directory into "application.acl.folder", unless they already exist in the latter. &ndash;&gt;
                                 <copy todir="${application.acl.folder}">
                                     <fileset dir="src/main/resources/acl">
                                         <present present="srconly" targetdir="${application.acl.folder}"/>
                                     </fileset>
                                 </copy>
-                                <!-- Always overwrite the permission definitions file(s) in "application.acl.folder". -->
+                                &lt;!&ndash; Always overwrite the permission definitions file(s) in "application.acl.folder". &ndash;&gt;
                                 <copy todir="${application.acl.folder}" overwrite="true">
                                     <fileset dir="src/main/resources/acl" includes="*.prms*"/>
                                     <fileset dir="src/main/resources/acl" includes="*.permissions*"/>
@@ -203,7 +260,7 @@
                     </execution>
 
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -226,19 +283,19 @@
 
         <!-- resources for the main code -->
 
-        <resources>
+<!--        <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
                 <includes>
                     <include>**/*</include>
                 </includes>
             </resource>
-        </resources>
+        </resources>-->
 
         <!-- resources for the main code -->
 
-        <testResources>
+<!--        <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
@@ -246,7 +303,7 @@
                     <include>**/*</include>
                 </includes>
             </testResource>
-        </testResources>
+        </testResources>-->
 
         <!-- name of the bundled project when it is finally built -->
 
@@ -326,7 +383,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.17</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
@@ -389,7 +446,7 @@
         <dependency>
             <groupId>eionet</groupId>
             <artifactId>acl</artifactId>
-            <version>2.0</version>
+            <version>4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
@@ -637,13 +694,18 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.4.6</version>
+        </dependency>
+
         <!-- TEST dependencies -->
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-            <!--<version>4.3.1</version>-->
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -666,6 +728,42 @@
             <artifactId>jetty-util</artifactId>
             <version>6.1.25</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Spring framework dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- PropertyPlaceholderConfigurer -->
+        <dependency>
+            <groupId>eionet</groupId>
+            <artifactId>property-placeholder-resolver</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
         </dependency>
 
     </dependencies>
