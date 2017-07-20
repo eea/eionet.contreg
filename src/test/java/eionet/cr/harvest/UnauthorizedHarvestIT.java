@@ -40,7 +40,6 @@ public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
 
     /**
      * @throws Exception
-     *
      */
     @Test
     public void test() throws Exception {
@@ -59,6 +58,8 @@ public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
 
             String url = "http://localhost:8999/testServlet";
             int intervalMinutes = 15;
+            // Next interval is a day after the previous one, so we add a day to the previous interval minutes
+            int expectedNextIntervalinMinutes= intervalMinutes +(24*60);
             int noOfTriples = 2;
 
             HarvestSourceDTO source = new HarvestSourceDTO();
@@ -76,11 +77,12 @@ public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
             assertEquals("Unexpected number of harvested triples", noOfTriples, harvest.getStoredTriplesCount());
             source = harvestSourceDao.getHarvestSourceByUrl(url);
             assertNotNull("Expected a stored harvest source for this URL: " + url, source);
-            assertEquals("Unexpected source harvest interval", Integer.valueOf(intervalMinutes), source.getIntervalMinutes());
+            assertEquals("Unexpected source harvest interval", Integer.valueOf(expectedNextIntervalinMinutes), source.getIntervalMinutes());
             assertEquals("Unexpected number of triples in source", Integer.valueOf(noOfTriples), source.getStatements());
 
             // Second call, now expecting HTTP 401.
-
+            // Since it is a second harvest attempt, the harvest interval will be the previous one plus  a day.
+            expectedNextIntervalinMinutes +=24*60;
             server.stop();
             server = new Server(8999);
             handler = new ServletHandler();
@@ -97,7 +99,7 @@ public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
             assertEquals("Unexpected number of harvested triples", 0, harvest.getStoredTriplesCount());
             source = harvestSourceDao.getHarvestSourceByUrl(url);
             assertNotNull("Expected a stored harvest source for this URL: " + url, source);
-            assertEquals("Unexpected source harvest interval", Integer.valueOf(intervalMinutes), source.getIntervalMinutes());
+            assertEquals("Unexpected source harvest interval", Integer.valueOf(expectedNextIntervalinMinutes), source.getIntervalMinutes());
             assertEquals("Unexpected number of triples in source", Integer.valueOf(0), source.getStatements());
         } finally {
             JettyUtil.close(server);

@@ -33,6 +33,7 @@ public class QueryResultValidator {
             if (queryResult.getRows() != null && queryResult.getRows().size() > 0) {
                 for (Map<String, ResultValue> row : queryResult.getRows()) {
                     if (row.isEmpty()) {
+                        System.out.println("some row is empty");
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
 
@@ -41,6 +42,7 @@ public class QueryResultValidator {
 
                     String strValue = resultValue.getValue();
                     if (!URLUtil.isURL(strValue)) {
+                        System.out.println("url is not url");
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
                 }

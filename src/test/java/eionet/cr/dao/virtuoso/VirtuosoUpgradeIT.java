@@ -143,7 +143,6 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
 
         SearchResultDTO<SubjectDTO> result =
                 DAOFactory.get().getDao(SearchDAO.class).searchByFilters(filters, false, pagingRequest, sortRequest, predicates);
-
         assertNotNull("Expected search result not to be null", result);
         List<SubjectDTO> items = result.getItems();
         assertNotNull("Expected search result items not to be null", items);
@@ -151,6 +150,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         SubjectDTO firstSubject = items.iterator().next();
         assertEquals("Expected first subject to be http://rod.eionet.europa.eu/obligations/569",
                 "http://rod.eionet.europa.eu/obligations/569", firstSubject.getUri());
+   
     }
 
     /**

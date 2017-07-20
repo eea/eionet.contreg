@@ -20,6 +20,7 @@
  */
 package eionet.cr.harvest;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +40,11 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
+import java.io.IOException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  *
@@ -70,15 +76,13 @@ public class PullHarvestIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      *
-     */
+     */    
     @Test
     public void testSimpleRdf() throws Exception {
-
         Server server = null;
         try {
             server = JettyUtil.startResourceServerMock(8999, "/testResources", "simple-rdf.xml");
             String url = "http://localhost:8999/testResources/simple-rdf.xml";
-
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
