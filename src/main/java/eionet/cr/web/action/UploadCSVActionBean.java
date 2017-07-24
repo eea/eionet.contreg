@@ -103,6 +103,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     private String fileURL;
 
+    private String onlineFileName;
+
     /** Uploaded file's bean object. */
     private FileBean fileBean;
 
@@ -218,7 +220,12 @@ public class UploadCSVActionBean extends AbstractActionBean {
             try {
                 isOnlineCsvTsv = true;
                 URL website = new URL(fileURL);
-                fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                if(onlineFileName != null && !onlineFileName.isEmpty()) {
+                    fileName = onlineFileName + "." + fileType.toString().toLowerCase();
+                }
+                else {
+                    fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                }
                 fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
                 String tempFilePath = folderUri + "/temp/" + fileName;
                 File tempFile = new File(tempFilePath);
@@ -602,6 +609,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     public void setFileURL(String fileURL) {
         this.fileURL = fileURL;
+    }
+
+    public String getOnlineFileName() {
+        return onlineFileName;
+    }
+
+    public void setOnlineFileName(String onlineFileName) {
+        this.onlineFileName = onlineFileName;
     }
 
     /**

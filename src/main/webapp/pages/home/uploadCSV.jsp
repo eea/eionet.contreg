@@ -67,6 +67,12 @@
                                     <td><stripes:text name="fileURL" id="fileURL" /></td>
                                 </tr>
                                 <tr>
+                                    <td>
+                                        <label class="question" for="onlineFileName" title="File Name.">File Name</label>
+                                    </td>
+                                    <td><stripes:text name="onlineFileName" id="onlineFileName" /></td>
+                                </tr>
+                                <tr>
                                     <td><label class="question" for="fileInput">File</label></td>
                                     <td><stripes:file name="fileBean" id="fileInput" size="30" /></td>
                                 </tr>
