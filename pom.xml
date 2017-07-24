@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <env>local</env>
+        <env>default</env>
         <javaVersion>1.6</javaVersion>
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
