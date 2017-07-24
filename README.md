@@ -218,3 +218,14 @@ Using both styles is not an issue, but using both styles with the same property 
 For debug purposes, the application will report at startup the settings that are overriden, like this:
 
     Setting harvester.tempFileDir overridden by ENV variable (old value /var/tmp, new value /var/tmp/cr)
+
+
+## 9. Tips for Handling Virtuoso Errors
+
+#### 9.1 Virtuoso Error : "Message: SR008: Function sequence_set needs an integer as argument 2, not an arg of type DB_NULL (204)" or similar error 
+   * **Solution:** <br>
+     It may be an indicator that we are trying to insert a wrong or null  value to a virtuoso column. 
+     The best way to overcome it is to try to print from the code, the query to be executed along with the actual values, 
+     and run the query manually to virtuoso server.
+     In this case  where this error occurs, we were passing null value to an integer not null column.
+
