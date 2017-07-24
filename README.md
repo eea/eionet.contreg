@@ -97,14 +97,14 @@ Set up the triple store's full text indexing
 ## 5. Integration tests
 There are 2 ways to run integration tests: Using a docker or manually. 
 
-### 2.1 Automated test execution using Docker(there are test failures)
+### 5.1 Automated test execution using Docker(there are test failures)
 You need to have docker installed. Then execute the following command: 
 
     shell> mvn -Pit clean verify
 
 The integration test will start up a virtuoso database on port 1112, then the application in Tomcat. The application will run the Liquibase scripts on the database, and then the integration tests will be run by the Maven program - not from the instance of Tomcat or Virtuoso.
 
-### 2.2 Manual Test Execution (All tests pass)
+### 5.2 Manual Test Execution (All tests pass)
 
 1. create a folder for test Virtuoso
 
