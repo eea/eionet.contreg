@@ -18,7 +18,7 @@ services:
 
   ## CONTREG SERVICE
   contreg:
-    image: tourikas/contreg:2017-07-20T1113
+    image: tourikas/contreg:2017-07-24T1705
     env_file: docker.env
 #    ports:
 #      - "8080:8080"
