@@ -12,9 +12,15 @@ import org.junit.Test;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.web.action.ActionBeanUtils;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
+import java.sql.Connection;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * unit test for testing HarvestScriptActionBean.
@@ -23,6 +29,40 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
  */
 public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
 
+    @Before
+    public void setUp() {
+        Connection conn = null;
+        List<Object> values = new ArrayList<Object>();
+        values.add(new Integer(1));
+        values.add("url");
+        values.add("type");
+        values.add("token");
+        values.add("admin");
+        try {
+            conn = SesameUtil.getSQLConnection();
+            SQLUtil.executeUpdateReturnAutoID("insert into EXTERNAL_SERVICE (SERVICE_ID, SERVICE_URL, SERVICE_TYPE, SECURE_TOKEN, USER_NAME) values (?, ?, ?, ?, ?)", values, conn);
+        } catch (Exception e) {
+
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    @After
+    public void tearDown() {
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            SQLUtil.execute("DELETE from  EXTERNAL_SERVICE  where SERVICE_URL = '" + "url" + "'", conn);
+        } catch (Exception e) {
+
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
+
+    
+    
     /**
      * Test the save action.
      *
@@ -38,7 +78,8 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         trip.setParameter("targetType", "TYPE");
         trip.setParameter("targetUrl", "http://targeturl.com");
         trip.setParameter("testSourceUrl", "http://dummyurl.nowhere.com");
-
+        trip.setParameter("type",HarvestScriptType.PUSH.getName());
+        trip.setParameter("externalServiceId","1");
         trip.execute();
 
         HarvestScriptActionBean bean = trip.getActionBean(HarvestScriptActionBean.class);

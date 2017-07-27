@@ -326,7 +326,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.13</version>
+            <version>1.2.17</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
@@ -651,6 +651,11 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.3</version>
+        </dependency>
 
         <!-- Jetty -->
 
@@ -866,6 +871,7 @@
                     <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
                     <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
                   </systemPropertyVariables>
+                  <trimStackTrace>false</trimStackTrace>
                 </configuration>
                 <executions>
                   <execution>

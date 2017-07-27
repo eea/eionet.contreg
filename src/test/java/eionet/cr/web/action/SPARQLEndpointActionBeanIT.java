@@ -96,7 +96,7 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
         trip.setParameter("query", sparql);
 
         trip.execute();
-
+        
         SPARQLEndpointActionBean bean = trip.getActionBean(SPARQLEndpointActionBean.class);
 
         // http response code = 400
