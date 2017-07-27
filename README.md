@@ -142,7 +142,7 @@ The integration test will start up a virtuoso database on port 1112, then the ap
    and this script: CR_SOURCE_HOME/sql/virtuoso/install/1_create_users.sql <br />
    (assuming the test server is running on port 1112) <br />
 
-    shell> isql localhost:1112 -U dba -P password < 1_create_users.sql
+    `shell> isql-vt localhost:1112 -U dba -P password < 1_create_users.sql`
 
 6. Add the test instance server parameters to *local.properties*
 
