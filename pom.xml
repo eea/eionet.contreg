@@ -714,6 +714,11 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.3</version>
+        </dependency>
 
         <!-- Jetty -->
 
@@ -965,6 +970,7 @@
                     <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
                     <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
                   </systemPropertyVariables>
+                  <trimStackTrace>false</trimStackTrace>
                 </configuration>
                 <executions>
                   <execution>

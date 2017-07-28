@@ -2128,7 +2128,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private void loadRdfFile(File file, RDFFormat rdfFormat, Connection conn, String baseUri, String contextUri)
             throws SQLException {
 
-        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + file.toString() + "'), '" + baseUri + "', '" + contextUri + "')";
+        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + file.getAbsolutePath()+ "'), '" + baseUri + "', '" + contextUri + "')";
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
             if (rdfFormat.equals(RDFFormat.TRIG)) {
