@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
-
+@Ignore
 public class HarvestSourceRedirectIT extends CRDatabaseTestCase {
 
     /*

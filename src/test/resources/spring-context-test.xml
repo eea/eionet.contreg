@@ -19,6 +19,7 @@
         <constructor-arg index="0">
             <array>
                 <value>eionetdir.properties</value>
+                <value>liquibase.properties</value>
                 <value>cr.properties</value>
                 <value>acl.properties</value>
                 <value>env.properties</value>
@@ -55,6 +56,20 @@
 
     <bean id="accessController" class="eionet.acl.AccessController">
         <constructor-arg index="0" ref="aclProperties" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${virtuoso.db.drv}" />
+        <property name="url" value="${virtuoso.db.url}" />
+        <property name="username" value="${virtuoso.db.usr}" />
+        <property name="password" value="${virtuoso.db.pwd}" />
+        <property name="maxTotal" value="40" />
+        <property name="maxWaitMillis" value="10000" />
+        <property name="removeAbandonedOnBorrow" value="true" />
+        <property name="removeAbandonedOnMaintenance" value="true" />
+        <property name="removeAbandonedTimeout" value="300" />
+        <property name="timeBetweenEvictionRunsMillis" value="300000" />
+        <property name="logAbandoned" value="false" />
     </bean>
 
     <!-- Runs on Tomcat startup. -->

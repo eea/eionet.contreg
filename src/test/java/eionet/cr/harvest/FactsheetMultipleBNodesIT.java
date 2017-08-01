@@ -11,6 +11,7 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Test;
 
 /**
  * Test that links and display values of blank nodes are properly returned in a factsheet, whether expanded or collapsed.
@@ -33,6 +34,7 @@ public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void test() throws Exception {
 
         String subjectUri = "http://example.org/Person#John";

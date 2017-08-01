@@ -8,12 +8,20 @@ import org.junit.Test;
 
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 /**
  * Tests for the {@link HarvestDAO} implementations.
  *
  * @author Jaanus
  */
+@SqlGroup({
+        @Sql({"/harvests.sql"}),
+        @Sql(scripts = "/harvests-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+})
 public class HarvestDAOIT extends CRDatabaseTestCase {
 
     /*

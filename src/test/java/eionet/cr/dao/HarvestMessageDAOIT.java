@@ -28,6 +28,10 @@ import org.junit.Test;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.
@@ -35,6 +39,10 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author altnyris
  *
  */
+@SqlGroup({
+        @Sql({"/sources-harvests-messages.sql"}),
+        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+})
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
     /*

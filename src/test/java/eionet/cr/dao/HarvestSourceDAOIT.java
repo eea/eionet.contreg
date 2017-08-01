@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -31,9 +32,15 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
@@ -41,6 +48,10 @@ import static org.hamcrest.core.Is.is;
  * @author altnyris
  *
  */
+@SqlGroup({
+        @Sql({"/sources-harvests-messages.sql"}),
+        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+})
 public class HarvestSourceDAOIT extends CRDatabaseTestCase {
 
     /*
@@ -49,7 +60,7 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
     @Override
-    protected List<String> getXMLDataSetFiles() {
+    public List<String> getXMLDataSetFiles() {
         return Arrays.asList("sources-harvests-messages.xml");
     }
 

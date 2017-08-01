@@ -17,6 +17,7 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.junit.Test;
 
 /**
  * For testing the {@link FolderActionBean}.
@@ -60,6 +61,7 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     @SuppressWarnings("rawtypes")
     public void testFolderCreation() throws Exception {
 

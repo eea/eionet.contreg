@@ -31,7 +31,7 @@ public class CopyAclFiles {
     public CopyAclFiles() throws IOException, URISyntaxException {
         String appHome = null;
         try {
-            appHome = propertyResolver.resolveValue("app.home");
+            appHome = propertyResolver.resolveValue("config.app.home");
             copyFiles(appHome);
         } catch (UnresolvedPropertyException e) {
             e.printStackTrace();

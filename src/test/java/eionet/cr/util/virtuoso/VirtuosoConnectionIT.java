@@ -32,12 +32,17 @@ import org.junit.Test;
 
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test Virtuoso Connection.
  *
  * @author Enriko Käsper
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/spring-context-test.xml")
 public class VirtuosoConnectionIT extends TestCase {
     /*
      * (non-Javadoc)

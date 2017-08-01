@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.Test;
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -78,6 +79,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testFactsheetQuery() throws DAOException {
 
         // "select ?pred min(xsd:int(isBlank(?s))) as ?anonSubj "
@@ -107,6 +109,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testFreeTextSearchSyntax() throws DAOException {
 
         // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
@@ -131,6 +134,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchByFilters() throws DAOException {
 
         Map<String, String> filters = new HashMap<String, String>();
@@ -158,6 +162,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchBySource() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
@@ -182,6 +187,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchByTags() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
@@ -206,6 +212,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchReferences() throws DAOException {
 
         String subjectUri = "http://rod.eionet.europa.eu/spatial/10";
@@ -231,6 +238,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws Exception If any error occurs.
      */
+    @Test
     public void testVariousFunctions() throws Exception {
 
         // The following queries are tested syntactically only, to enusre Virtuoso supports the specific functions used in them.
@@ -261,6 +269,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testGraphRename() throws Exception {
 
         String oldGraph = getSeedFileGraphUri(OBLIGATIONS_RDF);

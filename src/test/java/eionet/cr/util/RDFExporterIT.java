@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Test;
 
 /**
  *
@@ -25,6 +26,7 @@ public class RDFExporterIT extends CRDatabaseTestCase {
     /**
      *
      */
+    @Test
     public void testGetKnownNamespace() {
 
         assertEquals("rdf", NamespaceUtil.getKnownNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
@@ -37,6 +39,7 @@ public class RDFExporterIT extends CRDatabaseTestCase {
     /**
      *
      */
+    @Test
     public void testGetPredicate() {
 
         assertEquals("predicate1", NamespaceUtil.extractLocalName("http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate1"));

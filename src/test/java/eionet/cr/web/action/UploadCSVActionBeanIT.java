@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Ignore;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 
@@ -38,13 +39,13 @@ import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
-import org.junit.Ignore;
 
 /**
  * A class for testing the behavior of {@link UploadCSVActionBean}.
  *
  * @author Jaanus
  */
+@Ignore
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
 
     /** The name of user whose folder we're testing in. */
@@ -383,7 +384,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     private void doUploadOnline(boolean isOverwrite) throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.
-        MockServletContext ctx = createContextMock();
+        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
@@ -514,7 +515,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      */
     private void doSaveOnline(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
 
-        MockServletContext ctx = createContextMock();
+        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare the rich-type request parameters: the given data-linking scripts (if any)
@@ -571,8 +572,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         String expectedSparqlCompressed = expectedSparql.replaceAll("\\s+", "");
         assertEquals("Actual SPARQL query is not what expected", expectedSparqlCompressed, actualSparqlCompressed);
     }
-
-
 
     /**
      * Helper method to check if there were any messages for the user.

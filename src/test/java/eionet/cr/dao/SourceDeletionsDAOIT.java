@@ -12,12 +12,20 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 /**
  * Unit tests for operations with {@link SourceDeletionsDAO}.
  *
  * @author Jaanus
  */
+@SqlGroup({
+        @Sql({"/source-deletions.sql"}),
+        @Sql(scripts = "/source-deletions-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+})
 public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
     /*

@@ -6,6 +6,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Basic test of VoidDatasets Dao from sample file
    * @throws Exception
    */
+  @Test
   public void testFindDatasets() throws Exception {
     try {
       List<String> creators = new ArrayList<String>();
@@ -59,6 +61,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Tests for creators in database
    * @throws Exception
    */
+  @Test
   public void testFindCreators() throws Exception {
     try {
       BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
@@ -76,6 +79,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Tests for subjects in database
    * @throws Exception
    */
+  @Test
   public void testFindSubjects() throws Exception {
     try {
       BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);

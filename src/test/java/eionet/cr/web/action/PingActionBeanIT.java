@@ -7,6 +7,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Test;
 
 /**
  * Unit tests for the PING action bean.
@@ -18,6 +19,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
+    @Test
     public void testPingWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
@@ -43,6 +45,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
+    @Test
     public void testPingWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
@@ -70,6 +73,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
@@ -99,6 +103,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithFragmentedURL() throws Exception {
 
         // Set up and execute round-trip.
@@ -128,6 +133,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithBrokenURL() throws Exception {
 
         // Set up and execute round-trip.
@@ -157,6 +163,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingNonExistingSourceWithoutCreate() throws Exception {
 
         String url = "http://www.eea.europa.eu/";
@@ -194,6 +201,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingNonExistingSourceWithCreate() throws Exception {
 
         // Test that source does not exist yet.
@@ -234,6 +242,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingExistingSource() throws Exception {
 
         // First, create the source to test.

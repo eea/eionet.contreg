@@ -113,7 +113,8 @@ public final class SesameConnectionProvider {
      * @return the readWriteDataSource
      */
     private static synchronized DataSource getReadWriteDataSource() {
-        return SpringApplicationContext.getBean("dataSource");
+//        return SpringApplicationContext.getBean("dataSource");
+        return lookupDataSource(READONLY_DATASOURCE_NAME);
     }
 
     /**

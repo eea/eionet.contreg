@@ -9,6 +9,7 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.Test;
 import org.mortbay.jetty.Server;
 
 import eionet.cr.dao.DAOFactory;
@@ -57,6 +58,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
@@ -84,6 +86,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
@@ -114,6 +117,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteHarvestPingDeleteSequence() throws Exception {
 
         // Create the source to be tested. The URL is served by Jetty below.
