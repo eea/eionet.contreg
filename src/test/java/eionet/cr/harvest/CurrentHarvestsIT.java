@@ -34,7 +34,7 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
      */
     @Override
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
 
         super.setUp();
 
@@ -56,7 +56,7 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
      * @see junit.framework.TestCase#tearDown()
      */
     @Override
-    @After
+//    @After
     protected void tearDown() throws Exception {
         // No tear-down logic yet.
     }
