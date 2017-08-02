@@ -24,6 +24,7 @@ package eionet.cr.harvest.scheduled;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -39,6 +40,12 @@ import eionet.cr.web.security.CRUser;
  * @author Jaanus Heinlaid
  */
 public class UrgentHarvestIT extends CRDatabaseTestCase {
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     /*
      * (non-Javadoc)
