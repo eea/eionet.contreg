@@ -13,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openrdf.rio.RDFHandler;
@@ -38,11 +39,17 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
     /** RDF seed file to be loaded. */
     private static final String RDF_SEED_FILE = "rdf_national_chars_utf8.rdf.xml";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(RDF_SEED_FILE);

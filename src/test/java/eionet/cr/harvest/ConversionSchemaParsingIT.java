@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.openrdf.model.Statement;
@@ -38,7 +39,8 @@ public class ConversionSchemaParsingIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         new RdfLoader().clearAllTriples();
     }

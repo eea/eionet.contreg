@@ -6,6 +6,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,6 +17,13 @@ import java.util.List;
  * @author George Sofianos
  */
 public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
+
+  @Override
+  @Before
+  public void setUp() throws Exception {
+    super.setUp();
+  }
+
   /**
    * Loads test file into virtuoso test database
    * @return

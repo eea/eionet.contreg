@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
@@ -38,11 +39,17 @@ public class TagsDAOIT extends CRDatabaseTestCase {
     /** Seed file. */
     private static final String SEED_FILE = "tags.rdf";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(SEED_FILE);

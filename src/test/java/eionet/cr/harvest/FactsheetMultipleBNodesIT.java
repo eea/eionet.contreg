@@ -11,6 +11,7 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -20,11 +21,17 @@ import org.junit.Test;
  */
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList("blank_nodes.rdf");

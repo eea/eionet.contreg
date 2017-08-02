@@ -8,6 +8,7 @@ import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -28,11 +29,17 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_largebulk.xml";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(RDF_SEED_FILE);

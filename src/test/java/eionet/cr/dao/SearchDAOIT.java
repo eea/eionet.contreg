@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
@@ -48,11 +49,17 @@ public class SearchDAOIT extends CRDatabaseTestCase {
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(SEED_FILE);

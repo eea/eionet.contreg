@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
@@ -53,11 +54,17 @@ public class VirtuosoJdbcDriverIT extends CRDatabaseTestCase {
     /** Dummy graph URI. */
     private static final String DUMMY_GRAPH_URI = "http://test.virtuoso.jdbc.validity.com";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList("obligations.rdf");

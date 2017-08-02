@@ -9,6 +9,7 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.mortbay.jetty.Server;
 
@@ -49,7 +50,8 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         new RdfLoader().clearAllTriples();
     }

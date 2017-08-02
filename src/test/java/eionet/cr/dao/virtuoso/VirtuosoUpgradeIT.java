@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.QueryLanguage;
@@ -46,11 +47,17 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList("rdf_national_chars_utf8.rdf.xml", OBLIGATIONS_RDF, "persons.rdf", "tags.rdf");

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -22,11 +23,14 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
  *
  * @author Jaanus
  */
-@SqlGroup({
-        @Sql({"/source-deletions.sql"}),
-        @Sql(scripts = "/source-deletions-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
-})
+@Sql(scripts = "/source-deletions-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     /*
      * (non-Javadoc)

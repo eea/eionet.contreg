@@ -45,16 +45,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 })
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
-     */
-    @Override
-    protected List<String> getXMLDataSetFiles() {
-        return Arrays.asList("sources-harvests-messages.xml");
-    }
-
     /**
      *
      * @throws Exception
