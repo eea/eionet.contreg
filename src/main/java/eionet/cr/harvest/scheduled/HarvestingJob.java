@@ -32,7 +32,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.openrdf.rio.RDFParseException;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -53,6 +52,8 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -68,7 +69,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     };
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(HarvestingJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestingJob.class);
 
     /** Max number of urgent harvests executed per one interval. */
     private static final int DEFAULT_URGENT_HARVEST_LIMIT = 20;
@@ -564,7 +565,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             LOGGER.debug(getClass().getSimpleName() + " scheduled with interval seconds " + getIntervalSeconds()
                     + ", batch harvesting hours = " + getBatchHarvestingHours());
         } catch (Exception e) {
-            LOGGER.fatal("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(),
+            LOGGER.error("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(),
                     e);
         }
     }

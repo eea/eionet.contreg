@@ -26,8 +26,8 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
@@ -37,6 +37,8 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
  *
  */
 public final class GeneralConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralConfig.class);
 
     /** */
     public static final String BUNDLE_NAME = "cr";
@@ -163,9 +165,6 @@ public final class GeneralConfig {
     public static final int SERVLET_RESPONSE_BUFFER_SIZE = NumberUtils.toInt(getProperty("servletResponseBufferSize"), 32768);
 
     /** */
-    private static Log logger = LogFactory.getLog(GeneralConfig.class);
-
-    /** */
     private static Properties properties = null;
 
     /**
@@ -190,7 +189,7 @@ public final class GeneralConfig {
             }
 
         } catch (IOException e) {
-            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+            LOGGER.error("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
         }
     }
 
@@ -214,7 +213,7 @@ public final class GeneralConfig {
                         if(key.equalsIgnoreCase(propKey)) {
                             properties.setProperty(propKey, System.getenv(envKey));
                             found = true;
-                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
+                            LOGGER.info("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
                             break;
                         }
                     }
@@ -223,7 +222,7 @@ public final class GeneralConfig {
                 // if the match failed, adds it as it is
                 if(!found) {
                     properties.setProperty(key, System.getenv(envKey));
-                    System.out.println("Setting " + key + " added from ENV variable");
+                    LOGGER.info("Setting " + key + " added from ENV variable");
                 }
             }
         }

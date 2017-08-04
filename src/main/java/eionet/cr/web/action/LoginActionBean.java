@@ -37,7 +37,8 @@ import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static eionet.cr.web.util.WebConstants.*;
 
@@ -53,7 +54,7 @@ import static eionet.cr.web.util.WebConstants.*;
 public class LoginActionBean extends AbstractActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(LoginActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginActionBean.class);
 
     /** */
     private static final String LOGIN_JSP = "/pages/login.jsp";

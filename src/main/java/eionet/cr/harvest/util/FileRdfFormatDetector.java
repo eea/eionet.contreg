@@ -34,8 +34,8 @@ import java.util.Map;
 import javax.imageio.IIOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -56,7 +56,7 @@ import org.openrdf.rio.turtle.TurtleParserFactory;
 public class FileRdfFormatDetector {
 
     /** */
-    private static final Log LOGGER = LogFactory.getLog(FileRdfFormatDetector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileRdfFormatDetector.class);
 
     /** RDF format parser factories used in this class. */
     private static final RDFParserFactory[] PARSER_FACTORIES = {new RDFXMLParserFactory(), new TurtleParserFactory(),

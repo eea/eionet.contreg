@@ -156,7 +156,7 @@ public class URLUtil {
             URLUtil.disconnect(urlConnection);
         }
 
-        System.out.println("Response code: " + responseCode);
+        LOGGER.info("Response code: " + responseCode);
 
         return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException || ioe instanceof ConnectException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED

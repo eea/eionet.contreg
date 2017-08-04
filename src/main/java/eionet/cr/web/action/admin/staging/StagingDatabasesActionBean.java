@@ -114,7 +114,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
      */
     public Resolution openLog() throws DAOException {
 
-        logger.trace("Retrieving import log for this database id: " + databaseId);
+        LOGGER.trace("Retrieving import log for this database id: " + databaseId);
         String log = DAOFactory.get().getDao(StagingDatabaseDAO.class).getImportLog(databaseId);
         if (log == null) {
             log = "Found no import log for this database!";

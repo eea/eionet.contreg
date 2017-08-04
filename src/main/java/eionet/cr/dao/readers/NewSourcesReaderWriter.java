@@ -27,7 +27,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
@@ -36,6 +35,8 @@ import org.openrdf.query.BindingSet;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sql.SQLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -47,7 +48,7 @@ import eionet.cr.util.sql.SQLUtil;
 public class NewSourcesReaderWriter extends ResultSetMixedReader {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(NewSourcesReaderWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewSourcesReaderWriter.class);
 
     /** */
     private static final String INSERT_SQL = "insert soft HARVEST_SOURCE "

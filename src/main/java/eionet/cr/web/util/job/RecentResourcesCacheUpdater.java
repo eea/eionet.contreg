@@ -20,8 +20,8 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.web.util.job;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
@@ -45,7 +45,7 @@ public class RecentResourcesCacheUpdater implements StatefulJob {
     /**
      * Internal logger.
      */
-    private static Log logger = LogFactory.getLog(RecentResourcesCacheUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecentResourcesCacheUpdater.class);
 
     /**
      * Executes the job.
@@ -59,9 +59,9 @@ public class RecentResourcesCacheUpdater implements StatefulJob {
         try {
             HelperDAO dao = DAOFactory.get().getDao(HelperDAO.class);
             ApplicationCache.updateRecentResourceCache(dao.getLatestFiles(LASTRESOURCES_COUNT));
-            logger.debug("Recently discovered resources cache updated!");
+            LOGGER.debug("Recently discovered resources cache updated!");
         } catch (DAOException e) {
-            logger.error("Error when updating recently discovered files cache: ", e);
+            LOGGER.error("Error when updating recently discovered files cache: ", e);
         }
     }
 }

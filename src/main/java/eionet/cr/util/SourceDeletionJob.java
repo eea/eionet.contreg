@@ -1,6 +1,7 @@
 package eionet.cr.util;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;

@@ -36,6 +36,7 @@ import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.filestore.ScriptTemplateDaoImpl;
 import eionet.cr.web.action.AbstractActionBean;
+import eionet.cr.web.action.HarvestSourcesActionBean;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean.ActionType;
 import eionet.cr.web.util.ApplicationCache;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -45,6 +46,8 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +63,8 @@ import static eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean
  */
 @UrlBinding("/admin/harvestScript")
 public class HarvestScriptActionBean extends AbstractActionBean {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestSourcesActionBean.class);
 
     /** Default JSP to return to. */
     private static final String SCRIPT_JSP = "/pages/admin/harvestScripts/script.jsp";
@@ -203,8 +208,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         addSystemMessage("Scripts successfully pasted!");
 
         // view the list of all scripts.
-        if (logger.isTraceEnabled()) {
-            logger.trace("Redirecting after paste");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Redirecting after paste");
         }
         return resolutionToScripts();
     }
@@ -229,8 +234,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         // Depending on whether "Save" or "Save & close" was pressed, forward back to the same script's
         // view or to the list of all scripts.
         if (getContext().getRequestParameter("save").equalsIgnoreCase("Save & close")) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Redirecting after save & close");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Redirecting after save & close");
             }
             return resolutionToScripts();
         } else {
@@ -319,8 +324,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution test() throws Exception {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Handling test event");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Handling test event");
         }
 
         String harvestedSource = testSourceUrl;
@@ -337,7 +342,7 @@ public class HarvestScriptActionBean extends AbstractActionBean {
         } catch (ScriptParseException e) {
             addWarningMessage(e.toString());
         }
-        logger.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
+        LOGGER.debug("Executing derived CONSTRUCT query: " + executedTestQuery);
         // logger.debug("Using " + harvestedSource + " as the default graph");
 
         try {
@@ -357,8 +362,8 @@ public class HarvestScriptActionBean extends AbstractActionBean {
      */
     public Resolution cancel() throws DAOException {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Handling cancel event");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Handling cancel event");
         }
 
         if (StringUtils.isNotBlank(cancelUrl)) {

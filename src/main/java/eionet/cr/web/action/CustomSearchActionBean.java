@@ -58,6 +58,8 @@ import eionet.cr.web.util.CustomSearchFilter;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -66,6 +68,8 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 @UrlBinding("/customSearch.action")
 public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomSearchActionBean.class);
 
     /** */
     private static final String SELECTED_FILTERS_SESSION_ATTR_NAME = CustomSearchActionBean.class.getName() + ".selectedFilters";
@@ -146,7 +150,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
                     new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
-        logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
+        LOGGER.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
         List<SubjectDTO> resultList = result.getItems();
         SimpleSearchActionBean.setLastModifiedDates(resultList);
@@ -301,7 +305,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         Map<String, String> selectedFilters = getSelectedFilters();
         if (!selectedFilters.isEmpty()) {
 
-            System.out.println("*******************************************");
+            LOGGER.info("*******************************************");
 
             HttpServletRequest request = getContext().getRequest();
             Enumeration paramNames = request.getParameterNames();
@@ -310,7 +314,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 String paramName = (String) paramNames.nextElement();
                 String paramValue = request.getParameter(paramName);
 
-                System.out.println("Request parameter " + paramName + " = " + paramValue);
+                LOGGER.info("Request parameter " + paramName + " = " + paramValue);
 
                 if (paramName.startsWith(SELECTED_VALUE_PREFIX)) {
 
@@ -321,7 +325,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
                 }
             }
 
-            System.out.println("*******************************************");
+            LOGGER.info("*******************************************");
         }
     }
 

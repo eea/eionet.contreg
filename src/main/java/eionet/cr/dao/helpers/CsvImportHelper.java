@@ -38,7 +38,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -70,6 +69,8 @@ import eionet.cr.web.action.DataLinkingScript;
 import eionet.cr.web.action.UploadCSVActionBean.FileType;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.util.CharsetToolkit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods for importing CSV file.
@@ -85,7 +86,7 @@ public class CsvImportHelper {
     public static final String EMPTY_COLUMN = "Empty";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(CsvImportHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvImportHelper.class);
 
     /** Columns detected in the uploaded file (it's the titles of the columns). */
     private List<String> columns;

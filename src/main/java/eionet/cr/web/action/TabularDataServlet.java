@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import eionet.cr.common.CRException;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -42,6 +40,8 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.TriplesToOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -53,7 +53,7 @@ public class TabularDataServlet extends HttpServlet {
     public static final String URL_PATTERN = "/tabularData";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(TabularDataServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TabularDataServlet.class);
 
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -127,7 +127,7 @@ public class TabularDataServlet extends HttpServlet {
     private void handleException(Exception exception, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        LOGGER.error(exception);
+        LOGGER.error(exception.getMessage(), exception);
 
         if (Util.isWebBrowser(request)) {
             request.setAttribute(StripesExceptionHandler.EXCEPTION_ATTR, exception);

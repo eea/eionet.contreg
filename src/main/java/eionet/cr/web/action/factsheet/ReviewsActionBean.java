@@ -40,18 +40,23 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  * @author Risto Alt
- *
  */
 
 @UrlBinding("/reviews.action")
 public class ReviewsActionBean extends AbstractActionBean {
 
-    /** URI by which the factsheet has been requested. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReviewsActionBean.class);
+
+
+    /**
+     * URI by which the factsheet has been requested.
+     */
     private String uri;
     private List<TabElement> tabs;
 
@@ -69,13 +74,13 @@ public class ReviewsActionBean extends AbstractActionBean {
     private FileBean attachment;
 
     /**
-     *
      * @return
      * @throws DAOException
      * @throws SignOnException
      */
     @DefaultHandler
     public Resolution view() throws DAOException, SignOnException {
+        LOGGER.info("THIS IS A TEST MESSAGE");
         String aclPath = FolderUtil.extractAclPath(uri);
         if (!CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true)) {
             addSystemMessage("Not authorized to view reviews.");
@@ -110,8 +115,8 @@ public class ReviewsActionBean extends AbstractActionBean {
 
                 // Check if review is obsolete
                 obsolete =
-                    DAOFactory.get().getDao(ReviewsDAO.class)
-                    .isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
+                        DAOFactory.get().getDao(ReviewsDAO.class)
+                                .isReviewObsolete(review.getReviewSubjectUri(), review.getObjectUrl());
 
                 // Load review content from file.
                 try {
@@ -130,7 +135,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                         .getReviewAttachmentList(new CRUser(getAttemptedUserName()), reviewId));
             }
         } catch (DAOException ex) {
-            logger.error("Error when getting review", ex);
+            LOGGER.error("Error when getting review", ex);
         }
     }
 
@@ -151,8 +156,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                 }
                 addSystemMessage("Review successfully added.");
             } catch (DAOException ex) {
-                logger.error(ex);
-                ex.printStackTrace();
+                LOGGER.error(ex.getMessage(), ex);
                 addWarningMessage("System error while adding a review. The review was not added.");
             }
         } else {
@@ -185,10 +189,10 @@ public class ReviewsActionBean extends AbstractActionBean {
                 insertFile();
                 addSystemMessage("Review successfully saved.");
             } catch (IOException ex) {
-                logger.error(ex);
+                LOGGER.error(ex.getMessage(), ex);
                 addWarningMessage("System error while saving the review content. The review was not saved.");
             } catch (DAOException ex) {
-                logger.error(ex);
+                LOGGER.error(ex.getMessage(), ex);
                 addWarningMessage("System error while saving the review. The review was not saved.");
             }
         } else {
@@ -219,7 +223,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     }
                     addSystemMessage("Selected reviews were deleted.");
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    LOGGER.error(ex.getMessage(), ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
             } else {
@@ -252,7 +256,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     addSystemMessage("Review #" + reviewId + " was deleted.");
                     reviewId = 0;
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    LOGGER.error(ex.getMessage(), ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
             } else {
@@ -269,7 +273,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     public Resolution upload() {
 
         if (isUsersReview()) {
-            logger.debug("Storing uploaded review attachment, file bean = " + attachment);
+            LOGGER.debug("Storing uploaded review attachment, file bean = " + attachment);
 
             if (attachment != null) {
 
@@ -303,16 +307,16 @@ public class ReviewsActionBean extends AbstractActionBean {
                     // since the review URI was used above as triple source, add it to HARVEST_SOURCE too
                     // (but set interval minutes to 0, to avoid it being background-harvested)
                     DAOFactory.get().getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
+                            .addSourceIgnoreDuplicate(HarvestSourceDTO.create(reviewUri, true, 0, getUser().getUserName()));
 
                     // finally, attempt to harvest the uploaded file's contents
                     harvestUploadedFile(attachmentUri, file, null, getUser().getUserName(), attachment.getContentType());
 
                 } catch (DAOException daoe) {
-                    logger.error("Error when storing attachment", daoe);
+                    LOGGER.error("Error when storing attachment", daoe);
                     addSystemMessage("Error when storing attachment");
                 } catch (IOException ioe) {
-                    logger.error("File could not be successfully uploaded", ioe);
+                    LOGGER.error("File could not be successfully uploaded", ioe);
                     addSystemMessage("File could not be successfully uploaded");
                 } finally {
                     IOUtils.closeQuietly(attachmentContentStream);
@@ -325,7 +329,6 @@ public class ReviewsActionBean extends AbstractActionBean {
     }
 
     /**
-     *
      * @param sourceUrl
      * @param uploadedFile
      * @param dcTitle
@@ -337,7 +340,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         // harvestable
         HarvestSourceDTO harvestSourceDTO = null;
         try {
-            logger.debug("Creating and storing harvest source");
+            LOGGER.debug("Creating and storing harvest source");
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
             HarvestSourceDTO source = new HarvestSourceDTO();
@@ -347,7 +350,7 @@ public class ReviewsActionBean extends AbstractActionBean {
             dao.addSourceIgnoreDuplicate(source);
             harvestSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
         } catch (DAOException e) {
-            logger.info("Exception when trying to create harvest source for the uploaded file content", e);
+            LOGGER.error("Exception when trying to create harvest source for the uploaded file content", e);
         }
 
         // perform harvest,
@@ -363,10 +366,10 @@ public class ReviewsActionBean extends AbstractActionBean {
                     CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
                 }
             } else {
-                logger.debug("Harvest source was not created, so skipping harvest");
+                LOGGER.debug("Harvest source was not created, so skipping harvest");
             }
         } catch (HarvestException e) {
-            logger.info("Exception when trying to harvest uploaded file content", e);
+            LOGGER.error("Exception when trying to harvest uploaded file content", e);
         }
     }
 
@@ -384,7 +387,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     }
                 }
             } catch (DAOException ex) {
-                logger.error(ex);
+                LOGGER.error(ex.getMessage(), ex);
                 addCautionMessage(ex.getMessage());
             }
         } else {
@@ -429,7 +432,7 @@ public class ReviewsActionBean extends AbstractActionBean {
     public String getReviewContentHTML() {
         if (review.getReviewContent() != null) {
             return review.getReviewContent().replace("&", "&amp;").replace("<", "&lt;").replace("\r\n", "<br/>")
-            .replace("\n", "<br/>");
+                    .replace("\n", "<br/>");
         } else {
             return "";
         }

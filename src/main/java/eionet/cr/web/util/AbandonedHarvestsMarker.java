@@ -2,12 +2,11 @@ package eionet.cr.web.util;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.apache.log4j.Logger;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A servlet context listener that is executed on context startup and "mark" the status of all abandoned harvests
@@ -18,7 +17,7 @@ import eionet.cr.dao.HarvestDAO;
 public class AbandonedHarvestsMarker implements ServletContextListener {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(AbandonedHarvestsMarker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbandonedHarvestsMarker.class);
 
     /*
      * (non-Javadoc)

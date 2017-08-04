@@ -43,7 +43,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 public final class SQLUtil {
 
     /** Static logger. */
-    protected static final Logger LOGGER = Logger.getLogger(SQLUtil.class);
+    private static final Logger LOGGER = Logger.getLogger(SQLUtil.class);
 
     /**
      * Hide utility class constructor.

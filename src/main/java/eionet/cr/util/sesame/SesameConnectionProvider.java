@@ -9,16 +9,16 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import org.apache.log4j.Logger;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-
 import virtuoso.sesame2.driver.VirtuosoRepository;
 import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -28,7 +28,7 @@ import eionet.cr.config.GeneralConfig;
 public final class SesameConnectionProvider {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(SesameConnectionProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SesameConnectionProvider.class);
 
     /** */
     public static final String READWRITE_DATASOURCE_NAME = "jdbc/readWriteRepo";

@@ -25,22 +25,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.web.util.ApplicationCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,7 +50,7 @@ import eionet.cr.web.util.ApplicationCache;
 public class JsonActionBean extends AbstractActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(JsonActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonActionBean.class);
 
     /**
      *

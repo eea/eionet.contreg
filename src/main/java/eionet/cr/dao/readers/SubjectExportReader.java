@@ -24,19 +24,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.apache.log4j.Logger;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
-
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.SubjectExportEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -47,7 +46,7 @@ import eionet.cr.util.export.SubjectExportEvent;
 public class SubjectExportReader extends ResultSetExportReader {
 
     /** */
-    protected Logger logger = Logger.getLogger(SubjectExportReader.class);
+    protected Logger logger = LoggerFactory.getLogger(SubjectExportReader.class);
 
     /** */
     private SubjectDTO currentSubject = null;

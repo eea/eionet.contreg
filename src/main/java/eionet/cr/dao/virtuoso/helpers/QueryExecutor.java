@@ -1,8 +1,8 @@
 package eionet.cr.dao.virtuoso.helpers;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -20,7 +20,7 @@ import eionet.cr.web.sparqlClient.helpers.QueryResult;
 public class QueryExecutor {
 
     /** */
-    private static Log logger = LogFactory.getLog(QueryExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryExecutor.class);
 
     /** */
     private QueryResult results;
@@ -49,7 +49,7 @@ public class QueryExecutor {
             TupleQueryResult bindings = q.evaluate();
 
             if (bindings == null || !bindings.hasNext()) {
-                logger.info("The query gave no results");
+                LOGGER.info("The query gave no results");
             } else {
                 results = new QueryResult(bindings, false);
             }
@@ -60,7 +60,7 @@ public class QueryExecutor {
                 try {
                     conn.close();
                 } catch (Exception e) {
-                    logger.info("Failed to close QueryExecution object: " + e.toString());
+                    LOGGER.info("Failed to close QueryExecution object: " + e.toString());
                 }
             }
         }
@@ -94,7 +94,7 @@ public class QueryExecutor {
                 try {
                     conn.close();
                 } catch (Exception e) {
-                    logger.info("Failed to close RepositoryConnection object: " + e.toString());
+                    LOGGER.info("Failed to close RepositoryConnection object: " + e.toString());
                 }
             }
         }

@@ -39,7 +39,7 @@ import eionet.cr.util.URIUtil;
 public class SubjectPredicateColumn extends SearchResultColumn {
 
     /** */
-    protected static final Logger logger = Logger.getLogger(SubjectPredicateColumn.class);
+    private static final Logger logger = Logger.getLogger(SubjectPredicateColumn.class);
 
     /** */
     private String predicateUri;

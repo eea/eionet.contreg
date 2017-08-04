@@ -8,12 +8,13 @@ import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
-import org.apache.tools.ant.listener.Log4jListener;
 
 import eionet.cr.common.CRRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A servlet context startup listener that executes a bundled Ant build file that prepares various runtime resourecs that
@@ -24,7 +25,7 @@ import eionet.cr.common.CRRuntimeException;
 public class StartupAntRunner implements ServletContextListener {
 
     /** Private static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(StartupAntRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupAntRunner.class);
 
     /*
      * (non-Javadoc)
@@ -56,7 +57,6 @@ public class StartupAntRunner implements ServletContextListener {
 
         Project project = new Project();
         project.setBaseDir(buildFile.getParentFile());
-        project.addBuildListener(new Log4jListener());
         project.setUserProperty("ant.file", buildFileAbsolutePath);
         project.init();
         ProjectHelper helper = ProjectHelper.getProjectHelper();

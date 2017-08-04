@@ -24,6 +24,8 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unit tests for the "delete" operation of {@link PingActionBean}.
@@ -31,6 +33,8 @@ import eionet.cr.web.security.CRUser;
  * @author Jaanus
  */
 public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingDeleteActionBeanIT.class);
 
     /*
      * (non-Javadoc)
@@ -104,7 +108,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message", outputStr.contains("<message>URL not in catalogue of sources, no action taken"));
         assertTrue("Unexpected message", outputStr.contains("<flerror>0</flerror>"));

@@ -52,6 +52,8 @@ import eionet.cr.web.util.CustomPaginatedList;
 import eionet.cr.web.util.columns.GenericColumn;
 import eionet.cr.web.util.columns.HarvestSourcesColumn;
 import eionet.cr.web.util.columns.SearchResultColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author altnyris
@@ -59,6 +61,8 @@ import eionet.cr.web.util.columns.SearchResultColumn;
  */
 @UrlBinding("/sources.action")
 public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestSourcesActionBean.class);
 
     /** Default size of the deletion queue result list page. */
     public static final int RESULT_LIST_PAGE_SIZE = 15;
@@ -216,7 +220,7 @@ public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
                     }
                 }
 
-                logger.debug("Deleting the following sources: " + sourcesToDelete);
+                LOGGER.debug("Deleting the following sources: " + sourcesToDelete);
                 factory.getDao(HarvestSourceDAO.class).removeHarvestSources(sourcesToDelete);
 
                 if (!sourcesToDelete.isEmpty()) {

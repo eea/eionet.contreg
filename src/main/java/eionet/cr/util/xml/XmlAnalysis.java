@@ -34,8 +34,8 @@ import net.sourceforge.stripes.action.FileBean;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -55,7 +55,7 @@ import eionet.cr.common.CRException;
 public class XmlAnalysis {
 
     /** */
-    private static Log logger = LogFactory.getLog(XmlAnalysis.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlAnalysis.class);
 
     /** */
     private Handler handler = new Handler();
@@ -120,9 +120,9 @@ public class XmlAnalysis {
         try {
             parser.setProperty("http://xml.org/sax/properties/lexical-handler", doctypeReader);
         } catch (SAXNotRecognizedException e) {
-            logger.warn("Installed XML parser does not provide lexical events", e);
+            LOGGER.warn("Installed XML parser does not provide lexical events", e);
         } catch (SAXNotSupportedException e) {
-            logger.warn("Cannot turn on comment processing here", e);
+            LOGGER.warn("Cannot turn on comment processing here", e);
         }
 
         // set the handler and do the parsing

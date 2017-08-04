@@ -23,16 +23,15 @@ package eionet.cr.staging.imp;
 
 import java.io.File;
 import java.util.HashMap;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.staging.imp.msaccess.MSAccessImporter;
 import eionet.cr.util.LogUtil;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 
 /**
  * A runnable that creates a given staging database and populates it from a given DB file.

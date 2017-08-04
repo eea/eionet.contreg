@@ -37,6 +37,8 @@ import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,6 +46,8 @@ import eionet.cr.util.pagination.PagingRequest;
  *
  */
 public class SearchDAOIT extends CRDatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchDAOIT.class);
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
@@ -69,7 +73,7 @@ public class SearchDAOIT extends CRDatabaseTestCase {
         // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
         // By "real-time" we mean that the index is updated instantly after loading a triple.
         if (isRealTimeFullTextIndexingActivated() == false) {
-            System.out.println("Skipping full-text search test, as no real-time full-text indexing has been activated!");
+            LOGGER.info("Skipping full-text search test, as no real-time full-text indexing has been activated!");
             return;
         }
 

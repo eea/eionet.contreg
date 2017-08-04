@@ -92,7 +92,6 @@ public class UnicodeInputStream extends InputStream {
             encoding = defaultEnc;
             unread = n;
         }
-        // System.out.println("read=" + n + ", unread=" + unread);
 
         if (unread > 0)
             internalIn.unread(bom, (n - unread), unread);

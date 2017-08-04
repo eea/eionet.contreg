@@ -34,6 +34,8 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unit tests for SPARQL and SQL queries that are potentially sensitive to Virtuoso upgrade.
@@ -41,6 +43,8 @@ import eionet.cr.util.sql.SQLUtil;
  * @author Jaanus
  */
 public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoUpgradeIT.class);
 
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
@@ -113,7 +117,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         // By "real-time" we mean that the index is updated instantly after loading a triple.
         String value = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_REAL_TIME_FT_INDEXING);
         if (BooleanUtils.toBoolean(value) == false) {
-            System.out.println("Skipping full-text search test, as no real-time full-text indexing has been activated!");
+            LOGGER.info("Skipping full-text search test, as no real-time full-text indexing has been activated!");
             return;
         }
 

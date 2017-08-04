@@ -26,8 +26,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobListener;
@@ -53,7 +53,7 @@ import eionet.cr.web.util.job.TypeCacheUpdater;
 public class JobScheduler implements ServletContextListener {
 
     /** */
-    private static Log logger = LogFactory.getLog(JobScheduler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobScheduler.class);
 
     /** */
     private static Scheduler quartzScheduler = null;
@@ -183,10 +183,10 @@ public class JobScheduler implements ServletContextListener {
                 if (!StringUtils.isBlank(intervString)) {
                     int intervMillis = GeneralConfig.getTimePropertyMilliseconds(job.getLeft(), -1);
                     scheduleIntervalJob(intervMillis, job.getRight());
-                    logger.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
+                    LOGGER.debug(job.getRight().getName() + " scheduled, interval=" + intervString);
                 }
             } catch (Exception e) {
-                logger.fatal("Error when scheduling " + job.getRight().getName(), e);
+                LOGGER.error("Error when scheduling " + job.getRight().getName(), e);
             }
         }
     }

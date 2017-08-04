@@ -39,6 +39,8 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class for testing the behavior of {@link UploadCSVActionBean}.
@@ -46,6 +48,8 @@ import org.junit.Ignore;
  * @author Jaanus
  */
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBeanIT.class);
 
     /** The name of user whose folder we're testing in. */
     public static final String TEST_USER_NAME = "somebody";
@@ -379,7 +383,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
             List<Message> messages = aBean.getContext().getMessages(queue);
             for (Message message : messages) {
                 foundOne = true;
-                System.out.println(queue + ": " + message.getMessage(null));
+                LOGGER.info(queue + ": " + message.getMessage(null));
             }
         }
         return foundOne;

@@ -7,6 +7,8 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unit tests for the PING action bean.
@@ -14,6 +16,8 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author Jaanus
  */
 public class PingActionBeanIT extends CRDatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingActionBeanIT.class);
 
     /**
      * @throws Exception
@@ -62,7 +66,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message", outputStr.contains("<message>Not a valid URL, no action taken.</message>"));
     }
@@ -90,7 +94,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected error code", outputStr.contains("<flerror>" + PingActionBean.ERR_INVALID_URL + "</flerror>"));
     }
@@ -119,7 +123,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected error code", outputStr.contains("<flerror>" + PingActionBean.ERR_FRAGMENT_URL + "</flerror>"));
     }
@@ -148,7 +152,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected error code", outputStr.contains("<flerror>" + PingActionBean.ERR_BROKEN_URL + "</flerror>"));
     }
@@ -178,7 +182,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message",
                 outputStr.contains("<message>URL not in catalogue of sources, no action taken:"));
@@ -220,7 +224,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message", outputStr.contains("<message>URL added to the urgent harvest queue"));
         assertTrue("Unexpected error code", outputStr.contains("<flerror>0</flerror>"));
@@ -260,7 +264,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message", outputStr.contains("<message>URL added to the urgent harvest queue"));
         assertTrue("Unexpected error code", outputStr.contains("<flerror>0</flerror>"));

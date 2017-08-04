@@ -25,8 +25,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.apache.log4j.Logger;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -36,6 +34,8 @@ import org.openrdf.repository.RepositoryException;
 import eionet.cr.common.Predicates;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for importing a Scoreboard dimension's metadata from a staging database.
@@ -50,7 +50,7 @@ public class DimensionMetadataImporter extends Thread {
     }
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(DimensionMetadataImporter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DimensionMetadataImporter.class);
 
     /** */
     private String dbName;

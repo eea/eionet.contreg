@@ -29,8 +29,8 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File operation utilities.
@@ -45,7 +45,7 @@ public final class FileUtil {
     /**
      * class internal logger.
      */
-    private static Log logger = LogFactory.getLog(FileUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * Input stream buffer size.
