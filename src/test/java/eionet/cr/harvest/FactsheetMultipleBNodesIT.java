@@ -12,6 +12,7 @@ import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -19,6 +20,7 @@ import org.junit.Test;
  *
  * @author Jaanus
  */
+@Ignore
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
 
     @Override

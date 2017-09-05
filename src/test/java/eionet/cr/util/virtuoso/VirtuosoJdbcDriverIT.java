@@ -43,6 +43,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.Ignore;
 
 /**
  * Test Virtuoso Jdbc driver.
@@ -77,16 +78,20 @@ public class VirtuosoJdbcDriverIT extends CRDatabaseTestCase {
      */
     @Test
     public void testTooManyOpenStmts() throws SQLException {
-
+ String drv = "virtuoso.jdbc4.Driver";//GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_DRV);
+       //  url ="jdbc:virtuoso://localhost:1112/DATABASE=CR"; //GeneralConfig.getRequiredProperty(urlProperty);
+     //   System.out.println("url is:"+ url);
+    //     usr = "dba"; //GeneralConfig.getRequiredProperty(usrProperty);
+     //    pwd = "dba"; //GeneralConfig.getRequiredProperty(pwdProperty);
         VirtuosoConnectionPoolDataSource dbsource = new VirtuosoConnectionPoolDataSource();
 
-        String testDbURI = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+        String testDbURI ="jdbc:virtuoso://localhost:1112/DATABASE=CR";// GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
         URI uri = URI.create(testDbURI.substring(5));
 
         dbsource.setServerName(uri.getHost());
         dbsource.setPortNumber(uri.getPort());
-        dbsource.setPassword(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD));
-        dbsource.setUser(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR));
+        dbsource.setPassword("dba");
+        dbsource.setUser("dba");
         dbsource.setCharset("UTF-8");
         VirtuosoPooledConnection pooledConnection = (VirtuosoPooledConnection) dbsource.getPooledConnection();
         virtuoso.jdbc4.VirtuosoConnection con = pooledConnection.getVirtuosoConnection();

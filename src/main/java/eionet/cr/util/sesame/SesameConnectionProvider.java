@@ -64,11 +64,11 @@ public final class SesameConnectionProvider {
             String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
             String usrProperty = GeneralConfig.VIRTUOSO_DB_USR;
             String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
-
+          
             readWriteRepository =
                     createRepository(GeneralConfig.getRequiredProperty(urlProperty),
                             GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
-        }
+                            }
         return readWriteRepository;
     }
 

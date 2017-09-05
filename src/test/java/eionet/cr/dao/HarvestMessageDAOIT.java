@@ -20,7 +20,6 @@
  */
 package eionet.cr.dao;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -28,6 +27,7 @@ import org.junit.Test;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
@@ -43,6 +43,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
         @Sql({"/sources-harvests-messages.sql"}),
         @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 })
+@Ignore
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
     /**

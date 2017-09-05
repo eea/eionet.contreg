@@ -21,12 +21,14 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
 import java.sql.Connection;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 
 /**
  * unit test for testing HarvestScriptActionBean.
  *
  * @author kaido
  */
+@Ignore
 public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
 
     @Before

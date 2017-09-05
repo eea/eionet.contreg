@@ -17,6 +17,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
+import org.junit.Ignore;
 
 /**
  *

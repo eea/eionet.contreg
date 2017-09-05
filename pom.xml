@@ -195,17 +195,17 @@
                         <phase>process-test-resources</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="${project.build.directory}/test-classes/xsl" />
+                                <!--mkdir dir="${project.build.directory}/test-classes/xsl" />
                                 <mkdir dir="${project.build.directory}/test-classes/tmp" />
                                 <mkdir dir="${project.build.directory}/test-classes/queries" />
                                 <mkdir dir="${project.build.directory}/test-classes/xmlfile" />
-                                <mkdir dir="${project.build.directory}/test-classes/schema" />
+                                <mkdir dir="${project.build.directory}/test-classes/schema" /-->
                                 <copy todir="${project.build.directory}/test-classes/WEB-INF">
                                     <fileset dir="src/main/webapp/WEB-INF" />
                                 </copy>
-                                <copy todir="${project.build.directory}/test-classes/acl">
+                                <!--copy todir="${project.build.directory}/test-classes/acl">
                                     <fileset dir="acl" />
-                                </copy>
+                                </copy-->
                                 <copy file="${basedir}/${env}.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">

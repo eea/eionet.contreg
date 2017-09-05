@@ -7,6 +7,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -14,6 +15,7 @@ import org.junit.Test;
  *
  * @author Jaanus
  */
+@Ignore
 public class PingActionBeanIT extends CRDatabaseTestCase {
 
     /**

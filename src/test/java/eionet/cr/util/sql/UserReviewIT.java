@@ -15,6 +15,7 @@ import eionet.cr.dao.ReviewsDAO;
 import eionet.cr.dto.ReviewDTO;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.security.CRUser;
+import org.junit.Ignore;
 
 /**
  *

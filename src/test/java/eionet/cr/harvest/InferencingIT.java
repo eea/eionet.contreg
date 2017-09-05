@@ -19,11 +19,13 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
+import org.junit.Ignore;
 
 /**
  * @author Risto Alt
  *
  */
+//@Ignore
 public class InferencingIT extends CRDatabaseTestCase {
 
     /** Rule-set seed file. */
@@ -48,7 +50,7 @@ public class InferencingIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
 
         super.setUp();
         String rulesetGraphUri = RdfLoader.getSeedFileGraphUri(RULESET_SEED_FILE);

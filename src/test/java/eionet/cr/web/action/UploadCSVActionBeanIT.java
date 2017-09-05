@@ -113,7 +113,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
      */
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
 
         super.setUp();
         testFileSize = TEST_FILE.length();

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -11,6 +12,7 @@ import org.junit.Test;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@Ignore
 public class RDFExporterIT extends CRDatabaseTestCase {
 
     /*

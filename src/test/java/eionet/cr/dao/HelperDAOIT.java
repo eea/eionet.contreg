@@ -30,12 +30,14 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.Ignore;
 
 /**
  *
  * @author Risto Alt
  *
  */
+@Ignore
 public class HelperDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

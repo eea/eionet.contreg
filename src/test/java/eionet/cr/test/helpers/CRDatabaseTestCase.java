@@ -43,6 +43,7 @@ import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.sesame.SesameUtil;
+import org.junit.Before;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -63,8 +64,9 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception {
+    //@Override
+    @Before
+    public void setUp() throws Exception {
 
         super.setUp();
         setUpTripleStore();

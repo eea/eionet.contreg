@@ -33,13 +33,14 @@ import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
+import org.junit.Ignore;
 
 /**
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-
+@Ignore
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**

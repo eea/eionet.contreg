@@ -1799,7 +1799,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
                 }
 
-                // Throw the reason why content loading failed.
                 throw new DAOException("Failed content loading of " + graphUri, e);
 
             } finally {

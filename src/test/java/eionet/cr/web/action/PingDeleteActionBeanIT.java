@@ -26,12 +26,14 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.web.security.CRUser;
+import org.junit.Ignore;
 
 /**
  * Unit tests for the "delete" operation of {@link PingActionBean}.
  *
  * @author Jaanus
  */
+@Ignore
 public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
 
     /*

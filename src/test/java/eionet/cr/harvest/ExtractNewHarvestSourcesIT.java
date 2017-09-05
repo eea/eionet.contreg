@@ -33,12 +33,14 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import org.junit.Ignore;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@Ignore
 public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
     /** Jetty mock server for serving test resources via HTTP. */

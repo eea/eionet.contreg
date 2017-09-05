@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,7 +51,8 @@ public class VirtuosoConnectionIT extends TestCase {
      * @see junit.framework.TestCase#tearDown()
      */
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         Connection conn = null;
         try {
             conn = SesameUtil.getSQLConnection();

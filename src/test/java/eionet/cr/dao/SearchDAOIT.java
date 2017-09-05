@@ -38,12 +38,14 @@ import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.Ignore;
 
 /**
  *
  * @author Risto Alt
  *
  */
+@Ignore
 public class SearchDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

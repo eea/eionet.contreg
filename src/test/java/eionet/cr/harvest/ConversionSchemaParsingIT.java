@@ -24,6 +24,7 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameUtil;
+import org.junit.Ignore;
 
 /**
  * Unit tests for checking the various cases of detecting conversion schemas from harvested XML files and storing it into the
@@ -31,6 +32,7 @@ import eionet.cr.util.sesame.SesameUtil;
  *
  * @author Jaanus
  */
+@Ignore
 public class ConversionSchemaParsingIT extends CRDatabaseTestCase {
 
     /*

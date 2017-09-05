@@ -25,6 +25,7 @@ import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
+import org.junit.Ignore;
 
 /**
  *

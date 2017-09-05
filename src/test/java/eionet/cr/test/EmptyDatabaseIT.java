@@ -26,12 +26,14 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
+import org.junit.Ignore;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@Ignore
 public class EmptyDatabaseIT extends DatabaseTestCase {
 
     @Override

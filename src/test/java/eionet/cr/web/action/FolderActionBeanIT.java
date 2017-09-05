@@ -18,6 +18,7 @@ import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -25,6 +26,7 @@ import org.junit.Test;
  *
  * @author Jaanus
  */
+@Ignore
 public class FolderActionBeanIT extends CRDatabaseTestCase {
 
     private static final String USERNAME = "heinlja";

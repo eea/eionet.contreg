@@ -31,12 +31,14 @@ import eionet.cr.dao.virtuoso.VirtuosoSpoBinaryDAO;
 import eionet.cr.dao.virtuoso.VirtuosoTagsDAO;
 import eionet.cr.dao.virtuoso.VirtuosoUrgentHarvestQueueDAO;
 import eionet.cr.dao.virtuoso.VirtuosoUserHomeDAO;
+import org.junit.Ignore;
 
 /**
  * Tests the factory getDao methods.
  *
  * @author altnyris
  */
+@Ignore
 public class DaoFactoryIT extends TestCase {
 
     @Test

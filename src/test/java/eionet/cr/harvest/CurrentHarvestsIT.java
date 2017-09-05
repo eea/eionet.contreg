@@ -9,12 +9,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 
 /**
  * Tests for the {@link CurrentHarvests} class.
  *
  * @author Jaanus
  */
+@Ignore
 public class CurrentHarvestsIT extends CRDatabaseTestCase {
 
     /*

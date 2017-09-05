@@ -36,6 +36,7 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.Ignore;
 
 /**
  * Unit tests for SPARQL and SQL queries that are potentially sensitive to Virtuoso upgrade.
@@ -47,11 +48,12 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+  // @Override
+  //  @Before
+  //  public void setUp() throws Exception {
+  //      super.setUp();
+        
+   // }
 
     /*
          * (non-Javadoc)
@@ -87,6 +89,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+   // @Ignore
     public void testFactsheetQuery() throws DAOException {
 
         // "select ?pred min(xsd:int(isBlank(?s))) as ?anonSubj "
@@ -117,6 +120,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+ //   @Ignore
     public void testFreeTextSearchSyntax() throws DAOException {
 
         // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
@@ -142,6 +146,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+   // @Ignore
     public void testSearchByFilters() throws DAOException {
 
         Map<String, String> filters = new HashMap<String, String>();
@@ -170,6 +175,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+    //@Ignore
     public void testSearchBySource() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
@@ -195,6 +201,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+   // @Ignore
     public void testSearchByTags() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
@@ -220,6 +227,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws DAOException If query fails.
      */
     @Test
+    //@Ignore
     public void testSearchReferences() throws DAOException {
 
         String subjectUri = "http://rod.eionet.europa.eu/spatial/10";
@@ -246,6 +254,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws Exception If any error occurs.
      */
     @Test
+  //  @Ignore
     public void testVariousFunctions() throws Exception {
 
         // The following queries are tested syntactically only, to enusre Virtuoso supports the specific functions used in them.
@@ -277,6 +286,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     @Test
+    //@Ignore
     public void testGraphRename() throws Exception {
 
         String oldGraph = getSeedFileGraphUri(OBLIGATIONS_RDF);
@@ -285,8 +295,13 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         String sqlTemplate = VirtuosoHarvestSourceDAO.RENAME_GRAPH_SQL;
         String renameSql = sqlTemplate.replace("%old_graph%", oldGraph).replaceFirst("%new_graph%", newGraph);
 
+        System.out.println("renameSQL is: "+renameSql);
+        
         String countSql = "select count(*) from DB.DBA.RDF_QUAD where G=iri_to_id('%graph_uri%')";
 
+        System.out.println("countSql is:"+countSql);
+        
+        System.out.println("oldGraph is:"+oldGraph);
         Connection sqlConn = null;
         Statement stmt = null;
         ResultSet rs = null;

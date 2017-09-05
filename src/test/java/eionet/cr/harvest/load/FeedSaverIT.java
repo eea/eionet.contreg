@@ -28,12 +28,14 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.Ignore;
 
 /**
  * Tests for FeedSaver class.
  *
  * @author Kaido Laine
  */
+@Ignore
 public class FeedSaverIT {
 
     /** test atom RSS feed. */

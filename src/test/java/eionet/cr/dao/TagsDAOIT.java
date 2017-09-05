@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
 
 /**
  *
