@@ -5,6 +5,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.integration.spring.SpringLiquibase;
+import liquibase.resource.ResourceAccessor;
 
 import java.sql.Connection;
 
@@ -24,6 +25,7 @@ public class SpringLiquibaseVirtuoso extends SpringLiquibase {
      * @throws DatabaseException
      */
     @Override
+//    protected Database createDatabase(Connection c, ResourceAccessor resourceAccessor) throws DatabaseException {
     protected Database createDatabase(Connection c) throws DatabaseException {
 
         DatabaseFactory.getInstance().register(new eionet.liquibase.VirtuosoDatabase());

@@ -19,7 +19,6 @@
         <constructor-arg index="0">
             <array>
                 <value>eionetdir.properties</value>
-                <value>liquibase.properties</value>
                 <value>cr.properties</value>
                 <value>acl.properties</value>
                 <value>env.properties</value>
@@ -73,6 +72,16 @@
     </bean>
 
     <!-- Runs on Tomcat startup. -->
+    <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
+        <property name="dataSource" ref="dataSource" />
+        <property name="changeLog" value="classpath:sql/db-struct.xml" />
+    </bean>
+
+    <!--&lt;!&ndash; Runs on Tomcat startup. &ndash;&gt;-->
+    <!--<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+        <!--<property name="changeLog" value="classpath:sql/db-struct.xml" />-->
+    <!--</bean>-->
 <!--
     <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
         <property name="dataSource" ref="dataSource" />

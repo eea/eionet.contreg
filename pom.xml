@@ -6,7 +6,7 @@
     <artifactId>cr3</artifactId>
     <packaging>war</packaging>
     <prerequisites>
-        <maven>3.0.3</maven>
+        <maven>3.3.9</maven>
     </prerequisites>
 
 
@@ -14,10 +14,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <env>default</env>
-        <javaVersion>1.6</javaVersion>
+        <javaVersion>1.8</javaVersion>
+        <!-- TODO Replace with RDF4j and modernize -->
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
-        <spring.version>4.2.6.RELEASE</spring.version>
+        <spring.version>4.3.10.RELEASE</spring.version>
     </properties>
 
     <version>1.0-SNAPSHOT</version>
@@ -25,7 +26,6 @@
     <url>http://maven.apache.org</url>
 
     <!-- configuration of Maven repositories to be used -->
-
     <repositories>
         <repository>
             <id>archiva.internal</id>
@@ -42,12 +42,6 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
         </repository>
         <!--For unpublished Virtuoso 4.2.fix -->
         <repository>
@@ -74,17 +68,33 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <!-- the build configuration -->
+    <profiles>
+      <profile>
+        <id>docker</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+          <valid.images>virtuoso, httpd</valid.images>
+        </properties>
+      </profile>
+      <profile>
+        <id>local</id>
+        <properties>
+          <docker.host.address>localhost</docker.host.address>
+          <valid.images>none</valid.images>
+        </properties>
+      </profile>
+    </profiles>
 
+    <!-- the build configuration -->
     <build>
         <plugins>
-
             <!-- maven-compiler-plugin -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.6.1</version>
                 <inherited>true</inherited>
                 <configuration>
                     <verbose>false</verbose>
@@ -96,28 +106,18 @@
                 </configuration>
             </plugin>
 
-            <!-- maven-eclipse-plugin -->
-
-            <plugin>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <wtpversion>1.5</wtpversion>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
-                </configuration>
-            </plugin>
-
             <!-- maven-surefire-plugin -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.19.1</version>
                 <configuration>
+                    <excludes>
+                        <exclude>**/*.java</exclude>
+                    </excludes>
                     <!-- Disable JVM assertions when running surefire. Prevents from false JUnit assertion errors. -->
-                    <enableAssertions>false</enableAssertions>
-                    <skipTests>false</skipTests>
+                    <!--<enableAssertions>false</enableAssertions>-->
+                    <!--<skipTests>false</skipTests>-->
                 </configuration>
             </plugin>
 
@@ -125,7 +125,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
                 <configuration>
                     <filters>
                         <filter>${basedir}/${env}.properties</filter>
@@ -195,21 +195,16 @@
                         <phase>process-test-resources</phase>
                         <configuration>
                             <tasks>
-                                <!--mkdir dir="${project.build.directory}/test-classes/xsl" />
-                                <mkdir dir="${project.build.directory}/test-classes/tmp" />
-                                <mkdir dir="${project.build.directory}/test-classes/queries" />
-                                <mkdir dir="${project.build.directory}/test-classes/xmlfile" />
-                                <mkdir dir="${project.build.directory}/test-classes/schema" /-->
                                 <copy todir="${project.build.directory}/test-classes/WEB-INF">
                                     <fileset dir="src/main/webapp/WEB-INF" />
                                 </copy>
-                                <!--copy todir="${project.build.directory}/test-classes/acl">
-                                    <fileset dir="acl" />
-                                </copy-->
-                                <copy file="${basedir}/${env}.properties"
+                                <copy file="${basedir}/unittest.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">
                                     <fileset dir="sql" />
+                                </copy>
+                                <copy todir="${project.build.directory}/test-classes/acl">
+                                    <fileset dir="acl" />
                                 </copy>
                             </tasks>
                         </configuration>
@@ -219,48 +214,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-
-                    &lt;!&ndash; Pre-test preparations &ndash;&gt;
-
-                    <execution>
-                        <id>pre-test</id>
-                        <phase>process-test-classes</phase>
-                        <configuration>
-                            <target unless="maven.test.skip">
-                                &lt;!&ndash; Load build properties. &ndash;&gt;
-                                <loadproperties srcFile="${env}.properties"/>
-                                &lt;!&ndash; Ensure that the "harvester.tempFileDir" directory exists. &ndash;&gt;
-                                <mkdir dir="${harvester.tempFileDir}"/>
-                                &lt;!&ndash; Ensure that the "filestore.path" directory exists. &ndash;&gt;
-                                <mkdir dir="${filestore.path}"/>
-                                &lt;!&ndash; Ensure that the "application.acl.folder" directory exists. &ndash;&gt;
-                                <mkdir dir="${application.acl.folder}"/>
-                                &lt;!&ndash; Copy files from acl directory into "application.acl.folder", unless they already exist in the latter. &ndash;&gt;
-                                <copy todir="${application.acl.folder}">
-                                    <fileset dir="src/main/resources/acl">
-                                        <present present="srconly" targetdir="${application.acl.folder}"/>
-                                    </fileset>
-                                </copy>
-                                &lt;!&ndash; Always overwrite the permission definitions file(s) in "application.acl.folder". &ndash;&gt;
-                                <copy todir="${application.acl.folder}" overwrite="true">
-                                    <fileset dir="src/main/resources/acl" includes="*.prms*"/>
-                                    <fileset dir="src/main/resources/acl" includes="*.permissions*"/>
-                                </copy>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-                </executions>
-            </plugin>-->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -273,40 +226,209 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.21.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <filter>${valid.images}</filter>
+                    <!--<verbose>true</verbose>-->
+                    <!--<logDate>default</logDate>-->
+                    <!--<autoPull>true</autoPull>-->
+                    <images>
+                        <image>
+                            <alias>virtuoso</alias>
+                            <name>tourikas/virtuoso:latest</name>
+                            <run>
+                                <ports>
+                                    <port>58890:8890</port>
+                                    <port>51111:1111</port>
+                                </ports>
+                                <wait>
+                                    <log>Server online at </log>
+                                    <time>30000</time>
+                                    <!--<tcp>-->
+                                        <!--<mode>direct</mode>-->
+                                        <!--<ports>-->
+                                            <!--<port>51112</port>-->
+                                        <!--</ports>-->
+                                    <!--</tcp>-->
+                                    <!--<time>10000</time>-->
+                                </wait>
+                            </run>
+                        </image>
+
+                        <image>
+                            <alias>tomcat</alias>
+                            <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}</name>
+                            <!-- <registry>dockerrepo.eionet.europa.eu:5000</registry> -->
+                            <build>
+                                <from>tomcat:6</from>
+                                <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <assembly>
+                                    <descriptor>assembly.xml</descriptor>
+                                </assembly>
+                                <env>
+                                    <CATALINA_OPTS>-Djava.security.egd=file:/dev/./urandom</CATALINA_OPTS>
+                                    <KEYSTORE_PASS>changeit</KEYSTORE_PASS>
+                                </env>
+                                <volumes>
+                                    <volume>/config</volume>
+                                    <volume>/usr/local/tomcat/target</volume>
+                                </volumes>
+                                <runCmds>
+                                    <run>rm -rf /usr/local/tomcat/webapps/*</run>
+                                    <run>cp -r /maven/tomcat /usr/local</run>
+                                    <!--<run>rm -f $CATALINA_HOME/conf/logging.properties</run>-->
+                                </runCmds>
+                                <ports>
+                                    <port>8080</port>
+                                    <port>8009</port>
+                                </ports>
+                                <!-- <cmd>catalina.sh run</cmd> -->
+                            </build>
+
+                            <!--<run>-->
+                                <!--<hostname>contreg</hostname>-->
+                                <!--<volumes>-->
+                                    <!--<bind>-->
+                                        <!--<volume>${project.basedir}/target:/usr/local/tomcat/target</volume>-->
+                                        <!--<volume>/etc/localtime:/etc/localtime:ro</volume>-->
+                                    <!--</bind>-->
+                                <!--</volumes>-->
+                                <!--<ports>-->
+                                    <!--<port>tomcat.port:8080</port>-->
+                                <!--</ports>-->
+                                <!--<links>-->
+                                    <!--<link>database:database</link>-->
+                                <!--</links>-->
+                                <!--<wait>-->
+                                    <!--<http>-->
+                                        <!--&lt;!&ndash; Check for this URL to return a 200 return code .... &ndash;&gt;-->
+                                        <!--<url>http://${docker.host.address}:${tomcat.port}/</url>-->
+                                    <!--</http>-->
+                                    <!--&lt;!&ndash; ... but at max 40 seconds &ndash;&gt;-->
+                                    <!--<time>40000</time>-->
+                                <!--</wait>-->
+                                <!--<log>-->
+                                    <!--<prefix>TC</prefix>-->
+                                    <!--<color>cyan</color>-->
+                                <!--</log>-->
+                            <!--</run>-->
+
+                        </image>
+
+                        <!-- This image is rebuilt every time. It is not suitable for persistent data -->
+                        <image>
+                            <alias>virtuoso-new</alias>
+                            <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}-db</name>
+                            <build>
+                                <from>tenforce/virtuoso</from> <!-- https://hub.docker.com/r/tenforce/virtuoso/ -->
+                                <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <assembly>
+                                    <descriptor>assembly-db.xml</descriptor>
+                                </assembly>
+                                <env>
+                                    <!--<VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>-->
+                                    <SPARQL_UPDATE>true</SPARQL_UPDATE>
+                                </env>
+                                <volumes>
+                                    <volume>/var/lib/virtuoso/db/target</volume>
+                                </volumes>
+                                <runCmds>
+                                    <run>cp /maven/virtuoso.ini /virtuoso.ini</run>
+                                    <run>cat /maven/1_create_users.sql >/sql-query.sql</run>
+                                </runCmds>
+                                <ports>
+                                    <port>1111</port>
+                                    <port>8890</port>
+                                </ports>
+                            </build>
+                            <run>
+                                <volumes>
+                                    <bind>
+                                        <volume>${project.basedir}/target:/var/lib/virtuoso/db/target</volume>
+                                        <volume>/etc/localtime:/etc/localtime:ro</volume>
+                                    </bind>
+                                </volumes>
+                                <ports>
+                                    <port>database.port:1111</port>
+                                </ports>
+                                <wait>
+                                    <log>Server online at 1111</log>
+                                    <time>30000</time>
+                                </wait>
+                                <log>
+                                    <prefix>DB</prefix>
+                                    <color>blue</color>
+                                </log>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <skip>${maven.test.skip}</skip>
+                        </configuration>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                            <goal>build</goal>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <configuration>
+                            <skip>${maven.test.skip}</skip>
+                        </configuration>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <enableAssertions>false</enableAssertions>
+                    <systemPropertyVariables>
+                        <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
+                        <docker.host.address>${docker.host.address}</docker.host.address>
+                        <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
-        <!-- filters for src/main/resources and src/test/resources -->
-
-        <filters>
-            <filter>${env}.properties</filter>
-        </filters>
-
-        <!-- resources for the main code -->
-
-<!--        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>-->
-
-        <!-- resources for the main code -->
-
-<!--        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>-->
-
         <!-- name of the bundled project when it is finally built -->
-
         <finalName>cr</finalName>
 
     </build>
@@ -516,12 +638,12 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2.3</version>
+            <version>4.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.2.3</version>
+            <version>4.5.3</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -681,7 +803,7 @@
         </dependency>
 
         <!-- Liquibase -->
-
+        <!-- TODO Upgrade to 3.5.3+ asap -->
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
@@ -714,14 +836,8 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
-        </dependency>
 
         <!-- Jetty -->
-
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
@@ -777,7 +893,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.6</version>
                 <configuration>
                     <linkXref>false</linkXref>
                     <sourceEncoding>utf-8</sourceEncoding>
@@ -788,7 +904,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.17</version>
                 <configuration>
                     <configLocation>${checkstyle.config.location}</configLocation>
                 </configuration>
@@ -796,267 +912,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.5</version>
             </plugin>
         </plugins>
     </reporting>
 
-    <profiles>
-
-        <profile>
-          <id>it</id>
-          <activation>
-            <activeByDefault>false</activeByDefault>
-          </activation>
-          <properties>
-            <!-- Database configurations -->
-            <env>unittest</env>
-            <database.port>1112</database.port>
-          </properties>
-
-          <build>
-            <plugins>
-              <plugin>
-                <groupId>org.jolokia</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.13.4</version>
-                <configuration>
-                  <verbose>true</verbose>
-                  <logDate>default</logDate>
-                  <autoPull>true</autoPull>
-                  <images>
-                    <image>
-                      <alias>service</alias>
-                      <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}</name>
-                      <!-- <registry>dockerrepo.eionet.europa.eu:5000</registry> -->
-                      <build>
-                        <from>tomcat:6</from>
-                        <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
-                        <tags>
-                          <tag>latest</tag>
-                          <tag>${project.version}</tag>
-                        </tags>
-                        <assembly>
-                          <descriptor>assembly.xml</descriptor>
-                        </assembly>
-                        <env>
-                          <CATALINA_OPTS>-Djava.security.egd=file:/dev/./urandom</CATALINA_OPTS>
-                          <KEYSTORE_PASS>changeit</KEYSTORE_PASS>
-                        </env>
-			<volumes>
-                          <volume>/config</volume>
-                          <volume>/usr/local/tomcat/target</volume>
-			</volumes>
-                        <runCmds>
-                          <run>rm -rf /usr/local/tomcat/webapps/*</run>
-                          <run>cp -r /maven/tomcat /usr/local</run>
-                          <!--<run>rm -f $CATALINA_HOME/conf/logging.properties</run>-->
-                        </runCmds>
-                        <ports>
-                          <port>8080</port>
-                          <port>8009</port>
-                        </ports>
-                        <!-- <cmd>catalina.sh run</cmd> -->
-                      </build>
-
-                      <run>
-                        <hostname>contreg</hostname>
-			<volumes>
-			  <bind>
-			    <volume>${project.basedir}/target:/usr/local/tomcat/target</volume>
-                            <volume>/etc/localtime:/etc/localtime:ro</volume>
-			  </bind>
-			</volumes>
-                        <ports>
-                          <port>tomcat.port:8080</port>
-                        </ports>
-                        <links>
-                          <link>database:database</link>
-                        </links>
-                        <wait>
-                          <http>
-                            <!-- Check for this URL to return a 200 return code .... -->
-                            <url>http://${docker.host.address}:${tomcat.port}/</url>
-                          </http>
-                          <!-- ... but at max 40 seconds -->
-                          <time>40000</time>
-                        </wait>
-                        <log>
-                          <prefix>TC</prefix>
-                          <color>cyan</color>
-                        </log>
-                      </run>
-                    </image>
-
-                    <!-- This image is rebuilt every time. It is not suitable for persistent data -->
-                    <image>
-                      <alias>database</alias>
-                      <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}-db</name>
-                      <build>
-                        <from>tenforce/virtuoso</from> <!-- https://hub.docker.com/r/tenforce/virtuoso/ -->
-                        <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
-                        <tags>
-                          <tag>latest</tag>
-                          <tag>${project.version}</tag>
-                        </tags>
-                        <assembly>
-                          <descriptor>assembly-db.xml</descriptor>
-                        </assembly>
-                        <env>
-                          <!--<VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>-->
-                          <SPARQL_UPDATE>true</SPARQL_UPDATE>
-                        </env>
-			<volumes>
-                          <volume>/var/lib/virtuoso/db/target</volume>
-			</volumes>
-                        <runCmds>
-                          <run>cp /maven/virtuoso.ini /virtuoso.ini</run>
-                          <run>cat /maven/1_create_users.sql >/sql-query.sql</run>
-                        </runCmds>
-                        <ports>
-                          <port>1111</port>
-                          <port>8890</port>
-                        </ports>
-                      </build>
-                      <run>
-			<volumes>
-			  <bind>
-			    <volume>${project.basedir}/target:/var/lib/virtuoso/db/target</volume>
-                            <volume>/etc/localtime:/etc/localtime:ro</volume>
-			  </bind>
-			</volumes>
-                        <ports>
-                          <port>database.port:1111</port>
-                        </ports>
-                        <wait>
-                          <log>Server online at 1111</log>
-                          <time>30000</time>
-                        </wait>
-                        <log>
-                          <prefix>DB</prefix>
-                          <color>blue</color>
-                        </log>
-                      </run>
-                    </image>
-                  </images>
-                </configuration>
-
-                <!-- Hooking into the lifecycle -->
-                <executions>
-                  <execution>
-                    <id>start</id>
-                    <phase>pre-integration-test</phase>
-                    <goals>
-                      <goal>build</goal>
-                      <goal>start</goal>
-                    </goals>
-                  </execution>
-                  <execution>
-                    <id>stop</id>
-                    <phase>post-integration-test</phase>
-                    <goals>
-                      <goal>stop</goal>
-                    </goals>
-                  </execution>
-                </executions>
-              </plugin>
-
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                  <systemPropertyVariables>
-                    <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
-                    <!-- <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
-                  </systemPropertyVariables>
-                  <trimStackTrace>false</trimStackTrace>
-                </configuration>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>integration-test</goal>
-                      <goal>verify</goal>
-                    </goals>
-                  </execution>
-                </executions>
-              </plugin>
-
-            </plugins>
-          </build>
-        </profile>
-
-        <profile>
-          <id>manualit</id>
-          <activation>
-            <activeByDefault>false</activeByDefault>
-          </activation>
-          <properties>
-            <env>unittest</env>
-            <database.port>1112</database.port>
-          </properties>
-
-          <dependencies>
-            <dependency>
-                <groupId>eionet</groupId>
-                <artifactId>virtliquibase</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-          </dependencies>
-
-          <build>
-            <plugins>
-              <!-- Liquibase Maven plugin for database refactoring. -->
-
-              <plugin>
-                  <groupId>org.liquibase</groupId>
-                  <artifactId>liquibase-maven-plugin</artifactId>
-                  <version>3.0.4</version>
-                  <configuration>
-                      <propertyFile>target/classes/liquibase.properties</propertyFile>
-                      <changeLogFile>sql/db-struct.xml</changeLogFile>
-                      <databaseClass>eionet.liquibase.VirtuosoDatabase</databaseClass>
-                  </configuration>
-                  <executions>
-                      <execution>
-                          <id>Update test database</id>
-                          <phase>pre-integration-test</phase>
-                          <configuration>
-                              <skip>${maven.test.skip}</skip>
-                              <propertyFile>target/test-classes/liquibase.properties</propertyFile>
-                          </configuration>
-                          <goals>
-                              <!-- The "dropAll" goal is not yet supported by the liquibase-virtuoso plugin.
-                              <goal>dropAll</goal>
-                              -->
-                              <goal>update</goal>
-                          </goals>
-                      </execution>
-                  </executions>
-              </plugin>
-
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                  <enableAssertions>false</enableAssertions>
-                  <systemPropertyVariables>
-                    <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
-                  </systemPropertyVariables>
-                </configuration>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>integration-test</goal>
-                      <goal>verify</goal>
-                    </goals>
-                  </execution>
-                </executions>
-              </plugin>
-
-            </plugins>
-          </build>
-        </profile>
-    </profiles>
 </project>
