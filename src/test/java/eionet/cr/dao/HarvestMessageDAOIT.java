@@ -43,10 +43,10 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
  * @author altnyris
  *
  */
-@SqlGroup({
-        @Sql({"/sources-harvests-messages.sql"}),
-        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
-})
+//@SqlGroup({
+//        @Sql({"/sources-harvests-messages.sql"}),
+//        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+//})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
@@ -74,14 +74,12 @@ public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
     @Test
     public void testFindHarvestMessagesByHarvestID() throws Exception {
-
         List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(5);
         assertEquals(4, messages.size());
     }
 
     @Test
     public void testDeleteMessage() throws Exception {
-
         DAOFactory.get().getDao(HarvestMessageDAO.class).deleteMessage(5);
         HarvestMessageDTO message = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
         assertNull(message);

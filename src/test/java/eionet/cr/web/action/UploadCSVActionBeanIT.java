@@ -253,7 +253,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If any sort of data access error happens.
      */
-    @Test
     private void deleteUploadedFile() throws DAOException {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
@@ -271,7 +270,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If any sort of data access error happens.
      */
-    @Test
     private void deleteUploadedFileOnline() throws DAOException {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);

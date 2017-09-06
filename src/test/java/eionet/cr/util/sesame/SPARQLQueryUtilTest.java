@@ -23,13 +23,15 @@ package eionet.cr.util.sesame;
 import java.util.ArrayList;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import eionet.cr.common.Namespace;
 import eionet.cr.util.Bindings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test SPARQLQueryUtil methods.
@@ -38,7 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class SPARQLQueryUtilTest extends TestCase {
+public class SPARQLQueryUtilTest {
 
     private static final String CR_OWLSAMEAS_DEF = "DEFINE input:same-as \"yes\"";
     private static final String CR_NAMESPACE_DEF = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ";
@@ -49,8 +51,7 @@ public class SPARQLQueryUtilTest extends TestCase {
      * Test getOwlSameAsDefinition method.
      */
     @Test
-    public static void testOwlSameAs() {
-
+    public void testOwlSameAs() {
         assertEquals(CR_OWLSAMEAS_DEF, SPARQLQueryUtil.getCrOwlSameAsDefinitionStr());
     }
 

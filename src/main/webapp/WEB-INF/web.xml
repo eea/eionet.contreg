@@ -161,14 +161,6 @@
         <!--<filter-name>CAS Filter</filter-name>-->
         <!--<url-pattern>/login</url-pattern>-->
     <!--</filter-mapping>-->
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- listeners -->
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-    <listener>
-        <listener-class>eionet.cr.web.util.StartupAntRunner</listener-class>
-    </listener>
     <!--<listener>-->
         <!--<listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>-->
     <!--</listener>-->

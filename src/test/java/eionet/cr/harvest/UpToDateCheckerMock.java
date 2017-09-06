@@ -21,8 +21,6 @@ import eionet.cr.util.Util;
  *
  * @author jaanus
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UpToDateCheckerMock extends UpToDateChecker {
 
     /** Various cases of URLs to check. */

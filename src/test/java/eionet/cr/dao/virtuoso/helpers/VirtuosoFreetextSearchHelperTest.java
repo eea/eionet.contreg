@@ -15,12 +15,14 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * VirtuosoFreetextSearchHelper tests.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class VirtuosoFreetextSearchHelperTest extends TestCase {
+public class VirtuosoFreetextSearchHelperTest {
 
     /**
      * Test creating ordered query string.

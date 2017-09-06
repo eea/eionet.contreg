@@ -109,7 +109,7 @@ public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
             assertEquals("Unexpected source harvest interval", Integer.valueOf(expectedNextIntervalinMinutes), source.getIntervalMinutes());
             assertEquals("Unexpected number of triples in source", Integer.valueOf(0), source.getStatements());
         } finally {
-            JettyUtil.close(server);
+            server.stop();
         }
     }
 

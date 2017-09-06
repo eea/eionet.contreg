@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import eionet.cr.util.TestUtils;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -131,7 +132,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
 
         // Create the source to be tested. The URL is served by Jetty below.
 
-        String url = "http://localhost:8999/testResources/simple-rdf.xml";
+        String url = TestUtils.getFileUrl("simple-rdf.xml");
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(url);
         source.setIntervalMinutes(5);
@@ -140,20 +141,11 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
         source = sourceDao.getHarvestSourceByUrl(url);
         assertNotNull("Expected existing harvest source", source);
 
-        // Harvest the source, served by Jetty.
-
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "simple-rdf.xml");
-            PullHarvest harvest = new PullHarvest(url);
-            harvest.execute();
-            assertEquals(12, harvest.getStoredTriplesCount());
-        } finally {
-            JettyUtil.close(server);
-        }
+        PullHarvest harvest = new PullHarvest(url);
+        harvest.execute();
+        assertEquals(12, harvest.getStoredTriplesCount());
 
         // Assert that source graph has content and there's triples *about* the source.
-
         source = sourceDao.getHarvestSourceByUrl(url);
         assertNotNull("Expected existing harvest source", source);
         HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);

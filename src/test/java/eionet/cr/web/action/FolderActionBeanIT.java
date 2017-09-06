@@ -1,14 +1,11 @@
 package eionet.cr.web.action;
 
 import java.util.HashMap;
-
 import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-
 import org.apache.commons.lang.StringUtils;
-
 import eionet.acl.AccessController;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -74,7 +71,6 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     @Test
-    @SuppressWarnings("rawtypes")
     public void testFolderCreation() throws Exception {
 
         // Assert not-yet-existence of resulting folder subject.

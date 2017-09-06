@@ -1,5 +1,6 @@
 package eionet.cr.util;
 
+import eionet.cr.config.GeneralConfig;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -27,5 +28,10 @@ public class TestUtils {
         File file = new File(db.getClass().getClassLoader().getResource(dataset).getFile());
         IDataSet dataSet = new FlatXmlDataSetBuilder().build(file);
         DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
+    }
+
+    public static String getFileUrl(String seedName) {
+        return GeneralConfig.getProperty("test.httpd.url").concat(seedName);
+//        return GeneralConfig.getProperty("test.httpd.url").concat(seedName);
     }
 }

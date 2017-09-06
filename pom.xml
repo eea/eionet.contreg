@@ -115,10 +115,35 @@
                     <excludes>
                         <exclude>**/*.java</exclude>
                     </excludes>
-                    <!-- Disable JVM assertions when running surefire. Prevents from false JUnit assertion errors. -->
-                    <!--<enableAssertions>false</enableAssertions>-->
-                    <!--<skipTests>false</skipTests>-->
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <!--<enableAssertions>false</enableAssertions>-->
+                    <systemPropertyVariables>
+                        <!--<db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
+                        <docker.host.address>${docker.host.address}</docker.host.address>
+                        <!--<log.url>http://${docker.host.address}:${tomcat.port}/</log.url>-->
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/*.java</include>
+                        <!--<include>**/*Test.java</include>-->
+                        <!--<include>**/*IT.java</include>-->
+                    </includes>
+                    <!--<trimStackTrace>false</trimStackTrace>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- maven-war-plugin -->
@@ -260,6 +285,39 @@
                         </image>
 
                         <image>
+                            <alias>httpd</alias>
+                            <name>httpd</name>
+                            <build>
+                                <from>httpd:alpine</from>
+                                <maintainer>George Sofianos</maintainer>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+
+                                <assembly>
+                                    <mode>dir</mode>
+                                    <basedir>/usr/local/apache2/htdocs/</basedir>
+                                    <descriptor>httpd-assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>58081:80</port>
+                                </ports>
+                                <wait>
+                                    <tcp>
+                                        <mode>direct</mode>
+                                        <ports>
+                                            <port>80</port>
+                                        </ports>
+                                    </tcp>
+                                    <time>5000</time>
+                                </wait>
+                            </run>
+                        </image>
+
+                        <image>
                             <alias>tomcat</alias>
                             <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}</name>
                             <!-- <registry>dockerrepo.eionet.europa.eu:5000</registry> -->
@@ -396,33 +454,6 @@
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
-                <configuration>
-                    <enableAssertions>false</enableAssertions>
-                    <systemPropertyVariables>
-                        <db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>
-                        <docker.host.address>${docker.host.address}</docker.host.address>
-                        <log.url>http://${docker.host.address}:${tomcat.port}/</log.url>
-                    </systemPropertyVariables>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*IT.java</include>
-                    </includes>
-                    <trimStackTrace>false</trimStackTrace>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -685,7 +716,6 @@
         </dependency>
 
         <!-- start org.openrdf.sesame dependencies -->
-
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-util</artifactId>
