@@ -46,7 +46,6 @@ import org.junit.Ignore;
  *
  * @author Enriko Käsper
  */
-@Ignore
 public class HarvestScriptDAOIT extends CRDatabaseTestCase {
 
     /**

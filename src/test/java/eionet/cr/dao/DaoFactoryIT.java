@@ -38,7 +38,6 @@ import org.junit.Ignore;
  *
  * @author altnyris
  */
-@Ignore
 public class DaoFactoryIT extends TestCase {
 
     @Test

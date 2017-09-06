@@ -40,7 +40,6 @@ import org.junit.Ignore;
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
-@Ignore
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**

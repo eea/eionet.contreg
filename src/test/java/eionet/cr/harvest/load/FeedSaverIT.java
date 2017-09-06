@@ -35,7 +35,6 @@ import org.junit.Ignore;
  *
  * @author Kaido Laine
  */
-@Ignore
 public class FeedSaverIT {
 
     /** test atom RSS feed. */

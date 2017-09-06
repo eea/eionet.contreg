@@ -37,7 +37,6 @@ import org.junit.Ignore;
  * @author Risto Alt
  *
  */
-@Ignore
 public class HelperDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

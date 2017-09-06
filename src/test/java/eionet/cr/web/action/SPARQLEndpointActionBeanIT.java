@@ -34,7 +34,6 @@ import eionet.cr.web.util.WebConstants;
  * @author Kaido
  * @author Jaanus
  */
-@Ignore
 public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */
@@ -147,7 +146,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
-    @Ignore
     public void testConstructQueries() throws Exception {
 
         testConstructQuery("application/rdf+xml");

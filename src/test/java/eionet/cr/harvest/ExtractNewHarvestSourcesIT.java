@@ -40,7 +40,6 @@ import org.junit.Ignore;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-@Ignore
 public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
     /** Jetty mock server for serving test resources via HTTP. */

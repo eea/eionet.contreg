@@ -53,7 +53,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
         @Sql({"/sources-harvests-messages.sql"}),
         @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 })
-@Ignore
 public class HarvestSourceDAOIT extends CRDatabaseTestCase {
 
     /*

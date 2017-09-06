@@ -33,7 +33,6 @@ import org.junit.Ignore;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-@Ignore
 public class EmptyDatabaseIT extends DatabaseTestCase {
 
     @Override

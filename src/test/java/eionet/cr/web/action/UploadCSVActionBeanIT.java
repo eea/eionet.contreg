@@ -45,7 +45,6 @@ import eionet.cr.web.security.CRUser;
  *
  * @author Jaanus
  */
-@Ignore
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
 
     /** The name of user whose folder we're testing in. */

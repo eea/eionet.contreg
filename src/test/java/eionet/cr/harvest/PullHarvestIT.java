@@ -47,7 +47,6 @@ import org.junit.Ignore;
  * @author roug
  *
  */
-@Ignore
 public class PullHarvestIT extends CRDatabaseTestCase {
 
     /*

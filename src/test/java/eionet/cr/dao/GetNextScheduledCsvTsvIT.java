@@ -39,7 +39,6 @@ import java.util.List;
  * @author altnyris
  *
  */
-@Ignore
 public class GetNextScheduledCsvTsvIT extends CRDatabaseTestCase {
 
     /*

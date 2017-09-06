@@ -11,7 +11,6 @@ import org.junit.Ignore;
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
-@Ignore
 public class HarvestSourceRedirectIT extends CRDatabaseTestCase {
 
     /*

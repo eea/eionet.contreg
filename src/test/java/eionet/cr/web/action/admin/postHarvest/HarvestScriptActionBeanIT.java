@@ -28,7 +28,6 @@ import org.junit.Ignore;
  *
  * @author kaido
  */
-@Ignore
 public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
 
     @Before

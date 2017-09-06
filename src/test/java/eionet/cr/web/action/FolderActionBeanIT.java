@@ -26,7 +26,6 @@ import org.junit.Test;
  *
  * @author Jaanus
  */
-@Ignore
 public class FolderActionBeanIT extends CRDatabaseTestCase {
 
     private static final String USERNAME = "heinlja";

@@ -9,7 +9,6 @@ import org.junit.Ignore;
 /**
  * @author George Sofianos
  */
-@Ignore
 public class BrowseDatasetsActionBeanIT extends TestCase {
 
   public void setUp() throws Exception {

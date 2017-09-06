@@ -16,7 +16,6 @@ import org.junit.Ignore;
  *
  * @author Jaanus
  */
-@Ignore
 public class CurrentHarvestsIT extends CRDatabaseTestCase {
 
     /*

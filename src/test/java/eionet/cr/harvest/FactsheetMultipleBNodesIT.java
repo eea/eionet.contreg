@@ -20,7 +20,6 @@ import org.junit.Test;
  *
  * @author Jaanus
  */
-@Ignore
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
 
     @Override
