@@ -33,7 +33,7 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -43,6 +43,8 @@ import eionet.cr.staging.imp.ImportStatus;
 import eionet.cr.staging.util.ImportExportLogUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An action bean for listing the currently available "staging databases" and performing bulk operations with them (e.g. delete).
@@ -58,7 +60,7 @@ public class StagingDatabasesActionBean extends AbstractActionBean {
     public static final Map<String, String> IMPORT_STATUSES = createImportStatuses();
 
     /** The static logger. */
-    private static final Logger LOGGER = Logger.getLogger(StagingDatabasesActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StagingDatabasesActionBean.class);
 
     /** Location of the JSP that lists the databases. */
     public static final String STAGING_DATABASES_JSP = "/pages/admin/staging/databases.jsp";

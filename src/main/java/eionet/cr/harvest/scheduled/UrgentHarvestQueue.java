@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -34,6 +34,8 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for common operations with urgent harvest queue.
@@ -45,7 +47,7 @@ import eionet.cr.web.security.CRUser;
 public final class UrgentHarvestQueue {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UrgentHarvestQueue.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrgentHarvestQueue.class);
 
     /**
      * Hide utility class constructor.

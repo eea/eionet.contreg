@@ -29,7 +29,9 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -44,7 +46,7 @@ public final class MediaTypeToDcmiTypeConverter {
     private static final String MAPPINGS_FILENAME = "mediaTypeToDcmiType.xml";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(MediaTypeToDcmiTypeConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MediaTypeToDcmiTypeConverter.class);
 
     /** */
     private static LinkedHashMap<String, String> mappings;

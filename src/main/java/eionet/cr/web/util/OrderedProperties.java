@@ -7,11 +7,12 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.URIUtil;
+import org.slf4j.Logger;
 
 /**
  *

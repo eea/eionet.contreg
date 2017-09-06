@@ -41,11 +41,13 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Util;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link Interceptor} that intercepts {@link LifecycleStage#EventHandling}. Current purposes: - send user back
@@ -59,7 +61,7 @@ public class ActionEventInterceptor implements Interceptor {
     /**
      * Class internal logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(ActionEventInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionEventInterceptor.class);
 
     /*
      * (non-Javadoc)

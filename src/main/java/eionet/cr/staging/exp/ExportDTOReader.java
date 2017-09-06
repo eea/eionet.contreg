@@ -24,10 +24,12 @@ package eionet.cr.staging.exp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SQL result set reader for objects of type {@link ExportDTO}.
@@ -37,7 +39,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 public class ExportDTOReader extends SQLResultSetBaseReader<ExportDTO> {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(ExportDTOReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportDTOReader.class);
 
     /*
      * (non-Javadoc)

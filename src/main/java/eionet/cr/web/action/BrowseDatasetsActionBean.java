@@ -33,7 +33,9 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.sparqlClient.helpers.QueryCachedMap;
 import eionet.cr.web.util.CustomPaginatedList;
 import net.sourceforge.stripes.action.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.*;
 
@@ -47,7 +49,7 @@ import java.util.*;
 public class BrowseDatasetsActionBean extends DisplaytagSearchActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(BrowseDatasetsActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowseDatasetsActionBean.class);
 
     /** Default size of the result list page. */
     public static final int RESULT_LIST_PAGE_SIZE = 20;

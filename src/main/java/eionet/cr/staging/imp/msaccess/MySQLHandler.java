@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
 
 import com.healthmarketscience.jackcess.Table;
 
 import eionet.cr.staging.imp.ImportException;
 import eionet.cr.staging.util.MySQLUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -24,7 +26,7 @@ import eionet.cr.util.sql.SQLUtil;
 public class MySQLHandler implements MSAccessImportHandlerIF {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(MySQLHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLHandler.class);
 
     /** */
     private static final int INSERT_BATCH_SIZE = 10000;

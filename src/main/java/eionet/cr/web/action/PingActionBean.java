@@ -39,7 +39,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
@@ -52,6 +52,8 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An action bean that implements the CR's "ping" API. It is a RESTful API that enables other application to force an urgent harvest
@@ -65,7 +67,7 @@ import eionet.cr.web.security.CRUser;
 public class PingActionBean extends AbstractActionBean {
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(PingActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingActionBean.class);
 
     /** The Constant ERR_BLANK_URI. */
     public static final int ERR_BLANK_URI = 1;

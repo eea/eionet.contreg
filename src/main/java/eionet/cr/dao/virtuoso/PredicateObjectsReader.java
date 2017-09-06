@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -37,6 +37,8 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -45,7 +47,7 @@ import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 public class PredicateObjectsReader extends SPARQLResultSetBaseReader<ObjectDTO> {
 
     /** */
-    protected Logger logger = Logger.getLogger(PredicateObjectsReader.class);
+    protected Logger logger = LoggerFactory.getLogger(PredicateObjectsReader.class);
 
     /**  */
     public static final int PREDICATE_PAGE_SIZE = 10;

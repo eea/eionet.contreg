@@ -43,7 +43,9 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -78,7 +80,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBean.class);
 
     /** Default JSP to forward to. */
     private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";

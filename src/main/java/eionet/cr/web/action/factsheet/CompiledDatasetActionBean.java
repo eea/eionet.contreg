@@ -37,7 +37,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryException;
 import org.quartz.JobDetail;
@@ -63,6 +63,8 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.util.WebConstants;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Compiled dataset tab controller.
@@ -73,7 +75,7 @@ import eionet.cr.web.util.tabs.TabElement;
 public class CompiledDatasetActionBean extends AbstractActionBean {
 
     /** Static logger fot this class. */
-    private static final Logger LOGGER = Logger.getLogger(CompiledDatasetActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompiledDatasetActionBean.class);
 
     /** Default JSP to return to. */
     private static final String COMPILED_DATASET_JSP = "/pages/factsheet/compiledDataset.jsp";

@@ -38,7 +38,7 @@ import nl.bitwalker.useragentutils.BrowserType;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
@@ -47,6 +47,8 @@ import eionet.cr.util.Util;
 import eionet.cr.web.context.CRActionBeanContext;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.UsefulNamespaces;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Root class for all CR ActionBeans.
@@ -70,7 +72,7 @@ public abstract class AbstractActionBean implements ActionBean {
     protected static final String SCRIPTS_CLIPBOARD_TYPE = AbstractActionBean.class.getName() + ".clipboardType";
 
     /** */
-    protected static final Logger logger = Logger.getLogger(AbstractActionBean.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractActionBean.class);
 
     /** */
     private CRActionBeanContext context;

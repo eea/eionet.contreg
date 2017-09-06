@@ -62,7 +62,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -70,6 +70,8 @@ import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.mail.MessagingException;
@@ -100,7 +102,7 @@ public abstract class BaseHarvest implements Harvest {
     /**
      * Static logger for this class.
      */
-    private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseHarvest.class);
 
     /**
      * No of latest harvests whose history is kept in the database. Used in houskeeping.

@@ -20,12 +20,14 @@ import net.sourceforge.stripes.action.FileBean;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A utility class representing CR local file store.
@@ -36,7 +38,7 @@ import eionet.cr.web.security.CRUser;
 public final class FileStore {
 
     /** Static logger for this class */
-    private static final Logger LOGGER = Logger.getLogger(FileStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStore.class);
 
     /** File store path in file-system. */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);

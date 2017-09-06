@@ -31,12 +31,14 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRException;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.RDFGenerator;
 import eionet.cr.web.util.StripesExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action bean that exports the triples of a given graph as RDF/XML into servlet output stream.
@@ -47,7 +49,7 @@ import eionet.cr.web.util.StripesExceptionHandler;
 public class ExportTriplesActionBean extends AbstractActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(ExportTriplesActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportTriplesActionBean.class);
 
     /** */
     private String uri;

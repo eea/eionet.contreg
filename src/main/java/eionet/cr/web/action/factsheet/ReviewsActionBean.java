@@ -151,7 +151,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                 }
                 addSystemMessage("Review successfully added.");
             } catch (DAOException ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 ex.printStackTrace();
                 addWarningMessage("System error while adding a review. The review was not added.");
             }
@@ -185,10 +185,10 @@ public class ReviewsActionBean extends AbstractActionBean {
                 insertFile();
                 addSystemMessage("Review successfully saved.");
             } catch (IOException ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 addWarningMessage("System error while saving the review content. The review was not saved.");
             } catch (DAOException ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 addWarningMessage("System error while saving the review. The review was not saved.");
             }
         } else {
@@ -219,7 +219,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     }
                     addSystemMessage("Selected reviews were deleted.");
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    logger.error(ex.getMessage(), ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
             } else {
@@ -252,7 +252,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     addSystemMessage("Review #" + reviewId + " was deleted.");
                     reviewId = 0;
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    logger.error(ex.getMessage(), ex);
                     addWarningMessage("System error occured during review deletion.");
                 }
             } else {
@@ -384,7 +384,7 @@ public class ReviewsActionBean extends AbstractActionBean {
                     }
                 }
             } catch (DAOException ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
                 addCautionMessage(ex.getMessage());
             }
         } else {

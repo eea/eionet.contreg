@@ -40,10 +40,12 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for dealing with URLs.
@@ -53,7 +55,7 @@ import eionet.cr.config.GeneralConfig;
 public class URLUtil {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLUtil.class);
 
     /** Illegal characters in IRI. */
     private static final String[] BAD_IRI_CHARS = {" ", "{", "}", "<", ">", "\"", "|", "\\", "^", "`"};

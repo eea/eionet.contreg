@@ -27,13 +27,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.util.Hashes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -43,7 +45,7 @@ import eionet.cr.util.Hashes;
 public class UploadDTOReader extends ResultSetMixedReader<UploadDTO> {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(UploadDTOReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadDTOReader.class);
 
     /** */
     private static final long LABEL_HASH = Hashes.spoHash(Predicates.RDFS_LABEL);

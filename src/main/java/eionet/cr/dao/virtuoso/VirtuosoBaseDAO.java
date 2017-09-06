@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
@@ -32,6 +32,8 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLResultSetReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -47,7 +49,7 @@ public abstract class VirtuosoBaseDAO {
     public static final String N3_BNODE_PREFIX = "_:";
 
     /** */
-    protected Logger logger = Logger.getLogger(VirtuosoBaseDAO.class);
+    protected Logger logger = LoggerFactory.getLogger(VirtuosoBaseDAO.class);
 
     /**
      *

@@ -25,10 +25,12 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -46,7 +48,7 @@ import eionet.cr.util.Util;
 public class UploadHarvest extends BaseHarvest {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(UploadHarvest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadHarvest.class);
 
     /** File stored in local file system.*/
     private File file;

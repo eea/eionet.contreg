@@ -23,7 +23,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -71,6 +71,8 @@ import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -85,7 +87,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             "Must have administrator permissions to insert bulk sources through Sparql endpoint";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointActionBean.class);
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;

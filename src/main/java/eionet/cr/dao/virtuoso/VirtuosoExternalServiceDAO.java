@@ -3,7 +3,9 @@ package eionet.cr.dao.virtuoso;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.ExternalServiceDTOReader;
 import eionet.cr.dto.ExternalServiceDTO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
 public class VirtuosoExternalServiceDAO extends VirtuosoBaseDAO implements eionet.cr.dao.ExternalServiceDAO {
     
     /** */
-    private static final Logger LOGGER = Logger.getLogger(VirtuosoExternalServiceDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoExternalServiceDAO.class);
 
     /** */
     private static final String LIST_ALL_SERVICES =

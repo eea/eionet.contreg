@@ -9,7 +9,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -24,6 +24,8 @@ import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A background job that deletes harvest sources that have been scheduled for background deletion.
@@ -35,7 +37,7 @@ import eionet.cr.harvest.Harvest;
 public class SourceDeletionJob implements StatefulJob, ServletContextListener {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(SourceDeletionJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceDeletionJob.class);
 
     /** This job's running interval in milliseconds. Default is every 20000 ms, i.e. every 20 seconds. */
     public static int INTERVAL_MILLIS;

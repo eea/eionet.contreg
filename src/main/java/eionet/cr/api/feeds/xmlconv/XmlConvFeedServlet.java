@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.api.feeds.SubjectsRDFWriter;
 import eionet.cr.common.Namespace;
@@ -41,6 +41,8 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.SearchDAO;
 import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -53,7 +55,7 @@ public class XmlConvFeedServlet extends HttpServlet {
     private static final String SCHEMA_PARAM = "schema";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(XmlConvFeedServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlConvFeedServlet.class);
 
     /** */
     public static final String INCLUDE_DERIVED_VALUES = "inclDeriv";

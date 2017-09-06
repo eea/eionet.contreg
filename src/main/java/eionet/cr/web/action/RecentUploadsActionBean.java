@@ -32,7 +32,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -44,6 +44,8 @@ import eionet.cr.util.Util;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
 import eionet.cr.web.util.columns.SubjectUploadedColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,7 +59,7 @@ public class RecentUploadsActionBean extends AbstractSearchActionBean<SubjectDTO
     public static final int MAX_RESULTS = 20;
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(RecentUploadsActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecentUploadsActionBean.class);
     /** */
     private String type;
 

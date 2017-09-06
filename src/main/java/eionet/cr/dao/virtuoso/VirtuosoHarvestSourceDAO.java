@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -65,6 +65,8 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Methods operating with harvest sources. Implementation for Virtuoso.
@@ -76,7 +78,7 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
 public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements HarvestSourceDAO {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(VirtuosoHarvestSourceDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoHarvestSourceDAO.class);
 
     /** Suffix used in backup graph uris. */
     private static final String BACKUP_GRAPH_SUFFIX = "_backup";
