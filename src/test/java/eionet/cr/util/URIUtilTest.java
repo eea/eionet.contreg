@@ -20,19 +20,27 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class URIUtilTest extends TestCase {
 
     /**
      *
      */
+    @Test
     public void testExtractURILabel() {
 
         assertEquals(null, URIUtil.extractURILabel("http://sws.geonames.org/6255148/"));
@@ -50,6 +58,7 @@ public class URIUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testFixRelativeUrl() {
         assertEquals("http://sws.geonames.org", URLUtil.extractUrlHost("http://sws.geonames.org/6255148/"));
     }
@@ -57,6 +66,7 @@ public class URIUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testSanitizeVirtuosoBNodeUri() {
 
         assertEquals(null, URIUtil.sanitizeVirtuosoBNodeUri(null));

@@ -20,19 +20,27 @@
  */
 package eionet.cr.util.pagintation;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 import eionet.cr.util.pagination.Pagination;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PaginationTest extends TestCase {
 
     /**
      *
      */
+    @Test
     public void testPagination() {
 
         Pagination pagination = Pagination.createPagination(Pagination.pageLength(), 2, "", null);

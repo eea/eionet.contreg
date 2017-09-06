@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -16,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.helpers.RDFParserBase;
 import org.openrdf.rio.ntriples.NTriplesParser;
@@ -27,6 +29,8 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.test.helpers.SimpleStatementRecorder;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for SPARQL endpoint action bean.
@@ -34,6 +38,8 @@ import eionet.cr.web.util.WebConstants;
  * @author Kaido
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */
@@ -146,6 +152,7 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testConstructQueries() throws Exception {
 
         testConstructQuery("application/rdf+xml");

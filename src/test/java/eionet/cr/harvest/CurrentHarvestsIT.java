@@ -4,18 +4,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for the {@link CurrentHarvests} class.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class CurrentHarvestsIT extends CRDatabaseTestCase {
 
     /*

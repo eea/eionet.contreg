@@ -21,25 +21,35 @@
 
 package eionet.cr.util;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Type definition ...
  *
  * @author Kaido Laine
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class URLUtilTest extends TestCase {
 
+    @Test
     public void testReplaceBadCharsOK() {
         String url = "http://ok";
         assertEquals("http://ok", URLUtil.escapeIRI(url));
     }
 
+    @Test
     public void testReplaceBadCharsnotOK() {
         String url = "http://a.b.c/{aaa}";
         assertEquals("http://a.b.c/%7Baaa%7D", URLUtil.escapeIRI(url));
     }
 
+    @Test
     public void testReplaceSpaces() {
         String url = "http://a.b.c/ aaa b ";
         assertEquals("http://a.b.c/%20aaa%20b%20", URLUtil.escapeIRI(url));

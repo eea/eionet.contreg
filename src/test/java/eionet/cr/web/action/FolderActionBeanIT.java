@@ -2,6 +2,7 @@ package eionet.cr.web.action;
 
 import java.util.HashMap;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -20,12 +21,17 @@ import eionet.cr.web.util.WebConstants;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * For testing the {@link FolderActionBean}.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FolderActionBeanIT extends CRDatabaseTestCase {
 
     private static final String USERNAME = "heinlja";

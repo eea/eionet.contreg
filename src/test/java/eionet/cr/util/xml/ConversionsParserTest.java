@@ -22,18 +22,26 @@ package eionet.cr.util.xml;
 
 import java.io.File;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ConversionsParserTest extends TestCase {
 
     /**
      *
      */
+    @Test
     public void testConversionsParser() {
 
         ConversionsParser conversionsParser = new ConversionsParser();

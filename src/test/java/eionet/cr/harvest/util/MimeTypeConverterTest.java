@@ -20,13 +20,19 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest.util;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class MimeTypeConverterTest extends TestCase {
 
     /**

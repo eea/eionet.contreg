@@ -22,14 +22,18 @@ package eionet.cr.dao;
 
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
@@ -43,6 +47,8 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
         @Sql({"/sources-harvests-messages.sql"}),
         @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 })
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
     /**

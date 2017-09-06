@@ -23,7 +23,9 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 
 import eionet.cr.dao.DAOFactory;
@@ -34,12 +36,16 @@ import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
     /** Jetty mock server for serving test resources via HTTP. */

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -26,6 +27,9 @@ import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
@@ -33,6 +37,8 @@ import org.junit.Ignore;
  *
  * @author Jaak Kapten
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */

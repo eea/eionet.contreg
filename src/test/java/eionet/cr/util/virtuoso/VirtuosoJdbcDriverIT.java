@@ -30,13 +30,17 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import virtuoso.jdbc4.VirtuosoConnectionPoolDataSource;
 import virtuoso.jdbc4.VirtuosoPooledConnection;
 import eionet.cr.config.GeneralConfig;
@@ -50,6 +54,8 @@ import org.junit.Ignore;
  *
  * @author Enriko Käsper
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoJdbcDriverIT extends CRDatabaseTestCase {
 
     /** Dummy graph URI. */
@@ -78,20 +84,16 @@ public class VirtuosoJdbcDriverIT extends CRDatabaseTestCase {
      */
     @Test
     public void testTooManyOpenStmts() throws SQLException {
- String drv = "virtuoso.jdbc4.Driver";//GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_DRV);
-       //  url ="jdbc:virtuoso://localhost:1112/DATABASE=CR"; //GeneralConfig.getRequiredProperty(urlProperty);
-     //   System.out.println("url is:"+ url);
-    //     usr = "dba"; //GeneralConfig.getRequiredProperty(usrProperty);
-     //    pwd = "dba"; //GeneralConfig.getRequiredProperty(pwdProperty);
+
         VirtuosoConnectionPoolDataSource dbsource = new VirtuosoConnectionPoolDataSource();
 
-        String testDbURI ="jdbc:virtuoso://localhost:1112/DATABASE=CR";// GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
+        String testDbURI = GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_URL);
         URI uri = URI.create(testDbURI.substring(5));
 
         dbsource.setServerName(uri.getHost());
         dbsource.setPortNumber(uri.getPort());
-        dbsource.setPassword("dba");
-        dbsource.setUser("dba");
+        dbsource.setPassword(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_PWD));
+        dbsource.setUser(GeneralConfig.getRequiredProperty(GeneralConfig.VIRTUOSO_DB_USR));
         dbsource.setCharset("UTF-8");
         VirtuosoPooledConnection pooledConnection = (VirtuosoPooledConnection) dbsource.getPooledConnection();
         virtuoso.jdbc4.VirtuosoConnection con = pooledConnection.getVirtuosoConnection();

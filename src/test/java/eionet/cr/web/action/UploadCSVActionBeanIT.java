@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.Message;
@@ -22,6 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 
@@ -39,12 +42,16 @@ import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * A class for testing the behavior of {@link UploadCSVActionBean}.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
 
     /** The name of user whose folder we're testing in. */
@@ -138,6 +145,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception Any sort of error that happens.
      */
+    @Test
     public void IGNOREtestTwoUploadsInARow() throws Exception {
 
         // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
@@ -178,6 +186,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void IGNOREtestBrandNewUpload() throws Exception {
 
         deleteUploadedFile();
@@ -218,6 +227,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testOnlineSource() throws Exception {
 
         deleteUploadedFileOnline();
@@ -243,6 +253,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If any sort of data access error happens.
      */
+    @Test
     private void deleteUploadedFile() throws DAOException {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
@@ -260,6 +271,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If any sort of data access error happens.
      */
+    @Test
     private void deleteUploadedFileOnline() throws DAOException {
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
@@ -607,6 +619,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * Tests if a 404 error is returned if the folderuri is empty
      * @throws Exception Any sort of error that happens.
      */
+    @Test
     public void testUploadWithEmptyFolderURI() throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.

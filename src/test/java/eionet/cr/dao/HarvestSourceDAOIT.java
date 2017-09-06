@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +54,8 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
         @Sql({"/sources-harvests-messages.sql"}),
         @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 })
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestSourceDAOIT extends CRDatabaseTestCase {
 
     /*

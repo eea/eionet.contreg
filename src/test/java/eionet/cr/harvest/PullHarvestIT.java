@@ -24,8 +24,10 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
@@ -41,12 +43,16 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author roug
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PullHarvestIT extends CRDatabaseTestCase {
 
     /*

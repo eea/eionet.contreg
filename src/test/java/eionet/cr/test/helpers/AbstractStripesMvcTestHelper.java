@@ -77,7 +77,7 @@ public abstract class AbstractStripesMvcTestHelper extends AbstractActionBean {
         mockServletContext.addFilter(StripesFilter.class, "StripesFilter", filterParams);
         mockServletContext.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
 
-        mockServletContext.addInitParameter("contextConfigLocation", "classpath:spring-context-test.xml");
+        mockServletContext.addInitParameter("contextConfigLocation", "classpath:spring-test-context.xml");
 
         ContextLoaderListener springContextLoader = new ContextLoaderListener();
         springContextLoader.contextInitialized(new ServletContextEvent(mockServletContext));

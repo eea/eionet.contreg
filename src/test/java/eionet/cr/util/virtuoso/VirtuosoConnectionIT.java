@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -43,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Enriko Käsper
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/spring-context-test.xml")
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoConnectionIT extends TestCase {
     /*
      * (non-Javadoc)

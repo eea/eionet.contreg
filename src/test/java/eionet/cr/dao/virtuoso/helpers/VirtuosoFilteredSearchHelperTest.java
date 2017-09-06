@@ -8,7 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.util.Bindings;
@@ -19,7 +21,11 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoFilteredSearchHelperTest {
 
     @Test

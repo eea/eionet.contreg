@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.BooleanUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,12 +40,17 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Risto Alt
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SearchDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

@@ -4,6 +4,7 @@ import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -11,6 +12,7 @@ import net.sourceforge.stripes.mock.MockServletContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 
 import eionet.cr.dao.DAOFactory;
@@ -27,12 +29,16 @@ import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.web.security.CRUser;
 import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit tests for the "delete" operation of {@link PingActionBean}.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
 
     /*

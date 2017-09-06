@@ -6,7 +6,9 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
@@ -20,12 +22,16 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Risto Alt
  *
  */
 //@Ignore
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class InferencingIT extends CRDatabaseTestCase {
 
     /** Rule-set seed file. */

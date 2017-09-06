@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseTestCase;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/spring-context-test.xml")
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /** Repository connection to be used for checking existence of expected triples in the repository */

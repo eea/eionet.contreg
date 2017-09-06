@@ -20,6 +20,7 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.test;
 
+import eionet.cr.ApplicationTestContext;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
@@ -27,12 +28,18 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class EmptyDatabaseIT extends DatabaseTestCase {
 
     @Override
@@ -48,6 +55,7 @@ public class EmptyDatabaseIT extends DatabaseTestCase {
     /**
      * Just a dummy test to simply clean the database.
      */
+    @Test
     public void testMe() {
     }
 }

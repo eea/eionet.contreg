@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
@@ -14,12 +15,17 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test that links and display values of blank nodes are properly returned in a factsheet, whether expanded or collapsed.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
 
     @Override

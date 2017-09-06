@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -33,6 +34,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ScheduledHarvestSourcesIT extends CRDatabaseTestCase {
 
     /*

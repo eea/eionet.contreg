@@ -2,18 +2,26 @@ package eionet.cr.util;
 
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  *
  * @author Jaanus Heinlaid
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SubjectDTOOptimizerTest extends TestCase {
 
     /**
      *
      */
+    @Test
     public void testAcceptedLanguages() {
 
         List<String> languages = Util.getAcceptedLanguages("et,pl;q=0.5,dk,ru;q=0.7");

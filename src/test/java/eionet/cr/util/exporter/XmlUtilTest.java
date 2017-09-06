@@ -1,11 +1,17 @@
 package eionet.cr.util.exporter;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
 import eionet.cr.util.export.XmlUtil;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class XmlUtilTest extends TestCase {
 
     @Test

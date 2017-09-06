@@ -21,6 +21,7 @@
 package eionet.cr.dao.virtuoso;
 
 //import com.ibm.icu.util.Calendar;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
@@ -40,12 +41,17 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  *
  * @author Enriko Käsper
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestScriptDAOIT extends CRDatabaseTestCase {
 
     /**

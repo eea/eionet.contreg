@@ -23,17 +23,23 @@ package eionet.cr.web.action.admin.postHarvest;
 
 import static org.junit.Assert.assertEquals;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.action.admin.harvestscripts.ScriptParseException;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 /**
  *
  * @author Jaanus Heinlaid
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestScriptParserTest {
 
     /** */

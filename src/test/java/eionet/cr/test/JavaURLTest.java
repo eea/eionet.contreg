@@ -22,13 +22,20 @@ package eionet.cr.test;
 
 import java.net.URL;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class JavaURLTest extends TestCase {
 
     /**
@@ -36,6 +43,7 @@ public class JavaURLTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testURLWithSlash() throws Exception {
         URL basename = new URL("http://rs.tdwg.org/dwc/terms/");
         assertEquals(basename.toString(), "http://rs.tdwg.org/dwc/terms/");
@@ -59,6 +67,7 @@ public class JavaURLTest extends TestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testURLWithHash() throws Exception {
         URL basename = new URL("http://rs.tdwg.org/dwc/terms/something.rdf#");
         assertEquals(basename.toString(), "http://rs.tdwg.org/dwc/terms/something.rdf#");

@@ -23,18 +23,24 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class TagsDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

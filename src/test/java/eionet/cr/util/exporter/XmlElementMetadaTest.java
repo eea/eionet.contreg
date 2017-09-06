@@ -20,17 +20,22 @@
  */
 package eionet.cr.util.exporter;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlElementMetadata.Type;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class XmlElementMetadaTest extends TestCase {
 
     @Test

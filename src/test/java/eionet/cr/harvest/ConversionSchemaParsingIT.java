@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -25,6 +27,8 @@ import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameUtil;
 import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit tests for checking the various cases of detecting conversion schemas from harvested XML files and storing it into the
@@ -32,6 +36,8 @@ import org.junit.Ignore;
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ConversionSchemaParsingIT extends CRDatabaseTestCase {
 
     /*

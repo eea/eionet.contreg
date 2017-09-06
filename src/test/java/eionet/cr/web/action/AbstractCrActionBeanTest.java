@@ -21,6 +21,7 @@
  */
 package eionet.cr.web.action;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
@@ -40,6 +41,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author gerasvad, altnyris
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**

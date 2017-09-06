@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
@@ -14,11 +15,17 @@ import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 /**
  * user folder test.
  *
  * @author kaido
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UserFolderDAOTest {
 
     /** test count query. */

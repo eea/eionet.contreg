@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
@@ -34,12 +35,17 @@ import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     /**

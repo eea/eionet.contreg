@@ -20,6 +20,7 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 import eionet.cr.config.GeneralConfig;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/spring-context-test.xml")
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FolderUtilTest extends TestCase {
 
     /**

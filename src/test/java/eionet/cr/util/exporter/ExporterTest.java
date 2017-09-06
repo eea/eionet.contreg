@@ -3,6 +3,7 @@
  */
 package eionet.cr.util.exporter;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -17,7 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Enriko Käsper, TietoEnator Estonia AS ExporterTest
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/spring-context-test.xml")
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExporterTest extends TestCase {
 
     @Test

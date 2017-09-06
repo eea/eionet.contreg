@@ -21,6 +21,7 @@
 
 package eionet.cr.config;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Test for GeneralConfig methods.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/spring-context-test.xml")
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class GeneralConfigTest extends TestCase {
 
     @Test

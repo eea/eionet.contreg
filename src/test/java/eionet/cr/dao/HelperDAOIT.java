@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,12 +32,17 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Risto Alt
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HelperDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */

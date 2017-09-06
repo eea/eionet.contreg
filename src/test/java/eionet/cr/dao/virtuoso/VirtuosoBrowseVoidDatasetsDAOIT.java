@@ -1,5 +1,6 @@
 package eionet.cr.dao.virtuoso;
 
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -13,11 +14,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author George Sofianos
  */
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
 
   @Override

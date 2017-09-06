@@ -20,6 +20,7 @@
  */
 package eionet.cr.dao;
 
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
@@ -39,6 +40,8 @@ import java.util.List;
  * @author altnyris
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class GetNextScheduledCsvTsvIT extends CRDatabaseTestCase {
 
     /*

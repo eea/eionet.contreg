@@ -23,6 +23,7 @@ package eionet.cr.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.After;
@@ -30,10 +31,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.web.util.ApplicationCache;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class RecentDiscoveredFilesCacheTest extends TestCase {
 
     @Before

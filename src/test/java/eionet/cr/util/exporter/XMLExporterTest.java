@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import eionet.cr.ApplicationTestContext;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -32,11 +33,15 @@ import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlExporter;
 import eionet.cr.util.export.XmlUtil;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Enriko Käsper, Tieto Estonia AS XMLExporterTest
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class XMLExporterTest extends TestCase {
 
     @Test
@@ -61,7 +66,7 @@ public class XMLExporterTest extends TestCase {
 
     }
 
-
+    @Test
     public void testDoExport() throws Exception {
 
         // fill in search data

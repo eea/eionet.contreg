@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -18,6 +19,9 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
@@ -25,6 +29,8 @@ import org.junit.Ignore;
  *
  * @author Jaak Kapten
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */
