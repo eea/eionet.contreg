@@ -28,6 +28,7 @@ import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -44,6 +45,9 @@ import java.util.List;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class GetNextScheduledCsvTsvIT extends CRDatabaseTestCase {
 
+    @Autowired
+    private HarvestSourceDAO harvestSourceDAO;
+
     /*
      * (non-Javadoc)
      *
@@ -57,7 +61,7 @@ public class GetNextScheduledCsvTsvIT extends CRDatabaseTestCase {
     @Test
     public void testGetNextScheduledOnlineCsvTsv() throws Exception {
 
-        List<HarvestSourceDTO> sources = DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledOnlineCsvTsv(1);
+        List<HarvestSourceDTO> sources = harvestSourceDAO.getNextScheduledOnlineCsvTsv(1);
         assertEquals(1, sources.size());
         assertEquals(9, sources.get(0).getSourceId().intValue());
     }

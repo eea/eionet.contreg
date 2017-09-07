@@ -31,12 +31,16 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ScheduledHarvestSourcesIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private HarvestSourceDAO harvestSourceDAO;
 
     /*
      * (non-Javadoc)
@@ -55,27 +59,25 @@ public class ScheduledHarvestSourcesIT extends CRDatabaseTestCase {
     @Test
     public void testScheduledSources() throws Exception {
 
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl("http://rod.eionet.europa.eu/testObligations");
         source.setIntervalMinutes(5);
         source.setPrioritySource(false);
         source.setEmails("bob@europe.eu");
-        dao.addSource(source);
+        harvestSourceDAO.addSource(source);
 
         // finish harvest
         source.setStatements(100);
         source.setLastHarvestFailed(false);
         source.setLastHarvest(new Date());
         source.setOwner("system");
-        dao.updateSourceHarvestFinished(source);
+        harvestSourceDAO.updateSourceHarvestFinished(source);
 
         source.setUrl("http://rod.eionet.europa.eu/testObligations2");
         source.setIntervalMinutes(10);
-        dao.addSource(source);
+        harvestSourceDAO.addSource(source);
 
-        List<HarvestSourceDTO> dtos = dao.getNextScheduledSources(10);
+        List<HarvestSourceDTO> dtos = harvestSourceDAO.getNextScheduledSources(10);
         assertNotNull(dtos);
         // The first harvest_source has Harvest date field filled with now() and it will be available again in 5 minutes
         // The second harvest_soruce is not yet harvested and this is returned by the method.

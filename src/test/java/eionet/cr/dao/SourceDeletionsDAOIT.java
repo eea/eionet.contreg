@@ -16,6 +16,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
@@ -32,6 +33,10 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private SourceDeletionsDAO sourceDeletionsDAO;
+    private HarvestSourceDAO harvestSourceDAO;
 
     @Override
     @Before
@@ -68,8 +73,7 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
     @Test
     public void testMarkForDeletion() throws Exception {
 
-        HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDao.getHarvestSources(null, null, null);
+        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDAO.getHarvestSources(null, null, null);
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
         assertEquals("Unexpected count of harvest sources", 5, sources.getLeft().intValue());
@@ -79,11 +83,10 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
                         "http://rod.eionet.europa.eu/instruments", "http://www.eionet.europa.eu/seris/rdf",
                         "http://localhost:8080/cr/pages/test.xml", "http://additional.com/1", "http://additional.com/2");
 
-        SourceDeletionsDAO sourceDeletionsDao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-        int updateCount = sourceDeletionsDao.markForDeletion(sourceUrls);
+        int updateCount = sourceDeletionsDAO.markForDeletion(sourceUrls);
         assertEquals("Unexpected update count", sourceUrls.size(), updateCount);
 
-        sources = harvestSourceDao.getHarvestSources(null, null, null);
+        sources = harvestSourceDAO.getHarvestSources(null, null, null);
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
         assertEquals("Unexpected count of harvest sources", 0, sources.getLeft().intValue());
@@ -106,17 +109,14 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
         // Queue the SPARQL results.
 
-        SourceDeletionsDAO sourceDeletionsDao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-        int updateCount = sourceDeletionsDao.markForDeletionSparql(sparql);
+        int updateCount = sourceDeletionsDAO.markForDeletionSparql(sparql);
 
         // Test number of URLs queued.
 
         assertEquals("Unexpected update count", expectedNumberOfSparqlReturnedSubjects, updateCount);
 
         // Test number of URLs in harvest sources table.
-
-        HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDao.getHarvestSources(null, null, null);
+        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDAO.getHarvestSources(null, null, null);
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
 
@@ -124,7 +124,7 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
         // Test the size and contents of un-filtered deletion queue.
 
-        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null).getRight();
+        List<Pair<String, Date>> deletionQueue = sourceDeletionsDAO.getDeletionQueue(null, null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", expectedNumberOfSparqlReturnedSubjects, deletionQueue.size());
 
@@ -138,7 +138,7 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
         // Test the size and contents of the filtered deletion queue.
 
-        deletionQueue = sourceDeletionsDao.getDeletionQueue("Burlesque", null).getRight();
+        deletionQueue = sourceDeletionsDAO.getDeletionQueue("Burlesque", null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 1, deletionQueue.size());
         queuedUrls = new HashSet<String>();
@@ -150,7 +150,7 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
         // Test the size and contents of un-filtered paged deletion queue.
 
-        deletionQueue = sourceDeletionsDao.getDeletionQueue(null, PagingRequest.create(1, 1)).getRight();
+        deletionQueue = sourceDeletionsDAO.getDeletionQueue(null, PagingRequest.create(1, 1)).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 1, deletionQueue.size());
         queuedUrls = new HashSet<String>();
@@ -171,13 +171,10 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
     public void testMarkForDeletionSparqlNonUrls() throws Exception {
 
         String sparql = "PREFIX cd: <http://www.recshop.fake/cd#> select distinct ?o where {?s cd:artist ?o} order by ?o";
-
-        SourceDeletionsDAO sourceDeletionsDao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-        int updateCount = sourceDeletionsDao.markForDeletionSparql(sparql);
+        int updateCount = sourceDeletionsDAO.markForDeletionSparql(sparql);
         assertEquals("Unexpected update count", 0, updateCount);
 
-        HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDao.getHarvestSources(null, null, null);
+        Pair<Integer, List<HarvestSourceDTO>> sources = harvestSourceDAO.getHarvestSources(null, null, null);
         assertNotNull("Expected non-null harvest sources result set", sources);
         assertNotNull("Expected non-null count of returned harvest sources", sources.getLeft());
 
@@ -198,16 +195,15 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
                         "http://rod.eionet.europa.eu/instruments", "http://www.eionet.europa.eu/seris/rdf",
                         "http://localhost:8080/cr/pages/test.xml", "http://additional.com/1", "http://additional.com/2");
 
-        SourceDeletionsDAO sourceDeletionsDao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-        int updateCount = sourceDeletionsDao.markForDeletion(initialUrls);
+        int updateCount = sourceDeletionsDAO.markForDeletion(initialUrls);
         assertEquals("Unexpected update count", initialUrls.size(), updateCount);
 
         int cancelledCount =
-                sourceDeletionsDao.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/obligations",
+                sourceDeletionsDAO.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/obligations",
                         "http://rod.eionet.europa.eu/countries"));
         assertEquals("Unexpected cancelled deletions count", 2, cancelledCount);
 
-        List<Pair<String, Date>> deletionQueue = sourceDeletionsDao.getDeletionQueue(null, null).getRight();
+        List<Pair<String, Date>> deletionQueue = sourceDeletionsDAO.getDeletionQueue(null, null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 5, deletionQueue.size());
 
@@ -237,19 +233,18 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
         assertEquals("Unexpected element at list 2nd position", "http://rod.eionet.europa.eu/instruments", initialUrls.get(1));
         assertEquals("Unexpected element at list 3rd position", "http://rod.eionet.europa.eu/obligations", initialUrls.get(2));
 
-        SourceDeletionsDAO dao = DAOFactory.get().getDao(SourceDeletionsDAO.class);
-        int updateCount = dao.markForDeletion(initialUrls);
+        int updateCount = sourceDeletionsDAO.markForDeletion(initialUrls);
         assertEquals("Unexpected update count", initialUrls.size(), updateCount);
 
-        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/countries", dao.pickForDeletion());
-        dao.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/countries"));
-        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/instruments", dao.pickForDeletion());
-        dao.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/instruments"));
-        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/obligations", dao.pickForDeletion());
-        dao.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/obligations"));
-        assertNull("Expected no more sources in deletion queue", dao.pickForDeletion());
+        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/countries", sourceDeletionsDAO.pickForDeletion());
+        sourceDeletionsDAO.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/countries"));
+        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/instruments", sourceDeletionsDAO.pickForDeletion());
+        sourceDeletionsDAO.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/instruments"));
+        assertEquals("Unexpected URL", "http://rod.eionet.europa.eu/obligations", sourceDeletionsDAO.pickForDeletion());
+        sourceDeletionsDAO.unmarkForDeletion(Arrays.asList("http://rod.eionet.europa.eu/obligations"));
+        assertNull("Expected no more sources in deletion queue", sourceDeletionsDAO.pickForDeletion());
 
-        List<Pair<String, Date>> deletionQueue = dao.getDeletionQueue(null, null).getRight();
+        List<Pair<String, Date>> deletionQueue = sourceDeletionsDAO.getDeletionQueue(null, null).getRight();
         assertNotNull("Expected non-null deletion queue", deletionQueue);
         assertEquals("Unexpect size of deletion queue", 0, deletionQueue.size());
     }

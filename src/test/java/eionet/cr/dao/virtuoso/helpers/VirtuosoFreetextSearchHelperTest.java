@@ -1,9 +1,7 @@
 package eionet.cr.dao.virtuoso.helpers;
 
 import java.text.ParseException;
-
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortOrder;
@@ -79,7 +77,7 @@ public class VirtuosoFreetextSearchHelperTest {
      * test Freetext search by any file.
      */
     @Test
-    public static void testAnyFile() {
+    public void testAnyFile() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = false;

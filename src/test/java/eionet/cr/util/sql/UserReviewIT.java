@@ -1,8 +1,7 @@
 package eionet.cr.util.sql;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
@@ -21,6 +20,9 @@ import org.junit.Ignore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
@@ -28,14 +30,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class UserReviewIT extends TestCase {
+public class UserReviewIT {
 
     private static String[] TEST_USER_NAMES = {"kaptejaa", "test2"};
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         cleanUpReviews();
-        super.setUp();
     }
 
     @Test

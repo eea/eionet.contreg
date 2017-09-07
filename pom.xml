@@ -281,6 +281,11 @@
                                     <!--</tcp>-->
                                     <!--<time>10000</time>-->
                                 </wait>
+                                <volumes>
+                                    <bind>
+                                        <volume>/tmp/contreg/tmp:/contreg/tmp</volume>
+                                    </bind>
+                                </volumes>
                             </run>
                         </image>
 

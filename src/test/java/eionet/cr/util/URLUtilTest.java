@@ -22,11 +22,12 @@
 package eionet.cr.util;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Type definition ...
@@ -35,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class URLUtilTest extends TestCase {
+public class URLUtilTest {
 
     @Test
     public void testReplaceBadCharsOK() {

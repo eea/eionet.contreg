@@ -20,8 +20,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
@@ -37,12 +35,14 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Enriko Käsper, Tieto Estonia AS XMLExporterTest
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class XMLExporterTest extends TestCase {
+public class XMLExporterTest {
 
     @Test
     public void testGetUniqueElementName() {

@@ -11,17 +11,15 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author George Sofianos
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class BrowseDatasetsActionBeanIT extends TestCase {
+public class BrowseDatasetsActionBeanIT {
 
-  public void setUp() throws Exception {
-    super.setUp();
-
-  }
 
   /**
    * Tests Basic functionality of browseDatasets action

@@ -77,6 +77,18 @@
         <property name="changeLog" value="classpath:sql/db-struct.xml" />
     </bean>
 
+    <bean id="messageDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestMessageDAO" />
+    <bean id="harvestSourceDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestSourceDAO" />
+    <bean id="harvestDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestDAO" />
+    <bean id="tagsDao" class="eionet.cr.dao.virtuoso.VirtuosoTagsDAO" />
+    <bean id="userHomeDao" class="eionet.cr.dao.virtuoso.VirtuosoUserHomeDAO" />
+    <bean id="urgentHarvestQueueDao" class="eionet.cr.dao.virtuoso.VirtuosoUrgentHarvestQueueDAO" />
+    <bean id="spoBinaryDao" class="eionet.cr.dao.virtuoso.VirtuosoSpoBinaryDAO" />
+    <bean id="helperDao" class="eionet.cr.dao.virtuoso.VirtuosoHelperDAO" />
+    <bean id="searchDao" class="eionet.cr.dao.virtuoso.VirtuosoSearchDAO" />
+    <bean id="sourceDeletionDao" class="eionet.cr.dao.virtuoso.VirtuosoSourceDeletionsDAO" />
+    <bean id="harvestScriptDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestScriptDAO" />
+
     <!--&lt;!&ndash; Runs on Tomcat startup. &ndash;&gt;-->
     <!--<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">-->
         <!--<property name="dataSource" ref="dataSource" />-->

@@ -38,6 +38,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.fail;
+
 /**
  * Test Virtuoso Connection.
  *
@@ -45,13 +47,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class VirtuosoConnectionIT extends TestCase {
+public class VirtuosoConnectionIT {
     /*
      * (non-Javadoc)
      *
      * @see junit.framework.TestCase#tearDown()
      */
-    @Override
     @After
     public void tearDown() throws Exception {
         Connection conn = null;
@@ -63,7 +64,7 @@ public class VirtuosoConnectionIT extends TestCase {
         } finally {
             SQLUtil.close(conn);
         }
-        super.tearDown();
+//        super.tearDown();
     }
 
     /**

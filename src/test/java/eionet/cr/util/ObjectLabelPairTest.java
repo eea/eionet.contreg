@@ -1,15 +1,16 @@
 package eionet.cr.util;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class ObjectLabelPairTest extends TestCase {
+public class ObjectLabelPairTest {
 
     @Test
     public void testCompraision() {

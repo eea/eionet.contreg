@@ -31,6 +31,7 @@ import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,6 +46,9 @@ public class TagsDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "tags.rdf";
+
+    @Autowired
+    private TagsDAO tagsDAO;
 
     @Override
     @Before
@@ -70,7 +74,7 @@ public class TagsDAOIT extends CRDatabaseTestCase {
     @Test
     public void testTagCloudFrequencies() throws Exception {
 
-        List<TagDTO> result = DAOFactory.get().getDao(TagsDAO.class).getTagCloud();
+        List<TagDTO> result = tagsDAO.getTagCloud();
 
         assertTrue(result.contains(new TagDTO("tag1", 1, 4)));
         assertTrue(result.contains(new TagDTO("tag2", 2, 4)));

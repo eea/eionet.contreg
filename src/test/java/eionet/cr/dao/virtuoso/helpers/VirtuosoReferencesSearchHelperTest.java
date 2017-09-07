@@ -1,9 +1,7 @@
 package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.ArrayList;
-
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
@@ -13,9 +11,12 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class VirtuosoReferencesSearchHelperTest extends TestCase {
+public class VirtuosoReferencesSearchHelperTest {
 
     @Test
     public void testUnOrderedQuery() {

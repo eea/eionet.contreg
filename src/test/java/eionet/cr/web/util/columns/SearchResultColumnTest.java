@@ -4,13 +4,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * A unit test for the {@link SearchResultColumn}
@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class SearchResultColumnTest extends TestCase {
+public class SearchResultColumnTest {
 
     /**
      * @throws UnsupportedEncodingException

@@ -11,6 +11,7 @@ import eionet.cr.dto.HarvestDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
@@ -31,6 +32,9 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestDAOIT extends CRDatabaseTestCase {
 
+    @Autowired
+    private HarvestDAO harvestDAO;
+
     /*
      * (non-Javadoc)
      *
@@ -49,8 +53,7 @@ public class HarvestDAOIT extends CRDatabaseTestCase {
     @Test
     public void testMarkAbandonedHarvests() throws Exception {
 
-        HarvestDAO dao = DAOFactory.get().getDao(HarvestDAO.class);
-        List<HarvestDTO> harvests = dao.getHarvestsBySourceId(1);
+        List<HarvestDTO> harvests = harvestDAO.getHarvestsBySourceId(1);
 
         assertNotNull("Harvests shouldn't be null", harvests);
         assertFalse("Was expecting at least one harvest record", harvests.isEmpty());
@@ -58,14 +61,14 @@ public class HarvestDAOIT extends CRDatabaseTestCase {
         HashSet<Integer> actualAbandonedHarvests = collectAbandonedHarvests(harvests);
         assertTrue("Was expecting no abandoned harevsts yet!", actualAbandonedHarvests.isEmpty());
 
-        int updateCount = dao.markAbandonedHarvests();
+        int updateCount = harvestDAO.markAbandonedHarvests();
         assertEquals("Was expecting that 2 harvests were marked as abandoned!", 2, updateCount);
 
         HashSet<Integer> expectedAbandonedHarvests = new HashSet<Integer>();
         expectedAbandonedHarvests.add(3);
         expectedAbandonedHarvests.add(4);
 
-        harvests = dao.getHarvestsBySourceId(1);
+        harvests = harvestDAO.getHarvestsBySourceId(1);
         actualAbandonedHarvests = collectAbandonedHarvests(harvests);
         assertEquals("Was expecting different abandoned harvests!", expectedAbandonedHarvests, actualAbandonedHarvests);
     }

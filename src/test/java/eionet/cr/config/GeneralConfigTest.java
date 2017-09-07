@@ -22,18 +22,20 @@
 package eionet.cr.config;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for GeneralConfig methods.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class GeneralConfigTest extends TestCase {
+public class GeneralConfigTest {
 
     @Test
     public void testGetIntPropertyCorrect() {

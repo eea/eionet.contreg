@@ -33,6 +33,7 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -47,6 +48,9 @@ public class HelperDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
+
+    @Autowired
+    private HelperDAO helperDAO;
 
     @Override
     @Before
@@ -69,9 +73,7 @@ public class HelperDAOIT extends CRDatabaseTestCase {
      */
     @Test
     public void testGetSampleTriples() throws Exception {
-        List<TripleDTO> result =
-                DAOFactory.get().getDao(HelperDAO.class)
-                        .getSampleTriplesInSource(RdfLoader.getSeedFileGraphUri(SEED_FILE), PagingRequest.create(1, 10));
+        List<TripleDTO> result = helperDAO.getSampleTriplesInSource(RdfLoader.getSeedFileGraphUri(SEED_FILE), PagingRequest.create(1, 10));
         assertNotNull(result);
         assertEquals(100, result.size());
     }
