@@ -27,13 +27,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     /*
          * (non-Javadoc)
          *

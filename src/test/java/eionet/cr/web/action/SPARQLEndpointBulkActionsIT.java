@@ -45,13 +45,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_bulk.xml";
 
     public static final String GLOBAL_ERROR = "__stripes_global_error";
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     /*
          * (non-Javadoc)
          *

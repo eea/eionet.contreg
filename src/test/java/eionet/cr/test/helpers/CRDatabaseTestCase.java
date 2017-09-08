@@ -65,9 +65,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#setUp()
      */
-    //@Override
-    @Before
-    public void setUp() throws Exception {
+    @Override
+    protected void setUp() throws Exception {
 
         super.setUp();
         setUpTripleStore();
@@ -81,7 +80,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-
+        super.tearDown();
         SesameUtil.close(repoConn);
     }
 

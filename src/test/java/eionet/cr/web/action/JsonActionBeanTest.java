@@ -24,13 +24,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-
 import org.junit.Test;
-
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;

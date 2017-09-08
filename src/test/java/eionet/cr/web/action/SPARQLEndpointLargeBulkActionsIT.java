@@ -35,13 +35,6 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
 
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_largebulk.xml";
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     /*
          * (non-Javadoc)
          *

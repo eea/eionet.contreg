@@ -20,6 +20,7 @@
  */
 package eionet.cr.dao;
 
+import java.util.Arrays;
 import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
@@ -43,10 +44,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
  * @author altnyris
  *
  */
-@SqlGroup({
-        @Sql({"/sources-harvests-messages.sql"}),
-        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = BEFORE_TEST_METHOD)
-})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
@@ -55,6 +52,11 @@ public class HarvestMessageDAOIT extends CRDatabaseTestCase {
     private HarvestMessageDAO harvestMessageDAO;
     @Autowired
     private HarvestSourceDAO harvestSourceDAO;
+
+    @Override
+    protected List<String> getXMLDataSetFiles() {
+        return Arrays.asList("sources-harvests-messages.xml");
+    }
 
     /**
      *

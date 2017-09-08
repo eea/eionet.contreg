@@ -3,8 +3,6 @@ package eionet.cr.test.helpers;
 import java.io.File;
 import java.net.URL;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * Utility methods for dealing with Jetty's Java API.

@@ -53,14 +53,6 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
 
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
-
-  // @Override
-  //  @Before
-  //  public void setUp() throws Exception {
-  //      super.setUp();
-        
-   // }
-
     /*
          * (non-Javadoc)
          *

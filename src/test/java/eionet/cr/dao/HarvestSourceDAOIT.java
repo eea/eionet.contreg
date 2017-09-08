@@ -65,7 +65,7 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
      * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
      */
     @Override
-    public List<String> getXMLDataSetFiles() {
+    protected List<String> getXMLDataSetFiles() {
         return Arrays.asList("sources-harvests-messages.xml");
     }
 

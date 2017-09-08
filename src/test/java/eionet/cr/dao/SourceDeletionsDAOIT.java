@@ -9,7 +9,6 @@ import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import org.junit.Before;
 import org.junit.Test;
-
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
@@ -29,7 +28,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
  *
  * @author Jaanus
  */
-@Sql(scripts = "/source-deletions-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
@@ -37,13 +35,6 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
     @Autowired
     private SourceDeletionsDAO sourceDeletionsDAO;
     private HarvestSourceDAO harvestSourceDAO;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     /*
      * (non-Javadoc)
      *

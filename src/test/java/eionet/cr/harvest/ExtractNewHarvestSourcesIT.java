@@ -25,9 +25,9 @@ import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
 import eionet.cr.util.TestUtils;
+import org.eclipse.jetty.server.Server;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mortbay.jetty.Server;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
