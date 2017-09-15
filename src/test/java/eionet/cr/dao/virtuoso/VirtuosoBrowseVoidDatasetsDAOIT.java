@@ -26,7 +26,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
 
-  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();

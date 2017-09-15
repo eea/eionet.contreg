@@ -41,6 +41,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
 
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_bulk.xml";
 

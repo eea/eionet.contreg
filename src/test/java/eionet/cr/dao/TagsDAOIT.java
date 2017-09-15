@@ -50,7 +50,6 @@ public class TagsDAOIT extends CRDatabaseTestCase {
     @Autowired
     private TagsDAO tagsDAO;
 
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

@@ -39,12 +39,6 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
     private static String PARENT_FOLDER_URI;
     private static String EXPECTED_FINAL_FOLDER_URI;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

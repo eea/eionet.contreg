@@ -39,6 +39,7 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import org.junit.Ignore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -50,6 +51,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private SearchDAO searchDAO;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
@@ -128,10 +137,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         }
 
         PagingRequest pagingRequest = PagingRequest.create(1);
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
+        SearchResultDTO<SubjectDTO> result = searchDAO
                         .searchByFreeText(new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT,
                                 false, pagingRequest, null);
     }
@@ -152,8 +158,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         SortingRequest sortRequest = new SortingRequest("http://purl.org/dc/terms/title", SortOrder.DESCENDING);
         List<String> predicates = Arrays.asList("http://purl.org/dc/terms/title", "http://purl.org/dc/terms/valid");
 
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory.get().getDao(SearchDAO.class).searchByFilters(filters, false, pagingRequest, sortRequest, predicates);
+        SearchResultDTO<SubjectDTO> result = searchDAO.searchByFilters(filters, false, pagingRequest, sortRequest, predicates);
         assertNotNull("Expected search result not to be null", result);
         List<SubjectDTO> items = result.getItems();
         assertNotNull("Expected search result items not to be null", items);
@@ -174,9 +179,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
         SortingRequest sortRequest = new SortingRequest("http://purl.org/dc/terms/title", SortOrder.DESCENDING);
-        Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory.get().getDao(SearchDAO.class)
-                        .searchBySource(getSeedFileGraphUri(OBLIGATIONS_RDF), pagingRequest, sortRequest);
+        Pair<Integer, List<SubjectDTO>> result = searchDAO.searchBySource(getSeedFileGraphUri(OBLIGATIONS_RDF), pagingRequest, sortRequest);
 
         assertNotNull("Expected search result not to be null", result);
 
@@ -201,8 +204,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         SortingRequest sortRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.DESCENDING);
         List<String> tags = Arrays.asList("tag3", "tag4");
 
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory.get().getDao(SearchDAO.class).searchByTags(tags, pagingRequest, sortRequest);
+        SearchResultDTO<SubjectDTO> result = searchDAO.searchByTags(tags, pagingRequest, sortRequest);
 
         assertNotNull("Expected search result not to be null", result);
 
@@ -226,8 +228,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
         SortingRequest sortRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.DESCENDING);
 
-        SearchDAO dao = DAOFactory.get().getDao(SearchDAO.class);
-        Pair<Integer, List<SubjectDTO>> result = dao.searchReferences(subjectUri, pagingRequest, sortRequest);
+        Pair<Integer, List<SubjectDTO>> result = searchDAO.searchReferences(subjectUri, pagingRequest, sortRequest);
 
         assertNotNull("Expected search result not to be null", result);
 

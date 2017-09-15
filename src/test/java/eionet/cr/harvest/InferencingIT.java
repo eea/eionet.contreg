@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.query.QueryLanguage;
@@ -50,14 +51,8 @@ public class InferencingIT extends CRDatabaseTestCase {
         return Arrays.asList(RULESET_SEED_FILE, DATA_SEED_FILE);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
+    @Before
     public void setUp() throws Exception {
-
         super.setUp();
         String rulesetGraphUri = RdfLoader.getSeedFileGraphUri(RULESET_SEED_FILE);
         DAOFactory.get().getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(rulesetGraphUri);

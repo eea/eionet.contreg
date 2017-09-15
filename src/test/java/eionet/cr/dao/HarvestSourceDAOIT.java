@@ -34,14 +34,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.junit.Ignore;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
@@ -49,16 +45,18 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
  * @author altnyris
  *
  */
-@SqlGroup({
-        @Sql({"/sources-harvests-messages.sql"}),
-        @Sql(scripts = "/sources-harvests-messages-cleanup.sql", executionPhase = AFTER_TEST_METHOD)
-})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestSourceDAOIT extends CRDatabaseTestCase {
 
     @Autowired
     private HarvestSourceDAO harvestSourceDao;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+    }
+
     /*
      * (non-Javadoc)
      *

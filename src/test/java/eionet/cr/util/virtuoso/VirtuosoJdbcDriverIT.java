@@ -61,7 +61,6 @@ public class VirtuosoJdbcDriverIT extends CRDatabaseTestCase {
     /** Dummy graph URI. */
     private static final String DUMMY_GRAPH_URI = "http://test.virtuoso.jdbc.validity.com";
 
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

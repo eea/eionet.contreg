@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
@@ -27,6 +26,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
          * (non-Javadoc)
          *

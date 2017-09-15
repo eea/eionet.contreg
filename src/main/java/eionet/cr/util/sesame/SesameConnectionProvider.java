@@ -115,19 +115,15 @@ public final class SesameConnectionProvider {
      * @return the readWriteDataSource
      */
     private static synchronized DataSource getReadWriteDataSource() {
-//        return SpringApplicationContext.getBean("dataSource");
-        return lookupDataSource(READONLY_DATASOURCE_NAME);
+        return SpringApplicationContext.getBean("dataSource");
     }
 
     /**
      * @return the readOnlyDataSource
      */
     private static synchronized DataSource getReadOnlyDataSource() {
-
-        if (readOnlyDataSource == null) {
-            readOnlyDataSource = lookupDataSource(READONLY_DATASOURCE_NAME);
-        }
-        return readOnlyDataSource;
+        // todo make read only data source
+        return SpringApplicationContext.getBean("dataSource");
     }
 
     /**
@@ -135,16 +131,16 @@ public final class SesameConnectionProvider {
      * @param dataSourceName
      * @return
      */
-    private static DataSource lookupDataSource(String dataSourceName) {
-
-        try {
-            Context initContext = new InitialContext();
-            Context context = (Context) initContext.lookup("java:comp/env");
-            return (javax.sql.DataSource) context.lookup(dataSourceName);
-        } catch (NamingException e) {
-            return null;
-        }
-    }
+//    private static DataSource lookupDataSource(String dataSourceName) {
+//
+//        try {
+//            Context initContext = new InitialContext();
+//            Context context = (Context) initContext.lookup("java:comp/env");
+//            return (javax.sql.DataSource) context.lookup(dataSourceName);
+//        } catch (NamingException e) {
+//            return null;
+//        }
+//    }
 
     /**
      * Returns read-write connection to the repository.

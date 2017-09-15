@@ -52,7 +52,6 @@ public class HelperDAOIT extends CRDatabaseTestCase {
     @Autowired
     private HelperDAO helperDAO;
 
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

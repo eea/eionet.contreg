@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 import eionet.cr.ApplicationTestContext;
+import org.junit.Before;
 import org.junit.Test;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -52,6 +53,11 @@ public class HarvestMessageDAOIT extends CRDatabaseTestCase {
     private HarvestMessageDAO harvestMessageDAO;
     @Autowired
     private HarvestSourceDAO harvestSourceDAO;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+    }
 
     @Override
     protected List<String> getXMLDataSetFiles() {

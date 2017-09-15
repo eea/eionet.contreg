@@ -34,12 +34,6 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
         return Arrays.asList("harvests.xml");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
     @Before
     public void setUp() throws Exception {
 

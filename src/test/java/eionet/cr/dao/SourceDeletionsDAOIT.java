@@ -34,7 +34,14 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
 
     @Autowired
     private SourceDeletionsDAO sourceDeletionsDAO;
+    @Autowired
     private HarvestSourceDAO harvestSourceDAO;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
      * (non-Javadoc)
      *

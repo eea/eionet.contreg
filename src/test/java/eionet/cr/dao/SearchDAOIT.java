@@ -58,7 +58,6 @@ public class SearchDAOIT extends CRDatabaseTestCase {
     @Autowired
     private SearchDAO searchDAO;
 
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

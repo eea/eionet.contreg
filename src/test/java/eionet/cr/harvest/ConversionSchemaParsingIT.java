@@ -40,12 +40,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ConversionSchemaParsingIT extends CRDatabaseTestCase {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

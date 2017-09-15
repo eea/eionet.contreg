@@ -71,10 +71,28 @@
         <property name="logAbandoned" value="false" />
     </bean>
 
+<!--    <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${virtuoso.db.drv}" />
+        <property name="url" value="${virtuoso.db.url}" />
+        <property name="username" value="${virtuoso.db.rousr}" />
+        <property name="password" value="${virtuoso.db.ropwd}" />
+        <property name="maxTotal" value="40" />
+        <property name="maxWaitMillis" value="10000" />
+        <property name="removeAbandonedOnBorrow" value="true" />
+        <property name="removeAbandonedOnMaintenance" value="true" />
+        <property name="removeAbandonedTimeout" value="300" />
+        <property name="timeBetweenEvictionRunsMillis" value="300000" />
+        <property name="logAbandoned" value="false" />
+    </bean>-->
+
     <!-- Runs on Tomcat startup. -->
     <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
         <property name="dataSource" ref="dataSource" />
         <property name="changeLog" value="classpath:sql/db-struct.xml" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
     </bean>
 
     <bean id="messageDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestMessageDAO" />

@@ -50,12 +50,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
         return Arrays.asList("emptydb.xml");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

@@ -22,6 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -113,14 +114,8 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     /** Size of the file under test before test. */
     private long testFileSize;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         testFileSize = TEST_FILE.length();
     }
