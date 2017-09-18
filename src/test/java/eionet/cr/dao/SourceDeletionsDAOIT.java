@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -40,6 +41,11 @@ public class SourceDeletionsDAOIT extends CRDatabaseTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*

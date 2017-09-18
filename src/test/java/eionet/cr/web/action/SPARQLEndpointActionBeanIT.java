@@ -14,6 +14,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.test.helpers.SimpleStatementRecorder;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -42,9 +44,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
 
+    @Autowired
+    private MockServletContext ctx;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        ActionBeanUtils.addFilter(ctx);
+    }
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ctx.getFilters().get(0).destroy();
     }
 
     /** RDF seed file to be loaded. */
@@ -66,8 +77,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
      */
     @Test
     public void testExecuteNoFormat() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
         String sparql = "SELECT ?s ?p ?o WHERE {?s ?p ?o} limit 1";
         trip.setParameter("query", sparql);
@@ -97,8 +106,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
      */
     @Test
     public void testExecuteBadQuery() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
 
         // syntax error:
@@ -128,8 +135,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
      */
     @Test
     public void testExecuteMalformedRequest() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
 
         trip.execute();
@@ -162,7 +167,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
 
     @Test
     public void testCreateLargeBookmark() throws Exception {
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
         trip.getRequest().setMethod("POST");
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("user"));
@@ -217,7 +221,6 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
 
         String graphUri = RdfLoader.getSeedFileGraphUri(RDF_SEED_FILE);
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
         String sparql = "CONSTRUCT {?s ?p ?o} FROM <" + graphUri + "> WHERE {?s ?p ?o} order by ?s ?p ?o";
         trip.setParameter("query", sparql);

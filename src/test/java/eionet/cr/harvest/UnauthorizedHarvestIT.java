@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import eionet.cr.ApplicationTestContext;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Server;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import eionet.cr.dao.DAOFactory;
@@ -30,6 +32,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UnauthorizedHarvestIT extends CRDatabaseTestCase {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     /*
      * (non-Javadoc)

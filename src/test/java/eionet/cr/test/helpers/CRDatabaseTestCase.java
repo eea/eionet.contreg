@@ -53,8 +53,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationTestContext.class })
+/*@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })*/
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /** Repository connection to be used for checking existence of expected triples in the repository */

@@ -11,6 +11,7 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,9 @@ import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.web.security.CRUser;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,6 +43,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PingDeleteActionBeanIT.class);
 
     /*
      * (non-Javadoc)
@@ -54,6 +63,13 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
     public void setUp() throws Exception {
         super.setUp();
         new RdfLoader().clearAllTriples();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ctx.getFilters().get(0).destroy();
     }
 
     /**
@@ -64,7 +80,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
     public void testDeleteWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("delete", "");
         trip.execute();
@@ -92,7 +107,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
     public void testDeleteWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "...............");
         trip.setParameter("delete", "");
@@ -109,7 +123,7 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
 
         // Assert response message.
         String outputStr = response.getOutputString();
-        System.out.println(outputStr);
+        LOGGER.info(outputStr);
         assertNotNull("Expected non-null response message", outputStr);
         assertTrue("Unexpected message", outputStr.contains("<message>URL not in catalogue of sources, no action taken"));
         assertTrue("Unexpected message", outputStr.contains("<flerror>0</flerror>"));
@@ -123,7 +137,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
     public void testDeleteHarvestPingDeleteSequence() throws Exception {
 
         // Create the source to be tested. The URL is served by Jetty below.
-
         String url = TestUtils.getFileUrl("simple-rdf.xml");
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(url);
@@ -176,8 +189,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     private void doAndAssertAllowedSourceDelete(String url) throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.setParameter("delete", "");
@@ -206,7 +217,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      */
     private void doAndAssertForbiddenSourceDelete(String url) throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.setParameter("delete", "");

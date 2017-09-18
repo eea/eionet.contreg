@@ -50,7 +50,7 @@ public class ContregServletContextListener implements ApplicationListener {
 
         try {
             String url = configurationService.resolveValue("virtuoso.db.url");
-            System.out.println(url);
+            LOGGER.info(url);
         } catch (UnresolvedPropertyException e) {
             e.printStackTrace();
         } catch (CircularReferenceException e) {

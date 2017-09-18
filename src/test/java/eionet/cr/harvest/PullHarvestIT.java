@@ -27,6 +27,8 @@ import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import eionet.cr.util.TestUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.URI;
@@ -54,6 +56,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PullHarvestIT extends CRDatabaseTestCase {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     /*
      * (non-Javadoc)

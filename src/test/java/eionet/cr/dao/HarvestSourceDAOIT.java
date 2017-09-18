@@ -23,6 +23,7 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 import eionet.cr.ApplicationTestContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +56,11 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
     @Before
     public void setup() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*

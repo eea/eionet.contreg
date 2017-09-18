@@ -22,6 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,6 +44,9 @@ import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -54,6 +58,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBeanIT.class);
 
     /** The name of user whose folder we're testing in. */
     public static final String TEST_USER_NAME = "somebody";
@@ -118,6 +127,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     public void setUp() throws Exception {
         super.setUp();
         testFileSize = TEST_FILE.length();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*
@@ -316,7 +330,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     private void doUpload(boolean isOverwrite) throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
@@ -384,7 +397,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     private void doUploadOnline(boolean isOverwrite) throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
@@ -448,8 +460,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception For any sort of problems.
      */
     private void doSave(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare the rich-type request parameters: the given data-linking scripts (if any)
@@ -514,8 +524,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception For any sort of problems.
      */
     private void doSaveOnline(ArrayList<DataLinkingScript> dataLinkingScripts, String expectedSparql) throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare the rich-type request parameters: the given data-linking scripts (if any)
@@ -584,7 +592,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
             List<Message> messages = aBean.getContext().getMessages(queue);
             for (Message message : messages) {
                 foundOne = true;
-                System.out.println(queue + ": " + message.getMessage(null));
+                LOGGER.info(queue + ": " + message.getMessage(null));
             }
         }
         return foundOne;
@@ -612,7 +620,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     public void testUploadWithEmptyFolderURI() throws Exception {
 
         // Prepare the servlet context mock + Stripes action bean roundtrip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, UploadCSVActionBeanMock.class);
 
         // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder

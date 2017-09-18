@@ -10,6 +10,7 @@ import java.util.Map;
 
 import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,8 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -55,9 +58,16 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
     @Autowired
     private SearchDAO searchDAO;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoUpgradeIT.class);
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /** Obligations seed file. */
@@ -132,7 +142,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         // By "real-time" we mean that the index is updated instantly after loading a triple.
         String value = GeneralConfig.getProperty(GeneralConfig.VIRTUOSO_REAL_TIME_FT_INDEXING);
         if (BooleanUtils.toBoolean(value) == false) {
-            System.out.println("Skipping full-text search test, as no real-time full-text indexing has been activated!");
+            LOGGER.info("Skipping full-text search test, as no real-time full-text indexing has been activated!");
             return;
         }
 
@@ -285,14 +295,8 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
 
         String sqlTemplate = VirtuosoHarvestSourceDAO.RENAME_GRAPH_SQL;
         String renameSql = sqlTemplate.replace("%old_graph%", oldGraph).replaceFirst("%new_graph%", newGraph);
-
-        System.out.println("renameSQL is: "+renameSql);
-        
         String countSql = "select count(*) from DB.DBA.RDF_QUAD where G=iri_to_id('%graph_uri%')";
 
-        System.out.println("countSql is:"+countSql);
-        
-        System.out.println("oldGraph is:"+oldGraph);
         Connection sqlConn = null;
         Statement stmt = null;
         ResultSet rs = null;

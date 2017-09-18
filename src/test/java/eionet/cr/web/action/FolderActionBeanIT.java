@@ -15,10 +15,12 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -30,6 +32,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FolderActionBeanIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
 
     private static final String USERNAME = "heinlja";
     private static final CRUser USER = new CRUser(USERNAME);
@@ -48,6 +53,12 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
 
         DAOFactory.get().getDao(FolderDAO.class).createUserHomeFolder(USERNAME);
         USER.createDefaultAcls();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() {
+        ctx.getFilters().get(0).destroy();
     }
 
     /*
@@ -73,7 +84,6 @@ public class FolderActionBeanIT extends CRDatabaseTestCase {
         assertNull("Expected no subject for " + EXPECTED_FINAL_FOLDER_URI, subject);
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, FolderActionBean.class);
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, USER);
         trip.setParameter("uri", PARENT_FOLDER_URI);

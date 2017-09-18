@@ -27,12 +27,15 @@ import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -44,6 +47,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setUp() {
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() {
+        ctx.getFilters().get(0).destroy();
+    }
 
     /**
      *

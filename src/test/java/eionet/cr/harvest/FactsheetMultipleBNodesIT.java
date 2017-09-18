@@ -11,6 +11,7 @@ import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.dto.FactsheetDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,6 +31,11 @@ public class FactsheetMultipleBNodesIT extends CRDatabaseTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*

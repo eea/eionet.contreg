@@ -18,6 +18,7 @@ public final class ActionBeanUtils {
 
     /** prevent initialization. */
     private ActionBeanUtils() {
+        throw new AssertionError("");
     }
 
     /**
@@ -28,18 +29,23 @@ public final class ActionBeanUtils {
     public static MockServletContext getServletContext() {
         if (context == null) {
             MockServletContext ctx = new MockServletContext("test");
-            Map filterParams = new HashMap();
-            // filterParams.put("ActionResolver.Packages", "postHarvest");
-            filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
-            filterParams.put("Interceptor.Classes", "eionet.cr.web.interceptor.ActionEventInterceptor");
-            filterParams.put("ActionBeanContext.Class", "eionet.cr.web.action.CRTestActionBeanContext");
-            // filterParams.put("LocalePicker.Locales", "en_US:UTF-8");
-            ctx.addFilter(StripesFilter.class, "StripesFilter", filterParams);
             ctx.setServlet(DispatcherServlet.class, "StripesDispatcher", null);
-
             context = ctx;
         }
 
         return ActionBeanUtils.context;
+    }
+
+    public static void addFilter(MockServletContext context) {
+        if (context != null) {
+            Map filterParams = new HashMap();
+            filterParams.put("ActionResolver.Packages", "postHarvest");
+            filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
+            filterParams.put("Interceptor.Classes", "eionet.cr.web.interceptor.ActionEventInterceptor");
+            filterParams.put("Interceptor.Classes", "net.sourceforge.stripes.integration.spring.SpringInterceptor");
+            filterParams.put("ActionBeanContext.Class", "eionet.cr.web.action.CRTestActionBeanContext");
+            // filterParams.put("LocalePicker.Locales", "en_US:UTF-8");
+            context.addFilter(StripesFilter.class, "StripesFilter", filterParams);
+        }
     }
 }

@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.HarvestSourceDTO;
@@ -41,6 +43,17 @@ public class ScheduledHarvestSourcesIT extends CRDatabaseTestCase {
 
     @Autowired
     private HarvestSourceDAO harvestSourceDAO;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
 
     /*
      * (non-Javadoc)

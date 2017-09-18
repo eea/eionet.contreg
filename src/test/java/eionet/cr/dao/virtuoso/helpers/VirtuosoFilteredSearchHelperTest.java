@@ -21,12 +21,16 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoFilteredSearchHelperTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoFilteredSearchHelperTest.class);
 
     @Test
     public void testBuildTypeSearchQuery() {
@@ -120,10 +124,10 @@ public class VirtuosoFilteredSearchHelperTest {
             List<String> results = reader.getResultList();
 
             for (String url : results) {
-                System.out.println("URL " + url);
+                LOGGER.info("URL " + url);
             }
         } catch (Exception e) {
-            System.out.println("ERROR " + e);
+            LOGGER.error("ERROR " + e);
         } finally {
             SesameUtil.close(conn);
         }

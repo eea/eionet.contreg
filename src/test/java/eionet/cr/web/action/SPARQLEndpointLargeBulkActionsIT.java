@@ -9,6 +9,7 @@ import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -32,6 +34,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ctx.getFilters().get(0).destroy();
+    }
 
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_largebulk.xml";
@@ -54,7 +71,6 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
     @Test
     public void testProperQuery() throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "

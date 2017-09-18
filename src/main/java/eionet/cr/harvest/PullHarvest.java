@@ -1011,9 +1011,9 @@ public class PullHarvest extends BaseHarvest {
         UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(queryString);
         if (authentication != null) {
             addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
-            System.out.println("Using basic auth");
+            LOGGER.info("Using basic auth");
         } else {
-            System.out.println("NOT Using basic auth");
+            LOGGER.info("NOT Using basic auth");
         }
 
         // Set the timeout both for establishing the connection, and reading from it once established.

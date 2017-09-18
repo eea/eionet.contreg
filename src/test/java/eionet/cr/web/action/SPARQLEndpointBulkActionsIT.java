@@ -14,6 +14,7 @@ import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.validation.ValidationError;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +29,7 @@ import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -41,9 +43,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
 
+    @Autowired
+    private MockServletContext ctx;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /** RDF seed file to be loaded. */
@@ -69,7 +79,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
     @Test
     public void testProperQuery() throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -112,8 +121,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testWrongColumns() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -140,8 +147,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testCorrectMultipleColumns() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -168,8 +173,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testEmptyResult() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql = "select ?a ?b where {<s> <p> <o>} limit 0";
         trip.setParameter("query", sparql);
@@ -191,8 +194,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testAdminPrivileges() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
         String sparql = "select ?a ?b where {<s> <p> <o>} limit 0";
         trip.setParameter("query", sparql);

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import eionet.cr.common.Predicates;
@@ -39,6 +40,8 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -54,6 +57,7 @@ public class SearchDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchDAOIT.class);
 
     @Autowired
     private SearchDAO searchDAO;
@@ -61,6 +65,11 @@ public class SearchDAOIT extends CRDatabaseTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*
@@ -84,7 +93,7 @@ public class SearchDAOIT extends CRDatabaseTestCase {
         // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
         // By "real-time" we mean that the index is updated instantly after loading a triple.
         if (isRealTimeFullTextIndexingActivated() == false) {
-            System.out.println("Skipping full-text search test, as no real-time full-text indexing has been activated!");
+            LOGGER.info("Skipping full-text search test, as no real-time full-text indexing has been activated!");
             return;
         }
 

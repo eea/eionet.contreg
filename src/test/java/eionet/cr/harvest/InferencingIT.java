@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +58,11 @@ public class InferencingIT extends CRDatabaseTestCase {
         String rulesetGraphUri = RdfLoader.getSeedFileGraphUri(RULESET_SEED_FILE);
         DAOFactory.get().getDao(HarvestSourceDAO.class).removeSourceFromInferenceRule(rulesetGraphUri);
         DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIntoInferenceRule(rulesetGraphUri);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /**

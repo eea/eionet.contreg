@@ -3,6 +3,8 @@ package eionet.cr.web.sparqlClient.helpers;
 import java.util.Map;
 
 import eionet.cr.util.URLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,6 +17,7 @@ public class QueryResultValidator {
     public static final String PROPER_BULK_SOURCE_OK = "ok";
     public static final String PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY = "Query did not return any results.";
     public static final String PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS = "Query results first column includes results that are not URIs.";
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryResultValidator.class);
 
     /**
      * Validates whether the Sparql query result returned is proper for sources
@@ -33,7 +36,7 @@ public class QueryResultValidator {
             if (queryResult.getRows() != null && queryResult.getRows().size() > 0) {
                 for (Map<String, ResultValue> row : queryResult.getRows()) {
                     if (row.isEmpty()) {
-                        System.out.println("some row is empty");
+                        LOGGER.info("some row is empty");
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
 
@@ -42,7 +45,7 @@ public class QueryResultValidator {
 
                     String strValue = resultValue.getValue();
                     if (!URLUtil.isURL(strValue)) {
-                        System.out.println("url is not url");
+                        LOGGER.info("url is not url");
                         return PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS;
                     }
                 }
