@@ -32,8 +32,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * that can be exported from SPARQL endpoint.
  */
 @Ignore("Does not seem to be a class under test, but a helper class for classes under test")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class MockVirtuosoBaseDAOTest extends VirtuosoBaseDAO {
     /** Tag name in N3. */
     private static final String RESULTVARIABLE_NAME = "http://www.w3.org/2005/sparql-results#resultVariable";

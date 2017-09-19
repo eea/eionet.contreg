@@ -151,7 +151,8 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception Any sort of error that happens.
      */
     @Test
-    public void IGNOREtestTwoUploadsInARow() throws Exception {
+    @Ignore
+    public void testTwoUploadsInARow() throws Exception {
 
         // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
         // remove after the "upload". But we shall need it once more for the second run of the upload/save chain.
@@ -192,7 +193,8 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     @Test
-    public void IGNOREtestBrandNewUpload() throws Exception {
+    @Ignore
+    public void testBrandNewUpload() throws Exception {
 
         deleteUploadedFile();
 
