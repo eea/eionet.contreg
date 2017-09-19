@@ -156,19 +156,19 @@
                         <filter>${basedir}/${env}.properties</filter>
                     </filters>
                     <webResources>
-                        <resource>
-                            <directory>${basedir}/src/main/webapp/META-INF</directory>
-                            <filtering>true</filtering>
-                            <targetPath>META-INF</targetPath>
-                            <includes>
-                                <include>context.xml</include>
-                            </includes>
-                        </resource>
-                        <resource>
-                            <filtering>false</filtering>
-                            <directory>${basedir}/src/main/resources</directory>
-                            <targetPath>WEB-INF/classes</targetPath>
-                        </resource>
+                        <!--<resource>-->
+                            <!--<directory>${basedir}/src/main/webapp/META-INF</directory>-->
+                            <!--<filtering>true</filtering>-->
+                            <!--<targetPath>META-INF</targetPath>-->
+                            <!--<includes>-->
+                                <!--<include>context.xml</include>-->
+                            <!--</includes>-->
+                        <!--</resource>-->
+                        <!--<resource>-->
+                            <!--<filtering>false</filtering>-->
+                            <!--<directory>${basedir}/src/main/resources</directory>-->
+                            <!--<targetPath>WEB-INF/classes</targetPath>-->
+                        <!--</resource>-->
                         <resource>
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
                             <filtering>true</filtering>
@@ -185,13 +185,13 @@
                                 <include>dropdownmenus.txt</include>
                             </includes>
                         </resource>
-                        <resource>
-                            <directory>${basedir}/sql</directory>
-                            <targetPath>WEB-INF/classes/sql</targetPath>
-                            <includes>
-                                <include>db-struct.xml</include>
-                            </includes>
-                        </resource>
+                        <!--<resource>-->
+                            <!--<directory>${basedir}/sql</directory>-->
+                            <!--<targetPath>WEB-INF/classes/sql</targetPath>-->
+                            <!--<includes>-->
+                                <!--<include>db-struct.xml</include>-->
+                            <!--</includes>-->
+                        <!--</resource>-->
                     </webResources>
                 </configuration>
             </plugin>
@@ -215,6 +215,9 @@
                                 </copy>
                                 <copy file="${basedir}/${env}.properties"
                                       toFile="${project.build.directory}/classes/env.properties" />
+                                <copy todir="${project.build.directory}/classes/sql">
+                                    <fileset dir="sql" />
+                                </copy>
                             </tasks>
                         </configuration>
                     </execution>
@@ -226,9 +229,6 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="${project.build.directory}/test-classes/WEB-INF">
-                                    <fileset dir="src/main/webapp/WEB-INF" />
-                                </copy>
                                 <copy file="${basedir}/unittest.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">
@@ -287,6 +287,7 @@
                                 <volumes>
                                     <bind>
                                         <volume>/tmp/contreg/tmp:/tmp/contreg/tmp</volume>
+                                        <volume>/tmp/contreg/filestore:/tmp/contreg/filestore</volume>
                                     </bind>
                                 </volumes>
                             </run>
@@ -523,7 +524,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.0.1</version>
+            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -880,11 +881,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>2.4.6</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zaxxer</groupId>-->
+            <!--<artifactId>HikariCP</artifactId>-->
+            <!--<version>2.4.6</version>-->
+        <!--</dependency>-->
 
         <!-- TEST dependencies -->
 

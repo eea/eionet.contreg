@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eionet.cr.web.util.ApplicationCache;
@@ -43,6 +44,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class RecentDiscoveredFilesCacheTest {
+
+    @BeforeClass
+    public static void beforeClass() {
+        new ApplicationCache().contextDestroyed(null);
+    }
 
     @Before
     public void setUp() throws Exception {

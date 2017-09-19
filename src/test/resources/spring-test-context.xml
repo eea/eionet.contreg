@@ -8,12 +8,8 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:annotation-config/>
-
     <!-- Scans within the base package of the application for @Components to configure as beans -->
     <context:component-scan base-package="eionet.cr" />
-
-    <bean id="springApplicationContext" class="eionet.cr.spring.SpringApplicationContext"/>
 
     <bean id="appConfigDefinitionProvider" class="eionet.propertyplaceholderresolver.ConfigurationDefinitionProviderImpl">
         <constructor-arg index="0">
@@ -106,6 +102,8 @@
     <bean id="searchDao" class="eionet.cr.dao.virtuoso.VirtuosoSearchDAO" />
     <bean id="sourceDeletionDao" class="eionet.cr.dao.virtuoso.VirtuosoSourceDeletionsDAO" />
     <bean id="harvestScriptDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestScriptDAO" />
+
+    <!--<bean id="mockContext" class="eionet.cr.web.action.ActionBeanUtils" init-method="initializeCacheManager" />-->
 
     <!--&lt;!&ndash; Runs on Tomcat startup. &ndash;&gt;-->
     <!--<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">-->

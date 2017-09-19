@@ -29,6 +29,7 @@ import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
@@ -51,9 +52,15 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
     @Autowired
     private MockServletContext ctx;
 
+    @BeforeClass
+    public static void beforeClass() {
+        new ApplicationCache().contextDestroyed(null);
+    }
+
     @Before
     public void setUp() {
         ActionBeanUtils.addFilter(ctx);
+        new ApplicationCache().contextInitialized(null);
     }
 
     @After
@@ -67,8 +74,6 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
      */
     @Test
     public void testJsonTagsResult() throws Exception {
-
-        new ApplicationCache().contextInitialized(null);
         ApplicationCache.updateTagCloudCache(getTestData());
 
         // Setup the servlet engine

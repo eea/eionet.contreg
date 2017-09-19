@@ -53,17 +53,15 @@
     </context-param>-->
 
     <!-- Spring configuration -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
             classpath:spring-context.xml
         </param-value>
     </context-param>
-
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
-
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- filters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -271,7 +269,6 @@
     </servlet-mapping>
 
     <!-- AMP feed servlet -->
-
     <servlet>
         <servlet-name>AmpServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.amp.AmpFeedServlet</servlet-class>
@@ -283,7 +280,6 @@
     </servlet-mapping>
 
     <!-- Update template servlet -->
-
     <servlet>
         <servlet-name>RefreshTemplateServlet</servlet-name>
         <servlet-class>eionet.eea.template.RefreshTemplateServlet</servlet-class>
@@ -295,7 +291,6 @@
 
 
     <!-- XmlConvServlet -->
-
     <servlet>
         <servlet-name>XmlConvServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.xmlconv.XmlConvFeedServlet</servlet-class>
