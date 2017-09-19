@@ -121,9 +121,8 @@ public final class SesameConnectionProvider {
      * @return the readOnlyDataSource
      */
     private static synchronized DataSource getReadOnlyDataSource() {
-        // todo make read only data source
         if (readOnlyDataSource == null) {
-            readOnlyDataSource = SpringApplicationContext.getBean("dataSource");
+            readOnlyDataSource = SpringApplicationContext.getBean("roDataSource");
         }
         return readOnlyDataSource;
     }

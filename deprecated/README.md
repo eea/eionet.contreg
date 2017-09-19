@@ -67,7 +67,7 @@ and that it is run while being in CR_SOURCE_HOME directory:
 
 ### 3.1 Unit tests
 
-When you ran the above command you probably noticed that it ran the unit tests. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
+When you ran the above command you probably noticed that it ran the unit tests. These are designed to not require any external assets such as a database, mail server etc. It is safe to run them. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
 
 ## 4. Import CR database creation scripts
 
