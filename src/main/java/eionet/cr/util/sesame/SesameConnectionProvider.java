@@ -4,10 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import eionet.cr.spring.SpringApplicationContext;
@@ -115,7 +111,10 @@ public final class SesameConnectionProvider {
      * @return the readWriteDataSource
      */
     private static synchronized DataSource getReadWriteDataSource() {
-        return SpringApplicationContext.getBean("dataSource");
+        if (readWriteDataSource == null) {
+            readWriteDataSource = SpringApplicationContext.getBean("dataSource");
+        }
+        return readWriteDataSource;
     }
 
     /**
@@ -123,24 +122,11 @@ public final class SesameConnectionProvider {
      */
     private static synchronized DataSource getReadOnlyDataSource() {
         // todo make read only data source
-        return SpringApplicationContext.getBean("dataSource");
+        if (readOnlyDataSource == null) {
+            readOnlyDataSource = SpringApplicationContext.getBean("dataSource");
+        }
+        return readOnlyDataSource;
     }
-
-    /**
-     *
-     * @param dataSourceName
-     * @return
-     */
-//    private static DataSource lookupDataSource(String dataSourceName) {
-//
-//        try {
-//            Context initContext = new InitialContext();
-//            Context context = (Context) initContext.lookup("java:comp/env");
-//            return (javax.sql.DataSource) context.lookup(dataSourceName);
-//        } catch (NamingException e) {
-//            return null;
-//        }
-//    }
 
     /**
      * Returns read-write connection to the repository.
