@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import eionet.cr.dto.TagDTO;
-import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -47,7 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
+public class JsonActionBeanTest {
 
     @Autowired
     private MockServletContext ctx;
@@ -65,7 +64,7 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
 
     @After
     public void cleanUp() {
-        ctx.getFilters().get(0).destroy();
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     /**
@@ -76,10 +75,7 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
     public void testJsonTagsResult() throws Exception {
         ApplicationCache.updateTagCloudCache(getTestData());
 
-        // Setup the servlet engine
-        MockServletContext context = getMockServletContext();
-
-        MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
+        MockRoundtrip trip = new MockRoundtrip(ctx, JsonActionBean.class);
         trip.setParameter("query", "tag");
         trip.execute();
 

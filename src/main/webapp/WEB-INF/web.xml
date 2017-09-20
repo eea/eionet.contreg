@@ -30,28 +30,6 @@
         <param-value>${enableEEAFunctionality}</param-value>
     </context-param>
 
-    <!-- Liquibase configuration -->
-
-<!--    <context-param>
-        <param-name>liquibase.changelog</param-name>
-        <param-value>sql/db-struct.xml</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.datasource</param-name>
-        <param-value>java:comp/env/jdbc/readWriteRepo</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.onerror.fail</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.contexts</param-name>
-        <param-value>production</param-value>
-    </context-param>-->
-
     <!-- Spring configuration -->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -150,18 +128,7 @@
         <filter-name>CAS Filter</filter-name>
         <url-pattern>/login</url-pattern>
     </filter-mapping>
-    <!--<filter>-->
-        <!--<filter-name>CAS Filter</filter-name>-->
-        <!--<filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>-->
-    <!--</filter>-->
 
-    <!--<filter-mapping>-->
-        <!--<filter-name>CAS Filter</filter-name>-->
-        <!--<url-pattern>/login</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<listener>-->
-        <!--<listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>-->
-    <!--</listener>-->
     <listener>
         <listener-class>eionet.cr.web.util.AbandonedHarvestsMarker</listener-class>
     </listener>

@@ -55,7 +55,7 @@ public class SPARQLEndpointActionBeanIT extends CRDatabaseTestCase {
     @After
     public void cleanUp() throws Exception {
         super.tearDown();
-        ctx.getFilters().get(0).destroy();
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     /** RDF seed file to be loaded. */

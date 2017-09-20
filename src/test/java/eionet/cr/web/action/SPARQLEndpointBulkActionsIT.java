@@ -6,18 +6,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
 import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.validation.ValidationError;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -49,11 +46,13 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        ActionBeanUtils.addFilter(ctx);
     }
 
     @After
     public void tearDown() throws Exception {
         super.tearDown();
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     /** RDF seed file to be loaded. */
@@ -77,6 +76,7 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      *             if testing fails
      */
     @Test
+    // TODO FIX: This requests an external resource which depends on the timezone of each machine.
     public void testProperQuery() throws Exception {
 
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);

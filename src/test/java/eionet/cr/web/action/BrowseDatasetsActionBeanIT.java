@@ -32,7 +32,7 @@ public class BrowseDatasetsActionBeanIT {
 
   @After
   public void cleanUp() {
-    ctx.getFilters().get(0).destroy();
+    ActionBeanUtils.clearFilters(ctx);
   }
 
   /**

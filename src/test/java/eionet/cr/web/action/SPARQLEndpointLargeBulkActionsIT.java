@@ -47,7 +47,7 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
     @After
     public void cleanUp() throws Exception {
         super.tearDown();
-        ctx.getFilters().get(0).destroy();
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     /** RDF seed file to be loaded. */
@@ -69,6 +69,7 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
      *             if testing fails
      */
     @Test
+    // TODO FIX: This requests an external resource which depends on the timezone of each machine.
     public void testProperQuery() throws Exception {
 
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);

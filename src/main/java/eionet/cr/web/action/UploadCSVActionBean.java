@@ -24,6 +24,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import eionet.acl.AccessController;
 import eionet.acl.SignOnException;
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -229,7 +230,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
                     fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
                 }
                 fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
-                String tempFilePath = folderUri + "/temp/" + fileName;
+                //TODO improve temp directories functionality
+                String tempFilePath = GeneralConfig.getProperty("app.home") + "/tmp/" + FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
                 File tempFile = new File(tempFilePath);
                 tempFile.getParentFile().mkdirs();
                 tempFile.createNewFile();

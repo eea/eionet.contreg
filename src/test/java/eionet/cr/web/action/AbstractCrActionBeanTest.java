@@ -25,13 +25,15 @@ import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -43,7 +45,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
+public class AbstractCrActionBeanTest {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setUp() {
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void tearDown() {
+        ActionBeanUtils.clearFilters(ctx);
+    }
 
     /**
      * Tests method {@link AbstractCrActionBean#getUserName()} when user is logged in.
@@ -52,9 +67,8 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
      */
     @Test
     public void testGetUserNameWhenLoggedIn() throws Exception {
-        MockServletContext context = getMockServletContext();
 
-        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        MockRoundtrip trip = new MockRoundtrip(ctx, LoginActionBean.class);
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
         trip.execute();
 
@@ -70,9 +84,8 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
      */
     @Test
     public void testIsUserLoggedInTrue() throws Exception {
-        MockServletContext context = getMockServletContext();
 
-        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        MockRoundtrip trip = new MockRoundtrip(ctx, LoginActionBean.class);
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, new CRUser("smithbob"));
         trip.execute();
 
@@ -88,9 +101,8 @@ public class AbstractCrActionBeanTest extends AbstractStripesMvcTestHelper {
      */
     @Test
     public void testIsUserLoggedInFalse() throws Exception {
-        MockServletContext context = getMockServletContext();
 
-        MockRoundtrip trip = new MockRoundtrip(context, LoginActionBean.class);
+        MockRoundtrip trip = new MockRoundtrip(ctx, LoginActionBean.class);
         trip.getRequest().getSession().setAttribute(WebConstants.USER_SESSION_ATTR, null);
         trip.execute();
 

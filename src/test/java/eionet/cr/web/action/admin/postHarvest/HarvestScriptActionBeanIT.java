@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eionet.cr.ApplicationTestContext;
+import eionet.cr.web.action.ActionBeanUtils;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -56,6 +57,7 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         } finally {
             SQLUtil.close(conn);
         }
+        ActionBeanUtils.addFilter(ctx);
     }
 
     @After
@@ -69,6 +71,7 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         } finally {
             SQLUtil.close(conn);
         }
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     
