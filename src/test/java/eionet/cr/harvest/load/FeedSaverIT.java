@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TimeZone;
-
 import eionet.cr.ApplicationTestContext;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
@@ -20,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.openrdf.model.Resource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;

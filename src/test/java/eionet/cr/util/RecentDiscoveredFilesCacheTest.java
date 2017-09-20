@@ -22,15 +22,11 @@ package eionet.cr.util;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import eionet.cr.web.util.ApplicationCache;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

@@ -1,13 +1,8 @@
 package eionet.cr.dao.virtuoso;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-
 import java.util.ArrayList;
-
 import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.virtuoso.helpers.VirtuosoUserFolderSearchHelper;
@@ -18,6 +13,9 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * user folder test.

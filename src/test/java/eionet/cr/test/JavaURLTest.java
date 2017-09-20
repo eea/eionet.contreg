@@ -23,7 +23,6 @@ package eionet.cr.test;
 import java.net.URL;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

@@ -23,7 +23,6 @@ package eionet.cr.util.xml;
 import java.io.File;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

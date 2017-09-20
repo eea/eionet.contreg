@@ -100,18 +100,19 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         }
     }
 
-//    @After
-//    public void tearDown() {
-//        Connection conn = null;
-//        try {
-//            conn = SesameUtil.getSQLConnection();
-//            SQLUtil.execute("DELETE from  EXTERNAL_SERVICE  where SERVICE_URL = '" + externalServiceURL + "'", conn);
-//        } catch (Exception e) {
-//
-//        } finally {
-//            SQLUtil.close(conn);
-//        }
-//    }
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            SQLUtil.execute("DELETE from  EXTERNAL_SERVICE  where SERVICE_URL = '" + externalServiceURL + "'", conn);
+        } catch (Exception e) {
+
+        } finally {
+            SQLUtil.close(conn);
+        }
+    }
 
     /**
      *

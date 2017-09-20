@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import eionet.cr.ApplicationTestContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import eionet.cr.dto.HarvestDTO;
@@ -29,6 +30,11 @@ public class HarvestDAOIT extends CRDatabaseTestCase {
     @Before
     public void setup() throws Exception {
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /*

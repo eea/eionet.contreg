@@ -36,9 +36,7 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
 
     @Before
     public void setUp() throws Exception {
-
         super.setUp();
-
         // First clean up the on-demand harvests.
         Map<String, String> onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
         if (onDemandHarvests != null && !onDemandHarvests.isEmpty()) {
@@ -51,15 +49,9 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
         CurrentHarvests.setQueuedHarvest(null);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
-//    @After
-    protected void tearDown() throws Exception {
-        // No tear-down logic yet.
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /**

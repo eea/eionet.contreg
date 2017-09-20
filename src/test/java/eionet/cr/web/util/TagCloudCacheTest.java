@@ -21,16 +21,13 @@
 package eionet.cr.web.util;
 
 import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import eionet.cr.dto.TagDTO;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,18 +40,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
-@Ignore
 public class TagCloudCacheTest {
 
     @Before
     public void initializeContext() throws Exception {
+        new ApplicationCache().contextDestroyed(null);
         new ApplicationCache().contextInitialized(null);
     }
 
-//    @After
-//    public void destroyContext() throws Exception {
-//        new ApplicationCache().contextDestroyed(null);
-//    }
+    @After
+    public void destroyContext() throws Exception {
+        new ApplicationCache().contextDestroyed(null);
+    }
 
     @Test
     public void testTagCacheLimit() {

@@ -34,7 +34,8 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     private MockServletContext ctx;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         ActionBeanUtils.addFilter(ctx);
     }
 

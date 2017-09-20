@@ -1,7 +1,6 @@
 package eionet.cr.web.action;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;

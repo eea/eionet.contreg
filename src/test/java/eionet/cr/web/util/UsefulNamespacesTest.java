@@ -3,8 +3,6 @@ package eionet.cr.web.util;
 import java.util.Map.Entry;
 
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

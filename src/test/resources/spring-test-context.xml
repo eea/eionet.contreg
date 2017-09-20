@@ -67,7 +67,7 @@
         <property name="logAbandoned" value="false" />
     </bean>
 
-<!--    <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+    <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="${virtuoso.db.drv}" />
         <property name="url" value="${virtuoso.db.url}" />
         <property name="username" value="${virtuoso.db.rousr}" />
@@ -79,7 +79,7 @@
         <property name="removeAbandonedTimeout" value="300" />
         <property name="timeBetweenEvictionRunsMillis" value="300000" />
         <property name="logAbandoned" value="false" />
-    </bean>-->
+    </bean>
 
     <!-- Runs on Tomcat startup. -->
     <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">

@@ -25,12 +25,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 import eionet.cr.ApplicationTestContext;
-import junit.framework.TestCase;
-
 import org.junit.Test;
-
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import org.junit.After;
@@ -48,11 +44,7 @@ import static org.junit.Assert.fail;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoConnectionIT {
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#tearDown()
-     */
+
     @After
     public void tearDown() throws Exception {
         Connection conn = null;

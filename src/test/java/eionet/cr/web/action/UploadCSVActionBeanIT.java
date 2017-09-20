@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import eionet.cr.ApplicationTestContext;
+import eionet.cr.util.TestUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.Message;
-import net.sourceforge.stripes.controller.DispatcherServlet;
-import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -68,57 +65,36 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     public static final String TEST_USER_NAME = "somebody";
 
     /** The name of seeded CSV file we're testing. */
-    public static final String TEST_FILE_NAME = "Presidents_of_USA.csv";
+    public static final String TEST_FILE_NAME = "download.csv";
 
     /** The name of seeded CSV file we're testing, spaces escaped */
     public static final String TEST_FILE_NAME_ESCAPED = StringUtils.replace(TEST_FILE_NAME, " ", "%20");
 
     /** The URI of the virtual CR folder we're testing in. */
-    public static final String TEST_FOLDER_URI = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
+    public static String TEST_FOLDER_URI;
 
     /** The URI of the uploaded file we're testing. */
-    public static final String TEST_FILE_URI = TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED;
+    public static String TEST_FILE_URI;
 
     /** Abstract reference to the file under test. */
-    public static final File TEST_FILE = getTestFile(TEST_FILE_NAME_ESCAPED);
+    public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
-            + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED + "> WHERE {"
-            + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-            + "    OPTIONAL { _:rec tableFile:President ?President } ."
-            + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-            + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-            + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
-            + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
-            + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+    public static String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS;
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts NOT used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
-            + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED + "> WHERE {"
-            + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-            + "    OPTIONAL { _:rec tableFile:President ?President } ."
-            + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-            + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-            + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
-            + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ." + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
-            + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+    public static String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS;
 
     //
     // Online static properties
     //
-    public static final String TEST_ONLINE_URL = "https://www.eea.europa.eu/data-and-maps/daviz/sds/tourism-overnights-per-season/download.csv";
+    public static String TEST_ONLINE_URL;
     public static final String TEST_ONLINE_FILE_NAME = "download.csv";
     public static final String TEST_ONLINE_FILE_NAME_ESCAPED = StringUtils.replace(TEST_ONLINE_FILE_NAME, " ", "%20");
-    public static final String TEST_ONLINE_FILE_URI = TEST_FOLDER_URI + "/download.csv";
+    public static String TEST_ONLINE_FILE_URI;
 
     /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
-    public static final String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS_ONLINE = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
-            + TEST_ONLINE_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_ONLINE_FILE_NAME_ESCAPED + "> WHERE {"
-            + "    OPTIONAL { _:rec tableFile:ugeo ?ugeo } ."
-            + "    OPTIONAL { _:rec tableFile:obsValue ?obsValue } ."
-            + "    OPTIONAL { _:rec tableFile:date ?date } ."
-            + "    OPTIONAL { _:rec tableFile:quarter ?quarter } . }";
+    public static String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS_ONLINE;
 
     /** Size of the file under test before test. */
     private long testFileSize;
@@ -127,6 +103,35 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     public void setUp() throws Exception {
         super.setUp();
         testFileSize = TEST_FILE.length();
+        TEST_ONLINE_FILE_URI = TestUtils.getFileUrl(TEST_ONLINE_FILE_NAME_ESCAPED);
+        TEST_FOLDER_URI = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
+        TEST_FILE_URI =  TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED;
+        TEST_ONLINE_FILE_URI = TEST_FOLDER_URI + "/download.csv";
+        EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
+                + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME + "> WHERE {"
+                + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+                + "    OPTIONAL { _:rec tableFile:President ?President } ."
+                + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+                + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+                + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
+                + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
+                + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+        EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
+                + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME + "> WHERE {"
+                + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
+                + "    OPTIONAL { _:rec tableFile:President ?President } ."
+                + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
+                + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
+                + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
+                + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ." + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
+                + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+        EXPECTED_SPARQL_WITH_LINKING_SCRIPTS_ONLINE  = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
+                + TEST_ONLINE_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME + "> WHERE {"
+                + "    OPTIONAL { _:rec tableFile:ugeo ?ugeo } ."
+                + "    OPTIONAL { _:rec tableFile:obsValue ?obsValue } ."
+                + "    OPTIONAL { _:rec tableFile:date ?date } ."
+                + "    OPTIONAL { _:rec tableFile:quarter ?quarter } . }";
+
     }
 
     @After
@@ -151,7 +156,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception Any sort of error that happens.
      */
     @Test
-    @Ignore
     public void testTwoUploadsInARow() throws Exception {
 
         // First, make a backup of the file under test, because we shall create a Stripes FileBean from it and the latter will
@@ -193,7 +197,6 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     @Test
-    @Ignore
     public void testBrandNewUpload() throws Exception {
 
         deleteUploadedFile();
