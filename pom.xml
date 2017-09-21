@@ -286,8 +286,8 @@
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>/tmp/contreg/tmp:/tmp/contreg/tmp</volume>
-                                        <volume>/tmp/contreg/filestore:/tmp/contreg/filestore</volume>
+                                        <volume>/opt/contreg/tmp:/opt/contreg/tmp</volume>
+                                        <volume>/opt/contreg/filestore:/opt/contreg/filestore</volume>
                                     </bind>
                                 </volumes>
                             </run>

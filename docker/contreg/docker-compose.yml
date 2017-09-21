@@ -1,5 +1,5 @@
 ##
-# @author Thanos Tourikas
+# @author George Sofianos
 ##
 
 version: '2'
@@ -7,25 +7,16 @@ services:
 
   ## VIRTUOSO SERVICE
   virtuoso:
-    image: tourikas/virtuoso:2017-07-17T1338
+    image: sofiageo/virtuoso:2017-09-21T1334
     volumes:
-#      - /home/ato/Devel/deploy/app/contreg/virtuoso:/data
-#      - /home/ato/Devel/deploy/app/contreg:/contreg
       - virtuoso:/data
-      - contreg:/contreg
-    ports:
-      - "1111:1111"
+      - contreg:/opt/contreg
 
   ## CONTREG SERVICE
   contreg:
-    image: tourikas/contreg:2017-07-24T1705
+    image: sofiageo/contreg:2017-09-21T1252
     env_file: docker.env
-#    ports:
-#      - "8080:8080"
     links:
       - virtuoso
-#    volumes_from:
-#      - virtuoso
     volumes:
-#      - /home/ato/Devel/deploy/app/contreg:/contreg
-      - contreg:/contreg
+      - contreg:/opt/contreg
