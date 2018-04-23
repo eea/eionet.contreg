@@ -35,14 +35,6 @@ public interface CompiledDatasetDAO extends DAO {
 
     /**
      *
-     * @param deliveryUris
-     * @return List<DeliveryFilesDTO>
-     * @throws DAOException
-     */
-    List<DeliveryFilesDTO> getDeliveryFiles(List<String> deliveryUris) throws DAOException;
-
-    /**
-     *
      * @param homeFolder
      * @param excludeFileUri - if provided, then compiled datasets that include this file, are not returned
      * @return List<DatasetDTO>

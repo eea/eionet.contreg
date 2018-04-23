@@ -225,7 +225,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/unittest.properties"
+                                <copy file="${basedir}/jenkins.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">
                                     <fileset dir="sql" />
@@ -242,7 +242,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>2.7</version>
                 <configuration>
                     <formats>
                         <format>xml</format>
@@ -253,7 +253,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.21.0</version>
+                <version>0.24.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
@@ -263,7 +263,7 @@
                     <images>
                         <image>
                             <alias>virtuoso</alias>
-                            <name>sofiageo/virtuoso:latest</name>
+                            <name>sofiageo/virtuoso-test:latest</name>
                             <run>
                                 <ports>
                                     <port>58890:8890</port>
@@ -282,8 +282,8 @@
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>/opt/contreg/tmp:/opt/contreg/tmp</volume>
-                                        <volume>/opt/contreg/filestore:/opt/contreg/filestore</volume>
+                                        <volume>/tmp/contreg/tmp:/tmp/contreg/tmp</volume>
+                                        <volume>/tmp/contreg/filestore:/tmp/contreg/filestore</volume>
                                     </bind>
                                 </volumes>
                             </run>

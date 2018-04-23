@@ -887,6 +887,7 @@ public class PullHarvest extends BaseHarvest {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File file = TempFilePathGenerator.generate();
+        file.getParentFile().mkdirs();
         try {
             outputStream = new FileOutputStream(file);
             inputStream = urlConn.getInputStream();
