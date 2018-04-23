@@ -28,8 +28,8 @@ import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
 import eionet.propertyplaceholderresolver.UnresolvedPropertyException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
@@ -39,6 +39,8 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
  *
  */
 public final class GeneralConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralConfig.class);
 
     /** */
     public static final String BUNDLE_NAME = "cr";
@@ -163,9 +165,6 @@ public final class GeneralConfig {
 
     /** Servlet response buffer size to be used for requests that go via Stripes. The unit is number of bytes. */
     public static final int SERVLET_RESPONSE_BUFFER_SIZE = NumberUtils.toInt(getProperty("servletResponseBufferSize"), 32768);
-
-    /** */
-    private static Log logger = LogFactory.getLog(GeneralConfig.class);
 
     /** */
     private static Properties properties;

@@ -43,6 +43,8 @@ import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.action.factsheet.ObjectsInSourceActionBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action bean meant for operations with a particular RDF export run.
@@ -51,6 +53,9 @@ import eionet.cr.web.action.factsheet.ObjectsInSourceActionBean;
  */
 @UrlBinding("/admin/rdfExport.action")
 public class RDFExportActionBean extends AbstractActionBean {
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RDFExportActionBean.class);
 
     /** */
     private static final String VIEW_JSP = "/pages/admin/staging/rdfExport.jsp";
@@ -116,7 +121,7 @@ public class RDFExportActionBean extends AbstractActionBean {
      */
     public Resolution openLog() throws DAOException {
 
-        logger.trace("Retrieving export log for this export id: " + exportId);
+        LOGGER.trace("Retrieving export log for this export id: " + exportId);
         String log = DAOFactory.get().getDao(StagingDatabaseDAO.class).getExportLog(exportId);
         if (log == null) {
             log = "Found no RDF export for which the log is requested!";

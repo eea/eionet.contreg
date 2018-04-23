@@ -11,7 +11,6 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
-import org.apache.tools.ant.listener.Log4jListener;
 
 import eionet.cr.common.CRRuntimeException;
 import org.slf4j.Logger;
@@ -58,7 +57,6 @@ public class StartupAntRunner implements ServletContextListener {
 
         Project project = new Project();
         project.setBaseDir(buildFile.getParentFile());
-        project.addBuildListener(new Log4jListener());
         project.setUserProperty("ant.file", buildFileAbsolutePath);
         project.init();
         ProjectHelper helper = ProjectHelper.getProjectHelper();

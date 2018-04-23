@@ -49,6 +49,8 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.CustomPaginatedList;
 import eionet.cr.web.util.WebConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,6 +59,8 @@ import eionet.cr.web.util.WebConstants;
  */
 @UrlBinding("/deliverySearch.action")
 public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeliverySearchActionBean.class);
 
     /** */
     private List<String> years;
@@ -231,7 +235,7 @@ public class DeliverySearchActionBean extends DisplaytagSearchActionBean {
                         .getDao(SearchDAO.class)
                         .searchDeliveries(obligation, locality, year, sort, PagingRequest.create(page),
                                 new SortingRequest(COLUMNS.get(sort), SortOrder.parse(dir)));
-        logger.debug("found deliveries: " + deliveries.getFullListSize() + "; " + datasetFilter);
+        LOGGER.debug("found deliveries: " + deliveries.getFullListSize() + "; " + datasetFilter);
         return init();
     }
 

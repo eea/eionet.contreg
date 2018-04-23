@@ -5,10 +5,6 @@
     <groupId>eionet.cr</groupId>
     <artifactId>cr3</artifactId>
     <packaging>war</packaging>
-    <prerequisites>
-        <maven>3.3.9</maven>
-    </prerequisites>
-
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -701,6 +697,13 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>1.7.25</version>
         </dependency>
+        <!--GELF-->
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>1.11.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>

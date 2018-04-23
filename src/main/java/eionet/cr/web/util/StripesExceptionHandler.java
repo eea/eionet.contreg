@@ -30,8 +30,8 @@ import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.exception.ExceptionHandler;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author altnyris
@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
 public class StripesExceptionHandler implements ExceptionHandler {
 
     /** Static logger for this class. */
-    private static final Log LOGGER = LogFactory.getLog(StripesExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StripesExceptionHandler.class);
 
     /** */
     public static final String ERROR_PAGE = "/pages/common/error.jsp";

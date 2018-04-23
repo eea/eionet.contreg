@@ -6,8 +6,8 @@ package eionet.cr.dataset;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -31,7 +31,7 @@ import eionet.cr.util.URLUtil;
 public class LoadTriplesJob implements Job {
 
     /** */
-    private static Log logger = LogFactory.getLog(LoadTriplesJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadTriplesJob.class);
 
     public LoadTriplesJob() {
     }
@@ -55,7 +55,7 @@ public class LoadTriplesJob implements Job {
                 DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(datasetUri);
             }
         } catch (Exception e) {
-            logger.info("Error occured while loading triples: " + datasetUri);
+            LOGGER.info("Error occured while loading triples: " + datasetUri);
             e.printStackTrace();
             // Remove the flag that triples are being loaded
             CurrentLoadedDatasets.removeLoadedDataset(datasetUri);
@@ -91,7 +91,7 @@ public class LoadTriplesJob implements Job {
                     HarvestSourceDTO harvestSourceDTO = null;
                     HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
                     try {
-                        logger.debug("Creating and storing harvest source");
+                        LOGGER.debug("Creating and storing harvest source");
 
                         source = new HarvestSourceDTO();
                         source.setUrl(uri);
@@ -100,7 +100,7 @@ public class LoadTriplesJob implements Job {
                         dao.addSourceIgnoreDuplicate(source);
                         harvestSourceDTO = dao.getHarvestSourceByUrl(uri);
                     } catch (DAOException e) {
-                        logger.info("Exception when trying to create harvest source for the uploaded file content", e);
+                        LOGGER.info("Exception when trying to create harvest source for the uploaded file content", e);
                     }
 
                     // perform harvest
@@ -114,10 +114,10 @@ public class LoadTriplesJob implements Job {
                                 CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
                             }
                         } else {
-                            logger.debug("Harvest source was not created, so skipping harvest");
+                            LOGGER.debug("Harvest source was not created, so skipping harvest");
                         }
                     } catch (HarvestException e) {
-                        logger.info("Exception when trying to harvest file content", e);
+                        LOGGER.info("Exception when trying to harvest file content", e);
                     }
                 }
             }

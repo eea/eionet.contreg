@@ -75,6 +75,8 @@ import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factsheet.
@@ -84,6 +86,8 @@ import eionet.cr.web.util.tabs.TabElement;
  */
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactsheetActionBean.class);
 
     /** Prefix for the name of the "which page of predicate values to display" request parameter. */
     public static final String PAGE_PARAM_PREFIX = "page";
@@ -203,7 +207,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 }
                 addSystemMessage("Source successfully harvested!");
             } catch (Exception e) {
-                logger.error("Failed to harvest table file", e);
+                LOGGER.error("Failed to harvest table file", e);
                 addWarningMessage("Failed to harvest table file: " + e.getMessage());
             }
         } else {
@@ -730,7 +734,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     @HandlesEvent("openPredObjValue")
     public Resolution openPredObjValue() {
 
-        logger.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
+        LOGGER.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
         String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
         if (StringUtils.isBlank(value)) {
             value = "Found no value!";

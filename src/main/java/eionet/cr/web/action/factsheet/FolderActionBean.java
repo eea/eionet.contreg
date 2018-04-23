@@ -76,6 +76,8 @@ import eionet.cr.web.action.home.HomesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Folder tab on factsheet page.
@@ -84,6 +86,8 @@ import eionet.cr.web.util.tabs.TabElement;
  */
 @UrlBinding("/folder.action")
 public class FolderActionBean extends AbstractActionBean implements Runnable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FolderActionBean.class);
 
     /** Temporary space placeholder for some parsing below. */
     private static final String TEMP_SPACE_REPLACEMENT = "---TEMP_SPACE_REPLACEMENT---";
@@ -342,7 +346,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
                 boolean folderDeleted = fileStore.deleteFolder(FolderUtil.extractPathInFolder(item.getUri()));
                 if (!folderDeleted) {
-                    logger.warn("Failed to delete folder from filestore for uri: " + item.getUri());
+                    LOGGER.warn("Failed to delete folder from filestore for uri: " + item.getUri());
                 }
             }
             if (item.isSelected()
@@ -599,7 +603,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
 
             // persist the prepared "userHome cr:hasFile fileSubject" triple
-            logger.debug("Creating the cr:hasFile predicate");
+            LOGGER.debug("Creating the cr:hasFile predicate");
             helperDao.addTriples(homeSubjectDTO);
 
             // store file subject DTO if it has been initialized
@@ -655,7 +659,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     private File saveContent() throws DAOException, IOException {
 
-        logger.debug("Going to save the uploaded file's content into database");
+        LOGGER.debug("Going to save the uploaded file's content into database");
 
         File file = null;
 
@@ -697,7 +701,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // harvestable
         HarvestSourceDTO harvestSourceDTO = null;
         try {
-            logger.debug("Creating and storing harvest source");
+            LOGGER.debug("Creating and storing harvest source");
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
             HarvestSourceDTO source = new HarvestSourceDTO();
@@ -707,7 +711,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             dao.addSourceIgnoreDuplicate(source);
             harvestSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
         } catch (DAOException e) {
-            logger.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
+            LOGGER.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
         }
 
         // perform harvest,
@@ -723,10 +727,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                     CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
                 }
             } else {
-                logger.debug("Harvest source was not created, so skipping harvest");
+                LOGGER.debug("Harvest source was not created, so skipping harvest");
             }
         } catch (HarvestException e) {
-            logger.info("Exception when trying to harvest uploaded file content", e);
+            LOGGER.info("Exception when trying to harvest uploaded file content", e);
         }
     }
 
