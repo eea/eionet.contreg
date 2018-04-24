@@ -266,8 +266,8 @@
                             <name>sofiageo/virtuoso-test:latest</name>
                             <run>
                                 <ports>
-                                    <port>58890:8890</port>
-                                    <port>51111:1111</port>
+                                    <port>58891:8891</port>
+                                    <port>51112:1112</port>
                                 </ports>
                                 <wait>
                                     <log>Server online at </log>
