@@ -28,7 +28,7 @@ public class SpringLiquibaseVirtuoso extends SpringLiquibase {
 //    protected Database createDatabase(Connection c, ResourceAccessor resourceAccessor) throws DatabaseException {
     protected Database createDatabase(Connection c) throws DatabaseException {
 
-        DatabaseFactory.getInstance().register(new eionet.liquibase.VirtuosoDatabase());
+        DatabaseFactory.getInstance().register(new eionet.cr.liquibase.VirtuosoDatabase());
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
         if (getDefaultSchema() != null) {
             database.setDefaultSchemaName(getDefaultSchema());

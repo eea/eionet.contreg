@@ -317,7 +317,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
 
     <changeSet author="lainekai" id="rev-19">
         <preConditions onFail="MARK_RAN">
-            <customPrecondition className="eionet.liquibase.VirtuosoIndexNotExists">
+            <customPrecondition className="eionet.cr.liquibase.VirtuosoIndexNotExists">
                 <param name="tableName" value="post_harvest_script" />
                 <param name="indexName" value="post_harvest_script_source_url"  />
             </customPrecondition>
@@ -330,7 +330,7 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
     </changeSet>
     <changeSet author="lainekai" id="rev-20">
         <preConditions onFail="MARK_RAN">
-            <customPrecondition className="eionet.liquibase.VirtuosoIndexNotExists">
+            <customPrecondition className="eionet.cr.liquibase.VirtuosoIndexNotExists">
                 <param name="tableName" value="post_harvest_script" />
                 <param name="indexName" value="post_harvest_script_type_uri"  />
             </customPrecondition>
