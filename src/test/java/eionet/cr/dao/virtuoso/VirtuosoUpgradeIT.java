@@ -215,7 +215,6 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         List<String> tags = Arrays.asList("tag3", "tag4");
 
         SearchResultDTO<SubjectDTO> result = searchDAO.searchByTags(tags, pagingRequest, sortRequest);
-
         assertNotNull("Expected search result not to be null", result);
 
         List<SubjectDTO> items = result.getItems();

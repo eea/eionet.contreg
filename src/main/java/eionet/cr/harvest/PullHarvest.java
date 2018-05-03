@@ -499,7 +499,7 @@ public class PullHarvest extends BaseHarvest {
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
         getContextSourceDTO().setLastHarvest(new Date());
-        if (urlConn.getLastModified() > 0) {
+        if (urlConn != null && urlConn.getLastModified() > 0) {
             getContextSourceDTO().setLastModified(new Date(urlConn.getLastModified()));
         }
         getContextSourceDTO().setLastHarvestFailed(false);

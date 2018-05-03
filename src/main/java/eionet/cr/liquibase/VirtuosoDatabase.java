@@ -51,8 +51,8 @@ public class VirtuosoDatabase extends AbstractJdbcDatabase {
     public VirtuosoDatabase() {
 
         super.setCurrentDateTimeFunction("NOW()");
-//        super.quotingStartCharacter = "\"";
-//        super.quotingEndCharacter = "\"";
+        super.quotingStartCharacter = "\"";
+        super.quotingEndCharacter = "\"";
 
         // Register Virtuoso-specific implementations of various SQL generators and Liquibase changes.
 

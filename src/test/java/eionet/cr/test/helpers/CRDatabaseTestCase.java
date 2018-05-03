@@ -34,6 +34,7 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
@@ -150,7 +151,6 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
-    @SuppressWarnings("deprecation")
     @Override
     protected IDataSet getDataSet() throws Exception {
 
@@ -162,7 +162,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         int i = 0;
         IDataSet[] dataSets = new IDataSet[xmlDataSetFiles.size()];
         for (String fileName : xmlDataSetFiles) {
-            dataSets[i++] = new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream(fileName));
+            dataSets[i++] = new FlatXmlDataSetBuilder()
+                .setColumnSensing(true).build(getClass().getClassLoader().getResourceAsStream(fileName));
         }
 
         CompositeDataSet compositeDataSet = new CompositeDataSet(dataSets);
