@@ -85,6 +85,7 @@
     <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
         <property name="dataSource" ref="dataSource" />
         <property name="changeLog" value="classpath:sql/db-struct.xml" />
+        <property name="ignoreClasspathPrefix" value="true" />
     </bean>
 
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
