@@ -4,14 +4,25 @@
 
 version: '2'
 
-volumes:
-  virtuoso:
-    driver: rancher-nfs
-    external: true
+#volumes:
+#  contregdev-virtuoso:
+#    driver: rancher-ebs
+#    external: true
+#  contregdev-cr:
+#    driver: rancher-nfs
+#    external: true
 
 services:
 
-  ## VIRTUOSO SERVICE
+  helper:
+    image: eeacms/centos7dev:2.2.3
+    tty: true
+    stdin_open: true
+    volumes:
+      - contreg:/opt/contreg
+      - virtuoso:/opt/virtuoso
+
+ ## VIRTUOSO SERVICE
   virtuoso:
     image: eeacms/virtuoso:6.1.8
     volumes:

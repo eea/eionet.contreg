@@ -14,10 +14,10 @@
     <bean id="appConfigDefinitionProvider" class="eionet.propertyplaceholderresolver.ConfigurationDefinitionProviderImpl">
         <constructor-arg index="0">
             <array>
+                <value>env.properties</value>
                 <value>eionetdir.properties</value>
                 <value>cr.properties</value>
                 <value>acl.properties</value>
-                <value>env.properties</value>
             </array>
         </constructor-arg>
     </bean>
