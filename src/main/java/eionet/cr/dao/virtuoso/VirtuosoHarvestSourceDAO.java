@@ -669,7 +669,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             resourceStmt = conn.createStatement();
 
             for (String sourceUrl : sourceUrls) {
-
+                sourceUrl = sourceUrl.replace(" ","%20");
                 String graphSparql = sparqlClearGraph.replace("GRAPH_URI", sourceUrl);
                 String resourceSparql =
                         harvesterContextOnly ? sparqlDeleteResourceFromSpecificGraph.replace("GRAPH_URI",
