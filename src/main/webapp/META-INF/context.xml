@@ -22,6 +22,7 @@
                 removeAbandonedTimeout="300"
                 timeBetweenEvictionRunsMillis="300000"
                 logAbandoned="false"
+                validationQuery="SELECT 1" testOnBorrow="true"
                 >
     </Resource>
 
@@ -36,6 +37,7 @@
                 password="${virtuoso.db.ropwd}"
                 driverClassName="virtuoso.jdbc4.Driver"
                 url="${virtuoso.db.url}"
+                validationQuery="SELECT 1" testOnBorrow="true"
                 >
     </Resource>
 
