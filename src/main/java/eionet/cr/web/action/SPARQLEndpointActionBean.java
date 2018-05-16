@@ -37,6 +37,7 @@ import org.openrdf.rio.ntriples.NTriplesWriterFactory;
 import org.openrdf.rio.rdfxml.RDFXMLWriter;
 import org.openrdf.rio.turtle.TurtleWriterFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -120,6 +121,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String format;
     private int nrOfHits;
     private long executionTime;
+    private long fetchTime;
     private String[] defaultGraphUris;
     private String[] namedGraphUris;
 
@@ -597,12 +599,26 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     limitResultCount);
         }
 
+        logQuery(mimeType);
+
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
         if (errorCode != 0 && !isWebBrowser()) {
             resolution = new ErrorStreamingResolution(errorCode, errorMessage);
         }
 
         return resolution;
+    }
+
+    private void logQuery(String mimeType) {
+        String ip = null;
+        try {
+            HttpServletRequest request = getContext().getRequest();
+            ip = request.getRemoteAddr();
+        } catch (Exception e) {
+            LOGGER.debug(e, e);
+        }
+
+        LOGGER.info("SPARQL endpoint query='" + query + "', mime type=" + mimeType + ", query time: " + executionTime + "ms, including result fetch: " + fetchTime + "ms, IP = " + ip);
     }
 
     /**
@@ -795,6 +811,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         if (bindings != null) {
                             result = new QueryResult(bindings, false, limitResultCount);
                         }
+                        fetchTime = System.currentTimeMillis() - startTime;
 
                     } else if (outputFormat.equals(FORMAT_XML)) {
                         RDFXMLWriter writer = new RDFXMLWriter(outputStream);
@@ -854,6 +871,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         if (queryResult != null) {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
+                        fetchTime = System.currentTimeMillis() - startTime;
                     }
 
                 }
