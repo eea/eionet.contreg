@@ -121,7 +121,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     private String format;
     private int nrOfHits;
     private long executionTime;
-    private long fetchTime;
     private String[] defaultGraphUris;
     private String[] namedGraphUris;
 
@@ -619,7 +618,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             LOGGER.debug(e, e);
         }
 
-        LOGGER.info("SPARQL endpoint query='" + query + "', query time=" + executionTime + "ms, including result fetch=" + fetchTime + "ms, IP=" + ip);
+        LOGGER.info("SPARQL endpoint query='" + query + "', query time=" + executionTime + "ms, IP=" + ip);
     }
 
     /**
@@ -759,6 +758,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             TupleQueryResult queryResult = null;
 
+            long startTime = System.currentTimeMillis();
+
             try {
                 if (queryObject instanceof BooleanQuery) {
 
@@ -805,14 +806,12 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     // Evaluate CONSTRUCT query.
                     if (outputFormat.equals(FORMAT_HTML)) {
-                        long startTime = System.currentTimeMillis();
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
                         TupleQueryResult bindings = resultsTable.evaluate();
                         executionTime = System.currentTimeMillis() - startTime;
                         if (bindings != null) {
                             result = new QueryResult(bindings, false, limitResultCount);
                         }
-                        fetchTime = System.currentTimeMillis() - startTime;
 
                         logQuery();
 
@@ -868,19 +867,19 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     } else if (outputFormat != null && (outputFormat.equals(FORMAT_HTML)
                             || outputFormat.equals(FORMAT_HTML_PLUS))) {
                         response.setContentType("text/html");
-                        long startTime = System.currentTimeMillis();
                         queryResult = ((TupleQuery) queryObject).evaluate();
-                        executionTime = System.currentTimeMillis() - startTime;
                         if (queryResult != null) {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
-                        fetchTime = System.currentTimeMillis() - startTime;
-
-                        logQuery();
                     }
+
+                    logQuery();
 
                 }
             } finally {
+                executionTime = System.currentTimeMillis() - startTime;
+                logQuery();
+
                 SesameUtil.close(queryResult);
             }
         } catch (Exception e) {
