@@ -597,7 +597,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else {
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
-            logQuery(mimeType, false);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -608,7 +607,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return resolution;
     }
 
-    private void logQuery(String mimeType, boolean streaming) {
+    /**
+     * Logs the query
+     */
+    private void logQuery() {
         String ip = null;
         try {
             HttpServletRequest request = getContext().getRequest();
@@ -617,7 +619,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             LOGGER.debug(e, e);
         }
 
-        LOGGER.info("SPARQL endpoint query='" + query + "', mime type=" + mimeType + ", query time=" + executionTime + "ms, including result fetch=" + fetchTime + "ms, IP =" + ip + " streaming=" + streaming);
+        LOGGER.info("SPARQL endpoint query='" + query + "', query time=" + executionTime + "ms, including result fetch=" + fetchTime + "ms, IP=" + ip);
     }
 
     /**
@@ -710,7 +712,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         this.setFilename(fileName);
                     }
                 } finally {
-                    logQuery(internalFormat, true);
                     if (outputStream != null) {
                         try {
                             outputStream.close();
@@ -813,6 +814,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         }
                         fetchTime = System.currentTimeMillis() - startTime;
 
+                        logQuery();
+
                     } else if (outputFormat.equals(FORMAT_XML)) {
                         RDFXMLWriter writer = new RDFXMLWriter(outputStream);
                         ((GraphQuery) queryObject).evaluate(writer);
@@ -872,6 +875,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
                         fetchTime = System.currentTimeMillis() - startTime;
+
+                        logQuery();
                     }
 
                 }
