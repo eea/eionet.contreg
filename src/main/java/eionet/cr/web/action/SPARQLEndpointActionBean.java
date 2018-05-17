@@ -597,9 +597,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         } else {
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
+            logQuery(mimeType, false);
         }
-
-        logQuery(mimeType);
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
         if (errorCode != 0 && !isWebBrowser()) {
@@ -609,7 +608,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         return resolution;
     }
 
-    private void logQuery(String mimeType) {
+    private void logQuery(String mimeType, boolean streaming) {
         String ip = null;
         try {
             HttpServletRequest request = getContext().getRequest();
@@ -618,7 +617,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             LOGGER.debug(e, e);
         }
 
-        LOGGER.info("SPARQL endpoint query='" + query + "', mime type=" + mimeType + ", query time: " + executionTime + "ms, including result fetch: " + fetchTime + "ms, IP = " + ip);
+        LOGGER.info("SPARQL endpoint query='" + query + "', mime type=" + mimeType + ", query time=" + executionTime + "ms, including result fetch=" + fetchTime + "ms, IP =" + ip + " streaming=" + streaming);
     }
 
     /**
@@ -711,6 +710,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                         this.setFilename(fileName);
                     }
                 } finally {
+                    logQuery(internalFormat, true);
                     if (outputStream != null) {
                         try {
                             outputStream.close();
