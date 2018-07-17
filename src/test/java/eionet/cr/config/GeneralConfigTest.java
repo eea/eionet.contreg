@@ -21,30 +21,42 @@
 
 package eionet.cr.config;
 
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for GeneralConfig methods.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class GeneralConfigTest {
 
-public class GeneralConfigTest extends TestCase {
-
-    public static void testGetIntPropertyCorrect() {
+    @Test
+    public void testGetIntPropertyCorrect() {
         int propValue = GeneralConfig.getIntProperty("existing.intproperty", 2000);
         assertTrue(propValue == 1000);
     }
 
-    public static void testGetIntPropertyNotExisting() {
+    @Test
+    public void testGetIntPropertyNotExisting() {
         int propValue = GeneralConfig.getIntProperty("not.existing.intproperty", 2000);
         assertTrue(propValue == 2000);
     }
 
-    public static void testGetIntPropertyWrong() {
+    @Test
+    public void testGetIntPropertyWrong() {
         int propValue = GeneralConfig.getIntProperty("wrong.intproperty", 55);
         assertTrue(propValue == 55);
     }
 
-    public static void testTimePropertiesMilliseconds(){
+    @Test
+    public void testTimePropertiesMilliseconds(){
 
         int ms = 0;
 
@@ -90,7 +102,8 @@ public class GeneralConfigTest extends TestCase {
 
     }
 
-    public static void testTimePropertiesMinutes(){
+    @Test
+    public void testTimePropertiesMinutes(){
 
         int minutes = 0;
 

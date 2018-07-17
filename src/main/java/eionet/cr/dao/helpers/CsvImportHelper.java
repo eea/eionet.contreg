@@ -38,6 +38,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
+
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -207,6 +208,34 @@ public class CsvImportHelper {
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, userName));
 
+        insertFileMetadataAndSourceHelper(dao, size);
+    }
+
+    /**
+     * Iserts file metadata.
+     *
+     * @param size
+     * @param userName
+     * @param isOnlineCsvTsv
+     * @param interval
+     * @param csvUrl
+     * @throws Exception
+     */
+    public void insertFileMetadataAndSource(long size, String userName, boolean isOnlineCsvTsv, int interval, String csvUrl) throws Exception {
+
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, interval, userName, isOnlineCsvTsv, csvUrl));
+
+        insertFileMetadataAndSourceHelper(dao, size);
+    }
+
+    /**
+     *
+     * @param dao
+     * @param size
+     * @throws Exception
+     */
+    public void insertFileMetadataAndSourceHelper(HarvestSourceDAO dao, long size) throws Exception {
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
@@ -218,6 +247,7 @@ public class CsvImportHelper {
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
     }
+
 
     /**
      * Adds reference of the file to the given parent folder.

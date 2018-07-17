@@ -45,6 +45,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     /** */
     private Integer sourceId;
     private String url;
+    private String csvTsvUrl;
     private String emails;
     private Date timeCreated;
     private Integer statements;
@@ -60,6 +61,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
     private String mediaType;
     private Integer lastHarvestId;
     private boolean isSparqlEndpoint;
+    private boolean isOnlineCsvTsv;
 
     /**
      * Fields are used when adding new source.
@@ -102,6 +104,22 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      */
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String getCsvTsvUrl() {
+        return csvTsvUrl;
+    }
+
+    /**
+     *
+     * @param csvTsvUrl
+     */
+    public void setCsvTsvUrl(String csvTsvUrl) {
+        this.csvTsvUrl = csvTsvUrl;
     }
 
     /**
@@ -303,6 +321,7 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      * @param url
      * @param prioritySource
      * @param intervalMinutes
+     * @param owner
      * @return
      */
     public static HarvestSourceDTO create(String url, boolean prioritySource, int intervalMinutes, String owner) {
@@ -312,6 +331,24 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
         result.setPrioritySource(prioritySource);
         result.setIntervalMinutes(intervalMinutes);
         result.setOwner(owner);
+        return result;
+    }
+
+    /**
+     *
+     * @param url
+     * @param prioritySource
+     * @param intervalMinutes
+     * @param owner
+     * @param isOnlineCsvTsv
+     * @param csvTsvUrl
+     * @return
+     */
+    public static HarvestSourceDTO create(String url, boolean prioritySource, int intervalMinutes, String owner, boolean isOnlineCsvTsv, String csvTsvUrl) {
+
+        HarvestSourceDTO result = create(url, prioritySource, intervalMinutes, owner);
+        result.setOnlineCsvTsv(isOnlineCsvTsv);
+        result.setCsvTsvUrl(csvTsvUrl);
         return result;
     }
 
@@ -398,6 +435,14 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isOnlineCsvTsv() {
+        return isOnlineCsvTsv;
+    }
+
+    public void setOnlineCsvTsv(boolean onlineCsvTsv) {
+        isOnlineCsvTsv = onlineCsvTsv;
     }
 
     /**

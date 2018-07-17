@@ -30,8 +30,8 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.WebConstants;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -41,56 +41,41 @@ import java.util.List;
  * Class represents authenticated user.
  *
  * @author altnyris
+ *
  */
 public class CRUser {
 
     /** */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CRUser.class);
+    private static Log logger = LogFactory.getLog(CRUser.class);
 
     /** */
     public static final CRUser APPLICATION = new CRUser("application");
 
-    /**
-     * A constant user representing batch harvester.
-     */
+    /** A constant user representing batch harvester. */
     public static final CRUser BATCH_HARVEST = new CRUser("batch harvest");
 
-    /**
-     * A constant user representing ping harvest.
-     */
+    /** A constant user representing ping harvest. */
     public static final CRUser PING_HARVEST = new CRUser("ping harvest");
 
-    /**
-     * A constant user representing push harvest.
-     */
+    /** A constant user representing push harvest. */
     public static final CRUser PUSH_HARVEST = new CRUser("push harvest");
 
-    /**
-     * Permission to view files and folders.
-     */
+    /** Permission to view files and folders. */
     public static final String VIEW_PERMISSION = "v";
 
-    /**
-     * Permission to create files and folders.
-     */
+    /** Permission to create files and folders. */
     public static final String INSERT_PERMISSION = "i";
 
-    /**
-     * Permission to update (rename) files and folders.
-     */
+    /** Permission to update (rename) files and folders. */
     public static final String UPDATE_PERMISSION = "u";
 
-    /**
-     * Permission to delete files and folders.
-     */
+    /** Permission to delete files and folders. */
     public static final String DELETE_PERMISSION = "d";
 
     /** */
     private String userName;
 
-    /**
-     * List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself!
-     */
+    /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
     private List<String> reservedFolderAndFileUris;
 
     /**
@@ -133,7 +118,7 @@ public class CRUser {
      * Returns the value of {@link #hasPermission(String, String, String)}, using the given ACL path, the given permission, and the
      * name of this user.
      *
-     * @param aclPath    full ACL path
+     * @param aclPath full ACL path
      * @param permission permission to check
      * @return
      */
@@ -146,8 +131,8 @@ public class CRUser {
      * name of the user found in the given session. If no user found in session, the method will be called with user name set to
      * null.
      *
-     * @param session    current session
-     * @param aclPath    full acl path
+     * @param session current session
+     * @param aclPath full acl path
      * @param permission permission to be checked
      * @return true if user hsa the checked permission
      */
@@ -176,11 +161,11 @@ public class CRUser {
     /**
      * Checks is action is allowed. If ACL does not exist, checks if user is logged in or not
      *
-     * @param aclPath        ACL Path
-     * @param user           Current user (null if not logged in)
-     * @param permission     permission to be checked
+     * @param aclPath ACL Path
+     * @param user Current user (null if not logged in)
+     * @param permission permission to be checked
      * @param allowByDefault - indicates if to allow users to perform the action if ACL does not exist
-     *                       if the parameter is true only authenticated users are allowed otherwise all users are allowed
+     *  if the parameter is true only authenticated users are allowed otherwise all users are allowed
      * @return true if user can perform the action
      */
     public static boolean hasPermission(String aclPath, CRUser user, String permission, boolean allowByDefault) {
@@ -198,14 +183,14 @@ public class CRUser {
             if (acl != null) {
                 allowAction = acl.checkPermission(userName, permission);
             } else {
-                LOGGER.warn("ACL does not exist " + aclPath);
+                logger.warn("ACL does not exist " + aclPath);
                 // ACL does not exist - check the additional parameter
                 if (!allowByDefault) {
                     allowAction = (user != null);
                 }
             }
         } catch (SignOnException e) {
-            LOGGER.error("Error in ACL check " + e.toString());
+            logger.error("Error in ACL check " + e.toString());
         }
 
         return allowAction;
@@ -215,13 +200,13 @@ public class CRUser {
      * Looks up an ACL with the given path, and checks if the given user has the given permission in it. If no such ACL is found,
      * the method returns false. If the ACL is found, and it has the given permission for the given user, the method returns true,
      * otherwise false.
-     * <p>
+     *
      * Situation where user name is null, is handled by the ACL library (it is treated as anonymous user).
-     * <p>
+     *
      * If the ACL library throws an exception, it is not thrown onwards, but still logged at error level.
      *
-     * @param userName   username
-     * @param aclPath    ACL Path
+     * @param userName username
+     * @param aclPath ACL Path
      * @param permission Permission to be checked
      * @return true if user has permission. If no ACL found return false
      */
@@ -246,13 +231,13 @@ public class CRUser {
                 //    logger.debug("User " + userName + " does not have permission " + permission + " in ACL \"" + aclPath + "\"");
                 //}
             } else {
-                LOGGER.warn("ACL \"" + aclPath + "\" not found!");
+                logger.warn("ACL \"" + aclPath + "\" not found!");
             }
         } catch (SignOnException soe) {
             if (soe instanceof AclNotFoundException) {
-                LOGGER.warn("ACL \"" + aclPath + "\" not found!");
+                logger.warn("ACL \"" + aclPath + "\" not found!");
             } else {
-                LOGGER.error(soe.toString(), soe);
+                logger.error(soe.toString(), soe);
             }
         }
 
@@ -298,6 +283,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @return
      */
     public String getReviewAttachmentUri(int reviewId, String attachmentFileName) {
@@ -332,6 +318,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @return
      */
     public String getReviewsUri() {
@@ -384,6 +371,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @param uri
      * @return
@@ -398,6 +386,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @return
      */
@@ -407,6 +396,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @return
      */
@@ -416,6 +406,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @return
      */
@@ -425,6 +416,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @return
      */
@@ -434,6 +426,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param uriString
      * @return
      */
@@ -443,6 +436,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param uriString
      * @return
      */
@@ -485,6 +479,7 @@ public class CRUser {
     }
 
     /**
+     *
      * @param userName
      * @return
      */
@@ -500,6 +495,7 @@ public class CRUser {
 
     /**
      * Creates default ACL's when a new user is logging in.
+     *
      */
     public void createDefaultAcls() {
 
@@ -519,16 +515,15 @@ public class CRUser {
             }
 
         } catch (SignOnException e) {
-            LOGGER.error("Error creating ACL's ", e);
+            logger.error("Error creating ACL's " + e.toString());
         }
     }
 
     /**
      * Checks if user has the given privilege to the project.
-     *
-     * @param session     current HTTP session
+     * @param session current HTTP session
      * @param projectName project which ACL is checked
-     * @param privilege   privilege to check
+     * @param privilege privilege to check
      * @return true, if user can add/delete shared SPARQL bookmars.
      */
     public boolean hasProjectPrivilege(HttpSession session, String projectName, String privilege) {

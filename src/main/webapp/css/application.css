@@ -99,6 +99,9 @@ input.error[type="radio"], input.error[type="checkbox"], select.error {
     font-size: 80%;
     vertical-align:top;
 }
+input#fileURL {
+    width: 150%;
+}
 /* Tables for arranging formulars */
 
 table.formtable {

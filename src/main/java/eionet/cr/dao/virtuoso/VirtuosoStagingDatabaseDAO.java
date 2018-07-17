@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRException;
 import eionet.cr.dao.DAOException;
@@ -61,6 +61,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Virtuoso-specific implementation of {@link StagingDatabaseDAO}.
@@ -70,7 +72,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 public class VirtuosoStagingDatabaseDAO extends VirtuosoBaseDAO implements StagingDatabaseDAO {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(VirtuosoStagingDatabaseDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoStagingDatabaseDAO.class);
 
     /** */
     private static final String GET_INDICATORS_SPARQL = "select ?s as ?" + PairReader.LEFTCOL + " ?notation as ?"

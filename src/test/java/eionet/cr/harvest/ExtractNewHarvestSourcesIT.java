@@ -23,8 +23,11 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import eionet.cr.util.TestUtils;
+import org.eclipse.jetty.server.Server;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
+import org.junit.runner.RunWith;
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -33,12 +36,17 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
+import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
     /** Jetty mock server for serving test resources via HTTP. */
@@ -61,36 +69,30 @@ public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
     @Test
     public void test() throws Exception {
 
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "extract-new-sources.xml");
-            String url = "http://localhost:8999/testResources/extract-new-sources.xml";
+        String url = TestUtils.getFileUrl("extract-new-sources.xml");
 
-            HarvestSourceDTO source = new HarvestSourceDTO();
-            source.setUrl(url);
-            source.setIntervalMinutes(5);
-            source.setPrioritySource(true);
-            source.setEmails("bob@europe.eu");
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(url);
+        source.setIntervalMinutes(5);
+        source.setPrioritySource(true);
+        source.setEmails("bob@europe.eu");
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
 
-            Harvest harvest = new PullHarvest(url);
-            harvest.execute();
+        Harvest harvest = new PullHarvest(url);
+        harvest.execute();
 
-            Pair<Integer, List<HarvestSourceDTO>> resultPair =
-                    DAOFactory.get().getDao(HarvestSourceDAO.class)
-                            .getHarvestSources("http://test.com/datasets#dataset2", null, null);
-            assertNotNull(resultPair);
-            assertNotNull(resultPair.getLeft());
-            assertNotNull(resultPair.getRight());
-            assertEquals(1, resultPair.getLeft().intValue());
-            assertEquals(1, resultPair.getRight().size());
+        Pair<Integer, List<HarvestSourceDTO>> resultPair =
+                DAOFactory.get().getDao(HarvestSourceDAO.class)
+                        .getHarvestSources("http://test.com/datasets#dataset2", null, null);
+        assertNotNull(resultPair);
+        assertNotNull(resultPair.getLeft());
+        assertNotNull(resultPair.getRight());
+        assertEquals(1, resultPair.getLeft().intValue());
+        assertEquals(1, resultPair.getRight().size());
 
-            HarvestSourceDTO harvestSource = resultPair.getRight().get(0);
-            assertNotNull(harvestSource);
-            assertEquals("http://test.com/datasets#dataset2", harvestSource.getUrl());
-            assertEquals(Hashes.spoHash("http://test.com/datasets#dataset2"), harvestSource.getUrlHash().longValue());
-        } finally {
-            JettyUtil.close(server);
-        }
+        HarvestSourceDTO harvestSource = resultPair.getRight().get(0);
+        assertNotNull(harvestSource);
+        assertEquals("http://test.com/datasets#dataset2", harvestSource.getUrl());
+        assertEquals(Hashes.spoHash("http://test.com/datasets#dataset2"), harvestSource.getUrlHash().longValue());
     }
 }

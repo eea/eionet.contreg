@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--<context:annotation-config/>-->
+
+    <!-- Scans within the base package of the application for @Components to configure as beans -->
+    <context:component-scan base-package="eionet.cr, eionet.doc" />
+
+    <!--<bean id="springApplicationContext" class="eionet.cr.spring.SpringApplicationContext"/>-->
+
+    <bean id="appConfigDefinitionProvider" class="eionet.propertyplaceholderresolver.ConfigurationDefinitionProviderImpl">
+        <constructor-arg index="0">
+            <array>
+                <value>env.properties</value>
+                <value>eionetdir.properties</value>
+                <value>cr.properties</value>
+                <value>acl.properties</value>
+                <value>doc.properties</value>
+            </array>
+        </constructor-arg>
+    </bean>
+
+    <bean id="configurationPropertyResolver" class="eionet.propertyplaceholderresolver.ConfigurationPropertyResolverImpl">
+        <constructor-arg ref="appConfigDefinitionProvider" />
+    </bean>
+
+    <bean id="configurationPostProcessor" class="eionet.propertyplaceholderresolver.spring.EionetPlaceholderConfigurer">
+        <constructor-arg ref="configurationPropertyResolver" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${virtuoso.db.drv}" />
+        <property name="url" value="${virtuoso.db.url}" />
+        <property name="username" value="${virtuoso.db.usr}" />
+        <property name="password" value="${virtuoso.db.pwd}" />
+        <property name="maxTotal" value="40" />
+        <property name="maxWaitMillis" value="10000" />
+        <property name="removeAbandonedOnBorrow" value="true" />
+        <property name="removeAbandonedOnMaintenance" value="true" />
+        <property name="removeAbandonedTimeout" value="300" />
+        <property name="timeBetweenEvictionRunsMillis" value="300000" />
+        <property name="logAbandoned" value="false" />
+    </bean>
+
+    <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${virtuoso.db.drv}" />
+        <property name="url" value="${virtuoso.db.url}" />
+        <property name="username" value="${virtuoso.db.rousr}" />
+        <property name="password" value="${virtuoso.db.ropwd}" />
+        <property name="maxTotal" value="40" />
+        <property name="maxWaitMillis" value="10000" />
+        <property name="removeAbandonedOnBorrow" value="true" />
+        <property name="removeAbandonedOnMaintenance" value="true" />
+        <property name="removeAbandonedTimeout" value="300" />
+        <property name="timeBetweenEvictionRunsMillis" value="300000" />
+        <property name="logAbandoned" value="false" />
+    </bean>
+
+    <!-- Runs on Tomcat startup. -->
+    <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
+        <property name="dataSource" ref="dataSource" />
+        <property name="changeLog" value="classpath:sql/db-struct.xml" />
+        <property name="ignoreClasspathPrefix" value="true" />
+    </bean>
+
+    <bean id="copyAclFiles" class="eionet.cr.copy.acl.CopyAclFiles" depends-on="configurationPostProcessor"/>
+
+    <bean id="aclProperties" class="eionet.acl.AclProperties">
+        <property name="ownerPermission" value="${owner.permission}" />
+        <property name="anonymousAccess" value="${anonymous.access}" />
+        <property name="authenticatedAccess" value="${authenticated.access}" />
+        <property name="defaultdocPermissions" value="${defaultdoc.permissions}" />
+        <property name="persistenceProvider" value="${persistence.provider}" />
+        <property name="initialAdmin" value="${initial.admin}" />
+        <property name="fileAclfolder" value="${file.aclfolder}" />
+        <property name="fileLocalusers" value="${file.localusers}" />
+        <property name="fileLocalgroups" value="${file.localgroups}" />
+        <property name="filePermissions" value="${file.permissions}" />
+        <property name="dbDriver" value="${virtuoso.db.drv}" />
+        <property name="dbUrl" value="${virtuoso.db.url}" />
+        <property name="dbUser" value="${virtuoso.db.usr}" />
+        <property name="dbPwd" value="${virtuoso.db.pwd}" />
+    </bean>
+
+    <bean id="accessController" class="eionet.acl.AccessController">
+        <constructor-arg index="0" ref="aclProperties" />
+    </bean>
+
+</beans>

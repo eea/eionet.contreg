@@ -8,7 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.lang.BooleanUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -34,26 +39,44 @@ import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit tests for SPARQL and SQL queries that are potentially sensitive to Virtuoso upgrade.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private SearchDAO searchDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoUpgradeIT.class);
 
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
     /** Obligations seed file. */
     private static final String OBLIGATIONS_RDF = "obligations.rdf";
-
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList("rdf_national_chars_utf8.rdf.xml", OBLIGATIONS_RDF, "persons.rdf", "tags.rdf");
@@ -82,6 +105,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testFactsheetQuery() throws DAOException {
 
         // "select ?pred min(xsd:int(isBlank(?s))) as ?anonSubj "
@@ -111,6 +135,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testFreeTextSearchSyntax() throws DAOException {
 
         // Should not test full-text search if there is no real-time full-text indexing activated in the underlying repository.
@@ -122,10 +147,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         }
 
         PagingRequest pagingRequest = PagingRequest.create(1);
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory
-                        .get()
-                        .getDao(SearchDAO.class)
+        SearchResultDTO<SubjectDTO> result = searchDAO
                         .searchByFreeText(new SearchExpression("Questionnaire"), FreeTextSearchHelper.FilterType.ANY_OBJECT,
                                 false, pagingRequest, null);
     }
@@ -135,6 +157,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchByFilters() throws DAOException {
 
         Map<String, String> filters = new HashMap<String, String>();
@@ -145,8 +168,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
         SortingRequest sortRequest = new SortingRequest("http://purl.org/dc/terms/title", SortOrder.DESCENDING);
         List<String> predicates = Arrays.asList("http://purl.org/dc/terms/title", "http://purl.org/dc/terms/valid");
 
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory.get().getDao(SearchDAO.class).searchByFilters(filters, false, pagingRequest, sortRequest, predicates);
+        SearchResultDTO<SubjectDTO> result = searchDAO.searchByFilters(filters, false, pagingRequest, sortRequest, predicates);
         assertNotNull("Expected search result not to be null", result);
         List<SubjectDTO> items = result.getItems();
         assertNotNull("Expected search result items not to be null", items);
@@ -162,13 +184,12 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchBySource() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
         SortingRequest sortRequest = new SortingRequest("http://purl.org/dc/terms/title", SortOrder.DESCENDING);
-        Pair<Integer, List<SubjectDTO>> result =
-                DAOFactory.get().getDao(SearchDAO.class)
-                        .searchBySource(getSeedFileGraphUri(OBLIGATIONS_RDF), pagingRequest, sortRequest);
+        Pair<Integer, List<SubjectDTO>> result = searchDAO.searchBySource(getSeedFileGraphUri(OBLIGATIONS_RDF), pagingRequest, sortRequest);
 
         assertNotNull("Expected search result not to be null", result);
 
@@ -186,15 +207,14 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchByTags() throws DAOException {
 
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
         SortingRequest sortRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.DESCENDING);
         List<String> tags = Arrays.asList("tag3", "tag4");
 
-        SearchResultDTO<SubjectDTO> result =
-                DAOFactory.get().getDao(SearchDAO.class).searchByTags(tags, pagingRequest, sortRequest);
-
+        SearchResultDTO<SubjectDTO> result = searchDAO.searchByTags(tags, pagingRequest, sortRequest);
         assertNotNull("Expected search result not to be null", result);
 
         List<SubjectDTO> items = result.getItems();
@@ -210,14 +230,14 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws DAOException If query fails.
      */
+    @Test
     public void testSearchReferences() throws DAOException {
 
         String subjectUri = "http://rod.eionet.europa.eu/spatial/10";
         PagingRequest pagingRequest = PagingRequest.create(1, 200);
         SortingRequest sortRequest = new SortingRequest(Predicates.RDFS_LABEL, SortOrder.DESCENDING);
 
-        SearchDAO dao = DAOFactory.get().getDao(SearchDAO.class);
-        Pair<Integer, List<SubjectDTO>> result = dao.searchReferences(subjectUri, pagingRequest, sortRequest);
+        Pair<Integer, List<SubjectDTO>> result = searchDAO.searchReferences(subjectUri, pagingRequest, sortRequest);
 
         assertNotNull("Expected search result not to be null", result);
 
@@ -235,6 +255,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws Exception If any error occurs.
      */
+    @Test
     public void testVariousFunctions() throws Exception {
 
         // The following queries are tested syntactically only, to enusre Virtuoso supports the specific functions used in them.
@@ -265,6 +286,7 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testGraphRename() throws Exception {
 
         String oldGraph = getSeedFileGraphUri(OBLIGATIONS_RDF);
@@ -272,7 +294,6 @@ public class VirtuosoUpgradeIT extends CRDatabaseTestCase {
 
         String sqlTemplate = VirtuosoHarvestSourceDAO.RENAME_GRAPH_SQL;
         String renameSql = sqlTemplate.replace("%old_graph%", oldGraph).replaceFirst("%new_graph%", newGraph);
-
         String countSql = "select count(*) from DB.DBA.RDF_QUAD where G=iri_to_id('%graph_uri%')";
 
         Connection sqlConn = null;

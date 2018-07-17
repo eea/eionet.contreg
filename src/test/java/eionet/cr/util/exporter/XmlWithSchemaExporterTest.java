@@ -18,8 +18,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.common.Predicates;
@@ -30,12 +29,19 @@ import eionet.cr.util.Util;
 import eionet.cr.util.export.ExportException;
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlWithSchemaExporter;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS XMLExporterTest
  */
-
-public class XmlWithSchemaExporterTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class XmlWithSchemaExporterTest {
 
     @Test
     public void testExportedElementsInXmlSchema() throws Exception {

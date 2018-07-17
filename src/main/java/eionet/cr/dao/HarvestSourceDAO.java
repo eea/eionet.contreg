@@ -211,6 +211,17 @@ public interface HarvestSourceDAO extends DAO {
     List<HarvestSourceDTO> getNextScheduledSources(int limit) throws DAOException;
 
     /**
+     * Get a list of sources to harvest in the next harvesting round. The result is ordered with highest priority first.
+     *
+     * @param limit
+     *            - max number of sources to return.
+     * @return List<HarvestSourceDTO>
+     * @throws DAOException
+     *             if relational database is unavailable.
+     */
+    List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv(int limit) throws DAOException;
+
+    /**
      * @return String
      * @throws DAOException
      *             if relational database is unavailable.

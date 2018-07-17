@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
@@ -60,6 +60,8 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
@@ -69,7 +71,7 @@ import eionet.cr.web.security.CRUser;
 public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(VirtuosoFolderDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoFolderDAO.class);
 
     /** */
     private static final String INSERT_NEVER_HARVESTED_SOURCE_SQL =

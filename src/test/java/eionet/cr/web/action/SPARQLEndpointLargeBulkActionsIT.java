@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -16,6 +19,11 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Util;
 import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
@@ -23,16 +31,32 @@ import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
  *
  * @author Jaak Kapten
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ActionBeanUtils.clearFilters(ctx);
+    }
 
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_largebulk.xml";
-
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(RDF_SEED_FILE);
@@ -45,9 +69,9 @@ public class SPARQLEndpointLargeBulkActionsIT extends CRDatabaseTestCase {
      *             if testing fails
      */
     @Test
+    // TODO FIX: This requests an external resource which depends on the timezone of each machine.
     public void testProperQuery() throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "

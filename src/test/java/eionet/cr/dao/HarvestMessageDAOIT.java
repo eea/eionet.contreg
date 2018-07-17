@@ -22,12 +22,23 @@ package eionet.cr.dao;
 
 import java.util.Arrays;
 import java.util.List;
-
+import eionet.cr.ApplicationTestContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.
@@ -35,13 +46,25 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
  * @author altnyris
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestMessageDAOIT extends CRDatabaseTestCase {
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getXMLDataSetFiles()
-     */
+    @Autowired
+    private HarvestMessageDAO harvestMessageDAO;
+    @Autowired
+    private HarvestSourceDAO harvestSourceDAO;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
     @Override
     protected List<String> getXMLDataSetFiles() {
         return Arrays.asList("sources-harvests-messages.xml");
@@ -53,47 +76,41 @@ public class HarvestMessageDAOIT extends CRDatabaseTestCase {
      */
     @Test
     public void testInsertAndFindHarvestMessage() throws Exception {
-
         HarvestMessageDTO harvestMessage = new HarvestMessageDTO();
         harvestMessage.setHarvestId(5);
         harvestMessage.setMessage("test");
         harvestMessage.setStackTrace("teststack");
         harvestMessage.setType("01");
 
-        HarvestMessageDAO dao = DAOFactory.get().getDao(HarvestMessageDAO.class);
-        Integer messageID = dao.insertHarvestMessage(harvestMessage);
+        Integer messageID = harvestMessageDAO.insertHarvestMessage(harvestMessage);
         assertNotNull(messageID);
 
-        harvestMessage = dao.findHarvestMessageByMessageID(messageID.intValue());
+        harvestMessage = harvestMessageDAO.findHarvestMessageByMessageID(messageID.intValue());
         assertEquals(messageID, harvestMessage.getHarvestMessageId());
     }
 
     @Test
     public void testFindHarvestMessagesByHarvestID() throws Exception {
-
-        List<HarvestMessageDTO> messages = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessagesByHarvestID(5);
+        List<HarvestMessageDTO> messages = harvestMessageDAO.findHarvestMessagesByHarvestID(5);
         assertEquals(4, messages.size());
     }
 
     @Test
     public void testDeleteMessage() throws Exception {
-
-        DAOFactory.get().getDao(HarvestMessageDAO.class).deleteMessage(5);
-        HarvestMessageDTO message = DAOFactory.get().getDao(HarvestMessageDAO.class).findHarvestMessageByMessageID(5);
+        harvestMessageDAO.deleteMessage(5);
+        HarvestMessageDTO message = harvestMessageDAO.findHarvestMessageByMessageID(5);
         assertNull(message);
     }
 
     @Test
     public void testInsertSource() throws Exception {
-
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl("http://1.ee");
         source.setIntervalMinutes(1);
         source.setPrioritySource(true);
         source.setEmails("emails");
-        Integer id = DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+        Integer id = harvestSourceDAO.addSource(source);
         assertNotNull(id);
-
-        DAOFactory.get().getDao(HarvestSourceDAO.class).addSourceIgnoreDuplicate(source);
+        harvestSourceDAO.addSourceIgnoreDuplicate(source);
     }
 }

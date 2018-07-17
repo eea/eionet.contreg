@@ -3,7 +3,7 @@ package eionet.cr.dao.virtuoso.helpers;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -13,6 +13,8 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,7 +24,7 @@ import org.openrdf.rio.RDFHandlerException;
 public class ResourceRenameHandler implements RDFHandler {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(ResourceRenameHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceRenameHandler.class);
 
     /** */
     private ArrayList<Statement> originalStatements = new ArrayList<Statement>();

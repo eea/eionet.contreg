@@ -309,6 +309,10 @@ public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
         this.sourceUrl = sourceUrl;
     }
 
+    public List<String> getSourceUrl() {
+        return sourceUrl;
+    }
+
     /**
      * Sets the search string.
      *

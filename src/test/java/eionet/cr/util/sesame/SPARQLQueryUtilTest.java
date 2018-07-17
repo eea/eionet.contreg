@@ -22,16 +22,25 @@ package eionet.cr.util.sesame;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.common.Namespace;
 import eionet.cr.util.Bindings;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test SPARQLQueryUtil methods.
  *
  * @author Enriko Käsper
  */
-public class SPARQLQueryUtilTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class SPARQLQueryUtilTest {
 
     private static final String CR_OWLSAMEAS_DEF = "DEFINE input:same-as \"yes\"";
     private static final String CR_NAMESPACE_DEF = "PREFIX cr: <http://cr.eionet.europa.eu/ontologies/contreg.rdf#> ";
@@ -41,15 +50,16 @@ public class SPARQLQueryUtilTest extends TestCase {
     /**
      * Test getOwlSameAsDefinition method.
      */
-    public static void testOwlSameAs() {
-
+    @Test
+    public void testOwlSameAs() {
         assertEquals(CR_OWLSAMEAS_DEF, SPARQLQueryUtil.getCrOwlSameAsDefinitionStr());
     }
 
     /**
      * Test getPrefixes method.
      */
-    public static void testNamespaceDefs() {
+    @Test
+    public void testNamespaceDefs() {
 
         assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getPrefixes(Namespace.CR).toString());
         assertEquals(CR_NAMESPACE_DEF.concat(RDF_NAMESPACE_DEF).concat(RDFS_NAMESPACE_DEF),
@@ -59,7 +69,8 @@ public class SPARQLQueryUtilTest extends TestCase {
     /**
      * Test getSparqlQueryHeader method.
      */
-    public static void testSparqlQueryHeader() {
+    @Test
+    public void testSparqlQueryHeader() {
 
         assertEquals("", SPARQLQueryUtil.getSparqlQueryHeader().toString());
         assertEquals(CR_NAMESPACE_DEF, SPARQLQueryUtil.getSparqlQueryHeader(Namespace.CR).toString());
@@ -67,6 +78,7 @@ public class SPARQLQueryUtilTest extends TestCase {
                 SPARQLQueryUtil.getSparqlQueryHeader(Namespace.CR, Namespace.RDF, Namespace.RDFS).toString());
     }
 
+    @Test
     public void testUrisToCSV() {
         ArrayList<String> uris = new ArrayList<String>();
         uris.add("http://uri1.somewhere.nonono.com");
@@ -78,6 +90,7 @@ public class SPARQLQueryUtilTest extends TestCase {
         assertTrue(bindings.toString().indexOf("subjectValue1=http://uri1.somewhere.nonono.com") != -1);
     }
 
+    @Test
     public void testUrisWithSpaceToCSV() {
         ArrayList<String> uris = new ArrayList<String>();
         uris.add("http://uri1.somewhere.nonono.com");
@@ -91,6 +104,7 @@ public class SPARQLQueryUtilTest extends TestCase {
         assertTrue(bindings.toString().indexOf("subjectValue2=tel:+123 456 789") != -1);
     }
 
+    @Test
     public void testOrderByClause() {
         String orderBy = SPARQLQueryUtil.getOrderByClause("oorderby", "asc");
 
@@ -99,6 +113,7 @@ public class SPARQLQueryUtilTest extends TestCase {
                 orderBy);
     }
 
+    @Test
     public void testPrseIRIQuery() {
         String query = "SELECT ?s { WHERE ?s ?p ?o FILTER (?s=?subjectValue) ";
 

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import au.com.bytecode.opencsv.CSVReader;
 import eionet.cr.common.Predicates;
@@ -16,6 +16,8 @@ import eionet.cr.dao.helpers.CsvImportHelper;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.action.UploadCSVActionBean.FileType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class for CSV/TSV files import.
@@ -25,7 +27,7 @@ import eionet.cr.web.action.UploadCSVActionBean.FileType;
 public final class CsvImportUtil {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(CsvImportUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvImportUtil.class);
 
     /**
      * to prevent initialization.

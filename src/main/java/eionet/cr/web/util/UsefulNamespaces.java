@@ -7,11 +7,13 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.URIUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A linked hash-map of prefix-to-namespace pairs that could be useful at SPARQL query entrance in CR web forms.
@@ -32,7 +34,7 @@ public class UsefulNamespaces extends OrderedProperties {
     public static final String PROPERTIES_FILE = "useful-namespaces.properties";
 
     /** A static Log4j logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UsefulNamespaces.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsefulNamespaces.class);
 
     /**
      * Private constructor that loads the values.

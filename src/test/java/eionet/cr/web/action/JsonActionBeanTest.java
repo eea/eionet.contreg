@@ -24,23 +24,48 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
 import eionet.cr.dto.TagDTO;
-import eionet.cr.test.helpers.AbstractStripesMvcTestHelper;
 import eionet.cr.web.util.ApplicationCache;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class JsonActionBeanTest {
 
-public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
+    @Autowired
+    private MockServletContext ctx;
+
+    @BeforeClass
+    public static void beforeClass() {
+        new ApplicationCache().contextDestroyed(null);
+    }
+
+    @Before
+    public void setUp() {
+        ActionBeanUtils.addFilter(ctx);
+        new ApplicationCache().contextInitialized(null);
+    }
+
+    @After
+    public void cleanUp() {
+        ActionBeanUtils.clearFilters(ctx);
+    }
 
     /**
      *
@@ -48,14 +73,9 @@ public class JsonActionBeanTest extends AbstractStripesMvcTestHelper {
      */
     @Test
     public void testJsonTagsResult() throws Exception {
-
-        new ApplicationCache().contextInitialized(null);
         ApplicationCache.updateTagCloudCache(getTestData());
 
-        // Setup the servlet engine
-        MockServletContext context = getMockServletContext();
-
-        MockRoundtrip trip = new MockRoundtrip(context, JsonActionBean.class);
+        MockRoundtrip trip = new MockRoundtrip(ctx, JsonActionBean.class);
         trip.setParameter("query", "tag");
         trip.execute();
 

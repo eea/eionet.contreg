@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 

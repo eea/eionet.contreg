@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+
 import org.openrdf.query.BindingSet;
 
 import eionet.cr.common.Namespace;
@@ -24,7 +25,6 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.YesNoBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * @deprecated

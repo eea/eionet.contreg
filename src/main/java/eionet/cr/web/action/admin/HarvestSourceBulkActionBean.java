@@ -21,7 +21,9 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.dao.DAOException;
@@ -45,7 +47,7 @@ import eionet.cr.web.action.AbstractActionBean;
 public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(HarvestSourceBulkActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestSourceBulkActionBean.class);
 
     /** JSP page. */
     private static final String BULK_ACTIONS_PAGE = "/pages/admin/harvestSourceBulkActions.jsp";

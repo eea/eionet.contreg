@@ -1,0 +1,60 @@
+##
+# @author George Sofianos
+##
+
+version: '2'
+
+#volumes:
+#  contregdev-virtuoso:
+#    driver: rancher-ebs
+#    external: true
+#  contregdev-cr:
+#    driver: rancher-nfs
+#    external: true
+
+services:
+
+  helper:
+    image: eeacms/centos7dev:2.2.3
+    tty: true
+    stdin_open: true
+    volumes:
+      - contreg:/opt/contreg
+      - virtuoso:/opt/virtuoso
+
+ ## VIRTUOSO SERVICE
+  virtuoso:
+    image: eeacms/virtuoso:6.1.8
+    volumes:
+      - virtuoso:/opt/virtuoso
+      - contreg:/opt/contreg
+    command:
+    - /usr/bin/virtuoso-t
+    - +foreground
+    - +configfile
+    - /opt/virtuoso/virtuoso.ini
+
+  ## CONTREG SERVICE
+  contreg:
+    image: sofiageo/contreg:latest
+    env_file: docker.env
+    links:
+      - virtuoso
+    volumes:
+      - contreg:/opt/contreg
+
+  scpserver:
+    image: eeacms/scp-server:latest
+    working_dir: /opt
+#   labels:
+#     io.rancher.scheduler.affinity:host_label: publicip=54.229.211.197
+    volumes:
+    - virtuoso:/opt/virtuoso
+    ports:
+    - 2222:22/tcp
+    environment:
+      DATADIR: /opt
+      AUTHORIZED_KEYS: |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCt9rYOQEufwJ4QehXhhBLSnpKxHmj6EJq9F+Vm6WLVNEcihfQJHQgKVBCnwrt/A5cXXQ8ikhlyXpBnGSycRNibb5QapCuS0E1laymuiMbTDIv9EsvkMZ9HPvMJFTvrPH9rlkL721/UaUZ+iGeYFJvLERCoHQd5PwutNSLYazClVTmrvfcAF+RZxIu9t8OTK7xcQeMK5EnA/0Ol5ZbIbK9efH9iR3rtR3HMSm4NMkheqBw7zVUjaynRRueBOF7qjP6PLcSQtW5vIG3GBGhMCoJ7wfnAHonifofgL/jXw47apPdays1Bt1sE0QtO3iVB9bceOmMkv0pRcCPuf1xkgyXrf89tIsEExDpDYYO/P2LTGrz0FjwnnJan+/2Lo9LgSlfoYyuR0bXlQbKsBvhrK4HC1aG93mmRHJNdPZD3sKV82GbdrWtNT1SgySjvRsc7Kag5GGAGr/NpfZfJoY2UG/GjrCj+z5zlCrM4J2crAIfdmYDm9rT7PQTzHC751hOnR0MqOvw5XbgBOJTCLdRwb/F9usFmvcY9/leEdqWYp0Q4UE40IcNlboFW0s3DrUII3ANvQuaEEse8stlnI5QfmEQ2E7z0Zag9djNtDSobsH+YCpxI9g3jppzA1RYYCtryP4fnnJVFgwOt6WP92IHojKbu3AE13CO123wKLNKHlLemTQ==
+      USERID: 0
+      GROUPID: 0

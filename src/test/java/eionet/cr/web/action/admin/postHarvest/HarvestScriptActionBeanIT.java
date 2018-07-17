@@ -3,6 +3,8 @@ package eionet.cr.web.action.admin.postHarvest;
 import java.util.ArrayList;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import eionet.cr.web.action.ActionBeanUtils;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -16,18 +18,27 @@ import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.web.action.ActionBeanUtils;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
 import java.sql.Connection;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * unit test for testing HarvestScriptActionBean.
  *
  * @author kaido
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
 
     @Before
     public void setUp() {
@@ -46,6 +57,7 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         } finally {
             SQLUtil.close(conn);
         }
+        ActionBeanUtils.addFilter(ctx);
     }
 
     @After
@@ -59,6 +71,7 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
         } finally {
             SQLUtil.close(conn);
         }
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     
@@ -70,8 +83,6 @@ public class HarvestScriptActionBeanIT extends CRDatabaseTestCase {
      */
     @Test
     public void testSave() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, HarvestScriptActionBean.class);
         String title = "dummyscript_123456";
         trip.setParameter("title", title);

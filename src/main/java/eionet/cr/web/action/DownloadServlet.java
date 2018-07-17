@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import nl.bitwalker.useragentutils.Browser;
 import nl.bitwalker.useragentutils.BrowserType;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRException;
 import eionet.cr.filestore.FileStore;
@@ -43,6 +43,8 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.StripesExceptionHandler;
 import eionet.cr.web.util.WebConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A servlet for handling HTTP 1.1 complaint downloads of CR content.
@@ -57,7 +59,7 @@ public class DownloadServlet extends HttpServlet {
     private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
     private static final long DEFAULT_EXPIRE_TIME = 604800000L; // ..ms = 1 week.
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
-    private static final Logger LOGGER = Logger.getLogger(DownloadServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadServlet.class);
 
     // Properties ---------------------------------------------------------------------------------
 

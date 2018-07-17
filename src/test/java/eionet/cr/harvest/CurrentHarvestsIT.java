@@ -4,17 +4,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for the {@link CurrentHarvests} class.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class CurrentHarvestsIT extends CRDatabaseTestCase {
 
     /*
@@ -27,17 +34,9 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
         return Arrays.asList("harvests.xml");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
     @Before
-    protected void setUp() throws Exception {
-
+    public void setUp() throws Exception {
         super.setUp();
-
         // First clean up the on-demand harvests.
         Map<String, String> onDemandHarvests = CurrentHarvests.getOnDemandHarvests();
         if (onDemandHarvests != null && !onDemandHarvests.isEmpty()) {
@@ -50,15 +49,9 @@ public class CurrentHarvestsIT extends CRDatabaseTestCase {
         CurrentHarvests.setQueuedHarvest(null);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
     @After
-    protected void tearDown() throws Exception {
-        // No tear-down logic yet.
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /**

@@ -25,27 +25,28 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
-
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
+import org.junit.After;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.fail;
 
 /**
  * Test Virtuoso Connection.
  *
  * @author Enriko Käsper
  */
-public class VirtuosoConnectionIT extends TestCase {
-    /*
-     * (non-Javadoc)
-     *
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class VirtuosoConnectionIT {
+
+    @After
+    public void tearDown() throws Exception {
         Connection conn = null;
         try {
             conn = SesameUtil.getSQLConnection();
@@ -55,7 +56,7 @@ public class VirtuosoConnectionIT extends TestCase {
         } finally {
             SQLUtil.close(conn);
         }
-        super.tearDown();
+//        super.tearDown();
     }
 
     /**

@@ -21,6 +21,7 @@
 package eionet.cr.dao.virtuoso;
 
 //import com.ibm.icu.util.Calendar;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
@@ -39,13 +40,23 @@ import java.util.Calendar;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  *
  * @author Enriko Käsper
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestScriptDAOIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private HarvestScriptDAO harvestScriptDAO;
 
     /**
      *      */
@@ -70,7 +81,8 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         Connection conn = null;
         List<Object> values = new ArrayList<Object>();
         values.add(new Integer(externalServiceId));
@@ -89,7 +101,8 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        super.tearDown();
         Connection conn = null;
         try {
             conn = SesameUtil.getSQLConnection();
@@ -109,33 +122,31 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
     public void testInsert() throws DAOException {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf#Delivery";
         String title = "Post harvest script";
-        HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST,
+        harvestScriptDAO.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST,
                 1, null);
 
-        assertTrue(postHarvestDao.exists(TargetType.SOURCE, targetUrl, title));
-        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
+        assertTrue(harvestScriptDAO.exists(TargetType.SOURCE, targetUrl, title));
+        assertEquals(1, harvestScriptDAO.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
     }
 
     @Test
     public void testActivate() throws DAOException {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf#Delivery";
         String title = "Post harvest script";
-        HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST,
+        harvestScriptDAO.insert(TargetType.SOURCE, targetUrl, title, script, true, false, null, HarvestScriptType.POST_HARVEST,
                 externalServiceId, null);
 
-        List<HarvestScriptDTO> scriptsList = postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null,
+        List<HarvestScriptDTO> scriptsList = harvestScriptDAO.listActive(TargetType.SOURCE, targetUrl, null,
                 HarvestScriptType.POST_HARVEST);
 
-        assertEquals(1, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
+        assertEquals(1, harvestScriptDAO.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
 
         HarvestScriptDTO script = scriptsList.get(0);
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(script.getId());
-        postHarvestDao.activateDeactivate(ids);
+        harvestScriptDAO.activateDeactivate(ids);
 
-        assertEquals(0, postHarvestDao.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
+        assertEquals(0, harvestScriptDAO.listActive(TargetType.SOURCE, targetUrl, null, HarvestScriptType.POST_HARVEST).size());
     }
 
     @Test
@@ -143,26 +154,25 @@ public class HarvestScriptDAOIT extends CRDatabaseTestCase {
         String targetUrl = "http://rod.eionet.europa.eu/schema.rdf";
         String title1 = "Post harvest script 1";
         String title2 = "Post harvest script 2";
-        HarvestScriptDAO postHarvestDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title1, script, true, false, null,
+        harvestScriptDAO.insert(TargetType.SOURCE, targetUrl, title1, script, true, false, null,
                 HarvestScriptType.POST_HARVEST, 1, null);
 
         // There must definitely be no script newer than two days in the future.Virt
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, 2);
-        assertFalse(postHarvestDao.isScriptsModified(cal.getTime(), targetUrl));
+        assertFalse(harvestScriptDAO.isScriptsModified(cal.getTime(), targetUrl));
 
         // The above-inserted script is definitely modified after two days in the past.
         cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -2);
-        assertTrue(postHarvestDao.isScriptsModified(cal.getTime(), targetUrl));
+        assertTrue(harvestScriptDAO.isScriptsModified(cal.getTime(), targetUrl));
 
         // Sleep one second and insert one more script. Now there must be one script newer
         // then the moment we started sleeping.
         Calendar calNow = Calendar.getInstance();
         Thread.sleep(1000);
-        postHarvestDao.insert(TargetType.SOURCE, targetUrl, title2, script2, true, false, null,
+        harvestScriptDAO.insert(TargetType.SOURCE, targetUrl, title2, script2, true, false, null,
                 HarvestScriptType.POST_HARVEST, externalServiceId, null);
-        assertTrue(postHarvestDao.isScriptsModified(calNow.getTime(), targetUrl));
+        assertTrue(harvestScriptDAO.isScriptsModified(calNow.getTime(), targetUrl));
     }
 }

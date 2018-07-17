@@ -1,5 +1,6 @@
 package eionet.cr.web.action;
 
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
@@ -7,25 +8,50 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit tests for the PING action bean.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PingActionBeanIT extends CRDatabaseTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PingActionBeanIT.class);
 
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ActionBeanUtils.clearFilters(ctx);
+    }
+
     /**
      * @throws Exception
      */
+    @Test
     public void testPingWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.execute();
         PingActionBean bean = trip.getActionBean(PingActionBean.class);
@@ -47,10 +73,10 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
+    @Test
     public void testPingWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "...............");
         trip.execute();
@@ -74,10 +100,10 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
     /**
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "...............");
         trip.setParameter("create", "true");
@@ -103,10 +129,10 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithFragmentedURL() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "http://estonia.ee/test#fragment");
         trip.setParameter("create", "true");
@@ -132,10 +158,9 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingCreateWithBrokenURL() throws Exception {
-
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "http://localhost:1234/never");
         trip.setParameter("create", "true");
@@ -161,12 +186,11 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingNonExistingSourceWithoutCreate() throws Exception {
 
         String url = "http://www.eea.europa.eu/";
-
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.execute();
@@ -198,6 +222,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingNonExistingSourceWithCreate() throws Exception {
 
         // Test that source does not exist yet.
@@ -207,7 +232,6 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
         assertNull("Expected non-existing harvest source", harvestSource);
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.setParameter("create", "true");
@@ -238,6 +262,7 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testPingExistingSource() throws Exception {
 
         // First, create the source to test.
@@ -248,7 +273,6 @@ public class PingActionBeanIT extends CRDatabaseTestCase {
         harvestSourceDao.addSource(source);
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "http://www.eea.europa.eu/");
         trip.execute();

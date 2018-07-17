@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOException;
@@ -14,10 +15,15 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.export.XmlExporter;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Mock for exporterDAO.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExporterDAOTest extends VirtuosoExporterDAO {
 
     /**

@@ -1,20 +1,42 @@
 package eionet.cr.dao.virtuoso;
 
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.util.VoidDatasetsResultRow;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author George Sofianos
  */
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
+
+  @Before
+  public void setUp() throws Exception {
+    super.setUp();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    super.tearDown();
+  }
+
   /**
    * Loads test file into virtuoso test database
    * @return
@@ -28,6 +50,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Basic test of VoidDatasets Dao from sample file
    * @throws Exception
    */
+  @Test
   public void testFindDatasets() throws Exception {
     try {
       List<String> creators = new ArrayList<String>();
@@ -59,6 +82,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Tests for creators in database
    * @throws Exception
    */
+  @Test
   public void testFindCreators() throws Exception {
     try {
       BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);
@@ -76,6 +100,7 @@ public class VirtuosoBrowseVoidDatasetsDAOIT extends CRDatabaseTestCase {
    * Tests for subjects in database
    * @throws Exception
    */
+  @Test
   public void testFindSubjects() throws Exception {
     try {
       BrowseVoidDatasetsDAO dao = DAOFactory.get().getDao(BrowseVoidDatasetsDAO.class);

@@ -10,6 +10,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.ValueFactory;
@@ -32,13 +33,13 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.dao.readers.ResultSetReaderException;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public final class SesameUtil {
 
     /** Static logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SesameUtil.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SesameUtil.class);
 
     /**
      * Hide utility class constructor.

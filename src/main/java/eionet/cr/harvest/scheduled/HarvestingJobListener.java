@@ -22,11 +22,13 @@ package eionet.cr.harvest.scheduled;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Quartz job listener to be used for listening to {@link HarvestingJob}.
@@ -36,7 +38,7 @@ import org.quartz.JobListener;
 public class HarvestingJobListener implements JobListener {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(HarvestingJobListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestingJobListener.class);
 
     /** Simple name of this class. Made constant because we need to return it via interface method. */
     public static final String CLASS_NAME = HarvestingJobListener.class.getSimpleName();

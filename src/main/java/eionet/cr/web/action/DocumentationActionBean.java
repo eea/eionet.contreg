@@ -20,16 +20,19 @@
  */
 package eionet.cr.web.action;
 
+import eionet.doc.extensions.stripes.DocumentationValidator;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.ValidationErrors;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import eionet.doc.DocumentationService;
 import eionet.doc.dto.DocPageDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Action bean for handling events related to the online editing of CR documentation.
@@ -39,14 +42,15 @@ import eionet.doc.dto.DocPageDTO;
 @UrlBinding("/documentation/{pageId}/{event}")
 public class DocumentationActionBean extends AbstractActionBean {
 
-    /** The page id. */
     private String pageId;
-
-    /** The event. */
     private String event;
-
-    /** The page object. */
     private DocPageDTO pageObject;
+
+    @SpringBean
+    private DocumentationService documentationService;
+
+    @SpringBean
+    private DocumentationValidator docValidator;
 
     /**
      *
@@ -57,7 +61,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     public Resolution view() throws Exception {
 
         String forward = "/pages/documentation.jsp";
-        pageObject = DocumentationService.getInstance().view(pageId, event);
+        pageObject = documentationService.view(pageId, event);
         if (pageObject != null && pageObject.getFis() != null) {
             return new StreamingResolution(pageObject.getContentType(), pageObject.getFis());
         }
@@ -75,7 +79,7 @@ public class DocumentationActionBean extends AbstractActionBean {
 
         if (isUserLoggedIn()) {
             if (isPostRequest()) {
-                DocumentationService.getInstance().editContent(pageObject, true);
+                documentationService.editContent(pageObject);
                 addSystemMessage("Successfully saved!");
             }
         } else {
@@ -93,7 +97,7 @@ public class DocumentationActionBean extends AbstractActionBean {
     public Resolution addContent() throws Exception {
         if (isUserLoggedIn()) {
             if (isPostRequest()) {
-                DocumentationService.getInstance().addContent(pageObject, true);
+                documentationService.addContent(pageObject);
             }
         } else {
             addWarningMessage(getBundle().getString("not.logged.in"));
@@ -113,7 +117,7 @@ public class DocumentationActionBean extends AbstractActionBean {
         // Does two validations:
         // - If pageObject.overwrite = false, then checks if page ID already exists
         // - If no file is chosen, then Page ID is mandatory
-        errors = DocumentationService.getInstance().getStripesValidationErrors(pageObject, errors);
+        docValidator.getStripesValidationErrors(pageObject, errors);
         if (errors != null && errors.size() > 0) {
             getContext().setValidationErrors(errors);
         }
@@ -131,7 +135,7 @@ public class DocumentationActionBean extends AbstractActionBean {
         if (isUserLoggedIn()) {
             // The page title is not mandatory. If it is not filled in, then it takes the value of the page_id.
             if (pageObject != null && pageObject.getDocIds() != null && pageObject.getDocIds().size() > 0) {
-                DocumentationService.getInstance().delete(pageObject);
+                documentationService.delete(pageObject);
             } else {
                 addWarningMessage("No objects selected!");
             }

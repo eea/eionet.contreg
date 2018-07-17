@@ -1,13 +1,23 @@
 package eionet.cr.dao.virtuoso.helpers;
 
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class VirtuosoSearchBySourceHelperTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    public static void testOrderByLabel() {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class VirtuosoSearchBySourceHelperTest {
+
+    @Test
+    public void testOrderByLabel() {
         String sourceUrl = "http://www.eionet.europa.eu/rdf/portal_types.rdf";
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =

@@ -38,10 +38,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.CRRuntimeException;
@@ -61,7 +63,7 @@ import eionet.cr.util.xml.XmlAnalysis;
 public class FileToRdfProcessor {
 
     /** Static Log4j logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(FileToRdfProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileToRdfProcessor.class);
 
     /** The file to process. */
     private File file;

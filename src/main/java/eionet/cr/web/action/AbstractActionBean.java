@@ -39,6 +39,7 @@ import nl.bitwalker.useragentutils.BrowserType;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
+
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.Harvest;
@@ -71,7 +72,7 @@ public abstract class AbstractActionBean implements ActionBean {
     protected static final String SCRIPTS_CLIPBOARD_TYPE = AbstractActionBean.class.getName() + ".clipboardType";
 
     /** */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractActionBean.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractActionBean.class);
 
     /** */
     private CRActionBeanContext context;

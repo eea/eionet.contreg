@@ -24,9 +24,13 @@ package eionet.cr.harvest;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import eionet.cr.util.TestUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.mortbay.jetty.Server;
+import org.junit.runner.RunWith;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
 
@@ -40,13 +44,28 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
+import org.junit.Ignore;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author roug
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PullHarvestIT extends CRDatabaseTestCase {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     /*
      * (non-Javadoc)
@@ -74,10 +93,7 @@ public class PullHarvestIT extends CRDatabaseTestCase {
      */    
     @Test
     public void testSimpleRdf() throws Exception {
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "simple-rdf.xml");
-            String url = "http://localhost:8999/testResources/simple-rdf.xml";
+            String url = TestUtils.getFileUrl("simple-rdf.xml");
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
             source.setIntervalMinutes(5);
@@ -101,9 +117,6 @@ public class PullHarvestIT extends CRDatabaseTestCase {
             // Although we expect xsd:integer, the Sesame driver wrongly returns xsd:int.
             assertEquals("Unexpected datatype", XMLSchema.INT.stringValue(), datatype.stringValue());
             assertTrue("Unexpected byte size", NumberUtils.toInt(byteSizeObj.getValue(), -1) > 0);
-        } finally {
-            JettyUtil.close(server);
-        }
     }
 
     /**
@@ -131,11 +144,7 @@ public class PullHarvestIT extends CRDatabaseTestCase {
      */
     @Test
     public void testEncodingRdf() throws Exception {
-
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "encoding-scheme-rdf.xml");
-            String url = "http://localhost:8999/testResources/encoding-scheme-rdf.xml";
+            String url = TestUtils.getFileUrl("encoding-scheme-rdf.xml");
 
             HarvestSourceDTO source = new HarvestSourceDTO();
             source.setUrl(url);
@@ -146,10 +155,6 @@ public class PullHarvestIT extends CRDatabaseTestCase {
             harvest.execute();
 
             assertEquals(3, harvest.getStoredTriplesCount());
-        } finally {
-            JettyUtil.close(server);
-        }
-
     }
 
     /**
@@ -158,23 +163,16 @@ public class PullHarvestIT extends CRDatabaseTestCase {
      */
     @Test
     public void testInlineRdf() throws Exception {
+        String url = TestUtils.getFileUrl("inline-rdf.xml");
 
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "inline-rdf.xml");
-            String url = "http://localhost:8999/testResources/inline-rdf.xml";
+        HarvestSourceDTO source = new HarvestSourceDTO();
+        source.setUrl(url);
+        source.setIntervalMinutes(5);
+        DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
 
-            HarvestSourceDTO source = new HarvestSourceDTO();
-            source.setUrl(url);
-            source.setIntervalMinutes(5);
-            DAOFactory.get().getDao(HarvestSourceDAO.class).addSource(source);
+        Harvest harvest = new PullHarvest(url.toString());
+        harvest.execute();
 
-            Harvest harvest = new PullHarvest(url.toString());
-            harvest.execute();
-
-            assertEquals(6, harvest.getStoredTriplesCount());
-        } finally {
-            JettyUtil.close(server);
-        }
+        assertEquals(6, harvest.getStoredTriplesCount());
     }
 }

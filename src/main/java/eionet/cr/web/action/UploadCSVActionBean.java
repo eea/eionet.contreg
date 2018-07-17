@@ -24,6 +24,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import eionet.acl.AccessController;
 import eionet.acl.SignOnException;
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -43,10 +44,16 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.ValidationMethod;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,7 +81,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBean.class);
 
     /** Default JSP to forward to. */
     private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
@@ -93,6 +100,13 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /** URI of the folder where the file will be uploaded. */
     private String folderUri;
+
+    /**
+     * Online source of CSV/TSV
+     */
+    private String fileURL;
+
+    private String onlineFileName;
 
     /** Uploaded file's bean object. */
     private FileBean fileBean;
@@ -151,6 +165,16 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** Encoding of the uploadable file */
     private String fileEncoding;
 
+    /**
+     * Re-harvest interval
+     */
+    private int interval;
+
+    /**
+     * Is a CSV/TSV that has bean fetch from an online source instead of uploading it?
+     */
+    private boolean isOnlineCsvTsv = false;
+
     /** Encoding used to parse the file */
     private String finalEncoding;
 
@@ -194,6 +218,40 @@ public class UploadCSVActionBean extends AbstractActionBean {
      * @throws SignOnException if adding ACL fails
      */
     public Resolution upload() throws DAOException, SignOnException {
+
+        if (fileBean == null) {
+            try {
+                isOnlineCsvTsv = true;
+                URL website = new URL(fileURL);
+                if(onlineFileName != null && !onlineFileName.isEmpty()) {
+                    fileName = onlineFileName + "." + fileType.toString().toLowerCase();
+                }
+                else {
+                    fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                }
+                fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+                //TODO improve temp directories functionality
+                String tempFilePath = GeneralConfig.getProperty("app.home") + "/tmp/" + FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
+                File tempFile = new File(tempFilePath);
+                tempFile.getParentFile().mkdirs();
+                tempFile.createNewFile();
+
+                ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+                fileBean = new FileBean(tempFile, "text/plain", fileName);
+            } catch (MalformedURLException e) {
+                LOGGER.error("Malformed URL", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
+            } catch (IOException e) {
+                LOGGER.error("IOException when creating local file from online source.", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
+            }
+        }
+
 
         if (!uploadAllowed()) {
             addSystemMessage("No permission to upload CSV/TSV file.");
@@ -263,7 +321,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
             }
 
             // Store file as new source, but don't harvest it
-            helper.insertFileMetadataAndSource(fileSize, getUserName());
+            helper.insertFileMetadataAndSource(fileSize, getUserName(), isOnlineCsvTsv, interval, fileURL);
 
             // Add metadata about user folder update
             helper.linkFileToFolder(folderUri, getUserName());
@@ -400,7 +458,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     *-
      * @throws DAOException
      */
     @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
@@ -422,8 +480,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // if upload event, make sure the file bean is not null
         String eventName = getContext().getEventName();
-        if (eventName.equals(UPLOAD_EVENT) && fileBean == null) {
-            addGlobalValidationError("No file specified!");
+        if (eventName.equals(UPLOAD_EVENT) && fileBean == null && fileURL == null) {
+            addGlobalValidationError("You either need to upload a file or provide a url!");
         }
 
         // if insert event, make sure unique columns and object type are not null
@@ -547,6 +605,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
 
         return columnLabels;
+    }
+
+    public String getFileURL() {
+        return fileURL;
+    }
+
+    public void setFileURL(String fileURL) {
+        this.fileURL = fileURL;
+    }
+
+    public String getOnlineFileName() {
+        return onlineFileName;
+    }
+
+    public void setOnlineFileName(String onlineFileName) {
+        this.onlineFileName = onlineFileName;
     }
 
     /**
@@ -761,6 +835,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     public Map<String, String> getFileEncodings() {
         return fileEncodings;
+    }
+
+    public int getInterval() {
+        return interval;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
     }
 
     public String getFileEncoding() {

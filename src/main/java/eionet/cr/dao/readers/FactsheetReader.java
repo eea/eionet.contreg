@@ -23,7 +23,7 @@ package eionet.cr.dao.readers;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
@@ -34,6 +34,8 @@ import eionet.cr.dto.ObjectDTO;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.sesame.SPARQLResultSetBaseReader;
 import eionet.cr.web.util.WebConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,7 +44,7 @@ import eionet.cr.web.util.WebConstants;
 public class FactsheetReader extends SPARQLResultSetBaseReader<FactsheetDTO> {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(FactsheetReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactsheetReader.class);
 
     /** */
     public static final String OBJECT_DATA_SPLITTER = "<|>";

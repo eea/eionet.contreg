@@ -14,11 +14,10 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryResultValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QueryResultValidator.class);
-
     public static final String PROPER_BULK_SOURCE_OK = "ok";
     public static final String PROPER_BULK_SOURCE_FAIL_RESULT_EMPTY = "Query did not return any results.";
     public static final String PROPER_BULK_SOURCE_FAIL_RESULT_CONTAINS_NON_URLS = "Query results first column includes results that are not URIs.";
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryResultValidator.class);
 
     /**
      * Validates whether the Sparql query result returned is proper for sources

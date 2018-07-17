@@ -150,7 +150,7 @@ public class CustomSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             .searchByFilters(buildSearchCriteria(), true, PagingRequest.create(getPageN()),
                     new SortingRequest(getSortP(), SortOrder.parse(getSortO())), null, true);
 
-        LOGGER.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
+        logger.debug("It took " + (System.currentTimeMillis() - startTime) + " ms to execute custom search");
 
         List<SubjectDTO> resultList = result.getItems();
         SimpleSearchActionBean.setLastModifiedDates(resultList);

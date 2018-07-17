@@ -4,21 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import eionet.cr.spring.SpringApplicationContext;
+
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import virtuoso.sesame2.driver.VirtuosoRepository;
 import virtuoso.sesame2.driver.VirtuosoRepositoryConnection;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  *
@@ -63,11 +62,11 @@ public final class SesameConnectionProvider {
             String urlProperty = GeneralConfig.VIRTUOSO_DB_URL;
             String usrProperty = GeneralConfig.VIRTUOSO_DB_USR;
             String pwdProperty = GeneralConfig.VIRTUOSO_DB_PWD;
-
+          
             readWriteRepository =
                     createRepository(GeneralConfig.getRequiredProperty(urlProperty),
                             GeneralConfig.getRequiredProperty(usrProperty), GeneralConfig.getRequiredProperty(pwdProperty));
-        }
+                            }
         return readWriteRepository;
     }
 
@@ -112,9 +111,8 @@ public final class SesameConnectionProvider {
      * @return the readWriteDataSource
      */
     private static synchronized DataSource getReadWriteDataSource() {
-
         if (readWriteDataSource == null) {
-            readWriteDataSource = lookupDataSource(READWRITE_DATASOURCE_NAME);
+            readWriteDataSource = SpringApplicationContext.getBean("dataSource");
         }
         return readWriteDataSource;
     }
@@ -123,27 +121,10 @@ public final class SesameConnectionProvider {
      * @return the readOnlyDataSource
      */
     private static synchronized DataSource getReadOnlyDataSource() {
-
         if (readOnlyDataSource == null) {
-            readOnlyDataSource = lookupDataSource(READONLY_DATASOURCE_NAME);
+            readOnlyDataSource = SpringApplicationContext.getBean("roDataSource");
         }
         return readOnlyDataSource;
-    }
-
-    /**
-     *
-     * @param dataSourceName
-     * @return
-     */
-    private static DataSource lookupDataSource(String dataSourceName) {
-
-        try {
-            Context initContext = new InitialContext();
-            Context context = (Context) initContext.lookup("java:comp/env");
-            return (javax.sql.DataSource) context.lookup(dataSourceName);
-        } catch (NamingException e) {
-            return null;
-        }
     }
 
     /**

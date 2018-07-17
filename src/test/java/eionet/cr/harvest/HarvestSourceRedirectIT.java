@@ -2,15 +2,20 @@ package eionet.cr.harvest;
 
 import java.util.Arrays;
 import java.util.List;
-
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaak.kapten@tieto.com">Jaak Kapten</a>
  *
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestSourceRedirectIT extends CRDatabaseTestCase {
 
     /*
@@ -26,6 +31,7 @@ public class HarvestSourceRedirectIT extends CRDatabaseTestCase {
     /**
      *
      */
+    @Test
     public void testNothing() {
 
         // TODO

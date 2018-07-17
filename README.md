@@ -17,9 +17,9 @@ found at their websites.
 
 The necessary versions are as follows:
 
-* Java 1.6 or 1.7 ( higher versions are not recommended due to incompatibility )
-* Maven 3.0.5 or higher
-* Tomcat 6.0 or higher
+* Java 1.8
+* Maven 3.3.9
+* Tomcat 8.5.20
 
 ## 2. Download and install Virtuoso
 
@@ -67,7 +67,7 @@ and that it is run while being in CR_SOURCE_HOME directory:
 
 ### 3.1 Unit tests
 
-When you ran the above command you probably noticed that it ran the unit tests. These are designed to not require any external assets such as a database, mail server etc. It is safe to run them. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
+When you ran the above command you probably noticed that it ran the unit tests. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
 
 ## 4. Import CR database creation scripts
 
@@ -100,7 +100,7 @@ There are 2 ways to run integration tests: Using a docker or manually.
 ### 5.1 Automated test execution using Docker(there are test failures)
 You need to have docker installed. Then execute the following command: 
 
-    shell> mvn -Pit clean verify
+    shell> mvn clean verify
 
 The integration test will start up a virtuoso database on port 1112, then the application in Tomcat. The application will run the Liquibase scripts on the database, and then the integration tests will be run by the Maven program - not from the instance of Tomcat or Virtuoso.
 
@@ -146,7 +146,7 @@ The integration test will start up a virtuoso database on port 1112, then the ap
 
 6. Add the test instance server parameters to *local.properties*
 
-7. Run `mvn -Pmanualit clean verify`
+7. Run `mvn clean verify`
 
 All integration tests pass in the master branch.
 
@@ -194,35 +194,24 @@ that the <Connector> tag in Tomcat's server.xml has the following attributes:
 Once Tomcat is running, open CR in the browser. It's application context path is /cr,
 unless you renamed cr.war to something else or you chose to deploy CR into a virtual host.
 
+## 8. Setting up properties for local development (Optional)
 
-## 8. Overriding settings by environment variables (Docker)
+1. Create a copy of *default.properties* with name *local.properties*
+2. Change the property values on *local.properties* to meet your needs
+3. Change property 'env' to local in pom.xml
 
-All the settings in *cr.properties* (that are usually filled at build time using *local.properties* as source) can be overriden by environment variables, using the following rules:
+## 9. Overriding properties by environment variables (Docker)
 
-1. The env variable must start with *CR_*
-2. After CR_ the variable name continues with the property name from *cr.properties*, but the dots must be replaced by underscores (as OS vars with dots are not permitted)
-3. The variable name is not case-sensitive 
-4. The setting MUST still exist in *cr.properties* (otherwise you can have identification problems because of case sensitivity)
-5. The property names in *cr.properties* may be different than the ones in *local.properties*, so make sure you use the names from *cr.properties* in the environment variables.
+All the properties in *default.properties* can be overriden by environment variables.
 
-Sample: to override *application.displayName* you can use the following environment variables:
-
-    CR_APPLICATION_DISPLAYNAME = NewApplication
-
-or
-
-    CR_application_displayName = NewApplication
-
-Using both styles is not an issue, but using both styles with the same property and different values may cause problems, as the evaluation order is not guaranteed.
-
-For debug purposes, the application will report at startup the settings that are overriden, like this:
-
-    Setting harvester.tempFileDir overridden by ENV variable (old value /var/tmp, new value /var/tmp/cr)
+Recommended properties to override:
+* -Dconfig.application.homeURL=
+* -Dconfig.edu.yale.its.tp.cas.client.filter.serverName=
 
 
-## 9. Tips for Handling Virtuoso Errors
+## 10. Tips for Handling Virtuoso Errors
 
-#### 9.1 Virtuoso Error : "Message: SR008: Function sequence_set needs an integer as argument 2, not an arg of type DB_NULL (204)" or similar error 
+#### 10.1 Virtuoso Error : "Message: SR008: Function sequence_set needs an integer as argument 2, not an arg of type DB_NULL (204)" or similar error 
    * **Solution:** <br>
      It may be an indicator that we are trying to insert a wrong or null  value to a virtuoso column. 
      The best way to overcome it is to try to print from the code, the query to be executed along with the actual values, 

@@ -9,7 +9,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.dao.DAOException;
@@ -29,7 +31,7 @@ import eionet.cr.util.URLUtil;
 public class UpToDateChecker {
 
     /** Static Log4j logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UpToDateChecker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpToDateChecker.class);
 
     /** Initialize DAO already here. */
     private HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);

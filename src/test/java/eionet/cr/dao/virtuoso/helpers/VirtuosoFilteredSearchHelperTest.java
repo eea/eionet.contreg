@@ -8,7 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.util.Bindings;
@@ -21,7 +23,11 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoFilteredSearchHelperTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoFilteredSearchHelperTest.class);
@@ -120,9 +126,8 @@ public class VirtuosoFilteredSearchHelperTest {
             for (String url : results) {
                 LOGGER.info("URL " + url);
             }
-
         } catch (Exception e) {
-            LOGGER.error("ERROR ", e);
+            LOGGER.error("ERROR " + e);
         } finally {
             SesameUtil.close(conn);
         }

@@ -8,11 +8,11 @@
     <!-- context parameters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-    <display-name>${application.displayName}</display-name>
+    <display-name>${config.application.displayName}</display-name>
 
     <context-param>
         <param-name>appDispName</param-name>
-        <param-value>${application.displayName}</param-value>
+        <param-value>${config.application.displayName}</param-value>
     </context-param>
 
     <context-param>
@@ -30,28 +30,16 @@
         <param-value>${enableEEAFunctionality}</param-value>
     </context-param>
 
-    <!-- Liquibase configuration -->
-
+    <!-- Spring configuration -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
     <context-param>
-        <param-name>liquibase.changelog</param-name>
-        <param-value>sql/db-struct.xml</param-value>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:spring-context.xml
+        </param-value>
     </context-param>
-
-    <context-param>
-        <param-name>liquibase.datasource</param-name>
-        <param-value>java:comp/env/jdbc/readWriteRepo</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.onerror.fail</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.contexts</param-name>
-        <param-value>production</param-value>
-    </context-param>
-
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- filters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -97,7 +85,8 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>
-                eionet.cr.web.interceptor.ActionEventInterceptor
+                eionet.cr.web.interceptor.ActionEventInterceptor,
+                net.sourceforge.stripes.integration.spring.SpringInterceptor
             </param-value>
         </init-param>
         <init-param>
@@ -133,7 +122,7 @@
 
     <filter>
         <filter-name>CAS Filter</filter-name>
-        <filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>
+        <filter-class>eionet.cr.web.filters.cas.EionetCASFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -141,16 +130,6 @@
         <url-pattern>/login</url-pattern>
     </filter-mapping>
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- listeners -->
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-    <listener>
-        <listener-class>eionet.cr.web.util.StartupAntRunner</listener-class>
-    </listener>
-    <listener>
-        <listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>
-    </listener>
     <listener>
         <listener-class>eionet.cr.web.util.AbandonedHarvestsMarker</listener-class>
     </listener>
@@ -172,6 +151,7 @@
     <listener>
         <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
     </listener>
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Errors -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -183,13 +163,11 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <!-- StripesDispatcher -->
-
     <servlet>
         <servlet-name>StripesDispatcher</servlet-name>
         <servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>
@@ -259,7 +237,6 @@
     </servlet-mapping>
 
     <!-- AMP feed servlet -->
-
     <servlet>
         <servlet-name>AmpServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.amp.AmpFeedServlet</servlet-class>
@@ -271,7 +248,6 @@
     </servlet-mapping>
 
     <!-- Update template servlet -->
-
     <servlet>
         <servlet-name>RefreshTemplateServlet</servlet-name>
         <servlet-class>eionet.eea.template.RefreshTemplateServlet</servlet-class>
@@ -283,7 +259,6 @@
 
 
     <!-- XmlConvServlet -->
-
     <servlet>
         <servlet-name>XmlConvServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.xmlconv.XmlConvFeedServlet</servlet-class>

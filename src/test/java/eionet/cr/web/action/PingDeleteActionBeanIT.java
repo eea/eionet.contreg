@@ -4,13 +4,17 @@ import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import eionet.cr.util.TestUtils;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.mortbay.jetty.Server;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -24,15 +28,24 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.web.security.CRUser;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit tests for the "delete" operation of {@link PingActionBean}.
  *
  * @author Jaanus
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PingDeleteActionBeanIT.class);
 
@@ -46,25 +59,27 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
         return Arrays.asList("emptydb.xml");
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         new RdfLoader().clearAllTriples();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        super.tearDown();
+        ActionBeanUtils.clearFilters(ctx);
     }
 
     /**
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteWithoutURI() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("delete", "");
         trip.execute();
@@ -88,10 +103,10 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteWithInvalidURL() throws Exception {
 
         // Set up and execute round-trip.
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", "...............");
         trip.setParameter("delete", "");
@@ -118,11 +133,11 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testDeleteHarvestPingDeleteSequence() throws Exception {
 
         // Create the source to be tested. The URL is served by Jetty below.
-
-        String url = "http://localhost:8999/testResources/simple-rdf.xml";
+        String url = TestUtils.getFileUrl("simple-rdf.xml");
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(url);
         source.setIntervalMinutes(5);
@@ -131,20 +146,11 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
         source = sourceDao.getHarvestSourceByUrl(url);
         assertNotNull("Expected existing harvest source", source);
 
-        // Harvest the source, served by Jetty.
-
-        Server server = null;
-        try {
-            server = JettyUtil.startResourceServerMock(8999, "/testResources", "simple-rdf.xml");
-            PullHarvest harvest = new PullHarvest(url);
-            harvest.execute();
-            assertEquals(12, harvest.getStoredTriplesCount());
-        } finally {
-            JettyUtil.close(server);
-        }
+        PullHarvest harvest = new PullHarvest(url);
+        harvest.execute();
+        assertEquals(12, harvest.getStoredTriplesCount());
 
         // Assert that source graph has content and there's triples *about* the source.
-
         source = sourceDao.getHarvestSourceByUrl(url);
         assertNotNull("Expected existing harvest source", source);
         HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
@@ -183,8 +189,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      * @throws Exception
      */
     private void doAndAssertAllowedSourceDelete(String url) throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.setParameter("delete", "");
@@ -213,7 +217,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      */
     private void doAndAssertForbiddenSourceDelete(String url) throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, PingActionBean.class);
         trip.setParameter("uri", url);
         trip.setParameter("delete", "");

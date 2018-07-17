@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseTestCase;
@@ -33,6 +34,8 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -42,12 +45,17 @@ import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.sesame.SesameUtil;
+import org.junit.Before;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+/*@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })*/
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /** Repository connection to be used for checking existence of expected triples in the repository */
@@ -73,7 +81,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-
+        super.tearDown();
         SesameUtil.close(repoConn);
     }
 
@@ -143,7 +151,6 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
-    @SuppressWarnings("deprecation")
     @Override
     protected IDataSet getDataSet() throws Exception {
 
@@ -155,7 +162,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         int i = 0;
         IDataSet[] dataSets = new IDataSet[xmlDataSetFiles.size()];
         for (String fileName : xmlDataSetFiles) {
-            dataSets[i++] = new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream(fileName));
+            dataSets[i++] = new FlatXmlDataSetBuilder()
+                .setColumnSensing(true).build(getClass().getClassLoader().getResourceAsStream(fileName));
         }
 
         CompositeDataSet compositeDataSet = new CompositeDataSet(dataSets);

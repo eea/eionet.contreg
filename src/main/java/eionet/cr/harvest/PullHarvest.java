@@ -50,11 +50,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -94,7 +96,7 @@ import eionet.cr.util.xml.ConversionsParser;
 public class PullHarvest extends BaseHarvest {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(PullHarvest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PullHarvest.class);
 
     /** Code reserved for saying that "no HTTP response was returned. " */
     private static final int NO_RESPONSE = -1;
@@ -497,7 +499,7 @@ public class PullHarvest extends BaseHarvest {
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
         getContextSourceDTO().setLastHarvest(new Date());
-        if (urlConn.getLastModified() > 0) {
+        if (urlConn != null && urlConn.getLastModified() > 0) {
             getContextSourceDTO().setLastModified(new Date(urlConn.getLastModified()));
         }
         getContextSourceDTO().setLastHarvestFailed(false);
@@ -885,6 +887,7 @@ public class PullHarvest extends BaseHarvest {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File file = TempFilePathGenerator.generate();
+        file.getParentFile().mkdirs();
         try {
             outputStream = new FileOutputStream(file);
             inputStream = urlConn.getInputStream();

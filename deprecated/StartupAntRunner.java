@@ -64,7 +64,6 @@ public class StartupAntRunner implements ServletContextListener {
         helper.parse(project, buildFile);
 
         // Execute the project's default target.
-
         String defaultTarget = project.getDefaultTarget();
         LOGGER.debug("Executing Ant target \"" + defaultTarget + "\" in " + buildFileAbsolutePath);
         project.executeTarget(defaultTarget);

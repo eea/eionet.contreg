@@ -23,6 +23,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -391,7 +392,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // now save the bookmark subject
         dao.addTriples(subjectDTO);
-        LOGGER.debug("Query bookmarked with URI: " + bookmarksUri);
+        logger.debug("Query bookmarked with URI: " + bookmarksUri);
 
     }
 
@@ -476,7 +477,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // now save the bookmark subject
         dao.addTriples(subjectDTO);
-        LOGGER.debug("Query bookmarked with URI: " + bookmarksUri);
+        logger.debug("Query bookmarked with URI: " + bookmarksUri);
     }
 
     /**
@@ -1043,8 +1044,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         Resolution resolution = new ForwardResolution(FORM_PAGE);
         if (deleteQueries != null && !deleteQueries.isEmpty()) {
 
-            LOGGER.debug("Delete shared: " + deleteSharedBookmark);
-            LOGGER.debug("Deleting these bookmarked queries: " + deleteQueries);
+            logger.debug("Delete shared: " + deleteSharedBookmark);
+            logger.debug("Deleting these bookmarked queries: " + deleteQueries);
 
             List<String> sourceUris = new ArrayList<String>();
             if (deleteSharedBookmark) {

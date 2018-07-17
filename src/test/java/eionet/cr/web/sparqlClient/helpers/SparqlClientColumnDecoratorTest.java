@@ -4,18 +4,25 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A unit test for {@link SparqlClientColumnDecoratorTest}.
  *
  * @author jaanus
  */
-public class SparqlClientColumnDecoratorTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class SparqlClientColumnDecoratorTest {
 
     /**
      *

@@ -24,6 +24,9 @@ package eionet.cr.harvest.scheduled;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOFactory;
@@ -31,6 +34,10 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.security.CRUser;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test urgent harvests.
@@ -38,7 +45,19 @@ import eionet.cr.web.security.CRUser;
  * @author Enriko Käsper
  * @author Jaanus Heinlaid
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UrgentHarvestIT extends CRDatabaseTestCase {
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     /*
      * (non-Javadoc)

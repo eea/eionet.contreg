@@ -23,27 +23,50 @@ package eionet.cr.dao;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import eionet.cr.dto.TripleDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Risto Alt
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HelperDAOIT extends CRDatabaseTestCase {
 
     /** Seed file. */
     private static final String SEED_FILE = "obligations.rdf";
 
+    @Autowired
+    private HelperDAO helperDAO;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
     /*
-     * (non-Javadoc)
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(SEED_FILE);
@@ -55,9 +78,7 @@ public class HelperDAOIT extends CRDatabaseTestCase {
      */
     @Test
     public void testGetSampleTriples() throws Exception {
-        List<TripleDTO> result =
-                DAOFactory.get().getDao(HelperDAO.class)
-                        .getSampleTriplesInSource(RdfLoader.getSeedFileGraphUri(SEED_FILE), PagingRequest.create(1, 10));
+        List<TripleDTO> result = helperDAO.getSampleTriplesInSource(RdfLoader.getSeedFileGraphUri(SEED_FILE), PagingRequest.create(1, 10));
         assertNotNull(result);
         assertEquals(100, result.size());
     }

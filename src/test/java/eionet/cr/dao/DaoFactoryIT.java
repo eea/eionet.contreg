@@ -20,8 +20,7 @@
  */
 package eionet.cr.dao;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dao.virtuoso.VirtuosoHarvestDAO;
@@ -31,13 +30,20 @@ import eionet.cr.dao.virtuoso.VirtuosoSpoBinaryDAO;
 import eionet.cr.dao.virtuoso.VirtuosoTagsDAO;
 import eionet.cr.dao.virtuoso.VirtuosoUrgentHarvestQueueDAO;
 import eionet.cr.dao.virtuoso.VirtuosoUserHomeDAO;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the factory getDao methods.
  *
  * @author altnyris
  */
-public class DaoFactoryIT extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class DaoFactoryIT {
 
     @Test
     public void testFactory() {

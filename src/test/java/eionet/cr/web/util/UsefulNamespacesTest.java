@@ -2,14 +2,21 @@ package eionet.cr.web.util;
 
 import java.util.Map.Entry;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit test for the {@link UsefulNamespaces} class.
  */
-public class UsefulNamespacesTest extends TestCase{
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class UsefulNamespacesTest {
 
     /**
      * The single test of this class.

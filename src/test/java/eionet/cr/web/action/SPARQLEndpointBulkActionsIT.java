@@ -6,15 +6,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
+import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
 import net.sourceforge.stripes.validation.ValidationError;
-
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -24,6 +24,11 @@ import eionet.cr.web.action.mock.SPARQLEndpointActionBeanMock;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
@@ -31,18 +36,34 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
  *
  * @author Jaak Kapten
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private MockServletContext ctx;
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        ActionBeanUtils.addFilter(ctx);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        ActionBeanUtils.clearFilters(ctx);
+    }
 
     /** RDF seed file to be loaded. */
     private static String RDF_SEED_FILE = "testseed_sparqlendpoint_bulk.xml";
 
     public static final String GLOBAL_ERROR = "__stripes_global_error";
-
     /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
-     */
+         * (non-Javadoc)
+         *
+         * @see eionet.cr.test.helpers.CRDatabaseTestCase#getRDFXMLSeedFiles()
+         */
     @Override
     protected List<String> getRDFXMLSeedFiles() {
         return Arrays.asList(RDF_SEED_FILE);
@@ -55,9 +76,9 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      *             if testing fails
      */
     @Test
+    // TODO FIX: This requests an external resource which depends on the timezone of each machine.
     public void testProperQuery() throws Exception {
 
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -100,8 +121,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testWrongColumns() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -128,8 +147,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testCorrectMultipleColumns() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql =
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -156,8 +173,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testEmptyResult() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBeanMock.class);
         String sparql = "select ?a ?b where {<s> <p> <o>} limit 0";
         trip.setParameter("query", sparql);
@@ -179,8 +194,6 @@ public class SPARQLEndpointBulkActionsIT extends CRDatabaseTestCase {
      */
     @Test
     public void testAdminPrivileges() throws Exception {
-
-        MockServletContext ctx = ActionBeanUtils.getServletContext();
         MockRoundtrip trip = new MockRoundtrip(ctx, SPARQLEndpointActionBean.class);
         String sparql = "select ?a ?b where {<s> <p> <o>} limit 0";
         trip.setParameter("query", sparql);

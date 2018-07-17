@@ -31,7 +31,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -56,6 +56,8 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * View source tab.
@@ -66,7 +68,7 @@ import eionet.cr.web.util.tabs.TabElement;
 public class ViewSourceActionBean extends AbstractActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(ViewSourceActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewSourceActionBean.class);
 
     /** URI of the source. */
     private String uri;

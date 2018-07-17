@@ -56,8 +56,7 @@ public final class TempFilePathGenerator {
 
     /** */
     public static File generate() {
-
         String fileName = PREFIX + System.currentTimeMillis() + DASH + UUID.randomUUID();
-        return new File(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION), fileName);
+           return new File(GeneralConfig.getRequiredProperty(GeneralConfig.HARVESTER_FILES_LOCATION), fileName);
     }
 }

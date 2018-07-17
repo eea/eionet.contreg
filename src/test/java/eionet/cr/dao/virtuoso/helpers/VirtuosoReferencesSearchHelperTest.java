@@ -1,15 +1,25 @@
 package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.ArrayList;
-
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.ReferringPredicatesColumn;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class VirtuosoReferencesSearchHelperTest extends TestCase {
-    public static void testUnOrderedQuery() {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class VirtuosoReferencesSearchHelperTest {
+
+    @Test
+    public void testUnOrderedQuery() {
 
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
@@ -25,7 +35,8 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
         // select ?s where {?s ?p ?o. filter(isURI(?o) && ?o=<http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag>)}
     }
 
-    public static void testOrderedQuery() {
+    @Test
+    public void testOrderedQuery() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
                 new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
@@ -42,7 +53,8 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
         assertTrue(helper.getQueryBindings().toString().indexOf("sortPredicate=http://www.w3.org/2000/01/rdf-schema#label") != -1);
     }
 
-    public static void testOrderedByReference() {
+    @Test
+    public void testOrderedByReference() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
                 new SortingRequest(ReferringPredicatesColumn.class.getSimpleName(), SortOrder.parse(SortOrder.DESCENDING
@@ -62,7 +74,8 @@ public class VirtuosoReferencesSearchHelperTest extends TestCase {
 
     }
 
-    public static void testGetSubjectsData() {
+    @Test
+    public void testGetSubjectsData() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         String subjectUri = "http://cr.eionet.europa.eu/ontologies/contreg.rdf#tag";

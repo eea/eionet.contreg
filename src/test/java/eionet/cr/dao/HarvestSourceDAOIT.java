@@ -22,13 +22,23 @@ package eionet.cr.dao;
 
 import java.util.Arrays;
 import java.util.List;
-
+import eionet.cr.ApplicationTestContext;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import org.junit.Ignore;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.
@@ -36,7 +46,22 @@ import eionet.cr.util.pagination.PagingRequest;
  * @author altnyris
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class HarvestSourceDAOIT extends CRDatabaseTestCase {
+
+    @Autowired
+    private HarvestSourceDAO harvestSourceDao;
+
+    @Before
+    public void setup() throws Exception {
+        super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     /*
      * (non-Javadoc)
@@ -55,7 +80,6 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
     @Test
     public void testAddSource() throws Exception {
 
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl("http://rod.eionet.europa.eu/testObligations");
@@ -63,10 +87,10 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
         source.setPrioritySource(false);
         source.setEmails("bob@europe.eu");
 
-        Integer harvestSourceID = dao.addSource(source);
+        Integer harvestSourceID = harvestSourceDao.addSource(source);
         assertNotNull(harvestSourceID);
 
-        HarvestSourceDTO harvestSource = dao.getHarvestSourceById(harvestSourceID);
+        HarvestSourceDTO harvestSource = harvestSourceDao.getHarvestSourceById(harvestSourceID);
         assertEquals("bob@europe.eu", harvestSource.getEmails());
         assertEquals("http://rod.eionet.europa.eu/testObligations", harvestSource.getUrl());
         assertEquals("bob@europe.eu", harvestSource.getEmails());
@@ -75,38 +99,35 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
     @Test
     public void testGetHarvestSourceByUrl() throws Exception {
 
-        HarvestSourceDTO dto =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
+        HarvestSourceDTO dto = harvestSourceDao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
         assertNotNull(dto);
     }
 
     @Test
     public void testGetHarvestSources() throws Exception {
 
-        Pair<Integer, List<HarvestSourceDTO>> result =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSources("", PagingRequest.create(1, 100), null);
+        Pair<Integer, List<HarvestSourceDTO>> result = harvestSourceDao.getHarvestSources("", PagingRequest.create(1, 100), null);
         assertNotNull(result);
         assertNotNull(result.getRight());
-        assertEquals(5, result.getRight().size());
+        assertEquals(8, result.getRight().size());
     }
 
     @Test
     public void testEditSource() throws Exception {
 
         // get the source by URL
-        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-        HarvestSourceDTO harvestSource = dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
+        HarvestSourceDTO harvestSource = harvestSourceDao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf");
         assertNotNull(harvestSource);
 
         // change the URL of the source
         harvestSource.setUrl("http://www.eionet.europa.eu/seris/rdf-dummy");
-        dao.editSource(harvestSource);
+        harvestSourceDao.editSource(harvestSource);
 
         // get the source by previous URL again- now it must be null
-        assertNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf"));
+        assertNull(harvestSourceDao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf"));
 
         // get the source by new URL, it must not be null
-        assertNotNull(dao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
+        assertNotNull(harvestSourceDao.getHarvestSourceByUrl("http://www.eionet.europa.eu/seris/rdf-dummy"));
     }
 
     /**
@@ -117,8 +138,7 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
     @Test
     public void testGetUnauthorizedSources() throws Exception {
 
-        Pair<Integer, List<HarvestSourceDTO>> dto =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized("", null, null);
+        Pair<Integer, List<HarvestSourceDTO>> dto = harvestSourceDao.getHarvestSourcesUnauthorized("", null, null);
 
         assertNotNull(dto);
         assertEquals(2, (int) dto.getLeft());
@@ -133,8 +153,7 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
     @Test
     public void testGetUnauthorizedSourcesFilter() throws Exception {
 
-        Pair<Integer, List<HarvestSourceDTO>> dto =
-                DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourcesUnauthorized("%countries%", null, null);
+        Pair<Integer, List<HarvestSourceDTO>> dto = harvestSourceDao.getHarvestSourcesUnauthorized("%countries%", null, null);
 
         assertNotNull(dto);
         assertEquals(1, (int) dto.getLeft());
@@ -143,4 +162,24 @@ public class HarvestSourceDAOIT extends CRDatabaseTestCase {
         assertEquals("http://rod.eionet.europa.eu/countries", source.getUrl());
 
     }
+
+    @Test
+    public void testGetNextScheduledOnlineCsvTsv() throws Exception {
+
+        List<HarvestSourceDTO> sources = harvestSourceDao.getNextScheduledOnlineCsvTsv(1);
+        assertEquals(1, sources.size());
+        assertEquals(9, sources.get(0).getSourceId().intValue());
+    }
+
+    @Test
+    public void testGetNextScheduleOnlineCsvTsvException() throws Exception {
+
+        try {
+            harvestSourceDao.getNextScheduledOnlineCsvTsv(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is("Limit must be >=1"));
+        }
+    }
+
 }

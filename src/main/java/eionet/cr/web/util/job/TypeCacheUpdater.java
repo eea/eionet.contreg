@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
@@ -37,6 +37,8 @@ import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.web.util.ApplicationCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
@@ -45,7 +47,7 @@ public class TypeCacheUpdater implements StatefulJob {
     /**
      * Internal logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(TypeCacheUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TypeCacheUpdater.class);
 
     /**
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext) {@inheritDoc}
