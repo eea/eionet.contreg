@@ -1,6 +1,6 @@
 #!/bin/bash
-# APP=eeacms/contreg
-APP=sofiageo/contreg
+APP=eeacms/contreg
+#APP=eworxeea/contreg
 BUILDTIME=$(date '+%Y-%m-%dT%H%M')
 
 # docker build, tag and push
