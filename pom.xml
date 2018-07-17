@@ -564,6 +564,12 @@
             <groupId>com.hp.hpl.jena</groupId>
             <artifactId>jena</artifactId>
             <version>2.6.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -584,6 +590,10 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>jcl104-over-slf4j</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- Eionet dependencies -->
@@ -591,12 +601,6 @@
             <groupId>eionet</groupId>
             <artifactId>documentation.core</artifactId>
             <version>2.0-SNAPSHOT</version>
-            <!--<exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
@@ -664,16 +668,6 @@
 
 
         <!-- Logging dependencies -->
-        <!--<dependency>-->
-            <!--<groupId>commons-logging</groupId>-->
-            <!--<artifactId>commons-logging</artifactId>-->
-            <!--<version>1.1</version>-->
-        <!--</dependency>-->
-<!--        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
@@ -690,17 +684,12 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
         </dependency>
+        <!-- Intercepts logging from log4j and redirects it to slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>log4j-over-slf4j</artifactId>
             <version>1.7.25</version>
         </dependency>
-        <!-- Intercepts logging from log4j and redirects it to slf4j -->
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>log4j-over-slf4j</artifactId>-->
-            <!--<version>1.7.25</version>-->
-        <!--</dependency>-->
         <!-- Intercepts logging from apache commons logging and redirects it to slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
