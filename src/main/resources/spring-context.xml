@@ -11,7 +11,7 @@
     <!--<context:annotation-config/>-->
 
     <!-- Scans within the base package of the application for @Components to configure as beans -->
-    <context:component-scan base-package="eionet.cr" />
+    <context:component-scan base-package="eionet.cr, eionet.doc" />
 
     <!--<bean id="springApplicationContext" class="eionet.cr.spring.SpringApplicationContext"/>-->
 
@@ -22,6 +22,7 @@
                 <value>eionetdir.properties</value>
                 <value>cr.properties</value>
                 <value>acl.properties</value>
+                <value>doc.properties</value>
             </array>
         </constructor-arg>
     </bean>

@@ -121,8 +121,10 @@
                 <configuration>
                     <!--<enableAssertions>false</enableAssertions>-->
                     <systemPropertyVariables>
-                        <!--<db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
                         <docker.host.address>${docker.host.address}</docker.host.address>
+                        <virtuoso.port>${virtuoso.port}</virtuoso.port>
+                        <httpd.port>${httpd.port}</httpd.port>
+                        <!--<db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
                         <!--<log.url>http://${docker.host.address}:${tomcat.port}/</log.url>-->
                     </systemPropertyVariables>
                     <includes>
@@ -253,7 +255,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.24.0</version>
+                <version>0.26.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
@@ -266,8 +268,8 @@
                             <name>sofiageo/virtuoso-test:latest</name>
                             <run>
                                 <ports>
-                                    <port>58891:8891</port>
-                                    <port>51112:1112</port>
+                                    <port>virtuoso.web:8891</port>
+                                    <port>virtuoso.port:1112</port>
                                 </ports>
                                 <wait>
                                     <log>Server online at </log>
@@ -290,8 +292,8 @@
                         </image>
 
                         <image>
+                            <name>eworxeea/httpd-cr</name>
                             <alias>httpd</alias>
-                            <name>httpd</name>
                             <build>
                                 <from>httpd:alpine</from>
                                 <maintainer>George Sofianos</maintainer>
@@ -308,7 +310,7 @@
                             </build>
                             <run>
                                 <ports>
-                                    <port>58081:80</port>
+                                    <port>httpd.port:80</port>
                                 </ports>
                                 <wait>
                                     <tcp>
@@ -447,7 +449,6 @@
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
-                            <goal>build</goal>
                             <goal>start</goal>
                         </goals>
                     </execution>
@@ -530,7 +531,7 @@
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
-            <version>1.5.6</version>
+            <version>1.5.8</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -587,9 +588,20 @@
         </dependency>
         <!-- Eionet dependencies -->
         <dependency>
-            <groupId>eionet.doc</groupId>
-            <artifactId>documentation</artifactId>
-            <version>1.5</version>
+            <groupId>eionet</groupId>
+            <artifactId>documentation.core</artifactId>
+            <version>2.0-SNAPSHOT</version>
+            <!--<exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>-->
+        </dependency>
+        <dependency>
+            <groupId>eionet</groupId>
+            <artifactId>documentation.extensions.stripes</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>eionet</groupId>

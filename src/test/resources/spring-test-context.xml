@@ -18,6 +18,7 @@
                 <value>eionetdir.properties</value>
                 <value>cr.properties</value>
                 <value>acl.properties</value>
+                <value>doc.properties</value>
             </array>
         </constructor-arg>
     </bean>

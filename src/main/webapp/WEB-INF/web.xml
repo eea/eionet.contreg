@@ -85,7 +85,8 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>
-                eionet.cr.web.interceptor.ActionEventInterceptor
+                eionet.cr.web.interceptor.ActionEventInterceptor,
+                net.sourceforge.stripes.integration.spring.SpringInterceptor
             </param-value>
         </init-param>
         <init-param>

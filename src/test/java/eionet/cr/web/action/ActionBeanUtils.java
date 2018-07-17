@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockServletContext;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.Filter;
 
@@ -25,7 +26,7 @@ public final class ActionBeanUtils {
         if (context != null) {
             Map filterParams = new HashMap();
             filterParams.put("ActionResolver.Packages", "eionet.cr.web.action");
-            filterParams.put("Interceptor.Classes", "eionet.cr.web.interceptor.ActionEventInterceptor");
+            filterParams.put("Interceptor.Classes", getInterceptorClassesParameter());
             filterParams.put("ActionBeanContext.Class", "eionet.cr.web.action.CRTestActionBeanContext");
             filterParams.put("LocalePicker.Class", "eionet.cr.web.util.LocalePicker");
             filterParams.put("trimSpaces", "true");
@@ -43,5 +44,17 @@ public final class ActionBeanUtils {
         for (Filter filter : filters) {
             filter.destroy();
         }
+    }
+
+    //"eionet.web.action.di.ActionBeanDependencyInjectionInterceptor",
+    //                "eionet.web.action.di.SpyActionBeanInterceptor"
+
+    private static String getInterceptorClassesParameter() {
+        String[] interceptors = new String[] {
+                "net.sourceforge.stripes.integration.spring.SpringInterceptor",
+                "eionet.cr.web.interceptor.ActionEventInterceptor"
+        };
+
+        return StringUtils.join(interceptors, ", ");
     }
 }
