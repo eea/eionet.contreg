@@ -70,8 +70,6 @@
         <property name="ignoreClasspathPrefix" value="true" />
     </bean>
 
-    <bean id="copyAclFiles" class="eionet.cr.copy.acl.CopyAclFiles" depends-on="configurationPostProcessor"/>
-
     <bean id="aclProperties" class="eionet.acl.AclProperties">
         <property name="ownerPermission" value="${owner.permission}" />
         <property name="anonymousAccess" value="${anonymous.access}" />

@@ -1,4 +1,4 @@
-package eionet.cr.copy.acl;
+package eionet.cr.configuration;
 
 import eionet.cr.spring.SpringApplicationContext;
 import eionet.propertyplaceholderresolver.CircularReferenceException;
@@ -6,29 +6,30 @@ import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
 import eionet.propertyplaceholderresolver.UnresolvedPropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 
-/**
- *
- * @author Thanos Tourikas
- *
- */
-public class CopyAclFiles {
+@Component
+@DependsOn({"configurationPropertyResolver", "springApplicationContext"})
+public class StartupConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CopyAclFiles.class.getName());
-    private ConfigurationPropertyResolver propertyResolver = (ConfigurationPropertyResolver) SpringApplicationContext.getBean("configurationPropertyResolver");
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupConfiguration.class.getName());
 
     /**
      * Copy acl files at startup.
      * @throws IOException - If the file copy fails.
      * @throws URISyntaxException - If the file URL is wrong.
      */
-    public CopyAclFiles() throws IOException, URISyntaxException {
+    @PostConstruct
+    public void init() throws IOException, URISyntaxException {
+        ConfigurationPropertyResolver propertyResolver = SpringApplicationContext.getBean("configurationPropertyResolver");
         String appHome = null;
         try {
             appHome = propertyResolver.resolveValue("config.app.home");

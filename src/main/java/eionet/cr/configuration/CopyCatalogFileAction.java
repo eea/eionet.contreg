@@ -1,4 +1,4 @@
-package eionet.cr.copy;
+package eionet.cr.configuration;
 
 import eionet.cr.spring.SpringApplicationContext;
 import eionet.propertyplaceholderresolver.CircularReferenceException;
