@@ -70,9 +70,10 @@ public class JobScheduler implements ServletContextListener {
                 new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
                         DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                         DeliverySearchPicklistCacheUpdater.class)),
+/*                      TODO: This has temporarily been removed because it's being affected by https://github.com/openlink/virtuoso-opensource/issues/118
                         new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
                                 RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                RecentResourcesCacheUpdater.class)),
+                                RecentResourcesCacheUpdater.class)),*/
                                 new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
                                         TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                         TagCloudCacheUpdater.class)),
