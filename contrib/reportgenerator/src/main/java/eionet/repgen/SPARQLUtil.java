@@ -14,7 +14,7 @@ public class SPARQLUtil {
 
     // FIXME - to be propertized
     private static String testEndpointURL = "http://test.tripledev.ee/cr/sparql";
-    private static String endpointURL = "http://cr.eionet.europa.eu/sparql";
+    private static String endpointURL = "https://cr.eionet.europa.eu/sparql";
 
     private static SPARQLRepository crEndpoint;
     private static SPARQLRepository testEndpoint;
