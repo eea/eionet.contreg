@@ -782,10 +782,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     /** */
     private static final String GET_NEXT_SCHEDULED_SOURCES_SQL =
-            "select top <limit> * from HARVEST_SOURCE " +
-            "where COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 " +
+            "select top <limit> *, cast(abs(datediff('second', now(), coalesce(LAST_HARVEST, dateadd('second', -1*INTERVAL_MINUTES*60, TIME_CREATED)))) as float) / cast(INTERVAL_MINUTES*60 as float) as urgency " +
+            "from HARVEST_SOURCE where COUNT_UNAVAIL < 5 and INTERVAL_MINUTES > 0 " +
             "and <seconds_since_last_harvest> >= <harvest_interval_seconds> " +
-            "and ( IS_ONLINE_CSV_TSV IS NULL or IS_ONLINE_CSV_TSV = 'N' ) ";
+            "and ( IS_ONLINE_CSV_TSV IS NULL or IS_ONLINE_CSV_TSV = 'N' ) " +
+            "ORDER BY urgency DESC";
 
     /** */
     private static final String SECONDS_SINCE_LAST_HARVEST_EXPR = "cast("
@@ -796,10 +797,11 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private static final String HARVEST_INTERVAL_SECONDS_EXPR = "cast(INTERVAL_MINUTES*60 as float)";
 
     private static final String GET_NEXT_SCHEDULED_ONLINE_SOURCES_SQL =
-            "select top <limit> * from HARVEST_SOURCE " +
-            "where IS_ONLINE_CSV_TSV = 'Y' " +
+            "select top <limit> *, cast(abs(datediff('second', now(), coalesce(LAST_HARVEST, dateadd('second', -1*INTERVAL_MINUTES*60, TIME_CREATED)))) as float) / cast(INTERVAL_MINUTES*60 as float) as urgency " +
+            "from HARVEST_SOURCE where IS_ONLINE_CSV_TSV = 'Y' " +
             "and INTERVAL_MINUTES > 0 " +
-            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> ";
+            "and <seconds_since_last_harvest> >= <harvest_interval_seconds> " +
+            "ORDER BY urgency DESC";
 
     /*
      * (non-Javadoc)
