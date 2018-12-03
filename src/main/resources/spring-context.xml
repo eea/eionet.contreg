@@ -44,9 +44,11 @@
         <property name="maxWaitMillis" value="10000" />
         <property name="removeAbandonedOnBorrow" value="true" />
         <property name="removeAbandonedOnMaintenance" value="true" />
-        <property name="removeAbandonedTimeout" value="300" />
+        <property name="removeAbandonedTimeout" value="700" />
         <property name="timeBetweenEvictionRunsMillis" value="300000" />
         <property name="logAbandoned" value="false" />
+        <property name="testOnBorrow" value="true" />
+        <property name="maxConnLifetimeMillis" value="1800000" />
     </bean>
 
     <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
@@ -58,9 +60,11 @@
         <property name="maxWaitMillis" value="10000" />
         <property name="removeAbandonedOnBorrow" value="true" />
         <property name="removeAbandonedOnMaintenance" value="true" />
-        <property name="removeAbandonedTimeout" value="300" />
+        <property name="removeAbandonedTimeout" value="700" />
         <property name="timeBetweenEvictionRunsMillis" value="300000" />
         <property name="logAbandoned" value="false" />
+        <property name="testOnBorrow" value="true" />
+        <property name="maxConnLifetimeMillis" value="1800000" />
     </bean>
 
     <!-- Runs on Tomcat startup. -->
