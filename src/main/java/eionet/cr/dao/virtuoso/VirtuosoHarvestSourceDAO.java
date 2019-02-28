@@ -1,41 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
-
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
@@ -52,21 +16,32 @@ import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
-import eionet.cr.util.Bindings;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.Pair;
-import eionet.cr.util.SortingRequest;
-import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
-import eionet.cr.util.YesNoBoolean;
+import eionet.cr.util.*;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
 import eionet.cr.web.sparqlClient.helpers.ResultValue;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.*;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.sql.*;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Methods operating with harvest sources. Implementation for Virtuoso.
@@ -2131,22 +2106,29 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     private void loadRdfFile(File file, RDFFormat rdfFormat, Connection conn, String baseUri, String contextUri)
             throws SQLException {
 
-        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + file.getAbsolutePath()+ "'), '" + baseUri + "', '" + contextUri + "')";
+        String filePath = file.getAbsolutePath();
+        if (filePath.startsWith("C:\\") || filePath.startsWith("C:/")) {
+            filePath = filePath.substring(2).replace('\\', '/');
+        }
+
+        LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML(...) from " + filePath);
+
+        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + filePath + "'), '" + baseUri + "', '" + contextUri + "')";
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
             if (rdfFormat.equals(RDFFormat.TRIG)) {
                 // For TriG format we must raise the flag 256 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 256)";
+                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 256)";
             } else if (rdfFormat.equals(RDFFormat.NQUADS)) {
                 // For N-Quads format we must raise the flag 512 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 512)";
+                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 512)";
             } else {
                 // No flags for other cases.
-                sql = "DB.DBA.TTLP(file_open('" + file.toString() + "'), '" +baseUri+ "', '"+contextUri+"', 0)";
+                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 0)";
             }
         }
 
-        LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql + "("+ file.toString() + "," + contextUri +")", baseUri));
+        LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql, ""));
 
         Statement s = null;
         try {

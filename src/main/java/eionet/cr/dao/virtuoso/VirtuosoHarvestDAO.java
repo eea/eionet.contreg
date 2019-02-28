@@ -20,22 +20,20 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.virtuoso;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.readers.HarvestDTOReader;
 import eionet.cr.dao.readers.HarvestStatReader;
 import eionet.cr.dao.readers.HarvestWithMessageTypesReader;
-import eionet.cr.dao.readers.MinimalHarvestDTOReader;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestStatDTO;
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.util.Util;
 import eionet.cr.util.sql.SQLUtil;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -77,7 +75,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
                         + " H.HTTP_CODE as HTTP_CODE,"
                         + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
                         + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
-                        + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
+                        + " where H.HARVEST_SOURCE_ID=? order by H.HARVEST_ID desc";
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
@@ -137,7 +135,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
         values.add(harvestType);
         values.add(user);
         values.add(status);
-        values.add(Util.currentDateAsString());
+        values.add(new java.util.Date());
 
         Connection conn = null;
         try {
@@ -162,7 +160,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
 
         List<Object> values = new ArrayList<Object>();
         values.add(BaseHarvest.STATUS_FINISHED);
-        values.add(Util.currentDateAsString());
+        values.add(new java.util.Date());
         values.add(new Integer(noOfTriples));
         values.add(new Integer(httpCode));
 
@@ -185,35 +183,40 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     @Override
     public void deleteOldHarvests(int harvestId, int preserveRecent) throws DAOException {
 
-        //
-        // Because "TOP N" cannot be used in subselect, I must get the highest started value from the last element in the resultset.
-        //
+        // Get harvest source id and maximum started time.
+        // Because "TOP N" cannot be used in sub-select, we must get the highest started value from the last element
+        // in the resultset.
 
-        // get harvest source id and maximum started time
         List<Object> selectParams = new ArrayList<Object>();
         selectParams.add(harvestId);
 
         StringBuffer selectSql = new StringBuffer();
-        selectSql.append("SELECT TOP " + preserveRecent + " h.harvest_source_id, h.started ");
+        selectSql.append("SELECT TOP " + preserveRecent + " *, USERNAME as \"USER\" ");
         selectSql.append("FROM harvest AS h ");
         selectSql.append("WHERE h.harvest_source_id = ( ");
         selectSql.append("    SELECT h.harvest_source_id ");
         selectSql.append("    FROM harvest AS h ");
         selectSql.append("    WHERE h.harvest_id = ? ) ");
-        selectSql.append("ORDER BY h.started DESC");
+        selectSql.append("ORDER BY h.harvest_id DESC");
 
-        List<HarvestDTO> list = executeSQL(selectSql.toString(), selectParams, new MinimalHarvestDTOReader());
+        List<HarvestDTO> list = executeSQL(selectSql.toString(), selectParams, new HarvestDTOReader());
+        if (list == null || list.size() == 0 || list.size() <= preserveRecent) {
+            // If list smaller than preserveRecent, we have nothing more to do herLast 10 harvestse.
+            return;
+        }
+
         HarvestDTO dto = list.get(list.size() - 1);
+        if (dto == null) {
+            return;
+        }
 
-        // delete older harvests with same harvest source
+        // Delete older harvests with same harvest source.
         List<Object> deleteParams = new ArrayList<Object>();
         deleteParams.add(dto.getHarvestSourceId());
-        deleteParams.add(dto.getDateString());
+        deleteParams.add(dto.getHarvestId());
 
         StringBuffer deleteSql = new StringBuffer();
-        deleteSql.append("DELETE FROM harvest AS h ");
-        deleteSql.append("WHERE h.harvest_source_id = ? ");
-        deleteSql.append("AND h.started < ?");
+        deleteSql.append("DELETE FROM harvest AS h WHERE h.harvest_source_id = ? AND h.harvest_id < ?");
 
         executeSQL(deleteSql.toString(), deleteParams);
     }

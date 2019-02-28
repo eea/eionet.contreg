@@ -72,7 +72,7 @@ public class StartupConfiguration {
         File sourceFile = new File(source.toURI());
         File targetDirectory = new File(target);
         org.apache.commons.io.FileUtils.copyFile(sourceFile, targetDirectory);
-        LOGGER.info("Successfully copied file...{0}", target);
+        LOGGER.info(String.format("Successfully copied file: %s", target.toString()));
     }
 }
  

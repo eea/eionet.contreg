@@ -23,23 +23,10 @@ package eionet.cr.harvest;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.ExternalServiceDAO;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestScriptDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.ExternalServiceDTO;
-import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dao.*;
+import eionet.cr.dto.*;
 import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
@@ -62,7 +49,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
@@ -76,21 +62,10 @@ import org.xml.sax.SAXException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLConnection;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Base abstract class for harvest-performing classes.
@@ -756,7 +731,7 @@ public abstract class BaseHarvest implements Harvest {
      * @return
      */
     public static String loggerMsg(Object messageObject, String contextGraphUri) {
-        return messageObject + " [" + contextGraphUri + "]";
+        return StringUtils.isBlank(contextGraphUri) ? messageObject + "" : messageObject + " [" + contextGraphUri + "]";
     }
 
     /*
