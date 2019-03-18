@@ -406,4 +406,11 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet id="rev-26" author="heinlja">
+        <comment>Prune harvest history of orphan records not associated with any harvest source records.</comment>
+        <sql>
+            delete from "harvest" where "harvest_source_id" not in (select "harvest_source_id" from "harvest_source")
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
