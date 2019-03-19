@@ -663,6 +663,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
             for (String sourceUrl : sourceUrls) {
 
+                sourceUrl = URLUtil.escapeIRI(sourceUrl);
+
                 String graphSparql = sparqlClearGraph.replace("GRAPH_URI", sourceUrl);
                 String resourceSparql =
                         harvesterContextOnly ? sparqlDeleteResourceFromSpecificGraph.replace("GRAPH_URI",
