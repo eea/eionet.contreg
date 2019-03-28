@@ -20,11 +20,10 @@
  */
 package eionet.cr.web.util;
 
-import java.util.Locale;
+import net.sourceforge.stripes.localization.DefaultLocalePicker;
 
 import javax.servlet.http.HttpServletRequest;
-
-import net.sourceforge.stripes.localization.DefaultLocalePicker;
+import java.util.Locale;
 
 /**
  * Custom locale picker that overrides {@link DefaultLocalePicker}.
@@ -40,7 +39,6 @@ public class LocalePicker extends DefaultLocalePicker {
      */
     @Override
     public String pickCharacterEncoding(HttpServletRequest request, Locale locale) {
-
         String encoding = super.pickCharacterEncoding(request, locale);
         return encoding == null ? "UTF-8" : null;
     }
