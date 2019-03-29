@@ -37,6 +37,7 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.FileDeletionJob;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -815,6 +816,34 @@ public abstract class BaseHarvest implements Harvest {
     protected void startWithNewContext(String contextUrl) throws HarvestException, DAOException {
 
         changeContext(contextUrl);
+        startHarvest();
+    }
+
+    /**
+     *
+     * @param newUrl
+     * @throws HarvestException
+     * @throws DAOException
+     */
+    protected void switchContextTo(String newUrl) throws HarvestException, DAOException {
+
+        HarvestSourceDTO newSourceDTO = getHarvestSource(newUrl);
+        if (newSourceDTO == null) {
+
+            LOGGER.debug(loggerMsg("Creating harvest source for " + newUrl));
+
+            // Clone destination source from current context.
+            newSourceDTO = getContextSourceDTO().clone();
+            newSourceDTO.resetInterval();
+            newSourceDTO.setUrl(newUrl);
+            newSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(newUrl)));
+            newSourceDTO.setTimeCreated(new Date());
+            getHarvestSourceDAO().addSource(newSourceDTO);
+        }
+
+        this.contextUrl = newUrl;
+        this.contextSourceDTO = newSourceDTO;
+
         startHarvest();
     }
 

@@ -334,7 +334,7 @@ public class URLUtil {
         String host = url.getHost();
         int port = url.getPort();
         String path = url.getPath();
-        String query = url.getQuery();
+        String queryString = url.getQuery();
         String reference = url.getRef();
 
         // start building the result, processing each of the above-found URL parts
@@ -362,7 +362,7 @@ public class URLUtil {
                 result.append(normalizePath(path));
             }
 
-            if (!StringUtils.isEmpty(query)) {
+            if (!StringUtils.isEmpty(queryString)) {
                 String normalizedQuery = normalizeQueryString(uri);
                 if (!StringUtils.isBlank(normalizedQuery)) {
                     result.append("?").append(normalizedQuery);
