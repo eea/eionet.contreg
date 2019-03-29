@@ -1,31 +1,5 @@
 package eionet.cr.web.action.admin;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -36,6 +10,18 @@ import eionet.cr.harvest.UpToDateChecker;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.AbstractActionBean;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Action bean for harvest source bulk actions: add, delete, check.
@@ -212,7 +198,7 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
      *
      * @param userName The user who is adding.
      */
-    void bulkAddSources(String userName) {
+    private void bulkAddSources(String userName) {
 
         int counter = 0;
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
@@ -221,8 +207,9 @@ public class HarvestSourceBulkActionBean extends AbstractActionBean {
 
             boolean success = true;
             try {
-                dao.addSource(HarvestSourceDTO.create(URLUtil.escapeIRI(sourceUrl), false,
-                        HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName()));
+                HarvestSourceDTO sourceDTO = HarvestSourceDTO.create(URLUtil.escapeIRI(sourceUrl), false,
+                        HarvestSourceDTO.DEFAULT_REFERRALS_INTERVAL, getUserName());
+                dao.addSource(sourceDTO);
             } catch (DAOException e) {
                 success = false;
                 addSystemMessage("Adding " + sourceUrl + " failed with " + e.toString());

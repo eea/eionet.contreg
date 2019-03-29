@@ -21,23 +21,22 @@
 
 package eionet.cr.dao.readers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.Hashes;
+import eionet.cr.util.URLUtil;
+import eionet.cr.util.sql.SQLUtil;
 import org.apache.commons.lang.StringUtils;
-
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
-
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.sql.SQLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -95,36 +94,37 @@ public class NewSourcesReaderWriter extends ResultSetMixedReader {
     public void readRow(BindingSet bindingSet) throws ResultSetReaderException {
 
         String sourceUrl = getFirstBindingStringValue(bindingSet);
-        if (!StringUtils.isBlank(sourceUrl)) {
+        if (StringUtils.isBlank(sourceUrl)) {
+            return;
+        }
 
-            // Replace spaces from url
-            sourceUrl = StringUtils.replace(sourceUrl.trim(), " ", "%20");
+        // Normalize URL for becoming harvest source URL.
+        sourceUrl = URLUtil.normalizeHarvestSourceUrl(sourceUrl, true);
 
-            sourceCount++;
-            try {
-                getPreparedStatement().setString(1, sourceUrl);
-                getPreparedStatement().setLong(2, Hashes.spoHash(sourceUrl));
-                getPreparedStatement().addBatch();
-                currentBatchSize++;
+        sourceCount++;
+        try {
+            getPreparedStatement().setString(1, sourceUrl);
+            getPreparedStatement().setLong(2, Hashes.spoHash(sourceUrl));
+            getPreparedStatement().addBatch();
+            currentBatchSize++;
 
-                if (currentBatchSize == BATCH_LIMIT) {
+            if (currentBatchSize == BATCH_LIMIT) {
 
-                    if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace("Inserting " + currentBatchSize + " sources");
-                    }
-
-                    getPreparedStatement().executeBatch();
-                    getPreparedStatement().clearParameters();
-                    currentBatchSize = 0;
-
-                    if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace(sourceCount + " sources inserted so far");
-                    }
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Inserting " + currentBatchSize + " sources");
                 }
 
-            } catch (SQLException e) {
-                throw new ResultSetReaderException(e.getMessage(), e);
+                getPreparedStatement().executeBatch();
+                getPreparedStatement().clearParameters();
+                currentBatchSize = 0;
+
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace(sourceCount + " sources inserted so far");
+                }
             }
+
+        } catch (SQLException e) {
+            throw new ResultSetReaderException(e.getMessage(), e);
         }
     }
 

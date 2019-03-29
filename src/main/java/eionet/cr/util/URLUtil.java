@@ -20,32 +20,21 @@
  */
 package eionet.cr.util;
 
+import eionet.cr.common.CRRuntimeException;
+import eionet.cr.config.GeneralConfig;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-
-
-import eionet.cr.common.CRRuntimeException;
-import eionet.cr.config.GeneralConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for dealing with URLs.
@@ -497,5 +486,46 @@ public class URLUtil {
         }
 
         return decodeEncode(path, "/;");
+    }
+
+    /**
+     *
+     * @param urlString
+     * @return
+     */
+    public static String httpsToHttp(String urlString) {
+
+        String prefix = "https://";
+        if (StringUtils.startsWithIgnoreCase(urlString, prefix) && urlString.length() > prefix.length()) {
+            urlString = "http://" + urlString.substring(prefix.length());
+        }
+
+        return urlString;
+    }
+
+    /**
+     *
+     * @param urlString
+     * @param overwriteProtocol
+     * @return
+     */
+    public static String normalizeHarvestSourceUrl(String urlString, boolean overwriteProtocol) {
+
+        if (StringUtils.isBlank(urlString)) {
+            return urlString;
+        }
+
+        // Escape illegal IRI characters.
+        urlString = URLUtil.escapeIRI(urlString.trim());
+
+        // Prune fragment part.
+        urlString = StringUtils.substringBefore(urlString, "#");
+
+        // Overwrite HTTPS with HTTP if requested.
+        if (overwriteProtocol) {
+            urlString = URLUtil.httpsToHttp(urlString);
+        }
+
+        return urlString;
     }
 }

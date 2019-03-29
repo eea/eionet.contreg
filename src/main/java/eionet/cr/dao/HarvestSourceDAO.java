@@ -20,20 +20,6 @@
  */
 package eionet.cr.dao;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.openrdf.OpenRDFException;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
@@ -45,6 +31,19 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
+import org.openrdf.OpenRDFException;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author altnyris
@@ -504,12 +503,11 @@ public interface HarvestSourceDAO extends DAO {
 
     /**
      * Derives new harvest sources from the graph represented by the given source url, and inserts them into the HARVEST_SOURCE
-     * table. The method does not use inferencing for finding new soureces. They are created by POST-HARVEST scripts with SPARQL
+     * table. The method does not use inferencing for finding new sources. They are created by POST-HARVEST scripts with SPARQL
      * INSERT statements.
      *
      * @param sourceUrl
      *            The given source URL.
-     * @return The number of sources found and inserted.
      *
      * @throws DAOException
      */

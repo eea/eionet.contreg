@@ -21,26 +21,6 @@
 
 package eionet.cr.web.action;
 
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOFactory;
@@ -52,8 +32,20 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * An action bean that implements the CR's "ping" API. It is a RESTful API that enables other application to force an urgent harvest
@@ -140,15 +132,18 @@ public class PingActionBean extends AbstractActionBean {
                 // Helper flag that will be raised if a harvest is indeed needed.
                 boolean doHarvest = false;
 
+                // Normalize URL for becoming harvest source URL.
+                String sourceUrl = URLUtil.normalizeHarvestSourceUrl(uri, true);
+
                 // Check if a source by this URI exists.
-                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+                HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);
                 if (source != null) {
                     doHarvest = true;
                 } else if (create) {
 
                     // Graph does not exist, but must be created as indicated in request parameters
                     source = new HarvestSourceDTO();
-                    source.setUrl(uri);
+                    source.setUrl(this.uri);
 
                     // If the new introduced property has not been set in the config file, use deprecated value
                     source.setIntervalMinutes(GeneralConfig.getDefaultHarvestIntervalMinutes());
@@ -160,7 +155,7 @@ public class PingActionBean extends AbstractActionBean {
                 }
 
                 if (doHarvest) {
-                    UrgentHarvestQueue.addPullHarvest(uri, CRUser.PING_HARVEST.getUserName());
+                    UrgentHarvestQueue.addPullHarvest(this.uri, CRUser.PING_HARVEST.getUserName());
                     message = "URL added to the urgent harvest queue.";
                 }
             }

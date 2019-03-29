@@ -393,14 +393,16 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             for (Map<String, ResultValue> row : queryResult.getRows()) {
 
                 String resultValue = row.get(firstColumn).getValue();
-                String source = eionet.cr.util.URLUtil.escapeIRI(resultValue);
-                if (URLUtil.isURL(source)) {
-                    insertAndUpdate.setString(1, source);
-                    insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(source)));
+                String sourceUrl = eionet.cr.util.URLUtil.escapeIRI(resultValue);
+                sourceUrl = URLUtil.normalizeHarvestSourceUrl(sourceUrl, false);
+
+                if (URLUtil.isURL(sourceUrl)) {
+                    insertAndUpdate.setString(1, sourceUrl);
+                    insertAndUpdate.setLong(2, Long.valueOf(Hashes.spoHash(sourceUrl)));
                     insertAndUpdate.setInt(3, eionet.cr.config.GeneralConfig.getDefaultHarvestIntervalMinutes());
                     insertAndUpdate.addBatch();
 
-                    updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(source)));
+                    updateLastHarvest.setLong(1, Long.valueOf(Hashes.spoHash(sourceUrl)));
                     updateLastHarvest.addBatch();
 
                     counter++;
@@ -457,16 +459,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
     @Override
     public Integer addSource(Connection conn, HarvestSourceDTO source) throws DAOException {
+
         if (source == null) {
-            throw new IllegalArgumentException("harvest source must not be null");
+            throw new IllegalArgumentException("Harvest source DTO must not be null!");
         }
 
-        if (StringUtils.isBlank(source.getUrl())) {
-            throw new IllegalArgumentException("url must not be null");
+        String sourceUrl = source.getUrl();
+        if (StringUtils.isBlank(sourceUrl)) {
+            throw new IllegalArgumentException("Source URL must not be blank!");
         }
 
-        // harvest sources where URL has fragment part, are not allowed
-        String url = StringUtils.substringBefore(source.getUrl(), "#");
+        // Normalize URL before save.
+        String url = URLUtil.normalizeHarvestSourceUrl(sourceUrl, false);
         long urlHash = Hashes.spoHash(url);
 
         PreparedStatement ps = null;
