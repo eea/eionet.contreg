@@ -811,18 +811,6 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      *
-     * @param contextUrl
-     * @throws HarvestException
-     * @throws DAOException
-     */
-    protected void startWithNewContext(String contextUrl) throws HarvestException, DAOException {
-
-        changeContext(contextUrl);
-        startHarvest();
-    }
-
-    /**
-     *
      * @param url
      * @throws HarvestException
      * @throws DAOException
@@ -833,6 +821,10 @@ public abstract class BaseHarvest implements Harvest {
 
         this.contextUrl = url;
         this.contextSourceDTO = sourceDTO;
+        if (sourceMetadata != null) {
+            sourceMetadata.setUri(contextUrl);
+        }
+
         startHarvest();
     }
 

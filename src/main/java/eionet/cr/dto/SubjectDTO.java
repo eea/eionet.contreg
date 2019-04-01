@@ -20,26 +20,16 @@
  */
 package eionet.cr.dto;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.security.CRUser;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  *
@@ -556,5 +546,9 @@ public class SubjectDTO implements Serializable {
         }
 
         return result;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

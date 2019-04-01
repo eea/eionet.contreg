@@ -40,7 +40,16 @@ public final class ResponseCodeUtil {
      * @return
      */
     public static boolean isRedirect(int code) {
-        return code == 301 || code == 302 || code == 303 || code == 307;
+        return code == 301 || code == 302 || code == 303 || code == 307 || code == 308;
+    }
+
+    /**
+     *
+     * @param code
+     * @return
+     */
+    public static boolean isPermanentRedirect(int code) {
+        return code == 301 || code == 308;
     }
 
     /**

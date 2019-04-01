@@ -95,7 +95,7 @@
                     <td>
                         <c:choose>
                             <c:when test="${empty actionBean.harvestSource.lastModified}">
-                                <c:out value="hasn't been harvested yet"/>
+                                <c:out value=""/>
                             </c:when>
                             <c:otherwise>
                                 <fmt:formatDate value="${actionBean.harvestSource.lastModified}" pattern="yyyy-MM-dd HH:mm:ss"/>

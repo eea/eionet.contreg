@@ -427,158 +427,57 @@ public class PullHarvest extends BaseHarvest {
             return;
         }
 
+        Date date = new Date();
+
         String firstToUrl = redirections.iterator().next().getToUrl();
-        addSourceMetadata(Predicates.CR_REDIRECTED_TO, ObjectDTO.createResource(firstToUrl));
+        int firstRedirectionCode = redirections.iterator().next().getCode();
+
+        getContextSourceDTO().setLastHarvest(date);
+        getContextSourceDTO().setLastHarvestFailed(false);
+        getContextSourceDTO().setStatements(0);
+        getContextSourceDTO().setLastHarvestId(getHarvestId());
+        if (ResponseCodeUtil.isPermanentRedirect(firstRedirectionCode)) {
+            getContextSourceDTO().setIntervalMinutes(0);
+        } else {
+            getContextSourceDTO().calculateNewInterval();
+        }
+        getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
+        getHarvestDAO().updateFinishedHarvest(getHarvestId(), 0, firstRedirectionCode);
         addHarvestMessage(getContextUrl() + "  redirects to  " + firstToUrl, HarvestMessageType.INFO);
 
-        Date date = new Date();
         for (RedirectionDTO redirection : redirections) {
             updateRedirectionMetadata(redirection, date);
         }
 
         String normalizedContextUrl = normalizeSourceUrl(getContextUrl());
         String normalizedLastUrl = normalizeSourceUrl(lastUrl);
-        if (StringUtils.substringAfter(normalizedContextUrl, "://").equals(StringUtils.substringAfter(normalizedLastUrl, "://"))) {
-            if (normalizedContextUrl.startsWith("https://") && normalizedLastUrl.startsWith("http://")) {
+        boolean equalWithoutProtocol = StringUtils.substringAfter(normalizedContextUrl, "://").equals(StringUtils.substringAfter(normalizedLastUrl, "://"));
+        boolean httpsToHttp = normalizedContextUrl.startsWith("https://") && normalizedLastUrl.startsWith("http://");
 
-                HarvestSourceDTO lastUrlSource = getHarvestSource(lastUrl);
-                if (lastUrlSource == null) {
+        if (!equalWithoutProtocol || httpsToHttp) {
 
-                    LOGGER.debug(loggerMsg("Creating harvest source for " + lastUrl));
+            HarvestSourceDTO lastUrlSource = getHarvestSource(lastUrl);
+            if (lastUrlSource == null) {
 
-                    // Clone destination source from current context.
-                    lastUrlSource = getContextSourceDTO().clone();
-                    lastUrlSource.resetInterval();
-                    lastUrlSource.setUrl(lastUrl);
-                    lastUrlSource.setUrlHash(Long.valueOf(Hashes.spoHash(lastUrl)));
-                    lastUrlSource.setTimeCreated(date);
-                    getHarvestSourceDAO().addSource(lastUrlSource);
-                }
+                LOGGER.debug(loggerMsg("Creating harvest source for " + lastUrl));
 
-                switchContextTo(lastUrl, lastUrlSource);
+                // Clone destination source from current context.
+                lastUrlSource = getContextSourceDTO().clone();
+                lastUrlSource.setSourceId(null);
+                lastUrlSource.resetInterval();
+                lastUrlSource.setUrl(lastUrl);
+                lastUrlSource.setUrlHash(Long.valueOf(Hashes.spoHash(lastUrl)));
+                lastUrlSource.setTimeCreated(date);
+                Integer sourceId = getHarvestSourceDAO().addSource(lastUrlSource);
+                lastUrlSource = getHarvestSourceDAO().getHarvestSourceById(sourceId);
             }
+
+            switchContextTo(lastUrl, lastUrlSource);
+        } else {
+            httpResponseCode = firstRedirectionCode;
+            addSourceMetadata(Predicates.CR_REDIRECTED_TO, ObjectDTO.createResource(firstToUrl));
         }
     }
-
-//    private void doUrlHarvestOld() throws HarvestException {
-//
-//        String initialContextUrl = getContextUrl();
-//        HttpURLConnection urlConn = null;
-//        httpResponseCode = NO_RESPONSE;
-//        String responseMessage = null;
-//        int noOfRedirections = 0;
-//
-//        try {
-//            String connectUrl = getContextUrl();
-//            do {
-//                String message = "Opening URL connection";
-//                if (!connectUrl.equals(getContextUrl())) {
-//                    message = message + " to " + connectUrl;
-//                }
-//                LOGGER.debug(loggerMsg(message));
-//
-//                urlConn = prepareUrlConnection(connectUrl);
-//
-//                try {
-//                    httpResponseCode = urlConn.getResponseCode();
-//                    responseMessage = urlConn.getResponseMessage();
-//                } catch (IOException ioe) {
-//                    // An error when connecting to server is considered a temporary error:
-//                    // don't throw it, but log in the database and exit.
-//                    LOGGER.debug("Error when connecting to server: " + ioe);
-//                    finishWithError(NO_RESPONSE, null, ioe);
-//                    return;
-//                }
-//
-//                // Throws exception when the content-length indicated in HTTP response is more than the maximum allowed.
-//                validateContentLength(urlConn);
-//
-//                // Handle redirection.
-//                if (isRedirect(httpResponseCode)) {
-//
-//                    noOfRedirections++;
-//
-//                    // If number of redirects is more than maximum allowed, throw exception.
-//                    if (noOfRedirections > MAX_REDIRECTIONS) {
-//                        throw new TooManyRedirectionsException("Too many redirections, originally started from "
-//                                + initialContextUrl);
-//                    }
-//
-//                    // Get redirected-to-url, throw exception if it's missing.
-//                    String dstUrl = getRedirectUrl(urlConn);
-//                    redirectedUrls.add(connectUrl);
-//                    redirectedHarvestSources.add(getContextSourceDTO());
-//                    if (StringUtils.isBlank(dstUrl)) {
-//                        throw new NoRedirectLocationException("Redirection response code wihtout \"Location\" header!");
-//                    }
-//
-//                    LOGGER.debug(loggerMsg(connectUrl + " redirects to " + dstUrl));
-//
-//                    // Treat this as a redirection only if the context URL and the redirected-to-URL
-//                    // are not essentially the same.
-//                    if (!normalizeSourceUrl(getContextUrl()).equals(normalizeSourceUrl(dstUrl))) {
-//
-//                        boolean startWithNew = processRedirection(dstUrl, httpResponseCode);
-//                        LOGGER.debug(loggerMsg("Redirection details saved"));
-//
-//                        if (startWithNew) {
-//                            startWithNewContext(dstUrl);
-//                        } else {
-//                            isSourceAvailable = true;
-//                            return;
-//                        }
-//                    } else {
-//                        LOGGER.debug(loggerMsg("Ignoring this redirection, as it is essentially to the same URL"));
-//                    }
-//
-//                    connectUrl = dstUrl;
-//                    // Close redirected URL connection
-//                    URLUtil.disconnect(urlConn);
-//                }
-//            } while (isRedirect(httpResponseCode));
-//
-//            // if URL connection returned no errors and its content has been modified since last harvest,
-//            // proceed to downloading
-//            if (!isError(httpResponseCode) && !isNotModified(httpResponseCode) && !isUnauthorized(httpResponseCode)) {
-//
-//                int noOfTriples = downloadAndProcessContent(urlConn);
-//                setStoredTriplesCount(noOfTriples);
-//                LOGGER.debug(loggerMsg(noOfTriples + " triples loaded"));
-//                finishWithOK(urlConn, noOfTriples);
-//
-//            } else if (isNotModified(httpResponseCode)) {
-//                LOGGER.debug(loggerMsg("Source not modified since last harvest"));
-//                finishWithNotModified();
-//
-//            } else if (isUnauthorized(httpResponseCode)) {
-//                LOGGER.debug(loggerMsg("Source unauthorized!"));
-//                finishWithUnauthorized();
-//
-//            } else if (isError(httpResponseCode)) {
-//                LOGGER.debug(loggerMsg("Server returned error code " + httpResponseCode));
-//                finishWithError(httpResponseCode, responseMessage, null);
-//            }
-//        } catch (Exception e) {
-//
-//            LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
-//
-//            // check what caused the DAOException - fatal flag is set to true
-//            checkAndSetFatalExceptionFlag(e.getCause());
-//
-//            try {
-//                finishWithError(httpResponseCode, responseMessage, e);
-//            } catch (RuntimeException finishingException) {
-//                LOGGER.error("Error when finishing up: ", finishingException);
-//            }
-//            if (e instanceof HarvestException) {
-//                throw (HarvestException) e;
-//            } else {
-//                throw new HarvestException(e.getMessage(), e);
-//            }
-//        } finally {
-//            URLUtil.disconnect(urlConn);
-//        }
-//    }
 
     /*
      * (non-Javadoc)
@@ -904,169 +803,6 @@ public class PullHarvest extends BaseHarvest {
             FileDeletionJob.register(downloadedFile);
         }
     }
-
-    /**
-     *
-     * @param dstUrl The URL which the currently harvested context URL is redirecting to.
-     * @param responseCode HTTP Code from the redirected URL
-     * @return true if the redirected-to-URL should also be harvested, false otherwise.
-     * @throws DAOException if database eror happens
-     */
-//    private boolean processRedirection(String dstUrl, int responseCode) throws DAOException {
-//
-//        boolean httpToHttps = false;
-//        boolean httpsToHttp = false;
-//
-//        String normSrcUrl = normalizeSourceUrl(getContextUrl());
-//        String normDstUrl = normalizeSourceUrl(dstUrl);
-//        if (StringUtils.substringAfter(normSrcUrl, "://").equals(StringUtils.substringAfter(normDstUrl, "://"))) {
-//            if (normSrcUrl.startsWith("http://") && normDstUrl.startsWith("https://")) {
-//                httpToHttps = true;
-//            } else if (normSrcUrl.startsWith("https://") && normDstUrl.startsWith("http://")) {
-//                httpsToHttp = true;
-//            }
-//        }
-//
-//        boolean isSame = httpToHttps || httpsToHttp;
-//        Date redirectionSeen = new Date();
-//
-//        if (!isSame || httpsToHttp) {
-//
-//            // Updated HARVEST_SOURCE of the redirected URL.
-//            getContextSourceDTO().setLastHarvest(redirectionSeen);
-//            getContextSourceDTO().setLastHarvestFailed(false);
-//            getContextSourceDTO().setStatements(0);
-//            getContextSourceDTO().setLastHarvestId(getHarvestId());
-//            getContextSourceDTO().calculateNewInterval();
-//            getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
-//
-//            // Update current HARVEST record to finished, set its count of harvested triples to 0.
-//            getHarvestDAO().updateFinishedHarvest(getHarvestId(), 0, responseCode);
-//        }
-//
-//
-//        // Insert redirection message to the current HARVEST_MESSAGE.
-//        String message = getContextUrl() + "  redirects to  " + dstUrl;
-//        HarvestMessageDTO messageDTO = HarvestMessageDTO.create(message, HarvestMessageType.INFO, null);
-//        messageDTO.setHarvestId(getHarvestId());
-//        getHarvestMessageDAO().insertHarvestMessage(messageDTO);
-//
-//        // Clear redirected source's metadata, save new metadata about redirection.
-//        getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
-//        SubjectDTO subjectDTO = createRedirectionMetadata(getContextSourceDTO(), redirectionSeen, dstUrl);
-//        getHelperDAO().addTriples(subjectDTO);
-//
-//        // Indicates if the redirected-to source should be harvested at this run. Should always be true when on-demand harvest.
-//        // When batch-harvest, then true only if the redirected-to source does not yet exist.
-//        boolean harvestDstSource = isOnDemandHarvest;
-//
-//        if (!isSame || httpsToHttp) {
-//            // If destination is not in HARVEST_SOURCE yet, create it by copying the context source.
-//            HarvestSourceDTO dstSourceDTO = getHarvestSource(dstUrl);
-//            if (dstSourceDTO == null) {
-//
-//                LOGGER.debug(loggerMsg("Creating harvest source for " + dstUrl));
-//
-//                // A not-yet-existing redirected-to source should always be harvested.
-//                harvestDstSource = true;
-//
-//                // Clone destination source DTO from current context source.
-//                // (no null-checking, i.e. assuming the context source already exists)
-//                dstSourceDTO = getContextSourceDTO().clone();
-//
-//                // Reset interval minutes and set destination source's url, creation time and last harvest time.
-//                dstSourceDTO.resetInterval();
-//                dstSourceDTO.setUrl(dstUrl);
-//                dstSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(dstUrl)));
-//                dstSourceDTO.setTimeCreated(redirectionSeen);
-//                getHarvestSourceDAO().addSource(dstSourceDTO);
-//            }
-//        }
-//
-//        // Delete old harvests history.
-//        LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
-//        getHarvestDAO().deleteOldHarvests(getHarvestId(), NO_OF_LAST_HARVESTS_PRESERVED);
-//
-//        return harvestDstSource;
-//    }
-
-    /**
-     *
-     * @param dstUrl
-     * @param responseCode
-     * @return
-     * @throws DAOException
-     */
-//    private boolean processRedirection_old(String dstUrl, int responseCode) throws DAOException {
-//
-//        String normSrcUrl = normalizeSourceUrl(getContextUrl());
-//        String normDstUrl = normalizeSourceUrl(dstUrl);
-//
-//        if (StringUtils.substringAfter(normSrcUrl, "://").equals(StringUtils.substringAfter(normDstUrl, "://"))) {
-//            if (normSrcUrl.startsWith("http://") && normDstUrl.startsWith("https://")) {
-//                // Handle HTTP -> HTTPS.
-//            } else if (normSrcUrl.startsWith("https://") && normDstUrl.startsWith("http://")) {
-//                // Handle HTTPS -> HTTP.
-//            }
-//        }
-//
-//        Date redirectionSeen = new Date();
-//
-//        // Updated HARVEST_SOURCE of the redirected URL.
-//        getContextSourceDTO().setLastHarvest(redirectionSeen);
-//        getContextSourceDTO().setLastHarvestFailed(false);
-//        getContextSourceDTO().setStatements(0);
-//        getContextSourceDTO().setLastHarvestId(getHarvestId());
-//        getContextSourceDTO().calculateNewInterval();
-//        getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
-//
-//        // Update current HARVEST record to finished, set its count of harvested triples to 0.
-//        getHarvestDAO().updateFinishedHarvest(getHarvestId(), 0, responseCode);
-//
-//        // Insert redirection message to the current HARVEST_MESSAGE.
-//        String message = getContextUrl() + "  redirects to  " + dstUrl;
-//        HarvestMessageDTO messageDTO = HarvestMessageDTO.create(message, HarvestMessageType.INFO, null);
-//        messageDTO.setHarvestId(getHarvestId());
-//        getHarvestMessageDAO().insertHarvestMessage(messageDTO);
-//
-//        // Clear redirected source's metadata, save new metadata about redirection.
-//        getHarvestSourceDAO().deleteSubjectTriplesInSource(getContextUrl(), GeneralConfig.HARVESTER_URI);
-//        SubjectDTO subjectDTO = createRedirectionMetadata(getContextSourceDTO(), redirectionSeen, dstUrl);
-//        getHelperDAO().addTriples(subjectDTO);
-//
-//        // Indicates if the redirected-to source should be harvested at this run. Should always be true when on-demand harvest.
-//        // When batch-harvest, then true only if the redirected-to source does not yet exist.
-//        boolean shouldHarvestRedirectedToSource = isOnDemandHarvest;
-//
-//        // If redirected-to source not existing, create it by copying the context source.
-//        HarvestSourceDTO redirectedToSourceDTO = getHarvestSource(dstUrl);
-//        if (redirectedToSourceDTO == null) {
-//
-//            LOGGER.debug(loggerMsg("Creating harvest source for " + dstUrl));
-//
-//            // A not-yet-existing redirected-to source should always be harvested.
-//            shouldHarvestRedirectedToSource = true;
-//
-//            // clone the redirected-to source from the context source
-//            // (no null-checking, i.e. assuming the context source already exists)
-//            redirectedToSourceDTO = getContextSourceDTO().clone();
-//
-//            // reset interval minutes and set the redirected-to source's url, creation time and last harvest time
-//            redirectedToSourceDTO.resetInterval();
-//            redirectedToSourceDTO.setUrl(dstUrl);
-//            redirectedToSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(dstUrl)));
-//            redirectedToSourceDTO.setTimeCreated(redirectionSeen);
-//
-//            // persist the redirected-to source
-//            getHarvestSourceDAO().addSource(redirectedToSourceDTO);
-//        }
-//
-//        // Delete old harvests history.
-//        LOGGER.debug(loggerMsg("Deleting old redirected harvests history"));
-//        getHarvestDAO().deleteOldHarvests(getHarvestId(), NO_OF_LAST_HARVESTS_PRESERVED);
-//
-//        return shouldHarvestRedirectedToSource;
-//    }
 
     /**
      *
