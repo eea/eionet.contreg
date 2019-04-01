@@ -20,12 +20,13 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-
+import eionet.cr.common.Predicates;
+import eionet.cr.dao.DAOException;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.harvest.util.HarvestMessageType;
+import eionet.cr.util.Util;
 import org.apache.commons.lang.StringUtils;
-
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
@@ -33,12 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import eionet.cr.common.Predicates;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.harvest.util.HarvestMessageType;
-import eionet.cr.util.Util;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  *
@@ -136,7 +134,8 @@ public class UploadHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
 
         // add source metadata resulting from this harvest
-        addFirstSeenPredicate();
+        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
+        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
 
         String lastRefreshed = formatDate(new Date());
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));
@@ -163,7 +162,8 @@ public class UploadHarvest extends BaseHarvest {
         }
 
         // add source metadata resulting from this harvest
-        addFirstSeenPredicate();
+        String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
+        addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
 
         String lastRefreshed = formatDate(new Date());
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(lastRefreshed, XMLSchema.DATETIME));

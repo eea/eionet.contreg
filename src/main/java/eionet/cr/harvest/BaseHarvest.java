@@ -37,7 +37,6 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.FileDeletionJob;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
@@ -690,15 +689,18 @@ public abstract class BaseHarvest implements Harvest {
      * @throws DAOException
      */
     private void updateHarvestSourceFinished() throws DAOException {
+
         LOGGER.debug(loggerMsg("Updating harvest source record"));
         getContextSourceDTO().setLastHarvestId(harvestId);
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update redirected sources
         for (HarvestSourceDTO dto : redirectedHarvestSources) {
-            LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
-            dto.setLastHarvestId(harvestId);
-            getHarvestSourceDAO().updateSourceHarvestFinished(dto);
+            if (!dto.getSourceId().equals(getContextSourceDTO().getSourceId())) {
+                LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
+                dto.setLastHarvestId(harvestId);
+                getHarvestSourceDAO().updateSourceHarvestFinished(dto);
+            }
         }
     }
 
@@ -821,29 +823,16 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      *
-     * @param newUrl
+     * @param url
      * @throws HarvestException
      * @throws DAOException
      */
-    protected void switchContextTo(String newUrl) throws HarvestException, DAOException {
+    protected void switchContextTo(String url, HarvestSourceDTO sourceDTO) throws HarvestException, DAOException {
 
-        HarvestSourceDTO newSourceDTO = getHarvestSource(newUrl);
-        if (newSourceDTO == null) {
+        LOGGER.debug(loggerMsg("Switching context to " + url));
 
-            LOGGER.debug(loggerMsg("Creating harvest source for " + newUrl));
-
-            // Clone destination source from current context.
-            newSourceDTO = getContextSourceDTO().clone();
-            newSourceDTO.resetInterval();
-            newSourceDTO.setUrl(newUrl);
-            newSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(newUrl)));
-            newSourceDTO.setTimeCreated(new Date());
-            getHarvestSourceDAO().addSource(newSourceDTO);
-        }
-
-        this.contextUrl = newUrl;
-        this.contextSourceDTO = newSourceDTO;
-
+        this.contextUrl = url;
+        this.contextSourceDTO = sourceDTO;
         startHarvest();
     }
 
@@ -1394,17 +1383,5 @@ public abstract class BaseHarvest implements Harvest {
         }
 
         return contentLoader;
-    }
-
-    protected void addFirstSeenPredicate() {
-        // add source metadata resulting from this harvest
-
-        boolean subjectSeen = helperDAO.isSubjectSeen(getContextSourceDTO().getUrl());
-
-        if (!subjectSeen) {
-            String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
-            addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
-        }
-
     }
 }
