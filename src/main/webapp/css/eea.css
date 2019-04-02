@@ -1,0 +1,162 @@
+/* This style is for Semantic Data Service (SDS) new layout  */
+
+input[type='text'], input[type='password'],
+#content form select, textarea {
+    padding: 5px;
+    font-size: 1.2em;
+}
+#portal-columns input[type='radio'], #portal-columns input[type='checkbox'] {
+    margin: 7px 0 0;
+    vertical-align: top;
+}
+#portal-columns dd {
+    margin-left: 3em;
+}
+label {
+    font-size: 1.2em;
+    line-height: 2em;
+}
+#region-content form pre {
+    line-height: 1.3em;
+}
+
+/* For TemplateEEA layout */
+#region-content div.documentActions {
+    display: none;
+}
+div#visual-column-wrapper #portal-column-content {
+    width: 100%;
+    float: right;
+    margin-left: -190px;
+}
+div#visual-column-wrapper #content {
+    height: 100%;
+    margin: 0 0 0 190px;
+    padding-left: 1.3em;
+}
+div#visual-column-wrapper #portal-column-one {
+    float: left;
+    width: 190px;
+    overflow: hidden;
+    position: relative;
+}
+#portlet-navigation-tree ul,
+#region-content .menu {
+    margin: 0;
+    list-style-type: none;
+    list-style-image: none;
+}
+#region-content .menu > li {
+    display: block;
+}
+#portlet-navigation-tree ul li a {
+    background: transparent url(https://www.eea.europa.eu/bullet.gif) 10px -1px no-repeat;
+}
+
+#portal-column-one .portlet {
+    padding: 0.5em 0;
+    margin: 0;
+}
+
+.formtable label {
+    margin-bottom: 0;
+    padding-right: 6px;
+}
+#filtersForm > div {
+}
+
+#content #format {
+    vertical-align: inherit;
+}
+
+/* Simple Search page */
+.formtable #expressionText{
+    line-height: 1.6em;
+}
+.formtable tr td {
+    vertical-align: middle;
+}
+#region-content table.listing {
+    display: table !important;
+    width: 100%;
+}
+#resourcesResultList th a,
+#resourcesResultList th a:hover {
+    color: #fff !important;
+}
+#region-content .listingBar .listingPrevious,
+#region-content .listingBar .next {
+    min-width: initial;
+}
+
+/* Type Search page */
+#portal-columns .btn-block {
+    display: block !important;
+}
+#region-content div fieldset {
+    border: none;
+    border-style: none;
+}
+
+/* Tag search page */
+label.question {
+    vertical-align: baseline;
+}
+.tag-search-form {
+    
+}
+.tag-search-form p {
+    margin-top: 0.5em;
+}
+
+/* Browse datasets page */
+#content form#filtersForm fieldset {
+    border: none;
+    border-stlye: none;
+}
+#dataset thead th a,
+#dataset thead th a:hover {
+    color: #fff !important;
+}
+
+/* SPARQL endpoint page */
+#listItem thead th a,
+#listItem thead th a:hover {
+    color: #fff !important;
+}
+
+/* Harvest queue page */
+#harvestSource th a,
+#harvestSource th a:hover,
+#queueItems thead th a,
+#queueItems thead th a:hover {
+    color: #fff !important;
+}
+
+/* For the Operations button from top-right of page */
+#dropdown-operations a:visited, 
+#dropdown-operations > li a:hover {
+    color: #fff !important;
+}
+#dropdown-operations li ul li a:link, #dropdown-operations li ul li a:visited {
+    color: #000 !important;
+}
+#dropdown-operations li ul {
+    margin: 0;
+}
+
+/* Misc */
+#wizard form table {
+    display: table;
+    width: 100%;
+}
+#registratioinslist th a,
+#registratioinslist th a:hover {
+    color: #fff !important;
+}
+#region-content table.listing th a:link {
+    display: inline-block;
+}
+#region-content table.listing thead th {
+    text-align: center;
+}

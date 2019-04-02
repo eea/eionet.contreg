@@ -28,10 +28,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.ScriptTemplateDAO;
 import eionet.cr.dto.ScriptTemplateDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Script template DAO implementation.
@@ -41,7 +43,7 @@ import eionet.cr.dto.ScriptTemplateDTO;
 public class ScriptTemplateDaoImpl implements ScriptTemplateDAO {
 
     /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(ScriptTemplateDaoImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptTemplateDaoImpl.class);
 
     /** */
     private static final String PROPERTIES_FILE_NAME = "linkScripts.xml";

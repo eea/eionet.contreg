@@ -73,16 +73,16 @@ public class EditSourceActionBean extends AbstractActionBean {
     private String ownerName;
 
     /** Interval multiplyers. */
-    private int intervalMultiplier;
-    private static LinkedHashMap<Integer, String> intervalMultipliers;
+//    private int intervalMultiplier;
+//    private static LinkedHashMap<Integer, String> intervalMultipliers;
 
-    static {
-        intervalMultipliers = new LinkedHashMap<Integer, String>();
-        intervalMultipliers.put(Integer.valueOf(1), "minutes");
-        intervalMultipliers.put(Integer.valueOf(60), "hours");
-        intervalMultipliers.put(Integer.valueOf(1440), "days");
-        intervalMultipliers.put(Integer.valueOf(10080), "weeks");
-    }
+//    static {
+//        intervalMultipliers = new LinkedHashMap<Integer, String>();
+//        intervalMultipliers.put(Integer.valueOf(1), "minutes");
+//        intervalMultipliers.put(Integer.valueOf(60), "hours");
+//        intervalMultipliers.put(Integer.valueOf(1440), "days");
+//        intervalMultipliers.put(Integer.valueOf(10080), "weeks");
+//    }
 
     /**
      * Action event for displaying the source edit form.
@@ -277,16 +277,8 @@ public class EditSourceActionBean extends AbstractActionBean {
                     addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                 }
 
-                Integer intervalMinutes = harvestSource.getIntervalMinutes();
-                if (intervalMinutes != null) {
-                    if (intervalMinutes.intValue() < 0 || intervalMultiplier < 0) {
-                        addGlobalValidationError(new SimpleError("Harvest interval must be >= 0"));
-                    } else {
-                        harvestSource.setIntervalMinutes(Integer.valueOf(intervalMinutes.intValue() * intervalMultiplier));
-                    }
-                } else {
-                    harvestSource.setIntervalMinutes(Integer.valueOf(0));
-                }
+                harvestSource.calculateNewInterval(false);
+
             } catch (MalformedURLException e) {
                 addGlobalValidationError(new SimpleError("Invalid URL!"));
             }
@@ -308,9 +300,9 @@ public class EditSourceActionBean extends AbstractActionBean {
      *
      * @return int
      */
-    public int getSelectedIntervalMultiplier() {
-        return getIntervalMultipliers().keySet().iterator().next().intValue();
-    }
+//    public int getSelectedIntervalMultiplier() {
+//        return getIntervalMultipliers().keySet().iterator().next().intValue();
+//    }
 
     /**
      * Returns all the valid media types.
@@ -373,23 +365,23 @@ public class EditSourceActionBean extends AbstractActionBean {
     /**
      * @return the intervalMultiplier
      */
-    public int getIntervalMultiplier() {
-        return intervalMultiplier;
-    }
+//    public int getIntervalMultiplier() {
+//        return intervalMultiplier;
+//    }
 
     /**
      * @param intervalMultiplier the intervalMultiplier to set
      */
-    public void setIntervalMultiplier(int intervalMultiplier) {
-        this.intervalMultiplier = intervalMultiplier;
-    }
+//    public void setIntervalMultiplier(int intervalMultiplier) {
+//        this.intervalMultiplier = intervalMultiplier;
+//    }
 
     /**
      * @return the intervalMultipliers
      */
-    public LinkedHashMap<Integer, String> getIntervalMultipliers() {
-        return intervalMultipliers;
-    }
+//    public LinkedHashMap<Integer, String> getIntervalMultipliers() {
+//        return intervalMultipliers;
+//    }
 
     /**
      * @return the ownerName

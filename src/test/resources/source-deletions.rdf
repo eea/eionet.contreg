@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cd="http://www.recshop.fake/cd#">
+
+    <cd:Record rdf:about="http://www.recshop.fake/cd/Empire%20Burlesque">
+      <cd:artist>Bob Dylan</cd:artist>
+      <cd:country>USA</cd:country>
+      <cd:company>Columbia</cd:company>
+      <cd:price>10.90</cd:price>
+      <cd:year>1985</cd:year>
+    </cd:Record>
+
+    <cd:Record rdf:about="http://www.recshop.fake/cd/Hide%20your%20heart">
+      <cd:artist>Bonnie Tyler</cd:artist>
+      <cd:country>UK</cd:country>
+      <cd:company>CBS Records</cd:company>
+      <cd:price>9.90</cd:price>
+      <cd:year>1988</cd:year>
+    </cd:Record>
+
+</rdf:RDF>

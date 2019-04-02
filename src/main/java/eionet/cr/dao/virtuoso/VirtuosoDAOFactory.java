@@ -1,8 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eionet.cr.dao.BrowseVoidDatasetsDAO;
 import eionet.cr.dao.CompiledDatasetDAO;
 import eionet.cr.dao.DAO;
@@ -10,19 +7,24 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.DeliveryFilterDAO;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
 import eionet.cr.dao.ExporterDAO;
+import eionet.cr.dao.ExternalServiceDAO;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestDAO;
 import eionet.cr.dao.HarvestMessageDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dao.ReviewsDAO;
 import eionet.cr.dao.SearchDAO;
+import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.dao.SpoBinaryDAO;
 import eionet.cr.dao.StagingDatabaseDAO;
 import eionet.cr.dao.TagsDAO;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dao.UserHomeDAO;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -59,13 +61,15 @@ public final class VirtuosoDAOFactory extends DAOFactory {
         registeredDaos.put(UrgentHarvestQueueDAO.class, VirtuosoUrgentHarvestQueueDAO.class);
         registeredDaos.put(SpoBinaryDAO.class, VirtuosoSpoBinaryDAO.class);
         registeredDaos.put(CompiledDatasetDAO.class, VirtuosoCompiledDatasetDAO.class);
-        registeredDaos.put(PostHarvestScriptDAO.class, VirtuosoPostHarvestScriptDAO.class);
+        registeredDaos.put(HarvestScriptDAO.class, VirtuosoHarvestScriptDAO.class);
         registeredDaos.put(FolderDAO.class, VirtuosoFolderDAO.class);
         registeredDaos.put(ReviewsDAO.class, VirtuosoReviewsDAO.class);
         registeredDaos.put(DeliveryFilterDAO.class, VirtuosoDeliveryFilterDAO.class);
         registeredDaos.put(BrowseVoidDatasetsDAO.class, VirtuosoBrowseVoidDatasetsDAO.class);
         registeredDaos.put(StagingDatabaseDAO.class, VirtuosoStagingDatabaseDAO.class);
         registeredDaos.put(EndpointHarvestQueryDAO.class, VirtuosoEndpointHarvestQueryDAO.class);
+        registeredDaos.put(SourceDeletionsDAO.class, VirtuosoSourceDeletionsDAO.class);
+        registeredDaos.put(ExternalServiceDAO.class, VirtuosoExternalServiceDAO.class);
     }
 
     /**

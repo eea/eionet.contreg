@@ -44,8 +44,8 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.tee.uit.security.AccessController;
-import com.tee.uit.security.SignOnException;
+import eionet.acl.AccessController;
+import eionet.acl.SignOnException;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
@@ -76,6 +76,8 @@ import eionet.cr.web.action.home.HomesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Folder tab on factsheet page.
@@ -84,6 +86,11 @@ import eionet.cr.web.util.tabs.TabElement;
  */
 @UrlBinding("/folder.action")
 public class FolderActionBean extends AbstractActionBean implements Runnable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FolderActionBean.class);
+
+    /** Temporary space placeholder for some parsing below. */
+    private static final String TEMP_SPACE_REPLACEMENT = "---TEMP_SPACE_REPLACEMENT---";
 
     /** The current folder URI. */
     private String uri;
@@ -236,15 +243,15 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                 String oldUri = item.getUri();
 
                 String newUri = uri + "/";
-                String newName = StringUtils.replace(item.getNewName(), " ", "---TEMP_SPACE_REPLACEMENT---");
+                String newName = StringUtils.replace(item.getNewName(), " ", TEMP_SPACE_REPLACEMENT);
                 try {
                     newName = URLEncoder.encode(newName, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                newName = StringUtils.replace(newName, "---TEMP_SPACE_REPLACEMENT---", "%20");
+                newName = StringUtils.replace(newName, TEMP_SPACE_REPLACEMENT, "%20");
 
-                newUri+= newName;
+                newUri += newName;
 
                 if (!uniqueNewNames.add(item.getNewName())) {
                     addSystemMessage("Cannot name multiple items with the same name: " + item.getNewName());
@@ -302,15 +309,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * @throws SignOnException if deleting ACL fails
      */
     public Resolution delete() throws DAOException, SignOnException {
-        aclPath = FolderUtil.extractAclPath(uri);
 
-        // allow to view the folder by default if there is no ACL
-        //        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.DELETE_PERMISSION, false);
-        //
-        //        if (!actionAllowed) {
-        //            addSystemMessage("Only authorized users can delete files.");
-        //            return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
-        //        }
+        aclPath = FolderUtil.extractAclPath(uri);
 
         if (itemsNotSelected()) {
             addSystemMessage("Select files or folders to delete.");
@@ -340,13 +340,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous()));
 
-        // Delete folders
+        // Delete folders.
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FOLDER.equals(item.getType())) {
 
                 boolean folderDeleted = fileStore.deleteFolder(FolderUtil.extractPathInFolder(item.getUri()));
                 if (!folderDeleted) {
-                    logger.warn("Failed to delete folder from filestore for uri: " + item.getUri());
+                    LOGGER.warn("Failed to delete folder from filestore for uri: " + item.getUri());
                 }
             }
             if (item.isSelected()
@@ -355,7 +355,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             }
         }
 
-        // Delete files
+        // Delete files.
         for (RenameFolderItemDTO item : selectedItems) {
             if (item.isSelected() && FolderItemDTO.Type.FILE.equals(item.getType())) {
                 String filePath = FolderUtil.extractPathInFolder(item.getUri());
@@ -400,9 +400,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
         }
 
-        title = StringUtils.replace(title, " ", "---TEMP_SPACE_REPLACEMENT---");
+        title = StringUtils.replace(title, " ", TEMP_SPACE_REPLACEMENT);
         title = URLEncoder.encode(title, "UTF-8");
-        title = StringUtils.replace(title, "---TEMP_SPACE_REPLACEMENT---", "%20");
+
+        String titleSpacesUnescaped = StringUtils.replace(title, TEMP_SPACE_REPLACEMENT, " ");
+        title = StringUtils.replace(title, TEMP_SPACE_REPLACEMENT, "%20");
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (folderDAO.fileOrFolderExists(uri, title)) {
@@ -413,10 +415,11 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         String context = FolderUtil.folderContext(uri);
 
         folderDAO.createFolder(uri, title, label, context);
-        AccessController.addAcl(aclPath + "/" + title, getUserName(), title, true);
+        AccessController.addAcl(aclPath + "/" + titleSpacesUnescaped, getUserName(), titleSpacesUnescaped, true);
 
         if (FolderUtil.isProjectRootFolder(uri)) {
-            AccessController.addAcl(aclPath + "/" + title + "/bookmarks", getUserName(), "Bookmarks for " + title, true);
+            AccessController.addAcl(aclPath + "/" + titleSpacesUnescaped + "/bookmarks", getUserName(), "Bookmarks for "
+                    + titleSpacesUnescaped, true);
         }
 
         addSystemMessage("Folder created successfully.");
@@ -442,6 +445,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * Upload file to CR folder.
+     *
      * @return Stripes resolution
      * @throws DAOException if harvesting or any other DB operation fails
      * @throws IOException if I/O error
@@ -449,7 +453,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     public Resolution upload() throws DAOException, IOException, SignOnException {
         aclPath = FolderUtil.extractAclPath(uri);
-        boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), replaceExisting ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION, false);
+        boolean actionAllowed =
+                CRUser.hasPermission(aclPath, getUser(), replaceExisting ? CRUser.UPDATE_PERMISSION : CRUser.INSERT_PERMISSION,
+                        false);
         if (!actionAllowed) {
             addWarningMessage("Not authorized to upload files");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", uri);
@@ -487,7 +493,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // String urlBinding = getUrlBinding();
         // resolution = new RedirectResolution(StringUtils.replace(urlBinding, "{username}", getUserName()));
 
-        //add file ACL if not existing
+        // add file ACL if not existing
         if (!replaceExisting) {
             AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
         }
@@ -597,7 +603,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
 
             // persist the prepared "userHome cr:hasFile fileSubject" triple
-            logger.debug("Creating the cr:hasFile predicate");
+            LOGGER.debug("Creating the cr:hasFile predicate");
             helperDao.addTriples(homeSubjectDTO);
 
             // store file subject DTO if it has been initialized
@@ -618,10 +624,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
             // (but set interval minutes to 0, to avoid it being background-harvested)
             DAOFactory
-            .get()
-            .getDao(HarvestSourceDAO.class)
-            .addSourceIgnoreDuplicate(
-                    HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
+                    .get()
+                    .getDao(HarvestSourceDAO.class)
+                    .addSourceIgnoreDuplicate(
+                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
 
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -653,7 +659,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      */
     private File saveContent() throws DAOException, IOException {
 
-        logger.debug("Going to save the uploaded file's content into database");
+        LOGGER.debug("Going to save the uploaded file's content into database");
 
         File file = null;
 
@@ -695,7 +701,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // harvestable
         HarvestSourceDTO harvestSourceDTO = null;
         try {
-            logger.debug("Creating and storing harvest source");
+            LOGGER.debug("Creating and storing harvest source");
             HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
             HarvestSourceDTO source = new HarvestSourceDTO();
@@ -705,7 +711,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
             dao.addSourceIgnoreDuplicate(source);
             harvestSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
         } catch (DAOException e) {
-            logger.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
+            LOGGER.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
         }
 
         // perform harvest,
@@ -721,10 +727,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
                     CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
                 }
             } else {
-                logger.debug("Harvest source was not created, so skipping harvest");
+                LOGGER.debug("Harvest source was not created, so skipping harvest");
             }
         } catch (HarvestException e) {
-            logger.info("Exception when trying to harvest uploaded file content", e);
+            LOGGER.info("Exception when trying to harvest uploaded file content", e);
         }
     }
 
@@ -788,6 +794,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks selected items delete permission.
+     *
      * @return list of declined items
      * @throws SignOnException if acl check fails
      */
@@ -795,7 +802,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         StringBuilder result = new StringBuilder();
         for (RenameFolderItemDTO item : selectedItems) {
             String acl = aclPath + "/" + item.getName();
-            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.DELETE_PERMISSION)) {
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl)
+                    && !CRUser.hasPermission(getUserName(), acl, CRUser.DELETE_PERMISSION)) {
                 result.append(item.getName()).append(" ");
             }
 
@@ -807,6 +815,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks if items selected to be renamed have update permission.
+     *
      * @return list of declined items
      * @throws SignOnException if acl check fails
      */
@@ -814,7 +823,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         StringBuilder result = new StringBuilder();
         for (RenameFolderItemDTO item : renameItems) {
             String acl = aclPath + "/" + item.getName();
-            if (item.isSelected() && AccessController.getAcls().containsKey(acl) && !CRUser.hasPermission(getUserName(), acl, CRUser.UPDATE_PERMISSION)) {
+            if (item.isSelected() && AccessController.getAcls().containsKey(acl)
+                    && !CRUser.hasPermission(getUserName(), acl, CRUser.UPDATE_PERMISSION)) {
                 result.append(item.getName()).append(" ");
             }
         }
@@ -878,16 +888,24 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     /**
      * Deletes corresponding ACLs of the deleted items.
      *
-     * @param uris
-     *            array of URIs that are deleted
-     * @throws SignOnException
-     *             if delete ACLs files
+     * @param itemUris URIs of items whose ACLs are to be deleted.
+     * @throws SignOnException If problem with deleting ACLs.
      */
-    private void deleteAcls(List<String> uris) throws SignOnException {
-        for (String uriToDelete : uris) {
-            String aclP = FolderUtil.extractAclPath(uriToDelete);
-            if (AccessController.getAcls().containsKey(aclP)) {
-                AccessController.removeAcl(aclP);
+    @SuppressWarnings("rawtypes")
+    private void deleteAcls(List<String> itemUris) throws SignOnException {
+
+        for (String uri : itemUris) {
+
+            String aclPath = FolderUtil.extractAclPath(uri);
+            HashMap acls = AccessController.getAcls();
+            if (acls.containsKey(aclPath)) {
+                AccessController.removeAcl(aclPath);
+            } else {
+                // ACL names do NOT actually have the spaces escaped.
+                aclPath = StringUtils.replace(aclPath, "%20", " ");
+                if (acls.containsKey(aclPath)) {
+                    AccessController.removeAcl(aclPath);
+                }
             }
         }
     }
@@ -1076,6 +1094,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
     /**
      * checks if user has permission for this acl.
+     *
      * @param folderUri folder full URI
      * @param permission permission to check
      * @return tru if user has permission

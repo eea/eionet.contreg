@@ -2,7 +2,6 @@ package eionet.cr.filestore;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,34 +20,36 @@ import net.sourceforge.stripes.action.FileBean;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * A utility class representing CR local file store.
  *
  * @author jaanus
  *
  */
 public final class FileStore {
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(FileStore.class);
+    /** Static logger for this class */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStore.class);
 
-    /** */
+    /** File store path in file-system. */
     public static final String PATH = GeneralConfig.getRequiredProperty(GeneralConfig.FILESTORE_PATH);
 
-    /**
-     * current user home folder.
-     */
+    /** Current user home folder. */
     private final File userDir;
 
     /**
+     * Instantiates a new file store.
      *
-     * @param userName
+     * @param userName the user name
      */
     private FileStore(String userName) {
 
@@ -249,7 +250,7 @@ public final class FileStore {
      * @param oldName
      * @param newName
      */
-    public void rename(String oldName, String newName){
+    public void rename(String oldName, String newName) {
 
         File file = new File(userDir, oldName);
         if (file.exists() && file.isFile()) {
@@ -275,6 +276,7 @@ public final class FileStore {
 
         File file = new File(userDir, relativePath);
         if (!file.exists() || !file.isFile()) {
+            LOGGER.debug("File not found: " + file.getAbsolutePath());
             return null;
         } else {
             return file;
@@ -282,8 +284,25 @@ public final class FileStore {
     }
 
     /**
+     * Returns true if this file store has a file by the given relative path.
      *
-     * @param uriString
+     * @param relativePath The file's relative path.
+     * @return Boolean in indicating the file's existence.
+     */
+    public boolean fileExists(String relativePath) {
+
+        if (StringUtils.isBlank(relativePath)) {
+            return false;
+        }
+
+        File file = new File(userDir, relativePath);
+        return file.exists() && file.isFile();
+    }
+
+    /**
+     * Gets file by its URI.
+     *
+     * @param uriString the uri string
      * @return File
      */
     public static File getByUri(String uriString) {
@@ -368,7 +387,7 @@ public final class FileStore {
         if (!StringUtils.isBlank(relativePath)) {
             File file = new File(userDir, relativePath);
 
-            String tempFileName = relativePath+".encoding.temp";
+            String tempFileName = relativePath + ".encoding.temp";
             File tempFile = new File(userDir, tempFileName);
 
             if (tempFile.exists() && tempFile.isFile()) {
@@ -401,15 +420,12 @@ public final class FileStore {
                     encodingSuccessful = true;
                 }
 
-                if (encodingSuccessful){
+                if (encodingSuccessful) {
                     delete(relativePath);
                     rename(tempFileName, relativePath);
                 }
 
             }
         }
-
-
     }
-
 }

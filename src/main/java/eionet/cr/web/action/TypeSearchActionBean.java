@@ -62,6 +62,8 @@ import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Aleksandr Ivanov
@@ -69,6 +71,8 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 @UrlBinding("/typeSearch.action")
 public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TypeSearchActionBean.class);
 
     /**
      * Last action types on type search page.
@@ -184,7 +188,7 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
     @SuppressWarnings("unchecked")
     public Resolution export() throws Exception {
 
-        logger.trace("**************  START EXPORT REQUEST  ***********");
+        LOGGER.trace("**************  START EXPORT REQUEST  ***********");
 
         restoreStateFromSession();
         ExportFormat format = ExportFormat.fromName(exportFormat);
@@ -285,12 +289,12 @@ public class TypeSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
      */
     @Override
     public Resolution search() throws DAOException {
-        logger.trace("**************  START SEARCH REQUEST  ***********");
+        LOGGER.trace("**************  START SEARCH REQUEST  ***********");
         if (!StringUtils.isBlank(type)) {
             long startTime = System.currentTimeMillis();
 
             restoreStateFromSession();
-            logger.trace("after restoreStateFromSession " + Util.durationSince(startTime));
+            LOGGER.trace("after restoreStateFromSession " + Util.durationSince(startTime));
             startTime = System.currentTimeMillis();
 
             LastAction lastAction = getLastAction();

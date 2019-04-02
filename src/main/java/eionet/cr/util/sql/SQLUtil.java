@@ -30,10 +30,12 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRException;
 import eionet.cr.dao.readers.ResultSetReaderException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -43,7 +45,7 @@ import eionet.cr.dao.readers.ResultSetReaderException;
 public final class SQLUtil {
 
     /** Static logger. */
-    protected static final Logger LOGGER = Logger.getLogger(SQLUtil.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(SQLUtil.class);
 
     /**
      * Hide utility class constructor.
@@ -337,6 +339,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing connection", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }
@@ -352,6 +357,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing statement", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }
@@ -367,6 +375,9 @@ public final class SQLUtil {
             } catch (Exception e) {
                 // Ignore closing exceptions.
                 LOGGER.warn("Exception when closing result set", e);
+            } catch (Error e) {
+                // Ignore closing exceptions.
+                LOGGER.warn("Error when closing statement", e);
             }
         }
     }

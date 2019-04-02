@@ -26,11 +26,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dto.StagingDatabaseDTO;
 import eionet.cr.staging.imp.ImportStatus;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SQL result set reader for objects of type {@link StagingDatabaseDTO}.
@@ -40,7 +42,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 public class StagingDatabaseDTOReader extends SQLResultSetBaseReader<StagingDatabaseDTO> {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(StagingDatabaseDTOReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StagingDatabaseDTOReader.class);
 
     /* (non-Javadoc)
      * @see eionet.cr.util.sql.SQLResultSetReader#readRow(java.sql.ResultSet)

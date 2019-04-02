@@ -20,12 +20,11 @@
  */
 package eionet.cr.dto;
 
-import java.util.Date;
-
-import org.apache.commons.lang.time.DurationFormatUtils;
-
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.web.util.WebConstants;
+import org.apache.commons.lang.time.DurationFormatUtils;
+
+import java.util.Date;
 
 /**
  *
@@ -34,6 +33,7 @@ import eionet.cr.web.util.WebConstants;
  */
 public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
 
+    private static final long serialVersionUID = -8541217014927046005L;
     /** */
     private Integer harvestId;
     private Integer harvestSourceId;
@@ -45,7 +45,6 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
     private Integer encodingSchemes;
     private Integer totalStatements;
     private Integer litObjStatements;
-    private String dateString;
 
     /** HTTP response code. */
     private int responseCode;
@@ -210,20 +209,6 @@ public class HarvestDTO extends HarvestBaseDTO implements java.io.Serializable {
      */
     public void setEncodingSchemes(Integer encodingSchemes) {
         this.encodingSchemes = encodingSchemes;
-    }
-
-    /**
-     * @return the dateString
-     */
-    public String getDateString() {
-        return dateString;
-    }
-
-    /**
-     * @param dateString the dateString to set
-     */
-    public void setDateString(String dateString) {
-        this.dateString = dateString;
     }
 
     /** HTTP Response Code output.

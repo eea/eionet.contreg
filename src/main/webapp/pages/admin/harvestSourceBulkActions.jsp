@@ -5,11 +5,11 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Bulk add/delete/check harvest sources">
 
     <stripes:layout-component name="contents">
-    
+
         <h1>Bulk add/delete/check harvest sources</h1>
-        
+
         <div style="margin-top:15px">
-            <stripes:form beanclass="${actionBean.class.name}" method="post">
+            <stripes:form beanclass="${actionBean['class'].name}" method="post">
                 <div>
                     <label for="sourceUrlsTextArea" class="question">Harvest sources to add/delete/check:</label>
                     <textarea name="sourceUrlsString" id="sourceUrlsTextArea" rows="20" cols="80" style="display:block; width:100%"><c:out value="${actionBean.sourceUrlsString}"/></textarea>

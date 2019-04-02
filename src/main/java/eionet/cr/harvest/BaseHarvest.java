@@ -21,53 +21,18 @@
 
 package eionet.cr.harvest;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.xml.sax.SAXException;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestMessageDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
-import eionet.cr.dto.HarvestDTO;
-import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dao.*;
+import eionet.cr.dto.*;
+import eionet.cr.dto.HarvestScriptDTO.Phase;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
+import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
 import eionet.cr.harvest.load.RDFFormatLoader;
+import eionet.cr.harvest.service.ExternalService;
+import eionet.cr.harvest.service.ExternalServiceFactory;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.EMailSender;
@@ -75,43 +40,88 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
+import eionet.cr.util.xml.ConversionSchema;
+import eionet.cr.util.xml.ConversionSchema.Type;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.security.CRUser;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import java.io.*;
+import java.net.URLConnection;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
+ * Base abstract class for harvest-performing classes.
  *
  * @author Jaanus Heinlaid
  */
 public abstract class BaseHarvest implements Harvest {
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(BaseHarvest.class);
+    /**
+     * Static logger for this class.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseHarvest.class);
 
-    /** No of latest harvests whose history is kept in the database. Used in houskeeping. */
+    /**
+     * No of latest harvests whose history is kept in the database. Used in houskeeping.
+     */
     protected static final int NO_OF_LAST_HARVESTS_PRESERVED = 10;
 
-    /** Default harvesting timeout (36 hours = 129600000 ms) if no last harvest duration could be detected. */
+    /**
+     * Default harvesting timeout (36 hours = 129600000 ms) if no last harvest duration could be detected.
+     */
     protected static final int DEFAULT_HARVEST_TIMEOUT = 129600000;
 
-    /** Minimum possible harvest timeout (10 min = 600000 ms). */
+    /**
+     * Minimum possible harvest timeout (10 min = 600000 ms).
+     */
     protected static final int MINIMUM_HARVEST_TIMEOUT = 600000;
 
-    /** A harvest is expected to take no more than the duration of last harvest multiplied by this constnat. */
+    /**
+     * A harvest is expected to take no more than the duration of last harvest multiplied by this constnat.
+     */
     protected static final double HARVEST_TIMEOUT_MULTIPLIER = 1.2;
 
-    /** Text/plain content type. */
+    /**
+     * Text/plain content type.
+     */
     protected static final String CONTENT_TYPE_TEXT = "text/plain";
 
-    /** Turtle file extension. */
+    /**
+     * Turtle file extension.
+     */
     protected static final String EXT_TTL = "ttl";
 
-    /** N3 file extension. */
+    /**
+     * N3 file extension.
+     */
     protected static final String EXT_N3 = "n3";
 
-    /** N-Triples file extension. */
+    /**
+     * N-Triples file extension.
+     */
     protected static final String EXT_NTRIPLES = "nt";
 
-    /** container for redirected source DTOs. */
+    /**
+     * container for redirected source DTOs.
+     */
     protected final List<HarvestSourceDTO> redirectedHarvestSources = new ArrayList<HarvestSourceDTO>();
 
     /** */
@@ -119,63 +129,104 @@ public abstract class BaseHarvest implements Harvest {
     private final HarvestDAO harvestDAO = DAOFactory.get().getDao(HarvestDAO.class);
     private final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
     private final HarvestMessageDAO harvestMessageDAO = DAOFactory.get().getDao(HarvestMessageDAO.class);
+    private final ExternalServiceDAO externalServiceDAO = DAOFactory.get().getDao(ExternalServiceDAO.class);
 
-    /** The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled. */
+    /**
+     * The currently harvested URL. In case of redirections, this is the current redirected-to-URL that is baeing handled.
+     */
     private String contextUrl;
 
-    /** The harvest source DTO object mnatching the {@link #contextUrl}. */
+    /**
+     * The harvest source DTO object mnatching the {@link #contextUrl}.
+     */
     private HarvestSourceDTO contextSourceDTO;
 
-    /** The metadata of the currently harvest source as in triple store. */
+    /**
+     * The metadata of the currently harvest source as in triple store.
+     */
     private SubjectDTO sourceMetadata;
 
-    /** The current harvest's ID, assigned at the harvest's start. */
+    /**
+     * The current harvest's ID, assigned at the harvest's start.
+     */
     private int harvestId;
 
-    /** List of messages collected during the harvest and saved into the DB. */
+    /**
+     * List of messages collected during the harvest and saved into the DB.
+     */
     private List<HarvestMessageDTO> harvestMessages = new ArrayList<HarvestMessageDTO>();
 
-    /** If true, all previously present harvest source metadata should be purged from the triple store. */
+    /**
+     * If true, all previously present harvest source metadata should be purged from the triple store.
+     */
     private boolean cleanAllPreviousSourceMetadata;
 
-    /** The number of triples stored during this harvest. This does NOT include the generated harvest source metadata! */
+    /**
+     * If true, all triples must be removed from the graph represented by the harvested source in the harvest-finish stage.
+     */
+    private boolean clearTriplesInHarvestFinish;
+
+    /**
+     * The number of triples stored during this harvest. This does NOT include the generated harvest source metadata!
+     */
     private int storedTriplesCount;
 
-    /** True if the current harvest was initiated by the user (as opposed to batch harvester in the background) . */
+    /**
+     * True if the current harvest was initiated by the user (as opposed to batch harvester in the background) .
+     */
     protected boolean isOnDemandHarvest;
 
-    /** The user who initiated the current harvest (if this is is an on-edmand harvest). */
+    /**
+     * The user who initiated the current harvest (if this is is an on-edmand harvest).
+     */
     private String harvestUser;
 
-    /** Last harvest duration in milliseconds. */
+    /**
+     * Last harvest duration in milliseconds.
+     */
     private long lastHarvestDuration;
 
-    /** True if a fatal error occurred during this harvest, otherwise false. */
+    /**
+     * True if a fatal error occurred during this harvest, otherwise false.
+     */
     protected boolean isFatalErrorOccured = false;
 
-    /** HTTP response code returned from the harvest source. */
+    /**
+     * HTTP response code returned from the harvest source.
+     */
     protected int httpResponseCode;
 
-    /** The timeout value of this harvest. Initialized at first access to the getter. */
+    /**
+     * The timeout value of this harvest. Initialized at first access to the getter.
+     */
     private Integer timeout;
 
-    /** Harvest status classifier for started and on-going harvests. */
+    /**
+     * Harvest status classifier for started and on-going harvests.
+     */
     public static final String STATUS_STARTED = "started";
 
-    /** Harvest status classifier for properly finished harvests. */
+    /**
+     * Harvest status classifier for properly finished harvests.
+     */
     public static final String STATUS_FINISHED = "finished";
 
-    /** Harvest status classifier for abandoned (e.g. killed by Tomcat restart) harvests. */
+    /**
+     * Harvest status classifier for abandoned (e.g. killed by Tomcat restart) harvests.
+     */
     public static final String STATUS_ABANDONED = "abandoned";
 
-    /** Classifier for indicating harvests where the content is being pulled from the source. */
+    /**
+     * Classifier for indicating harvests where the content is being pulled from the source.
+     */
     public static final String TYPE_PULL = "pull";
 
-    /** Classifier for indicating harvests where the content is being pushed by the source. */
+    /**
+     * Classifier for indicating harvests where the content is being pushed by the source.
+     */
     public static final String TYPE_PUSH = "push";
 
     /**
-     *
      * Class constructor.
      *
      * @param contextUrl
@@ -187,7 +238,6 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     *
      * @param contextSourceDTO
      */
     protected BaseHarvest(HarvestSourceDTO contextSourceDTO) {
@@ -228,7 +278,6 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * @throws HarvestException
-     *
      */
     private void startHarvest() throws HarvestException {
 
@@ -250,21 +299,35 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     *
      * @throws HarvestException
      */
     protected abstract void doHarvest() throws HarvestException;
 
     /**
-     *
      * @param dontThrowException
      * @throws HarvestException
      */
     private void finishHarvest(boolean dontThrowException) throws HarvestException {
 
         try {
-            // run post-harvest scripts
-            runPostHarvestScripts();
+            // Clear the triples if sub-classes have requested so.
+            // They should do that when the harvest failed in such a way that no previous content is to be left into the graph.
+            if (clearTriplesInHarvestFinish) {
+
+                // Run pre-purge scripts.
+                runHarvestScripts(Phase.PRE_PURGE, HarvestScriptType.POST_HARVEST);
+
+                LOGGER.debug("Purging the graph of " + getContextUrl());
+                DAOFactory.get().getDao(HarvestSourceDAO.class).clearGraph(getContextUrl());
+                getContextSourceDTO().setStatements(0);
+            }
+
+            // Run post-harvest scripts.
+            runHarvestScripts(Phase.AFTER_NEW, HarvestScriptType.POST_HARVEST);
+
+
+            // Run Push scripts.
+            runHarvestScripts(null, HarvestScriptType.PUSH);
 
             // send harvest messages
             sendHarvestMessages();
@@ -278,7 +341,7 @@ public abstract class BaseHarvest implements Harvest {
                 }
             }
 
-            // update harvest source dto
+            // update harvest source DTO
             updateHarvestSourceFinished();
 
             // close harvest record, persist harvest messages
@@ -324,30 +387,40 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      * Runs all post-harvest scripts relevant for this harvest.
+     *
+     * @param phase Only scripts meant for this phase will be run.
      */
-    private void runPostHarvestScripts() {
+    private void runHarvestScripts(Phase phase, HarvestScriptType type) {
 
-        if (getStoredTriplesCount() <= 0) {
-            LOGGER.info(loggerMsg("Ignoring post-harvest scripts, as no triples were harvested!"));
-            return;
+        if (phase == null && HarvestScriptType.POST_HARVEST.equals(type)) {
+            throw new IllegalArgumentException("Phase must be specified for post-harvest scripts!");
         }
 
-        LOGGER.debug(loggerMsg("Running post-harvest scripts"));
+        // If the phase is "after harvesting new content" and there was actually 0 triple harvested then don't continue.
+        if (Phase.AFTER_NEW.equals(phase) || HarvestScriptType.PUSH.equals(type)) {
+            if (getStoredTriplesCount() <= 0) {
+                LOGGER.info(loggerMsg("Ignoring harvest scripts, as no triples were harvested!"));
+                return;
+            }
+        }
+
+        String dbgLabel = type.getShortLabel() + (phase != null ? " " + phase.getShortLabel() : "");
+        LOGGER.debug(loggerMsg("Running \"" + dbgLabel  + "\" scripts..."));
 
         RepositoryConnection conn = null;
         try {
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
-            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+            HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
             int totalScriptsFound = 0;
             // run scripts meant for all sources (i.e. all-source scripts)
-            List<PostHarvestScriptDTO> scripts = dao.listActive(null, null);
+            List<HarvestScriptDTO> scripts = dao.listActive(null, null, phase, type);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
             // run scripts meant for this source only
-            scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, getContextUrl());
+            scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, getContextUrl(), phase, type);
             totalScriptsFound += scripts.size();
             runScripts(scripts, conn);
 
@@ -357,39 +430,38 @@ public abstract class BaseHarvest implements Harvest {
             List<String> distinctTypes = reader.getResultList();
             if (distinctTypes != null && !distinctTypes.isEmpty()) {
 
-                scripts = dao.listActiveForTypes(distinctTypes);
+                scripts = dao.listActiveForTypes(distinctTypes, phase, type);
                 totalScriptsFound += scripts.size();
                 runScripts(scripts, conn);
             }
 
             if (totalScriptsFound == 0) {
-                LOGGER.debug(loggerMsg("No active post-harvest scripts were found relevant for this source"));
+                LOGGER.debug(loggerMsg("No active \"" + dbgLabel  + "\" scripts were found relevant for this source"));
             }
 
             // commit changes
             conn.commit();
         } catch (Exception e) {
             SesameUtil.rollback(conn);
-            addHarvestMessage("Error when running post-harvest scripts: " + e.getMessage(), HarvestMessageType.ERROR,
-                    Util.getStackTrace(e));
-            LOGGER.error(loggerMsg("Error when running post-harvest scripts: " + e.getMessage()), e);
+            addHarvestMessage("Error when running \"" + dbgLabel  + "\" scripts: " + e.getMessage(),
+                    HarvestMessageType.ERROR, Util.getStackTrace(e));
+            LOGGER.error(loggerMsg("Error when running \"" + phase.getShortLabel() + "\" scripts: " + e.getMessage()), e);
         } finally {
             SesameUtil.close(conn);
         }
     }
 
     /**
-     *
      * @param scriptDtos
      * @param conn
      */
-    private void runScripts(List<PostHarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
+    private void runScripts(List<HarvestScriptDTO> scriptDtos, RepositoryConnection conn) {
 
         if (scriptDtos == null || scriptDtos.isEmpty()) {
             return;
         }
 
-        for (PostHarvestScriptDTO scriptDto : scriptDtos) {
+        for (HarvestScriptDTO scriptDto : scriptDtos) {
             runScript(scriptDto, conn);
         }
     }
@@ -398,7 +470,7 @@ public abstract class BaseHarvest implements Harvest {
      * @param scriptDto
      * @param conn
      */
-    private void runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
+    private void runScript(HarvestScriptDTO scriptDto, RepositoryConnection conn) {
 
         TargetType targetType = scriptDto.getTargetType();
         String targetUrl = scriptDto.getTargetUrl();
@@ -406,25 +478,18 @@ public abstract class BaseHarvest implements Harvest {
         String title = scriptDto.getTitle();
         String scriptType = targetType == null ? "all-source" : targetType.toString().toLowerCase() + "-specific";
         String associatedType = targetType != null && targetType.equals(TargetType.TYPE) ? targetUrl : null;
-        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
+        String parsedQuery = HarvestScriptParser.parseForExecution(query, getContextUrl(), associatedType);
+        Phase phase = scriptDto.getPhase();
+        String phaseShortLabel = phase == null ? "unknown phase" : phase.getShortLabel();
 
         try {
-            LOGGER.info(MessageFormat.format("Executing {0} script titled \"{1}\"", scriptType, title));
+            LOGGER.info(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
 
-            int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
-            if (updateCount > 0 && !scriptDto.isRunOnce()) {
-                // run maximum 100 times
-                LOGGER.debug("Script's update count was " + updateCount
-                        + ", running it until the count becomes 0, or no more than 100 times ...");
-                int i = 0;
-                int totalUpdateCount = updateCount;
-                for (; updateCount > 0 && i < 100; i++) {
-                    updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
-                    totalUpdateCount += updateCount;
-                }
-                LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
-            } else {
-                LOGGER.debug("Script's update count was " + updateCount);
+            //post-harvest
+            if (scriptDto.getType().name().equals(HarvestScriptType.POST_HARVEST.name())) {
+                runPostHarvestScript(parsedQuery, conn, scriptDto);
+            } else if (scriptDto.getType().name().equals(HarvestScriptType.PUSH.name())) {
+                runPushScript(parsedQuery, conn, scriptDto);
             }
         } catch (Exception e) {
             String message =
@@ -434,6 +499,73 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.warn(message);
             addHarvestMessage(message, HarvestMessageType.WARNING);
         }
+    }
+
+    private void runPushScript(String parsedQuery, RepositoryConnection conn, HarvestScriptDTO scriptDto)
+        throws  Exception {
+        FileWriter writer = null;
+        File file = null;
+
+        PostMethod post = null;
+        try {
+            //export CONSTRUCT result to a temp file
+            String fileName = System.getProperty("java.io.tmpdir") + File.separator + scriptDto.getId() + "_output.rdf";
+            writer = new FileWriter(fileName);
+            RDFHandler rdfxmlWriter = new RDFXMLWriter(writer);
+            SesameUtil.exportGraphQuery(parsedQuery, rdfxmlWriter, conn, null);
+            
+            file = new File(fileName);
+
+            //make POST
+            ExternalServiceDTO serviceDTO = externalServiceDAO.fetch(scriptDto.getExternalServiceId());
+
+            ExternalService service = ExternalServiceFactory.getService(serviceDTO.getServiceType());
+            post = service.buildPost(serviceDTO, scriptDto, file);
+
+            HttpClient httpclient = new HttpClient();
+            int status = httpclient.executeMethod(post);
+            LOGGER.info("Push service returned HTTP code " + status);
+            
+            if (HttpStatus.SC_OK != status) {
+                throw  new HarvestException("Unsuccessful response code from the remote service " + status);
+            }
+
+
+        } finally {
+            IOUtils.closeQuietly(writer);
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+            if (post != null) {
+                post.releaseConnection();
+            }
+        }
+
+    }
+    
+    private void runPostHarvestScript(String parsedQuery, RepositoryConnection conn, HarvestScriptDTO scriptDto)
+        throws  Exception {
+        int updateCount = SesameUtil.executeSPARUL(parsedQuery, conn);
+        if (updateCount > 0 && !scriptDto.isRunOnce()) {
+            // run maximum 100 times
+            LOGGER.debug("Script's update count was " + updateCount
+                    + ", running it until the count becomes 0, or no more than 100 times ...");
+            int i = 0;
+            int totalUpdateCount = updateCount;
+            for (; updateCount > 0 && i < 100; i++) {
+                updateCount = SesameUtil.executeSPARUL(parsedQuery, conn, getContextUrl());
+                totalUpdateCount += updateCount;
+            }
+            LOGGER.debug("Script was run for a total of " + (i + 1) + " times, total update count = " + totalUpdateCount);
+        } else {
+            LOGGER.debug("Script's update count was " + updateCount);
+        }
+        
+    }
+
+    private void runPushScript() {
+
+
     }
 
     /**
@@ -599,7 +731,7 @@ public abstract class BaseHarvest implements Harvest {
      * @return
      */
     public static String loggerMsg(Object messageObject, String contextGraphUri) {
-        return messageObject + " [" + contextGraphUri + "]";
+        return StringUtils.isBlank(contextGraphUri) ? messageObject + "" : messageObject + " [" + contextGraphUri + "]";
     }
 
     /*
@@ -777,6 +909,15 @@ public abstract class BaseHarvest implements Harvest {
         this.cleanAllPreviousSourceMetadata = cleanAllPreviousSourceMetadata;
     }
 
+    /**
+     * Sets the clearTriplesInHarvestFinish flag.
+     *
+     * @param clearTriples the clearTriplesInHarvestFinish to set
+     */
+    protected void setClearTriplesInHarvestFinish(boolean clearTriples) {
+        this.clearTriplesInHarvestFinish = clearTriples;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -796,7 +937,6 @@ public abstract class BaseHarvest implements Harvest {
 
     /**
      *
-     * @param message
      * @param throwable
      */
     private void sendFinishingError(Throwable throwable) {
@@ -1039,19 +1179,43 @@ public abstract class BaseHarvest implements Harvest {
      * @throws RDFParseException if error in RDF parsing
      */
     protected int processLocalContent(File file, String contentType) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
-        // If the downloaded file can be loaded straight away as it is, then proceed to loading straight away.
+        // If the file can be loaded straight away as it is, then proceed to loading straight away.
         // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
         ContentLoader contentLoader = getLocalFileContentloader(file, contentType);
+        int result = loadFileContent(file, contentLoader);
+        return result;
+    }
+
+    /**
+     * Loads content of the given file using the given content loader. The loader may be null, in which case the method attempts
+     * to further process the file into RDF format and create a loader from there.
+     *
+     * @param file The file whose content is to be loaded.
+     * @param contentLoader The loader to used. May be null as indicated above.
+     * @return Number of loaded triples.
+     *
+     * @throws DAOException If DAO call fails.
+     * @throws IOException If error in I/O.
+     * @throws SAXException If SAX parsing fails.
+     * @throws RDFHandlerException If error in RDF handler.
+     * @throws RDFParseException If error in RDF parsing.
+     */
+    protected int loadFileContent(File file, ContentLoader contentLoader) throws DAOException, IOException, SAXException,
+            RDFHandlerException, RDFParseException {
 
         if (contentLoader != null) {
+
             contentLoader.setTimeout(getTimeout());
-            LOGGER.debug(loggerMsg("Filestore file is in RDF or web feed format"));
-            return loadFile(file, contentLoader);
+            LOGGER.debug(loggerMsg("File is in RDF or web feed format"));
+            String loaderClassName = contentLoader.getClass().getSimpleName();
+            LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + loaderClassName));
+            return loadFiles(Collections.singletonMap(file, contentLoader));
         } else {
-            LOGGER.debug(loggerMsg("Filestore file is not in RDF or web feed format, processing the file further"));
+
+            LOGGER.debug(loggerMsg("File is not in RDF or web feed format, processing the file further"));
             File processedFile = null;
             try {
                 // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
@@ -1059,18 +1223,22 @@ public abstract class BaseHarvest implements Harvest {
                 FileToRdfProcessor fileProcessor = new FileToRdfProcessor(file, getContextUrl());
                 processedFile = fileProcessor.process();
 
-                String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
-                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
+                // Add conversion schema into source metadata under cr:xmlSchema attribute, unless there is no schema information
+                // or it is actually the file's root element.
+                ConversionSchema convSchema = fileProcessor.getConversionSchema();
+                if (convSchema != null && !ConversionSchema.Type.ROOT_ELEM.equals(convSchema.getType())) {
+                    addConversionSchemaMetadata(convSchema);
                 }
 
                 if (processedFile != null && fileProcessor.getRdfFormat() != null) {
                     LOGGER.debug(loggerMsg("File processed into RDF format"));
                     ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
                     rdfLoader.setTimeout(getTimeout());
-                    return loadFile(processedFile, rdfLoader);
+                    return loadFiles(Collections.singletonMap(processedFile, rdfLoader));
                 } else {
                     LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
+                    // File couldn't be processed into RDF, schedule its content deletion for the finish-harvest phase
+                    setClearTriplesInHarvestFinish(true);
                     return 0;
                 }
             } finally {
@@ -1082,17 +1250,29 @@ public abstract class BaseHarvest implements Harvest {
     }
 
     /**
-     * Loads file into triplestore.
+     * Adds source metadata about the given conversion schema.
      *
-     * @param file object in file system.
-     * @param contentLoader does the actual loading of triples.
-     * @return number of triples.
-     * @throws DAOException database exception
+     * @param convSchema The conversion schema object.
      */
-    protected int loadFile(File file, ContentLoader contentLoader) throws DAOException {
+    private void addConversionSchemaMetadata(ConversionSchema convSchema) {
 
-        LOGGER.debug(loggerMsg("Loading file into triple store, loader class is " + contentLoader.getClass().getSimpleName()));
-        return loadFiles(Collections.singletonMap(file, contentLoader));
+        Type convSchemaType = convSchema.getType();
+        String stringValue = convSchema.getStringValue();
+
+        if (StringUtils.isNotBlank(stringValue)) {
+
+            // We split, as the string value can contain actually multiple URIs.
+            String[] tokens = StringUtils.split(stringValue);
+            for (String token : tokens) {
+
+                // A Public DTD (i.e. as in XHTML documents) is not a URI, so make it literal. Otherwise URI.
+                if (convSchemaType.equals(ConversionSchema.Type.PUBLIC_DTD)) {
+                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(token, true, XMLSchema.STRING));
+                } else {
+                    addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(token, false));
+                }
+            }
+        }
     }
 
     /**
@@ -1110,6 +1290,9 @@ public abstract class BaseHarvest implements Harvest {
 
         HarvestSourceDAO dao = getHarvestSourceDAO();
         String url = getContextUrl();
+
+        // Run harvest scripts meant to be run before clearing the graph before loading new content.
+        runHarvestScripts(Phase.PRE_PURGE, HarvestScriptType.POST_HARVEST);
 
         int tripleCount = dao.loadContentFast(filesAndLoaders, url);
         return tripleCount;
@@ -1184,12 +1367,12 @@ public abstract class BaseHarvest implements Harvest {
         return contentLoader;
     }
 
-    protected void addFirstSeenPredicate(){
+    protected void addFirstSeenPredicate() {
         // add source metadata resulting from this harvest
 
         boolean subjectSeen = helperDAO.isSubjectSeen(getContextSourceDTO().getUrl());
 
-        if (!subjectSeen){
+        if (!subjectSeen) {
             String firstSeen = formatDate(getContextSourceDTO().getTimeCreated());
             addSourceMetadata(Predicates.CR_FIRST_SEEN, ObjectDTO.createLiteral(firstSeen, XMLSchema.DATETIME));
         }

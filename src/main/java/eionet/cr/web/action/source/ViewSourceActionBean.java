@@ -31,31 +31,33 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.HarvestDTO;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
-import eionet.cr.dto.PostHarvestScriptDTO.TargetType;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.endpointquery.EndpointQueriesActionBean;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptActionBean;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptsActionBean;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * View source tab.
@@ -66,7 +68,7 @@ import eionet.cr.web.util.tabs.TabElement;
 public class ViewSourceActionBean extends AbstractActionBean {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(ViewSourceActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewSourceActionBean.class);
 
     /** URI of the source. */
     private String uri;
@@ -80,8 +82,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
     /** Harvest history. */
     private List<HarvestDTO> harvests;
 
-    /** Number of post-harvest scripts available for this source. */
-    private int noOfPostHarvestScripts;
+    /** Number of harvest scripts available for this source. */
+    private int noOfHarvestScripts;
 
     /** Is schema source. */
     private boolean schemaSource;
@@ -99,8 +101,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
             addCautionMessage("No request criteria specified!");
         } else {
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
-            noOfPostHarvestScripts =
-                    factory.getDao(PostHarvestScriptDAO.class).list(PostHarvestScriptDTO.TargetType.SOURCE, uri).size();
+            noOfHarvestScripts =
+                    factory.getDao(HarvestScriptDAO.class).list(HarvestScriptDTO.TargetType.SOURCE, uri, null).size();
             if (harvestSource != null) {
                 schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
                 harvests = factory.getDao(HarvestDAO.class).getHarvestsBySourceId(harvestSource.getSourceId());
@@ -144,7 +146,7 @@ public class ViewSourceActionBean extends AbstractActionBean {
         // Different action depending on the subject's type.
         if (isTableFile) {
             try {
-                List<String> warnings = CsvImportUtil.harvestTableFile(subject, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subject, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }
@@ -286,8 +288,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
      *
      * @return The class in question.
      */
-    public Class getPostHarvestScriptActionBeanClass() {
-        return PostHarvestScriptActionBean.class;
+    public Class<HarvestScriptActionBean> getHarvestScriptActionBeanClass() {
+        return HarvestScriptActionBean.class;
     }
 
     /**
@@ -296,8 +298,8 @@ public class ViewSourceActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getPostHarvestScriptsActionBeanClass() {
-        return PostHarvestScriptsActionBean.class;
+    public Class<HarvestScriptsActionBean> getHarvestScriptsActionBeanClass() {
+        return HarvestScriptsActionBean.class;
     }
 
     /**
@@ -311,9 +313,9 @@ public class ViewSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the noOfPostHarvestScripts
+     * @return the noOfHarvestScripts
      */
-    public int getNoOfPostHarvestScripts() {
-        return noOfPostHarvestScripts;
+    public int getNoOfHarvestScripts() {
+        return noOfHarvestScripts;
     }
 }

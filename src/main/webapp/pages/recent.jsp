@@ -13,12 +13,12 @@
         If none are displayed, it means addition time is known for none.
     </p>
 
-        <div id="tabbedmenu">
+        <div class="tabbedmenu" id="tabbedmenu">
             <ul>
                 <c:forEach items="${actionBean.types}" var="loopType">
                     <c:choose>
                           <c:when test="${actionBean.type==loopType.uri}" >
-                            <li id="currenttab"><span><c:out value="${loopType.title}"/></span></li>
+                            <li id="currenttab"><a class="current"><c:out value="${loopType.title}"/></a></li>
                         </c:when>
                         <c:otherwise>
                             <li>

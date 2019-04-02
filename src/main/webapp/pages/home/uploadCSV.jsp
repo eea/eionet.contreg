@@ -61,7 +61,19 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label class="question required" for="fileInput">File</label></td>
+                                    <td>
+                                        <label class="question" for="fileURL" title="URL of CSV/TSV file.">Online Source</label>
+                                    </td>
+                                    <td><stripes:text name="fileURL" id="fileURL" /></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label class="question" for="onlineFileName" title="File Name.">File Name</label>
+                                    </td>
+                                    <td><stripes:text name="onlineFileName" id="onlineFileName" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label class="question" for="fileInput">File</label></td>
                                     <td><stripes:file name="fileBean" id="fileInput" size="30" /></td>
                                 </tr>
                                 <tr>
@@ -75,6 +87,17 @@
                                             <c:forEach var="col" items="${actionBean.fileEncodings}">
                                                 <stripes:option value="${col.key}" label="${col.value}" />
                                             </c:forEach>
+                                        </stripes:select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label class="question" for="intervalSelect" title="">Re-harvest Interval</label></td>
+                                    <td>
+                                        <stripes:select name="interval" id="intervalSelect" style="width: 350px;">
+                                            <stripes:option value="0" label="Once" />
+                                            <stripes:option value="60" label="Hourly" />
+                                            <stripes:option value="1440" label="Daily" />
+                                            <stripes:option value="10080" label="Weekly" />
                                         </stripes:select>
                                     </td>
                                 </tr>
@@ -194,22 +217,22 @@
                                     </div>
                                     <table>
                                     <c:forEach items="${actionBean.dataLinkingScripts}" varStatus="loop">
-                                     <tr>
-                                        <td><label class="question required" for="linkedColumnSelect${loop.index}" title="Column to link data with.">Column</label></td>
-                                        <td>
-                                            <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="max-width:100%;">
-                                                <stripes:options-collection collection="${actionBean.columnLabels}" />
-                                            </stripes:select>
-                                        </td>
-                                     </tr>
-                                     <tr>
-                                        <td><label class="question required" for="scriptTemplateSelect${loop.index}" title="Linking script.">Linking script</label></td>
-                                        <td>
-                                            <stripes:select name="dataLinkingScripts[${loop.index}].scriptId" id="scriptTemplateSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].scriptId}" style="max-width:100%;">
-                                                <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
-                                            </stripes:select>
-                                        </td>
-                                     </tr>
+	                                    <tr>
+	                                        <td><label class="question required" for="linkedColumnSelect${loop.index}" title="Column to link data with.">Column</label></td>
+	                                        <td>
+	                                            <stripes:select name="dataLinkingScripts[${loop.index}].column" id="linkedColumnSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].column}" style="max-width:100%;">
+	                                                <stripes:options-collection collection="${actionBean.columnLabels}" />
+	                                            </stripes:select>
+	                                        </td>
+	                                    </tr>
+	                                    <tr>
+	                                        <td><label class="question required" for="scriptTemplateSelect${loop.index}" title="Linking script.">Linking script</label></td>
+	                                        <td>
+	                                            <stripes:select name="dataLinkingScripts[${loop.index}].scriptId" id="scriptTemplateSelect${loop.index}" value="${actionBean.dataLinkingScripts[loop.index].scriptId}" style="max-width:100%;">
+	                                                <stripes:options-collection collection="${actionBean.scriptTemplates}" value="id" label="name" />
+	                                            </stripes:select>
+	                                        </td>
+	                                    </tr>
                                     </c:forEach>
                                     <tr>
                                         <td colspan="2">

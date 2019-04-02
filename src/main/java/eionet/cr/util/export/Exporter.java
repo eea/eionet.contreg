@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
@@ -43,6 +43,8 @@ import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to handle export procedure.
@@ -51,7 +53,7 @@ import eionet.cr.util.pagination.PagingRequest;
  */
 public abstract class Exporter {
 
-    protected Logger logger = Logger.getLogger(Exporter.class);
+    protected Logger logger = LoggerFactory.getLogger(Exporter.class);
 
     private ExportFormat exportFormat;
     private Map<String, String> selectedFilters;

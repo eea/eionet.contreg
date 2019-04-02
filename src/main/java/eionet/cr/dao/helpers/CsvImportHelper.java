@@ -33,11 +33,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import eionet.cr.dto.enums.HarvestScriptType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -51,12 +52,13 @@ import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dto.HarvestScriptDTO;
+import eionet.cr.dto.HarvestScriptDTO.Phase;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PostHarvestScriptDTO;
 import eionet.cr.dto.ScriptTemplateDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
@@ -66,8 +68,10 @@ import eionet.cr.util.Util;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.DataLinkingScript;
 import eionet.cr.web.action.UploadCSVActionBean.FileType;
-import eionet.cr.web.action.admin.postHarvest.PostHarvestScriptParser;
+import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
 import eionet.cr.web.util.CharsetToolkit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods for importing CSV file.
@@ -83,7 +87,7 @@ public class CsvImportHelper {
     public static final String EMPTY_COLUMN = "Empty";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(CsvImportHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CsvImportHelper.class);
 
     /** Columns detected in the uploaded file (it's the titles of the columns). */
     private List<String> columns;
@@ -166,6 +170,9 @@ public class CsvImportHelper {
         CSVReader csvReader = null;
         try {
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, userName, true);
+            if (csvReader == null) {
+                throw new IllegalStateException("No CSV reader successfully created!");
+            }
             return helper.extractColumnLabels(helper.extractColumns(csvReader));
         } catch (Exception e) {
             throw e;
@@ -192,23 +199,55 @@ public class CsvImportHelper {
     /**
      * Iserts file metadata.
      *
-     * @param fileSize
+     * @param size
      * @param userName
      * @throws Exception
      */
-    public void insertFileMetadataAndSource(long fileSize, String userName) throws Exception {
+    public void insertFileMetadataAndSource(long size, String userName) throws Exception {
 
         HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
         dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, 0, userName));
 
+        insertFileMetadataAndSourceHelper(dao, size);
+    }
+
+    /**
+     * Iserts file metadata.
+     *
+     * @param size
+     * @param userName
+     * @param isOnlineCsvTsv
+     * @param interval
+     * @param csvUrl
+     * @throws Exception
+     */
+    public void insertFileMetadataAndSource(long size, String userName, boolean isOnlineCsvTsv, int interval, String csvUrl) throws Exception {
+
+        HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+        dao.addSourceIgnoreDuplicate(HarvestSourceDTO.create(fileUri, false, interval, userName, isOnlineCsvTsv, csvUrl));
+
+        insertFileMetadataAndSourceHelper(dao, size);
+    }
+
+    /**
+     *
+     * @param dao
+     * @param size
+     * @throws Exception
+     */
+    public void insertFileMetadataAndSourceHelper(HarvestSourceDAO dao, long size) throws Exception {
         String mediaType = fileType.toString();
         String lastModified = Util.virtuosoDateToString(new Date());
 
+        // If long size can be converted to int without loss, then do so, otherwise remain true to long.
+        ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
+
         dao.insertUpdateSourceMetadata(fileUri, Predicates.RDF_TYPE, ObjectDTO.createResource(Subjects.CR_TABLE_FILE));
-        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(fileSize));
+        dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_BYTE_SIZE, byteSize);
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(mediaType));
         dao.insertUpdateSourceMetadata(fileUri, Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(lastModified));
     }
+
 
     /**
      * Adds reference of the file to the given parent folder.
@@ -286,6 +325,8 @@ public class CsvImportHelper {
                                 ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE),
                                 charset), delim);
             }
+        } else {
+            throw new IOException("Found no such file: " + (file == null ? "null" : file.toString()));
         }
 
         return result;
@@ -405,27 +446,27 @@ public class CsvImportHelper {
         }
 
         // Retrieve the list of already stored post-harvest scripts.
-        PostHarvestScriptDAO postHarvestScriptDAO = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
-        List<PostHarvestScriptDTO> postHarvestScripts = postHarvestScriptDAO.list(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+        HarvestScriptDAO harvestScriptDAO = DAOFactory.get().getDao(HarvestScriptDAO.class);
+        List<HarvestScriptDTO> harvestScripts = harvestScriptDAO.list(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
 
         // Loop over the given data-linking scripts, save each one as a post-harvest script in the database.
         for (DataLinkingScript dataLinkingScript : dataLinkingScripts) {
 
             // Prepare URI of the column that this data-linking script is associated with.
-            String columnUri = fileUri + "#" + dataLinkingScript.getColumn();
-            columnUri = "<" + columnUri.replace(" ", "_") + ">";
+            String columnUri = "<" + columnLabelToUri(dataLinkingScript.getColumn(), fileUri) + ">";
 
             // Prepare the data-linking script SPARQL based on the template retrieved by the script's id.
             ScriptTemplateDTO scriptTemplate = new ScriptTemplateDaoImpl().getScriptTemplate(dataLinkingScript.getScriptId());
             String sparql = StringUtils.replace(scriptTemplate.getScript(), "[TABLECOLUMN]", columnUri);
 
             String scriptTemplateName = scriptTemplate.getName();
-            int existingScriptId = getMatchingScriptId(postHarvestScripts, fileUri, scriptTemplateName);
+            int existingScriptId = getMatchingScriptId(harvestScripts, fileUri, scriptTemplateName);
             if (existingScriptId == 0) {
-                postHarvestScriptDAO.insert(PostHarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
-                        true);
+                harvestScriptDAO.insert(HarvestScriptDTO.TargetType.SOURCE, fileUri, scriptTemplateName, sparql, true,
+                        true, null, HarvestScriptType.POST_HARVEST, null, null);
             } else {
-                postHarvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true);
+                harvestScriptDAO.save(existingScriptId, scriptTemplateName, sparql, true, true, null, 
+                        HarvestScriptType.POST_HARVEST, null, null);
             }
         }
     }
@@ -442,11 +483,12 @@ public class CsvImportHelper {
         try {
             conn = SesameUtil.getRepositoryConnection();
             conn.setAutoCommit(false);
-            PostHarvestScriptDAO dao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+            HarvestScriptDAO dao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
-            List<PostHarvestScriptDTO> scripts = dao.listActive(PostHarvestScriptDTO.TargetType.SOURCE, fileUri);
+            List<HarvestScriptDTO> scripts = dao.listActive(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW, 
+                    HarvestScriptType.POST_HARVEST);
 
-            for (PostHarvestScriptDTO script : scripts) {
+            for (HarvestScriptDTO script : scripts) {
                 String warning = runScript(script, conn);
                 if (StringUtils.isNotEmpty(warning)) {
                     warnings.add(warning);
@@ -471,12 +513,12 @@ public class CsvImportHelper {
      * @param conn
      * @return warning message
      */
-    private String runScript(PostHarvestScriptDTO scriptDto, RepositoryConnection conn) {
+    private String runScript(HarvestScriptDTO scriptDto, RepositoryConnection conn) {
 
         String targetUrl = scriptDto.getTargetUrl();
         String query = scriptDto.getScript();
         String title = scriptDto.getTitle();
-        String parsedQuery = PostHarvestScriptParser.parseForExecution(query, targetUrl, null);
+        String parsedQuery = HarvestScriptParser.parseForExecution(query, targetUrl, null);
 
         String warningMessage = null;
 
@@ -513,9 +555,9 @@ public class CsvImportHelper {
      * @param title Script's title to check against.
      * @return Matching script's id.
      */
-    private int getMatchingScriptId(List<PostHarvestScriptDTO> scripts, String targetUrl, String title) {
+    private int getMatchingScriptId(List<HarvestScriptDTO> scripts, String targetUrl, String title) {
 
-        for (PostHarvestScriptDTO script : scripts) {
+        for (HarvestScriptDTO script : scripts) {
 
             boolean targetUrlEqual = StringUtils.equalsIgnoreCase(script.getTargetUrl(), targetUrl);
             boolean titleEqual = StringUtils.equalsIgnoreCase(script.getTitle(), title);
@@ -732,8 +774,7 @@ public class CsvImportHelper {
      *
      * @throws DAOException
      */
-    public void generateAndStoreTableFileQuery()
-            throws DAOException {
+    public void generateAndStoreTableFileQuery() throws DAOException {
 
         String objectsTypeUri = fileUri + "/" + objectsType;
 
@@ -807,5 +848,78 @@ public class CsvImportHelper {
         } finally {
             SesameUtil.close(repoConn);
         }
+    }
+
+    /**
+     * A utility method for constructing a URI for a particular column of a particular file.
+     *
+     * @param columnLabel The column's label.
+     * @param fileUri The file's URI.
+     * @return The columns's URI.
+     */
+    public static String columnLabelToUri(String columnLabel, String fileUri) {
+        return new StringBuilder(fileUri).append("#").append(columnLabel.replace(' ', '_')).toString();
+    }
+
+    /**
+     * Returns data-linking scripts that already exist for this {@link #fileUri}, taking into account the the given columns
+     * exist in the file.
+     *
+     * @return The given column labels.
+     * @throws DAOException In case database access error occurs.
+     */
+    public List<DataLinkingScript> getExistingDataLinkingScripts(List<String> columnLabels) throws DAOException {
+
+        ArrayList<DataLinkingScript> resultList = new ArrayList<DataLinkingScript>();
+
+        HarvestScriptDAO scriptsDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
+        List<HarvestScriptDTO> existingScripts = scriptsDao.list(HarvestScriptDTO.TargetType.SOURCE, fileUri, Phase.AFTER_NEW);
+        if (CollectionUtils.isNotEmpty(existingScripts)) {
+
+            List<ScriptTemplateDTO> scriptTemplates = new ScriptTemplateDaoImpl().getScriptTemplates();
+            if (CollectionUtils.isNotEmpty(scriptTemplates)) {
+
+                // Loop over the file's existing post-harvest scripts, and find a matching data-linking script for each one.
+                // The latter is found by looping over all available data-linking script templates and
+                // - comparing the title of the post-harvest script and the name of the data-linking script template.
+                // - finding the data-linking column in the post-harvest script by looping over all possible column URIs and
+                // finding the first one whose URI is contained in the post-harvest script.
+
+                for (HarvestScriptDTO phScript : existingScripts) {
+
+                    String phScriptTitle = phScript.getTitle();
+                    String phScriptSparql = phScript.getScript();
+                    if (StringUtils.isNotBlank(phScriptTitle) && StringUtils.isNotBlank(phScriptSparql)) {
+
+                        for (ScriptTemplateDTO scriptTemplate : scriptTemplates) {
+
+                            String templateId = scriptTemplate.getId();
+                            String templateName = scriptTemplate.getName();
+
+                            boolean matchingTemplateFound = false;
+                            if (phScriptTitle.equals(templateName) && StringUtils.isNotBlank(templateId)) {
+
+                                for (String columnLabel : columnLabels) {
+
+                                    if (phScriptSparql.contains("<" + columnLabelToUri(columnLabel, fileUri) + ">")) {
+
+                                        DataLinkingScript dataLinkingScript = DataLinkingScript.create(columnLabel, templateId);
+                                        resultList.add(dataLinkingScript);
+                                        matchingTemplateFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (matchingTemplateFound) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return resultList;
     }
 }

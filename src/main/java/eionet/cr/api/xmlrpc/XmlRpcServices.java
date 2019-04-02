@@ -20,21 +20,6 @@
  */
 package eionet.cr.api.xmlrpc;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import eionet.cr.common.CRException;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -48,7 +33,21 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.qawcommons.DataflowResultDto;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 
 /**
  *
@@ -61,7 +60,7 @@ public class XmlRpcServices implements Services {
     private static final int MAX_RESULTS = 1000;
 
     /** */
-    private static Log logger = LogFactory.getLog(XmlRpcServices.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlRpcServices.class);
 
     /*
      * (non-Javadoc)
@@ -71,8 +70,8 @@ public class XmlRpcServices implements Services {
     @Override
     public List getResourcesSinceTimestamp(Date timestamp) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         List<Map<String, String[]>> result = new ArrayList<Map<String, String[]>>();
@@ -133,8 +132,8 @@ public class XmlRpcServices implements Services {
     @Override
     public List dataflowSearch(Map<String, String> criteria) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         if (criteria == null) {
@@ -190,8 +189,8 @@ public class XmlRpcServices implements Services {
     @Override
     public String pushContent(String content, String sourceUrl) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         if (content != null && content.trim().length() > 0) {
@@ -230,8 +229,8 @@ public class XmlRpcServices implements Services {
     @Override
     public Vector getEntries(Hashtable criteria) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
@@ -279,8 +278,8 @@ public class XmlRpcServices implements Services {
     @Override
     public Vector getDeliveries(Integer pageNum, Integer pageSize) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
@@ -363,8 +362,8 @@ public class XmlRpcServices implements Services {
     @Override
     public Vector getXmlFilesBySchema(String schemaIdentifier) throws CRException {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Entered " + Thread.currentThread().getStackTrace()[1].getMethodName());
         }
 
         Vector result = new Vector();
@@ -379,7 +378,7 @@ public class XmlRpcServices implements Services {
 
                 int subjectCount = searchResult.getMatchCount();
 
-                logger.debug(getClass().getSimpleName() + ".getXmlFilesBySchema(" + schemaIdentifier + "), " + subjectCount
+                LOGGER.debug(getClass().getSimpleName() + ".getXmlFilesBySchema(" + schemaIdentifier + "), " + subjectCount
                         + " subjects found in total");
 
                 List<SubjectDTO>  subjects = searchResult.getItems();

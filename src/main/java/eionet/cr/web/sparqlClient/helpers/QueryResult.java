@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
@@ -48,7 +48,7 @@ public class QueryResult {
     /**
      * Local logger.
      */
-    private static final Log LOGGER = LogFactory.getLog(QueryResult.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryResult.class);
 
     /**
      * Constructor that by default limits the result count.

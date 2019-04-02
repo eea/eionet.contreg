@@ -21,7 +21,7 @@
 package eionet.cr.harvest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
@@ -33,6 +33,8 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,7 +44,7 @@ import eionet.cr.web.security.CRUser;
 public final class OnDemandHarvester extends Thread {
 
     /** The static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(OnDemandHarvester.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OnDemandHarvester.class);
 
     /** */
     public enum Resolution {

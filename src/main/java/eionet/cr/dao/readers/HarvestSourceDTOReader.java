@@ -32,6 +32,7 @@ import eionet.cr.util.sql.SQLResultSetBaseReader;
 /**
  *
  * @author altnyris
+ * @author George Sofianos
  *
  */
 public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSourceDTO> {
@@ -53,9 +54,11 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         harvestSourceDTO.setStatements(new Integer(rs.getInt("STATEMENTS")));
         harvestSourceDTO.setCountUnavail(new Integer(rs.getInt("COUNT_UNAVAIL")));
         harvestSourceDTO.setLastHarvest(rs.getTimestamp("LAST_HARVEST"));
+        harvestSourceDTO.setLastModified(rs.getTimestamp("LAST_MODIFIED"));
         harvestSourceDTO.setIntervalMinutes(rs.getInt("INTERVAL_MINUTES"));
         harvestSourceDTO.setOwner(rs.getString("SOURCE_OWNER"));
         harvestSourceDTO.setMediaType(rs.getString("MEDIA_TYPE"));
+        harvestSourceDTO.setCsvTsvUrl(rs.getString("CSV_TSV_URL"));
 
         String isPrioritySourceStr = rs.getString("PRIORITY_SOURCE");
         if (StringUtils.isNotBlank(isPrioritySourceStr)) {
@@ -75,6 +78,11 @@ public class HarvestSourceDTOReader extends SQLResultSetBaseReader<HarvestSource
         String isSparqlEndpointStr = rs.getString("IS_SPARQL_ENDPOINT");
         if (StringUtils.isNotBlank(isSparqlEndpointStr)) {
             harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(isSparqlEndpointStr));
+        }
+
+        String isOnlineCsvTsv = rs.getString("IS_ONLINE_CSV_TSV");
+        if (StringUtils.isNotBlank(isOnlineCsvTsv)) {
+            harvestSourceDTO.setSparqlEndpoint(YesNoBoolean.parse(isOnlineCsvTsv));
         }
 
         resultList.add(harvestSourceDTO);

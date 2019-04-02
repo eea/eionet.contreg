@@ -20,31 +20,37 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Date;
+
+
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * Quartz job listener to be used for listening to {@link HarvestingJob}.
  *
- * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
+ * @author Jaanus
  */
 public class HarvestingJobListener implements JobListener {
 
-    public static final String NAME = HarvestingJobListener.class.getClass().getSimpleName();
+    /** Static logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestingJobListener.class);
 
-    /** */
-    private static Log logger = LogFactory.getLog(HarvestingJobListener.class);
+    /** Simple name of this class. Made constant because we need to return it via interface method. */
+    public static final String CLASS_NAME = HarvestingJobListener.class.getSimpleName();
 
     /*
      * (non-Javadoc)
      *
      * @see org.quartz.JobListener#getName()
      */
+    @Override
     public String getName() {
-        return NAME;
+        return CLASS_NAME;
     }
 
     /*
@@ -52,8 +58,9 @@ public class HarvestingJobListener implements JobListener {
      *
      * @see org.quartz.JobListener#jobExecutionVetoed(org.quartz.JobExecutionContext)
      */
+    @Override
     public void jobExecutionVetoed(JobExecutionContext context) {
-        logger.error("Execution vetoed for job " + context.getJobDetail().getName());
+        LOGGER.error("Execution vetoed for job " + context.getJobDetail().getName());
     }
 
     /*
@@ -61,8 +68,9 @@ public class HarvestingJobListener implements JobListener {
      *
      * @see org.quartz.JobListener#jobToBeExecuted(org.quartz.JobExecutionContext)
      */
+    @Override
     public void jobToBeExecuted(JobExecutionContext context) {
-        // logger.debug("Going to execute job " + context.getJobDetail().getName());
+        // LOGGER.debug("Going to execute job " + context.getJobDetail().getName());
     }
 
     /*
@@ -70,14 +78,16 @@ public class HarvestingJobListener implements JobListener {
      *
      * @see org.quartz.JobListener#jobWasExecuted(org.quartz.JobExecutionContext, org.quartz.JobExecutionException)
      */
+    @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException exception) {
 
+        JobDetail jobDetail = context.getJobDetail();
+        jobDetail.getJobDataMap().put(HarvestingJob.JobStateAttrs.LAST_FINISH.toString(), new Date());
+
         if (exception != null) {
-            logger.error("Exception thrown when executing job " + context.getJobDetail().getName() + ": " + exception.toString(),
-                    exception);
-            return;
+            LOGGER.error("Exception thrown when executing job " + jobDetail.getName() + ": " + exception.toString(), exception);
         }
 
-        // logger.debug("Executed job " + context.getJobDetail().getName());
+        // LOGGER.debug("Executed job " + context.getJobDetail().getName());
     }
 }

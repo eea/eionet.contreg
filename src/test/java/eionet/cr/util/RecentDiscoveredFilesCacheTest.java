@@ -22,43 +22,48 @@ package eionet.cr.util;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
 import eionet.cr.web.util.ApplicationCache;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandr Ivanov <a href="mailto:aleksandr.ivanov@tietoenator.com">contact</a>
  */
-public class RecentDiscoveredFilesCacheTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class RecentDiscoveredFilesCacheTest {
+
+    @BeforeClass
+    public static void beforeClass() {
+        new ApplicationCache().contextDestroyed(null);
+    }
 
     @Before
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void setUp() throws Exception {
         new ApplicationCache().contextInitialized(null);
     }
 
     @After
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void tearDown() throws Exception {
         new ApplicationCache().contextDestroyed(null);
     }
 
     @Test
     public void testCache() {
-
         for (int i = 0; i < 100; i++) {
             ApplicationCache.updateRecentResourceCache(getTestData(11));
             assertEquals(10, ApplicationCache.getRecentDiscoveredFiles(10).size());
         }
-
         assertEquals(3, ApplicationCache.getRecentDiscoveredFiles(3).size());
         assertEquals("8", ApplicationCache.getRecentDiscoveredFiles(3).get(0).getLeft());
-
     }
 
     /**

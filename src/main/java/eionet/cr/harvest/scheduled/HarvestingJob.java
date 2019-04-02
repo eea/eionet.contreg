@@ -20,19 +20,38 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import au.com.bytecode.opencsv.CSVReader;
+import eionet.acl.AccessController;
+import eionet.cr.common.Predicates;
+import eionet.cr.dao.*;
+import eionet.cr.dao.helpers.CsvImportHelper;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.filestore.FileStore;
+import eionet.cr.util.FolderUtil;
+import eionet.cr.web.action.DataLinkingScript;
+import eionet.cr.web.action.UploadCSVActionBean;
+import eionet.cr.web.action.factsheet.FolderActionBean;
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.rio.RDFParseException;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -40,9 +59,6 @@ import org.quartz.StatefulJob;
 
 import eionet.cr.common.JobScheduler;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.CurrentHarvests;
@@ -51,6 +67,9 @@ import eionet.cr.harvest.HarvestException;
 import eionet.cr.harvest.PullHarvest;
 import eionet.cr.harvest.PushHarvest;
 import eionet.cr.web.security.CRUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 /**
  *
@@ -59,24 +78,40 @@ import eionet.cr.web.security.CRUser;
  */
 public class HarvestingJob implements StatefulJob, ServletContextListener {
 
-    /** */
-    public static final String NAME = HarvestingJob.class.getClass().getSimpleName();
+    /** Enum for the names of attributes used for propagating job state specifics across its runs. */
+    public enum JobStateAttrs {
+        /** The date-time of the job's last execution's finish. */
+        LAST_FINISH
+    };
 
-    /**
-     * Number of minutes in an hour.
-     */
+    /** Static logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(HarvestingJob.class);
+
+    /** Max number of urgent harvests executed per one interval. */
+    private static final int DEFAULT_URGENT_HARVEST_LIMIT = 20;
+
+    /** Simple name of this class. */
+    public static final String NAME = HarvestingJob.class.getSimpleName();
+
+    /** Number of minutes in an hour. */
     private static final int MINUTES = 60;
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(HarvestingJob.class);
+    /** Upper limit for the number of urgent harvests performed at one interval. */
+    public static int URGENT_HARVEST_LIMIT;
 
-    /** */
+    /** The batch harvesting queue as retrieved from database. */
     private static List<HarvestSourceDTO> batchQueue;
 
-    /** */
+    /** Hours when the batch harvesting should be active. */
     private static List<HourSpan> batchHarvestingHours;
+
+    /** Interval (in seconds) at which this job (i.e. represented by this class) runs. */
     private static Integer intervalSeconds;
-    private static Integer harvesterUpperLimit;
+
+    /** Number of sources that can be batch-harvested during one interval. */
+    private static Integer batchHarvestLimit;
+
+    /** Total number of minutes per day when the batch-harvesting is active. */
     private static Integer dailyActiveMinutes;
 
     /*
@@ -87,20 +122,25 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     @Override
     public void execute(JobExecutionContext jobExecContext) throws JobExecutionException {
 
+        // Ensure that the job rests the configured amount of time after last run, before proceeding.
+        ensureRestingTime(jobExecContext);
+
         try {
-            // harvest urgent queue
+            // Harvest urgent queue.
             handleUrgentQueue();
 
-            // harvest batch queue
+            // Harvest batch queue.
             if (isBatchHarvestingEnabled()) {
                 handleBatchQueue();
             }
+
+            handleOnlineCsvTsv();
         } catch (Exception e) {
             throw new JobExecutionException(e.toString(), e);
         } finally {
             // State that no harvest is currently queued.
             CurrentHarvests.setQueuedHarvest(null);
-            // reset batch-harvesting queue
+            // Reset batch-harvesting queue
             batchQueue = null;
         }
     }
@@ -115,10 +155,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             UrgentHarvestQueueItemDTO queueItem = null;
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
 
-                counter++;
-                if (counter == 50) {
+                if (counter++ == URGENT_HARVEST_LIMIT) {
                     // Just a security measure to avoid an infinite loop here.
-                    // So lets do max 50 urgent harvests at one time.
+                    LOGGER.info("Handled " + URGENT_HARVEST_LIMIT + " urgent harvests, resting until next interval");
                     break;
                 }
 
@@ -232,6 +271,172 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
+     * @return List<HarvestSourceDTO
+     * @throws DAOException
+     */
+    private void handleOnlineCsvTsv() throws DAOException {
+        List<HarvestSourceDTO> nextScheduledSources = getNextScheduledOnlineCsvTsv();
+
+        for (HarvestSourceDTO sourceDTO : nextScheduledSources) {
+
+            String fileName = null;
+            String fileUri = null;
+            FileBean fileBean = null;
+            String fileTypeStr = sourceDTO.getUrl().split("\\.")[sourceDTO.getUrl().split("\\.").length - 1];
+            UploadCSVActionBean.FileType fileType = fileTypeStr.equalsIgnoreCase("csv") ? UploadCSVActionBean.FileType.CSV : UploadCSVActionBean.FileType.TSV;
+            String folderUri = sourceDTO.getUrl().substring(0, sourceDTO.getUrl().lastIndexOf("/"));
+            String username = folderUri.split("/")[folderUri.split("/").length - 1];
+            try {
+                URL website = new URL(sourceDTO.getCsvTsvUrl());
+                fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+                String tempFilePath = folderUri + "/temp/" + StringUtils.replace(fileName, " ", "%20");
+                File tempFile = new File(tempFilePath);
+                tempFile.getParentFile().mkdirs();
+                tempFile.createNewFile();
+                ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+                fileBean = new FileBean(tempFile, "text/plain", StringUtils.replace(fileName, " ", "%20"));
+            } catch (MalformedURLException e) {
+                LOGGER.error("Cannot get URL");
+                e.printStackTrace();
+                throw new DAOException(e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new DAOException(e.getMessage());
+            }
+
+            if (fileBean == null) {
+                continue;
+            }
+
+            fileName = fileBean.getFileName();
+            String fileRelativePath = "/" + StringUtils.replace(fileName, " ", "%20");
+            FileStore fileStore = FileStore.getInstance(folderUri);
+            SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(fileUri);
+
+            List<String> uniqueColumns = new ArrayList<String>();
+            String fileLabel = fileSubject.getObjectValue(Predicates.RDFS_LABEL);
+            String objectsType = fileSubject.getObjectValue(Predicates.CR_OBJECTS_TYPE);
+            String publisher = fileSubject.getObjectValue(Predicates.DCTERMS_PUBLISHER);
+            String attribution = fileSubject.getObjectValue(Predicates.DCTERMS_BIBLIOGRAPHIC_CITATION);
+            String source = fileSubject.getObjectValue(Predicates.DCTERMS_SOURCE);
+            Collection<String> coll = fileSubject.getObjectValues(Predicates.CR_OBJECTS_UNIQUE_COLUMN);
+            if (coll != null && !coll.isEmpty()) {
+                uniqueColumns.addAll(coll);
+            }
+            String license = fileSubject.getObjectValue(Predicates.DCTERMS_LICENSE);
+            if (StringUtils.isBlank(license)) {
+                license = fileSubject.getObjectValue(Predicates.DCTERMS_RIGHTS);
+            }
+
+            CsvImportHelper helper =
+                    new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution, source);
+
+            // Get already existing data-linking scripts for this file URI, as we need to remember them before overwrite.
+            List<DataLinkingScript> dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels(fileUri, fileRelativePath, username, fileType));
+
+            FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
+
+            String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+            // Delete existing data
+            folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
+            DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
+            fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + StringUtils.replace(fileName, " ", "%20")));
+
+            try {
+                // Save the file into user's file-store.
+                long fileSize = fileBean.getSize();
+                fileStore.addByMoving(folderUri, true, fileBean);
+
+                // Detect charset and convert the file to UTF-8
+                Charset detectedCharset = helper.detectCSVencoding(folderUri, fileRelativePath, username);
+                if (detectedCharset == null) {
+                    fileStore.delete(fileRelativePath);
+                    LOGGER.error("Cannot detect Charset");
+                } else if (!detectedCharset.toString().startsWith("UTF")) {
+                    fileStore.changeFileEncoding(fileRelativePath, detectedCharset, Charset.forName("UTF-8"));
+                }
+
+                // Store file as new source, but don't harvest it
+                helper.insertFileMetadataAndSource(fileSize, username, true, sourceDTO.getIntervalMinutes(), sourceDTO.getCsvTsvUrl());
+
+                // Add metadata about user folder update
+                helper.linkFileToFolder(folderUri, username);
+
+                // Save
+                CSVReader csvReader = null;
+                try {
+
+                    // The file was encoded to UTF-8 or UTF-* after upload
+                    csvReader = helper.createCSVReader(folderUri, fileRelativePath, username, true);
+                    if (csvReader == null) {
+                        throw new IllegalStateException("No CSV reader successfully created!");
+                    }
+
+                    helper.extractObjects(csvReader);
+                    helper.saveWizardInputs();
+
+                    // Save data-linking scripts, if any added.
+                    try {
+                        LOGGER.debug("Saving data-linking scripts for " + fileUri);
+                        helper.saveDataLinkingScripts(dataLinkingScripts);
+                    } catch (DAOException e) {
+                        LOGGER.error("Failed to add data linking script", e);
+                    }
+
+                    // Run all post-harvest scripts specific to this source (i.e. to this uploaded file).
+                    // This will run both the data data-linking scripts saved in the previous block, plus any that existed already.
+                    try {
+                        LOGGER.debug("Running all source-specific post-harvest scripts of " + fileUri);
+                        List<String> warnings = helper.runScripts();
+                        if (warnings.size() > 0) {
+                            for (String w : warnings) {
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to run data linking scripts", e);
+                    }
+
+                    // Finally, make sure that the file has the correct number of harvested statements in its predicates.
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).updateHarvestedStatementsTriple(fileUri);
+
+                } catch (Exception e) {
+                    LOGGER.error("Exception while processing the uploaded file:", e);
+                } finally {
+                    try {
+                        helper.generateAndStoreTableFileQuery();
+                    } catch (Exception e2) {
+                        LOGGER.error("Failed to generate SPARQL query", e2);
+                    }
+                    CsvImportHelper.close(csvReader);
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Error while reading the file: ", e);
+            }
+        }
+
+    }
+
+    /**
+     * Singleton getter for column labels.
+     *
+     * @return
+     */
+    public List<String> getColumnLabels(String folderUri, String fileUri, String username, UploadCSVActionBean.FileType fileType) {
+        try {
+            List<String> columnLabels = CsvImportHelper.extractColumnLabels(folderUri, fileUri, username, fileType);
+            return columnLabels;
+        } catch (Exception e) {
+            LOGGER.error("Exception while reading uploaded file:", e);
+            return new ArrayList<String>();
+        }
+    }
+
+    /**
      *
      * @return List<HarvestSourceDTO>
      * @throws DAOException
@@ -240,6 +445,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
         if (isBatchHarvestingEnabled()) {
             return DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledSources(getSourcesLimitForInterval());
+        } else {
+            return new ArrayList<HarvestSourceDTO>();
+        }
+    }
+
+    /**
+     *
+     * @return List<HarvestSourceDTO>
+     * @throws DAOException
+     */
+    public static List<HarvestSourceDTO> getNextScheduledOnlineCsvTsv() throws DAOException {
+
+        if (isBatchHarvestingEnabled()) {
+            return DAOFactory.get().getDao(HarvestSourceDAO.class).getNextScheduledOnlineCsvTsv(getSourcesLimitForInterval());
         } else {
             return new ArrayList<HarvestSourceDTO>();
         }
@@ -318,23 +537,20 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     }
 
     /**
-     * Returns the upper limit on the number of sources that are harvested in each interval. The value is retrieved from the general
-     * configuration file.
+     * Returns the the number of sources that can be batch-harvested during one interval. The value is retrieved from the general
+     * configuration file. The default is 5.
      *
      * @return the upper limit
      */
-    public static Integer getHarvesterUpperLimit() {
+    public static Integer getBatchHarvestLimit() {
 
-        if (harvesterUpperLimit == null) {
-            String upperLimitStr = GeneralConfig.getProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT).trim();
-            if (upperLimitStr != null && upperLimitStr.length() > 0) {
-                harvesterUpperLimit = Integer.parseInt(upperLimitStr);
-            } else {
-                harvesterUpperLimit = new Integer(0);
-            }
+        if (batchHarvestLimit == null) {
+
+            int value = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_SOURCES_UPPER_LIMIT, 5);
+            batchHarvestLimit = Integer.valueOf(value);
         }
 
-        return harvesterUpperLimit;
+        return batchHarvestLimit;
     }
 
     /**
@@ -393,6 +609,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             if (harvestSource == null) {
                 harvestSource = new HarvestSourceDTO();
                 harvestSource.setUrl(url);
+                harvestSource.calculateNewInterval();
                 harvestSourceDAO.addSource(harvestSource);
             }
 
@@ -480,7 +697,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
         try {
             int numOfSegments = getNumberOfSegments();
             Long numberOfSources = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrgencySourcesCount();
-            int upperLimit = getHarvesterUpperLimit();
+            int upperLimit = getBatchHarvestLimit();
 
             // Round up to 1 if there is something at all to harvest
             limit = (int) Math.ceil((double) numberOfSources / (double) numOfSegments);
@@ -533,6 +750,8 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
+        URGENT_HARVEST_LIMIT = GeneralConfig.getIntProperty(GeneralConfig.HARVESTER_URGENT_HARVESTS_PER_INTERVAL, DEFAULT_URGENT_HARVEST_LIMIT);
+
         try {
             JobDetail jobDetails = new JobDetail(HarvestingJob.NAME, JobScheduler.class.getName(), HarvestingJob.class);
 
@@ -545,7 +764,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             LOGGER.debug(getClass().getSimpleName() + " scheduled with interval seconds " + getIntervalSeconds()
                     + ", batch harvesting hours = " + getBatchHarvestingHours());
         } catch (Exception e) {
-            LOGGER.fatal("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(),
+            LOGGER.error("Error when scheduling " + getClass().getSimpleName() + " with interval seconds " + getIntervalSeconds(),
                     e);
         }
     }
@@ -557,5 +776,30 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    }
+
+    /**
+     * Ensure that the job rests the configured amount of time after last run, before proceeding.
+     *
+     * @param jobExecContext Job execution context as provided by Quartz.
+     */
+    private void ensureRestingTime(JobExecutionContext jobExecContext) {
+
+        JobDataMap jobDataMap = jobExecContext.getJobDetail().getJobDataMap();
+        Object o = jobDataMap.get(HarvestingJob.JobStateAttrs.LAST_FINISH.toString());
+
+        Date lastFinish = o instanceof Date ? (Date) o : null;
+        if (lastFinish != null) {
+
+            long lastFinishMillisAgo = Math.max((System.currentTimeMillis() - lastFinish.getTime()), 0L);
+            long millisToRest = (getIntervalSeconds().longValue() * 1000L) - lastFinishMillisAgo;
+            if (millisToRest > 0) {
+                try {
+                    Thread.sleep(millisToRest);
+                } catch (InterruptedException e) {
+                    LOGGER.warn("Resting interrupted: " + e);
+                }
+            }
+        }
     }
 }

@@ -55,7 +55,7 @@
                 <h1>Search Reportnet deliveries</h1>
                         <p class="documentDescription">
                         A Reportnet delivery is a response from a country on a reporting obligation. Deliveries can reside on several locations
-                        such as <a href="http://cdr.eionet.europa.eu/">CDR</a> or the country's own website.
+                        such as <a href="https://cdr.eionet.europa.eu/">CDR</a> or the country's own website.
                         Deliveries are tagged with the obligation, spatial coverage (locality) and temporal coverage (year).
                         </p>
 

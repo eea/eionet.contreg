@@ -300,4 +300,117 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet author="heinlja" id="rev-17">
+        <comment>A timestamp indicating when a harvest source was marked for batch deletion.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "delete_requested" DATETIME DEFAULT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-18">
+        <comment>A field indicating the phase when the harvest script should be run.</comment>
+        <sql>
+            ALTER TABLE "post_harvest_script" ADD COLUMN "phase" varchar(32) NOT NULL default 'AFTER_NEW'
+        </sql>
+    </changeSet>
+
+    <changeSet author="lainekai" id="rev-19">
+        <preConditions onFail="MARK_RAN">
+            <customPrecondition className="eionet.cr.liquibase.VirtuosoIndexNotExists">
+                <param name="tableName" value="post_harvest_script" />
+                <param name="indexName" value="post_harvest_script_source_url"  />
+            </customPrecondition>
+        </preConditions>
+
+        <comment>Add missing indexes to post harvest script.</comment>
+        <sql>
+            CREATE INDEX post_harvest_script_source_url ON post_harvest_script (target_source_url)
+        </sql>
+    </changeSet>
+    <changeSet author="lainekai" id="rev-20">
+        <preConditions onFail="MARK_RAN">
+            <customPrecondition className="eionet.cr.liquibase.VirtuosoIndexNotExists">
+                <param name="tableName" value="post_harvest_script" />
+                <param name="indexName" value="post_harvest_script_type_uri"  />
+            </customPrecondition>
+        </preConditions>
+        <comment>Add missing indexes to post harvest script.</comment>
+        <sql>
+            CREATE INDEX post_harvest_script_type_uri ON post_harvest_script (target_type_url)
+        </sql>
+    </changeSet>
+
+    <changeSet author="heinlja" id="rev-21">
+        <comment>Helper flag for understanding if a harvest source is marked for deletion or not (1=yes, 0=no)</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "delete_flag" SMALLINT DEFAULT 0
+        </sql>
+    </changeSet>
+
+    <changeSet author="lainekai" id="rev-22">
+        <comment>Harvest script type and external service for push services</comment>
+        <sql>
+            create table "external_service"
+            (
+            "service_id" INTEGER IDENTITY,
+            "service_url" VARCHAR(255),
+            "service_type" VARCHAR(50),
+            "secure_token" VARCHAR(255),
+            "user_name" VARCHAR(50),
+            PRIMARY KEY ("service_id")
+            )
+        </sql>
+
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "type" VARCHAR DEFAULT 'POST_HARVEST'
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "external_service_id" INTEGER IDENTITY
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD FOREIGN KEY ("external_service_id")
+            REFERENCES "external_service" ("service_id") ON DELETE CASCADE
+        </sql>
+        <sql>
+            ALTER TABLE "post_harvest_script"
+            ADD COLUMN "external_service_params" VARCHAR(255)
+        </sql>
+    </changeSet>
+
+    <changeSet id="rev-23" author="sofiageo">
+      <comment>A field indicating when the content was last modified</comment>
+      <sql>
+        ALTER TABLE "harvest_source"
+        ADD COLUMN "last_modified" DATETIME
+      </sql>
+    </changeSet>
+
+    <changeSet id="rev-24" author="thanostourikas">
+        <comment>A field indicating whether the source is a CSV/TSV downloaded file.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "is_online_csv_tsv" VARCHAR(1)
+        </sql>
+    </changeSet>
+
+    <changeSet id="rev-25" author="thanostourikas">
+        <comment>A field indicating the online source of CSV/TSV.</comment>
+        <sql>
+            ALTER TABLE "harvest_source"
+            ADD COLUMN "csv_tsv_url" VARCHAR(255)
+        </sql>
+    </changeSet>
+
+    <changeSet id="rev-26" author="heinlja">
+        <comment>Prune harvest history of orphan records not associated with any harvest source records.</comment>
+        <sql>
+            delete from "harvest" where "harvest_source_id" not in (select "harvest_source_id" from "harvest_source")
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

@@ -94,7 +94,6 @@ public class XmlExporter extends Exporter implements SubjectExportEvent {
                 }
             }
         }
-        // System.out.println(new String(outStream.toByteArray()));
 
         return new ByteArrayInputStream(outStream.toByteArray());
     }

@@ -28,12 +28,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.Namespace;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The AmpFeedServlet searches for objects of rdf:type "http://rdfdata.eionet.europa.eu/amp/ontology/Output". It then outputs the
@@ -45,7 +47,7 @@ import eionet.cr.util.sesame.SesameUtil;
 public class AmpFeedServlet extends HttpServlet {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(AmpFeedServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AmpFeedServlet.class);
 
     /** */
     public static final String SPARQL_QUERY = "select ?s ?p ?o where {?s ?p ?o."

@@ -3,18 +3,23 @@
  */
 package eionet.cr.util.exporter;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.util.export.XlsExporter;
 import eionet.cr.util.export.XmlExporter;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Enriko Käsper, TietoEnator Estonia AS ExporterTest
  */
-
-public class ExporterTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class ExporterTest {
 
     @Test
     public void testGetRowsLimit() {

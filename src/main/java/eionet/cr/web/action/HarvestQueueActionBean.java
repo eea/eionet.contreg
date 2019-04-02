@@ -228,6 +228,10 @@ public class HarvestQueueActionBean extends AbstractActionBean {
         this.selectedItems = selectedItems;
     }
 
+    public List<Integer> getSelectedItems() {
+        return selectedItems;
+    }
+
     /**
      * Returns the entry set of the on-going on-demand harvests map.
      *

@@ -22,6 +22,7 @@ package eionet.cr.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -39,35 +40,40 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * Utility methods for dealing with URLs.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
  */
 public class URLUtil {
 
-    /**  */
+    /** Static logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLUtil.class);
+
+    /** Illegal characters in IRI. */
     private static final String[] BAD_IRI_CHARS = {" ", "{", "}", "<", ">", "\"", "|", "\\", "^", "`"};
+
+    /** Escape codes for illegal characters in IRI (same order as the above array of illegal characters). */
     private static final String[] BAD_IRI_CHARS_ESCAPES = {"%20", "%7B", "%7D", "%3C", "%3E", "%22", "%7C", "%5C", "%5E", "%60"};
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(URLUtil.class);
-
-    /** */
+    /** The default character encoding . */
     private static final String DEFAULT_CHARACTAER_ENCODING = "UTF-8";
 
-    /** */
+    /** Various session identifiers to look for in URLs. */
     private static final List<String> SESSSION_IDENTIFIERS = Arrays.asList("JSESSIONID", "PHPSESSID", "ASPSESSIONID");
 
     /**
+     * Returns true if the given string is a URL by Java's {@link URL} constructor.
      *
-     * @param s
-     * @return boolean
+     * @param s String to check.
+     * @return boolean True/false.
      */
     public static boolean isURL(String s) {
 
@@ -152,9 +158,9 @@ public class URLUtil {
             URLUtil.disconnect(urlConnection);
         }
 
-        System.out.println("Response code: "+responseCode);
+        LOGGER.debug("Response code: " + responseCode);
 
-        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException
+        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException || ioe instanceof ConnectException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
                 || responseCode == HttpURLConnection.HTTP_VERSION;
     }
@@ -203,7 +209,7 @@ public class URLUtil {
 
             String userpass = username + ":" + password;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-            urlConnection.setRequestProperty ("Authorization", basicAuth);
+            urlConnection.setRequestProperty("Authorization", basicAuth);
 
             responseCode = ((HttpURLConnection) urlConnection).getResponseCode();
         } catch (IOException e) {
@@ -216,9 +222,9 @@ public class URLUtil {
                 && responseCode != HttpURLConnection.HTTP_FORBIDDEN && responseCode != HttpURLConnection.HTTP_UNAUTHORIZED;
     }
 
-
     /**
      * Calls {@link #isNotExisting(String, boolean)} with the boolean set to false. See documentation of that method.
+     *
      * @param urlStr As described above.
      * @return As described above.
      */

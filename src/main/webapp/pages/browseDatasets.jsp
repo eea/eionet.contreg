@@ -56,11 +56,18 @@
 
         <h1>Browse VoID datasets</h1>
 
-        <crfn:form id="filtersForm" beanclass="${actionBean.class.name}" method="post" style="margin-top:20px">
+        <crfn:form id="filtersForm" beanclass="${actionBean['class'].name}" method="post" style="margin-top:20px">
 
-            <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
-            <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
-            <stripes:submit name="filter" value="Filter"/>
+            <div>
+                <stripes:label for="txtTitle" class="question">Title contains:</stripes:label>&nbsp;
+                <stripes:text name="titleFilter" size="60" id="txtTitle"/>&nbsp;
+                <stripes:submit name="filter" value="Filter"/>
+            </div>
+
+            <div style="margin-top:10px">
+                <stripes:label for="harvestedCheck" class="question">Already Harvested</stripes:label>&nbsp;
+                <input type="checkbox" id="harvestedCheck" name="harvestedCheck" title="Show already harvested datasets" onclick="return submitFiltersForm();" ${actionBean.harvestedCheck ? 'checked="checked"' : ''}}/>
+            </div>
 
             <fieldset style="margin-top:10px">
                 <legend>Filters</legend>
@@ -68,14 +75,14 @@
                     <div style="width:100%;">
                         <table style="background-color:#CCCCCC;color:#FFFFFF;font-weight:bold;width:100%;">
                             <tr>
-                                <td style="padding-left:5px;">Creator</td>
-                                <td style="width:7%;">
+                                <td style="padding-left:5px;width:96.4%;">Creator</td>
+                                <td style="float:right;">
                                     <input type="checkbox" name="creatorsClearer" title="Clear this filter" onchange="clearerChanged(this,'creator');" ${empty actionBean.selectedCreators ? '' : 'checked="checked"'}}/>
                                 </td>
                             </tr>
                         </table>
                     </div>
-                    <div style="height:130px;overflow:auto;background-color:#F2F2F2;">
+                    <div class="wrapper-browse-list" style="height:130px;overflow:auto;background-color:#F2F2F2;">
                         <c:if test="${not empty actionBean.availableCreators}">
                             <table style="width:100%;height:100%;background-color:#F2F2F2;">
                                 <c:forEach items="${actionBean.availableCreators}" var="availableCreator" varStatus="creatorsLoop">
@@ -86,7 +93,7 @@
                                         <c:set var="isCreatorChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('creator_${creatorsLoop.index}');submitFiltersForm();return false;">
+                                        <td style="padding-left:5px;font-size:0.8em;width:96.4%" onclick="toggleCheckbox('creator_${creatorsLoop.index}');submitFiltersForm();return false;">
                                             <label for="creator_${creatorsLoop.index}" title="Select this creator" style="color:#2A6495"><c:out value="${availableCreator}"/></label>
                                         </td>
                                         <td style="width:7%">
@@ -105,14 +112,14 @@
                     <div style="width:100%;">
                         <table style="background-color:#CCCCCC;color:#FFFFFF;font-weight:bold;width:100%;">
                             <tr>
-                                <td style="padding-left:5px;">Subject</td>
-                                <td style="width:7%;">
+                                <td style="padding-left:5px;width:96.4%">Subject</td>
+                                <td style="float:right;">
                                     <input type="checkbox" name="subjectsClearer" title="Clear this filter" onchange="clearerChanged(this,'subject');" ${empty actionBean.selectedSubjects ? '' : 'checked="checked"'}}/>
                                 </td>
                             </tr>
                         </table>
                     </div>
-                    <div style="height:130px;overflow:auto;background-color:#F2F2F2;">
+                    <div class="wrapper-browse-list" style="height:130px;overflow:auto;background-color:#F2F2F2;">
                         <c:if test="${not empty actionBean.availableSubjects}">
                             <table style="width:100%;height:100%;background-color:#F2F2F2;">
                                 <c:forEach items="${actionBean.availableSubjects}" var="availableSubject" varStatus="subjectsLoop">
@@ -123,7 +130,7 @@
                                         <c:set var="isSubjectChecked" value=""/>
                                     </c:if>
                                     <tr>
-                                        <td style="padding-left:5px;font-size:0.8em;" onclick="toggleCheckbox('subject_${subjectsLoop.index}');submitFiltersForm();return false;">
+                                        <td style="padding-left:5px;font-size:0.8em;width:94%;" onclick="toggleCheckbox('subject_${subjectsLoop.index}');submitFiltersForm();return false;">
                                             <label for="subject_${subjectsLoop.index}" title="Select this subject" style="color:#2A6495"><c:out value="${availableSubject}"/></label>
                                         </td>
                                         <td style="width:7%">
@@ -138,18 +145,20 @@
                         </c:if>
                     </div>
                 </div>
-                <stripes:hidden name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
-                <stripes:hidden name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
+                <input type="hidden" name="prevCrtSize" value="${actionBean.prevCrtSize}"/>
+                <input type="hidden" name="prevSbjSize" value="${actionBean.prevSbjSize}"/>
             </fieldset>
 
         </crfn:form>
         <br/>
-        <display:table name="${actionBean.datasets}" class="sortable" id="dataset" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:98%;">
+        <display:table name="${actionBean.paginatedList}" class="sortable" id="dataset" sort="external" pagesize="${actionBean.resultListPageSize}" requestURI="${actionBean.urlBinding}" style="width:98%;">
 
             <display:setProperty name="paging.banner.item_name" value="dataset"/>
             <display:setProperty name="paging.banner.items_name" value="datasets"/>
-            <display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
-            <display:setProperty name="paging.banner.onepage" value=""/>
+	    <div class="listingBar">
+        	<display:setProperty name="paging.banner.all_items_found" value='<span class="pagebanner">{0} {1} found.</span>'/>
+        	<display:setProperty name="paging.banner.onepage" value=""/>
+	    </div>
 
             <display:column title='<span title="Title or label of the dataset, either supplied or derived from dataset URI.">Title</span>' sortable="true" sortProperty="label" style="width:50%;">
                 <stripes:link beanclass="${actionBean.factsheetActionBeanClass.name}" title="Go to the dataset factsheet">

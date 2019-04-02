@@ -20,8 +20,8 @@
  * Enriko Käsper, Tieto Eesti*/
 package eionet.cr.web.util.job;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
@@ -40,7 +40,7 @@ import eionet.cr.web.util.ApplicationCache;
 public class TagCloudCacheUpdater implements StatefulJob {
 
     /** */
-    private static Log logger = LogFactory.getLog(TagCloudCacheUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagCloudCacheUpdater.class);
 
     /**
      * Executes the job.
@@ -54,9 +54,9 @@ public class TagCloudCacheUpdater implements StatefulJob {
         try {
             TagsDAO dao = DAOFactory.get().getDao(TagsDAO.class);
             ApplicationCache.updateTagCloudCache(dao.getTagCloud());
-            logger.debug("Tag cloud cache updated!");
+            LOGGER.debug("Tag cloud cache updated!");
         } catch (DAOException e) {
-            logger.error("Error when updating tag cloud cache: ", e);
+            LOGGER.error("Error when updating tag cloud cache: ", e);
         }
     }
 }

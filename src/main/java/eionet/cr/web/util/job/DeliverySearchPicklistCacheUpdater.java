@@ -22,8 +22,8 @@ package eionet.cr.web.util.job;
 
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
@@ -44,7 +44,7 @@ public class DeliverySearchPicklistCacheUpdater implements StatefulJob {
     /**
      * Class internal logger.
      */
-    private static Log logger = LogFactory.getLog(DeliverySearchPicklistCacheUpdater.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeliverySearchPicklistCacheUpdater.class);
 
     /**
      * Executes the job.
@@ -61,9 +61,9 @@ public class DeliverySearchPicklistCacheUpdater implements StatefulJob {
 
             ApplicationCache.updateDeliverySearchPicklistCache(DAOFactory.get().getDao(HelperDAO.class)
                     .getDeliverySearchPicklist(), localities);
-            logger.debug("Delivery search picklist cache updated");
+            LOGGER.debug("Delivery search picklist cache updated");
         } catch (Exception e) {
-            logger.error("Error when updating delivery search picklist cache: ", e);
+            LOGGER.error("Error when updating delivery search picklist cache: ", e);
         }
     }
 

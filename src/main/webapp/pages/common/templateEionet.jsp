@@ -1,7 +1,5 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<%@page import="eionet.cr.web.util.BaseUrl"%>
-
 <stripes:layout-definition>
     <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 
@@ -12,13 +10,12 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="initial-scale=1.0" />
             <meta name="Publisher" content="EEA, The European Environment Agency" />
-            <base href="<%= BaseUrl.getBaseUrl(request) %>/"/>
 
             <title>${initParam.appDispName} - ${pageTitle}</title>
 
-            <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
-            <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
-            <link rel="stylesheet" type="text/css" href="http://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
+            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
+            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
+            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen" title="Eionet 2007 style"/>
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
             <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
@@ -55,13 +52,6 @@
                         <a id="printlink" title="Print this page" href="javascript:this.print();"><span>Print</span></a>
                         <a id="fullscreenlink" href="javascript:toggleFullScreenMode()" title="Switch to/from full screen mode"><span>Switch to/from full screen mode</span></a>
                         <a id="acronymlink" href="about.action" title="About ${initParam.appDispName}"><span>About</span></a>
-                        <form action="http://search.eionet.europa.eu/search.jsp" method="get">
-                            <div id="freesrchform"><label for="freesrchfld">Search</label>
-                                <input type="text" id="freesrchfld" name="query"/>
-
-                                <input id="freesrchbtn" type="image" src="<c:url value="/images/button_go.gif"/>" alt="Go"/>
-                            </div>
-                        </form>
                     </div>
                 </div> <!-- toolribbon -->
 

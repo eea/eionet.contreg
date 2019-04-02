@@ -28,7 +28,7 @@
 
         <c:if test="${not empty actionBean.urlAuthentications}">
             <div style="margin-top:20px">
-                <crfn:form id="urlAuthenticationsForm" beanclass="${actionBean.class.name}" method="post">
+                <crfn:form id="urlAuthenticationsForm" beanclass="${actionBean['class'].name}" method="post">
                     <display:table name="${actionBean.urlAuthentications}" class="datatable" id="authentication" sort="list" pagesize="20" requestURI="${actionBean.urlBinding}" style="width:80%">
 
                         <display:setProperty name="paging.banner.item_name" value="Url authentication"/>

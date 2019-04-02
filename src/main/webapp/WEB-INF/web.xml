@@ -1,62 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
-         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-     version="2.4">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+         version="3.1">
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- context parameters -->
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-    <display-name>${application.displayName}</display-name>
-
+    <!-- Spring configuration -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
     <context-param>
-        <param-name>appDispName</param-name>
-        <param-value>${application.displayName}</param-value>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:spring-context.xml
+        </param-value>
     </context-param>
-
-    <context-param>
-        <param-name>useEeaTemplate</param-name>
-        <param-value>false</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>templateCacheFolder</param-name>
-        <param-value>${application.eea.template.folder}</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>useCentralAuthenticationService</param-name>
-        <param-value>${useCentralAuthenticationService}</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>enableEEAFunctionality</param-name>
-        <param-value>${enableEEAFunctionality}</param-value>
-    </context-param>
-
-    <!-- Liquibase configuration -->
-
-    <context-param>
-        <param-name>liquibase.changelog</param-name>
-        <param-value>sql/db-struct.xml</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.datasource</param-name>
-        <param-value>java:comp/env/jdbc/readWriteRepo</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.onerror.fail</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>liquibase.contexts</param-name>
-        <param-value>production</param-value>
-    </context-param>
-
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- filters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -102,7 +58,8 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>
-                eionet.cr.web.interceptor.ActionEventInterceptor
+                eionet.cr.web.interceptor.ActionEventInterceptor,
+                net.sourceforge.stripes.integration.spring.SpringInterceptor
             </param-value>
         </init-param>
         <init-param>
@@ -119,7 +76,7 @@
         </init-param>
         <init-param>
             <param-name>FileUpload.MaximumPostSize</param-name>
-            <param-value>35000000</param-value>
+            <param-value>50000000</param-value>
         </init-param>
 
     </filter>
@@ -138,7 +95,7 @@
 
     <filter>
         <filter-name>CAS Filter</filter-name>
-        <filter-class>eionet.cr.web.security.EionetCASFilter</filter-class>
+        <filter-class>eionet.cr.web.filters.cas.EionetCASFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -146,13 +103,6 @@
         <url-pattern>/login</url-pattern>
     </filter-mapping>
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- listeners -->
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-    <listener>
-        <listener-class>eionet.cr.util.liquibase.CRLiquibaseServletListener</listener-class>
-    </listener>
     <listener>
         <listener-class>eionet.cr.web.util.AbandonedHarvestsMarker</listener-class>
     </listener>
@@ -169,19 +119,28 @@
         <listener-class>eionet.cr.util.FileDeletionJob</listener-class>
     </listener>
     <listener>
+        <listener-class>eionet.cr.util.SourceDeletionJob</listener-class>
+    </listener>
+    <listener>
         <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
     </listener>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- Errors -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/pages/common/pagenotfound.jsp</location>
+    </error-page>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <!-- StripesDispatcher -->
-
     <servlet>
         <servlet-name>StripesDispatcher</servlet-name>
         <servlet-class>net.sourceforge.stripes.controller.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>StripesDispatcher</servlet-name>
@@ -242,7 +201,7 @@
 
     <servlet>
         <servlet-name>rpcrouter</servlet-name>
-        <servlet-class>com.tee.uit.servlets.XmlRpcRouter</servlet-class>
+        <servlet-class>eionet.rpcserver.servlets.XmlRpcRouter</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -251,7 +210,6 @@
     </servlet-mapping>
 
     <!-- AMP feed servlet -->
-
     <servlet>
         <servlet-name>AmpServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.amp.AmpFeedServlet</servlet-class>
@@ -263,10 +221,9 @@
     </servlet-mapping>
 
     <!-- Update template servlet -->
-
     <servlet>
         <servlet-name>RefreshTemplateServlet</servlet-name>
-        <servlet-class>eea.template.RefreshTemplateServlet</servlet-class>
+        <servlet-class>eionet.eea.template.RefreshTemplateServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>RefreshTemplateServlet</servlet-name>
@@ -275,7 +232,6 @@
 
 
     <!-- XmlConvServlet -->
-
     <servlet>
         <servlet-name>XmlConvServlet</servlet-name>
         <servlet-class>eionet.cr.api.feeds.xmlconv.XmlConvFeedServlet</servlet-class>

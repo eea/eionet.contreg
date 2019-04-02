@@ -31,6 +31,42 @@ import java.net.URLDecoder;
  */
 public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
+    /**
+     * The Enum for folder item type.
+     */
+    public enum Type {
+
+        /** The reserved folder. */
+        RESERVED_FOLDER(1),
+        /** The folder. */
+        FOLDER(2),
+        /** The reserved file. */
+        RESERVED_FILE(3),
+        /** The file. */
+        FILE(4);
+
+        /** The order. */
+        int order;
+
+        /**
+         * Instantiates a new type.
+         *
+         * @param order the order
+         */
+        Type(int order) {
+            this.order = order;
+        }
+
+        /**
+         * Gets the order.
+         *
+         * @return the order
+         */
+        public int getOrder() {
+            return order;
+        }
+    }
+
     /** Uri. */
     private String uri;
 
@@ -45,19 +81,6 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /** Last modified. */
     private String lastModified;
-
-    public enum Type {
-        RESERVED_FOLDER(1), FOLDER(2), RESERVED_FILE(3), FILE(4);
-        int order;
-
-        Type(int order) {
-            this.order = order;
-        }
-
-        public int getOrder() {
-            return order;
-        }
-    }
 
     /**
      * True, if type is reserved folder.
@@ -97,6 +120,7 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
@@ -179,9 +203,10 @@ public class FolderItemDTO implements Comparable<FolderItemDTO> {
 
     /**
      * Returns name that is urlDecoded.
+     *
      * @return
      */
-    public String getUrlDecodedName(){
+    public String getUrlDecodedName() {
 
         try {
             return URLDecoder.decode(name, "UTF-8");

@@ -1,24 +1,32 @@
 package eionet.cr.dao.virtuoso.helpers;
 
 import java.text.ParseException;
-
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.helpers.FreeTextSearchHelper.FilterType;
 import eionet.cr.dao.util.SearchExpression;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sql.VirtuosoFullTextQuery;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * VirtuosoFreetextSearchHelper tests.
  */
-public class VirtuosoFreetextSearchHelperTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class VirtuosoFreetextSearchHelperTest {
 
     /**
      * Test creating ordered query string.
      */
-    public static void testNonExactAnyObject() {
+    @Test
+    public void testNonExactAnyObject() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = false;
@@ -43,7 +51,8 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     /**
      * Test creating unordered query string.
      */
-    public static void testExactAnyObject() {
+    @Test
+    public void testExactAnyObject() {
         PagingRequest pagingRequest = PagingRequest.create(2);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = true;
@@ -67,7 +76,8 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     /**
      * test Freetext search by any file.
      */
-    public static void testAnyFile() {
+    @Test
+    public void testAnyFile() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = false;
@@ -97,7 +107,8 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     /**
      * test freetext sort by label.
      */
-    public static void testSortedQueryLabel() {
+    @Test
+    public void testSortedQueryLabel() {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest =
                 new SortingRequest("http://www.w3.org/2000/01/rdf-schema#label", SortOrder.parse(SortOrder.ASCENDING.toString()));
@@ -128,7 +139,8 @@ public class VirtuosoFreetextSearchHelperTest extends TestCase {
     /**
      * test exact match search. Search expression is a URI.
      */
-    public static void testExactUri() {
+    @Test
+    public void testExactUri() {
         PagingRequest pagingRequest = PagingRequest.create(2);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
         boolean exactMatch = true;

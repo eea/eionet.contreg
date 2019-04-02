@@ -1,12 +1,18 @@
 package eionet.cr.util.exporter;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.util.export.XmlUtil;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class XmlUtilTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class XmlUtilTest {
 
     @Test
     public void testEscapeElementName() {

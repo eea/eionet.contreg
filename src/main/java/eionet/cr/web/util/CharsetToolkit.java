@@ -54,9 +54,17 @@ import java.util.Collection;
  * @author Guillaume LAFORGE
  */
 public class CharsetToolkit {
+
+    /** The buffer. */
     private byte[] buffer;
+
+    /** The default charset. */
     private Charset defaultCharset;
+
+    /** The enforce8 bit. */
     private boolean enforce8Bit = false;
+
+    /** The return null if not detected. */
     private boolean returnNullIfNotDetected = false;
 
     /**
@@ -199,46 +207,51 @@ public class CharsetToolkit {
                 if (isTwoBytesSequence(b0)) {
                     // there must be one continuation byte of the form 10xxxxxx,
                     // otherwise the following characteris is not a valid UTF-8 construct
-                    if (!isContinuationChar(b1))
+                    if (!isContinuationChar(b1)) {
                         validU8Char = false;
-                    else
+                    } else {
                         i++;
+                    }
                 }
                 // a three-bytes sequence was encoutered
                 else if (isThreeBytesSequence(b0)) {
                     // there must be two continuation bytes of the form 10xxxxxx,
                     // otherwise the following characteris is not a valid UTF-8 construct
-                    if (!(isContinuationChar(b1) && isContinuationChar(b2)))
+                    if (!(isContinuationChar(b1) && isContinuationChar(b2))) {
                         validU8Char = false;
-                    else
+                    } else {
                         i += 2;
+                    }
                 }
                 // a four-bytes sequence was encoutered
                 else if (isFourBytesSequence(b0)) {
                     // there must be three continuation bytes of the form 10xxxxxx,
                     // otherwise the following characteris is not a valid UTF-8 construct
-                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3)))
+                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3))) {
                         validU8Char = false;
-                    else
+                    } else {
                         i += 3;
+                    }
                 }
                 // a five-bytes sequence was encoutered
                 else if (isFiveBytesSequence(b0)) {
                     // there must be four continuation bytes of the form 10xxxxxx,
                     // otherwise the following characteris is not a valid UTF-8 construct
-                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3) && isContinuationChar(b4)))
+                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3) && isContinuationChar(b4))) {
                         validU8Char = false;
-                    else
+                    } else {
                         i += 4;
+                    }
                 }
                 // a six-bytes sequence was encoutered
                 else if (isSixBytesSequence(b0)) {
                     // there must be five continuation bytes of the form 10xxxxxx,
                     // otherwise the following characteris is not a valid UTF-8 construct
-                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3) && isContinuationChar(b4) && isContinuationChar(b5)))
+                    if (!(isContinuationChar(b1) && isContinuationChar(b2) && isContinuationChar(b3) && isContinuationChar(b4) && isContinuationChar(b5))) {
                         validU8Char = false;
-                    else
+                    } else {
                         i += 5;
+                    }
                 } else {
                     validU8Char = false;
                 }
@@ -264,7 +277,7 @@ public class CharsetToolkit {
             return Charset.forName("UTF-8");
         }
         // finally, if it's not UTF-8 nor US-ASCII, let's assume the encoding is the default encoding or return null.
-        if (this.isReturnNullIfNotDetected()){
+        if (this.isReturnNullIfNotDetected()) {
             return null;
         } else {
             return this.defaultCharset;
@@ -309,7 +322,6 @@ public class CharsetToolkit {
         return guessEncoding(f, bufferLength, defaultCharset, false, false);
     }
 
-
     /**
      * @param f
      * @param bufferLength
@@ -317,7 +329,8 @@ public class CharsetToolkit {
      * @return
      * @throws IOException
      */
-    public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset, boolean enforce8bit, boolean returnNullIfNotDetected) throws IOException {
+    public static Charset guessEncoding(File f, int bufferLength, Charset defaultCharset, boolean enforce8bit,
+            boolean returnNullIfNotDetected) throws IOException {
         FileInputStream fis = new FileInputStream(f);
         byte[] buffer = new byte[bufferLength];
         fis.read(buffer);
@@ -328,7 +341,6 @@ public class CharsetToolkit {
         toolkit.setReturnNullIfNotDetected(returnNullIfNotDetected);
         return toolkit.guessEncoding();
     }
-
 
     /**
      * If the byte has the form 10xxxxx, then it's a continuation byte of a multiple byte character;

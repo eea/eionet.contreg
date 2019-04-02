@@ -8,7 +8,7 @@
         <li><a href="${pageContext.request.contextPath}/simpleSearch.action">Simple search</a></li>
         <c:if test='${not empty sessionScope.crUser && crfn:userHasPermission(pageContext.session, "/mergedeliveries", "v")}'>
             <c:if test="${initParam.enableEEAFunctionality}">
-               <li><a href="${pageContext.request.contextPath}/deliverySearch.action">Merge deliveries</a></li>
+               <li><a href="${pageContext.request.contextPath}/deliverySearch.action">Search deliveries</a></li>
             </c:if>
         </c:if>
         <li><a href="${pageContext.request.contextPath}/customSearch.action">Custom search</a></li>

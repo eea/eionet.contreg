@@ -3,9 +3,10 @@ package eionet.cr.dao.virtuoso;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOException;
@@ -14,10 +15,15 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.export.XmlExporter;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Mock for exporterDAO.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExporterDAOTest extends VirtuosoExporterDAO {
 
     /**
@@ -34,7 +40,7 @@ public class ExporterDAOTest extends VirtuosoExporterDAO {
      */
     @Test
     public void testGetQuery() {
-        HashMap<String, String> filters = new HashMap<String, String>();
+        LinkedHashMap<String, String> filters = new LinkedHashMap<String, String>();
         filters.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://rod.eionet.europa.eu/schema.rdf#Obligation");
         filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
         List<String> selectedPredicates = new ArrayList<String>();

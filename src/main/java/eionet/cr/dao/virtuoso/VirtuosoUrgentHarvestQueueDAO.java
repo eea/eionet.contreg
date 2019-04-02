@@ -53,11 +53,9 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
             "insert into URGENT_HARVEST_QUEUE (URL,\"TIMESTAMP\",PUSHED_CONTENT, USERNAME) VALUES (?,NOW(),?,?)";
     /** */
     private static final String GET_URGENT_HARVEST_QUEUE_SQL = "select * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
+
     /** */
     private static final String PEEK_SQL = "select top 1 * from URGENT_HARVEST_QUEUE order by \"TIMESTAMP\" asc";
-    /** */
-    private static final String DELETE_QUEUE_ITEM_SQL = "delete from URGENT_HARVEST_QUEUE "
-            + "where URL=? and datediff('second', \"TIMESTAMP\", ?) = 0";
 
     /** SQL for removing occurrences of a given URL from urgent harvest queue table. */
     private static final String REMOVE_URL_SQL = "delete from URGENT_HARVEST_QUEUE where URL=?";
@@ -176,10 +174,11 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
+     * Returns top-most item in queue, but does not remove it.
      *
-     * @param conn
-     * @return
-     * @throws SQLException
+     * @param conn Db connection.
+     * @return The item.
+     * @throws SQLException if SQL error
      */
     private static UrgentHarvestQueueItemDTO peek(Connection conn) throws Exception {
 
@@ -193,17 +192,21 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     }
 
     /**
+     * Helper method for deleting given queue item.
      *
-     * @param queueItem
-     * @throws SQLException
+     * @param queueItem The queue item to delete.
+     * @throws SQLException if SQL error
      */
-    private static void deleteQueueItem(UrgentHarvestQueueItemDTO queueItem, Connection conn) throws SQLException {
+    private static int deleteQueueItem(UrgentHarvestQueueItemDTO item, Connection conn) throws SQLException {
+
+        if (item == null || StringUtils.isBlank(item.getUrl()) || item.getTimeAdded() == null) {
+            return 0;
+        }
 
         List<Object> values = new ArrayList<Object>();
-        values.add(queueItem.getUrl());
-        values.add(queueItem.getTimeAdded());
+        values.add(item.getItemId());
 
-        SQLUtil.executeUpdate(DELETE_QUEUE_ITEM_SQL, values, conn);
+        return SQLUtil.executeUpdate(REMOVE_ITEM_SQL, values, conn);
     }
 
     /*
@@ -212,7 +215,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
      * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String)
      */
     @Override
-    public boolean isInQueue(String url) {
+    public boolean isInQueue(String url) throws DAOException {
 
         boolean ret = false;
         String sql = "select top 1 * from URGENT_HARVEST_QUEUE where URL = ?";
@@ -228,13 +231,35 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
                 ret = true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new DAOException(e.toString(), e);
         } finally {
+            SQLUtil.close(rs);
             SQLUtil.close(ps);
             SQLUtil.close(conn);
         }
         return ret;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.UrgentHarvestQueueDAO#isInQueue(java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean isInQueue(String url, String userName) throws DAOException {
+
+        String sql = "select top 1 URL from URGENT_HARVEST_QUEUE where URL = ? and USERNAME = ?";
+
+        Connection conn = null;
+        try {
+            conn = getSQLConnection();
+            Object urlObject = SQLUtil.executeSingleReturnValueQuery(sql, Arrays.asList(url, userName), conn);
+            return urlObject != null && urlObject.toString().equals(url);
+        } catch (Exception e) {
+            throw new DAOException(e.toString(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
     }
 
     /*

@@ -49,6 +49,8 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectLastModifiedColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,6 +59,8 @@ import eionet.cr.web.util.columns.SubjectPredicateColumn;
  */
 @UrlBinding("/simpleSearch.action")
 public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSearchActionBean.class);
 
     /** */
     private String searchExpression;
@@ -149,7 +153,7 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
             return;
         }
 
-        logger.debug("Preparing last-modified dates ...");
+        LOGGER.debug("Preparing last-modified dates ...");
         long startTime = System.currentTimeMillis();
 
         HashSet<String> subjectUris = new HashSet<String>();
@@ -160,14 +164,14 @@ public class SimpleSearchActionBean extends AbstractSearchActionBean<SubjectDTO>
         Map<String, Date> dates = DAOFactory.get().getDao(HelperDAO.class).getSourceLastModifiedDates(subjectUris);
         if (!dates.isEmpty()) {
 
-            logger.debug("Last-modified-dates found for " + dates.size() + " subjects");
+            LOGGER.debug("Last-modified-dates found for " + dates.size() + " subjects");
 
             for (SubjectDTO subjectDTO : subjects) {
                 subjectDTO.setLastModifiedDate(dates.get(subjectDTO.getUri()));
             }
         }
 
-        logger.debug("Last-modified dates prepared in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.debug("Last-modified dates prepared in " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     /**

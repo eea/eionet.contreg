@@ -20,34 +20,11 @@
  */
 package eionet.cr.web.action;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
-
-import com.tee.uit.security.AccessController;
-import com.tee.uit.security.SignOnException;
-
+import eionet.acl.AccessController;
+import eionet.acl.SignOnException;
 import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
@@ -62,38 +39,74 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.web.action.factsheet.FolderActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.FileUploadEncoding;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CSV upload action bean.
  *
  * @author Jaanus Heinlaid
+ * @author George Sofianos
  */
 @UrlBinding("/uploadCSV.action")
 public class UploadCSVActionBean extends AbstractActionBean {
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(UploadCSVActionBean.class);
-
-    /** */
-    private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
-
-    /** */
-    private static final String UPLOAD_EVENT = "upload";
-    private static final String SAVE_EVENT = "save";
-
-    /** */
-    private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
-
-    /** */
-    private static final String PARAM_FINAL_ENCODING = "finalEncoding";
-
     /** Enum for uploaded files' types. */
     public enum FileType {
-        CSV, TSV;
+
+        /** The CSV file type. */
+        CSV,
+        /** The TSV file type. */
+        TSV;
     }
+
+    /** Static logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBean.class);
+
+    /** Default JSP to forward to. */
+    private static final String JSP_PAGE = "/pages/home/uploadCSV.jsp";
+
+    /** The Constant UPLOAD_EVENT. */
+    private static final String UPLOAD_EVENT = "upload";
+
+    /** The Constant SAVE_EVENT. */
+    private static final String SAVE_EVENT = "save";
+
+    /** The Constant PARAM_DISPLAY_WIZARD. */
+    private static final String PARAM_DISPLAY_WIZARD = "displayWizard";
+
+    /** The Constant PARAM_FINAL_ENCODING. */
+    private static final String PARAM_FINAL_ENCODING = "finalEncoding";
 
     /** URI of the folder where the file will be uploaded. */
     private String folderUri;
+
+    /**
+     * Online source of CSV/TSV
+     */
+    private String fileURL;
+
+    private String onlineFileName;
 
     /** Uploaded file's bean object. */
     private FileBean fileBean;
@@ -152,28 +165,44 @@ public class UploadCSVActionBean extends AbstractActionBean {
     /** Encoding of the uploadable file */
     private String fileEncoding;
 
-    /** Encoding used to parse the file*/
-    private String finalEncoding;
+    /**
+     * Re-harvest interval
+     */
+    private int interval;
 
+    /**
+     * Is a CSV/TSV that has bean fetch from an online source instead of uploading it?
+     */
+    private boolean isOnlineCsvTsv = false;
+
+    /** Encoding used to parse the file */
+    private String finalEncoding;
 
     private static final String ENCODING_AUTODETECT_ID = "AUTODETECT";
 
     /** Upload file encoding values */
     private static Map<String, String> fileEncodings;
 
+    /**
+     * Static initialization block.
+     */
     static {
         fileEncodings = new LinkedHashMap<String, String>();
         fileEncodings.put(ENCODING_AUTODETECT_ID, "Auto detect");
         fileEncodings.putAll(FileUploadEncoding.getInstance());
     }
 
-
-
     /**
-     * @return
+     * Default event.
+     *
+     * @return Resolution to got to.
      */
     @DefaultHandler
     public Resolution init() {
+        if (folderUri == null) {
+            addSystemMessage("You need to have a folder selected before uploading a file.");
+            return new ErrorResolution(HttpServletResponse.SC_NOT_FOUND);
+        }
         if (!uploadAllowed()) {
             addSystemMessage("No permission to upload CSV/TSV file.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
@@ -190,15 +219,61 @@ public class UploadCSVActionBean extends AbstractActionBean {
      */
     public Resolution upload() throws DAOException, SignOnException {
 
+        if (fileBean == null) {
+            try {
+                isOnlineCsvTsv = true;
+                URL website = new URL(fileURL);
+                if(onlineFileName != null && !onlineFileName.isEmpty()) {
+                    fileName = onlineFileName + "." + fileType.toString().toLowerCase();
+                }
+                else {
+                    fileName = website.getFile().split("/")[website.getFile().split("/").length - 1];
+                }
+                fileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
+                //TODO improve temp directories functionality
+                String tempFilePath = GeneralConfig.getProperty("app.home") + "/tmp/" + FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
+                File tempFile = new File(tempFilePath);
+                tempFile.getParentFile().mkdirs();
+                tempFile.createNewFile();
+
+                ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+                fileBean = new FileBean(tempFile, "text/plain", fileName);
+            } catch (MalformedURLException e) {
+                LOGGER.error("Malformed URL", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
+            } catch (IOException e) {
+                LOGGER.error("IOException when creating local file from online source.", e);
+                addWarningMessage(e.toString());
+                return new ForwardResolution(JSP_PAGE);
+            }
+        }
+
+
         if (!uploadAllowed()) {
             addSystemMessage("No permission to upload CSV/TSV file.");
             return new RedirectResolution(FolderActionBean.class).addParameter("uri", folderUri);
         }
 
-        // Prepare resolution.
+        // Prepare various stuff
         ForwardResolution resolution = new ForwardResolution(JSP_PAGE);
-
         fileName = fileBean.getFileName();
+        relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
+        FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
+        CsvImportHelper helper =
+                new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
+                        source);
+
+        // Get already existing data-linking scripts for this file URI, as we need to remember them before overwrite.
+        if (fileStore.fileExists(relativeFilePath)) {
+            dataLinkingScripts = helper.getExistingDataLinkingScripts(getColumnLabels());
+        }
+        if (CollectionUtils.isNotEmpty(dataLinkingScripts)) {
+            addDataLinkingScripts = true;
+        }
 
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         if (overwrite) {
@@ -209,7 +284,6 @@ public class UploadCSVActionBean extends AbstractActionBean {
             if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
                 String oldFileUri = folderUri + "/" + StringUtils.replace(fileName, " ", "%20");
                 // Delete existing data
-                FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
                 folderDAO.deleteFileOrFolderUris(folderUri, Collections.singletonList(oldFileUri));
                 DAOFactory.get().getDao(HarvestSourceDAO.class).removeHarvestSources(Collections.singletonList(oldFileUri));
                 fileStore.delete(FolderUtil.extractPathInUserHome(folderUri + "/" + fileName));
@@ -217,49 +291,46 @@ public class UploadCSVActionBean extends AbstractActionBean {
         } else {
             if (folderDAO.fileOrFolderExists(folderUri, StringUtils.replace(fileName, " ", "%20"))) {
                 addCautionMessage("File or folder with the same name already exists.");
-                return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
+                return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter(
+                        "fileEncoding", fileEncoding);
             }
         }
 
         try {
             // Save the file into user's file-store.
             long fileSize = fileBean.getSize();
-            relativeFilePath = FolderUtil.extractPathInUserHome(folderUri + "/" + fileName);
-            // FileStore fileStore = FileStore.getInstance(getUserName());
-            FileStore fileStore = FileStore.getInstance(FolderUtil.getUserDir(folderUri, getUserName()));
             fileStore.addByMoving(relativeFilePath, true, fileBean);
-
-            CsvImportHelper helper =
-                    new CsvImportHelper(uniqueColumns, fileUri, fileLabel, fileType, objectsType, publisher, license, attribution,
-                            source);
 
             // Detect charset and convert the file to UTF-8
             if (StringUtils.isNotBlank(fileEncoding)) {
-                if (fileEncoding.equals(ENCODING_AUTODETECT_ID)){
+                if (fileEncoding.equals(ENCODING_AUTODETECT_ID)) {
                     Charset detectedCharset = helper.detectCSVencoding(folderUri, relativeFilePath, getUserName());
-                    if (detectedCharset == null){
+                    if (detectedCharset == null) {
                         addCautionMessage("The charset of the uploaded file could not be detected automatically. Please select the files charset from the list.");
                         fileStore.delete(relativeFilePath);
-                        return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri).addParameter("fileEncoding", fileEncoding);
-                    } else if (!detectedCharset.toString().startsWith("UTF")){
-                        fileStore.changeFileEncoding(relativeFilePath,  detectedCharset, Charset.forName("UTF-8"));
+                        return new RedirectResolution(UploadCSVActionBean.class).addParameter("folderUri", folderUri)
+                                .addParameter("fileEncoding", fileEncoding);
+                    } else if (!detectedCharset.toString().startsWith("UTF")) {
+                        fileStore.changeFileEncoding(relativeFilePath, detectedCharset, Charset.forName("UTF-8"));
                     }
                     resolution.addParameter(PARAM_FINAL_ENCODING, detectedCharset.name());
                 } else {
-                    fileStore.changeFileEncoding(relativeFilePath,  Charset.forName(fileEncoding), Charset.forName("UTF-8"));
+                    fileStore.changeFileEncoding(relativeFilePath, Charset.forName(fileEncoding), Charset.forName("UTF-8"));
                     resolution.addParameter(PARAM_FINAL_ENCODING, "UTF-8");
                 }
             }
 
             // Store file as new source, but don't harvest it
-            helper.insertFileMetadataAndSource(fileSize, getUserName());
+            helper.insertFileMetadataAndSource(fileSize, getUserName(), isOnlineCsvTsv, interval, fileURL);
 
             // Add metadata about user folder update
             helper.linkFileToFolder(folderUri, getUserName());
 
             // Prepare data linkins scripts dropdown
-            dataLinkingScripts = new ArrayList<DataLinkingScript>();
-            dataLinkingScripts.add(new DataLinkingScript());
+            if (CollectionUtils.isEmpty(dataLinkingScripts)) {
+                dataLinkingScripts = new ArrayList<DataLinkingScript>();
+                dataLinkingScripts.add(new DataLinkingScript());
+            }
 
             // If not given, the file's label equals the file's name
             if (StringUtils.isEmpty(fileLabel)) {
@@ -296,6 +367,9 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
             // The file was encoded to UTF-8 or UTF-* after upload
             csvReader = helper.createCSVReader(folderUri, relativeFilePath, getUserName(), Charset.forName(finalEncoding));
+            if (csvReader == null) {
+                throw new IllegalStateException("No CSV reader successfully created!");
+            }
 
             helper.extractObjects(csvReader);
             helper.saveWizardInputs();
@@ -384,7 +458,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
     }
 
     /**
-     *
+     *-
      * @throws DAOException
      */
     @ValidationMethod(on = {UPLOAD_EVENT, SAVE_EVENT})
@@ -406,8 +480,8 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
         // if upload event, make sure the file bean is not null
         String eventName = getContext().getEventName();
-        if (eventName.equals(UPLOAD_EVENT) && fileBean == null) {
-            addGlobalValidationError("No file specified!");
+        if (eventName.equals(UPLOAD_EVENT) && fileBean == null && fileURL == null) {
+            addGlobalValidationError("You either need to upload a file or provide a url!");
         }
 
         // if insert event, make sure unique columns and object type are not null
@@ -531,6 +605,22 @@ public class UploadCSVActionBean extends AbstractActionBean {
         }
 
         return columnLabels;
+    }
+
+    public String getFileURL() {
+        return fileURL;
+    }
+
+    public void setFileURL(String fileURL) {
+        this.fileURL = fileURL;
+    }
+
+    public String getOnlineFileName() {
+        return onlineFileName;
+    }
+
+    public void setOnlineFileName(String onlineFileName) {
+        this.onlineFileName = onlineFileName;
     }
 
     /**
@@ -747,6 +837,14 @@ public class UploadCSVActionBean extends AbstractActionBean {
         return fileEncodings;
     }
 
+    public int getInterval() {
+        return interval;
+    }
+
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+
     public String getFileEncoding() {
         return fileEncoding;
     }
@@ -765,6 +863,7 @@ public class UploadCSVActionBean extends AbstractActionBean {
 
     /**
      * True if user can upload the file.
+     *
      * @return boolean
      */
     protected boolean uploadAllowed() {

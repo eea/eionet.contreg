@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseTestCase;
@@ -33,20 +34,28 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.sesame.SesameUtil;
+import org.junit.Before;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
  *
  */
+/*@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })*/
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /** Repository connection to be used for checking existence of expected triples in the repository */
@@ -72,7 +81,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      */
     @Override
     protected void tearDown() throws Exception {
-
+        super.tearDown();
         SesameUtil.close(repoConn);
     }
 
@@ -92,8 +101,9 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         List<String> turtleSeedFiles = getTurtleSeedFiles();
         List<String> n3SeedFiles = getN3SeedFiles();
 
-        // If at least one seed file given, clear triple store before proceeding to the loading.
-        if (CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
+        // If there is forced clearance of triplestore, or if there is at least one triplestore seed file given,
+        // then clear triple store before proceeding.
+        if (forceClearTriplesOnSetup() || CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
                 || CollectionUtils.isNotEmpty(turtleSeedFiles) || CollectionUtils.isNotEmpty(n3SeedFiles)) {
             rdfLoader.clearAllTriples();
         }
@@ -115,6 +125,16 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         }
     }
 
+    /**
+     * If this method returns true, the test setup will clear triple store regardless of whether there are any
+     * triplestore seed files to load. In this abstract class it always returns false, but subclasses may oveerride it.
+     *
+     * @return True/false as indicated above.
+     */
+    protected boolean forceClearTriplesOnSetup() {
+        return false;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -131,7 +151,6 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
      *
      * @see org.dbunit.DatabaseTestCase#getDataSet()
      */
-    @SuppressWarnings("deprecation")
     @Override
     protected IDataSet getDataSet() throws Exception {
 
@@ -143,7 +162,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         int i = 0;
         IDataSet[] dataSets = new IDataSet[xmlDataSetFiles.size()];
         for (String fileName : xmlDataSetFiles) {
-            dataSets[i++] = new FlatXmlDataSet(getClass().getClassLoader().getResourceAsStream(fileName));
+            dataSets[i++] = new FlatXmlDataSetBuilder()
+                .setColumnSensing(true).build(getClass().getClassLoader().getResourceAsStream(fileName));
         }
 
         CompositeDataSet compositeDataSet = new CompositeDataSet(dataSets);
@@ -208,16 +228,18 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /**
      * A convenience method for checking if the given statement exists in the repository. The object is expected to be a literal.
-     * Graph is optional.
+     * Graph is optional. Datatype of the literal may be null in which case the literal is considered to have no datatype.
      *
      * @param subj The subject.
      * @param pred The predicate.
      * @param obj The literal object.
+     * @param datatype The literal's datatype, may be null in which case the literal is considered to have no datatype.
      * @param graph The graph.
      * @return True if statement exists, otherwise false.
      * @throws OpenRDFException When problems with querying the repository.
      */
-    protected boolean hasLiteralStatement(String subj, String pred, String obj, String... graph) throws OpenRDFException {
+    protected boolean hasLiteralStatement(String subj, String pred, String obj, URI datatype, String... graph)
+            throws OpenRDFException {
 
         if (repoConn == null) {
             throw new IllegalStateException("Expected the repository connection to be already created!");
@@ -228,7 +250,8 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         ValueFactory vf = repoConn.getValueFactory();
         org.openrdf.model.URI subjURI = StringUtils.isBlank(subj) ? null : vf.createURI(subj);
         org.openrdf.model.URI predURI = StringUtils.isBlank(pred) ? null : vf.createURI(pred);
-        Literal objLiteral = StringUtils.isBlank(obj) ? null : vf.createLiteral(obj);
+        Literal objLiteral =
+                StringUtils.isBlank(obj) ? null : (datatype == null ? vf.createLiteral(obj) : vf.createLiteral(obj, datatype));
 
         if (graph != null && graph.length > 0) {
 
@@ -301,10 +324,10 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
         boolean result = false;
         if (statement.length == 3) {
-            result = hasLiteralStatement(statement[0], statement[1], statement[2]);
+            result = hasLiteralStatement(statement[0], statement[1], statement[2], null);
         } else {
             String[] graphs = Arrays.copyOfRange(statement, 3, statement.length);
-            result = hasLiteralStatement(statement[0], statement[1], statement[2], graphs);
+            result = hasLiteralStatement(statement[0], statement[1], statement[2], null, graphs);
         }
         return result;
     }

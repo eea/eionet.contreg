@@ -20,13 +20,13 @@
  */
 package eionet.cr.api.xmlrpc;
 
+import eionet.cr.common.CRException;
+
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-import eionet.cr.common.CRException;
 
 /**
  *
@@ -49,7 +49,7 @@ public interface Services {
     List getResourcesSinceTimestamp(Date timestamp) throws CRException;
 
     /**
-     * Returns an array of eionet.qawcommons.DataflowResultDto objects, where each represents a resource that matches the given
+     * Returns an array of DataflowResultDto objects, where each represents a resource that matches the given
      * input criteria. A pre-defined and hard-coded criterion is that the returned resources are members of
      * http://rod.eionet.europa.eu/schema.rdf#Delivery class.
      *

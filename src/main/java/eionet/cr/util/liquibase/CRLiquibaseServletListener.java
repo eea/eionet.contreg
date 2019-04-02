@@ -4,8 +4,9 @@ import javax.servlet.ServletContextEvent;
 
 import liquibase.database.DatabaseFactory;
 import liquibase.integration.servlet.LiquibaseServletListener;
-
-import org.apache.log4j.Logger;
+import eionet.cr.liquibase.VirtuosoDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An extension of {@link LiquibaseServletListener} to be instantiated from <listener> tag of web.xml.
@@ -15,22 +16,23 @@ import org.apache.log4j.Logger;
  *
  * @author Jaanus
  */
-public class CRLiquibaseServletListener extends LiquibaseServletListener {
+//public class CRLiquibaseServletListener extends LiquibaseServletListener {
+public class CRLiquibaseServletListener {
 
     /** Static logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(CRLiquibaseServletListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CRLiquibaseServletListener.class);
 
     /*
      * (non-Javadoc)
      *
      * @see liquibase.integration.servlet.LiquibaseServletListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-    @Override
+//    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
         LOGGER.info("Initializing " + getClass().getSimpleName());
 
-        DatabaseFactory.getInstance().register(new VirtuosoDatabase());
-        super.contextInitialized(servletContextEvent);
+//        DatabaseFactory.getInstance().register(new eionet.cr.liquibase.VirtuosoDatabase());
+//        super.contextInitialized(servletContextEvent);
     }
 }

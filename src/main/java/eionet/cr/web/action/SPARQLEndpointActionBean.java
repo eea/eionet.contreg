@@ -23,7 +23,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BooleanQuery;
@@ -49,6 +49,7 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.SourceDeletionsDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -70,6 +71,8 @@ import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -84,13 +87,16 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             "Must have administrator permissions to insert bulk sources through Sparql endpoint";
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(SPARQLEndpointActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointActionBean.class);
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
 
     /** */
     private static final String DEFAULT_STREAMING_RESPONSE_MIME_TYPE = "application/sparql-results+xml";
+
+    /** endpoint output file name. */
+    private static final String DEFAULT_SPARQL_FILENAME = "sparql-result";
 
     /** The endpoint's internal conventional output formats. */
     private static final String FORMAT_XML = "xml";
@@ -210,8 +216,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /** Selected project for the bookmark. */
     private String bookmarkFolder;
 
-    /** Keeps the state of the bulk actions buttons visibility cross the requests */
-    private boolean bulkActionsPanelVisible;
+    /** Keeps the state of the bulk actions visibility across requests */
+    private boolean displayBulkActions;
 
     /**
      *
@@ -240,7 +246,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Fills the bean's following properties from the bookmarked query: - the query itself - output format - hits per page - whether
+     * Fills the bean's following properties from the bookmarked query:
+     * - the query itself - output format - hits per page - whether
      * to use same-as "yes".
      *
      * @throws DAOException
@@ -276,38 +283,56 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public Resolution bookmark() throws DAOException {
-
         setDefaultAndNamedGraphs();
-
         CRUser user = getUser();
-        String requestMethod = getContext().getRequest().getMethod();
-
         userProjects = FolderUtil.getUserAccessibleProjectFolderNames(user, "i");
 
         if (user == null) {
             addWarningMessage("Cannot bookmark for anonymous user!");
-        } else if (StringUtils.isBlank(query)) {
+        }
+        else if (StringUtils.isBlank(query)) {
             addGlobalValidationError("Query is missing!");
-        } else if (requestMethod.equalsIgnoreCase("get")) {
+        }
+        else {
             return new ForwardResolution(BOOKMARK_PAGE);
-        } else if (StringUtils.isBlank(bookmarkName)) {
+        }
+
+        return new ForwardResolution(FORM_PAGE);
+    }
+
+    public Resolution saveBookmark() throws DAOException {
+        setDefaultAndNamedGraphs();
+        CRUser user = getUser();
+
+        if (user == null) {
+            addWarningMessage("Cannot bookmark for anonymous user!");
+        }
+        else if (StringUtils.isBlank(query)) {
+            addGlobalValidationError("Query is missing!");
+        }
+        else if (StringUtils.isBlank(bookmarkName)) {
             addGlobalValidationError("Bookmark name is missing!");
-        } else {
+        }
+        else {
             if (bookmarkFolder != null && bookmarkFolder.equals(SHARED_BOOKMARKS_FOLDER)) {
                 if (!isSharedBookmarkPrivilege()) {
                     addGlobalValidationError("No privilege to update shared SPARQL bookmark.");
                     return new ForwardResolution(FORM_PAGE);
                 }
+
                 storeSharedBookmark();
                 // store to project folder
-            } else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
+            }
+            else if (bookmarkFolder != null && !bookmarkFolder.equals(MY_BOOKMARKS_FOLDER)) {
                 // bookmarkFolder = project name
                 if (!hasProjectPrivilege(bookmarkFolder)) {
                     addGlobalValidationError("No privilege to add SPARQL bookmark to the selected project.");
                     return new ForwardResolution(FORM_PAGE);
                 }
+
                 storeProjectBookmark();
-            } else {
+            }
+            else {
                 storePersonalBookmark();
             }
             // log and display message about successful operation
@@ -470,26 +495,53 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Executes the SparqlEndpoint query and adds result to sources.
      *
-     * @return Resolution
-     * @throws DAOException
+     * @return Resolution to return to.
+     * @throws DAOException If DAO access error.
      */
     public Resolution executeAddSources() throws DAOException {
         Resolution resolution = executeSparqlQuery(false);
 
         if (isAdminPrivilege()) {
-            String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
-            if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
-                DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
+            if (result != null) {
 
-                addSystemMessage(result.getRows().size() + " sources added and scheduled for urgent harvest.");
-                LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
+                String resultValidation = QueryResultValidator.isProperBulkSourceResult(result);
+                if (resultValidation.equals(QueryResultValidator.PROPER_BULK_SOURCE_OK)) {
+                    DAOFactory.get().getDao(HarvestSourceDAO.class).addBulkSourcesFromSparql(result);
+
+                    addSystemMessage(result.getRows().size() + " sources scheduled for urgent batch harvest!");
+                    LOGGER.info("Successfully added " + result.getRows().size() + " sources from Sparql query.");
+                } else {
+                    addGlobalValidationError(resultValidation);
+                    LOGGER.info("Sparql endpoint add bulk sources validation error: " + resultValidation);
+                }
             } else {
-                addGlobalValidationError(resultValidation);
-                LOGGER.info("Sparql endpoint add bulk sources validation error: " + resultValidation);
+                addWarningMessage("No query results to add sources from!");
             }
         } else {
             addGlobalValidationError(VALIDATION_ERROR_MUST_BE_ADMINISTRATOR);
-            LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk sources through Sparql endpoint");
+            LOGGER.info("Sparql endpoint add bulk sources validation error: Must have administrator permissions to insert bulk "
+                    + "sources through Sparql endpoint");
+        }
+
+        return resolution;
+    }
+
+    /**
+     * Schedules background deletion for sources identified by URLs returned in the 1st column of executed SPARQL results.
+     *
+     * @return Resolution to return to.
+     * @throws DAOException If DAO access error.
+     */
+    public Resolution executeDeleteSources() throws DAOException {
+
+        Resolution resolution = new ForwardResolution(FORM_PAGE);
+        if (!isAdminPrivilege()) {
+            addWarningMessage("You are not authorized for this operation!");
+        } else if (StringUtils.isBlank(query)) {
+            addCautionMessage("Found no SPARQL query in the reqeust!");
+        } else {
+            int markedCount = DAOFactory.get().getDao(SourceDeletionsDAO.class).markForDeletionSparql(query);
+            addSystemMessage("A total of " + markedCount + " sources were scheduled for background deletion!");
         }
 
         return resolution;
@@ -590,8 +642,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties. See SPARQL
-     * protocol specifications for more.
+     * Gets the default-graph-uri and named-graph-uri parameters from request and stores them into ActionBean properties.
+     * See SPARQL protocol specifications for more.
      */
     private void setDefaultAndNamedGraphs() {
         defaultGraphUris = getContext().getRequest().getParameterValues(DEFAULT_GRAPH_URI);
@@ -626,7 +678,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     /**
      * Checks if user has insert right to the project ACL.
      *
-     * @param project
+     * @param projectName
      *            name
      * @return true, if user can add resources to the project.
      */
@@ -698,8 +750,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
     }
 
     /**
-     * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers of the given servlet
-     * response.
+     * Executes the {@link #query}, using the given output format and stream, and possibly setting some headers
+     * of the given servlet response.
      *
      * TODO: the execution of the query and communication with Sesame should really not be in controller.
      *
@@ -725,6 +777,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
 
             TupleQueryResult queryResult = null;
+
             try {
                 if (queryObject instanceof BooleanQuery) {
 
@@ -799,30 +852,37 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                     // Evaluate SELECT query.
                     if (outputFormat.equals(FORMAT_XML)) {
+                        setFileNameToHeader(response, "xml");
                         CRXmlWriter sparqlWriter = new CRXmlWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_XML_SCHEMA)) {
+                        setFileNameToHeader(response, "xml");
                         CRXmlSchemaWriter sparqlWriter = new CRXmlSchemaWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat.equals(FORMAT_JSON)) {
+                        setFileNameToHeader(response, "json");
                         CRJsonWriter sparqlWriter = new CRJsonWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_CSV)) {
+                        setFileNameToHeader(response, "csv");
                         addBOM(outputStream, "UTF-8");
+
                         // as main consumer of the result is Excel use ";" because otherwise Excel does not handle CSV correctly
                         CRSPARQLCSVWriter sparqlWriter = new CRSPARQLCSVWriter(outputStream, ';');
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
                     } else if (outputFormat != null && outputFormat.equals(FORMAT_TSV)) {
+                        setFileNameToHeader(response, "csv");
                         // MS Excel expects TSV to be UTF-16Little Endian
                         response.setCharacterEncoding("UTF-16LE");
                         addBOM(outputStream, "utf-16le");
                         CRSPARQLTSVWriter sparqlWriter = new CRSPARQLTSVWriter(outputStream);
                         ((TupleQuery) queryObject).evaluate(sparqlWriter);
 
-                    } else if (outputFormat.equals(FORMAT_HTML) || outputFormat.equals(FORMAT_HTML_PLUS)) {
+                    } else if (outputFormat != null && (outputFormat.equals(FORMAT_HTML)
+                            || outputFormat.equals(FORMAT_HTML_PLUS))) {
                         response.setContentType("text/html");
                         long startTime = System.currentTimeMillis();
                         queryResult = ((TupleQuery) queryObject).evaluate();
@@ -831,6 +891,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
                     }
+
                 }
             } finally {
                 SesameUtil.close(queryResult);
@@ -864,7 +925,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             nrOfTriples =
                     DAOFactory.get().getDao(HelperDAO.class)
-                    .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
+                            .addTriples(query, dataset, defaultGraphUris, namedGraphUris, maxRowsCount);
 
             if (nrOfTriples > 0) {
                 // prepare and insert cr:hasFile predicate
@@ -876,21 +937,21 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
                 // Create source
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
+                        .addSourceIgnoreDuplicate(HarvestSourceDTO.create(dataset, false, 0, getUserName()));
 
                 // Insert last modified predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
-                        ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_LAST_MODIFIED,
+                                ObjectDTO.createLiteral(Util.virtuosoDateToString(new Date()), XMLSchema.DATETIME));
 
                 // Insert harvested statements predicate
                 DAOFactory
-                .get()
-                .getDao(HarvestSourceDAO.class)
-                .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
-                        ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
+                        .get()
+                        .getDao(HarvestSourceDAO.class)
+                        .insertUpdateSourceMetadata(dataset, Predicates.CR_HARVESTED_STATEMENTS,
+                                ObjectDTO.createLiteral(String.valueOf(nrOfTriples), XMLSchema.INTEGER));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1316,7 +1377,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
             // A ClassCastException means bad query too, because that's what is thrown when the query dos not start with
             // "SELECT", "CONSTRUCT" or "ASK".
-            if (isBadQuery == false) {
+            if (!isBadQuery) {
                 isBadQuery = exception instanceof ClassCastException;
             }
 
@@ -1435,15 +1496,36 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     }
 
-    public boolean isBulkActionsAvailable() {
+    /**
+     * Checks if is bulk actions panel should be available for the current user.
+     *
+     * @return true, if is bulk actions available
+     */
+    public boolean isBulkActionsAllowed() {
         return isAdminPrivilege();
     }
 
-    public boolean isBulkActionsPanelVisible() {
-        return bulkActionsPanelVisible;
+    /**
+     * @return the displayBulkActions
+     */
+    public boolean isDisplayBulkActions() {
+        return displayBulkActions;
     }
 
-    public void setBulkActionsPanelVisible(boolean bulkActionsPanelVisible) {
-        this.bulkActionsPanelVisible = bulkActionsPanelVisible;
+    /**
+     * @param displayBulkActions the displayBulkActions to set
+     */
+    public void setDisplayBulkActions(boolean displayBulkActions) {
+        this.displayBulkActions = displayBulkActions;
+    }
+
+    /**
+     * adds file name header to response.
+      * @param response Http Response
+     * @param fileExtension file extension without dot
+     */
+    private void setFileNameToHeader(HttpServletResponse response, String fileExtension) {
+        response.setHeader("Content-Disposition", "attachment; filename=\""
+                + DEFAULT_SPARQL_FILENAME + "." + fileExtension + "\"");
     }
 }

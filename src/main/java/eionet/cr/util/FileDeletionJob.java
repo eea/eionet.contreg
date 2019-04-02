@@ -32,7 +32,7 @@ import java.util.HashSet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
+
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -42,6 +42,8 @@ import org.quartz.StatefulJob;
 import eionet.cr.common.JobScheduler;
 import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Background job that silently deletes CR's temporary files in the background. Files must be registered to this job to get deleted.
@@ -51,11 +53,10 @@ import eionet.cr.config.GeneralConfig;
 public class FileDeletionJob implements ServletContextListener, StatefulJob {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(FileDeletionJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileDeletionJob.class);
 
     /** */
-    private static final long RUNNING_INTERVAL_MS = GeneralConfig.getTimePropertyMilliseconds(
-            GeneralConfig.FILE_DELETION_JOB_INTERVAL, 20000);
+    private static long RUNNING_INTERVAL_MS;
 
     /** */
     private static final Collection<File> QUEUED_FILES = Collections.synchronizedSet(new HashSet<File>());
@@ -70,6 +71,8 @@ public class FileDeletionJob implements ServletContextListener, StatefulJob {
      */
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+
+        RUNNING_INTERVAL_MS = GeneralConfig.getTimePropertyMilliseconds(GeneralConfig.FILE_DELETION_JOB_INTERVAL, 20000);
 
         Class<FileDeletionJob> clazz = FileDeletionJob.class;
         JobDetail jobDetails = new JobDetail(clazz.getSimpleName(), clazz.getName(), clazz);

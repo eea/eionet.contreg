@@ -19,7 +19,9 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.FileNameUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -29,7 +31,7 @@ import org.apache.log4j.Logger;
 public class CompressUtil {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(CompressUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompressUtil.class);
 
     /** */
     private static final FileNameUtil FILE_NAME_UTIL;

@@ -1,9 +1,18 @@
 package eionet.cr.util;
 
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class ObjectLabelPairTest extends TestCase {
+import static org.junit.Assert.assertTrue;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class ObjectLabelPairTest {
+
+    @Test
     public void testCompraision() {
         ObjectLabelPair pair2 =
                 new ObjectLabelPair("http://www.w3.org/2002/07/owl#NotDifferent", "http://www.w3.org/2002/07/owl#NotDifferent");
@@ -14,6 +23,7 @@ public class ObjectLabelPairTest extends TestCase {
 
     }
 
+    @Test
     public void testCompraision2() {
         ObjectLabelPair pair2 = new ObjectLabelPair("http://www.w3.org/2002/07/owl#NotDifferent", "AAAA");
         ObjectLabelPair pair1 = new ObjectLabelPair("http://www.w3.org/2002/07/owl#AllDifferent", "MMMMMM");
@@ -22,6 +32,7 @@ public class ObjectLabelPairTest extends TestCase {
 
     }
 
+    @Test
     public void testCompraision3() {
         ObjectLabelPair pair2 = new ObjectLabelPair("ZZZZZZ", "ZZZ");
         ObjectLabelPair pair1 = new ObjectLabelPair("AAAA", "AAAAAA");

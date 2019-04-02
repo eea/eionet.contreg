@@ -4,10 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.util.Bindings;
@@ -18,8 +21,16 @@ import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class VirtuosoFilteredSearchHelperTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtuosoFilteredSearchHelperTest.class);
 
     @Test
     public void testBuildTypeSearchQuery() {
@@ -65,7 +76,7 @@ public class VirtuosoFilteredSearchHelperTest {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
 
-        Map<String, String> filters = new HashMap<String, String>();
+        Map<String, String> filters = new LinkedHashMap<String, String>();
         // http://rod.eionet.europa.eu/schema.rdf#obligation=http://rod.eionet.europa.eu/obligations/15,
         // http://www.w3.org/2000/01/rdf-schema#label=CLRTAP}
         filters.put("http://rod.eionet.europa.eu/schema.rdf#obligation", "http://rod.eionet.europa.eu/obligations/15");
@@ -87,18 +98,19 @@ public class VirtuosoFilteredSearchHelperTest {
         PagingRequest pagingRequest = PagingRequest.create(1);
         SortingRequest sortingRequest = new SortingRequest(null, SortOrder.parse(SortOrder.ASCENDING.toString()));
 
-        Map<String, String> filters = new HashMap<String, String>();
+        Map<String, String> filters = new LinkedHashMap<String, String>();
         // http://rod.eionet.europa.eu/schema.rdf#obligation=http://rod.eionet.europa.eu/obligations/15,
         // http://www.w3.org/2000/01/rdf-schema#label=CLRTAP}
         filters.put("http://rod.eionet.europa.eu/schema.rdf#obligation", "http://rod.eionet.europa.eu/obligations/15");
-        filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
         filters.put("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://rod.eionet.europa.eu/schema.rdf#Delivery");
+        filters.put("http://www.w3.org/2000/01/rdf-schema#label", "CLRTAP");
         VirtuosoFilteredSearchHelper helper = new VirtuosoFilteredSearchHelper(filters, null, pagingRequest, sortingRequest, true);
 
         String paramStr = helper.getWhereContents();
 
-        assertEquals("?s ?p1 ?o1 . filter(?p1 = ?p1Val) . filter(?o1 = ?o1Val) . ?s ?p2 ?o2 . filter(?p2 = ?p2Val) . "
-                + "filter(?o2 = ?o2Val) . ?s ?p3 ?o3 . filter(?p3 = ?p3Val) . filter bif:contains(?o3, ?o3Val)", paramStr);
+        String expected = "?s ?p1 ?o1 . filter(?p1 = ?p1Val) . filter(?o1 = ?o1Val) . ?s ?p2 ?o2 . filter(?p2 = ?p2Val) . "
+                + "filter(?o2 = ?o2Val) . ?s ?p3 ?o3 . filter(?p3 = ?p3Val) . filter bif:contains(?o3, ?o3Val)";
+        assertEquals(expected, paramStr);
     }
 
     private void checkQuery(String query, Bindings bindings) {
@@ -112,10 +124,10 @@ public class VirtuosoFilteredSearchHelperTest {
             List<String> results = reader.getResultList();
 
             for (String url : results) {
-                System.out.println("URL " + url);
+                LOGGER.info("URL " + url);
             }
         } catch (Exception e) {
-            System.out.println("ERROR " + e);
+            LOGGER.error("ERROR " + e);
         } finally {
             SesameUtil.close(conn);
         }

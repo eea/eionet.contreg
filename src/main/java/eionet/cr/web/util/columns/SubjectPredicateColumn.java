@@ -24,12 +24,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.Predicates;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.util.URIUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -39,7 +41,7 @@ import eionet.cr.util.URIUtil;
 public class SubjectPredicateColumn extends SearchResultColumn {
 
     /** */
-    protected static final Logger logger = Logger.getLogger(SubjectPredicateColumn.class);
+    protected static final Logger logger = LoggerFactory.getLogger(SubjectPredicateColumn.class);
 
     /** */
     private String predicateUri;

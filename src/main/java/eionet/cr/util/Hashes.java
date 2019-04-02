@@ -24,6 +24,8 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import eionet.cr.common.CRRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for generating various hashes used in CR.
@@ -35,6 +37,7 @@ public final class Hashes {
 
     /** */
     private static final long SEED = 0xcbf29ce484222325L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hashes.class);
 
     /**
      * Hide utility class constructor.
@@ -138,10 +141,10 @@ public final class Hashes {
 
         if (args.length != 0) {
             for (String s : args) {
-                System.out.println(s + " = " + Hashes.spoHash(s));
+                LOGGER.info(s + " = " + Hashes.spoHash(s));
             }
         } else {
-            System.out.println(spoHash("http://www.gutenberg.org/feeds/catalog.rdf"));
+            LOGGER.info(Long.toString(spoHash("http://www.gutenberg.org/feeds/catalog.rdf")));
         }
     }
 }

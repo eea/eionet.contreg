@@ -32,11 +32,13 @@ import java.net.URLConnection;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.URLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A thread that downloads from a given URL a file that will be available for creating staging databases.
@@ -46,7 +48,7 @@ import eionet.cr.util.URLUtil;
 public class FileDownloader extends Thread {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(FileDownloader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloader.class);
 
     /** */
     public static final File FILES_DIR = getFilesDir();

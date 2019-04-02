@@ -17,15 +17,42 @@ WHERE {
 ]]></entry>
 
 
-    <entry key="countryCodeMatching.name">Match country codes with the EEA contries vocabulary (fast)</entry>
+    <entry key="estatGeoMatching.name">Match country codes with the Eurostat GEO vocabulary (fast)</entry>
+    <entry key="estatGeoMatching.script">
+<![CDATA[
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?rowuri [TABLECOLUMN] ?value
+}
+INSERT {
+    ?rowuri [TABLECOLUMN] ?countryuri
+}
+WHERE {
+  GRAPH ?harvestedSource {
+    ?rowuri [TABLECOLUMN] ?value
+  }
+  GRAPH <http://rdfdata.eionet.europa.eu/eurostat/dic/geo.rdf> {
+     ?countryuri skos:notation ?value
+  }
+}
+]]></entry>
+
+
+    <entry key="countryCodeMatching.name">Match country codes with the EEA countries vocabulary (fast)</entry>
     <entry key="countryCodeMatching.script">
 <![CDATA[
 PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-INSERT INTO ?harvestedSource {
-    ?rowuri eea:forCountry ?countryuri
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?rowuri [TABLECOLUMN] ?value
+}
+INSERT {
+    ?rowuri [TABLECOLUMN] ?countryuri
 }
 WHERE {
   GRAPH ?harvestedSource {
@@ -42,15 +69,19 @@ WHERE {
 ]]></entry>
 
 
-    <entry key="countryNameMatching.name">Match country codes or names with the EEA contries vocabulary (slow)</entry>
+    <entry key="countryNameMatching.name">Match country codes or names with the EEA countries vocabulary (slow)</entry>
     <entry key="countryNameMatching.script">
 <![CDATA[
 PREFIX eea: <http://rdfdata.eionet.europa.eu/eea/ontology/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-INSERT INTO ?harvestedSource {
-    ?rowuri eea:forCountry ?countryuri
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?rowuri [TABLECOLUMN] ?value
+}
+INSERT {
+    ?rowuri [TABLECOLUMN] ?countryuri
 }
 WHERE {
   GRAPH ?harvestedSource {
@@ -168,6 +199,26 @@ WHERE {
     GRAPH ?harvestedSource {
         {?recordY [TABLECOLUMN] ?yval FILTER(?yval IN ('Y','y','YES', 'Yes','yes')) } UNION
         {?recordN [TABLECOLUMN] ?nval FILTER(?nval IN ('N','n','NO', 'No','no')) }
+    }
+}
+]]></entry>
+
+    <entry key="uriConvert.name">Convert values to URI data type</entry>
+    <entry key="uriConvert.script"><![CDATA[
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+MODIFY GRAPH ?harvestedSource
+DELETE {
+    ?record [TABLECOLUMN] ?value
+}
+INSERT {
+    ?record [TABLECOLUMN] `IRI(bif:trim(?value))`
+}
+WHERE {
+    GRAPH ?harvestedSource {
+        ?record [TABLECOLUMN] ?value
+        FILTER(DATATYPE(?value) = xsd:string && (STRSTARTS(?value,'http:') || STRSTARTS(?value,'https:')
+          || STRSTARTS(?value,'mailto:') || STRSTARTS(?value,'urn:')))
     }
 }
 ]]></entry>

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -45,6 +45,8 @@ import eionet.cr.web.action.DownloadServlet;
 import eionet.cr.web.action.ExportTriplesActionBean;
 import eionet.cr.web.action.TabularDataServlet;
 import eionet.cr.web.action.factsheet.ViewActionBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Purpose of this filter is to enable RESTful download of files stored at CR. Since it is assumed that all these will have a URL
@@ -59,7 +61,7 @@ import eionet.cr.web.action.factsheet.ViewActionBean;
 public class HomespaceUrlFilter implements Filter {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(HomespaceUrlFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomespaceUrlFilter.class);
 
     /*
      * (non-Javadoc)

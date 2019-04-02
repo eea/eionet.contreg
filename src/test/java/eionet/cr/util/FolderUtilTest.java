@@ -20,19 +20,28 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.util;
 
-import junit.framework.TestCase;
+import eionet.cr.ApplicationTestContext;
 import eionet.cr.config.GeneralConfig;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
 
 /**
  *
  * @author altnyris
  *
  */
-public class FolderUtilTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class FolderUtilTest {
 
     /**
      *
      */
+    @Test
     public void testIsUserHomeUri() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -54,6 +63,7 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testExtarctUserName() {
 
         try {
@@ -79,6 +89,7 @@ public class FolderUtilTest extends TestCase {
     /**
      *
      */
+    @Test
     public void testIsUserReservedUri() {
 
         try {
@@ -100,6 +111,7 @@ public class FolderUtilTest extends TestCase {
         }
     }
 
+    @Test
     public void testExtractAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -108,6 +120,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("/abc/cba", aclPath);
     }
 
+    @Test
     public void testExtractProcectAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -116,6 +129,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("/project/aux/poux", aclPath);
     }
 
+    @Test
     public void testEmtpyProcectAcl() {
 
         String appHomeUrl = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
@@ -124,6 +138,7 @@ public class FolderUtilTest extends TestCase {
         assertEquals("", aclPath);
     }
 
+    @Test
     public void testExtractParentFolderUri() {
         assertEquals("http://aa.bb.com/level1/level2/level3", FolderUtil.extractParentFolderUri("http://aa.bb.com/level1/level2/level3/somethingattheen"));
     }

@@ -50,11 +50,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.common.Predicates;
@@ -63,9 +65,9 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.EndpointHarvestQueryDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
 import eionet.cr.dto.EndpointHarvestQueryDTO;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -83,48 +85,49 @@ import eionet.cr.util.FileDeletionJob;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
-import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.xml.ConversionsParser;
 
 /**
+ * Performs a pull-harvest.
  *
  * @author Jaanus Heinlaid
+ * @author George Sofianos
  */
 public class PullHarvest extends BaseHarvest {
 
-    /** */
+    /** Static logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PullHarvest.class);
+
+    /** Code reserved for saying that "no HTTP response was returned. " */
     private static final int NO_RESPONSE = -1;
 
-    /** */
-    private static final Logger LOGGER = Logger.getLogger(PullHarvest.class);
-
-    /** */
+    /** Number of redirections to follow before giving up. */
     private static final int MAX_REDIRECTIONS = 4;
 
-    /** */
-    private static final int MAX_CONTENTLENGTH = 5;
-
-    /** */
+    /** Default "Accept" HTTP header when submitting HTTP requests to sources. */
     private static final String ACCEPT_HEADER = StringUtils.join(RDFMediaTypes.collection(), ',') + ",text/xml,*/*;q=0.6";
 
-    /** */
+    /** Was the source available? */
     private boolean isSourceAvailable;
 
-    /** */
+    /** URL that the source redirected to. */
     private final List<String> redirectedUrls = new ArrayList<String>();
 
     /**
-     * @param contextUrl
-     * @throws HarvestException
+     * Instantiates a new pull harvest.
+     *
+     * @param contextUrl the context url
+     * @throws HarvestException the harvest exception
      */
     public PullHarvest(String contextUrl) throws HarvestException {
         super(contextUrl);
     }
 
     /**
+     * Instantiates a new pull harvest.
      *
-     * @param contextSourceDTO
-     * @throws DAOException
+     * @param contextSourceDTO the context source dto
+     * @throws DAOException the DAO exception
      */
     public PullHarvest(HarvestSourceDTO contextSourceDTO) throws DAOException {
         super(contextSourceDTO);
@@ -178,7 +181,10 @@ public class PullHarvest extends BaseHarvest {
                 addSourceMetadata(Predicates.CR_MEDIA_TYPE, ObjectDTO.createLiteral(contentType));
             }
 
-            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(file.length())));
+            // If long size can be converted to int without loss, then do so, otherwise remain true to long.
+            long size = file.length();
+            ObjectDTO byteSize = ((int) size) == size ? ObjectDTO.createLiteral((int) size) : ObjectDTO.createLiteral(size);
+            addSourceMetadata(Predicates.CR_BYTE_SIZE, byteSize);
             addSourceMetadata(Predicates.CR_LAST_MODIFIED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
 
             httpResponseCode = 0;
@@ -493,9 +499,13 @@ public class PullHarvest extends BaseHarvest {
         // update context source DTO with the results of this harvest
         getContextSourceDTO().setStatements(noOfTriples);
         getContextSourceDTO().setLastHarvest(new Date());
+        if (urlConn != null && urlConn.getLastModified() > 0) {
+            getContextSourceDTO().setLastModified(new Date(urlConn.getLastModified()));
+        }
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
         // add source metadata resulting from this harvest
         addSourceMetadata(urlConn, 0, null, null);
@@ -518,6 +528,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
         // since the server returned source-not-modified, we're keeping the old metadata,
         // but still updating the cr:lastRefreshed
@@ -539,9 +550,11 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
+        getContextSourceDTO().calculateNewInterval();
 
-        // since the server returned source-not-modified, we're keeping the old metadata,
-        // but still updating the cr:lastRefreshed
+        setClearTriplesInHarvestFinish(true);
+        LOGGER.debug("Old harvested content will be removed, because of source unauthorized error!");
+
         setCleanAllPreviousSourceMetadata(false);
         addSourceMetadata(Predicates.CR_LAST_REFRESHED, ObjectDTO.createLiteral(formatDate(new Date()), XMLSchema.DATETIME));
     }
@@ -565,26 +578,21 @@ public class PullHarvest extends BaseHarvest {
 
         // if permanent error, clean previously harvested metadata of this source,
         // and if not a priority source, clean all previously harvested content of this source too
-        int noOfStatements = getContextSourceDTO().getStatements();
         if (isPermanentError(responseCode)) {
 
             setCleanAllPreviousSourceMetadata(true);
             if (!getContextSourceDTO().isPrioritySource()) {
-                try {
-                    getHarvestSourceDAO().clearGraph(getContextUrl());
-                    noOfStatements = 0;
-                } catch (DAOException e) {
-                    LOGGER.error("Failed to delete previous content after permanent error", e);
-                }
+                setClearTriplesInHarvestFinish(true);
+                LOGGER.debug("Old harvested content will be removed, because of permanent error on a non-priority source!");
             }
         }
 
         // update context source DTO with the results of this harvest
-        getContextSourceDTO().setStatements(noOfStatements);
         getContextSourceDTO().setLastHarvest(lastHarvest);
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
         getContextSourceDTO().setCountUnavail(countUnavail);
+        getContextSourceDTO().calculateNewInterval(false);
 
         // save same error parameters to parent sources where this source was redirected from
         handleRedirectedHarvestDTOs(lastHarvest, responseCode, sourceNotAvailable);
@@ -731,7 +739,7 @@ public class PullHarvest extends BaseHarvest {
             // content size
             int contentLength = urlConn.getContentLength();
             if (contentLength >= 0) {
-                addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(contentLength)));
+                addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(contentLength));
             }
         }
 
@@ -751,7 +759,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws RDFHandlerException if RDF parsing fails while analyzing file with unknown format
      */
     private int downloadAndProcessContent(HttpURLConnection urlConn) throws IOException, DAOException, SAXException,
-    RDFHandlerException, RDFParseException {
+            RDFHandlerException, RDFParseException {
 
         File downloadedFile = null;
         try {
@@ -762,41 +770,8 @@ public class PullHarvest extends BaseHarvest {
             // Otherwise try to process the file into RDF format and *then* proceed to loading.
 
             ContentLoader contentLoader = createContentLoader(urlConn);
-
-            if (contentLoader != null) {
-                contentLoader.setTimeout(getTimeout());
-                LOGGER.debug(loggerMsg("Downloaded file is in RDF or web feed format"));
-                return loadFile(downloadedFile, contentLoader);
-            } else {
-                LOGGER.debug(loggerMsg("Downloaded file is not in RDF or web feed format, processing the file further"));
-                File processedFile = null;
-                try {
-                    // The file could be a zipped RDF, an XML with an RDF conversion, N3, or actually a completely valid RDF
-                    // that simply wasn't declared in the server-returned content type.
-                    FileToRdfProcessor fileProcessor = new FileToRdfProcessor(downloadedFile, getContextUrl());
-                    processedFile = fileProcessor.process();
-
-                    String conversionSchemaUri = fileProcessor.getConversionSchemaUri();
-                    if (StringUtils.isNotBlank(conversionSchemaUri) && SesameUtil.isValidURI(conversionSchemaUri)) {
-                        addSourceMetadata(Predicates.CR_SCHEMA, new ObjectDTO(conversionSchemaUri, false));
-                    }
-
-                    if (processedFile != null && fileProcessor.getRdfFormat() != null) {
-                        LOGGER.debug(loggerMsg("File processed into RDF format"));
-                        ContentLoader rdfLoader = new RDFFormatLoader(fileProcessor.getRdfFormat());
-                        rdfLoader.setTimeout(getTimeout());
-                        return loadFile(processedFile, rdfLoader);
-                    } else {
-                        LOGGER.debug(loggerMsg("File couldn't be processed into RDF format"));
-                        // if no conversion found but triples exist from previous harvests, clear content
-                        getHarvestSourceDAO().clearGraph(getContextUrl());
-
-                        return 0;
-                    }
-                } finally {
-                    FileDeletionJob.register(processedFile);
-                }
-            }
+            int result = loadFileContent(downloadedFile, contentLoader);
+            return result;
         } finally {
             FileDeletionJob.register(downloadedFile);
         }
@@ -818,6 +793,7 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setStatements(0);
         getContextSourceDTO().setLastHarvestId(getHarvestId());
+        getContextSourceDTO().calculateNewInterval();
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update current harvest to finished, set its count of harvested triples to 0
@@ -851,7 +827,8 @@ public class PullHarvest extends BaseHarvest {
             // (no null-checking, i.e. assuming the context source already exists)
             redirectedToSourceDTO = getContextSourceDTO().clone();
 
-            // set the redirected-to source's url, creation time and last harvest time
+            // reset interval minutes and set the redirected-to source's url, creation time and last harvest time
+            redirectedToSourceDTO.resetInterval();
             redirectedToSourceDTO.setUrl(redirectedToUrl);
             redirectedToSourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(redirectedToUrl)));
             redirectedToSourceDTO.setTimeCreated(redirectionSeen);
@@ -910,6 +887,7 @@ public class PullHarvest extends BaseHarvest {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         File file = TempFilePathGenerator.generate();
+        file.getParentFile().mkdirs();
         try {
             outputStream = new FileOutputStream(file);
             inputStream = urlConn.getInputStream();
@@ -917,7 +895,7 @@ public class PullHarvest extends BaseHarvest {
             int bytesCopied = IOUtils.copy(inputStream, outputStream);
 
             // add number of bytes to source metadata, unless it's already there
-            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(String.valueOf(bytesCopied)));
+            addSourceMetadata(Predicates.CR_BYTE_SIZE, ObjectDTO.createLiteral(bytesCopied));
 
         } catch (IOException e) {
             FileDeletionJob.register(file);
@@ -934,10 +912,10 @@ public class PullHarvest extends BaseHarvest {
     /**
      * Adds basic authentication information to URL connection
      */
-    private void addBasicAuthentication(HttpURLConnection urlConnection, String username, String password){
+    private void addBasicAuthentication(HttpURLConnection urlConnection, String username, String password) {
         String userpass = username + ":" + password;
         String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-        urlConnection.setRequestProperty ("Authorization", basicAuth);
+        urlConnection.setRequestProperty("Authorization", basicAuth);
     }
 
     /**
@@ -951,7 +929,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws ParserConfigurationException When parsing the response from conversion service fails due to parser configuration.
      */
     private HttpURLConnection prepareUrlConnection(String connectUrl) throws IOException, DAOException, SAXException,
-    ParserConfigurationException {
+            ParserConfigurationException {
 
         String sanitizedUrl = StringUtils.substringBefore(connectUrl, "#");
         sanitizedUrl = StringUtils.replace(sanitizedUrl, " ", "%20");
@@ -962,9 +940,9 @@ public class PullHarvest extends BaseHarvest {
         connection.setRequestProperty("Connection", "close");
 
         UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(connectUrl);
-        if (authentication != null){
+        if (authentication != null) {
             addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
-            LOGGER.info("Source has basic authentication. Using credentials of "+authentication.getUrlBeginning());
+            LOGGER.info("Source has basic authentication. Using credentials of " + authentication.getUrlBeginning());
         }
 
         connection.setInstanceFollowRedirects(false);
@@ -981,27 +959,27 @@ public class PullHarvest extends BaseHarvest {
         if (isOnDemandHarvest == false && getContextSourceDTO().isLastHarvestFailed() == false) {
 
             // "If-Modified-Since" will be compared to this URL's last harvest
-            Date lastHarvestDate = getContextSourceDTO().getLastHarvest();
-            long lastHarvest = lastHarvestDate == null ? 0L : lastHarvestDate.getTime();
-            if (lastHarvest > 0) {
+            Date lastModifiedDate = getContextSourceDTO().getLastModified();
+            long lastModified = lastModifiedDate == null ? 0L : lastModifiedDate.getTime();
+            if (lastModified > 0) {
 
                 // Check if this URL has a conversion stylesheet, and if the latter has been modified since last harvest.
                 String conversionStylesheetUrl = getConversionStylesheetUrl(getHelperDAO(), sanitizedUrl);
                 boolean hasConversion = StringUtils.isNotBlank(conversionStylesheetUrl);
-                boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastHarvest);
+                boolean hasModifiedConversion = hasConversion && URLUtil.isModifiedSince(conversionStylesheetUrl, lastModified);
 
                 // Check if post-harvest scripts are updated
                 boolean scriptsModified =
-                        DAOFactory.get().getDao(PostHarvestScriptDAO.class)
-                        .isScriptsModified(lastHarvestDate, getContextSourceDTO().getUrl());
+                        DAOFactory.get().getDao(HarvestScriptDAO.class)
+                                .isScriptsModified(lastModifiedDate, getContextSourceDTO().getUrl());
 
                 // "If-Modified-Since" should only be set if there is no modified conversion or post-harvest scripts for this URL.
                 // Because if there is a conversion stylesheet or post-harvest scripts, and any of them has been modified since last
                 // harvest, we surely want to get the content again and run the conversion or script on the content, regardless of
                 // when the content itself was last modified.
                 if (!hasModifiedConversion && !scriptsModified) {
-                    LOGGER.debug(loggerMsg("Using if-modified-since, compared to last harvest " + formatDate(lastHarvestDate)));
-                    connection.setIfModifiedSince(lastHarvest);
+                    LOGGER.debug(loggerMsg("Using if-modified-since, compared to last successful harvest " + formatDate(lastModifiedDate)));
+                    connection.setIfModifiedSince(lastModified);
                 }
             }
         }
@@ -1032,11 +1010,11 @@ public class PullHarvest extends BaseHarvest {
         connection.setInstanceFollowRedirects(false);
 
         UrlAuthenticationDTO authentication = DAOFactory.get().getDao(HarvestSourceDAO.class).getUrlAuthentication(queryString);
-        if (authentication != null){
+        if (authentication != null) {
             addBasicAuthentication(connection, authentication.getUsername(), authentication.getPassword());
-            System.out.println("Using basic auth");
+            LOGGER.info("Using basic auth");
         } else {
-            System.out.println("NOT Using basic auth");
+            LOGGER.info("NOT Using basic auth");
         }
 
         // Set the timeout both for establishing the connection, and reading from it once established.
@@ -1092,7 +1070,7 @@ public class PullHarvest extends BaseHarvest {
      * @throws IOException
      */
     public static String getConversionStylesheetUrl(HelperDAO helperDAO, String harvestSourceUrl) throws DAOException,
-    IOException, SAXException, ParserConfigurationException {
+            IOException, SAXException, ParserConfigurationException {
 
         String result = null;
         String schemaUri = helperDAO.getSubjectSchemaUri(harvestSourceUrl);

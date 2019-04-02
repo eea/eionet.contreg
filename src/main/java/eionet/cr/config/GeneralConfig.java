@@ -20,14 +20,16 @@
  */
 package eionet.cr.config;
 
-import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.Properties;
 
+import eionet.cr.spring.SpringApplicationContext;
+import eionet.propertyplaceholderresolver.CircularReferenceException;
+import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
+import eionet.propertyplaceholderresolver.UnresolvedPropertyException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eionet.cr.harvest.scheduled.HarvestingJob;
 
@@ -37,6 +39,8 @@ import eionet.cr.harvest.scheduled.HarvestingJob;
  *
  */
 public final class GeneralConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralConfig.class);
 
     /** */
     public static final String BUNDLE_NAME = "cr";
@@ -52,8 +56,16 @@ public final class GeneralConfig {
     /** Property for the default harvest interval. */
     public static final String DEFAULT_HARVEST_INTERVAL = "harvester.defaultHarvestInterval";
 
+    /** Upper limit for the number of sources that are harvested in each interval. */
     public static final String HARVESTER_SOURCES_UPPER_LIMIT = "harvester.batchHarvestingUpperLimit";
+
+    /** Upper limit for the number of urgent harvests performed at one interval. */
+    public static final String HARVESTER_URGENT_HARVESTS_PER_INTERVAL = "urgentHarvestsPerInterval";
+
+    /** Maximum content length of harvested sources. */
     public static final String HARVESTER_MAX_CONTENT_LENGTH = "harvester.maximumContentLength";
+
+    /** The timeout that harvester will feed into java.net.URLConnection's setConnectTimeout() and setReadTimeout(). */
     public static final String HARVESTER_HTTP_TIMEOUT = "harvester.httpConnection.timeout";
 
     /** */
@@ -134,6 +146,15 @@ public final class GeneralConfig {
     /** */
     public static final String VIRTUOSO_REAL_TIME_FT_INDEXING = "virtuoso.unittest.realTimeFullTextIndexing";
 
+    /** Interval for the job that deletes harvest sources in the background. */
+    public static final String SOURCE_DELETION_JOB_INTERVAL = "sourceDeletionJob.interval";
+
+    /** Comma-separated list of hours when source deletion background job should be active. */
+    public static final String SOURCE_DELETION_JOB_ACTIVE_HOURS = "sourceDeletionJob.activeHours";
+
+    /** Number of sources that the source deletion background job should delete during one run. */
+    public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
@@ -146,10 +167,9 @@ public final class GeneralConfig {
     public static final int SERVLET_RESPONSE_BUFFER_SIZE = NumberUtils.toInt(getProperty("servletResponseBufferSize"), 32768);
 
     /** */
-    private static Log logger = LogFactory.getLog(GeneralConfig.class);
+    private static Properties properties;
+    private static ConfigurationPropertyResolver propertyResolver;
 
-    /** */
-    private static Properties properties = null;
 
     /**
      * Hide utility class constructor.
@@ -159,21 +179,58 @@ public final class GeneralConfig {
     }
 
     /** */
-    private static void init() {
-        properties = new Properties();
-        try {
-            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+//    private static void init() {
+//        properties = new Properties();
+//        try {
+//            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
+//
+//            loadEnvProperties(properties, "CR_");
+//
+//            // trim all the values (i.e. we don't allow preceding or trailing
+//            // white space in property values)
+//            for (Entry<Object, Object> entry : properties.entrySet()) {
+//                entry.setValue(entry.getValue().toString().trim());
+//            }
+//
+//        } catch (IOException e) {
+//            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
+//        }
+//    }
 
-            // trim all the values (i.e. we don't allow preceding or trailing
-            // white space in property values)
-            for (Entry<Object, Object> entry : properties.entrySet()) {
-                entry.setValue(entry.getValue().toString().trim());
-            }
-
-        } catch (IOException e) {
-            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
-        }
-    }
+    /**
+     * Loads all the environment variables starting with startsWith in the given Properties object.
+     * Replaces the already defined properties ignoring case
+     * @param properties
+     * @param startsWith
+     */
+//    private static void loadEnvProperties(Properties properties, String startsWith) {
+//        for(String envKey : System.getenv().keySet()) {
+//            if(envKey.startsWith(startsWith)) {
+//                String key = envKey.replace(startsWith, "").replaceAll("_", ".");
+//                boolean found = false;
+//
+//                // tries to match the environment var with an already configured setting (case insensitive)
+//                for(Object propKeyObj : properties.keySet()) {
+//                    if(propKeyObj instanceof String) {
+//                        String propKey = (String) propKeyObj;
+//                        String oldValue = properties.getProperty(propKey);
+//                        if(key.equalsIgnoreCase(propKey)) {
+//                            properties.setProperty(propKey, System.getenv(envKey));
+//                            found = true;
+//                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//                // if the match failed, adds it as it is
+//                if(!found) {
+//                    properties.setProperty(key, System.getenv(envKey));
+//                    System.out.println("Setting " + key + " added from ENV variable");
+//                }
+//            }
+//        }
+//    }
 
     /**
      *
@@ -183,10 +240,33 @@ public final class GeneralConfig {
     public static synchronized String getProperty(String key) {
 
         if (properties == null) {
-            init();
+            properties = new Properties();
+        }
+        if (propertyResolver == null) {
+            propertyResolver = SpringApplicationContext.getBean("configurationPropertyResolver");
         }
 
-        return properties.getProperty(key);
+        String value = "";
+        if (properties.containsKey(key)) {
+            value = properties.getProperty(key);
+        }
+        else {
+            try {
+                value = propertyResolver.resolveValue(key);
+            } catch (UnresolvedPropertyException e) {
+//            e.printStackTrace();
+            } catch (CircularReferenceException e) {
+//            e.printStackTrace();
+            }
+            properties.put(key, value);
+        }
+
+        return value != null && !value.isEmpty() ? value : null;
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        return properties.getProperty(key);
     }
 
     /**
@@ -197,26 +277,22 @@ public final class GeneralConfig {
      */
     public static synchronized String getProperty(String key, String defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
 
-        return properties.getProperty(key, defaultValue);
+        String value = getProperty(key);
+        return value == null ? defaultValue : value;
+
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        return properties.getProperty(key, defaultValue);
     }
 
     /**
      *
      */
     public static synchronized boolean isPropertySet(String key) {
-        if (properties == null) {
-            init();
-        }
-
-        if (properties.getProperty(key) == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return getProperty(key) == null ? false : true;
     }
 
     /**
@@ -230,15 +306,18 @@ public final class GeneralConfig {
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
-        String propValue = properties.getProperty(key);
+//        if (properties == null) {
+//            init();
+//        }
+//
+//        String propValue = properties.getProperty(key);
+
+        String propValue = getProperty(key);
         int value = defaultValue;
         if (propValue != null) {
             try {
-                value = Integer.valueOf(propValue);
-            } catch (Exception e) {
+                value = Integer.parseInt(propValue.trim());
+            } catch (NumberFormatException e) {
                 // Ignore exceptions resulting from string-to-integer conversion here.
             }
         }
@@ -255,13 +334,14 @@ public final class GeneralConfig {
      */
     public static synchronized Integer getTimePropertyMilliseconds(final String key, Integer defaultValue) {
 
-        if (properties == null) {
-            init();
-        }
+//        if (properties == null) {
+//            init();
+//        }
 
         int coeficient = 1;
 
-        String propValue = properties.getProperty(key);
+//        String propValue = properties.getProperty(key);
+        String propValue = getProperty(key);
         Integer value = defaultValue;
 
         if (propValue != null) {
@@ -344,9 +424,9 @@ public final class GeneralConfig {
      */
     public static synchronized Properties getProperties() {
 
-        if (properties == null) {
-            init();
-        }
+//        if (properties == null) {
+//            init();
+//        }
 
         return properties;
     }

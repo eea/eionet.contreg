@@ -18,14 +18,14 @@
                     <li><a href="#">Operations</a>
                     <ul>
                         <li>
-                            <stripes:link beanclass="${actionBean.class.name}" event="scheduleUrgentHarvest" title="Schedule urgent harvest of this source">
+                            <stripes:link beanclass="${actionBean['class'].name}" event="scheduleUrgentHarvest" title="Schedule urgent harvest of this source">
                                 <c:out value="Schedule urgent harvest"/>
                                 <stripes:param name="uri" value="${actionBean.uri}"/>
                             </stripes:link>
                         </li>
                         <li>
-                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="Manage post-harvest scripts of this source">
-                                <c:out value="Manage post-harvest scripts"/>
+                            <stripes:link beanclass="${actionBean.harvestScriptsActionBeanClass.name}" title="Manage harvest scripts of this source">
+                                <c:out value="Manage harvest scripts"/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
                             </stripes:link>
@@ -91,6 +91,19 @@
                     </td>
                 </tr>
                 <tr>
+                    <th scope="row">Last modified</th>
+                    <td>
+                        <c:choose>
+                            <c:when test="${empty actionBean.harvestSource.lastModified}">
+                                <c:out value="hasn't been harvested yet"/>
+                            </c:when>
+                            <c:otherwise>
+                                <fmt:formatDate value="${actionBean.harvestSource.lastModified}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row">Last harvest</th>
                     <td>
                         <c:choose>
@@ -132,19 +145,6 @@
                     </tr>
                 </c:if>
                 <tr>
-                    <th scope="row">"Schema" source</th>
-                    <td>
-                        <c:choose>
-                            <c:when test="${actionBean.schemaSource}">
-                                <c:out value="yes"/>
-                            </c:when>
-                            <c:otherwise>
-                                <c:out value="no"/>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
-                </tr>
-                <tr>
                     <th scope="row">"Priority" source</th>
                     <td>
                         <c:choose>
@@ -164,17 +164,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row">Post-harvest scripts</th>
+                    <th scope="row">Harvest scripts</th>
                     <td>
-                        <c:if test="${actionBean.noOfPostHarvestScripts == 0}">
+                        <c:if test="${actionBean.noOfHarvestScripts == 0}">
                             <c:out value="No scripts available for this source."/>
                         </c:if>
-                        <c:if test="${actionBean.noOfPostHarvestScripts == 1}">
+                        <c:if test="${actionBean.noOfHarvestScripts == 1}">
                             <c:out value="1 script available for this source."/>
                         </c:if>
-                        <c:if test="${actionBean.noOfPostHarvestScripts > 1}">
-                            <stripes:link beanclass="${actionBean.postHarvestScriptsActionBeanClass.name}" title="View post-harvest scripts of this source">
-                                <c:out value="${actionBean.noOfPostHarvestScripts} scripts available for this source."/>
+                        <c:if test="${actionBean.noOfHarvestScripts > 1}">
+                            <stripes:link beanclass="${actionBean.harvestScriptsActionBeanClass.name}" title="View harvest scripts of this source">
+                                <c:out value="${actionBean.noOfHarvestScripts} scripts available for this source."/>
                                 <stripes:param name="targetUrl" value="${actionBean.uri}" />
                                 <stripes:param name="targetType" value="SOURCE"/>
                             </stripes:link>

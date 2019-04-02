@@ -30,7 +30,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.tee.uit.security.SignOnException;
+import eionet.acl.SignOnException;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;

@@ -1,7 +1,5 @@
 <%@ include file="/pages/common/taglibs.jsp"%>
 
-<%@page import="eionet.cr.web.util.BaseUrl"%>
-
 <stripes:layout-definition>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -10,12 +8,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="initial-scale=1.0" />
         <meta name="Publisher" content="EEA, The European Environment Agency" />
-        <base href="<%= BaseUrl.getBaseUrl(request) %>"/>
 
         <title>${initParam.appDispName} - ${pageTitle}</title>
 
         <link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen"/>
         <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="<c:url value="/css/eea.css"/>" media="screen"/>
         <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
 
         <link type="text/css" href="<c:url value="/css/smoothness/jquery-ui-1.8.16.custom.css" />" rel="stylesheet" />
@@ -32,13 +30,15 @@
         <script type="text/javascript" src="<c:url value="/scripts/pageops.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/scripts/prototype.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/scripts/map.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/scripts/eea.js"/>"></script>
         <stripes:layout-component name="head"/>
         <crfn:template file="required_head.html"/>
     </head>
     <body>
-        <div id="visual-portal-wrapper">
-
+    
         <crfn:template file="header.html"/>
+        
+        <div id="visual-portal-wrapper">
 
         <!-- The wrapper div. It contains the three columns. -->
         <div id="portal-columns" class="visualColumnHideTwo">
@@ -51,22 +51,9 @@
                             <a name="documentContent"></a>
                             <div class="documentActions">
                                 <h5 class="hiddenStructure">Document Actions</h5>
-                                   <ul>
-                                    <li>
-                                          <a href="javascript:this.print();">
-                                              <img src="http://webservices.eea.europa.eu/templates/print_icon.gif"
-                                              alt="Print this page" title="Print this page" />
-                                          </a>
-                                     </li>
-                                    <li>
-                                          <a href="javascript:toggleFullScreenMode();">
-                                              <img src="http://webservices.eea.europa.eu/templates/fullscreenexpand_icon.gif"
-                                            alt="Toggle full screen mode" title="Toggle full screen mode" />
-                                          </a>
-                                    </li>
-                                  </ul>
-                               </div>
-                           <!--  validation errors -->
+                                <!-- document actions are added here if needed -->
+                            </div>
+                            <!--  validation errors -->
                             <stripes:errors/>
 
                             <!--  messages -->
@@ -95,13 +82,13 @@
                                 <c:when test="${actionBean.homeContext}">
                                     <c:choose>
                                         <c:when test="${actionBean.userAuthorized || actionBean.showPublic}" >
-                                            <div id="tabbedmenu">
+                                            <div class="tabbedmenu" id="tabbedmenu">
                                                 <ul>
                                                     <c:forEach items="${actionBean.tabs}" var="tab">
                                                         <c:if test="${actionBean.userAuthorized || tab.showPublic == actionBean.showpublicYes }" >
                                                             <c:choose>
                                                                   <c:when test="${actionBean.section == tab.tabType}" >
-                                                                    <li id="currenttab"><span><c:out value="${tab.title}"/></span></li>
+                                                                    <li id="currenttab"><a class="current"><c:out value="${tab.title}"/></a></li>
                                                                 </c:when>
                                                                 <c:otherwise>
                                                                     <li>
@@ -170,8 +157,11 @@
             <div class="visualClear"><!-- --></div>
         </div>
         <!-- end column wrapper -->
-        <crfn:template file="footer.html"/>
+        
         </div>
+        
+        <crfn:template file="footer.html"/>
+        
     </body>
 </html>
 </stripes:layout-definition>

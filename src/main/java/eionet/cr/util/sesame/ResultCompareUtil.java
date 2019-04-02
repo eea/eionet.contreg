@@ -50,6 +50,8 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 
 import eionet.cr.common.CRException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Type definition ...
@@ -57,6 +59,8 @@ import eionet.cr.common.CRException;
  * @author jaanus
  */
 public class ResultCompareUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultCompareUtil.class);
 
     /**
      *
@@ -104,12 +108,12 @@ public class ResultCompareUtil {
             BindingSet bs1 = queryResult1.get(idx);
 
             if (idx % 5000 == 0) {
-                System.out.println("checking idx #" + idx);
+                LOGGER.info("checking idx #" + idx);
             }
             List<BindingSet> matchingBindingSets = findMatchingBindingSets(bs1, queryResult2, bNodeMapping);
 
             if (matchingBindingSets.isEmpty()) {
-                System.out.println("Result2 has no match for result1's BindingSet #" + idx + ":\n" + toString(bs1));
+                LOGGER.info("Result2 has no match for result1's BindingSet #" + idx + ":\n" + toString(bs1));
             }
 
             for (BindingSet bs2 : matchingBindingSets) {
@@ -283,7 +287,7 @@ public class ResultCompareUtil {
             i++;
 
             if (i % 5000 == 0) {
-                System.out.println("At row#" + i);
+                LOGGER.info("At row#" + i);
             }
 
             hasNext1 = result1.hasNext();
@@ -317,13 +321,13 @@ public class ResultCompareUtil {
 
                 if (!values1.equals(values2)) {
                     numOfUnequalRows++;
-                    System.out.println("Row #" + i + " is different:\n1: " + values1 + "\n2: " + values2);
+                    LOGGER.info("Row #" + i + " is different:\n1: " + values1 + "\n2: " + values2);
                     return false;
                 }
             }
         } while (hasNext1 && hasNext2);
 
-        System.out.println("numOfUnequalRows = " + numOfUnequalRows);
+        LOGGER.info("numOfUnequalRows = " + numOfUnequalRows);
 
         if (!hasNext1 && hasNext2) {
             throw new CRException("At row#" + i + " result2 has next, but result1 does not!");

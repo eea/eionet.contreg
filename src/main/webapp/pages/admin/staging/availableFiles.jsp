@@ -81,7 +81,7 @@
 	        </div>
 
             <div style="width:75%;padding-top:10px">
-                <stripes:form id="filesForm" method="post" beanclass="${actionBean.class.name}">
+                <stripes:form id="filesForm" method="post" beanclass="${actionBean['class'].name}">
 
                     <display:table name="${actionBean.availableFiles}" id="file" class="sortable" sort="list" requestURI="${actionBean.urlBinding}" style="width:100%">
                         <display:column>
@@ -124,7 +124,7 @@
         <%-- The upload dialog. Hidden unless activated. --%>
 
         <div id="uploadDialog" title="Upload file">
-            <stripes:form beanclass="${actionBean.class.name}" method="post">
+            <stripes:form beanclass="${actionBean['class'].name}" method="post">
 
                 <table>
                     <tr>
@@ -160,7 +160,7 @@
         <%-- The download dialog. Hidden unless activated. --%>
 
         <div id="downloadDialog" title="Download file">
-            <stripes:form beanclass="${actionBean.class.name}" method="post">
+            <stripes:form beanclass="${actionBean['class'].name}" method="post">
 
                 <table>
                     <tr>

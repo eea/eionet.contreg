@@ -20,18 +20,23 @@
  */
 package eionet.cr.util.exporter;
 
-import junit.framework.TestCase;
-
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.util.export.XmlElementMetadata;
 import eionet.cr.util.export.XmlElementMetadata.Type;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:enriko.kasper@tieto.com">Enriko Käsper</a>, Tieto Estonia
  */
-
-public class XmlElementMetadaTest extends TestCase {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
+public class XmlElementMetadaTest {
 
     @Test
     public void testXmlElementMetada() {

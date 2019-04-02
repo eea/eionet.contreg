@@ -13,9 +13,9 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.web.security.CRUser;
 
 /**
+ * Utility class for registering URLs.
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
- *
  */
 public final class RegisterUrl {
 
@@ -41,7 +41,7 @@ public final class RegisterUrl {
      * @throws HarvestException
      */
     public static void register(String url, CRUser user, boolean saveToBookmarks, String label) throws DAOException,
-    HarvestException {
+            HarvestException {
         // register URL
         DAOFactory.get().getDao(HelperDAO.class).registerUserUrl(user, url, saveToBookmarks, label);
 
@@ -69,7 +69,7 @@ public final class RegisterUrl {
      * @return
      * @throws DAOException
      */
-    public static boolean isSubjectRegistered(String subject) throws DAOException{
+    public static boolean isSubjectRegistered(String subject) throws DAOException {
         return DAOFactory.get().getDao(HelperDAO.class).isExistingSubject(subject);
     }
 
@@ -81,11 +81,11 @@ public final class RegisterUrl {
      * @return
      * @throws DAOException
      */
-    public static boolean isSubjectBookmarkedByUser(String subject, CRUser user) throws DAOException{
+    public static boolean isSubjectBookmarkedByUser(String subject, CRUser user) throws DAOException {
         return DAOFactory.get().getDao(HelperDAO.class).isSubjectUserBookmark(user, subject);
     }
 
-    public static void saveSubjectUserBookmark(String subject, CRUser user, String label) throws DAOException{
+    public static void saveSubjectUserBookmark(String subject, CRUser user, String label) throws DAOException {
         DAOFactory.get().getDao(HelperDAO.class).addUserBookmark(user, subject, label);
     }
 }

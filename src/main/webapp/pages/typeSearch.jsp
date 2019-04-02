@@ -103,7 +103,7 @@
                </c:when>
                <c:otherwise>
 
-               <div id="tabbedmenu">
+               <div class="tabbedmenu" id="tabbedmenu">
                 <ul>
                     <c:choose>
                         <c:when test="${actionBean.typesByName}">
@@ -113,10 +113,10 @@
                                     <stripes:param name="typesByName" value="false"/>
                                 </stripes:link>
                             </li>
-                            <li id="currenttab"><span>By Name</span></li>
+                            <li id="currenttab"><a class="current">By Name</a></li>
                         </c:when>
                         <c:otherwise>
-                            <li id="currenttab"><span>By namespace URI</span></li>
+                            <li id="currenttab"><a class="current">By namespace URI</a></li>
                             <li>
                                 <stripes:link href="${actionBean.urlBinding}">
                                     By Name
@@ -151,7 +151,7 @@
                </c:choose>
 
 
-            <stripes:submit name="search" value="Search" />
+            <stripes:submit class="btn-block" name="search" value="Search" />
             <c:if test='${crfn:userHasPermission(pageContext.session, "/", "u")}'>
                 &nbsp;<stripes:submit name="introspect" value="Introspect"/>
             </c:if>

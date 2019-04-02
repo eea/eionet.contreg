@@ -75,6 +75,8 @@ import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factsheet.
@@ -85,10 +87,12 @@ import eionet.cr.web.util.tabs.TabElement;
 @UrlBinding("/factsheet.action")
 public class FactsheetActionBean extends AbstractActionBean {
 
-    /**  */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactsheetActionBean.class);
+
+    /** Prefix for the name of the "which page of predicate values to display" request parameter. */
     public static final String PAGE_PARAM_PREFIX = "page";
 
-    /** */
+    /** Name for session attributes for addible properties. */
     private static final String ADDIBLE_PROPERTIES_SESSION_ATTR = FactsheetActionBean.class.getName() + ".addibleProperties";
 
     /** URI by which the factsheet has been requested. */
@@ -180,22 +184,6 @@ public class FactsheetActionBean extends AbstractActionBean {
     }
 
     /**
-     * Handle for ajax harvesting.
-     *
-     * @return Resolution
-     */
-    public Resolution harvestAjax() {
-        String message;
-        try {
-            message = harvestNow().getRight();
-        } catch (Exception ignored) {
-            logger.error("error while scheduling ajax harvest", ignored);
-            message = "Error occured, more info can be obtained in application logs";
-        }
-        return new StreamingResolution("text/html", message);
-    }
-
-    /**
      * Schedules a harvest for resource.
      *
      * @return view resolution
@@ -205,24 +193,26 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails
      */
     public Resolution harvest() throws HarvestException, DAOException {
-        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
-        SubjectDTO subjectDto = helperDAO.getSubject(uri);
 
-        if (subjectDto != null && CsvImportUtil.isSourceTableFile(subjectDto)) {
-            // Harvest table file
+        HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
+        SubjectDTO subjectDTO = helperDAO.getSubject(uri);
+
+        if (subjectDTO != null && CsvImportUtil.isSourceTableFile(subjectDTO)) {
+
+            // Special block for harvesting table files.
             try {
-                // harvestTableFile();
-                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDto, uri, getUserName());
+                List<String> warnings = CsvImportUtil.harvestTableFile(subjectDTO, getUserName());
                 for (String msg : warnings) {
                     addWarningMessage(msg);
                 }
-                addSystemMessage("Source successfully harvested");
+                addSystemMessage("Source successfully harvested!");
             } catch (Exception e) {
-                logger.error("Failed to harvest table file", e);
+                LOGGER.error("Failed to harvest table file", e);
                 addWarningMessage("Failed to harvest table file: " + e.getMessage());
             }
         } else {
-            // Harvest other source
+
+            // Block for harvesting other, i.e. non-table-file sources.
             Pair<Boolean, String> message = harvestNow();
             if (message.getLeft()) {
                 addWarningMessage(message.getRight());
@@ -230,6 +220,7 @@ public class FactsheetActionBean extends AbstractActionBean {
                 addSystemMessage(message.getRight());
             }
         }
+
         return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
     }
 
@@ -248,7 +239,7 @@ public class FactsheetActionBean extends AbstractActionBean {
         if (isUserLoggedIn()) {
             if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)) {
 
-                /* add this url into HARVEST_SOURCE table */
+                // Add this URL into HARVEST_SOURCE table.
 
                 HarvestSourceDAO dao = factory.getDao(HarvestSourceDAO.class);
                 HarvestSourceDTO dto = new HarvestSourceDTO();
@@ -259,11 +250,11 @@ public class FactsheetActionBean extends AbstractActionBean {
                 dto.setOwner(null);
                 dao.addSourceIgnoreDuplicate(dto);
 
-                /* issue an instant harvest of this url */
+                // Issue an instant harvest of this URL.
 
                 OnDemandHarvester.Resolution resolution = OnDemandHarvester.harvest(dto.getUrl(), getUserName());
 
-                /* give feedback to the user */
+                // Give feedback to the user.
 
                 if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING)) {
                     message = "The resource is currently being harvested by another user or background harvester!";
@@ -275,8 +266,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                     message = "The resource was not available!";
                 } else if (resolution.equals(OnDemandHarvester.Resolution.NO_STRUCTURED_DATA)) {
                     message = "The resource contained no RDF data!";
-                    // else if (resolution.equals(InstantHarvester.Resolution.RECENTLY_HARVESTED))
-                    // message = "Source redirects to another source that has recently been harvested! Will not harvest.";
                 } else {
                     message = "No feedback given from harvest!";
                 }
@@ -362,10 +351,10 @@ public class FactsheetActionBean extends AbstractActionBean {
         // since user registrations URI was used as triple source, add it to HARVEST_SOURCE too
         // (but set interval minutes to 0, to avoid it being background-harvested)
         DAOFactory
-        .get()
-        .getDao(HarvestSourceDAO.class)
-        .addSourceIgnoreDuplicate(
-                HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(getUser().getRegistrationsUri(), true, 0, getUser().getUserName()));
 
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
@@ -451,12 +440,12 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @throws DAOException
      *             if query fails
      */
+    @SuppressWarnings("unchecked")
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
 
         // get the addible properties from session
 
         HttpSession session = getContext().getRequest().getSession();
-        @SuppressWarnings("unchecked")
         ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>) session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
 
         // if not in session, create them and add to session
@@ -598,8 +587,9 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      *
      * @return boolean
+     * @throws DAOException
      */
-    public boolean isCurrentlyHarvested() {
+    public boolean isCurrentlyHarvested() throws DAOException {
 
         return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentLoadedDatasets
                 .contains(uri));
@@ -657,6 +647,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     /**
      * @return the predicatePages
      */
+    @SuppressWarnings("unchecked")
     public Map<String, Integer> getPredicatePageNumbers() {
 
         if (predicatePageNumbers == null) {
@@ -743,7 +734,7 @@ public class FactsheetActionBean extends AbstractActionBean {
     @HandlesEvent("openPredObjValue")
     public Resolution openPredObjValue() {
 
-        logger.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
+        LOGGER.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
         String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
         if (StringUtils.isBlank(value)) {
             value = "Found no value!";
@@ -805,7 +796,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      *
      * @return
      */
-    public Class getViewSourceActionBeanClass() {
+    public Class<ViewSourceActionBean> getViewSourceActionBeanClass() {
         return ViewSourceActionBean.class;
     }
 

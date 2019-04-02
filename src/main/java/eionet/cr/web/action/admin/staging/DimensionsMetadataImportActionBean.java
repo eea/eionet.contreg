@@ -43,21 +43,22 @@ import eionet.cr.web.action.admin.AdminWelcomeActionBean;
 @UrlBinding("/admin/dimImport.action")
 public class DimensionsMetadataImportActionBean extends AbstractActionBean {
 
-    /** */
+    /** Default JSP to return to. */
     private static final String JSP = "/pages/admin/staging/dimImport.jsp";
 
-    /** */
+    /** Database name. */
     private String dbName;
 
-    /** */
+    /** Query to execute. */
     private String query;
 
-    /** */
+    /** The dimension. */
     private Dimension dimension;
 
     /**
+     * Default event.
      *
-     * @return
+     * @return Resolution to return to.
      */
     @DefaultHandler
     public Resolution defaultHandler() {

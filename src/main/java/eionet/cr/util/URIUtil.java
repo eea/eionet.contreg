@@ -24,7 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
-// TODO: Auto-generated Javadoc
+import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
+
 /**
  *
  * @author <a href="mailto:jaanus.heinlaid@tietoenator.com">Jaanus Heinlaid</a>
@@ -137,6 +138,32 @@ public final class URIUtil {
         }
 
         return result == null ? dflt : result;
+    }
+
+    /**
+     * Sanitizes Virtuoso's blank node URI.
+     * Virtuoso is unstable about returning URIs of anonymous resources. They can come in three ways:
+     * - "b102328"
+     * - "_:b102328"
+     * - "nodeID://b102328".
+     * The last one is the one we actually need, and this function takes care of it.
+     * If the given URI is null or blank or does not contain a 'b' then returns it as it is.
+     *
+     * @param uri The URI to sanitize.
+     * @return The sanitized URI.
+     */
+    public static String sanitizeVirtuosoBNodeUri(String uri) {
+
+        String result = uri;
+
+        if (uri != null && !uri.startsWith(VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX)) {
+            int i = uri.indexOf('b');
+            if (i >= 0) {
+                result = VirtuosoBaseDAO.VIRTUOSO_BNODE_PREFIX + uri.substring(i).trim();
+            }
+        }
+
+        return result;
     }
 
     /**

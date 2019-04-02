@@ -3,8 +3,8 @@
  */
 package eionet.cr.dataset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,12 +12,11 @@ import org.quartz.JobListener;
 
 /**
  * @author Risto Alt
- *
  */
 public class LoadTriplesJobListener implements JobListener {
 
     /** */
-    private static Log logger = LogFactory.getLog(LoadTriplesJobListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadTriplesJobListener.class);
 
     /*
      * (non-Javadoc)
@@ -34,7 +33,7 @@ public class LoadTriplesJobListener implements JobListener {
      */
     @Override
     public void jobExecutionVetoed(JobExecutionContext context) {
-        logger.error("Execution vetoed for job " + context.getJobDetail().getName());
+        LOGGER.error("Execution vetoed for job " + context.getJobDetail().getName());
     }
 
     /*
@@ -46,7 +45,7 @@ public class LoadTriplesJobListener implements JobListener {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         String datasetUri = dataMap.getString("datasetUri");
 
-        logger.info("Loading triples started: " + datasetUri);
+        LOGGER.info("Loading triples started: " + datasetUri);
     }
 
     /*
@@ -61,6 +60,6 @@ public class LoadTriplesJobListener implements JobListener {
         // Remove the flag that dataset is being reloaded
         CurrentLoadedDatasets.removeLoadedDataset(datasetUri);
 
-        logger.info("Loading triples finished: " + datasetUri);
+        LOGGER.info("Loading triples finished: " + datasetUri);
     }
 }

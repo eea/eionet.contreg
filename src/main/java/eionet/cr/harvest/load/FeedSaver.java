@@ -33,7 +33,7 @@ import net.htmlparser.jericho.Source;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -59,6 +59,8 @@ import com.sun.syndication.io.XmlReader;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.util.sesame.SesameUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class that reads a feed (e.g. RSS, Atom) from the given input stream and saves it into the given context (i.e. graph) in
@@ -70,7 +72,7 @@ import eionet.cr.util.sesame.SesameUtil;
 public class FeedSaver {
 
     /** */
-    private static final Logger LOGGER = Logger.getLogger(FeedSaver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedSaver.class);
 
     /** Connection to the repository where the content is persisted into. */
     private RepositoryConnection repoConn;

@@ -30,12 +30,14 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HelperDAO;
 import eionet.cr.dto.UploadDTO;
 import eionet.cr.web.util.SitemapXmlWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Semantic sitemap controller.
@@ -46,7 +48,7 @@ import eionet.cr.web.util.SitemapXmlWriter;
 public class SemanticSitemapActionBean extends AbstractActionBean {
 
     /** Logger. */
-    private static final Logger LOGGER = Logger.getLogger(SemanticSitemapActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticSitemapActionBean.class);
 
     /**
      *

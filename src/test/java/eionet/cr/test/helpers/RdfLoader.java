@@ -22,6 +22,7 @@ package eionet.cr.test.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -96,8 +97,9 @@ public class RdfLoader {
             if (inputStream == null) {
                 throw new IOException("Could not load resource by the name of " + fileName);
             }
+
             repoConn = SesameUtil.getRepositoryConnection();
-            repoConn.add(inputStream, baseUri, rdfFormat, repoConn.getValueFactory().createURI(graphUri));
+            repoConn.add(new InputStreamReader(inputStream, "UTF-8"), baseUri, rdfFormat, repoConn.getValueFactory().createURI(graphUri));
         } finally {
             SesameUtil.close(repoConn);
             IOUtils.closeQuietly(inputStream);

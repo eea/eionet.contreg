@@ -4,15 +4,21 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import eionet.cr.ApplicationTestContext;
 import org.junit.Test;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.MockVirtuosoBaseDAOTest;
 import eionet.cr.dao.readers.FreeTextSearchReader;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests Freetext search result processing.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { ApplicationTestContext.class })
 public class FreetextSearchTest extends MockVirtuosoBaseDAOTest {
     private static final String FILE_NAME = "test-freetext.nt";
 

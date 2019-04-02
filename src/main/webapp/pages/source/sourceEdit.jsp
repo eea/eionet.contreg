@@ -63,29 +63,12 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="txtInterval" class="question">Harvest interval:</label></td>
-                    <td>
-                        <stripes:text name="harvestSource.intervalMinutes" size="10" id="txtInterval"/>
-                        <stripes:select name="intervalMultiplier" value="${actionBean.selectedIntervalMultiplier}">
-                            <c:forEach items="${actionBean.intervalMultipliers}" var="intervalMultiplier">
-                                <stripes:option value="${intervalMultiplier.key}" label="${intervalMultiplier.value}"/>
-                            </c:forEach>
-                        </stripes:select>
-                    </td>
-                </tr>
-                <tr>
                     <td><label for="slctMediaType" class="question">Media type:</label></td>
                     <td><stripes:select name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}" id="slctMediaType">
                         <c:forEach items="${actionBean.mediaTypes}" var="type">
                             <stripes:option value="${type}" label="${type}"/>
                         </c:forEach>
                         </stripes:select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label class="question" for="schema">Is "Schema" source:</label></td>
-                    <td>
-                        <stripes:checkbox name="schemaSource" id="schema"/>
                     </td>
                 </tr>
                 <tr>

@@ -6,6 +6,26 @@
 
     <stripes:layout-component name="head">
 
+        <style type="text/css">
+	        .close-link{
+                display: block;
+                float: right;
+                position: absolute;
+                top:13px;
+                right: 5px;
+                color: #404040;
+                font-weight: 900;
+                font-family: "Arial Black", Gadget, sans-serif;
+                font-size: 0.8em;
+                cursor: pointer;
+                border: 1px solid #7A7A7A;
+                border-radius: 3px;
+                background-color: #EBEBEB;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        </style>
+
         <script type="text/javascript" src="<c:url value="/scripts/useful_namespaces.js"/>"></script>
 
         <script type="text/javascript">
@@ -115,6 +135,11 @@
                             return true;
                         });
 
+                        // On-click handler for the "close div" links.
+                        $(".close-link").click(function() {
+                            $(this).parent().hide();
+                        });
+
                         // The handling of useful namespaces
                         <c:forEach items="${actionBean.usefulNamespaces}" var="usefulNamespace" varStatus="usefulNamespacesLoop">
                         $("#prefix${usefulNamespacesLoop.index}").click(function() {
@@ -122,7 +147,15 @@
                             });
                         </c:forEach>
 
-
+                        $('form[name="mainForm"]').bind('submit', function() {
+                            var queryLength = $('#queryText').val().length;
+                            var $frm = $(this);
+                            var maxQueryLength = 2 * 1024;
+                            
+                            if (queryLength > maxQueryLength) {
+                                $frm.attr('method', 'post');
+                            }
+                        });
                     });
             } ) ( jQuery );
             // ]]>
@@ -172,15 +205,8 @@
                         // Toggle bulk action buttons
                         $("#bulkActionsLink").click(function() {
                             $("#bulkActions").toggle();
-
                             var isVisible = $("#bulkActions").is(":visible");
-                            if (isVisible) {
-                                $("#bulkActionsLink").text("Hide bulk actions");
-                                $("#bulkActionsPanelVisible").val("true");
-                            } else {
-                                $("#bulkActionsLink").text("Show bulk actions");
-                                $("#bulkActionsPanelVisible").val("false");
-                            }
+                            $("#input_displayBulkActions").val(isVisible ? "true" : "false");
                             return false;
                         });
                     });
@@ -214,16 +240,9 @@
                         <a href="#" id="prefixesLink">Useful namespaces</a>
                     </li>
 
-                    <c:if test="${actionBean.bulkActionsAvailable == 'true'}">
+                    <c:if test="${actionBean.bulkActionsAllowed}">
                        <li>
-                           <c:choose>
-                           <c:when test="${actionBean.bulkActionsPanelVisible == 'true'}">
-                               <a href="#" id="bulkActionsLink">Hide bulk actions</a>
-                            </c:when>
-                            <c:otherwise>
-                               <a href="#" id="bulkActionsLink">Show bulk actions</a>
-                           </c:otherwise>
-                           </c:choose>
+                           <a href="#" id="bulkActionsLink">Show/hide bulk actions</a>
                        </li>
                     </c:if>
 
@@ -316,7 +335,7 @@ while (l--) {
                 </div>
                 <div style="position: relative; margin-bottom: 30px">
                     <div style="position: absolute; top: 5px; left: 0px;">
-                        <label for="format" class="question" style="width: 200px;">Output format:</label>
+                        <label for="format" class="question">Output format:</label>
                         <stripes:select name="format" id="format">
                             <stripes:option value="text/html" label="HTML" />
                             <stripes:option value="text/html+" label="HTML+" />
@@ -342,7 +361,7 @@ while (l--) {
                                 <stripes:submit name="execute" value="Execute" id="executeButton" />
                                 <stripes:submit name="bookmark" value="Bookmark" id="bookmarkButton" />
                                 <stripes:hidden name="bookmarkName" value="${actionBean.bookmarkName}"/>
-                                <stripes:hidden name="bulkActionsPanelVisible" id="bulkActionsPanelVisible" value="${actionBean.bulkActionsPanelVisible}"/>
+                                <stripes:hidden name="displayBulkActions" id="input_displayBulkActions" value="${actionBean.displayBulkActions}"/>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -353,15 +372,13 @@ while (l--) {
                     </c:choose>
                 </div>
 
-                <c:if test="${actionBean.bulkActionsAvailable == 'true'}">
-                    <div id="bulkActions" style=" position: relative; width:900px; height: 30px; margin-top:40px; margin-bottom:10px; padding:10px; border: 1px solid black; background-color:#F8F8F8 ;
-                        <c:if test="${actionBean.bulkActionsPanelVisible == 'false'}">
-                            display: none;
-                        </c:if>
-                        ">
-                        <b>Add bulk sources:</b> Add sources from the sqarql query results first column
-                        <stripes:submit name="executeAddSources" value="Execute" id="executeConstructAddSources" onclick="return confirm('All urls from the resultset\\\'s first column will be added to harvest source list and will be scheduled for urgent harvest. Continue?');"/>
-                    </div>
+                <c:if test="${actionBean.bulkActionsAllowed}">
+                    <fieldset id="bulkActions" style="position: relative; width:95%; padding:10px; border: 1px solid black; background-color:#F8F8F8;${actionBean.displayBulkActions ? '' : 'display: none;'}">
+                        <legend>Bulk actions</legend>
+                        <a class="close-link">X</a>
+                        <stripes:submit name="executeAddSources" value="Schedule urgent batch harvest..." title="Schedule all URLs returned in the first result set column for an urgent batch harvest." onclick="return confirm('All URLs returned in the first result set column will now be scheduled for urgent batch harvest. They will be picked up by the batch harvester when it runs. Are you sure you want to continue?');"/>
+                        <stripes:submit name="executeDeleteSources" value="Schedule background deletion..." title="Schedule all URLs returned in the first result set column for background deletion." onclick="return confirm('All URLs returned in the first result set column will now be scheduled for background deletion. Are you sure you want to continue?');"/>
+                    </fieldset>
                 </c:if>
 
                 <div style="clear:both">

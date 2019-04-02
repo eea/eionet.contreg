@@ -33,7 +33,7 @@ import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -44,6 +44,8 @@ import eionet.cr.staging.FileDownloader;
 import eionet.cr.staging.imp.ImportRunner;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.admin.AdminWelcomeActionBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action bean for operations with a single staging database.
@@ -63,7 +65,7 @@ public class StagingDatabaseActionBean extends AbstractActionBean {
     private static final String ADD_STAGING_DATABASE_JSP = "/pages/admin/staging/addDatabase.jsp";
 
     /** Static logger. */
-    private static final Logger LOGGER = Logger.getLogger(StagingDatabaseActionBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StagingDatabaseActionBean.class);
 
     /** */
     private StagingDatabaseDTO database;

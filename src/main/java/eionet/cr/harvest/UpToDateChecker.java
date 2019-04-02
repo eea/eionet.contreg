@@ -9,14 +9,16 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.PostHarvestScriptDAO;
+import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.URLUtil;
 
@@ -29,13 +31,13 @@ import eionet.cr.util.URLUtil;
 public class UpToDateChecker {
 
     /** Static Log4j logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(UpToDateChecker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpToDateChecker.class);
 
     /** Initialize DAO already here. */
     private HarvestSourceDAO harvestSourceDao = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
     /** Initialize DAO already here. */
-    private PostHarvestScriptDAO postHarvestScriptDao = DAOFactory.get().getDao(PostHarvestScriptDAO.class);
+    private HarvestScriptDAO harvestScriptDao = DAOFactory.get().getDao(HarvestScriptDAO.class);
 
     /** Initialize DAO already here. */
     private HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
@@ -166,7 +168,7 @@ public class UpToDateChecker {
      * @throws DAOException If database access error happens.
      */
     boolean hasScriptsModified(String url, Date lastHarvest) throws DAOException {
-        return postHarvestScriptDao.isScriptsModified(lastHarvest, url);
+        return harvestScriptDao.isScriptsModified(lastHarvest, url);
     }
 
     /**
