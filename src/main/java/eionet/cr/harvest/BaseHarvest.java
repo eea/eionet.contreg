@@ -276,7 +276,7 @@ public abstract class BaseHarvest implements Harvest {
             try {
                 finishHarvest(wasHarvestException);
             } finally {
-                startAfterFinishJobs();
+                afterFinish();
             }
         }
     }
@@ -390,7 +390,7 @@ public abstract class BaseHarvest implements Harvest {
      * Called as the very last thing after {@link #finishHarvest(boolean)}. This is an abstract method that extending classes must
      * implement.
      */
-    protected abstract void startAfterFinishJobs();
+    protected abstract void afterFinish();
 
     /**
      * Runs all post-harvest scripts relevant for this harvest.
@@ -568,11 +568,6 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug("Script's update count was " + updateCount);
         }
         
-    }
-
-    private void runPushScript() {
-
-
     }
 
     /**
@@ -838,33 +833,6 @@ public abstract class BaseHarvest implements Harvest {
         startHarvest();
     }
 
-
-    /**
-     *
-     * @param url
-     * @throws HarvestException
-     * @throws DAOException
-     */
-    protected void switchContextTo(String url, HarvestSourceDTO sourceDTO) throws HarvestException, DAOException {
-
-        LOGGER.debug(loggerMsg("Switching context to " + url));
-
-        this.contextUrl = url;
-        this.contextSourceDTO = sourceDTO;
-        if (sourceMetadata != null) {
-            sourceMetadata.setUri(contextUrl);
-        }
-
-        startHarvest();
-    }
-
-    /**
-     * @return the harvestId
-     */
-    protected int getHarvestId() {
-        return harvestId;
-    }
-
     /**
      *
      * @param predicate
@@ -966,13 +934,6 @@ public abstract class BaseHarvest implements Harvest {
     @Override
     public void setHarvestUser(String harvestUser) {
         this.harvestUser = harvestUser;
-    }
-
-    /**
-     * @return the harvestUser
-     */
-    protected String getHarvestUser() {
-        return harvestUser;
     }
 
     /**

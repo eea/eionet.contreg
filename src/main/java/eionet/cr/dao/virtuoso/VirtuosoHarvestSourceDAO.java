@@ -27,7 +27,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.OpenRDFException;
-import org.openrdf.model.*;
+import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
@@ -37,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.*;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -65,11 +67,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String SEARCH_SOURCES_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND delete_requested is null ";
-
-    /** */
-    private static final String GET_HARVEST_SOURCES_WITH_LAST_HARVESTS =
-            "SELECT hs.url AS url, h.http_code AS http_code FROM harvest_source hs " +
-                    "LEFT OUTER JOIN harvest h ON hs.last_harvest_id = h.harvest_id ORDER BY hs.url";
 
     /** */
     private static final String GET_HARVEST_SOURCES_FAILED_SQL =
@@ -611,38 +608,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             SQLUtil.close(urgentQueueDeleteStatement);
             SQLUtil.close(rulesetDeleteStatement);
             SQLUtil.close(harvestScriptsDeleteStatement);
-        }
-    }
-
-    /**
-     * Clear graphs denoted by the given URLs and also deletes triples where the given URLs are in subject position. If the flag is
-     * true then the latter triples will be deleted only from the graph denoted by {@link GeneralConfig#HARVESTER_URI}. Otherwise
-     * they will be deleted regardless of graph.
-     *
-     * @param conn
-     *            The repository connection to use.
-     * @param sourceUrls
-     *            The URLs in question.
-     * @param harvesterContextOnly
-     *            Indicates if the triples where the given URLs are in subject position, will be deleted from harvester context
-     *            only.
-     * @throws RepositoryException
-     *             Any sort of repository exception.
-     */
-    private void removeResources(RepositoryConnection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
-            throws RepositoryException, DAOException {
-
-        ValueFactory valueFactory = conn.getValueFactory();
-
-        // We need to clear all triples in the graph, and remove the graph's metadata (in harvester context) as well.
-        for (String sourceUrl : sourceUrls) {
-            Resource graphResource = valueFactory.createURI(sourceUrl);
-            conn.clear(graphResource);
-            if (harvesterContextOnly) {
-                conn.remove(graphResource, null, null, valueFactory.createURI(GeneralConfig.HARVESTER_URI));
-            } else {
-                conn.remove(graphResource, null, null);
-            }
         }
     }
 
@@ -1713,9 +1678,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
         URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
-
-        String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
-        URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
 
         int triplesLoaded = 0;
         boolean wasOrigEmpty = false;

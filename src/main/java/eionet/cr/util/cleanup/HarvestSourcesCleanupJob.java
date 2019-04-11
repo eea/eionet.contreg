@@ -13,7 +13,6 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.openrdf.repository.RepositoryConnection;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,7 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
     /** */
     private static final Logger LOGGER = LoggerFactory.getLogger(HarvestSourcesCleanupJob.class);
     private static final long INTERVAL_MINUTES = 30 * 24 * 60;
-    public static final String HTTP = "http://";
-    public static final String HTTPS = "https://";
+    private static final String HTTPS = "https://";
     public static final String CLEANUP_USERNAME = "cleanup";
 
     /**
@@ -149,31 +147,6 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
 
     /**
      *
-     * @throws DAOException
-     */
-    private void cleanByRedirections() throws DAOException {
-        List<Pair<String, String>> redirectionPairs = findRedirectionPairs();
-        if (redirectionPairs == null || redirectionPairs.isEmpty()) {
-            return;
-        }
-
-        HashSet<String> fromUrls = new LinkedHashSet<>();
-        HashSet<String> toUrls = new LinkedHashSet<>();
-        for (Pair<String, String> pair : redirectionPairs) {
-            fromUrls.add(pair.getLeft());
-            toUrls.add(pair.getRight());
-        }
-
-        HashSet<String> finalUrls = new LinkedHashSet<>();
-        for (String toUrl : toUrls) {
-            if (!fromUrls.contains(toUrl)) {
-                finalUrls.add(toUrl);
-            }
-        }
-    }
-
-    /**
-     *
      * @return
      * @throws DAOException
      */
@@ -233,62 +206,17 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
      * @return
      * @throws DAOException
      */
-    private List<Pair<String, String>> findRedirectionPairs() throws DAOException {
-
-        String sparql = "select distinct ?s1 as ?LCOL ?s2 as ?RCOL where {\n" +
-                "  ?s1 <http://cr.eionet.europa.eu/ontologies/contreg.rdf#redirectedTo> ?s2\n" +
-                "}";
-
-        PairReader<String,String> reader = new PairReader<>();
-
-        RepositoryConnection conn = null;
-        try {
-            conn = SesameUtil.getRepositoryConnection();
-            SesameUtil.executeQuery(sparql, reader, conn);
-        } catch (Exception e) {
-            throw new DAOException(e.toString(), e);
-        } finally {
-            SesameUtil.close(conn);
-        }
-
-        List<Pair<String, String>> resultList = reader.getResultList();
-        return resultList;
-    }
-
-    /**
-     *
-     * @return
-     * @throws DAOException
-     */
     private Set<String> findRedirectedResources() throws DAOException {
 
-        LOGGER.debug("Finding redirecting resources from triple store ...");
-
-        String sql = "sparql select distinct str(?s1) where {\n" +
-                "  ?s1 <http://cr.eionet.europa.eu/ontologies/contreg.rdf#redirectedTo> ?s2\n" +
-                "}";
-
-        SingleObjectReader<String> reader = new SingleObjectReader<>();
-
-//        Connection conn = null;
-//        try {
-//            conn = SesameUtil.getSQLConnection();
-//            SQLUtil.executeQuery(sql, reader, conn);
-//        } catch (Exception e) {
-//            throw new DAOException(e.getMessage(), e);
-//        } finally {
-//            SQLUtil.close(conn);
-//        }
-
-        List<String> resultList = reader.getResultList();
-        LOGGER.debug("Found a total of {} redirecting resources in triple store", resultList.size());
-        return new HashSet<>(resultList);
-
+//        LOGGER.debug("Finding redirecting resources from triple store ...");
+//
+//        SingleObjectReader<String> reader = new SingleObjectReader<>();
+//
 //        String sparql = "select distinct ?s1 where {\n" +
 //                "  ?s1 <http://cr.eionet.europa.eu/ontologies/contreg.rdf#redirectedTo> ?s2\n" +
 //                "}";
 //
-//        SingleObjectReader<String> reader = new SingleObjectReader<>();
+        SingleObjectReader<String> reader = new SingleObjectReader<>();
 //
 //        RepositoryConnection conn = null;
 //        try {
@@ -300,8 +228,9 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
 //            SesameUtil.close(conn);
 //        }
 //
-//        List<String> resultList = reader.getResultList();
-//        return new HashSet<>(resultList);
+//        LOGGER.debug("Found a total of {} redirecting resources in triple store", resultList.size());
+        List<String> resultList = reader.getResultList();
+        return new HashSet<>(resultList);
     }
 
     @Override

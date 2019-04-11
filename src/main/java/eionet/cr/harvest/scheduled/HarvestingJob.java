@@ -149,7 +149,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                 if (!StringUtils.isBlank(url)) {
 
                     if (queueItem.isPushHarvest()) {
-                        pushHarvest(url, queueItem.getPushedContent(), queueItem.getUserName());
+                        pushHarvest(url, queueItem.getPushedContent());
                     } else {
                         HarvestSourceDTO src = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(url);
                         if (src != null) {
@@ -574,12 +574,10 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
     /**
      * Executes push harvest of the given pushed content under the given URL by the given user.
-     *
-     * @param url Source URL under which the content should be pushed.
+     *  @param url Source URL under which the content should be pushed.
      * @param pushedContent The content to harvest.
-     * @param userName The user who is "pushing". May be null, in which case the harvester assumes default.
      */
-    private void pushHarvest(String url, String pushedContent, String userName) {
+    private void pushHarvest(String url, String pushedContent) {
 
         // if the source is currently being harvested then return
         if (url != null && CurrentHarvests.contains(url)) {

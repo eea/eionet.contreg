@@ -282,17 +282,6 @@ public class URLUtil {
 
     /**
      *
-     * @param url1
-     * @param url2
-     * @return
-     */
-    public static boolean equalUrls(String url1, String url2) {
-
-        return normalizeUrl(url1).equals(normalizeUrl(url2));
-    }
-
-    /**
-     *
      * @param urlString
      * @return
      */

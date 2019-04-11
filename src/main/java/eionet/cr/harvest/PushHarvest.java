@@ -20,13 +20,13 @@
  */
 package eionet.cr.harvest;
 
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-
-import org.apache.commons.lang.StringUtils;
-import org.openrdf.OpenRDFException;
 
 /**
  *
@@ -103,7 +103,7 @@ public class PushHarvest extends BaseHarvest {
      * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
      */
     @Override
-    protected void startAfterFinishJobs() {
+    protected void afterFinish() {
         // TODO Auto-generated method stub
 
     }

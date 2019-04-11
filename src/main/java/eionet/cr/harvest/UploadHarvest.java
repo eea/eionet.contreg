@@ -187,6 +187,6 @@ public class UploadHarvest extends BaseHarvest {
      * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
      */
     @Override
-    protected void startAfterFinishJobs() {
+    protected void afterFinish() {
     }
 }
