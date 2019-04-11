@@ -131,7 +131,7 @@ public class URLUtil {
      * @param clientErrorOk If true, then a response code in the range of 400 to 499 is considered OK.
      * @return As described above.
      */
-    public static boolean isNotExisting(String urlStr, boolean clientErrorOk) {
+    public static boolean resourceExists(String urlStr, boolean clientErrorOk) {
 
         int responseCode = -1;
         IOException ioe = null;
@@ -147,11 +147,9 @@ public class URLUtil {
             URLUtil.disconnect(urlConnection);
         }
 
-        LOGGER.debug("Response code: " + responseCode);
-
-        return ioe instanceof MalformedURLException || ioe instanceof UnknownHostException || ioe instanceof ConnectException
+        return !(ioe instanceof MalformedURLException || ioe instanceof UnknownHostException || ioe instanceof ConnectException
                 || (!clientErrorOk && isClientError(responseCode)) || responseCode == HttpURLConnection.HTTP_NOT_IMPLEMENTED
-                || responseCode == HttpURLConnection.HTTP_VERSION;
+                || responseCode == HttpURLConnection.HTTP_VERSION);
     }
 
     /**
@@ -212,16 +210,6 @@ public class URLUtil {
     }
 
     /**
-     * Calls {@link #isNotExisting(String, boolean)} with the boolean set to false. See documentation of that method.
-     *
-     * @param urlStr As described above.
-     * @return As described above.
-     */
-    public static boolean isNotExisting(String urlStr) {
-        return isNotExisting(urlStr, false);
-    }
-
-    /**
      * Check if given HTTP response code is a "client error".
      *
      * @param httpResponseCode The given HTTP response code.
@@ -235,7 +223,6 @@ public class URLUtil {
      * A cross-the-stream-to-get-water replacement for {@link java.net.URL#getHost()}.
      *
      * @param uri
-     * @param dflt
      * @return String
      */
     public static String extractUrlHost(String uri) {
@@ -527,5 +514,14 @@ public class URLUtil {
         }
 
         return urlString;
+    }
+
+    /**
+     *
+     * @param sourceUrl
+     * @return
+     */
+    public static String sanitizeHarvestSourceUrl(String sourceUrl) {
+        return StringUtils.replace(StringUtils.substringBefore(sourceUrl, "#"), " ", "%20");
     }
 }

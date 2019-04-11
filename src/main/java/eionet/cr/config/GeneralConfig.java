@@ -20,8 +20,7 @@
  */
 package eionet.cr.config;
 
-import java.util.Properties;
-
+import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.spring.SpringApplicationContext;
 import eionet.propertyplaceholderresolver.CircularReferenceException;
 import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
@@ -31,7 +30,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eionet.cr.harvest.scheduled.HarvestingJob;
+import java.util.Properties;
 
 /**
  *
@@ -234,7 +233,7 @@ public final class GeneralConfig {
 
     /**
      *
-     * @param name
+     * @param key
      * @return
      */
     public static synchronized String getProperty(String key) {
@@ -334,13 +333,8 @@ public final class GeneralConfig {
      */
     public static synchronized Integer getTimePropertyMilliseconds(final String key, Integer defaultValue) {
 
-//        if (properties == null) {
-//            init();
-//        }
-
         int coeficient = 1;
 
-//        String propValue = properties.getProperty(key);
         String propValue = getProperty(key);
         Integer value = defaultValue;
 

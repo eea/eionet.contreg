@@ -65,6 +65,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /** */
     private static final String SEARCH_SOURCES_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE WHERE URL like (?) AND delete_requested is null ";
+
+    /** */
+    private static final String GET_HARVEST_SOURCES_WITH_LAST_HARVESTS =
+            "SELECT hs.url AS url, h.http_code AS http_code FROM harvest_source hs " +
+                    "LEFT OUTER JOIN harvest h ON hs.last_harvest_id = h.harvest_id ORDER BY hs.url";
+
     /** */
     private static final String GET_HARVEST_SOURCES_FAILED_SQL =
             "SELECT<pagingParams> * FROM HARVEST_SOURCE JOIN HARVEST H ON H.HARVEST_ID = LAST_HARVEST_ID "
@@ -623,7 +629,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @throws RepositoryException
      *             Any sort of repository exception.
      */
-    private void removeGraphsAndResources(RepositoryConnection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
+    private void removeResources(RepositoryConnection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
             throws RepositoryException, DAOException {
 
         ValueFactory valueFactory = conn.getValueFactory();
@@ -641,17 +647,15 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * Helper method for clearing all graphs identified by the given URLs and also triples about those URLs.
+     * Helper method for clearing all triples about those URLs.
      *
      * @param conn SQL connection to operate with.
      * @param sourceUrls The URLs in question.
      * @param harvesterContextOnly
      * @throws SQLException
      */
-    private void removeGraphsAndResources(Connection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
+    private void removeResources(Connection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
             throws SQLException {
-
-        String sparqlClearGraph = "SPARQL CLEAR GRAPH <GRAPH_URI>";
 
         String sparqlDeleteResourceFromAllGraphs =
                 "SPARQL DELETE {GRAPH ?g {?s ?p ?o}} WHERE {GRAPH ?g {?s ?p ?o filter (?s = <RESOURCE_URI>)}}";
@@ -659,31 +663,52 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         String sparqlDeleteResourceFromSpecificGraph =
                 "SPARQL DELETE FROM <GRAPH_URI> {?s ?p ?o} WHERE {GRAPH <GRAPH_URI> {?s ?p ?o filter (?s = <RESOURCE_URI>)}}";
 
-        Statement graphStmt = null;
         Statement resourceStmt = null;
         try {
-            graphStmt = conn.createStatement();
             resourceStmt = conn.createStatement();
 
             for (String sourceUrl : sourceUrls) {
 
                 sourceUrl = URLUtil.escapeIRI(sourceUrl);
 
-                String graphSparql = sparqlClearGraph.replace("GRAPH_URI", sourceUrl);
                 String resourceSparql =
                         harvesterContextOnly ? sparqlDeleteResourceFromSpecificGraph.replace("GRAPH_URI",
                                 GeneralConfig.HARVESTER_URI).replace("RESOURCE_URI", sourceUrl)
                                 : sparqlDeleteResourceFromAllGraphs.replace("RESOURCE_URI", sourceUrl);
 
-                graphStmt.addBatch(graphSparql);
                 resourceStmt.addBatch(resourceSparql);
             }
 
-            graphStmt.executeBatch();
             resourceStmt.executeBatch();
         } finally {
-            SQLUtil.close(graphStmt);
             SQLUtil.close(resourceStmt);
+        }
+    }
+
+    /**
+     *
+     * @param conn
+     * @param sourceUrls
+     * @throws SQLException
+     */
+    private void removeGraphs(Connection conn, Collection<String> sourceUrls) throws SQLException {
+
+        String sparqlClearGraph = "SPARQL CLEAR GRAPH <GRAPH_URI>";
+
+        Statement graphStmt = null;
+        try {
+            graphStmt = conn.createStatement();
+
+            for (String sourceUrl : sourceUrls) {
+
+                sourceUrl = URLUtil.escapeIRI(sourceUrl);
+                String graphSparql = sparqlClearGraph.replace("GRAPH_URI", sourceUrl);
+                graphStmt.addBatch(graphSparql);
+            }
+
+            graphStmt.executeBatch();
+        } finally {
+            SQLUtil.close(graphStmt);
         }
     }
 
@@ -1011,13 +1036,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         removeHarvestSources(sourceUrls, true);
     }
 
+    @Override
+    public void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly) throws DAOException {
+        removeHarvestSources(sourceUrls, harvesterContextOnly, true);
+    }
+
     /*
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection, boolean)
      */
     @Override
-    public void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly) throws DAOException {
+    public void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException {
 
         if (sourceUrls == null || sourceUrls.isEmpty()) {
             return;
@@ -1032,26 +1062,15 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             sqlConn = getSQLConnection();
             repoConn = SesameUtil.getRepositoryConnection();
 
-            // sqlConn.setAutoCommit(false);
-            // repoConn.setAutoCommit(false);
-
-            // Perform removals in triple store.
-            // removeGraphsAndResources(repoConn, sourceUrls, harvesterContextOnly);
-            removeGraphsAndResources(sqlConn, sourceUrls, harvesterContextOnly);
-            // Perform removals in relational tables.
+            removeResources(sqlConn, sourceUrls, harvesterContextOnly);
             removeHarvestSources(sqlConn, sourceUrls);
 
-            // Commit removals.
-            // repoConn.commit();
-            // sqlConn.commit();
-
+            if (clearGraphs) {
+                removeGraphs(sqlConn, sourceUrls);
+            }
         } catch (RepositoryException e) {
-            // SesameUtil.rollback(repoConn);
-            // SQLUtil.rollback(sqlConn);
             throw new DAOException("Repository exception when deleting sources", e);
         } catch (SQLException e) {
-            // SesameUtil.rollback(repoConn);
-            // SQLUtil.rollback(sqlConn);
             throw new DAOException("SQLException when deleting sources", e);
         } finally {
             SesameUtil.close(repoConn);
@@ -1067,22 +1086,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public void clearGraph(String graphUri) throws DAOException {
 
-        // Tolerate blank graph URI.
         if (StringUtils.isBlank(graphUri)) {
             return;
         }
 
-        RepositoryConnection conn = null;
+        Connection sqlConn = null;
         try {
-            conn = SesameUtil.getRepositoryConnection();
-            conn.setAutoCommit(false);
-            conn.clear(conn.getValueFactory().createURI(graphUri));
-            conn.commit();
-        } catch (RepositoryException e) {
-            SesameUtil.rollback(conn);
-            throw new DAOException("Repository exception when clearing graph " + graphUri, e);
+            sqlConn = getSQLConnection();
+            SQLUtil.executeUpdate("sparql clear graph <" + graphUri + ">", sqlConn);
+        } catch (SQLException e) {
+            throw new DAOException("Exception when clearing graph: e", e);
         } finally {
-            SesameUtil.close(conn);
+            SQLUtil.close(sqlConn);
         }
     }
 

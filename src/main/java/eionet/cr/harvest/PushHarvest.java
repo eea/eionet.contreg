@@ -103,7 +103,7 @@ public class PushHarvest extends BaseHarvest {
      * @see eionet.cr.harvest.BaseHarvest#afterFinishActions()
      */
     @Override
-    protected void afterFinish() {
+    protected void startAfterFinishJobs() {
         // TODO Auto-generated method stub
 
     }

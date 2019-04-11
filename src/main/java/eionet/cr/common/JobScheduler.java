@@ -20,29 +20,20 @@
  */
 package eionet.cr.common;
 
-import java.text.ParseException;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
-import org.quartz.JobListener;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
-import org.quartz.impl.StdSchedulerFactory;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Pair;
 import eionet.cr.web.util.job.DeliverySearchPicklistCacheUpdater;
-import eionet.cr.web.util.job.RecentResourcesCacheUpdater;
 import eionet.cr.web.util.job.TagCloudCacheUpdater;
 import eionet.cr.web.util.job.TypeCacheUpdater;
+import org.apache.commons.lang.StringUtils;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.text.ParseException;
 
 /**
  *
@@ -70,10 +61,11 @@ public class JobScheduler implements ServletContextListener {
                 new Pair(GeneralConfig.DELIVERY_SEARCH_PICKLIST_CACHE_UPDATE_INTERVAL, new JobDetail(
                         DeliverySearchPicklistCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                         DeliverySearchPicklistCacheUpdater.class)),
-/*                      TODO: This has temporarily been removed because it's being affected by https://github.com/openlink/virtuoso-opensource/issues/118
-                        new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
-                                RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
-                                RecentResourcesCacheUpdater.class)),*/
+                        // TODO: This has temporarily been removed because it's being affected by
+                        // https://github.com/openlink/virtuoso-opensource/issues/118
+//                        new Pair(GeneralConfig.RECENT_DISCOVERED_FILES_CACHE_UPDATE_INTERVAL, new JobDetail(
+//                                RecentResourcesCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
+//                                RecentResourcesCacheUpdater.class)),
                                 new Pair(GeneralConfig.TAG_CLOUD_CACHE_UPDATE_INTERVAL, new JobDetail(
                                         TagCloudCacheUpdater.class.getSimpleName(), JobScheduler.class.getName(),
                                         TagCloudCacheUpdater.class)),
@@ -107,8 +99,9 @@ public class JobScheduler implements ServletContextListener {
         CronTrigger trigger = new CronTrigger(jobDetails.getName(), jobDetails.getGroup());
         trigger.setCronExpression(cronExpression);
 
-        if (quartzScheduler == null)
+        if (quartzScheduler == null) {
             init();
+        }
 
         quartzScheduler.scheduleJob(jobDetails, trigger);
     }
@@ -127,8 +120,9 @@ public class JobScheduler implements ServletContextListener {
         trigger.setRepeatInterval(repeatInterval);
         trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
 
-        if (quartzScheduler == null)
+        if (quartzScheduler == null) {
             init();
+        }
 
         quartzScheduler.scheduleJob(jobDetails, trigger);
     }
@@ -140,11 +134,13 @@ public class JobScheduler implements ServletContextListener {
      */
     public static synchronized void registerJobListener(JobListener jobListener) throws SchedulerException {
 
-        if (jobListener == null)
+        if (jobListener == null) {
             return;
+        }
 
-        if (quartzScheduler == null)
+        if (quartzScheduler == null) {
             init();
+        }
 
         quartzScheduler.addJobListener(jobListener);
     }

@@ -39,4 +39,9 @@ public class RedirectionDTO {
     public void setCode(int code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s -> (%d) %s", fromUrl, code, toUrl);
+    }
 }

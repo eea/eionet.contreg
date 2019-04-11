@@ -21,21 +21,6 @@
 
 package eionet.cr.web.action.source;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -48,6 +33,14 @@ import eionet.cr.web.action.HarvestSourcesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.SimpleError;
+import org.apache.commons.lang.StringUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Edit source tab.
@@ -273,7 +266,7 @@ public class EditSourceActionBean extends AbstractActionBean {
                     addGlobalValidationError(new SimpleError("URL with a fragment part not allowed!"));
                 }
 
-                if (!StringUtils.equals(uri, urlString) && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
+                if (!StringUtils.equals(uri, urlString) && !URLUtil.resourceExists(urlString, harvestSource.isSparqlEndpoint())) {
                     addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                 }
 

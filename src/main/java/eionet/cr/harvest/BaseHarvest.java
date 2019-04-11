@@ -37,7 +37,9 @@ import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.harvest.util.RDFMediaTypes;
 import eionet.cr.util.EMailSender;
 import eionet.cr.util.FileDeletionJob;
+import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
+import eionet.cr.util.cleanup.HarvestSourcesCleanupJob;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.util.xml.ConversionSchema;
@@ -271,8 +273,11 @@ public abstract class BaseHarvest implements Harvest {
             wasHarvestException = true;
             throw e;
         } finally {
-            finishHarvest(wasHarvestException);
-            afterFinish();
+            try {
+                finishHarvest(wasHarvestException);
+            } finally {
+                startAfterFinishJobs();
+            }
         }
     }
 
@@ -354,7 +359,9 @@ public abstract class BaseHarvest implements Harvest {
             deriveNewHarvestSources();
 
             // delete old harvests history
-            housekeepOldHarvests();
+            if (!HarvestSourcesCleanupJob.CLEANUP_USERNAME.equals(harvestUser)) {
+                housekeepOldHarvests();
+            }
 
             // add source into inference if it is schema source
             addIntoInferenceRule();
@@ -383,7 +390,7 @@ public abstract class BaseHarvest implements Harvest {
      * Called as the very last thing after {@link #finishHarvest(boolean)}. This is an abstract method that extending classes must
      * implement.
      */
-    protected abstract void afterFinish();
+    protected abstract void startAfterFinishJobs();
 
     /**
      * Runs all post-harvest scripts relevant for this harvest.
@@ -572,7 +579,7 @@ public abstract class BaseHarvest implements Harvest {
      * @throws DAOException
      */
     private void housekeepOldHarvests() throws DAOException {
-        LOGGER.debug(loggerMsg("Deleting old harvests history"));
+        LOGGER.debug(loggerMsg("Deleting old harvests history of the harvested source ..."));
         getHarvestDAO().deleteOldHarvests(harvestId, NO_OF_LAST_HARVESTS_PRESERVED);
     }
 
@@ -693,15 +700,6 @@ public abstract class BaseHarvest implements Harvest {
         LOGGER.debug(loggerMsg("Updating harvest source record"));
         getContextSourceDTO().setLastHarvestId(harvestId);
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
-
-        // update redirected sources
-        for (HarvestSourceDTO dto : redirectedHarvestSources) {
-            if (!dto.getSourceId().equals(getContextSourceDTO().getSourceId())) {
-                LOGGER.debug(loggerMsg("Updating redirected harvest source record [" + dto.getUrl() + "]"));
-                dto.setLastHarvestId(harvestId);
-                getHarvestSourceDAO().updateSourceHarvestFinished(dto);
-            }
-        }
     }
 
     /**
@@ -808,6 +806,38 @@ public abstract class BaseHarvest implements Harvest {
             throw new HarvestException("Context source must exist in the database!");
         }
     }
+
+    /**
+     *
+     * @param url
+     */
+    protected void switchContextTo(String url) throws DAOException, HarvestException {
+
+        LOGGER.debug(loggerMsg("Switching context to " + url));
+
+        HarvestSourceDTO sourceDTO = getHarvestSourceDAO().getHarvestSourceByUrl(url);
+        if (sourceDTO == null) {
+
+            // Clone destination source from current context.
+            sourceDTO = getContextSourceDTO().clone();
+            sourceDTO.setSourceId(null);
+            sourceDTO.setUrl(url);
+            sourceDTO.setUrlHash(Long.valueOf(Hashes.spoHash(url)));
+            sourceDTO.resetInterval();
+            sourceDTO.setTimeCreated(new Date());
+            Integer sourceId = getHarvestSourceDAO().addSource(sourceDTO);
+            sourceDTO = getHarvestSourceDAO().getHarvestSourceById(sourceId);
+        }
+
+        this.contextUrl = url;
+        this.contextSourceDTO = sourceDTO;
+        if (sourceMetadata != null) {
+            sourceMetadata.setUri(contextUrl);
+        }
+
+        startHarvest();
+    }
+
 
     /**
      *

@@ -20,6 +20,30 @@
  */
 package eionet.cr.harvest.scheduled;
 
+import au.com.bytecode.opencsv.CSVReader;
+import eionet.cr.common.JobScheduler;
+import eionet.cr.common.Predicates;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.*;
+import eionet.cr.dao.helpers.CsvImportHelper;
+import eionet.cr.dto.HarvestSourceDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.filestore.FileStore;
+import eionet.cr.harvest.*;
+import eionet.cr.util.FolderUtil;
+import eionet.cr.web.action.DataLinkingScript;
+import eionet.cr.web.action.UploadCSVActionBean;
+import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.FileBean;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.rio.RDFParseException;
+import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,47 +53,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.*;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import au.com.bytecode.opencsv.CSVReader;
-import eionet.acl.AccessController;
-import eionet.cr.common.Predicates;
-import eionet.cr.dao.*;
-import eionet.cr.dao.helpers.CsvImportHelper;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.filestore.FileStore;
-import eionet.cr.util.FolderUtil;
-import eionet.cr.web.action.DataLinkingScript;
-import eionet.cr.web.action.UploadCSVActionBean;
-import eionet.cr.web.action.factsheet.FolderActionBean;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import org.openrdf.rio.RDFParseException;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.StatefulJob;
-
-import eionet.cr.common.JobScheduler;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.harvest.CurrentHarvests;
-import eionet.cr.harvest.Harvest;
-import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.PullHarvest;
-import eionet.cr.harvest.PushHarvest;
-import eionet.cr.web.security.CRUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
+import java.util.Calendar;
 
 /**
  *
@@ -82,7 +66,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     public enum JobStateAttrs {
         /** The date-time of the job's last execution's finish. */
         LAST_FINISH
-    };
+    }
 
     /** Static logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(HarvestingJob.class);

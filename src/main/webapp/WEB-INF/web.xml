@@ -113,6 +113,9 @@
         <listener-class>eionet.cr.common.JobScheduler</listener-class>
     </listener>
     <listener>
+        <listener-class>eionet.cr.util.cleanup.HarvestSourcesCleanupJob</listener-class>
+    </listener>
+    <listener>
         <listener-class>eionet.cr.harvest.scheduled.HarvestingJob</listener-class>
     </listener>
     <listener>

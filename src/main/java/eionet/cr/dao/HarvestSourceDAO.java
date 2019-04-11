@@ -410,6 +410,13 @@ public interface HarvestSourceDAO extends DAO {
      */
     void deleteSubjectTriplesInSource(String subjectUri, String sourceUri) throws DAOException;
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection, boolean)
+     */
+    void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException;
+
     /**
      * Clear the given graph.
      *

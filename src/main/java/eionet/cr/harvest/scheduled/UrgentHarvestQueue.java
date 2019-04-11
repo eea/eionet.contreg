@@ -20,22 +20,21 @@
  */
 package eionet.cr.harvest.scheduled;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.harvest.HarvestException;
 import eionet.cr.web.security.CRUser;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility class for common operations with urgent harvest queue.
@@ -57,7 +56,7 @@ public final class UrgentHarvestQueue {
     }
 
     /**
-     * Calls {@link #addPullHarvests(List, String)} with a singleton-list from the given URL and the given user name.
+     * Calls {@link #addPullHarvests(Collection, String)} with a singleton-list from the given URL and the given user name.
      *
      * @param url The URL.
      * @param userName The user name.
@@ -76,7 +75,7 @@ public final class UrgentHarvestQueue {
      *
      * @throws HarvestException Wraps any sort of exception that happens.
      */
-    public static synchronized void addPullHarvests(List<String> urls, String userName) throws HarvestException {
+    public static synchronized void addPullHarvests(Collection<String> urls, String userName) throws HarvestException {
 
         if (CollectionUtils.isEmpty(urls)) {
             return;

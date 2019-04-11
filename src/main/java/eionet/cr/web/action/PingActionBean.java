@@ -125,15 +125,15 @@ public class PingActionBean extends AbstractActionBean {
             } else if (create && new URL(uri).getRef() != null) {
                 errorCode = ERR_FRAGMENT_URL;
                 message = "URL with a fragment part not allowed, source cannot be created.";
-            } else if (create && URLUtil.isNotExisting(uri, true)) {
+            } else if (create && !URLUtil.resourceExists(uri, true)) {
                 errorCode = ERR_BROKEN_URL;
                 message = "Could not make a connection to this URL, source cannot be created.";
             } else {
                 // Helper flag that will be raised if a harvest is indeed needed.
                 boolean doHarvest = false;
 
-                // Normalize URL for becoming harvest source URL.
-                String sourceUrl = URLUtil.normalizeHarvestSourceUrl(uri, true);
+                // Sanitize URL and force it HTTP for becoming harvest source URL.
+                String sourceUrl = URLUtil.httpsToHttp(URLUtil.sanitizeHarvestSourceUrl(uri));
 
                 // Check if a source by this URI exists.
                 HarvestSourceDTO source = DAOFactory.get().getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(sourceUrl);

@@ -20,29 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-import org.quartz.SchedulerException;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -63,6 +40,18 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.RDFGenerator;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringUtils;
+import org.quartz.SchedulerException;
+
+import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Controller for adding new harvest source and for exporting source triples.
@@ -571,7 +560,8 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                     }
 
                     if (!StringUtils.equals(urlBefore, urlString)
-                            && URLUtil.isNotExisting(urlString, harvestSource.isSparqlEndpoint())) {
+                            && !URLUtil.resourceExists(urlString, harvestSource.isSparqlEndpoint())) {
+
                         if (URLUtil.isUnauthorized(urlString)) {
 
                             UrlAuthenticationDTO urlAuthentication =
