@@ -20,6 +20,15 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.dao.virtuoso;
 
+import eionet.cr.dao.DAOException;
+import eionet.cr.dao.UrgentHarvestQueueDAO;
+import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
+import eionet.cr.dto.UrgentHarvestQueueItemDTO;
+import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.web.security.CRUser;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,16 +36,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.UrgentHarvestQueueDAO;
-import eionet.cr.dao.readers.HarvestQueueItemDTOReader;
-import eionet.cr.dto.UrgentHarvestQueueItemDTO;
-import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.web.security.CRUser;
 
 /**
  *
@@ -194,7 +193,7 @@ public class VirtuosoUrgentHarvestQueueDAO extends VirtuosoBaseDAO implements Ur
     /**
      * Helper method for deleting given queue item.
      *
-     * @param queueItem The queue item to delete.
+     * @param item The queue item to delete.
      * @throws SQLException if SQL error
      */
     private static int deleteQueueItem(UrgentHarvestQueueItemDTO item, Connection conn) throws SQLException {

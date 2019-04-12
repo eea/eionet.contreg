@@ -406,7 +406,7 @@ public abstract class BaseHarvest implements Harvest {
         // If the phase is "after harvesting new content" and there was actually 0 triple harvested then don't continue.
         if (Phase.AFTER_NEW.equals(phase) || HarvestScriptType.PUSH.equals(type)) {
             if (getStoredTriplesCount() <= 0) {
-                LOGGER.info(loggerMsg("Ignoring harvest scripts, as no triples were harvested!"));
+                LOGGER.debug(loggerMsg("Ignoring harvest scripts, as no triples were harvested!"));
                 return;
             }
         }
@@ -490,7 +490,7 @@ public abstract class BaseHarvest implements Harvest {
         String phaseShortLabel = phase == null ? "unknown phase" : phase.getShortLabel();
 
         try {
-            LOGGER.info(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
+            LOGGER.debug(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
 
             //post-harvest
             if (scriptDto.getType().name().equals(HarvestScriptType.POST_HARVEST.name())) {
@@ -531,7 +531,7 @@ public abstract class BaseHarvest implements Harvest {
 
             HttpClient httpclient = new HttpClient();
             int status = httpclient.executeMethod(post);
-            LOGGER.info("Push service returned HTTP code " + status);
+            LOGGER.debug("Push service returned HTTP code " + status);
             
             if (HttpStatus.SC_OK != status) {
                 throw  new HarvestException("Unsuccessful response code from the remote service " + status);
@@ -612,7 +612,7 @@ public abstract class BaseHarvest implements Harvest {
             // If it was failed delete redirected sources as well
             if (getContextSourceDTO().isPermanentError()) {
                 if (!getContextSourceDTO().isPrioritySource()) {
-                    LOGGER.info(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
+                    LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
                             + "with permanent error");
                     sourcesToDelete.add(getContextSourceDTO().getUrl());
                     sourceInError = true;
@@ -620,7 +620,7 @@ public abstract class BaseHarvest implements Harvest {
                 }
             } else if (getContextSourceDTO().getCountUnavail() >= 5) {
                 if (!getContextSourceDTO().isPrioritySource()) {
-                    LOGGER.info(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
+                    LOGGER.debug(getContextSourceDTO().getUrl() + "  will be deleted as a non-priority source "
                             + "with unavailability >= 5");
                     sourcesToDelete.add(getContextSourceDTO().getUrl());
                     sourceInError = true;
@@ -893,7 +893,7 @@ public abstract class BaseHarvest implements Harvest {
 
         try {
             int foundSourceCount = getHarvestSourceDAO().deriveNewHarvestSources(getContextUrl());
-            LOGGER.info(loggerMsg(foundSourceCount + " new harvest sources found and inserted"));
+            LOGGER.debug(loggerMsg(foundSourceCount + " new harvest sources found and inserted"));
         } catch (DAOException e) {
             LOGGER.warn("Failure when extracting new harvest sources", e);
         }
