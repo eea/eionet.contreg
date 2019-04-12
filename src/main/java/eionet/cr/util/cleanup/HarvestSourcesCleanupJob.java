@@ -170,7 +170,7 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
         }
 
         List<Pair<String, Integer>> resultList = reader.getResultList();
-        LOGGER.debug("Found a total of {} harvest sources", resultList.size());
+        LOGGER.info("Found a total of {} harvest sources", resultList.size());
         return resultList;
     }
 
@@ -197,7 +197,7 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
         }
 
         List<String> resultList = reader.getResultList();
-        LOGGER.debug("Found a total of {} sources in urgent harvest queue", resultList.size());
+        LOGGER.info("Found a total of {} sources in urgent harvest queue", resultList.size());
         return new HashSet<>(resultList);
     }
 

@@ -135,13 +135,14 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
     protected void handleUrgentQueue() {
 
         try {
+            LOGGER.info("Polling urgent harvest queue ...");
+
             int counter = 0;
             UrgentHarvestQueueItemDTO queueItem = null;
             for (queueItem = UrgentHarvestQueue.poll(); queueItem != null; queueItem = UrgentHarvestQueue.poll()) {
 
+                // Just a security measure to avoid an infinite loop here.
                 if (counter++ == URGENT_HARVEST_LIMIT) {
-                    // Just a security measure to avoid an infinite loop here.
-                    LOGGER.info("Handled " + URGENT_HARVEST_LIMIT + " urgent harvests, resting until next interval");
                     break;
                 }
 
@@ -160,6 +161,9 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
                     }
                 }
             }
+
+            LOGGER.info("Executed " + counter + " urgent harvests, resting until next interval");
+
         } catch (DAOException e) {
             LOGGER.error(e.toString(), e);
         }
