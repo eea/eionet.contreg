@@ -51,6 +51,8 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
             return;
         }
 
+        removeUrgentHarvestsOfNonExistingSources();
+
         Set<String> sourcesInUrgentHarvestQueue = findSourcesInUrgentHarvestQueue();
         Set<String> redirectedResources = findRedirectedResources();
 
@@ -231,6 +233,29 @@ public class HarvestSourcesCleanupJob implements StatefulJob, ServletContextList
 //        LOGGER.debug("Found a total of {} redirecting resources in triple store", resultList.size());
         List<String> resultList = reader.getResultList();
         return new HashSet<>(resultList);
+    }
+
+    /**
+     *
+     * @throws DAOException
+     */
+    private void removeUrgentHarvestsOfNonExistingSources() throws DAOException {
+
+        LOGGER.info("Removing urgent harvests of sources not existing any more...");
+
+        String sql = String.format(
+                "DELETE FROM urgent_harvest_queue WHERE username='%s' AND url NOT IN (SELECT url FROM harvest_source)",
+                CLEANUP_USERNAME);
+
+        Connection conn = null;
+        try {
+            conn = SesameUtil.getSQLConnection();
+            SQLUtil.executeUpdate(sql, conn);
+        } catch (Exception e) {
+            throw new DAOException(e.getMessage(), e);
+        } finally {
+            SQLUtil.close(conn);
+        }
     }
 
     @Override

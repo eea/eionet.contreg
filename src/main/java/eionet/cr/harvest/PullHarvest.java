@@ -83,7 +83,7 @@ public class PullHarvest extends BaseHarvest {
     /** */
     private final List<String> redirectedUrls = new ArrayList<String>();
     private List<RedirectionDTO> redirections = new ArrayList<RedirectionDTO>();
-    private List<String> sourcesToDelete = new ArrayList<>();
+    private Set<String> sourcesToDelete = new LinkedHashSet<>();
 
     /**
      * Instantiates a new pull harvest.
@@ -1149,7 +1149,7 @@ public class PullHarvest extends BaseHarvest {
     @Override
     protected void afterFinish() {
 
-        // Add all redirected sources to source to delete, except the last context URL we saved triples into.
+        // Add all redirected sources to sources-to-delete, except the last context URL we saved triples into.
         sourcesToDelete.addAll(redirectedUrls);
         sourcesToDelete.remove(getContextUrl());
 

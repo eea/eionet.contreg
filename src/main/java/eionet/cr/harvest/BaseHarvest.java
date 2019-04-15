@@ -287,7 +287,7 @@ public abstract class BaseHarvest implements Harvest {
     private void startHarvest() throws HarvestException {
 
         LOGGER.debug("                                                                   ");
-        LOGGER.debug(loggerMsg("Starting harvest"));
+        LOGGER.info(loggerMsg("Starting harvest"));
 
         // no null checking, i.e. assuming the context source exists for sure
         int sourceId = contextSourceDTO.getSourceId();
@@ -381,7 +381,7 @@ public abstract class BaseHarvest implements Harvest {
                 throw new HarvestException(e.getMessage(), e);
             }
         } finally {
-            LOGGER.debug(loggerMsg("Harvest finished"));
+            LOGGER.info(loggerMsg("Harvest finished"));
             LOGGER.debug("                                                                   ");
         }
     }

@@ -624,7 +624,7 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
 
             // if the source is currently being harvested then return
             if (CurrentHarvests.contains(harvestSource.getUrl())) {
-                LOGGER.debug("The source is currently being harvested, so skipping it");
+                LOGGER.debug("Source is currently already being harvested, so skipping it: " + harvestSource.getUrl());
                 return;
             }
 
