@@ -612,6 +612,19 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
+     *
+     * @param conn
+     * @param sourceUrls
+     * @param harvesterContextOnly
+     * @throws SQLException
+     */
+    private void removeResources(Connection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
+            throws SQLException {
+        removeResources(conn, sourceUrls, null, harvesterContextOnly);
+    }
+
+
+    /**
      * Helper method for clearing all triples about those URLs.
      *
      * @param conn SQL connection to operate with.
@@ -619,14 +632,29 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
      * @param harvesterContextOnly
      * @throws SQLException
      */
-    private void removeResources(Connection conn, Collection<String> sourceUrls, boolean harvesterContextOnly)
+    private void removeResources(Connection conn, Collection<String> sourceUrls, Set<String> exceptPredicates, boolean harvesterContextOnly)
             throws SQLException {
 
         String sparqlDeleteResourceFromAllGraphs =
-                "SPARQL DELETE {GRAPH ?g {?s ?p ?o}} WHERE {GRAPH ?g {?s ?p ?o filter (?s = <RESOURCE_URI>)}}";
+                "SPARQL DELETE {GRAPH ?g {?s ?p ?o}} WHERE {GRAPH ?g {?s ?p ?o filter (?s = <RESOURCE_URI>@exceptPredicates@)}}";
 
         String sparqlDeleteResourceFromSpecificGraph =
-                "SPARQL DELETE FROM <GRAPH_URI> {?s ?p ?o} WHERE {GRAPH <GRAPH_URI> {?s ?p ?o filter (?s = <RESOURCE_URI>)}}";
+                "SPARQL DELETE FROM <GRAPH_URI> {?s ?p ?o} WHERE {GRAPH <GRAPH_URI> {?s ?p ?o filter (?s = <RESOURCE_URI>@exceptPredicates@)}}";
+
+        if (exceptPredicates != null && !exceptPredicates.isEmpty()) {
+            StringBuilder sb = new StringBuilder(" AND ?p NOT IN (");
+            int i = 0;
+            for (String exceptPredicate : exceptPredicates) {
+                if (i++ > 0) {
+                    sb.append(", ");
+                }
+                sb.append(String.format("<%s>", exceptPredicate));
+            }
+            sb.append(")");
+
+            sparqlDeleteResourceFromAllGraphs = sparqlDeleteResourceFromAllGraphs.replace("@exceptPredicates@", sb.toString());
+            sparqlDeleteResourceFromSpecificGraph = sparqlDeleteResourceFromSpecificGraph.replace("@exceptPredicates@", sb.toString());
+        }
 
         Statement resourceStmt = null;
         try {
@@ -1006,13 +1034,21 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         removeHarvestSources(sourceUrls, harvesterContextOnly, true);
     }
 
+    @Override
+    public void removeHarvestSources(
+            Collection<String> sourceUrls, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException {
+        removeHarvestSources(sourceUrls, null, harvesterContextOnly, true);
+    }
+
+
     /*
      * (non-Javadoc)
      *
      * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection, boolean)
      */
     @Override
-    public void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException {
+    public void removeHarvestSources(Collection<String> sourceUrls,
+                                     Set<String> exceptPredicates, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException {
 
         if (sourceUrls == null || sourceUrls.isEmpty()) {
             return;
@@ -1027,7 +1063,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             sqlConn = getSQLConnection();
             repoConn = SesameUtil.getRepositoryConnection();
 
-            removeResources(sqlConn, sourceUrls, harvesterContextOnly);
+            removeResources(sqlConn, sourceUrls, exceptPredicates, harvesterContextOnly);
             removeHarvestSources(sqlConn, sourceUrls);
 
             if (clearGraphs) {

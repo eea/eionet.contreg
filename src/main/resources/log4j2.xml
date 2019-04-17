@@ -7,7 +7,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <logger name="eionet" level="info"/>
+        <logger name="eionet" level="debug"/>
         <Root level="INFO">
             <AppenderRef ref="console"/>
         </Root>

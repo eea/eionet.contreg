@@ -44,6 +44,7 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author altnyris
@@ -416,6 +417,14 @@ public interface HarvestSourceDAO extends DAO {
      * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection, boolean)
      */
     void removeHarvestSources(Collection<String> sourceUrls, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException;
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see eionet.cr.dao.HarvestSourceDAO#removeHarvestSources(java.util.Collection, boolean)
+     */
+    void removeHarvestSources(Collection<String> sourceUrls,
+                              Set<String> exceptPredicates, boolean harvesterContextOnly, boolean clearGraphs) throws DAOException;
 
     /**
      * Clear the given graph.
