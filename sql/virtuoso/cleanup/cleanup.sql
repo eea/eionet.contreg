@@ -38,6 +38,11 @@ DELETE FROM CR.cr3user.post_harvest_script WHERE target_source_url NOT IN (SELEC
 DELETE FROM CR.cr3user.urgent_harvest_queue WHERE url NOT IN (SELECT url FROM CR.cr3user.harvest_source);
 
 -- ---------------------------------------------------------------------
+-- Ensure we have no harvest sources with space in URL.
+-- ---------------------------------------------------------------------
+DELETE FROM CR.cr3user.harvest_source WHERE url LIKE '% %';
+
+-- ---------------------------------------------------------------------
 -- Re-create triggers.
 -- ---------------------------------------------------------------------
 

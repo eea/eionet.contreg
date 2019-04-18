@@ -48,7 +48,8 @@
         <property name="timeBetweenEvictionRunsMillis" value="300000" />
         <property name="logAbandoned" value="false" />
         <property name="testOnBorrow" value="true" />
-        <property name="maxConnLifetimeMillis" value="1800000" />
+        <property name="maxConnLifetimeMillis" value="9600000" />
+        <property name="logExpiredConnections" value="false" />
     </bean>
 
     <bean id="roDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
@@ -64,7 +65,8 @@
         <property name="timeBetweenEvictionRunsMillis" value="300000" />
         <property name="logAbandoned" value="false" />
         <property name="testOnBorrow" value="true" />
-        <property name="maxConnLifetimeMillis" value="1800000" />
+        <property name="maxConnLifetimeMillis" value="9600000" />
+        <property name="logExpiredConnections" value="false" />
     </bean>
 
     <!-- Runs on Tomcat startup. -->
