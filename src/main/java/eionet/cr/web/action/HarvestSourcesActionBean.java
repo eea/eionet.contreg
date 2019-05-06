@@ -20,20 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
@@ -45,15 +31,18 @@ import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.web.action.factsheet.FactsheetActionBean;
-import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.CustomPaginatedList;
-import eionet.cr.web.util.columns.GenericColumn;
-import eionet.cr.web.util.columns.HarvestSourcesColumn;
-import eionet.cr.web.util.columns.SearchResultColumn;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * @author altnyris
@@ -116,32 +105,40 @@ public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
                 filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
             }
 
-            Pair<Integer, List<HarvestSourceDTO>> pair = null;
+            Pair<Integer, List<HarvestSourceDTO>> resultPair = null;
             HarvestSourceDAO harvestSourceDAO = factory.getDao(HarvestSourceDAO.class);
             if (type == null || HarvestSourceType.TRACKED.equals(type)) {
                 if (type == null) {
                     type = HarvestSourceType.TRACKED;
                 }
-                pair = harvestSourceDAO.getHarvestSources(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getHarvestSources(filterString, pagingRequest, sortingRequest);
             } else if (HarvestSourceType.PRIORITY.equals(type)) {
-                pair = harvestSourceDAO.getPrioritySources(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getPrioritySources(filterString, pagingRequest, sortingRequest);
             } else if (HarvestSourceType.UNAVAILABLE.equals(type)) {
-                pair = harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getHarvestSourcesUnavailable(filterString, pagingRequest, sortingRequest);
             } else if (HarvestSourceType.FAILED.equals(type)) {
-                pair = harvestSourceDAO.getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getHarvestSourcesFailed(filterString, pagingRequest, sortingRequest);
             } else if (HarvestSourceType.UNAUHTORIZED.equals(type)) {
-                pair = harvestSourceDAO.getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getHarvestSourcesUnauthorized(filterString, pagingRequest, sortingRequest);
             } else if (HarvestSourceType.ENDPOINT.equals(type)) {
-                pair = harvestSourceDAO.getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
+                resultPair = harvestSourceDAO.getRemoteEndpoints(filterString, pagingRequest, sortingRequest);
             }
 
             int matchCount = 0;
-            if (pair != null) {
-                resultList = pair.getRight();
+            if (resultPair != null) {
+                resultList = resultPair.getRight();
                 if (resultList == null) {
                     resultList = new ArrayList<HarvestSourceDTO>();
                 }
-                matchCount = pair.getLeft() == null ? 0 : pair.getLeft().intValue();
+                matchCount = resultPair.getLeft() == null ? 0 : resultPair.getLeft().intValue();
+            }
+
+            if (matchCount == 0) {
+                HarvestSourceDTO sourceDTO = harvestSourceDAO.getHarvestSourceByUrl(this.searchString);
+                if (sourceDTO != null) {
+                    matchCount = 1;
+                    resultList = Arrays.asList(sourceDTO);
+                }
             }
 
             paginatedList = new CustomPaginatedList<HarvestSourceDTO>(this, matchCount, resultList, RESULT_LIST_PAGE_SIZE);
