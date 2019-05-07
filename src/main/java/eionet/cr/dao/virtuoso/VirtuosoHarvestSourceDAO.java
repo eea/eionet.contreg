@@ -597,10 +597,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 }
             }
 
+            LOGGER.debug("Deleting requested sources from harvest scripts table.");
             harvestScriptsDeleteStatement.executeBatch();
+            LOGGER.debug("Deleting requested sources from harvest source table.");
             sourcesDeleteStatement.executeBatch();
+            LOGGER.debug("Deleting requested sources from urgent harvest queue.");
             urgentQueueDeleteStatement.executeBatch();
             if (GeneralConfig.isUseInferencing()) {
+                LOGGER.debug("Deleting requested sources from inference ruleset.");
                 rulesetDeleteStatement.executeBatch();
             }
         } finally {
@@ -654,6 +658,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
             sparqlDeleteResourceFromAllGraphs = sparqlDeleteResourceFromAllGraphs.replace("@exceptPredicates@", sb.toString());
             sparqlDeleteResourceFromSpecificGraph = sparqlDeleteResourceFromSpecificGraph.replace("@exceptPredicates@", sb.toString());
+        } else {
+            sparqlDeleteResourceFromAllGraphs = sparqlDeleteResourceFromAllGraphs.replace("@exceptPredicates@", "");
+            sparqlDeleteResourceFromSpecificGraph = sparqlDeleteResourceFromSpecificGraph.replace("@exceptPredicates@", "");
         }
 
         Statement resourceStmt = null;
@@ -664,10 +671,15 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
                 sourceUrl = URLUtil.escapeIRI(sourceUrl);
 
-                String resourceSparql =
-                        harvesterContextOnly ? sparqlDeleteResourceFromSpecificGraph.replace("GRAPH_URI",
-                                GeneralConfig.HARVESTER_URI).replace("RESOURCE_URI", sourceUrl)
-                                : sparqlDeleteResourceFromAllGraphs.replace("RESOURCE_URI", sourceUrl);
+                String resourceSparql;
+                if (harvesterContextOnly) {
+                    resourceSparql = sparqlDeleteResourceFromSpecificGraph.replace("GRAPH_URI", GeneralConfig.HARVESTER_URI).replace("RESOURCE_URI", sourceUrl);
+                    LOGGER.debug("Deleting this resource from harvester graph");
+                } else {
+                    LOGGER.debug("Deleting resource from all graphs");
+                    resourceSparql = sparqlDeleteResourceFromAllGraphs.replace("RESOURCE_URI", sourceUrl);
+                }
+
 
                 resourceStmt.addBatch(resourceSparql);
             }
@@ -698,6 +710,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 String graphSparql = sparqlClearGraph.replace("GRAPH_URI", sourceUrl);
                 graphStmt.addBatch(graphSparql);
             }
+
+            LOGGER.debug("Clearing graphs: " + sourceUrls);
 
             graphStmt.executeBatch();
         } finally {
