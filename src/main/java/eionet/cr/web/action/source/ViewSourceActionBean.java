@@ -21,26 +21,9 @@
 
 package eionet.cr.web.action.source;
 
-import java.util.Arrays;
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.lang.StringUtils;
-
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.HarvestDAO;
-import eionet.cr.dao.HarvestScriptDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.*;
 import eionet.cr.dto.HarvestDTO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
@@ -56,8 +39,13 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptsActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * View source tab.

@@ -85,7 +85,7 @@
                                 <c:out value="not to be batch-harvested"/>
                             </c:when>
                             <c:otherwise>
-                                <c:out value="${actionBean.intervalMinutesDisplay}"/>
+                                <c:out value="${actionBean.harvestSource.intervalPair.left} ${actionBean.harvestSource.intervalPair.left > 1 ? actionBean.harvestSource.intervalPair.right.label : actionBean.harvestSource.intervalPair.right.labelSingular}"/>
                             </c:otherwise>
                         </c:choose>
                     </td>

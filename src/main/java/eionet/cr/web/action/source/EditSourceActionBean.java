@@ -21,21 +21,6 @@
 
 package eionet.cr.web.action.source;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.HarvestSourceDAO;
@@ -48,6 +33,14 @@ import eionet.cr.web.action.HarvestSourcesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.SimpleError;
+import org.apache.commons.lang.StringUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Edit source tab.
@@ -72,17 +65,11 @@ public class EditSourceActionBean extends AbstractActionBean {
     /** Username when changing owner. */
     private String ownerName;
 
-    /** Interval multiplyers. */
-//    private int intervalMultiplier;
-//    private static LinkedHashMap<Integer, String> intervalMultipliers;
+    /** Indicates the harvest source interval value as submitted from the form. */
+    private int intervalValue;
 
-//    static {
-//        intervalMultipliers = new LinkedHashMap<Integer, String>();
-//        intervalMultipliers.put(Integer.valueOf(1), "minutes");
-//        intervalMultipliers.put(Integer.valueOf(60), "hours");
-//        intervalMultipliers.put(Integer.valueOf(1440), "days");
-//        intervalMultipliers.put(Integer.valueOf(10080), "weeks");
-//    }
+    /** Indicates the harvest source interval unit as submitted from the form. */
+    private HarvestIntervalUnit intervalUnit;
 
     /**
      * Action event for displaying the source edit form.
@@ -98,6 +85,8 @@ public class EditSourceActionBean extends AbstractActionBean {
         } else {
             schemaSource = factory.getDao(HarvestSourceDAO.class).isSourceInInferenceRule(uri);
             harvestSource = factory.getDao(HarvestSourceDAO.class).getHarvestSourceByUrl(uri);
+            intervalValue = harvestSource.getIntervalPair().getLeft();
+            intervalUnit = harvestSource.getIntervalPair().getRight();
 
             SourceTabMenuHelper helper = new SourceTabMenuHelper(uri, isUserOwner(harvestSource));
             tabs = helper.getTabs(SourceTabMenuHelper.TabTitle.EDIT);
@@ -203,7 +192,7 @@ public class EditSourceActionBean extends AbstractActionBean {
         factory.getDao(HarvestSourceDAO.class).editSource(harvestSource);
         addSystemMessage("Owner successfully changed.");
 
-        return new RedirectResolution(EditSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
+        return new RedirectResolution(ViewSourceActionBean.class).addParameter("uri", harvestSource.getUrl());
     }
 
     /**
@@ -277,7 +266,11 @@ public class EditSourceActionBean extends AbstractActionBean {
                     addGlobalValidationError(new SimpleError("There is no resource existing behind this URL!"));
                 }
 
-                harvestSource.calculateNewInterval(false);
+                if (intervalValue < 0 || intervalUnit == null) {
+                    addGlobalValidationError(new SimpleError("No harvest interval specified!"));
+                } else {
+                    harvestSource.setIntervalMinutes(Integer.valueOf(intervalValue * intervalUnit.getMinutes()));
+                }
 
             } catch (MalformedURLException e) {
                 addGlobalValidationError(new SimpleError("Invalid URL!"));
@@ -295,14 +288,6 @@ public class EditSourceActionBean extends AbstractActionBean {
     public boolean isUserOwner() {
         return isUserOwner(harvestSource);
     }
-
-    /**
-     *
-     * @return int
-     */
-//    public int getSelectedIntervalMultiplier() {
-//        return getIntervalMultipliers().keySet().iterator().next().intValue();
-//    }
 
     /**
      * Returns all the valid media types.
@@ -363,25 +348,11 @@ public class EditSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @return the intervalMultiplier
+     * @return
      */
-//    public int getIntervalMultiplier() {
-//        return intervalMultiplier;
-//    }
-
-    /**
-     * @param intervalMultiplier the intervalMultiplier to set
-     */
-//    public void setIntervalMultiplier(int intervalMultiplier) {
-//        this.intervalMultiplier = intervalMultiplier;
-//    }
-
-    /**
-     * @return the intervalMultipliers
-     */
-//    public LinkedHashMap<Integer, String> getIntervalMultipliers() {
-//        return intervalMultipliers;
-//    }
+    public HarvestIntervalUnit[] getIntervalUnits() {
+        return HarvestIntervalUnit.values();
+    }
 
     /**
      * @return the ownerName
@@ -397,4 +368,19 @@ public class EditSourceActionBean extends AbstractActionBean {
         this.ownerName = ownerName;
     }
 
+    public int getIntervalValue() {
+        return intervalValue;
+    }
+
+    public void setIntervalValue(int intervalValue) {
+        this.intervalValue = intervalValue;
+    }
+
+    public HarvestIntervalUnit getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(HarvestIntervalUnit intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 }

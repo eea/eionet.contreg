@@ -20,29 +20,6 @@
  */
 package eionet.cr.web.action;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.SimpleError;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-import org.quartz.SchedulerException;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
@@ -61,8 +38,21 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
+import eionet.cr.web.action.source.HarvestIntervalUnit;
 import eionet.cr.web.action.source.ViewSourceActionBean;
 import eionet.cr.web.util.RDFGenerator;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.SimpleError;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringUtils;
+import org.quartz.SchedulerException;
+
+import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Controller for adding new harvest source and for exporting source triples.
@@ -94,12 +84,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
 
     /** The sample triples. */
     private List<TripleDTO> sampleTriples;
-
-    /** The interval multiplier. */
-//    private int intervalMultiplier;
-
-    /** The interval multipliers. */
-//    private static LinkedHashMap<Integer, String> intervalMultipliers;
 
     /** The Constant tabs. */
     private static final List<Pair<String, String>> tabs;
@@ -140,6 +124,12 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     /** Used to perform bulk operations with several url authentications at a time */
     private List<String> selectedUrlAuthenticationIds;
 
+    /** Indicates the harvest source interval value as submitted from the form. */
+    private int intervalValue = GeneralConfig.getDefaultHarvestIntervalMinutes() / HarvestIntervalUnit.DAYS.getMinutes();
+
+    /** Indicates the harvest source interval unit as submitted from the form. */
+    private HarvestIntervalUnit intervalUnit = HarvestIntervalUnit.DAYS;
+
     /**
      * Static initialization block.
      */
@@ -148,12 +138,6 @@ public class HarvestSourceActionBean extends AbstractActionBean {
         tabs.add(new Pair<String, String>("view", "View"));
         tabs.add(new Pair<String, String>("sampleTriples", "Sample triples"));
         tabs.add(new Pair<String, String>("history", "History"));
-
-//        intervalMultipliers = new LinkedHashMap<Integer, String>();
-//        intervalMultipliers.put(new Integer(1), "minutes");
-//        intervalMultipliers.put(new Integer(60), "hours");
-//        intervalMultipliers.put(new Integer(1440), "days");
-//        intervalMultipliers.put(new Integer(10080), "weeks");
 
         MEDIA_TYPES = new ArrayList<String>();
         MEDIA_TYPES.add(null);
@@ -601,8 +585,10 @@ public class HarvestSourceActionBean extends AbstractActionBean {
                         }
                     }
 
-                    if (harvestSource.getIntervalMinutes() == null) {
-                        harvestSource.resetInterval();
+                    if (intervalValue < 0 || intervalUnit == null) {
+                        addGlobalValidationError(new SimpleError("No harvest interval specified!"));
+                    } else {
+                        harvestSource.setIntervalMinutes(Integer.valueOf(intervalValue * intervalUnit.getMinutes()));
                     }
 
                 } catch (MalformedURLException e) {
@@ -622,68 +608,11 @@ public class HarvestSourceActionBean extends AbstractActionBean {
     }
 
     /**
-     * @param intervalMultiplier
-     *            the intervalMultiplier to set
-     */
-//    public void setIntervalMultiplier(int intervalMultiplier) {
-//        this.intervalMultiplier = intervalMultiplier;
-//    }
-
-    /**
      *
-     * @return Map<Integer,String>
-     */
-//    public Map<Integer, String> getIntervalMultipliers() {
-//
-//        return intervalMultipliers;
-//    }
-
-    /**
-     *
-     * @return int
-     */
-//    public int getSelectedIntervalMultiplier() {
-//        return getIntervalMultipliers().keySet().iterator().next().intValue();
-//    }
-
-    /**
-     *
-     * @return String
-     */
-    public String getIntervalMinutesDisplay() {
-
-        String result = "";
-        if (harvestSource != null && harvestSource.getIntervalMinutes() != null) {
-            result = getMinutesDisplay(harvestSource.getIntervalMinutes().intValue());
-        }
-
-        return result;
-    }
-
-    /**
-     *
-     * @param minutes
      * @return
      */
-    private static String getMinutesDisplay(int minutes) {
-
-        int days = minutes / 1440;
-        minutes = minutes - (days * 1440);
-        int hours = minutes / 60;
-        minutes = minutes - (hours * 60);
-
-        StringBuffer buf = new StringBuffer();
-        if (days > 0) {
-            buf.append(days).append(days == 1 ? " day" : " days");
-        }
-        if (hours > 0) {
-            buf.append(buf.length() > 0 ? ", " : "").append(hours).append(hours == 1 ? " hour" : " hours");
-        }
-        if (minutes > 0) {
-            buf.append(buf.length() > 0 ? ", " : "").append(minutes).append(minutes == 1 ? " minute" : " minutes");
-        }
-
-        return buf.toString();
+    public HarvestIntervalUnit[] getIntervalUnits() {
+        return HarvestIntervalUnit.values();
     }
 
     /**
@@ -887,5 +816,21 @@ public class HarvestSourceActionBean extends AbstractActionBean {
      */
     public void setSelectedUrlAuthenticationIds(List<String> selectedUrlAuthenticationIds) {
         this.selectedUrlAuthenticationIds = selectedUrlAuthenticationIds;
+    }
+
+    public int getIntervalValue() {
+        return intervalValue;
+    }
+
+    public void setIntervalValue(int intervalValue) {
+        this.intervalValue = intervalValue;
+    }
+
+    public HarvestIntervalUnit getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(HarvestIntervalUnit intervalUnit) {
+        this.intervalUnit = intervalUnit;
     }
 }

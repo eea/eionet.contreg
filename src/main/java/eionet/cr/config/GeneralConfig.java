@@ -20,8 +20,7 @@
  */
 package eionet.cr.config;
 
-import java.util.Properties;
-
+import eionet.cr.harvest.scheduled.HarvestingJob;
 import eionet.cr.spring.SpringApplicationContext;
 import eionet.propertyplaceholderresolver.CircularReferenceException;
 import eionet.propertyplaceholderresolver.ConfigurationPropertyResolver;
@@ -31,7 +30,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eionet.cr.harvest.scheduled.HarvestingJob;
+import java.util.Properties;
 
 /**
  *
@@ -486,8 +485,8 @@ public final class GeneralConfig {
     }
 
     /**
-     * Returns default harvest interval to be used in situations where the system has auto-discovered new harvest sources, or it
-     * is not possible to ask the interval from the user. The value is in minutes!
+     * Returns default harvest interval to be used in situations where the system has auto-discovered new harvest sources,
+     * or it is not possible to ask the interval from the user. The value is in minutes!
      *
      * @return The default harvest interval in minutes!
      */

@@ -23,6 +23,9 @@
  */
 package eionet.cr.dto;
 
+import eionet.cr.util.Pair;
+import eionet.cr.web.action.source.HarvestIntervalUnit;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -458,10 +461,11 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      * @param success
      */
     public void calculateNewInterval(boolean success) {
-        if (success)
+        if (success) {
             intervalMinutes = (intervalMinutes != null) ? intervalMinutes + (24 * 60) : 1440;
-        else
+        } else {
             intervalMinutes = (intervalMinutes != null && intervalMinutes > 0) ? intervalMinutes : 1440;
+        }
     }
 
     /**
@@ -469,6 +473,32 @@ public class HarvestSourceDTO implements Serializable, Cloneable {
      */
     public void resetInterval() {
         intervalMinutes = 0;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Pair<Integer, HarvestIntervalUnit> getIntervalPair() {
+
+        int minutes = this.intervalMinutes;
+
+        int days = minutes / 1440;
+        minutes = minutes - (days * 1440);
+        int hours = minutes / 60;
+        minutes = minutes - (hours * 60);
+
+        if (days > 0) {
+            return new Pair<>(days, HarvestIntervalUnit.DAYS);
+        }
+        if (hours > 0) {
+            return new Pair<>(hours, HarvestIntervalUnit.HOURS);
+        }
+        if (minutes > 0) {
+            return new Pair<>(minutes, HarvestIntervalUnit.MINUTES);
+        }
+
+        return new Pair<>(0, HarvestIntervalUnit.MINUTES);
     }
 
 }

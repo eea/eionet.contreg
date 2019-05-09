@@ -18,11 +18,6 @@
                             return true;
                         });
 
-                        $('#isIntervalDynamic').click(function() {
-                            setHarvestIntervalVisibility();
-                            return true;
-                        })
-
                         function setAuthRowVisibility(){
                             if($('#chkAuthenticated').is(':checked')) {
                                 $('#usernameRow').show();
@@ -30,15 +25,6 @@
                             } else {
                                 $('#usernameRow').hide();
                                 $('#passwordRow').hide();
-                            }
-                        }
-
-                        function setHarvestIntervalVisibility() {
-                            if ( $('#isIntervalDynamic').is(':checked') ) {
-                                $('#harvestIntervalRow').hide();
-                            }
-                            else {
-                                $('#harvestIntervalRow').show();
                             }
                         }
 
@@ -62,6 +48,17 @@
                         <td><label class="question" for="emails">E-mails</label></td>
                         <td><stripes:text id="emails" name="harvestSource.emails" size="80"/></td>
                     </tr>
+                    <tr id="harvestIntervalRow">
+                        <td><label class="question" for="interval">Harvest interval</label></td>
+                        <td>
+                            <stripes:text id="interval" name="intervalValue" size="10" value="6"/>
+                            <stripes:select name="intervalUnit">
+                                <c:forEach items="${actionBean.intervalUnits}" var="intervalUnit">
+                                    <stripes:option value="${intervalUnit}" label="${intervalUnit.label}"/>
+                                </c:forEach>
+                            </stripes:select>
+                        </td>
+                    </tr>
                     <tr>
                         <td><label class="question" for="mediaType">Media type</label></td>
                         <td><stripes:select id="mediaType" name="harvestSource.mediaType" value="${actionBean.harvestSource.mediaType}">
@@ -69,6 +66,12 @@
                                 <stripes:option value="${type}" label="${type}"/>
                             </c:forEach>
                             </stripes:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label class="question" for="priority">Is "Priority" source</label></td>
+                        <td>
+                            <stripes:checkbox name="harvestSource.prioritySource" id="priority"/>
                         </td>
                     </tr>
                     <tr>

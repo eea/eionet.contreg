@@ -21,59 +21,11 @@
 
 package eionet.cr.harvest;
 
-import static eionet.cr.harvest.ResponseCodeUtil.isError;
-import static eionet.cr.harvest.ResponseCodeUtil.isNotModified;
-import static eionet.cr.harvest.ResponseCodeUtil.isPermanentError;
-import static eionet.cr.harvest.ResponseCodeUtil.isRedirect;
-import static eionet.cr.harvest.ResponseCodeUtil.isUnauthorized;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.TempFilePathGenerator;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.EndpointHarvestQueryDAO;
-import eionet.cr.dao.HarvestScriptDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dto.EndpointHarvestQueryDTO;
-import eionet.cr.dto.HarvestMessageDTO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.dto.UrlAuthenticationDTO;
+import eionet.cr.dao.*;
+import eionet.cr.dto.*;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.load.FeedFormatLoader;
@@ -86,6 +38,24 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.xml.ConversionsParser;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.net.*;
+import java.text.MessageFormat;
+import java.util.*;
+
+import static eionet.cr.harvest.ResponseCodeUtil.*;
 
 /**
  * Performs a pull-harvest.
@@ -592,7 +562,6 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
         getContextSourceDTO().setCountUnavail(countUnavail);
-        getContextSourceDTO().calculateNewInterval(false);
 
         // save same error parameters to parent sources where this source was redirected from
         handleRedirectedHarvestDTOs(lastHarvest, responseCode, sourceNotAvailable);
