@@ -475,7 +475,6 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
-        getContextSourceDTO().calculateNewInterval();
 
         // add source metadata resulting from this harvest
         addSourceMetadata(urlConn, 0, null, null);
@@ -498,7 +497,6 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
-        getContextSourceDTO().calculateNewInterval();
 
         // since the server returned source-not-modified, we're keeping the old metadata,
         // but still updating the cr:lastRefreshed
@@ -520,7 +518,6 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setPermanentError(false);
         getContextSourceDTO().setCountUnavail(0);
-        getContextSourceDTO().calculateNewInterval();
 
         setClearTriplesInHarvestFinish(true);
         LOGGER.debug("Old harvested content will be removed, because of source unauthorized error!");
@@ -538,9 +535,6 @@ public class PullHarvest extends BaseHarvest {
         // source is unavailable if there was no response, or it was an error code, or the exception cause is RDFParseException
         boolean isRDFParseException = exception != null && (exception.getCause() instanceof RDFParseException);
         boolean sourceNotAvailable = responseCode == NO_RESPONSE || isError(responseCode) || isRDFParseException;
-
-        // if source was not available, the new unavailability-count is increased by one, otherwise reset
-        int countUnavail = sourceNotAvailable ? getContextSourceDTO().getCountUnavail() + 1 : 0;
 
         // if permanent error, the last harvest date will be set to now, otherwise special logic used
         Date now = new Date();
@@ -561,6 +555,9 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvest(lastHarvest);
         getContextSourceDTO().setLastHarvestFailed(true);
         getContextSourceDTO().setPermanentError(isPermanentError(responseCode));
+
+        // if source was not available, the new unavailability-count is increased by one, otherwise reset
+        int countUnavail = sourceNotAvailable ? getContextSourceDTO().getCountUnavail() + 1 : 0;
         getContextSourceDTO().setCountUnavail(countUnavail);
 
         // save same error parameters to parent sources where this source was redirected from
@@ -617,7 +614,6 @@ public class PullHarvest extends BaseHarvest {
         harvestSourceDTO.setLastHarvestFailed(true);
         harvestSourceDTO.setPermanentError(isPermanentError(responseCode));
         harvestSourceDTO.setCountUnavail(countUnavail);
-
     }
 
     /**
@@ -762,7 +758,6 @@ public class PullHarvest extends BaseHarvest {
         getContextSourceDTO().setLastHarvestFailed(false);
         getContextSourceDTO().setStatements(0);
         getContextSourceDTO().setLastHarvestId(getHarvestId());
-        getContextSourceDTO().calculateNewInterval();
         getHarvestSourceDAO().updateSourceHarvestFinished(getContextSourceDTO());
 
         // update current harvest to finished, set its count of harvested triples to 0
