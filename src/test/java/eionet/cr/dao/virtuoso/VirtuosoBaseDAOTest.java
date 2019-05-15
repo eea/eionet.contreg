@@ -1,21 +1,20 @@
 package eionet.cr.dao.virtuoso;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.Arrays;
-import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
-import org.junit.Test;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.MockVirtuosoBaseDAOTest;
 import eionet.cr.dto.SubjectDTO;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
@@ -93,8 +92,8 @@ public class VirtuosoBaseDAOTest extends MockVirtuosoBaseDAOTest {
             e.printStackTrace();
         }
 
-        assertEquals("select distinct " + "?s bif:either(isLiteral(?o0), bif:substring(str(?o0), 1, 800), ?o0) as ?val0 "
-                + "bif:either(isLiteral(?o1), bif:substring(str(?o1), 1, 800), ?o1) as ?val1 "
+        assertEquals("select distinct " + "?s bif:coalesce(bif:either(isLiteral(?o0), bif:substring(str(?o0), 1, 800), ?o0), '') as ?val0 "
+                + "bif:coalesce(bif:either(isLiteral(?o1), bif:substring(str(?o1), 1, 800), ?o1), '') as ?val1 "
                 + "where {?s ?p ?o. optional {?s ?p0 ?o0} optional {?s ?p1 ?o1} "
                 + "filter (?s IN (?subjectValue1,?subjectValue2,?subjectValue3,?subjectValue4,?subjectValue5,?subjectValue6,"
                 + "?subjectValue7,?subjectValue8,?subjectValue9,?subjectValue10,?subjectValue11,?subjectValue12,?subjectValue13,"

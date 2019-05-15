@@ -1,51 +1,45 @@
 package eionet.cr.web.action;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import eionet.cr.ApplicationTestContext;
-import eionet.cr.util.TestUtils;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.Message;
-import net.sourceforge.stripes.mock.MockHttpServletResponse;
-import net.sourceforge.stripes.mock.MockRoundtrip;
-import net.sourceforge.stripes.mock.MockServletContext;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openrdf.model.URI;
-import org.openrdf.model.vocabulary.XMLSchema;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
+import eionet.cr.dao.*;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.util.CsvImportUtil;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.FolderUtil;
+import eionet.cr.util.TestUtils;
 import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.action.Message;
+import net.sourceforge.stripes.mock.MockHttpServletResponse;
+import net.sourceforge.stripes.mock.MockRoundtrip;
+import net.sourceforge.stripes.mock.MockServletContext;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A class for testing the behavior of {@link UploadCSVActionBean}.
@@ -56,9 +50,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
 
-    @Autowired
-    private MockServletContext ctx;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadCSVActionBeanIT.class);
 
     /** The name of user whose folder we're testing in. */
@@ -67,61 +58,64 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
     /** The name of seeded CSV file we're testing. */
     public static final String TEST_FILE_NAME = "download.csv";
 
-    /** The name of seeded CSV file we're testing, spaces escaped */
-    public static final String TEST_FILE_NAME_ESCAPED = StringUtils.replace(TEST_FILE_NAME, " ", "%20");
-
-    /** The URI of the virtual CR folder we're testing in. */
-    public static String TEST_FOLDER_URI;
-
-    /** The URI of the uploaded file we're testing. */
-    public static String TEST_FILE_URI;
-
     /** Abstract reference to the file under test. */
     public static final File TEST_FILE = getTestFile(TEST_FILE_NAME);
 
-    /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
-    public static String EXPECTED_SPARQL_WITH_LINKING_SCRIPTS;
+    /** The name of seeded CSV file we're testing, spaces escaped */
+    public static final String TEST_FILE_NAME_ESCAPED = StringUtils.replace(TEST_FILE_NAME, " ", "%20");
 
-    /** Expected SPARQL query to be generated for the file when data-linking scripts NOT used. Ignore whitespace when comparing! */
-    public static String EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS;
-
-    public static String TEST_ONLINE_URL;
     public static final String TEST_ONLINE_FILE_NAME = "download.csv";
+
     public static final String TEST_ONLINE_FILE_NAME_ESCAPED = StringUtils.replace(TEST_ONLINE_FILE_NAME, " ", "%20");
-    public static String TEST_ONLINE_FILE_URI;
+
+    /** The URI of the virtual CR folder we're testing in. */
+    private String testFolderUri;
+
+    /** The URI of the uploaded file we're testing. */
+    private String testFileUri;
+
+    /** Expected SPARQL query to be generated for the file when data-linking scripts used. Ignore whitespace when comparing! */
+    private String expectedSparqlQuery;
+
+    private String testOnlineFileUri;
 
     /** Size of the file under test before test. */
     private long testFileSize;
 
+    @Autowired
+    private MockServletContext ctx;
+
+    @Override
     @Before
     public void setUp() throws Exception {
+
         super.setUp();
+
         testFileSize = TEST_FILE.length();
-        TEST_ONLINE_FILE_URI = TestUtils.getFileUrl(TEST_ONLINE_FILE_NAME_ESCAPED);
-        TEST_FOLDER_URI = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
-        TEST_FILE_URI =  TEST_FOLDER_URI + "/" + TEST_FILE_NAME_ESCAPED;
-//        TEST_ONLINE_FILE_URI = TEST_FOLDER_URI + "/download.csv";
-        EXPECTED_SPARQL_WITH_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
-                + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME + "> WHERE {"
-                + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-                + "    OPTIONAL { _:rec tableFile:President ?President } ."
-                + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-                + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-                + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
-                + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ."
-                + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
-        EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS = "PREFIX tableFile: <" + TEST_FOLDER_URI + "/"
-                + TEST_FILE_NAME_ESCAPED + "#> SELECT * FROM <" + TEST_FOLDER_URI + "/" + TEST_FILE_NAME + "> WHERE {"
-                + "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ."
-                + "    OPTIONAL { _:rec tableFile:President ?President } ."
-                + "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ."
-                + "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ."
-                + "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." + "    OPTIONAL { _:rec tableFile:Party ?Party } ."
-                + "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ." + "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . "
-                + "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } . }";
+
+        testFolderUri = CRUser.rootHomeUri() + "/" + TEST_USER_NAME;
+        testFileUri = testFolderUri + "/" + TEST_FILE_NAME_ESCAPED;
+        testOnlineFileUri = TestUtils.getFileUrl(TEST_ONLINE_FILE_NAME_ESCAPED);
+
+        expectedSparqlQuery = "" +
+                "PREFIX tableFile: <" + testFolderUri + "/" + TEST_FILE_NAME_ESCAPED + "#> " +
+                "SELECT * FROM <" + testFolderUri + "/" + TEST_FILE_NAME + "> " +
+                "WHERE {" +
+                "    OPTIONAL { _:rec tableFile:Presidency ?Presidency } ." +
+                "    OPTIONAL { _:rec tableFile:President ?President } ." +
+                "    OPTIONAL { _:rec tableFile:Wikipedia_Entry ?Wikipedia_Entry } ." +
+                "    OPTIONAL { _:rec tableFile:Took_office ?Took_office } ." +
+                "    OPTIONAL { _:rec tableFile:Left_office ?Left_office } ." +
+                "    OPTIONAL { _:rec tableFile:Party ?Party } ." +
+                "    OPTIONAL { _:rec tableFile:Portrait ?Portrait } ." +
+                "    OPTIONAL { _:rec tableFile:Thumbnail ?Thumbnail } . " +
+                "    OPTIONAL { _:rec tableFile:Home_State ?Home_State } ." +
+                "}";
+
         ActionBeanUtils.addFilter(ctx);
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();
@@ -166,7 +160,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
         dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
-        doUploadSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
+        doUploadSave(dataLinkingScripts, expectedSparqlQuery, true);
 
         // Now restore the file-under-test from the above-made backup if indeed it has been deleted as noted above.
         if (!TEST_FILE.exists()) {
@@ -178,7 +172,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         }
 
         // Now do a run WITHOUT data linking script(s).
-        doUploadSave(null, EXPECTED_SPARQL_WITHOUT_LINKING_SCRIPTS, true);
+        doUploadSave(null, expectedSparqlQuery, true);
     }
 
     /**
@@ -209,11 +203,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
         dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
-        doUploadSave(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
+        doUploadSave(dataLinkingScripts, expectedSparqlQuery, true);
 
         // Try harvesting the freshly uploaded file.
-        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
-        assertNotNull("Expected existing subject for " + TEST_FILE_URI, subject);
+        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(testFileUri);
+        assertNotNull("Expected existing subject for " + testFileUri, subject);
         try {
             List<String> harvestWarnings = CsvImportUtil.harvestTableFile(subject, "heinlja");
             assertTrue("Was expecting no harvest warnings!", CollectionUtils.isEmpty(harvestWarnings));
@@ -234,11 +228,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         // Now do a run WITH data linking script(s).
         ArrayList<DataLinkingScript> dataLinkingScripts = new ArrayList<DataLinkingScript>();
         dataLinkingScripts.add(DataLinkingScript.create("Thumbnail", "deleteColumn"));
-        doUploadSaveOnline(dataLinkingScripts, EXPECTED_SPARQL_WITH_LINKING_SCRIPTS, true);
+        doUploadSaveOnline(dataLinkingScripts, expectedSparqlQuery, true);
 
         // Try harvesting the freshly uploaded file.
-        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_ONLINE_FILE_URI);
-        assertNotNull("Expected existing subject for " + TEST_ONLINE_FILE_URI, subject);
+        SubjectDTO subject = DAOFactory.get().getDao(HelperDAO.class).getSubject(testFileUri);
+        assertNotNull("Expected existing subject for " + testFileUri, subject);
         try {
             List<String> harvestWarnings = CsvImportUtil.harvestTableFile(subject, "heinlja");
             assertTrue("Was expecting no harvest warnings!", CollectionUtils.isEmpty(harvestWarnings));
@@ -257,11 +251,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
-        folderDAO.deleteFileOrFolderUris(TEST_FOLDER_URI, Collections.singletonList(TEST_FILE_URI));
-        harvestSourceDAO.removeHarvestSources(Collections.singletonList(TEST_FILE_URI));
+        folderDAO.deleteFileOrFolderUris(testFolderUri, Collections.singletonList(testFileUri));
+        harvestSourceDAO.removeHarvestSources(Collections.singletonList(testFileUri));
 
         FileStore fileStore = FileStore.getInstance(TEST_USER_NAME);
-        fileStore.delete(FolderUtil.extractPathInUserHome(TEST_FOLDER_URI + "/" + TEST_FILE_NAME));
+        fileStore.delete(FolderUtil.extractPathInUserHome(testFolderUri + "/" + TEST_FILE_NAME));
     }
 
     /**
@@ -274,11 +268,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);
 
-        folderDAO.deleteFileOrFolderUris(TEST_FOLDER_URI, Collections.singletonList(TEST_ONLINE_FILE_URI));
-        harvestSourceDAO.removeHarvestSources(Collections.singletonList(TEST_ONLINE_FILE_URI));
+        folderDAO.deleteFileOrFolderUris(testFolderUri, Collections.singletonList(testOnlineFileUri));
+        harvestSourceDAO.removeHarvestSources(Collections.singletonList(testOnlineFileUri));
 
         FileStore fileStore = FileStore.getInstance(TEST_USER_NAME);
-        fileStore.delete(FolderUtil.extractPathInUserHome(TEST_FOLDER_URI + "/" + TEST_ONLINE_FILE_NAME));
+        fileStore.delete(FolderUtil.extractPathInUserHome(testFolderUri + "/" + TEST_ONLINE_FILE_NAME));
     }
 
     /**
@@ -329,12 +323,11 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         // Prepare rich-type (e.g. file bean) request parameters. These will be picked up by CRActionBeanPropertyBinder
         // that has already been injected into the servlet context mock obtained above.
         HashMap<String, Object> richTypeRequestParams = new HashMap<String, Object>();
-        FileBean fileBean = new FileBean(TEST_FILE, "text/plain", TEST_FILE.getName());
-        richTypeRequestParams.put("fileBean", fileBean);
         trip.getRequest().setAttribute(CRActionBeanPropertyBinder.RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         // Prepare simple string-based request parameters.
-        trip.setParameter("folderUri", TEST_FOLDER_URI);
+        trip.setParameter("fileURL", testOnlineFileUri);
+        trip.setParameter("folderUri", testFolderUri);
         trip.setParameter("overwrite", String.valueOf(isOverwrite));
         trip.setParameter("fileType", "CSV");
         trip.setParameter("fileEncoding", "UTF-8");
@@ -346,10 +339,9 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         UploadCSVActionBean actionBean = trip.getActionBean(UploadCSVActionBeanMock.class);
         MockHttpServletResponse response = (MockHttpServletResponse) actionBean.getContext().getResponse();
         assertEquals(200, response.getStatus());
-        //assertFalse(anyMessages(actionBean));
 
         // Assert that the file was created in CR filestore.
-        File storedFile = FileStore.getByUri(TEST_FILE_URI);
+        File storedFile = FileStore.getByUri(testFileUri);
         assertNotNull("Didn't expect the stored file to be null!", storedFile);
         long storedFileSize = storedFile.length();
         boolean flag =
@@ -358,23 +350,23 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         assertEquals("Expected stored file size to be equal to the uploaded file size", testFileSize, storedFileSize);
 
         // Assert existence of various triples about the uploaded file and its parent folder.
-        String[] statement1 = {TEST_FOLDER_URI, Predicates.CR_HAS_FILE, TEST_FILE_URI};
+        String[] statement1 = {testFolderUri, Predicates.CR_HAS_FILE, testFileUri};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement1), hasResourceStatement(statement1));
 
-        boolean b = hasLiteralStatement(TEST_FILE_URI, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize), XMLSchema.INT);
+        boolean b = hasLiteralStatement(testFileUri, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize), XMLSchema.INT);
         assertTrue("Missing or unexpected value for " + Predicates.CR_BYTE_SIZE, b);
 
-        String[] statement3 = {TEST_FILE_URI, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
+        String[] statement3 = {testFileUri, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement3), hasResourceStatement(statement3));
 
-        String[] statement4 = {TEST_FILE_URI, Predicates.CR_MEDIA_TYPE, "CSV"};
+        String[] statement4 = {testFileUri, Predicates.CR_MEDIA_TYPE, "CSV"};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement4), hasLiteralStatement(statement4));
 
-        String[] statement5 = {TEST_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
+        String[] statement5 = {testFileUri, Predicates.CR_LAST_MODIFIED, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
 
-        SubjectDTO testFileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
-        assertNotNull("Expected existing subject for " + TEST_FILE_URI, testFileSubject);
+        SubjectDTO testFileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(testFileUri);
+        assertNotNull("Expected existing subject for " + testFileUri, testFileSubject);
         ObjectDTO byteSizeLiteral = testFileSubject.getObject(Predicates.CR_BYTE_SIZE);
         assertNotNull("Expected a literal for " + Predicates.CR_BYTE_SIZE, byteSizeLiteral);
         URI datatype = byteSizeLiteral.getDatatype();
@@ -399,8 +391,8 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         trip.getRequest().setAttribute(CRActionBeanPropertyBinder.RICH_TYPE_REQUEST_PARAMS_ATTR_NAME, richTypeRequestParams);
 
         // Prepare simple string-based request parameters.
-        trip.setParameter("fileURL", TEST_ONLINE_FILE_URI);
-        trip.setParameter("folderUri", TEST_FOLDER_URI);
+        trip.setParameter("fileURL", testOnlineFileUri);
+        trip.setParameter("folderUri", testFolderUri);
         trip.setParameter("overwrite", String.valueOf(isOverwrite));
         trip.setParameter("fileType", "CSV");
         trip.setParameter("fileEncoding", "UTF-8");
@@ -414,7 +406,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         assertEquals(200, response.getStatus());
 
         // Assert that the file was created in CR filestore.
-        File storedFile = FileStore.getByUri(TEST_FILE_URI);
+        File storedFile = FileStore.getByUri(testFileUri);
         assertNotNull("Didn't expect the stored file to be null!", storedFile);
         long storedFileSize = storedFile.length();
         boolean flag =
@@ -422,23 +414,23 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         assertTrue("Expected an existing stored file with name: " + TEST_ONLINE_FILE_NAME, flag);
 
         // Assert existence of various triples about the uploaded file and its parent folder.
-        String[] statement1 = {TEST_FOLDER_URI, Predicates.CR_HAS_FILE, TEST_ONLINE_FILE_URI};
+        String[] statement1 = {testFolderUri, Predicates.CR_HAS_FILE, testFileUri};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement1), hasResourceStatement(statement1));
 
-        boolean b = hasLiteralStatement(TEST_ONLINE_FILE_URI, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize), XMLSchema.INT);
+        boolean b = hasLiteralStatement(testFileUri, Predicates.CR_BYTE_SIZE, String.valueOf(storedFileSize), XMLSchema.INT);
         assertTrue("Missing or unexpected value for " + Predicates.CR_BYTE_SIZE, b);
 
-        String[] statement3 = {TEST_ONLINE_FILE_URI, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
+        String[] statement3 = {testFileUri, Predicates.RDF_TYPE, Subjects.CR_TABLE_FILE};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement3), hasResourceStatement(statement3));
 
-        String[] statement4 = {TEST_ONLINE_FILE_URI, Predicates.CR_MEDIA_TYPE, "CSV"};
+        String[] statement4 = {testFileUri, Predicates.CR_MEDIA_TYPE, "CSV"};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement4), hasLiteralStatement(statement4));
 
-        String[] statement5 = {TEST_ONLINE_FILE_URI, Predicates.CR_LAST_MODIFIED, null};
+        String[] statement5 = {testFileUri, Predicates.CR_LAST_MODIFIED, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(statement5), hasLiteralStatement(statement5));
 
-        SubjectDTO testFileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_ONLINE_FILE_URI);
-        assertNotNull("Expected existing subject for " + TEST_ONLINE_FILE_URI, testFileSubject);
+        SubjectDTO testFileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(testFileUri);
+        assertNotNull("Expected existing subject for " + testFileUri, testFileSubject);
         ObjectDTO byteSizeLiteral = testFileSubject.getObject(Predicates.CR_BYTE_SIZE);
         assertNotNull("Expected a literal for " + Predicates.CR_BYTE_SIZE, byteSizeLiteral);
         URI datatype = byteSizeLiteral.getDatatype();
@@ -482,7 +474,7 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
 
         trip.setParameter("fileName", TEST_FILE_NAME);
         trip.setParameter("fileLabel", TEST_FILE_NAME);
-        trip.setParameter("folderUri", TEST_FOLDER_URI);
+        trip.setParameter("folderUri", testFolderUri);
         trip.setParameter("relativeFilePath", TEST_FILE_NAME);
 
         trip.execute("save");
@@ -494,15 +486,12 @@ public class UploadCSVActionBeanIT extends CRDatabaseTestCase {
         assertEquals(302, response.getStatus());
 
         // Assert existence of various triples about the uploaded file.
-        String[] statement6 = {TEST_FILE_URI, Predicates.CR_OBJECTS_UNIQUE_COLUMN, "Presidency"};
-        assertTrue("Expected statement: " + ArrayUtils.toString(statement6), hasLiteralStatement(statement6));
-
-        String[] statement7 = {TEST_FILE_URI, Predicates.CR_SPARQL_QUERY, null};
+        String[] statement7 = {testFileUri, Predicates.CR_SPARQL_QUERY, null};
         assertTrue("Expected statement: " + ArrayUtils.toString(7), hasLiteralStatement(statement7));
 
         // Assert that the SPARQL query generated for the uploaded file is correct.
         // Keeping in mind that above we requested the delete-column script on the "Thumbnail" column.
-        SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(TEST_FILE_URI);
+        SubjectDTO fileSubject = DAOFactory.get().getDao(HelperDAO.class).getSubject(testFileUri);
         assertTrue("Expected a non-null file subject with predicates", fileSubject != null && fileSubject.getPredicateCount() > 0);
         String actualSparql = fileSubject.getObjectValue(Predicates.CR_SPARQL_QUERY);
         String actualSparqlCompressed = actualSparql == null ? null : actualSparql.replaceAll("\\s+", "");

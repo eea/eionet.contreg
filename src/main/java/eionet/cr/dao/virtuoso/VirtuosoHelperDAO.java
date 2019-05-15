@@ -1,35 +1,5 @@
 package eionet.cr.dao.virtuoso;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-
 import eionet.cr.common.Namespace;
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
@@ -38,40 +8,13 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.readers.DeliverySearchPicklistReader;
-import eionet.cr.dao.readers.FactsheetReader;
-import eionet.cr.dao.readers.MapReader;
-import eionet.cr.dao.readers.ObjectLabelReader;
-import eionet.cr.dao.readers.PredicateLabelsReader;
-import eionet.cr.dao.readers.RDFExporter;
-import eionet.cr.dao.readers.RecentFilesReader;
-import eionet.cr.dao.readers.RecentUploadsReader;
-import eionet.cr.dao.readers.ResultSetReaderException;
-import eionet.cr.dao.readers.SPOReader;
-import eionet.cr.dao.readers.SubPropertiesReader;
-import eionet.cr.dao.readers.TriplesReader;
-import eionet.cr.dao.readers.UploadDTOReader;
+import eionet.cr.dao.readers.*;
 import eionet.cr.dao.util.PredicateLabels;
 import eionet.cr.dao.util.SubProperties;
 import eionet.cr.dao.util.UriLabelPair;
 import eionet.cr.dao.virtuoso.helpers.ResourceRenameHandler;
-import eionet.cr.dto.FactsheetDTO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.PredicateDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.dto.TripleDTO;
-import eionet.cr.dto.UploadDTO;
-import eionet.cr.dto.UserBookmarkDTO;
-import eionet.cr.dto.UserHistoryDTO;
-import eionet.cr.util.Bindings;
-import eionet.cr.util.FolderUtil;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.ObjectLabelPair;
-import eionet.cr.util.Pair;
-import eionet.cr.util.URIUtil;
-import eionet.cr.util.URLUtil;
-import eionet.cr.util.Util;
+import eionet.cr.dto.*;
+import eionet.cr.util.*;
 import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
@@ -81,6 +24,18 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.*;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.*;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Virtuoso DAO helper methods.
@@ -1440,7 +1395,7 @@ public class VirtuosoHelperDAO extends VirtuosoBaseDAO implements HelperDAO {
             + "} order by ?pred ?label";
 
     /** */
-    private static final String GET_PREDICATE_OBJECTS = "select ?obj ?objLabel ?g where {graph ?g {"
+    private static final String GET_PREDICATE_OBJECTS = "select ?obj bif:coalesce(?objLabel, '') as ?objLabel ?g where {graph ?g {"
             + "?s ?p ?obj. filter(?s=iri(?subjectUri) and ?p=iri(?predicateUri))}" + ". optional {?obj <" + Predicates.RDFS_LABEL
             + "> ?objLabel}" + "} order by str(bif:either(isLiteral(?obj),?obj,bif:coalesce(?objLabel,str(?obj)))) " + "limit "
             + PredicateObjectsReader.PREDICATE_PAGE_SIZE + " offset ";

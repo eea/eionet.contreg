@@ -20,34 +20,29 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.test.helpers;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import eionet.cr.ApplicationTestContext;
+import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
+import eionet.cr.util.sesame.SesameUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;
 import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.junit.runner.RunWith;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
-import eionet.cr.util.sesame.SesameUtil;
-import org.junit.Before;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -57,6 +52,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /*@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })*/
 public abstract class CRDatabaseTestCase extends DatabaseTestCase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CRDatabaseTestCase.class);
 
     /** Repository connection to be used for checking existence of expected triples in the repository */
     private RepositoryConnection repoConn;
@@ -105,6 +102,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         // then clear triple store before proceeding.
         if (forceClearTriplesOnSetup() || CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
                 || CollectionUtils.isNotEmpty(turtleSeedFiles) || CollectionUtils.isNotEmpty(n3SeedFiles)) {
+            LOGGER.debug("Clearing all triples ...");
             rdfLoader.clearAllTriples();
         }
 
@@ -309,7 +307,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
 
     /**
      * A convenience method for checking if the given statement exists in the repository.
-     * Calls {@link #hasLiteralStatement(String, String, String, String...)} by forming the required arguments from the respective
+     * Calls {@link #hasLiteralStatement(String, String, String, URI, String...)} by forming the required arguments from the respective
      * positions in the given statement array.
      *
      * @param statement The given statement array.
@@ -356,5 +354,4 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         }
         return result;
     }
-
 }

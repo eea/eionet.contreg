@@ -20,14 +20,12 @@
  */
 package eionet.cr.dao.readers;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-
+import eionet.cr.dto.ObjectDTO;
+import eionet.cr.dto.SubjectDTO;
+import eionet.cr.util.Bindings;
+import eionet.cr.util.Hashes;
+import eionet.cr.util.sesame.SPARQLQueryUtil;
+import eionet.cr.web.util.WebConstants;
 import org.apache.commons.lang.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
@@ -35,12 +33,13 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Bindings;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
-import eionet.cr.web.util.WebConstants;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Implementation of {@link SubjectDataReader} that reads specific predicates given through the constructor(s).
@@ -186,7 +185,7 @@ public class SpecificSubjectDataReader extends SubjectDataReader {
         StringBuilder qry = new StringBuilder();
         qry.append("select distinct ?s");
 
-        String predSelector = " bif:either(isLiteral(?o), bif:substring(str(?o), 1, MAX), ?o) as ?val";
+        String predSelector = " bif:coalesce(bif:either(isLiteral(?o), bif:substring(str(?o), 1, MAX), ?o), '') as ?val";
         for (int i = 0; i < selectedPredicates.length; i++) {
             String index = String.valueOf(i);
             String s = StringUtils.replace(predSelector, "?o", "?o" + index);

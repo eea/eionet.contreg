@@ -20,25 +20,22 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import java.util.Arrays;
-import java.util.List;
-
 import eionet.cr.ApplicationTestContext;
-import eionet.cr.util.TestUtils;
-import org.eclipse.jetty.server.Server;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
-import org.junit.Ignore;
+import eionet.cr.util.TestUtils;
+import org.eclipse.jetty.server.Server;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -83,7 +80,7 @@ public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
         Pair<Integer, List<HarvestSourceDTO>> resultPair =
                 DAOFactory.get().getDao(HarvestSourceDAO.class)
-                        .getHarvestSources("http://test.com/datasets#dataset2", null, null);
+                        .getHarvestSources("http://test.com/datasets/dataset2", null, null);
         assertNotNull(resultPair);
         assertNotNull(resultPair.getLeft());
         assertNotNull(resultPair.getRight());
@@ -92,7 +89,7 @@ public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
 
         HarvestSourceDTO harvestSource = resultPair.getRight().get(0);
         assertNotNull(harvestSource);
-        assertEquals("http://test.com/datasets#dataset2", harvestSource.getUrl());
-        assertEquals(Hashes.spoHash("http://test.com/datasets#dataset2"), harvestSource.getUrlHash().longValue());
+        assertEquals("http://test.com/datasets/dataset2", harvestSource.getUrl());
+        assertEquals(Hashes.spoHash("http://test.com/datasets/dataset2"), harvestSource.getUrlHash().longValue());
     }
 }
