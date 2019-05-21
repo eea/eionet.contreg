@@ -480,8 +480,8 @@ public final class GeneralConfig {
     }
 
     /**
-     * Returns default harvest interval to be used in situations where the system has auto-discovered new harvest sources, or it
-     * is not possible to ask the interval from the user. The value is in minutes!
+     * Returns default harvest interval to be used in situations where the system has auto-discovered new harvest sources,
+     * or it is not possible to ask the interval from the user. The value is in minutes!
      *
      * @return The default harvest interval in minutes!
      */

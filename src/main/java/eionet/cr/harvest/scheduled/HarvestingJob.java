@@ -592,7 +592,6 @@ public class HarvestingJob implements StatefulJob, ServletContextListener {
             if (harvestSource == null) {
                 harvestSource = new HarvestSourceDTO();
                 harvestSource.setUrl(url);
-                harvestSource.calculateNewInterval();
                 harvestSourceDAO.addSource(harvestSource);
             }
 

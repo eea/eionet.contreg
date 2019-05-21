@@ -56,10 +56,15 @@
                     <td><label for="txtEmails" class="question">E-mails:</label></td>
                     <td><stripes:text name="harvestSource.emails" size="100" style="width:100%" id="txtEmails"/></td>
                 </tr>
-                <tr>
-                    <td class="question">Owner:</td>
+                <tr id="harvestIntervalRow">
+                    <td><label class="question" for="interval">Harvest interval</label></td>
                     <td>
-                        <c:out value="${actionBean.harvestSource.owner}" />
+                        <input type="text" id="interval" name="intervalValue" size="10" value="${actionBean.harvestSource.intervalPair.left}"/>
+                        <stripes:select name="intervalUnit" value="">
+                            <c:forEach items="${actionBean.intervalUnits}" var="intervalUnit">
+                                <stripes:option value="${intervalUnit}" label="${intervalUnit.label}"/>
+                            </c:forEach>
+                        </stripes:select>
                     </td>
                 </tr>
                 <tr>
@@ -81,6 +86,12 @@
                     <td><label class="question" for="chkEndpoint">Is SPARQL endpoint:</label></td>
                     <td>
                         <stripes:checkbox name="harvestSource.sparqlEndpoint" id="chkEndpoint"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="question">Owner:</td>
+                    <td>
+                        <c:out value="${actionBean.harvestSource.owner}" />
                     </td>
                 </tr>
                 <tr>
