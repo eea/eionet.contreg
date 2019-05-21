@@ -77,7 +77,7 @@
       <profile>
         <id>local</id>
         <properties>
-          <docker.host.address>localhost</docker.host.address>
+          <tests.virtuoso.host>localhost</tests.virtuoso.host>
           <valid.images>none</valid.images>
         </properties>
       </profile>
@@ -86,6 +86,26 @@
     <!-- the build configuration -->
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>tests.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- maven-compiler-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -119,20 +139,15 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.20</version>
                 <configuration>
-                    <!--<enableAssertions>false</enableAssertions>-->
                     <systemPropertyVariables>
-                        <docker.host.address>${docker.host.address}</docker.host.address>
-                        <virtuoso.port>${virtuoso.port}</virtuoso.port>
-                        <httpd.port>${httpd.port}</httpd.port>
-                        <!--<db.url>jdbc:virtuoso://localhost:1112/charset=UTF-8/log_enable=2/DATABASE=CR</db.url>-->
-                        <!--<log.url>http://${docker.host.address}:${tomcat.port}/</log.url>-->
+                        <tests.virtuoso.host>${tests.virtuoso.host}</tests.virtuoso.host>
+                        <tests.virtuoso.port>${tests.virtuoso.port}</tests.virtuoso.port>
+                        <tests.httpd.host>${tests.httpd.host}</tests.httpd.host>
+                        <tests.httpd.port>${tests.httpd.port}</tests.httpd.port>
                     </systemPropertyVariables>
                     <includes>
                         <include>**/*.java</include>
-                        <!--<include>**/*Test.java</include>-->
-                        <!--<include>**/*IT.java</include>-->
                     </includes>
-                    <!--<trimStackTrace>false</trimStackTrace>-->
                 </configuration>
                 <executions>
                     <execution>
@@ -154,19 +169,6 @@
                         <filter>${basedir}/${env}.properties</filter>
                     </filters>
                     <webResources>
-                        <!--<resource>-->
-                            <!--<directory>${basedir}/src/main/webapp/META-INF</directory>-->
-                            <!--<filtering>true</filtering>-->
-                            <!--<targetPath>META-INF</targetPath>-->
-                            <!--<includes>-->
-                                <!--<include>context.xml</include>-->
-                            <!--</includes>-->
-                        <!--</resource>-->
-                        <!--<resource>-->
-                            <!--<filtering>false</filtering>-->
-                            <!--<directory>${basedir}/src/main/resources</directory>-->
-                            <!--<targetPath>WEB-INF/classes</targetPath>-->
-                        <!--</resource>-->
                         <resource>
                             <directory>${basedir}/src/main/webapp/WEB-INF</directory>
                             <filtering>true</filtering>
@@ -183,13 +185,6 @@
                                 <include>dropdownmenus.txt</include>
                             </includes>
                         </resource>
-                        <!--<resource>-->
-                            <!--<directory>${basedir}/sql</directory>-->
-                            <!--<targetPath>WEB-INF/classes/sql</targetPath>-->
-                            <!--<includes>-->
-                                <!--<include>db-struct.xml</include>-->
-                            <!--</includes>-->
-                        <!--</resource>-->
                     </webResources>
                 </configuration>
             </plugin>
@@ -216,7 +211,21 @@
                                 <copy todir="${project.build.directory}/classes/sql">
                                     <fileset dir="sql" />
                                 </copy>
+                                <mkdir dir="${config.app.home}/tmp"/>
+                                <pathconvert property="apphome.unix" targetos="unix">
+                                    <path location="${config.app.home}"/>
+                                    <map from="C:" to=""/>
+                                    <map from="D:" to=""/>
+                                    <map from="E:" to=""/>
+                                    <map from="F:" to=""/>
+                                </pathconvert>
+                                <pathconvert property="apphome.windows" targetos="unix">
+                                    <path location="${config.app.home}"/>
+                                </pathconvert>
+                                <echo>apphome.unix = ${apphome.unix}</echo>
+                                <echo>apphome.windows = ${apphome.windows}</echo>
                             </tasks>
+                            <exportAntProperties>true</exportAntProperties>
                         </configuration>
                     </execution>
                     <execution>
@@ -227,7 +236,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/jenkins.properties"
+                                <copy file="${basedir}/tests.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">
                                     <fileset dir="sql" />
@@ -259,186 +268,53 @@
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
-                    <!--<verbose>true</verbose>-->
-                    <!--<logDate>default</logDate>-->
-                    <!--<autoPull>true</autoPull>-->
                     <images>
+
                         <image>
                             <alias>virtuoso</alias>
-                            <name>sofiageo/virtuoso-test:latest</name>
+                            <name>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</name>
                             <run>
+                                <env>
+                                    <DBA_PASSWORD>dba</DBA_PASSWORD>
+                                    <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
+                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp</VIRT_Parameters_DirsAllowed>
+                                </env>
                                 <ports>
-                                    <port>virtuoso.web:8891</port>
-                                    <port>virtuoso.port:1112</port>
+                                    <port>8891:8890</port>
+                                    <port>${tests.virtuoso.port}:1111</port>
                                 </ports>
                                 <wait>
-                                    <log>Server online at </log>
-                                    <time>30000</time>
-                                    <!--<tcp>-->
-                                        <!--<mode>direct</mode>-->
-                                        <!--<ports>-->
-                                            <!--<port>51112</port>-->
-                                        <!--</ports>-->
-                                    <!--</tcp>-->
-                                    <!--<time>10000</time>-->
+                                    <time>10000</time>
+                                    <exec>
+                                        <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
+                                    </exec>
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>/tmp/contreg/tmp:/tmp/contreg/tmp</volume>
-                                        <volume>/tmp/contreg/filestore:/tmp/contreg/filestore</volume>
+                                        <volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>
+                                        <volume>${basedir}/sql/virtuoso/unittest:${apphome.unix}/dbinit</volume>
                                     </bind>
                                 </volumes>
                             </run>
                         </image>
 
                         <image>
-                            <name>eworxeea/httpd-cr</name>
                             <alias>httpd</alias>
-                            <build>
-                                <from>httpd:alpine</from>
-                                <maintainer>George Sofianos</maintainer>
-                                <tags>
-                                    <tag>latest</tag>
-                                    <tag>${project.version}</tag>
-                                </tags>
-
-                                <assembly>
-                                    <mode>dir</mode>
-                                    <basedir>/usr/local/apache2/htdocs/</basedir>
-                                    <descriptor>httpd-assembly.xml</descriptor>
-                                </assembly>
-                            </build>
+                            <name>httpd:2.4</name>
                             <run>
                                 <ports>
-                                    <port>httpd.port:80</port>
+                                    <port>${tests.httpd.port}:80</port>
                                 </ports>
-                                <wait>
-                                    <tcp>
-                                        <mode>direct</mode>
-                                        <ports>
-                                            <port>80</port>
-                                        </ports>
-                                    </tcp>
-                                    <time>5000</time>
-                                </wait>
-                            </run>
-                        </image>
-
-                        <image>
-                            <alias>tomcat</alias>
-                            <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}</name>
-                            <!-- <registry>dockerrepo.eionet.europa.eu:5000</registry> -->
-                            <build>
-                                <from>tomcat:6</from>
-                                <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
-                                <tags>
-                                    <tag>latest</tag>
-                                    <tag>${project.version}</tag>
-                                </tags>
-                                <assembly>
-                                    <descriptor>assembly.xml</descriptor>
-                                </assembly>
-                                <env>
-                                    <CATALINA_OPTS>-Djava.security.egd=file:/dev/./urandom</CATALINA_OPTS>
-                                    <KEYSTORE_PASS>changeit</KEYSTORE_PASS>
-                                </env>
-                                <volumes>
-                                    <volume>/config</volume>
-                                    <volume>/usr/local/tomcat/target</volume>
-                                </volumes>
-                                <runCmds>
-                                    <run>rm -rf /usr/local/tomcat/webapps/*</run>
-                                    <run>cp -r /maven/tomcat /usr/local</run>
-                                    <!--<run>rm -f $CATALINA_HOME/conf/logging.properties</run>-->
-                                </runCmds>
-                                <ports>
-                                    <port>8080</port>
-                                    <port>8009</port>
-                                </ports>
-                                <!-- <cmd>catalina.sh run</cmd> -->
-                            </build>
-
-                            <!--<run>-->
-                                <!--<hostname>contreg</hostname>-->
-                                <!--<volumes>-->
-                                    <!--<bind>-->
-                                        <!--<volume>${project.basedir}/target:/usr/local/tomcat/target</volume>-->
-                                        <!--<volume>/etc/localtime:/etc/localtime:ro</volume>-->
-                                    <!--</bind>-->
-                                <!--</volumes>-->
-                                <!--<ports>-->
-                                    <!--<port>tomcat.port:8080</port>-->
-                                <!--</ports>-->
-                                <!--<links>-->
-                                    <!--<link>database:database</link>-->
-                                <!--</links>-->
-                                <!--<wait>-->
-                                    <!--<http>-->
-                                        <!--&lt;!&ndash; Check for this URL to return a 200 return code .... &ndash;&gt;-->
-                                        <!--<url>http://${docker.host.address}:${tomcat.port}/</url>-->
-                                    <!--</http>-->
-                                    <!--&lt;!&ndash; ... but at max 40 seconds &ndash;&gt;-->
-                                    <!--<time>40000</time>-->
-                                <!--</wait>-->
-                                <!--<log>-->
-                                    <!--<prefix>TC</prefix>-->
-                                    <!--<color>cyan</color>-->
-                                <!--</log>-->
-                            <!--</run>-->
-
-                        </image>
-
-                        <!-- This image is rebuilt every time. It is not suitable for persistent data -->
-                        <image>
-                            <alias>virtuoso-new</alias>
-                            <name>dockerrepo.eionet.europa.eu:5000/${project.artifactId}-db</name>
-                            <build>
-                                <from>tenforce/virtuoso</from> <!-- https://hub.docker.com/r/tenforce/virtuoso/ -->
-                                <maintainer>Søren Roug &lt;soren.roug@eea.europa.eu&gt;</maintainer>
-                                <tags>
-                                    <tag>latest</tag>
-                                    <tag>${project.version}</tag>
-                                </tags>
-                                <assembly>
-                                    <descriptor>assembly-db.xml</descriptor>
-                                </assembly>
-                                <env>
-                                    <!--<VIRTUOSO_DB_PATH>/virtuoso_db</VIRTUOSO_DB_PATH>-->
-                                    <SPARQL_UPDATE>true</SPARQL_UPDATE>
-                                </env>
-                                <volumes>
-                                    <volume>/var/lib/virtuoso/db/target</volume>
-                                </volumes>
-                                <runCmds>
-                                    <run>cp /maven/virtuoso.ini /virtuoso.ini</run>
-                                    <run>cat /maven/1_create_users.sql >/sql-query.sql</run>
-                                </runCmds>
-                                <ports>
-                                    <port>1111</port>
-                                    <port>8890</port>
-                                </ports>
-                            </build>
-                            <run>
                                 <volumes>
                                     <bind>
-                                        <volume>${project.basedir}/target:/var/lib/virtuoso/db/target</volume>
-                                        <volume>/etc/localtime:/etc/localtime:ro</volume>
+                                        <volume>./src/test/resources:/usr/local/apache2/htdocs</volume>
                                     </bind>
                                 </volumes>
-                                <ports>
-                                    <port>database.port:1111</port>
-                                </ports>
-                                <wait>
-                                    <log>Server online at 1111</log>
-                                    <time>30000</time>
-                                </wait>
-                                <log>
-                                    <prefix>DB</prefix>
-                                    <color>blue</color>
-                                </log>
                             </run>
                         </image>
+
                     </images>
+
                 </configuration>
                 <executions>
                     <execution>
@@ -576,11 +452,6 @@
             <artifactId>xercesImpl</artifactId>
             <version>2.11.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>xerces</groupId>-->
-            <!--<artifactId>xmlParserAPIs</artifactId>-->
-            <!--<version>2.6.2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>displaytag</groupId>
             <artifactId>displaytag</artifactId>
@@ -875,19 +746,6 @@
             <artifactId>liquibase-core</artifactId>
             <version>3.0.6</version>
         </dependency>
-
-        <!--copied classes inside CR3 -->
-<!--        <dependency>
-            <groupId>eionet</groupId>
-            <artifactId>virtliquibase</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>com.zaxxer</groupId>-->
-            <!--<artifactId>HikariCP</artifactId>-->
-            <!--<version>2.4.6</version>-->
-        <!--</dependency>-->
 
         <!-- TEST dependencies -->
 

@@ -102,7 +102,6 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
         // then clear triple store before proceeding.
         if (forceClearTriplesOnSetup() || CollectionUtils.isNotEmpty(rdfxmlSeedFiles) || CollectionUtils.isNotEmpty(ntSeedFiles)
                 || CollectionUtils.isNotEmpty(turtleSeedFiles) || CollectionUtils.isNotEmpty(n3SeedFiles)) {
-            LOGGER.debug("Clearing all triples ...");
             rdfLoader.clearAllTriples();
         }
 

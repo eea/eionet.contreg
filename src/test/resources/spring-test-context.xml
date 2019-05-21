@@ -103,24 +103,4 @@
     <bean id="sourceDeletionDao" class="eionet.cr.dao.virtuoso.VirtuosoSourceDeletionsDAO" />
     <bean id="harvestScriptDao" class="eionet.cr.dao.virtuoso.VirtuosoHarvestScriptDAO" />
 
-    <!--&lt;!&ndash; Runs on Tomcat startup. &ndash;&gt;-->
-    <!--<bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">-->
-        <!--<property name="dataSource" ref="dataSource" />-->
-        <!--<property name="changeLog" value="classpath:sql/db-struct.xml" />-->
-    <!--</bean>-->
-<!--
-    <bean id="liquibase" class="eionet.cr.web.listener.SpringLiquibaseVirtuoso">
-        <property name="dataSource" ref="dataSource" />
-        <property name="changeLog" value="classpath:sql/db-struct.xml" />
-    </bean>
-
-    <bean name="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource">
-        <property name="driverClassName" value="${virtuoso.unittest.db.drv}" />
-        <property name="username" value="${virtuoso.unittest.db.usr}" />
-        <property name="password" value="${virtuoso.unittest.db.pwd}" />
-        <property name="url" value="${virtuoso.unittest.db.url}" />
-        <property name="suppressClose" value="true" />
-    </bean>
--->
-
 </beans>

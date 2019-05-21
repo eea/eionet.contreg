@@ -95,60 +95,52 @@ Set up the triple store's full text indexing
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
 
 ## 5. Integration tests
-There are 2 ways to run integration tests: Using a docker or manually. 
 
-### 5.1 Automated test execution using Docker(there are test failures)
-You need to have docker installed. Then execute the following command: 
+There are 2 ways to run integration tests: using a docker or manually.
+
+### 5.1 Automated test execution using Docker
+
+You need to have docker installed (on Windows it's called Docker Desktop). Then execute the following command: 
 
     shell> mvn clean verify
 
-The integration test will start up a virtuoso database on port 1112, then the application in Tomcat. The application will run the Liquibase scripts on the database, and then the integration tests will be run by the Maven program - not from the instance of Tomcat or Virtuoso.
+The integration tests runner (ie Maven's Failsafe plugin) will download (only when executed for the first time)
+and start start a Virtuoso docker container (see inside `pom.xml` for the particular docker image it downloads)
+that will be used by the tests. It will then start that container.
 
-### 5.2 Manual Test Execution (All tests pass)
+The tests runner will also start a dockerized Apache Web Server container (ie httpd) for serving files
+that the tests will be trying to access over HTTP (these are typically CR harevster tests).
 
-1. create a folder for test Virtuoso
+Finally, the tests runner will run all tests, and it will eventually tear down the started docker containers.
 
-2. copy  file *virtuoso.ini* from Virtuoso folder to the created folder
+**NB!** The tests runner will attempt to create a directory defined by the `config.app.home` property in `tests.properties`.
+This is the directory where integration tests will create some temporaey files they need to use.
+If for some reason it fails to create that directory or you want to use a different location, then you can override
+this property by using `-Dconfig.app.home` option on command line, like this:
+
+    shell> mvn -Dconfig.app.home=/some/other/dir clean verify
+
+**NB!** Other properties noteworthy from the integration tests point of view in `tests.properties` are
+
+* `tests.virtuoso.host` - the host for the dockerized Virtuoso test instance (defaults to "localhost" and usually no need to change it);
+* `tests.virtuoso.port` - the port for the dockerized Virtuoso test instance (defaults to "1112" and usually no need to change it);
+* `tests.httpd.host` - the host for the dockerized Httpd test instance (defaults to "localhost" and usually no need to change it);
+* `tests.httpd.port` - the port for the dockerized Httpd test instance (defaults to "8080" and usually no need to change it);
     
-    2.1:For a Linux Environment <br />
-    An example virtuoso.ini file in typical installation can be found at: /etc/virtuoso-opensource-<version_number>  
-    /virtuoso.ini
-    where virtuoso installs a default instance .
- 
-   
-3. Make adjustements in the copied file. At least *ServerPort* in sections *Parameters* and *HTTPServer* sections have to be changed
-  
-    3.1:For a Linux Environment <br />
-    In the virtuoso.ini file, in The sections [Database] and [TempDatabase] , change the files location path to a new  
-    folder you wish to place virtuoso test Database + server files. <br />
-    Example:  <br />
-    Old: DatabaseFile       = /var/lib/virtuoso-opensource-6.1/db/virtuoso.db <br />
-    Updated: DatabaseFile   = /home/user1/cr-virtuoso-test/db/virtuoso.db <br />
-    Notice that everything after the /db must remain as is. <br />
-    Also in the [HTTPServer] section, change "ServerRoot" to also point to the above created folder <br />
-    Example: <br />
-    Old: ServerRoot                  = /var/lib/virtuoso-opensource-6.1/vsp <br />
-    Updated: ServerRoot              = /home/user1/cr-virtuoso-test/vsp <br />
-4. Install the test server as another service as described in Virtuoso documentation. <br />
+### 5.2 Manual Test Execution
 
-    4.1. For Linux Environment <br />
-    As soon as virtuoso is installed in the system, one may navigate to the location of the newly modified virtuoso.ini    
-    <br />
-    file and execute the following command: <br />
-       shell> virtuoso-t -fd <br />
-   If the virtuoso.ini file is correct, the test virtuoso instance will start. <br />
-  The DB files will be placed in the newly created directory as explained in step 3.1. <br />
-5. Create needed users  for tests using this script:CR_SOURCE_HOME/sql/virtuoso/unittest/1_create_testuser.sql <br />
-   and this script: CR_SOURCE_HOME/sql/virtuoso/install/1_create_users.sql <br />
-   (assuming the test server is running on port 1112) <br />
+By manual test execution it is meant that if you don't have docker installed or don't want to use the above-described
+dockerized automated test environment, then you need to manually run a test Virtuoso instance and also a web server
+for serving the files that integration tests will attempt to access over HTTP.
 
-    `shell> isql-vt localhost:1112 -U dba -P password < 1_create_users.sql`
+For being able to run this manual test execution, you need to execute Maven build with the "local" profile,
+because by default it is run with the "docker" profile. For running it with "local" profile, you need to execute this:
 
-6. Add the test instance server parameters to *local.properties*
+    shell> mvn -P local clean verify
 
-7. Run `mvn clean verify`
-
-All integration tests pass in the master branch.
+But before doing so, you need to ensure that you have manually started the above mentioned test instances of Virtuoso
+and web server. It is up to you who exactly you will do it. The important point is that you need to ensure that the
+properties mentioned in previous chapter will point to your Virtuoso and web server instances.
 
 ## 6. Conditional: register Eionet's GlobalSign CA certificates in your JVM.
 
