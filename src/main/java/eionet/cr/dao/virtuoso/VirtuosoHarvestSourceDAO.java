@@ -2144,9 +2144,13 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             filePath = filePath.substring(2).replace('\\', '/');
         }
 
-        LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML(...) from " + filePath);
+        //LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML(...) from " + filePath);
+        LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML_MT(...) from " + filePath);
 
-        String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + filePath + "'), '" + baseUri + "', '" + contextUri + "')";
+        //String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + filePath + "'), '" + baseUri + "', '" + contextUri + "')";
+        int noOfThreads = 6;
+        String sql = String.format("DB.DBA.RDF_LOAD_RDFXML_MT(file_open('%s'), '%s', '%s', 2, %d, 0)", filePath, baseUri, contextUri, noOfThreads);
+
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
             if (rdfFormat.equals(RDFFormat.TRIG)) {
