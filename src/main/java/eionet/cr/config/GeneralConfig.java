@@ -30,7 +30,10 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  *
@@ -154,6 +157,9 @@ public final class GeneralConfig {
     /** Number of sources that the source deletion background job should delete during one run. */
     public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
 
+    /** SQL Like patterns of harvest sources to skip/exclude. */
+    public static final String HARVEST_SOURCE_EXCLUSION_PATTERNS = "harvestSourcesExclusionPatterns";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
@@ -177,60 +183,6 @@ public final class GeneralConfig {
         // Hide utility class constructor.
     }
 
-    /** */
-//    private static void init() {
-//        properties = new Properties();
-//        try {
-//            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
-//
-//            loadEnvProperties(properties, "CR_");
-//
-//            // trim all the values (i.e. we don't allow preceding or trailing
-//            // white space in property values)
-//            for (Entry<Object, Object> entry : properties.entrySet()) {
-//                entry.setValue(entry.getValue().toString().trim());
-//            }
-//
-//        } catch (IOException e) {
-//            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
-//        }
-//    }
-
-    /**
-     * Loads all the environment variables starting with startsWith in the given Properties object.
-     * Replaces the already defined properties ignoring case
-     * @param properties
-     * @param startsWith
-     */
-//    private static void loadEnvProperties(Properties properties, String startsWith) {
-//        for(String envKey : System.getenv().keySet()) {
-//            if(envKey.startsWith(startsWith)) {
-//                String key = envKey.replace(startsWith, "").replaceAll("_", ".");
-//                boolean found = false;
-//
-//                // tries to match the environment var with an already configured setting (case insensitive)
-//                for(Object propKeyObj : properties.keySet()) {
-//                    if(propKeyObj instanceof String) {
-//                        String propKey = (String) propKeyObj;
-//                        String oldValue = properties.getProperty(propKey);
-//                        if(key.equalsIgnoreCase(propKey)) {
-//                            properties.setProperty(propKey, System.getenv(envKey));
-//                            found = true;
-//                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                // if the match failed, adds it as it is
-//                if(!found) {
-//                    properties.setProperty(key, System.getenv(envKey));
-//                    System.out.println("Setting " + key + " added from ENV variable");
-//                }
-//            }
-//        }
-//    }
-
     /**
      *
      * @param key
@@ -253,19 +205,12 @@ public final class GeneralConfig {
             try {
                 value = propertyResolver.resolveValue(key);
             } catch (UnresolvedPropertyException e) {
-//            e.printStackTrace();
             } catch (CircularReferenceException e) {
-//            e.printStackTrace();
             }
             properties.put(key, value);
         }
 
         return value != null && !value.isEmpty() ? value : null;
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        return properties.getProperty(key);
     }
 
     /**
@@ -279,12 +224,6 @@ public final class GeneralConfig {
 
         String value = getProperty(key);
         return value == null ? defaultValue : value;
-
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        return properties.getProperty(key, defaultValue);
     }
 
     /**
@@ -304,12 +243,6 @@ public final class GeneralConfig {
      * @return property value or default if not specified correctly
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
-
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        String propValue = properties.getProperty(key);
 
         String propValue = getProperty(key);
         int value = defaultValue;
@@ -417,22 +350,7 @@ public final class GeneralConfig {
      * @return
      */
     public static synchronized Properties getProperties() {
-
-//        if (properties == null) {
-//            init();
-//        }
-
         return properties;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static synchronized boolean useVirtuoso() {
-
-        String virtuosoDbUrl = getProperty(VIRTUOSO_DB_URL);
-        return virtuosoDbUrl != null && virtuosoDbUrl.trim().length() > 0;
     }
 
     /**
@@ -502,5 +420,15 @@ public final class GeneralConfig {
 
         // If still no value found (i.e. it is <= 0), then fall back to 42 days, i.e. 60480 minutes.
         return minutes <= 0 ? 60480 : minutes;
+    }
+
+    public static Set<String> getHarvestingSourceExcludingPatterns() {
+
+        Set<String> result = new HashSet<>();
+        String propValue = GeneralConfig.getProperty(GeneralConfig.HARVEST_SOURCE_EXCLUSION_PATTERNS);
+        if (StringUtils.isNotBlank(propValue)) {
+            result.addAll(Arrays.asList(StringUtils.split(propValue)));
+        }
+        return result;
     }
 }
