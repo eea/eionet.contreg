@@ -1700,7 +1700,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     @Override
     public int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException {
 
-        LOGGER.debug(BaseHarvest.loggerMsg("Attempting FAST load!", graphUri));
+        LOGGER.debug(BaseHarvest.loggerMsg("Going to attempt FAST load", graphUri));
 
         // Prepare connections (repository and SQL).
 
@@ -1736,7 +1736,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             forceLogEnable(2, sqlConn, LOGGER);
 
             // Clear potential leftover from previous harvest
-            clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
+            clearGraph(sqlConn, tempGraphUri, "Clearing leftovers of previous TEMP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
@@ -1751,9 +1751,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
 
                 if (wasOrigEmpty) {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into ORIGINAL graph", graphUri));
+                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into ORIGINAL graph", graphUri));
                 } else {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into TEMP graph", tempGraphUri));
                 }
 
                 // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
@@ -1900,8 +1900,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         try {
 
             // Clear potential leftover from previous harvest
-            clearGraph(sqlConn, tempGraphUri, "Clearing potential leftover of previous TEMP graph", false);
-            clearGraph(sqlConn, backupGraphUri, "Clearing potential leftover of previous BACKUP graph", false);
+            clearGraph(sqlConn, tempGraphUri, "Clearing leftovers of previous TEMP graph", false);
+            clearGraph(sqlConn, backupGraphUri, "Clearing leftovers of previous BACKUP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
@@ -1920,9 +1920,9 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
 
                 if (wasOrigEmpty) {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into ORIGINAL graph", graphUri));
+                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into ORIGINAL graph", graphUri));
                 } else {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Loading triples into TEMP graph", tempGraphUri));
+                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into TEMP graph", tempGraphUri));
                 }
 
                 for (Pair<InputStream, ContentLoader> pair : streams) {
@@ -2103,11 +2103,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         boolean graphCleared = false;
         String logMessage = BaseHarvest.loggerMsg(message, graphUri);
+        String graphEmptyCkeckerQuery = String.format("sparql select 1 from <%s> where {?s ?p ?o} limit 1", graphUri);
 
         try {
-            LOGGER.debug(logMessage);
-            SQLUtil.executeUpdate("sparql clear graph <" + graphUri + ">", sqlConn);
-            graphCleared = true;
+            Object rslt = SQLUtil.executeSingleReturnValueQuery(graphEmptyCkeckerQuery, sqlConn);
+            boolean isGraphEmpty = rslt == null || !rslt.toString().equals("1");
+            if (isGraphEmpty) {
+                graphCleared = true;
+            } else {
+                LOGGER.debug(logMessage);
+                SQLUtil.executeUpdate("sparql clear graph <" + graphUri + ">", sqlConn);
+                graphCleared = true;
+            }
         } catch (Exception e) {
             if (failSafely) {
                 LOGGER.warn("Failed to clear graph. " + logMessage);
@@ -2144,11 +2151,7 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             filePath = filePath.substring(2).replace('\\', '/');
         }
 
-        //LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML(...) from " + filePath);
-        LOGGER.debug("Going to load with DB.DBA.RDF_LOAD_RDFXML_MT(...) from " + filePath);
-
-        //String sql = "DB.DBA.RDF_LOAD_RDFXML(file_open('" + filePath + "'), '" + baseUri + "', '" + contextUri + "')";
-        int noOfThreads = 6;
+        int noOfThreads = GeneralConfig.getIntProperty(GeneralConfig.RDF_LOADER_THREADS, 1);
         String sql = String.format("DB.DBA.RDF_LOAD_RDFXML_MT(file_open('%s'), '%s', '%s', 0, %d, 0)", filePath, baseUri, contextUri, noOfThreads);
 
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {

@@ -154,6 +154,9 @@ public final class GeneralConfig {
     /** Number of sources that the source deletion background job should delete during one run. */
     public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
 
+    /** Number of sources that the source deletion background job should delete during one run. */
+    public static final String RDF_LOADER_THREADS = "harvester.rdfLoaderThreads";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
@@ -304,12 +307,6 @@ public final class GeneralConfig {
      * @return property value or default if not specified correctly
      */
     public static synchronized int getIntProperty(final String key, final int defaultValue) {
-
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        String propValue = properties.getProperty(key);
 
         String propValue = getProperty(key);
         int value = defaultValue;
