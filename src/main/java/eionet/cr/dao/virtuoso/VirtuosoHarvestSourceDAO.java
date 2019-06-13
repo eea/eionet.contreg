@@ -2151,8 +2151,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             filePath = filePath.substring(2).replace('\\', '/');
         }
 
+        long fileSize = file.length();
+        int fileSizeThreshold = GeneralConfig.getIntProperty(
+                GeneralConfig.TRANSACTIONAL_LOADING_FILE_SIZE_THRESHOLD_BYTES, 500000000);
+        int logMode = fileSize > fileSizeThreshold ? 0 : 1;
+
         int noOfThreads = GeneralConfig.getIntProperty(GeneralConfig.RDF_LOADER_THREADS, 1);
-        String sql = String.format("DB.DBA.RDF_LOAD_RDFXML_MT(file_open('%s'), '%s', '%s', 0, %d, 0)", filePath, baseUri, contextUri, noOfThreads);
+        String sql = String.format("DB.DBA.RDF_LOAD_RDFXML_MT(file_open('%s'), '%s', '%s', %d, %d, %d)",
+                filePath, baseUri, contextUri, logMode, noOfThreads, logMode);
 
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
@@ -2173,7 +2179,18 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         Statement s = null;
         try {
             s = conn.createStatement();
+            long start = System.currentTimeMillis();
             s.execute(sql);
+
+            long durationMinutes = (System.currentTimeMillis() - start) / 1000L / 60L;
+            int durationThreshold = GeneralConfig.getIntProperty(
+                    GeneralConfig.CHECKPOINT_LOADING_DURATION_THRESHOLD_MINUTES, 15);
+            if (durationMinutes >= durationThreshold) {
+                LOGGER.debug(BaseHarvest.loggerMsg(
+                        "Making checkpoint, because loading lasted " + durationMinutes + " min", ""));
+                s.execute("checkpoint");
+            }
+
             s.close();
         } finally {
             SQLUtil.close(s);

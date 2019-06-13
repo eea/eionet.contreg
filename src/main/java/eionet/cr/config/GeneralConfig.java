@@ -154,8 +154,14 @@ public final class GeneralConfig {
     /** Number of sources that the source deletion background job should delete during one run. */
     public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
 
-    /** Number of sources that the source deletion background job should delete during one run. */
+    /** Number of threads to use in multi-threaded RDF loading. Defaults to 1. */
     public static final String RDF_LOADER_THREADS = "harvester.rdfLoaderThreads";
+
+    /** File size (in bytes) threshold (exclusive) upon which the harvester will use transactional loading. Defaults to 500000000. */
+    public static final String TRANSACTIONAL_LOADING_FILE_SIZE_THRESHOLD_BYTES = "harvester.transactionalLoading.fileSizeThresholdBytes";
+
+    /** Harvester loading duration threshold (in minutes) over which a checkpoint will be issued after loading. Defaults to 15. */
+    public static final String CHECKPOINT_LOADING_DURATION_THRESHOLD_MINUTES = "harvester.checkpoint.loadingDurationThresholdMinutes";
 
     /** */
     public static final int SEVERITY_INFO = 1;
@@ -180,60 +186,6 @@ public final class GeneralConfig {
         // Hide utility class constructor.
     }
 
-    /** */
-//    private static void init() {
-//        properties = new Properties();
-//        try {
-//            properties.load(GeneralConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME));
-//
-//            loadEnvProperties(properties, "CR_");
-//
-//            // trim all the values (i.e. we don't allow preceding or trailing
-//            // white space in property values)
-//            for (Entry<Object, Object> entry : properties.entrySet()) {
-//                entry.setValue(entry.getValue().toString().trim());
-//            }
-//
-//        } catch (IOException e) {
-//            logger.fatal("Failed to load properties from " + PROPERTIES_FILE_NAME, e);
-//        }
-//    }
-
-    /**
-     * Loads all the environment variables starting with startsWith in the given Properties object.
-     * Replaces the already defined properties ignoring case
-     * @param properties
-     * @param startsWith
-     */
-//    private static void loadEnvProperties(Properties properties, String startsWith) {
-//        for(String envKey : System.getenv().keySet()) {
-//            if(envKey.startsWith(startsWith)) {
-//                String key = envKey.replace(startsWith, "").replaceAll("_", ".");
-//                boolean found = false;
-//
-//                // tries to match the environment var with an already configured setting (case insensitive)
-//                for(Object propKeyObj : properties.keySet()) {
-//                    if(propKeyObj instanceof String) {
-//                        String propKey = (String) propKeyObj;
-//                        String oldValue = properties.getProperty(propKey);
-//                        if(key.equalsIgnoreCase(propKey)) {
-//                            properties.setProperty(propKey, System.getenv(envKey));
-//                            found = true;
-//                            System.out.println("Setting " + propKey + " overridden by ENV variable (old value " + oldValue + ", new value " + properties.getProperty(propKey) + ")");
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                // if the match failed, adds it as it is
-//                if(!found) {
-//                    properties.setProperty(key, System.getenv(envKey));
-//                    System.out.println("Setting " + key + " added from ENV variable");
-//                }
-//            }
-//        }
-//    }
-
     /**
      *
      * @param key
@@ -256,19 +208,14 @@ public final class GeneralConfig {
             try {
                 value = propertyResolver.resolveValue(key);
             } catch (UnresolvedPropertyException e) {
-//            e.printStackTrace();
+                // Ignore intentionally.
             } catch (CircularReferenceException e) {
-//            e.printStackTrace();
+                // Ignore intentionally.
             }
             properties.put(key, value);
         }
 
         return value != null && !value.isEmpty() ? value : null;
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        return properties.getProperty(key);
     }
 
     /**
@@ -282,12 +229,6 @@ public final class GeneralConfig {
 
         String value = getProperty(key);
         return value == null ? defaultValue : value;
-
-//        if (properties == null) {
-//            init();
-//        }
-//
-//        return properties.getProperty(key, defaultValue);
     }
 
     /**
@@ -414,10 +355,6 @@ public final class GeneralConfig {
      * @return
      */
     public static synchronized Properties getProperties() {
-
-//        if (properties == null) {
-//            init();
-//        }
 
         return properties;
     }
