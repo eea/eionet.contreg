@@ -21,47 +21,13 @@
 
 package eionet.cr.web.action.factsheet;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
 import eionet.acl.AccessController;
 import eionet.acl.SignOnException;
-
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.SpoBinaryDAO;
-import eionet.cr.dto.FolderItemDTO;
-import eionet.cr.dto.HarvestSourceDTO;
-import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.RenameFolderItemDTO;
-import eionet.cr.dto.SpoBinaryDTO;
-import eionet.cr.dto.SubjectDTO;
+import eionet.cr.dao.*;
+import eionet.cr.dto.*;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.CurrentHarvests;
 import eionet.cr.harvest.HarvestException;
@@ -71,13 +37,25 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
+import eionet.cr.util.cleanup.FoldersAndFilesRestorer;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.home.HomesActionBean;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
+import net.sourceforge.stripes.action.*;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * Folder tab on factsheet page.
@@ -388,7 +366,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         aclPath = FolderUtil.extractAclPath(uri);
 
-        // check if use r has permission to add entries in the parent
+        // Check if user has permission to add entries in the parent.
         boolean actionAllowed = CRUser.hasPermission(aclPath, getUser(), CRUser.INSERT_PERMISSION, false);
         if (!actionAllowed) {
             addSystemMessage("No permission to add folder.");
@@ -691,8 +669,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      * Harvests file.
      *
      * @param sourceUrl
-     * @param uploadedFile
+     * @param file
      * @param dcTitle
+     * @param userName
+     * @param contentType
      */
     protected void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType) {
 
@@ -1103,5 +1083,18 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
     private boolean hasPermission(String folderUri, String permission) throws SignOnException {
         String acl = FolderUtil.extractAclPath(folderUri);
         return CRUser.hasPermission(getUserName(), acl, permission);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Resolution restoreFoldersAndFiles() {
+
+        FoldersAndFilesRestorer restorer = new FoldersAndFilesRestorer();
+        restorer.restore();
+
+        addSystemMessage("Restoration done!");
+        return new RedirectResolution(FolderActionBean.class).addParameter("uri", FolderUtil.getProjectsFolder());
     }
 }
