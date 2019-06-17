@@ -99,10 +99,18 @@ public class FoldersAndFilesRestorer {
         folderDAO.createFolder(parentUri, uriLegalFolderName, "", context);
 
         String aclPath = FolderUtil.extractAclPath(parentUri);
-        AccessController.addAcl(aclPath + "/" + folderName, crUser.getUserName(), folderName, true);
+        String aclName = aclPath + "/" + folderName;
+
+        if (!AccessController.aclExists(aclName)) {
+            AccessController.addAcl(aclName, crUser.getUserName(), folderName, true);
+        }
+
         if (FolderUtil.isProjectRootFolder(parentUri)) {
-            AccessController.addAcl(aclPath + "/" + folderName + "/bookmarks", crUser.getUserName(), "Bookmarks for "
-                    + folderName, true);
+            aclName = aclPath + "/" + folderName + "/bookmarks";
+            if (!AccessController.aclExists(aclName)) {
+                AccessController.addAcl(aclName, crUser.getUserName(), "Bookmarks for "
+                        + folderName, true);
+            }
         }
 
         createdFoldersCount++;
@@ -125,7 +133,10 @@ public class FoldersAndFilesRestorer {
         filesToHarvest.add(new Pair<>(fileUri, file));
 
         String aclPath = FolderUtil.extractAclPath(parentUri);
-        AccessController.addAcl(aclPath + "/" + fileName, crUser.getUserName(), "");
+        String aclName = aclPath + "/" + fileName;
+        if (!AccessController.aclExists(aclName)) {
+            AccessController.addAcl(aclName, crUser.getUserName(), "");
+        }
 
         createdFilesCount++;
         LOGGER.debug("File \"{}\" successfully created in folder {}", fileName, parentUri);
