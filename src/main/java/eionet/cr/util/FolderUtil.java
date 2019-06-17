@@ -27,6 +27,8 @@ import eionet.cr.dao.FolderDAO;
 import eionet.cr.web.security.CRUser;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -275,8 +277,13 @@ public final class FolderUtil {
     public static String extractAclPath(String uri) {
 
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-
-        return StringUtils.substringAfter(uri, appHome);
+        String result = StringUtils.substringAfter(uri, appHome);
+        try {
+            result = URLDecoder.decode(result, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /**

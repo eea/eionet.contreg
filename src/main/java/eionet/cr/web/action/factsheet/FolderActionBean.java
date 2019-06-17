@@ -24,17 +24,15 @@ package eionet.cr.web.action.factsheet;
 import eionet.acl.AccessController;
 import eionet.acl.SignOnException;
 import eionet.cr.common.CRRuntimeException;
-import eionet.cr.common.Predicates;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.*;
-import eionet.cr.dto.*;
+import eionet.cr.dto.FolderItemDTO;
+import eionet.cr.dto.RenameFolderItemDTO;
+import eionet.cr.dto.SubjectDTO;
 import eionet.cr.filestore.FileStore;
 import eionet.cr.harvest.CurrentHarvests;
-import eionet.cr.harvest.HarvestException;
-import eionet.cr.harvest.UploadHarvest;
 import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.FolderUtil;
-import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.cleanup.FoldersAndFilesRestorer;
@@ -45,14 +43,12 @@ import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -473,7 +469,7 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
 
         // add file ACL if not existing
         if (!replaceExisting) {
-            AccessController.addAcl(aclPath + "/" + StringUtils.substringAfterLast(fileUri, "/"), getUserName(), "");
+            AccessController.addAcl(aclPath + "/" + uploadedFile.getFileName(), getUserName(), "");
         }
 
         addSystemMessage("File successfully uploaded.");
@@ -549,64 +545,10 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         if (uploadedFile == null) {
             throw new CRRuntimeException("Uploaded file object must not be null");
         }
-        // use folder context as graph uri
-        String graphUri = FolderUtil.folderContext(uri);
-        // prepare cr:hasFile predicate
-        ObjectDTO objectDTO = new ObjectDTO(getUploadedFileSubjectUri(), false);
-        // objectDTO.setSourceUri(uri);
-        objectDTO.setSourceUri(graphUri);
-        SubjectDTO homeSubjectDTO = new SubjectDTO(uri, false);
-        homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
 
-        // declare file subject DTO, set it to null for starters
-        SubjectDTO fileSubjectDTO = null;
-
-        // if title needs to be stored, add it to file subject DTO
-        if (!fileExists || !StringUtils.isBlank(title)) {
-
-            String titleToStore = title;
-            if (StringUtils.isBlank(titleToStore)) {
-                titleToStore = URIUtil.extractURILabel(getUploadedFileSubjectUri(), SubjectDTO.NO_LABEL);
-                titleToStore = StringUtils.replace(titleToStore, "%20", " ");
-            }
-
-            objectDTO = new ObjectDTO(titleToStore, true);
-            // objectDTO.setSourceUri(uri);
-            objectDTO.setSourceUri(graphUri);
-            fileSubjectDTO = new SubjectDTO(getUploadedFileSubjectUri(), false);
-            fileSubjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
-        }
-
+        FolderDAO folderDAO = DAOFactory.get().getDao(FolderDAO.class);
         try {
-            HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
-
-            // persist the prepared "userHome cr:hasFile fileSubject" triple
-            LOGGER.debug("Creating the cr:hasFile predicate");
-            helperDao.addTriples(homeSubjectDTO);
-
-            // store file subject DTO if it has been initialized
-            if (fileSubjectDTO != null) {
-
-                // delete previous value of dc:title if new one set
-                if (fileExists && fileSubjectDTO.hasPredicate(Predicates.RDFS_LABEL)) {
-
-                    List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
-                    List<String> predicateUris = Collections.singletonList(Predicates.RDFS_LABEL);
-                    List<String> sourceUris = Collections.singletonList(uri);
-
-                    helperDao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
-                }
-                helperDao.addTriples(fileSubjectDTO);
-            }
-
-            // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
-            // (but set interval minutes to 0, to avoid it being background-harvested)
-            DAOFactory
-                    .get()
-                    .getDao(HarvestSourceDAO.class)
-                    .addSourceIgnoreDuplicate(
-                            HarvestSourceDTO.create(FolderUtil.folderContext(uri), false, 0, getUserNameOrAnonymous()));
-
+            folderDAO.createFileSubject(uri, getUploadedFileSubjectUri(), title, getUserNameOrAnonymous(), fileExists);
         } catch (DAOException e) {
             saveAndHarvestException = e;
             return;
@@ -615,7 +557,9 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         // save the file's content into database
         File file = null;
         try {
-            file = saveContent();
+            LOGGER.debug("Going to save the uploaded file's content into database");
+            file = folderDAO.saveFileContent(
+                    uri, getUploadedFileSubjectUri(), uploadedFile, getUserNameOrAnonymous(), replaceExisting);
             contentSaved = true;
         } catch (DAOException e) {
             saveAndHarvestException = e;
@@ -626,92 +570,8 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
         }
 
         // attempt to harvest the uploaded file
-        harvestUploadedFile(getUploadedFileSubjectUri(), file, null, getUserNameOrAnonymous(), uploadedFile.getContentType());
-    }
-
-    /**
-     * Stores file data into filesystem and database.
-     *
-     * @throws DAOException
-     * @throws IOException
-     */
-    private File saveContent() throws DAOException, IOException {
-
-        LOGGER.debug("Going to save the uploaded file's content into database");
-
-        File file = null;
-
-        SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(getUploadedFileSubjectUri()));
-        dto.setContentType(uploadedFile.getContentType());
-        dto.setLanguage("");
-        dto.setMustEmbed(false);
-
-        InputStream contentStream = null;
-        try {
-            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
-            contentStream = uploadedFile.getInputStream();
-            String filePath = FolderUtil.extractPathInFolder(uri);
-            if (StringUtils.isNotEmpty(filePath)) {
-                filePath += "/" + uploadedFile.getFileName();
-            } else {
-                filePath = uploadedFile.getFileName();
-            }
-            file =
-                    FileStore.getInstance(FolderUtil.getUserDir(uri, getUserNameOrAnonymous())).add(filePath, replaceExisting,
-                            contentStream);
-        } finally {
-            IOUtils.closeQuietly(contentStream);
-        }
-        return file;
-    }
-
-    /**
-     * Harvests file.
-     *
-     * @param sourceUrl
-     * @param file
-     * @param dcTitle
-     * @param userName
-     * @param contentType
-     */
-    protected void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType) {
-
-        // create and store harvest source for the above source url,
-        // don't throw exceptions, as an uploaded file does not have to be
-        // harvestable
-        HarvestSourceDTO harvestSourceDTO = null;
-        try {
-            LOGGER.debug("Creating and storing harvest source");
-            HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
-
-            HarvestSourceDTO source = new HarvestSourceDTO();
-            source.setUrl(sourceUrl);
-            source.setIntervalMinutes(0);
-
-            dao.addSourceIgnoreDuplicate(source);
-            harvestSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
-        } catch (DAOException e) {
-            LOGGER.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
-        }
-
-        // perform harvest,
-        // don't throw exceptions, as an uploaded file does not HAVE to be
-        // harvestable
-        try {
-            if (harvestSourceDTO != null) {
-                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, file, dcTitle, contentType);
-                CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
-                try {
-                    uploadHarvest.execute();
-                } finally {
-                    CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
-                }
-            } else {
-                LOGGER.debug("Harvest source was not created, so skipping harvest");
-            }
-        } catch (HarvestException e) {
-            LOGGER.info("Exception when trying to harvest uploaded file content", e);
-        }
+        folderDAO.harvestUploadedFile(
+                getUploadedFileSubjectUri(), file, null, getUserNameOrAnonymous(), uploadedFile.getContentType());
     }
 
     private String getUploadedFileSubjectUri() {
@@ -1089,12 +949,13 @@ public class FolderActionBean extends AbstractActionBean implements Runnable {
      *
      * @return
      */
-    public Resolution restoreFoldersAndFiles() {
+    public Resolution restoreFoldersAndFiles() throws DAOException, SignOnException {
 
-        FoldersAndFilesRestorer restorer = new FoldersAndFilesRestorer();
+        FoldersAndFilesRestorer restorer = new FoldersAndFilesRestorer(getUser());
         restorer.restore();
 
-        addSystemMessage("Restoration done!");
+        addSystemMessage("Restoration done! Created " +
+                restorer.getCreatedFoldersCount() + " folders and " + restorer.getCreatedFilesCount() + " files!");
         return new RedirectResolution(FolderActionBean.class).addParameter("uri", FolderUtil.getProjectsFolder());
     }
 }

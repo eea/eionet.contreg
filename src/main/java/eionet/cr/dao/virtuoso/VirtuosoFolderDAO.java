@@ -21,47 +21,44 @@
 
 package eionet.cr.dao.virtuoso;
 
+import eionet.cr.common.Predicates;
+import eionet.cr.common.Subjects;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.*;
+import eionet.cr.dao.readers.ResultSetReaderException;
+import eionet.cr.dao.readers.UserFolderReader;
+import eionet.cr.dto.*;
+import eionet.cr.filestore.FileStore;
+import eionet.cr.harvest.CurrentHarvests;
+import eionet.cr.harvest.HarvestException;
+import eionet.cr.harvest.UploadHarvest;
+import eionet.cr.util.*;
+import eionet.cr.util.sesame.SPARQLResultSetReader;
+import eionet.cr.util.sesame.SesameUtil;
+import eionet.cr.util.sql.SQLUtil;
+import eionet.cr.util.sql.SingleObjectReader;
+import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.FileBean;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.*;
+import org.openrdf.model.impl.ContextStatementImpl;
+import org.openrdf.query.BindingSet;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ContextStatementImpl;
-import org.openrdf.query.BindingSet;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-
-import eionet.cr.common.Predicates;
-import eionet.cr.common.Subjects;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.readers.ResultSetReaderException;
-import eionet.cr.dao.readers.UserFolderReader;
-import eionet.cr.dto.FolderItemDTO;
-import eionet.cr.util.Bindings;
-import eionet.cr.util.FolderUtil;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.Pair;
-import eionet.cr.util.URIUtil;
-import eionet.cr.util.URLUtil;
-import eionet.cr.util.sesame.SPARQLResultSetReader;
-import eionet.cr.util.sesame.SesameUtil;
-import eionet.cr.util.sql.SQLUtil;
-import eionet.cr.util.sql.SingleObjectReader;
-import eionet.cr.web.security.CRUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Virtuoso implementation for the {@link FolderDAO}.
@@ -588,4 +585,137 @@ public class VirtuosoFolderDAO extends VirtuosoBaseDAO implements FolderDAO {
         }
     }
 
+    @Override
+    public void createFileSubject(String parentFolderUri, String fileUri, String fileTitle, String userName, boolean fileExists) throws DAOException {
+
+        String graphUri = FolderUtil.folderContext(parentFolderUri);
+        // prepare cr:hasFile predicate
+        ObjectDTO objectDTO = new ObjectDTO(fileUri, false);
+        objectDTO.setSourceUri(graphUri);
+        SubjectDTO homeSubjectDTO = new SubjectDTO(parentFolderUri, false);
+        homeSubjectDTO.addObject(Predicates.CR_HAS_FILE, objectDTO);
+
+        // declare file subject DTO, set it to null for starters
+        SubjectDTO fileSubjectDTO = null;
+
+        // if title needs to be stored, add it to file subject DTO
+        if (!fileExists || !StringUtils.isBlank(fileTitle)) {
+
+            String titleToStore = fileTitle;
+            if (StringUtils.isBlank(titleToStore)) {
+                titleToStore = URIUtil.extractURILabel(fileUri, SubjectDTO.NO_LABEL);
+                titleToStore = StringUtils.replace(titleToStore, "%20", " ");
+            }
+
+            objectDTO = new ObjectDTO(titleToStore, true);
+            // objectDTO.setSourceUri(uri);
+            objectDTO.setSourceUri(graphUri);
+            fileSubjectDTO = new SubjectDTO(fileUri, false);
+            fileSubjectDTO.addObject(Predicates.RDFS_LABEL, objectDTO);
+        }
+
+        HelperDAO helperDao = DAOFactory.get().getDao(HelperDAO.class);
+
+        // persist the prepared "userHome cr:hasFile fileSubject" triple
+        helperDao.addTriples(homeSubjectDTO);
+
+        // store file subject DTO if it has been initialized
+        if (fileSubjectDTO != null) {
+
+            // delete previous value of dc:title if new one set
+            if (fileExists && fileSubjectDTO.hasPredicate(Predicates.RDFS_LABEL)) {
+
+                List<String> subjectUris = Collections.singletonList(fileSubjectDTO.getUri());
+                List<String> predicateUris = Collections.singletonList(Predicates.RDFS_LABEL);
+                List<String> sourceUris = Collections.singletonList(parentFolderUri);
+
+                helperDao.deleteSubjectPredicates(subjectUris, predicateUris, sourceUris);
+            }
+            helperDao.addTriples(fileSubjectDTO);
+        }
+
+        // since user's home URI was used above as triple source, add it to HARVEST_SOURCE too
+        // (but set interval minutes to 0, to avoid it being background-harvested)
+        DAOFactory
+                .get()
+                .getDao(HarvestSourceDAO.class)
+                .addSourceIgnoreDuplicate(
+                        HarvestSourceDTO.create(FolderUtil.folderContext(parentFolderUri), false, 0, userName));
+    }
+
+    @Override
+    public File saveFileContent(
+            String parentFolderUri, String fileUri, FileBean uploadedFile, String userName, boolean replaceExisting)
+            throws DAOException, IOException {
+
+        SpoBinaryDTO dto = new SpoBinaryDTO(Hashes.spoHash(fileUri));
+        dto.setContentType(uploadedFile.getContentType());
+        dto.setLanguage("");
+        dto.setMustEmbed(false);
+
+        File file = null;
+        InputStream contentStream = null;
+        try {
+            DAOFactory.get().getDao(SpoBinaryDAO.class).add(dto);
+            contentStream = uploadedFile.getInputStream();
+            String filePath = FolderUtil.extractPathInFolder(parentFolderUri);
+            if (StringUtils.isNotEmpty(filePath)) {
+                filePath += "/" + uploadedFile.getFileName();
+            } else {
+                filePath = uploadedFile.getFileName();
+            }
+            file =
+                    FileStore.getInstance(FolderUtil.getUserDir(parentFolderUri, userName)).add(filePath, replaceExisting,
+                            contentStream);
+        } finally {
+            IOUtils.closeQuietly(contentStream);
+        }
+
+        if (file == null) {
+            throw new DAOException("Saved file instance was null!");
+        }
+
+        return file;
+    }
+
+    @Override
+    public void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType) {
+
+        // create and store harvest source for the above source url,
+        // don't throw exceptions, as an uploaded file does not have to be
+        // harvestable
+        HarvestSourceDTO harvestSourceDTO = null;
+        try {
+            LOGGER.debug("Creating and storing harvest source");
+            HarvestSourceDAO dao = DAOFactory.get().getDao(HarvestSourceDAO.class);
+
+            HarvestSourceDTO source = new HarvestSourceDTO();
+            source.setUrl(sourceUrl);
+            source.setIntervalMinutes(0);
+
+            dao.addSourceIgnoreDuplicate(source);
+            harvestSourceDTO = dao.getHarvestSourceByUrl(sourceUrl);
+        } catch (DAOException e) {
+            LOGGER.info("Exception when trying to create" + "harvest source for the uploaded file content", e);
+        }
+
+        // perform harvest,
+        // don't throw exceptions, as an uploaded file does not HAVE to be
+        // harvestable
+        try {
+            if (harvestSourceDTO != null) {
+                UploadHarvest uploadHarvest = new UploadHarvest(harvestSourceDTO, file, dcTitle, contentType);
+                CurrentHarvests.addOnDemandHarvest(harvestSourceDTO.getUrl(), userName);
+                try {
+                    uploadHarvest.execute();
+                } finally {
+                    CurrentHarvests.removeOnDemandHarvest(harvestSourceDTO.getUrl());
+                }
+            } else {
+                LOGGER.debug("Harvest source was not created, so skipping harvest");
+            }
+        } catch (HarvestException e) {
+            LOGGER.info("Exception when trying to harvest uploaded file content", e);
+        }
+    }
 }
