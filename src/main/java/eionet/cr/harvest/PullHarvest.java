@@ -1136,6 +1136,25 @@ public class PullHarvest extends BaseHarvest {
         getHelperDAO().addTriples(subjectDTO);
     }
 
+    /**
+     * Returns true if the given should not become harvest source, based on some configuration or whatever rules.
+     * Otherwise returns false.
+     *
+     * @param url
+     * @return
+     */
+    private boolean shouldNotBecomeHarvestSource(String url) {
+
+        Set<String> urlExcludingSubstrings = GeneralConfig.getHarvestingSourceExcludingSubstrings();
+        for (String substr : urlExcludingSubstrings) {
+            if (url.contains(substr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -1146,7 +1165,14 @@ public class PullHarvest extends BaseHarvest {
 
         // Add all redirected sources to sources-to-delete, except the last context URL we saved triples into.
         sourcesToDelete.addAll(redirectedUrls);
-        sourcesToDelete.remove(getContextUrl());
+
+        // If the final context URL should not become harvest source, ensure it goes into sources-to-delete,
+        // otherwise ensure it is removed from sources-to-delete.
+        if (shouldNotBecomeHarvestSource(getContextUrl())) {
+            sourcesToDelete.add(getContextUrl());
+        } else {
+            sourcesToDelete.remove(getContextUrl());
+        }
 
         // Delete sources. incl. metadata about them and all associated relational records.
         final HarvestSourceDAO harvestSourceDAO = DAOFactory.get().getDao(HarvestSourceDAO.class);

@@ -158,7 +158,7 @@ public final class GeneralConfig {
     public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
 
     /** SQL Like patterns of harvest sources to skip/exclude. */
-    public static final String HARVEST_SOURCE_EXCLUSION_PATTERNS = "harvestSourcesExclusionPatterns";
+    public static final String HARVEST_SOURCE_EXCLUSION_SUBSTRINGS = "harvestSourcesExclusionSubstrings";
 
     /** */
     public static final int SEVERITY_INFO = 1;
@@ -422,10 +422,16 @@ public final class GeneralConfig {
         return minutes <= 0 ? 60480 : minutes;
     }
 
-    public static Set<String> getHarvestingSourceExcludingPatterns() {
+    /**
+     * Ignore CR harvester redirects to login forms based on URL substrings returned by this function.
+     * Never returns null, may return empty set.
+     *
+     * @return
+     */
+    public static Set<String> getHarvestingSourceExcludingSubstrings() {
 
         Set<String> result = new HashSet<>();
-        String propValue = GeneralConfig.getProperty(GeneralConfig.HARVEST_SOURCE_EXCLUSION_PATTERNS);
+        String propValue = GeneralConfig.getProperty(GeneralConfig.HARVEST_SOURCE_EXCLUSION_SUBSTRINGS);
         if (StringUtils.isNotBlank(propValue)) {
             result.addAll(Arrays.asList(StringUtils.split(propValue)));
         }
