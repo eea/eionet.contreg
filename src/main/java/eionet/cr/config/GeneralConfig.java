@@ -157,6 +157,15 @@ public final class GeneralConfig {
     /** Number of sources that the source deletion background job should delete during one run. */
     public static final String SOURCE_DELETION_JOB_BATCH_SIZE = "sourceDeletionJob.batchSize";
 
+    /** Number of threads to use in multi-threaded RDF loading. Defaults to 1. */
+    public static final String RDF_LOADER_THREADS = "harvester.rdfLoaderThreads";
+
+    /** File size (in bytes) threshold (exclusive) upon which the harvester will use transactional loading. Defaults to 500000000. */
+    public static final String TRANSACTIONAL_LOADING_FILE_SIZE_THRESHOLD_BYTES = "harvester.transactionalLoading.fileSizeThresholdBytes";
+
+    /** Harvester loading duration threshold (in minutes) over which a checkpoint will be issued after loading. Defaults to 15. */
+    public static final String CHECKPOINT_LOADING_DURATION_THRESHOLD_MINUTES = "harvester.checkpoint.loadingDurationThresholdMinutes";
+
     /** SQL Like patterns of harvest sources to skip/exclude. */
     public static final String HARVEST_SOURCE_EXCLUSION_SUBSTRINGS = "harvestSourcesExclusionSubstrings";
 
@@ -205,7 +214,9 @@ public final class GeneralConfig {
             try {
                 value = propertyResolver.resolveValue(key);
             } catch (UnresolvedPropertyException e) {
+                // Ignore intentionally.
             } catch (CircularReferenceException e) {
+                // Ignore intentionally.
             }
             properties.put(key, value);
         }

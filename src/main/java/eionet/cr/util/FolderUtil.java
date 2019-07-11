@@ -20,16 +20,17 @@
  */
 package eionet.cr.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
 import eionet.cr.web.security.CRUser;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -172,7 +173,7 @@ public final class FolderUtil {
      */
     public static String extractPathInSpecialFolder(String uri, String mainFolder) {
 
-        String result = null;
+        String result = "";
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
         if (uri.startsWith(appHome + "/" + mainFolder + "/")) {
             result = StringUtils.substringAfter(uri, appHome + "/" + mainFolder + "/");
@@ -276,8 +277,13 @@ public final class FolderUtil {
     public static String extractAclPath(String uri) {
 
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-
-        return StringUtils.substringAfter(uri, appHome);
+        String result = StringUtils.substringAfter(uri, appHome);
+        try {
+            result = URLDecoder.decode(result, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /**

@@ -1,33 +1,21 @@
 package eionet.cr.filestore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.URLDecoder;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.Map;
-
-import net.sourceforge.stripes.action.FileBean;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.web.security.CRUser;
+import net.sourceforge.stripes.action.FileBean;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.URLDecoder;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * A utility class representing CR local file store.
@@ -331,7 +319,7 @@ public final class FileStore {
                 throw new CRRuntimeException(e);
             }
 
-            return FileStore.getInstance("project").getFile(fileName);
+            return StringUtils.isBlank(fileName) ? null : FileStore.getInstance("project").getFile(fileName);
         } else {
             LOGGER.info("Not a home URI: " + uriString);
         }

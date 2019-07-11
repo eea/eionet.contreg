@@ -21,10 +21,13 @@
 
 package eionet.cr.dao;
 
-import java.util.List;
-
 import eionet.cr.dto.FolderItemDTO;
 import eionet.cr.util.Pair;
+import net.sourceforge.stripes.action.FileBean;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Folder DAO.
@@ -120,4 +123,11 @@ public interface FolderDAO extends DAO {
      */
     void createProjectBookmarksFolder(String projectName) throws DAOException;
 
+    void createFileSubject(String parentFolderUri, String fileUri, String fileTitle, String userName, boolean fileExists) throws DAOException;
+
+    File saveFileContent(
+            String parentFolderUri, String fileUri, FileBean uploadedFile, String userName, boolean replaceExisting)
+            throws DAOException, IOException;
+
+    void harvestUploadedFile(String sourceUrl, File file, String dcTitle, String userName, String contentType);
 }
