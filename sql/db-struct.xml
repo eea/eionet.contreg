@@ -413,4 +413,11 @@ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liqui
         </sql>
     </changeSet>
 
+    <changeSet id="rev-27" author="heinlja">
+        <comment>Bugfix: post_harvest_script.external_service_id column was wrongfully of IDENTITY type.</comment>
+        <sql>
+            ALTER TABLE "CR"."cr3user"."post_harvest_script" MODIFY COLUMN "external_service_id" INTEGER
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
