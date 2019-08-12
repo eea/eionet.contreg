@@ -21,6 +21,7 @@ The necessary versions are as follows:
 * Maven 3.3.9
 * Tomcat 8.5.20
 
+
 ## 2. Download and install Virtuoso
 
 CR uses OpenLink Virtuoso as its backend for relational database and triple
