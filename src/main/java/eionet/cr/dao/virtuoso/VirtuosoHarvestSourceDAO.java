@@ -26,6 +26,7 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -777,7 +778,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + "cast(\"last_harvest\" as varchar) as last_harvest,interval_minutes,source, last_modified,"
             + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag, is_online_csv_tsv, csv_tsv_url "
             + " from HARVEST_SOURCE where URL_HASH=?";
-    //private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -1722,20 +1722,28 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
         }
 
+        int currentTriplesCount = getNoOfHarvestedStatements(sqlConn, graphUri);
+        int xoringThresholdTriplesCount = GeneralConfig.getIntProperty(
+                GeneralConfig.HARVESTER_SKIP_XORING_NOOFTRIPLES_THRESHOLD, 1000000000);
+        boolean isDirectLoading = currentTriplesCount > -1 && currentTriplesCount > xoringThresholdTriplesCount;
+
+        String s = String.format("SELECT ?o FROM <%s> WHERE {<%s> <%s> ?o} ORDER BY DESC(?o) LIMIT 1");
+
         // Prepare URI objects of the original graph, backup graph and temporary graph.
 
         URI graphResource = repoConn.getValueFactory().createURI(graphUri);
-
         String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
         URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
+
+        // Start loading steps.
 
         int triplesLoaded = 0;
         boolean wasOrigEmpty = false;
         try {
-            // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
+            // Ensure auto-commit, as Virtuoso tends to "forget it" at long harvests.
             forceLogEnable(2, sqlConn, LOGGER);
 
-            // Clear potential leftover from previous harvest
+            // Clear potential temporary graph leftover from previous harvest.
             clearGraph(sqlConn, tempGraphUri, "Clearing leftovers of previous TEMP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
@@ -1831,6 +1839,26 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         // Return the number of triples loaded into the graph.
         return triplesLoaded;
+    }
+
+    /**
+     * Gets the {@link Predicates#CR_HARVESTED_STATEMENTS} value for given subject.
+     * Defaults to -1, if not found.
+     *
+     * @param sqlConn
+     * @param subjectUri
+     * @return
+     */
+    private int getNoOfHarvestedStatements(Connection sqlConn, String subjectUri) throws DAOException {
+
+        String sql = String.format("SPARQL SELECT ?o FROM <%s> WHERE {<%s> <%s> ?o} ORDER BY DESC(?o) LIMIT 1",
+                GeneralConfig.HARVESTER_URI, subjectUri, Predicates.CR_HARVESTED_STATEMENTS);
+        try {
+            Object o = SQLUtil.executeSingleReturnValueQuery(sql, sqlConn);
+            return NumberUtils.toInt(StringUtils.trimToEmpty(o.toString()), -1);
+        } catch (Exception e) {
+            throw new DAOException("Failed to get number of harvested statements for " + subjectUri, e);
+        }
     }
 
     /**

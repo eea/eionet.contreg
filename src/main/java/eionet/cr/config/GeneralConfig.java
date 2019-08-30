@@ -169,6 +169,19 @@ public final class GeneralConfig {
     /** SQL Like patterns of harvest sources to skip/exclude. */
     public static final String HARVEST_SOURCE_EXCLUSION_SUBSTRINGS = "harvestSourcesExclusionSubstrings";
 
+    /**
+     * If number of triples in source is above this threshold, no XORing should be applied by harvester.
+     * Defaults to 1000000000 (ie one billion) to ensure that by default XORing is always applied.
+     */
+    public static final String HARVESTER_SKIP_XORING_NOOFTRIPLES_THRESHOLD = "harvester.skipXoring.noOfTriplesThreshold";
+
+    /**
+     * If downloaded file size is above this bytes threshold, no XORing should be applied by harvester.
+     * Used only when the harvester cannot guess the number of triples for some reason (see harvester.skipXoring.noOfTriplesThreshold).
+     * Defaults to 1000000000000 (ie one terabyte) to ensure that by default XORing is always applied.
+     */
+    public static final String HARVESTER_SKIP_XORING_FILESIZE_BYTES_THRESHOLD = "harvester.skipXoring.fileSizeBytesThreshold";
+
     /** */
     public static final int SEVERITY_INFO = 1;
     public static final int SEVERITY_CAUTION = 2;
