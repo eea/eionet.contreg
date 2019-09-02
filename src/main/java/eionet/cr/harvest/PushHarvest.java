@@ -63,7 +63,7 @@ public class PushHarvest extends BaseHarvest {
         InputStream inputStream = null;
         try {
             inputStream = new ByteArrayInputStream(pushedContent.getBytes("UTF-8"));
-            int noOfTriples = getHarvestSourceDAO().loadIntoRepository(inputStream, null, getContextUrl(), false);
+            int noOfTriples = getHarvestSourceDAO().loadContentNaive(inputStream, null, getContextUrl(), false);
             setStoredTriplesCount(noOfTriples);
         } catch (UnsupportedEncodingException e) {
             throw new HarvestException(e.getMessage(), e);

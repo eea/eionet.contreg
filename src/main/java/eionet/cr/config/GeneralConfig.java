@@ -282,6 +282,28 @@ public final class GeneralConfig {
     }
 
     /**
+     * Returns long property.
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static synchronized long getLongProperty(final String key, final long defaultValue) {
+
+        String propValue = getProperty(key);
+        long value = defaultValue;
+        if (propValue != null) {
+            try {
+                value = Long.parseLong(propValue.trim());
+            } catch (NumberFormatException e) {
+                // Ignore exceptions resulting from string-to-integer conversion here.
+            }
+        }
+
+        return value;
+    }
+
+    /**
      * Get property value of time in milliseconds presented by time value and unit suffix (1h, 30m, 15s etc).
      *
      * @param key
