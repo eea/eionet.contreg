@@ -13,8 +13,10 @@ pipeline {
 
   stages {
     stage ('Build') {
-      steps {
-        sh 'mvn clean -B -V verify'
+    node(label: 'docker') {
+          steps {
+            sh 'mvn clean -B -V verify'
+          }
       }
       post {
         success {
@@ -24,8 +26,10 @@ pipeline {
     }
 
     stage ('Tests') {
+    node(label: 'docker') {
       steps {
         sh 'mvn clean install verify'
+        }
       }
     }
 
@@ -48,8 +52,10 @@ pipeline {
     }
 
     stage('Code analysis') {
-      steps {
-        sh 'mvn clean -B -V -Pcobertura verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
+    node(label: 'docker') {
+          steps {
+            sh 'mvn clean -B -V -Pcobertura verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
+          }
       }
       post {
         always {
