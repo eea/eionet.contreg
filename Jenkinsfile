@@ -16,6 +16,7 @@ pipeline {
       steps {
         node(label: 'docker') {
           script {
+            checkout scm
             sh 'mvn clean -B -V verify'
           }
         }
@@ -31,6 +32,7 @@ pipeline {
       steps {
         node(label: 'docker') {
           script {
+            checkout scm
             sh 'mvn clean install verify'
           }
         }
