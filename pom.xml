@@ -277,7 +277,7 @@
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
                                     <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
-                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp, ${apphome.unix}/dbinit</VIRT_Parameters_DirsAllowed>
+                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp</VIRT_Parameters_DirsAllowed>
                                 </env>
                                 <ports>
                                     <port>8891:8890</port>
@@ -287,15 +287,16 @@
                                     <log>Server online at</log>
                                     <time>20000</time>
                                     <exec>
-                                        <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
+                                        <postStart>printf "USER_CREATE('cr3test', 'zzz', vector ('SQL_ENABLE',1,'DAV_ENABLE',1));\nUSER_GRANT_ROLE('cr3test','SPARQL_SELECT',0);\nUSER_GRANT_ROLE('cr3test','SPARQL_UPDATE',0);\nUSER_CREATE('cr3rouser', 'yyy', vector ('DAV_ENABLE',1));\nUSER_GRANT_ROLE('cr3rouser','SPARQL_SELECT',0);\nuser_set_qualifier ('cr3test', 'CRTEST');\n" > 1_create_testuser.sql</postStart>
+                                        <postStart>isql localhost:1111 dba dba 1_create_testuser.sql</postStart>
                                     </exec>
                                 </wait>
-                                <volumes>
-                                    <bind>
-                                        <volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>
-                                        <volume>${basedir}/sql/virtuoso/unittest:${apphome.unix}/dbinit</volume>
-                                    </bind>
-                                </volumes>
+                                <!--<volumes>-->
+                                    <!--<bind>-->
+                                        <!--<volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>-->
+                                        <!--<volume>${basedir}/sql/virtuoso/unittest:${apphome.unix}/dbinit</volume>-->
+                                    <!--</bind>-->
+                                <!--</volumes>-->
                             </run>
                         </image>
 
