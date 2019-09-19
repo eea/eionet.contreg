@@ -288,7 +288,6 @@
                                     <time>60000</time>
                                     <exec>
                                         <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
-                                        <!--<postStart>isql localhost:1111 dba dba /1_create_users.sql</postStart>-->
                                     </exec>
                                 </wait>
                                 <volumes>
