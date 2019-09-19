@@ -277,7 +277,7 @@
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
                                     <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
-                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp</VIRT_Parameters_DirsAllowed>
+                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp, ${apphome.unix}/dbinit</VIRT_Parameters_DirsAllowed>
                                 </env>
                                 <ports>
                                     <port>8891:8890</port>
@@ -285,7 +285,7 @@
                                 </ports>
                                 <wait>
                                     <log>Server online at</log>
-                                    <time>60000</time>
+                                    <time>20000</time>
                                     <exec>
                                         <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
                                     </exec>
