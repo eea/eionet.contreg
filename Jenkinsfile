@@ -17,7 +17,7 @@ pipeline {
         node(label: 'docker') {
           script {
             checkout scm
-            sh 'mvn clean -B -V verify'
+            sh 'mvn -P docker clean -B -V verify'
           }
         }
       }
