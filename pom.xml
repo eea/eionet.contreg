@@ -325,7 +325,7 @@
                                     <!-- ... but at max 2 minutes -->
                                     <time>120000</time>
                                     <exec>
-                                        <postStart>cp -r /maven/* /usr/local/apache2/htdocs/</postStart>
+                                        <postStart>/maven/move-test-files.sh</postStart>
                                     </exec>
                                 </wait>
                             </run>

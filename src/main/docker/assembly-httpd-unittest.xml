@@ -7,4 +7,11 @@
             <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>src/main/docker/move-test-files.sh</source>
+            <outputDirectory>.</outputDirectory>
+            <destName>move-test-files.sh</destName>
+        </file>
+    </files>
 </assembly>
