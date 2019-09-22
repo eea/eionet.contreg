@@ -306,16 +306,14 @@
                         </image>
 
                         <image>
-                            <alias>httpd</alias>
-                            <!--<name>httpd</name>-->
-                            <name>httpd:2.4</name>
+                            <name>httpd</name>
 
-                            <!--<build>-->
-                                <!--<from>httpd:2.4</from>-->
-                                <!--<assembly>-->
-                                    <!--<descriptor>assembly-httpd-unittest.xml</descriptor>-->
-                                <!--</assembly>-->
-                            <!--</build>-->
+                            <build>
+                                <from>httpd:2.4</from>
+                                <assembly>
+                                    <descriptor>assembly-httpd-unittest.xml</descriptor>
+                                </assembly>
+                            </build>
 
                             <run>
                                 <ports>
@@ -323,15 +321,13 @@
                                 </ports>
                                 <wait>
                                     <!-- Check for this URL to return a 200 return code .... -->
-                                    <url>http://localhost:80/</url>
+                                    <url>http://localhost:${tests.httpd.port}/</url>
                                     <!-- ... but at max 2 minutes -->
                                     <time>120000</time>
+                                    <exec>
+                                        <postStart>cp -r /maven/* /usr/local/apache2/htdocs/</postStart>
+                                    </exec>
                                 </wait>
-                                <volumes>
-                                    <bind>
-                                        <volume>src/test/resources:/usr/local/apache2/htdocs</volume>
-                                    </bind>
-                                </volumes>
                             </run>
                         </image>
 
