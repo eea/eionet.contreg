@@ -271,8 +271,15 @@
                     <images>
 
                         <image>
-                            <alias>virtuoso</alias>
-                            <name>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</name>
+                            <name>virtuoso</name>
+
+                            <build>
+                                <from>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</from>
+                                <assembly>
+                                    <descriptor>assembly-virtuoso-unittest.xml</descriptor>
+                                </assembly>
+                            </build>
+
                             <run>
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
@@ -287,13 +294,12 @@
                                     <log>Server online at</log>
                                     <time>20000</time>
                                     <exec>
-                                        <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
+                                        <postStart>isql localhost:1111 dba dba /maven/1_create_testuser.sql</postStart>
                                     </exec>
                                 </wait>
                                 <volumes>
                                     <bind>
                                         <volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>
-                                        <volume>${basedir}/sql/virtuoso/unittest:${apphome.unix}/dbinit</volume>
                                     </bind>
                                 </volumes>
                             </run>
@@ -302,13 +308,21 @@
                         <image>
                             <alias>httpd</alias>
                             <name>httpd:2.4</name>
+
+                            <!--<build>-->
+                                <!--<from></from>-->
+                                <!--<assembly>-->
+                                    <!--<descriptor>assembly-httpd-unittest.xml</descriptor>-->
+                                <!--</assembly>-->
+                            <!--</build>-->
+
                             <run>
                                 <ports>
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
                                 <volumes>
                                     <bind>
-                                        <volume>./src/test/resources:/usr/local/apache2/htdocs</volume>
+                                        <volume>src/test/resources:/usr/local/apache2/htdocs</volume>
                                     </bind>
                                 </volumes>
                             </run>
@@ -326,6 +340,7 @@
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                            <goal>build</goal>
                             <goal>start</goal>
                         </goals>
                     </execution>
