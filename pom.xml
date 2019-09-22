@@ -307,10 +307,11 @@
 
                         <image>
                             <alias>httpd</alias>
+                            <!--<name>httpd</name>-->
                             <name>httpd:2.4</name>
 
                             <!--<build>-->
-                                <!--<from></from>-->
+                                <!--<from>httpd:2.4</from>-->
                                 <!--<assembly>-->
                                     <!--<descriptor>assembly-httpd-unittest.xml</descriptor>-->
                                 <!--</assembly>-->
@@ -320,6 +321,12 @@
                                 <ports>
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
+                                <wait>
+                                    <!-- Check for this URL to return a 200 return code .... -->
+                                    <url>http://localhost:80/</url>
+                                    <!-- ... but at max 2 minutes -->
+                                    <time>120000</time>
+                                </wait>
                                 <volumes>
                                     <bind>
                                         <volume>src/test/resources:/usr/local/apache2/htdocs</volume>
