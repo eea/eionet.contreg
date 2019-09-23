@@ -264,13 +264,14 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.26.0</version>
+                <version>0.26.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
                     <images>
 
                         <image>
+                            <alias>virtuoso-cr-jenkins</alias>
                             <name>virtuoso</name>
 
                             <build>
@@ -306,6 +307,7 @@
                         </image>
 
                         <image>
+                            <alias>httpd-cr-jenkins</alias>
                             <name>httpd</name>
 
                             <build>
@@ -316,12 +318,15 @@
                             </build>
 
                             <run>
+                                <links>
+                                    <link>virtuoso</link>
+                                </links>
                                 <ports>
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
                                 <wait>
                                     <!-- Check for this URL to return a 200 return code .... -->
-                                    <url>http://localhost:${tests.httpd.port}/</url>
+                                    <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
                                     <!-- ... but at max 2 minutes -->
                                     <time>120000</time>
                                     <exec>

@@ -28,17 +28,6 @@ pipeline {
       }
     }
 
-    stage ('Tests') {
-      steps {
-        node(label: 'docker') {
-          script {
-            checkout scm
-            sh 'mvn clean install verify'
-          }
-        }
-      }
-    }
-
     stage('Pull Request') {
       when {
         not {
