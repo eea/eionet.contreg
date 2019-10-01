@@ -49,7 +49,7 @@ pipeline {
     stage('Code analysis') {
       steps {
         node(label: 'docker') {
-          sh 'mvn clean -B -V -Pcobertura verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
+          sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
         }
       }
       post {

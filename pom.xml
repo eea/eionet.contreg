@@ -11,6 +11,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <env>default</env>
         <javaVersion>1.8</javaVersion>
+         <!--SonarQube integration-->
+        <!--<sonar.host.url>http://xxxxx:9000</sonar.host.url>-->
+        <!--<sonar.login>be2fe3y27f07db354983dfxysdsa5256</sonar.login>-->
+        <!--<sonar.language>java</sonar.language>-->
+        <!--<sonar.scm.provider>git</sonar.scm.provider>-->
         <!-- TODO Replace with RDF4j and modernize -->
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
@@ -788,6 +793,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.6.0.1398</version>
             <scope>test</scope>
         </dependency>
         <dependency>
