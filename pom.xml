@@ -298,7 +298,7 @@
                                 </ports>
                                 <wait>
                                     <log>Server online at</log>
-                                    <time>20000</time>
+                                    <time>60000</time>
                                     <exec>
                                         <postStart>isql localhost:1111 dba dba /maven/1_create_testuser.sql</postStart>
                                     </exec>
