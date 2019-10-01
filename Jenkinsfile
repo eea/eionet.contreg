@@ -12,14 +12,14 @@ pipeline {
   }
 
   stages {
-    stage ('Build') {
+    stage ('Build and code analysis') {
       steps {
         node(label: 'docker') {
           script {
               try {
                 checkout scm
                 sh './prepare-tmp.sh'
-                sh 'mvn -P docker clean -B -V verify'
+                sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
               } catch (err) {
                 throw err
               } finally {
@@ -32,16 +32,6 @@ pipeline {
         success {
           archive 'target/*.war'
         }
-      }
-    }
-
-    stage('Code analysis') {
-      steps {
-        node(label: 'docker') {
-          sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
-        }
-      }
-      post {
         always {
             junit '**/target/failsafe-reports/*.xml'
             pmd canComputeNew: false
@@ -55,22 +45,22 @@ pipeline {
     }
 
     stage('Pull Request') {
-          when {
-            not {
-              environment name: 'CHANGE_ID', value: ''
-            }
-            environment name: 'CHANGE_TARGET', value: 'master'
-          }
-          steps {
-            node(label: 'swarm') {
-              script {
-                if ( env.CHANGE_BRANCH != "develop" &&  !( env.CHANGE_BRANCH.startsWith("hotfix")) ) {
-                    error "Pipeline aborted due to PR not made from develop or hotfix branch"
-                }
-              }
+      when {
+        not {
+          environment name: 'CHANGE_ID', value: ''
+        }
+        environment name: 'CHANGE_TARGET', value: 'master'
+      }
+      steps {
+        node(label: 'swarm') {
+          script {
+            if ( env.CHANGE_BRANCH != "develop" &&  !( env.CHANGE_BRANCH.startsWith("hotfix")) ) {
+                error "Pipeline aborted due to PR not made from develop or hotfix branch"
             }
           }
         }
+      }
+    }
   }
 
   post {
