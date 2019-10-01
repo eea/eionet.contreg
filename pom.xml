@@ -299,7 +299,7 @@
                                 <wait>
                                     <log>Server online at</log>
                                     <time>20000</time>
-                                    <shutdown>10000000</shutdown>
+                                    <shutdown>100000000</shutdown>
                                     <exec>
                                         <postStart>isql localhost:1111 dba dba /maven/1_create_testuser.sql</postStart>
                                     </exec>
