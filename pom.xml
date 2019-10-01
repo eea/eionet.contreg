@@ -290,7 +290,7 @@
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
                                     <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
-                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp</VIRT_Parameters_DirsAllowed>
+                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, /tmp, ${config.app.home}/tmp</VIRT_Parameters_DirsAllowed>
                                 </env>
                                 <ports>
                                     <port>8891:8890</port>
@@ -305,7 +305,7 @@
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>
+                                        <volume>${config.app.home}/tmp:${config.app.home}/tmp</volume>
                                     </bind>
                                 </volumes>
                             </run>
