@@ -10,6 +10,6 @@ echo "Identify path for WORKERDIR"
 
 mkdir /var/jenkins_home/worker/tmp_cr
 
-sed -i "s/^config.docker.sharedVolume=.*/config.docker.sharedVolume=$WORKERDIR\/tmp_cr/g" tests.properties
+sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 
 exit 0
