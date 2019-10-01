@@ -299,14 +299,13 @@
                                 <wait>
                                     <log>Server online at</log>
                                     <time>20000</time>
-                                    <shutdown>100000000</shutdown>
                                     <exec>
                                         <postStart>isql localhost:1111 dba dba /maven/1_create_testuser.sql</postStart>
                                     </exec>
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>${config.app.home}/tmp:${config.app.home}/tmp</volume>
+                                        <volume>${config.docker.sharedVolume}/tmp:${config.app.home}/tmp</volume>
                                     </bind>
                                 </volumes>
                             </run>

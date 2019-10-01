@@ -16,32 +16,21 @@ pipeline {
       steps {
         node(label: 'docker') {
           script {
-            checkout scm
-            sh 'mvn -P docker clean -B -V verify'
+              try {
+                checkout scm
+                sh './prepare-tmp.sh'
+                sh 'mvn -P docker clean -B -V verify'
+              } catch (err) {
+                throw err
+              } finally {
+                sh 'rm -r /var/jenkins_home/worker/tmp_cr'
+              }
           }
         }
       }
       post {
         success {
           archive 'target/*.war'
-        }
-      }
-    }
-
-    stage('Pull Request') {
-      when {
-        not {
-          environment name: 'CHANGE_ID', value: ''
-        }
-        environment name: 'CHANGE_TARGET', value: 'master'
-      }
-      steps {
-        node(label: 'swarm') {
-          script {
-            if ( env.CHANGE_BRANCH != "develop" &&  !( env.CHANGE_BRANCH.startsWith("hotfix")) ) {
-                error "Pipeline aborted due to PR not made from develop or hotfix branch"
-            }
-          }
         }
       }
     }
@@ -64,6 +53,24 @@ pipeline {
         }
       }
     }
+
+    stage('Pull Request') {
+          when {
+            not {
+              environment name: 'CHANGE_ID', value: ''
+            }
+            environment name: 'CHANGE_TARGET', value: 'master'
+          }
+          steps {
+            node(label: 'swarm') {
+              script {
+                if ( env.CHANGE_BRANCH != "develop" &&  !( env.CHANGE_BRANCH.startsWith("hotfix")) ) {
+                    error "Pipeline aborted due to PR not made from develop or hotfix branch"
+                }
+              }
+            }
+          }
+        }
   }
 
   post {
