@@ -20,9 +20,11 @@ pipeline {
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
-                sh 'env'
+                withSonarQubeEnv('Sonarqube') {
+                    sh "env"
+                }
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
-                sh 'find /var/jenkins_home/worker/tmp_cr -name coverage.xml'
+                sh 'find . -name coverage.xml'
                 stash name: "cobertura.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "/var/jenkins_home/worker/tmp_cr/target/cobertura/cobertura.ser"
               } catch (err) {
