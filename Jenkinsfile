@@ -24,8 +24,8 @@ pipeline {
               } catch (err) {
                 throw err
               } finally {
-                stash name: "cobertura", includes: "./target/site/cobertura/coverage.xml"
-                stash name: "findbugsXml", includes: "./target/findbugsXml.xml"
+                stash name: "cobertura".xml, includes: "./target/site/cobertura/coverage.xml"
+                stash name: "findbugsXml.xml", includes: "./target/findbugsXml.xml"
                 stash name: "failsafe", includes: "./target/failsafe-reports/*.xml"
                 archiveArtifacts './target/site/cobertura/coverage.xml'
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
