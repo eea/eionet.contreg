@@ -24,9 +24,6 @@ pipeline {
                     sh "env"
                 }
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
-                sh 'find . -name coverage.xml'
-                sh 'find . -name cobertura.ser'
-                sh 'pwd'
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "target/cobertura/cobertura.ser"
               } catch (err) {
@@ -55,10 +52,9 @@ pipeline {
                 checkout scm
                 unstash "coverage.xml"
                 unstash "cobertura.ser"
-                def scannerHome = tool 'SonarQubeScanner';
+
                 withSonarQubeEnv('Sonarqube') {
-                    sh "export PATH=$PATH:${scannerHome}/bin; sonar-scanner -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.sources=./eea -Dsonar.projectKey=$GIT_NAME-$BRANCH_NAME -Dsonar.projectVersion=$BRANCH_NAME-$BUILD_NUMBER"
-                    sh '''try=2; while [ \$try -gt 0 ]; do curl -s -XPOST -u "${SONAR_AUTH_TOKEN}:" "${SONAR_HOST_URL}api/project_tags/set?project=${GIT_NAME}-${BRANCH_NAME}&tags=${SONARQUBE_TAGS},${BRANCH_NAME}" > set_tags_result; if [ \$(grep -ic error set_tags_result ) -eq 0 ]; then try=0; else cat set_tags_result; echo "... Will retry"; sleep 60; try=\$(( \$try - 1 )); fi; done'''
+                    sh 'mvn -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${env.SONAR_HOST_URL} -Dsonar.login=${env.SONAR_AUTH_TOKEN} sonar:sonar'
                 }
             }
        }
