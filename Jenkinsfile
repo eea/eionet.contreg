@@ -24,10 +24,10 @@ pipeline {
               } catch (err) {
                 throw err
               } finally {
-                stash name: "cobertura".xml, includes: "./target/site/cobertura/coverage.xml"
-                stash name: "findbugsXml.xml", includes: "./target/findbugsXml.xml"
-                stash name: "failsafe", includes: "./target/failsafe-reports/*.xml"
-                archiveArtifacts './target/site/cobertura/coverage.xml'
+                stash name: "cobertura".xml, includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
+                stash name: "findbugsXml.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/findbugsXml.xml"
+                stash name: "failsafe", includes: "/var/jenkins_home/worker/tmp_cr/target/failsafe-reports/*.xml"
+                archiveArtifacts '/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml'
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
           }
@@ -38,13 +38,13 @@ pipeline {
           archive 'target/*.war'
         }
         always {
-            junit './target/failsafe-reports/*.xml'
+            junit '/var/jenkins_home/worker/tmp_cr/target/failsafe-reports/*.xml'
             pmd canComputeNew: false
             dry canComputeNew: false
             checkstyle canComputeNew: false
-            findbugs pattern: './target/findbugsXml.xml'
+            findbugs pattern: '/var/jenkins_home/worker/tmp_cr/target/findbugsXml.xml'
             openTasks canComputeNew: false
-            cobertura coberturaReportFile: './target/site/cobertura/coverage.xml', failNoReports: true
+            cobertura coberturaReportFile: '/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml', failNoReports: true
         }
       }
     }
