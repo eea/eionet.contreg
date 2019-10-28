@@ -17,6 +17,7 @@ pipeline {
         node(label: 'docker') {
           script {
               try {
+                sh 'rm -r /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
