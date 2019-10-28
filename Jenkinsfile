@@ -17,7 +17,7 @@ pipeline {
         node(label: 'docker') {
           script {
               try {
-                sh 'rm -r /var/jenkins_home/worker/tmp_cr'
+                sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
                 withSonarQubeEnv('Sonarqube') {
@@ -30,7 +30,7 @@ pipeline {
               } catch (err) {
                 throw err
               } finally {
-                sh 'rm -r /var/jenkins_home/worker/tmp_cr'
+                sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
               }
           }
         }
