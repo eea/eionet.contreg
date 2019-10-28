@@ -21,11 +21,12 @@ pipeline {
                 checkout scm
                 sh './prepare-tmp.sh'
                 sh 'env'
-                sh 'mvn clean -B -V -P docker verify cobertura:cobertura sonar:sonar'
+                sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
               } catch (err) {
                 throw err
               } finally {
-                stash name: "cobertura".xml, includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
+                stash name: "cobertura.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
+                stash name: "cobertura.ser", includes: "/var/jenkins_home/worker/tmp_cr/target/cobertura/cobertura.ser"
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
           }
@@ -39,16 +40,19 @@ pipeline {
     }
 
     stage ('Report to SonarQube') {
-        when {
+       when {
             allOf {
               environment name: 'CHANGE_ID', value: ''
             }
        }
        steps {
-            checkout scm
-            unstash "cobertura.xml"
-            withSonarQubeEnv('Sonarqube') {
-                sh "env"
+            node(label: 'swarm') {
+                checkout scm
+                unstash "cobertura.xml"
+                unstash "cobertura.ser"
+                withSonarQubeEnv('Sonarqube') {
+                    sh "env"
+                }
             }
        }
     }
