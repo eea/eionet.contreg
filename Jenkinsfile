@@ -20,14 +20,12 @@ pipeline {
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
-                sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
+                sh 'env'
+                sh 'mvn clean -B -V -P docker verify cobertura:cobertura sonar:sonar'
               } catch (err) {
                 throw err
               } finally {
                 stash name: "cobertura".xml, includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
-                stash name: "findbugsXml.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/findbugsXml.xml"
-                stash name: "failsafe", includes: "/var/jenkins_home/worker/tmp_cr/target/failsafe-reports/*.xml"
-                archiveArtifacts '/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml'
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
           }
@@ -36,15 +34,6 @@ pipeline {
       post {
         success {
           archive 'target/*.war'
-        }
-        always {
-            junit '/var/jenkins_home/worker/tmp_cr/target/failsafe-reports/*.xml'
-            pmd canComputeNew: false
-            dry canComputeNew: false
-            checkstyle canComputeNew: false
-            findbugs pattern: '/var/jenkins_home/worker/tmp_cr/target/findbugsXml.xml'
-            openTasks canComputeNew: false
-            cobertura coberturaReportFile: '/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml', failNoReports: true
         }
       }
     }
@@ -58,11 +47,6 @@ pipeline {
        steps {
             checkout scm
             unstash "cobertura.xml"
-            unstash "findbugsXml.xml"
-            dir('failsafe') {
-                unstash "failsafe"
-            }
-
             withSonarQubeEnv('Sonarqube') {
                 sh "env"
             }
