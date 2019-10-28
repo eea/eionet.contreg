@@ -22,11 +22,12 @@ pipeline {
                 sh './prepare-tmp.sh'
                 sh 'env'
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
+                sh 'find /var/jenkins_home/worker/tmp_cr -name coverage.xml'
+                stash name: "cobertura.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
+                stash name: "cobertura.ser", includes: "/var/jenkins_home/worker/tmp_cr/target/cobertura/cobertura.ser"
               } catch (err) {
                 throw err
               } finally {
-                stash name: "cobertura.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
-                stash name: "cobertura.ser", includes: "/var/jenkins_home/worker/tmp_cr/target/cobertura/cobertura.ser"
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
           }
