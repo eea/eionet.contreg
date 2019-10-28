@@ -26,7 +26,7 @@ pipeline {
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
                 sh 'find . -name coverage.xml'
                 sh 'find . -name cobertura.ser'
-                stash name: "cobertura.xml", includes: "./target/site/cobertura/coverage.xml"
+                stash name: "coverage.xml", includes: "./target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "./target/cobertura/cobertura.ser"
               } catch (err) {
                 throw err
@@ -52,7 +52,7 @@ pipeline {
        steps {
             node(label: 'swarm') {
                 checkout scm
-                unstash "cobertura.xml"
+                unstash "coverage.xml"
                 unstash "cobertura.ser"
                 withSonarQubeEnv('Sonarqube') {
                     sh "env"
