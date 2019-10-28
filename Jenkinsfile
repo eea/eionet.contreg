@@ -20,9 +20,6 @@ pipeline {
                 sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
-                withSonarQubeEnv('Sonarqube') {
-                    sh "env"
-                }
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "target/cobertura/cobertura.ser"
@@ -54,7 +51,8 @@ pipeline {
                 unstash "cobertura.ser"
 
                 withSonarQubeEnv('Sonarqube') {
-                    sh 'mvn -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${env.SONAR_HOST_URL} -Dsonar.login=${env.SONAR_AUTH_TOKEN} sonar:sonar'
+                    sh 'env'
+                    sh "mvn -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} sonar:sonar"
                 }
             }
        }
