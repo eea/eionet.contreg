@@ -20,12 +20,12 @@ pipeline {
                 checkout scm
                 sh './prepare-tmp.sh'
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
-                stash name: "cobertura", includes: "./target/site/cobertura/coverage.xml"
-                stash name: "findbugsXml", includes: "./target/findbugsXml.xml"
-                stash name: "failsafe", includes: "./target/failsafe-reports/*.xml"
               } catch (err) {
                 throw err
               } finally {
+                stash name: "cobertura", includes: "./target/site/cobertura/coverage.xml"
+                stash name: "findbugsXml", includes: "./target/findbugsXml.xml"
+                stash name: "failsafe", includes: "./target/failsafe-reports/*.xml"
                 archiveArtifacts './target/site/cobertura/coverage.xml'
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
