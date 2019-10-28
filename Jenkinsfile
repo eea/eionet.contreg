@@ -61,9 +61,9 @@ pipeline {
             dir('failsafe') {
                 unstash "failsafe"
             }
-            def scannerHome = tool 'SonarQubeScanner';
-            withSonarQubeEnv('Sonarqube') {
 
+            withSonarQubeEnv('Sonarqube') {
+                sh "env"
             }
        }
     }
