@@ -12,6 +12,10 @@
         <env>default</env>
         <javaVersion>1.8</javaVersion>
          <!--SonarQube integration-->
+        <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+        <sonar.phase>generate-sources</sonar.phase>
+        <!--<sonar.surefire.reportsPath>target/reports/test/</sonar.surefire.reportsPath>-->
+        <sonar.cobertura.reportPath>${config.app.home}/target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <!--<sonar.host.url>http://xxxxx:9000</sonar.host.url>-->
         <!--<sonar.login>be2fe3y27f07db354983dfxysdsa5256</sonar.login>-->
         <!--<sonar.language>java</sonar.language>-->

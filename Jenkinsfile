@@ -20,9 +20,13 @@ pipeline {
                 checkout scm
                 sh './prepare-tmp.sh'
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
+                stash name: "cobertura", includes: "./target/site/cobertura/coverage.xml"
+                stash name: "findbugsXml", includes: "./target/findbugsXml.xml"
+                stash name: "failsafe", includes: "./target/failsafe-reports/*.xml"
               } catch (err) {
                 throw err
               } finally {
+                archiveArtifacts './target/site/cobertura/coverage.xml'
                 sh 'rm -r /var/jenkins_home/worker/tmp_cr'
               }
           }
@@ -33,15 +37,35 @@ pipeline {
           archive 'target/*.war'
         }
         always {
-            junit '**/target/failsafe-reports/*.xml'
+            junit './target/failsafe-reports/*.xml'
             pmd canComputeNew: false
             dry canComputeNew: false
             checkstyle canComputeNew: false
-            findbugs pattern: '**/target/findbugsXml.xml'
+            findbugs pattern: './target/findbugsXml.xml'
             openTasks canComputeNew: false
-            cobertura coberturaReportFile: '**/target/site/cobertura/coverage.xml', failNoReports: true
+            cobertura coberturaReportFile: './target/site/cobertura/coverage.xml', failNoReports: true
         }
       }
+    }
+
+    stage ('Report to SonarQube') {
+        when {
+            allOf {
+              environment name: 'CHANGE_ID', value: ''
+            }
+       }
+       steps {
+            checkout scm
+            unstash "cobertura.xml"
+            unstash "findbugsXml.xml"
+            dir('failsafe') {
+                unstash "failsafe"
+            }
+            def scannerHome = tool 'SonarQubeScanner';
+            withSonarQubeEnv('Sonarqube') {
+
+            }
+       }
     }
 
     stage('Pull Request') {
