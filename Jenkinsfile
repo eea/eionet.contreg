@@ -25,8 +25,9 @@ pipeline {
                 }
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
                 sh 'find . -name coverage.xml'
-                stash name: "cobertura.xml", includes: "/var/jenkins_home/worker/tmp_cr/target/site/cobertura/coverage.xml"
-                stash name: "cobertura.ser", includes: "/var/jenkins_home/worker/tmp_cr/target/cobertura/cobertura.ser"
+                sh 'find . -name cobertura.ser'
+                stash name: "cobertura.xml", includes: "./target/site/cobertura/coverage.xml"
+                stash name: "cobertura.ser", includes: "./target/cobertura/cobertura.ser"
               } catch (err) {
                 throw err
               } finally {
