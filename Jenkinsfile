@@ -20,7 +20,7 @@ pipeline {
                 sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
-                sh 'mvn clean -B -V -P docker verify cobertura:cobertura'
+                sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "target/cobertura/cobertura.ser"
                 stash name: "cr3-classes", includes: "target/classes/**"
