@@ -12,9 +12,9 @@ mkdir /var/jenkins_home/worker/tmp_cr
 
 sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 
-until [ "docker ps -a | grep virtuoso | cut -d " " -f1 2> /dev/null)" == "" ]; do
-    echo "Waiting for ports to be available ..."
-    sleep 10;
-done;
-
-exit 0
+IF ! docker ps --format '{{.Image}}' | grep -w virtuoso &> /dev/null; (
+    exit 0
+) ELSE (
+    echo "Waiting for available ports..."
+    sleep 10
+)
