@@ -24,6 +24,7 @@ pipeline {
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
                 stash name: "${GIT_NAME}-${GIT_BRANCH}-classes", includes: "target/classes/**"
                 stash name: "${GIT_NAME}-${GIT_BRANCH}-test-classes", includes: "target/test-classes/**"
+                stash name: "${GIT_NAME}-${GIT_BRANCH}-target", includes: "target/**"
               } catch (err) {
                 throw err
               } finally {
@@ -55,8 +56,11 @@ pipeline {
                 dir("${GIT_NAME}-${GIT_BRANCH}-test-classes") {
                   unstash "${GIT_NAME}-${GIT_BRANCH}-test-classes"
                 }
+                dir("${GIT_NAME}-${GIT_BRANCH}-target") {
+                  unstash "${GIT_NAME}-${GIT_BRANCH}-target"
+                }
                 withSonarQubeEnv('Sonarqube') {
-                    sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=${GIT_NAME}-${GIT_BRANCH}-classes -Dsonar.java.test.binaries=${GIT_NAME}-${GIT_BRANCH}-test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}"
+                    sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=${GIT_NAME}-${GIT_BRANCH}-target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=${GIT_NAME}-${GIT_BRANCH}-target/classes -Dsonar.java.test.binaries=${GIT_NAME}-${GIT_BRANCH}-target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}"
                     sh '''try=2; while [ \$try -gt 0 ]; do curl -s -XPOST -u "${SONAR_AUTH_TOKEN}:" "${SONAR_HOST_URL}api/project_tags/set?project=${GIT_NAME}-${BRANCH_NAME}&tags=${SONARQUBE_TAGS},${BRANCH_NAME}" > set_tags_result; if [ \$(grep -ic error set_tags_result ) -eq 0 ]; then try=0; else cat set_tags_result; echo "... Will retry"; sleep 60; try=\$(( \$try - 1 )); fi; done'''
                 }
             }
