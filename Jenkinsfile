@@ -80,20 +80,6 @@ pipeline {
         }
       }
     }
-
-    stage('Release') {
-        when {
-            allOf {
-                environment name: 'CHANGE_ID', value: ''
-                branch 'master'
-            }
-        }
-        steps {
-            node(label: 'swarm') {
-                sh 'echo $BUILDTIME'
-            }
-        }
-    }
   }
 
   post {
