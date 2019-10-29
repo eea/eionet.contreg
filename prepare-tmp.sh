@@ -12,4 +12,6 @@ mkdir /var/jenkins_home/worker/tmp_cr
 
 sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 
+BUILDTIME=$(date '+%Y-%m-%dT%H%M')
+
 exit 0
