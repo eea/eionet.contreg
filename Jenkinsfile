@@ -55,7 +55,7 @@ pipeline {
                   unstash "${GIT_NAME}-${GIT_BRANCH}-classes"
                 }
                 withSonarQubeEnv('Sonarqube') {
-                    sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=cr3-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH}"
+                    sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=cr3-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}"
                 }
             }
        }
