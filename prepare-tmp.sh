@@ -8,13 +8,13 @@ WORKERDIR=$(docker inspect $docker_id | grep :/var/jenkins_home/worker | awk -F'
 
 echo "Identify path for WORKERDIR"
 
-mkdir /var/jenkins_home/worker/tmp_cr
+#mkdir /var/jenkins_home/worker/tmp_cr
 
 sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 
-IF ! docker ps --format '{{.Image}}' | grep -w virtuoso &> /dev/null; (
+if [! docker ps --format '{{.Image}}' | grep -w virtuoso &> /dev/null]; then
     exit 0
-) ELSE (
+else
     echo "Waiting for available ports..."
     sleep 10
-)
+fi
