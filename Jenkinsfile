@@ -22,7 +22,6 @@ pipeline {
                 sh './prepare-tmp.sh'
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
-                stash name: "cobertura.ser", includes: "target/cobertura/cobertura.ser"
                 stash name: "${GIT_NAME}-${GIT_BRANCH}-classes", includes: "target/classes/**"
               } catch (err) {
                 throw err
@@ -48,9 +47,7 @@ pipeline {
        steps {
             node(label: 'swarm') {
                 checkout scm
-                sh 'ls -all'
                 unstash "coverage.xml"
-                unstash "cobertura.ser"
                 dir("${GIT_NAME}-${GIT_BRANCH}-classes") {
                   unstash "${GIT_NAME}-${GIT_BRANCH}-classes"
                 }
