@@ -60,7 +60,6 @@ pipeline {
                 dir("${GIT_NAME}-${GIT_BRANCH}-target") {
                   unstash "${GIT_NAME}-${GIT_BRANCH}-target"
                 }
-                pwd
                 sh 'ls -all'
                 withSonarQubeEnv('Sonarqube') {
                     sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=${GIT_NAME}-${GIT_BRANCH}-target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=${GIT_NAME}-${GIT_BRANCH}-target/classes -Dsonar.java.test.binaries=${GIT_NAME}-${GIT_BRANCH}-target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}"
