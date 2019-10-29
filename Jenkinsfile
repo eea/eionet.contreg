@@ -14,7 +14,7 @@ pipeline {
   stages {
     stage ('Build, code analysis and SonarQube report') {
       steps {
-        node(label: 'docker') {
+        node(label: 'docker-1.13') {
           script {
               try {
                 sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
