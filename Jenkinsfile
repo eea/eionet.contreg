@@ -23,7 +23,7 @@ pipeline {
                 sh 'mvn clean -B -V -P docker verify cobertura:cobertura pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle'
                 stash name: "coverage.xml", includes: "target/site/cobertura/coverage.xml"
                 stash name: "cobertura.ser", includes: "target/cobertura/cobertura.ser"
-                stash name: "cr3-classes", includes: "target/classes/**"
+                stash name: "${GIT_NAME}-${GIT_BRANCH}-classes", includes: "target/classes/**"
               } catch (err) {
                 throw err
               } finally {
@@ -51,8 +51,8 @@ pipeline {
                 sh 'ls -all'
                 unstash "coverage.xml"
                 unstash "cobertura.ser"
-                dir('cr3-classes') {
-                  unstash "cr3-classes"
+                dir("${GIT_NAME}-${GIT_BRANCH}-classes") {
+                  unstash "${GIT_NAME}-${GIT_BRANCH}-classes"
                 }
                 withSonarQubeEnv('Sonarqube') {
                     sh "mvn sonar:sonar -Dsonar.cobertura.reportPat=coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=cr3-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH}"
@@ -76,6 +76,18 @@ pipeline {
             }
           }
         }
+      }
+    }
+
+     stage('Release') {
+      when {
+        allOf {
+          environment name: 'CHANGE_ID', value: ''
+          branch 'master'
+        }
+      }
+      steps {
+
       }
     }
   }
