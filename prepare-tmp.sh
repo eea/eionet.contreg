@@ -12,7 +12,7 @@ echo "Identify path for WORKERDIR"
 
 sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 
-if [! docker ps --format '{{.Image}}' | grep -w virtuoso &> /dev/null]; then
+if [ "$(docker ps --format '{{.Image}}' | grep -w virtuoso)" == "" ]; then
     exit 0
 else
     echo "Waiting for available ports..."
