@@ -494,7 +494,7 @@ public abstract class BaseHarvest implements Harvest {
             LOGGER.debug(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
 
             //extralogging to be removed
-            LOGGER.debug(MessageFormat("Executing parsedQuery: {0}", parsedQuery));
+            LOGGER.debug(MessageFormat.format("Executing parsedQuery: {0}", parsedQuery));
 
             //post-harvest
             if (scriptDto.getType().name().equals(HarvestScriptType.POST_HARVEST.name())) {
