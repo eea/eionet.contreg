@@ -26,6 +26,7 @@ import eionet.cr.web.sparqlClient.helpers.ResultValue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
@@ -34,11 +35,13 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -777,7 +780,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             + "cast(\"last_harvest\" as varchar) as last_harvest,interval_minutes,source, last_modified,"
             + "gen_time,last_harvest_failed,priority_source,source_owner,permanent_error,media_type,last_harvest_id,is_sparql_endpoint,delete_requested,delete_flag, is_online_csv_tsv, csv_tsv_url "
             + " from HARVEST_SOURCE where URL_HASH=?";
-    //private static final String GET_SOURCES_BY_URL_SQL = "select * from HARVEST_SOURCE where URL_HASH=?";
 
     /*
      * (non-Javadoc)
@@ -1270,34 +1272,22 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * See {@link HarvestSourceDAO#loadContentNaive(InputStream, RDFFormat, String, boolean)}.
      *
-     * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.File, org.openrdf.rio.RDFFormat, java.lang.String, boolean)
+     * @param inputStream
+     * @param rdfFormat
+     * @param graphUrl
+     * @param clearPreviousGraphContent
+     * @return
+     * @throws IOException
+     * @throws OpenRDFException
+     *
+     * {@link Deprecated}
      */
     @Override
-    public int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
-            throws IOException, OpenRDFException {
-
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-            return loadIntoRepository(inputStream, rdfFormat, graphUrl, clearPreviousGraphContent);
-
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#loadIntoRepository(java.io.InputStream, org.openrdf.rio.RDFFormat, java.lang.String,
-     * boolean)
-     */
-    @Override
-    public int
-            loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+    public int loadContentNaive(
+            InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
                     throws IOException, OpenRDFException {
 
         int storedTriplesCount = 0;
@@ -1339,51 +1329,6 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
         }
 
         return storedTriplesCount;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#addSourceMetadata(SubjectDTO)
-     */
-    @Override
-    public void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException,
-            IOException {
-
-        if (sourceMetadata.getPredicateCount() > 0) {
-
-            boolean isSuccess = false;
-            RepositoryConnection conn = null;
-
-            try {
-                conn = SesameUtil.getRepositoryConnection();
-                conn.setAutoCommit(false);
-
-                // The contextURI is always the harvester URI
-                URI harvesterContext = conn.getValueFactory().createURI(GeneralConfig.HARVESTER_URI);
-
-                if (sourceMetadata != null) {
-                    URI subject = conn.getValueFactory().createURI(sourceMetadata.getUri());
-
-                    // Remove old predicates
-                    conn.remove(subject, null, null, harvesterContext);
-
-                    if (sourceMetadata.getPredicateCount() > 0) {
-                        insertMetadata(sourceMetadata, conn, harvesterContext, subject);
-                    }
-                }
-                // commit transaction
-                conn.commit();
-
-                // no transaction rollback needed, when reached this point
-                isSuccess = true;
-            } finally {
-                if (!isSuccess) {
-                    SesameUtil.rollback(conn);
-                }
-                SesameUtil.close(conn);
-            }
-        }
     }
 
     /**
@@ -1659,48 +1604,12 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     /*
      * (non-Javadoc)
      *
-     * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.io.File, eionet.cr.harvest.load.ContentLoader, java.lang.String)
-     */
-    @Override
-    public int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException {
-        return loadContent(Collections.singletonMap(file, contentLoader), graphUri);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
      * @see eionet.cr.dao.HarvestSourceDAO#loadContent(java.util.Map, java.lang.String)
      */
     @Override
     public int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException {
 
-        ArrayList<Pair<InputStream, ContentLoader>> pairs = new ArrayList<Pair<InputStream, ContentLoader>>();
-
-        try {
-            for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
-                File file = entry.getKey();
-                ContentLoader loader = entry.getValue();
-                pairs.add(new Pair<InputStream, ContentLoader>(new FileInputStream(file), loader));
-            }
-            return loadContent(pairs, graphUri);
-        } catch (FileNotFoundException e) {
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            for (Pair<InputStream, ContentLoader> pair : pairs) {
-                IOUtils.closeQuietly(pair.getLeft());
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see eionet.cr.dao.HarvestSourceDAO#loadContentFast(java.util.Map, java.lang.String)
-     */
-    @Override
-    public int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException {
-
-        LOGGER.debug(BaseHarvest.loggerMsg("Going to attempt FAST load", graphUri));
+        LOGGER.debug(BaseHarvest.loggerMsg("Starting content loading ...", graphUri));
 
         // Prepare connections (repository and SQL).
 
@@ -1722,42 +1631,55 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             }
         }
 
+        int currentTriplesCount = getNoOfHarvestedStatements(sqlConn, graphUri);
+        int xoringThresholdTriplesCount = GeneralConfig.getIntProperty(
+                GeneralConfig.HARVESTER_SKIP_XORING_NOOFTRIPLES_THRESHOLD, 1000000000);
+        long fileSize = getFileSizesSum(filesAndLoaders.keySet());
+        long fileSizeThreshold = GeneralConfig.getLongProperty(
+                GeneralConfig.HARVESTER_SKIP_XORING_FILESIZE_BYTES_THRESHOLD, 1000000000000L);
+        boolean isDirectLoading = currentTriplesCount > xoringThresholdTriplesCount || fileSize > fileSizeThreshold;
+
+        LOGGER.debug(BaseHarvest.loggerMsg(String.format(
+                "Current triples count = %d, file size = %d, direct loading flag = %s",
+                currentTriplesCount, fileSize, String.valueOf(isDirectLoading).toUpperCase()), graphUri));
+
         // Prepare URI objects of the original graph, backup graph and temporary graph.
 
         URI graphResource = repoConn.getValueFactory().createURI(graphUri);
-
         String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
         URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
+
+        // Start loading steps.
 
         int triplesLoaded = 0;
         boolean wasOrigEmpty = false;
         try {
-            // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
-            forceLogEnable(2, sqlConn, LOGGER);
+            // Ensure auto-commit.
+            forceLogEnable(3, sqlConn, LOGGER);
 
-            // Clear potential leftover from previous harvest
+            // Clear potential temporary graph leftover from previous harvest.
             clearGraph(sqlConn, tempGraphUri, "Clearing leftovers of previous TEMP graph", false);
 
             // Load the content into the temporary graph, but be sure to use the "original" graph URI
             // as the base URI for resolving any relative identifiers in the content.
             try {
 
-                // We need to know if the "original" graph is empty.
-                wasOrigEmpty = getGraphTriplesCount(sqlConn, graphResource) == 0;
+                if (isDirectLoading) {
+                    clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph", false);
+                } else {
+                    // We need to know if the "original" graph is empty.
+                    wasOrigEmpty = isGraphEmpty(sqlConn, graphResource);
+                }
 
                 // Prepare base URI for resolving relative URIs and also the target graph where the triples will be loaded into.
                 // The latter is either "original" or temporary graph, depending on whether original is empty or not.
                 String baseUri = graphUri;
-                String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
-
-                if (wasOrigEmpty) {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into ORIGINAL graph", graphUri));
-                } else {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into TEMP graph", tempGraphUri));
-                }
+                String targetGraphUri = isDirectLoading || wasOrigEmpty ? graphUri : tempGraphUri;
+                LOGGER.debug(BaseHarvest.loggerMsg(String.format("Going to load triples into %s graph",
+                        isDirectLoading || wasOrigEmpty ? "ORIGINAL" : "TEMP"), graphUri));
 
                 // Ensure auto-commit, as Virtuoso tends to forget it at long harvests.
-                forceLogEnable(2, sqlConn, LOGGER);
+                forceLogEnable(3, sqlConn, LOGGER);
 
                 for (Entry<File, ContentLoader> entry : filesAndLoaders.entrySet()) {
 
@@ -1786,13 +1708,14 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                     }
                 }
 
-                if (!wasOrigEmpty) {
+                if (!isDirectLoading && !wasOrigEmpty) {
 
                     // Log the number of triples loaded into TEMP graph.
-                    int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
-                    LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
+                    boolean isTempEmpty = isGraphEmpty(sqlConn, tempGraphResource);
+                    LOGGER.debug(BaseHarvest.loggerMsg(
+                            String.format("TEMP graph %sempty", isTempEmpty ? "" : "not "), tempGraphUri));
 
-                    if (tCount > 0) {
+                    if (!isTempEmpty) {
                         // XOR the temporary and original graphs.
                         LOGGER.debug("XOR-ing <" + tempGraphUri + " with <" + graphUri + ">");
                         synchronizeGraphs(sqlConn, graphResource, tempGraphResource);
@@ -1807,15 +1730,15 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
                 SesameUtil.rollback(repoConn);
 
                 // Clean-up attempt
-                if (wasOrigEmpty) {
+                if (!isDirectLoading && wasOrigEmpty) {
                     clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
                 }
 
                 throw new DAOException("Failed content loading of " + graphUri, e);
 
             } finally {
-                if (!wasOrigEmpty) {
-                    forceLogEnable(2, sqlConn, LOGGER);
+                if (!isDirectLoading && !wasOrigEmpty) {
+                    forceLogEnable(3, sqlConn, LOGGER);
                     clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph", true);
                 }
             }
@@ -1831,6 +1754,26 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         // Return the number of triples loaded into the graph.
         return triplesLoaded;
+    }
+
+    /**
+     * Gets the {@link Predicates#CR_HARVESTED_STATEMENTS} value for given subject.
+     * Defaults to -1, if not found.
+     *
+     * @param sqlConn
+     * @param subjectUri
+     * @return
+     */
+    private int getNoOfHarvestedStatements(Connection sqlConn, String subjectUri) throws DAOException {
+
+        String sql = String.format("SPARQL SELECT ?o FROM <%s> WHERE {<%s> <%s> ?o} ORDER BY DESC(?o) LIMIT 1",
+                GeneralConfig.HARVESTER_URI, subjectUri, Predicates.CR_HARVESTED_STATEMENTS);
+        try {
+            Object o = SQLUtil.executeSingleReturnValueQuery(sql, sqlConn);
+            return o == null ? -1 : NumberUtils.toInt(o.toString(), -1);
+        } catch (Exception e) {
+            throw new DAOException("Failed to get number of harvested statements for " + subjectUri, e);
+        }
     }
 
     /**
@@ -1853,157 +1796,57 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
     }
 
     /**
-     * Loads the given input streams into given target graph. Streams are given as a collection of pairs where the left-side is the
-     * stream to load, and the right side is the loader to use.
      *
-     * @param streams
-     *            The streams as descibred above.
-     * @param graphUri
-     *            The target graph URI.
-     * @return Total number of loaded triples.
-     * @throws DAOException
-     *             All exceptions are wrapped into this one.
+     * @param sqlConn
+     * @param graphResource
+     * @return
+     * @throws SQLException
      */
-    private int loadContent(Collection<Pair<InputStream, ContentLoader>> streams, String graphUri) throws DAOException {
+    private boolean isGraphEmpty(Connection sqlConn, URI graphResource) throws SQLException {
 
-        // Prepare connections (repository and SQL).
-        RepositoryConnection repoConn = null;
-        Connection sqlConn = null;
-        boolean noExceptions = false;
-        try {
-            repoConn = SesameUtil.getRepositoryConnection();
-            sqlConn = SesameUtil.getSQLConnection();
-            noExceptions = true;
-        } catch (RepositoryException e) {
-            throw new DAOException("Creating repository connection failed", e);
-        } catch (SQLException e) {
-            throw new DAOException("Creating SQL connection failed", e);
-        } finally {
-            if (!noExceptions) {
-                SesameUtil.close(repoConn);
-                SQLUtil.close(sqlConn);
+        String qry = String.format("sparql select 1 from <%s> where {?s ?p ?o} limit 1", graphResource);
+        Object o = SQLUtil.executeSingleReturnValueQuery(qry, sqlConn);
+        boolean result = o == null || !o.toString().equals("1");
+        return result;
+    }
+
+    /**
+     *
+     * @param files
+     * @return
+     */
+    private boolean fileSizeExceedsXoringThreshold(Collection<File> files) {
+
+        boolean result = false;
+
+        long fileSizeThreshold = GeneralConfig.getLongProperty(
+                GeneralConfig.HARVESTER_SKIP_XORING_FILESIZE_BYTES_THRESHOLD, 1000000000000L);
+
+        for (File file : files) {
+            long fileSize = file.length();
+            if (fileSize > fileSizeThreshold) {
+                result = true;
+                break;
             }
         }
 
-        // Prepare URI objects of the original graph, backup graph and temporary graph.
-        URI graphResource = repoConn.getValueFactory().createURI(graphUri);
+        return result;
+    }
 
-        String tempGraphUri = graphUri + TEMP_GRAPH_SUFFIX;
-        URI tempGraphResource = repoConn.getValueFactory().createURI(tempGraphUri);
+    /**
+     *
+     * @param files
+     * @return
+     */
+    private long getFileSizesSum(Collection<File> files) {
 
-        String backupGraphUri = graphUri + BACKUP_GRAPH_SUFFIX;
-        URI backupGraphResource = repoConn.getValueFactory().createURI(backupGraphUri);
+        long result = 0L;
 
-        int triplesLoaded = 0;
-        boolean backupCreated = false;
-        boolean wasOrigEmpty = false;
-        try {
-
-            // Clear potential leftover from previous harvest
-            clearGraph(sqlConn, tempGraphUri, "Clearing leftovers of previous TEMP graph", false);
-            clearGraph(sqlConn, backupGraphUri, "Clearing leftovers of previous BACKUP graph", false);
-
-            // Load the content into the temporary graph, but be sure to use the "original" graph URI
-            // as the base URI for resolving any relative identifiers in the content.
-            try {
-                // Essential to set auto-commit to false, cause' otherwise lazy-loading will cause "Too many open statements".
-                // Read more about lazy-loading in the JavaDocs of virtuoso.sesame2.driver.VirtuosoRepository
-                // and eionet.cr.util.sesame.SesameConnectionProvider.java.createRepository().
-                repoConn.setAutoCommit(false);
-
-                // We need to know if the "original" graph is empty
-                wasOrigEmpty = getGraphTriplesCount(sqlConn, graphResource) == 0;
-
-                // Prepare base URI for resolving relative URIs and also the target graph where the triples will be loaded into.
-                // The latter is either "original" or temporary graph, depending on whether original is empty or not.
-                String baseUri = graphUri;
-                String targetGraphUri = wasOrigEmpty ? graphUri : tempGraphUri;
-
-                if (wasOrigEmpty) {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into ORIGINAL graph", graphUri));
-                } else {
-                    LOGGER.debug(BaseHarvest.loggerMsg("Going to load triples into TEMP graph", tempGraphUri));
-                }
-
-                for (Pair<InputStream, ContentLoader> pair : streams) {
-
-                    InputStream inputStream = pair.getLeft();
-                    ContentLoader contentLoader = pair.getRight();
-                    triplesLoaded += contentLoader.load(inputStream, repoConn, sqlConn, baseUri, targetGraphUri);
-                }
-
-                repoConn.commit();
-                repoConn.setAutoCommit(true);
-
-                if (!wasOrigEmpty) {
-
-                    int tCount = getGraphTriplesCount(sqlConn, tempGraphResource);
-                    LOGGER.debug(BaseHarvest.loggerMsg("Number of triples loaded into TEMP graph: " + tCount, tempGraphUri));
-
-                    // Note that Virtuoso's Sesame driver renames graphs in auto-commit by force,
-                    // even if you set auto-commit to false.
-                    renameGraph(sqlConn, graphResource, backupGraphResource, "Renaming ORIGINAL graph to BACKUP");
-                    backupCreated = true;
-
-                    renameGraph(sqlConn, tempGraphResource, graphResource, "Renaming TEMP graph to ORIGINAL");
-                }
-
-            } catch (Exception e) {
-
-                // The repository connection rollback is ignored if the Virtuoso connection URL has log_enable=2 or log_enable=3.
-                SesameUtil.rollback(repoConn);
-
-                // Restore attempt
-                boolean restoredFromBackupSuccess = false;
-                if (backupCreated) {
-                    try {
-                        clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", false);
-                        renameGraph(sqlConn, backupGraphResource, graphResource, "Renaming BACKUP graph back to ORIGINAL");
-                        restoredFromBackupSuccess = true;
-                    } catch (Exception ee) {
-                        LOGGER.warn(BaseHarvest
-                                .loggerMsg("Failed restoring ORIGINAL graph after failed content loading", graphUri));
-                    }
-                }
-
-                // Clean-up attempt
-                boolean cleanupSuccess = false;
-                if (wasOrigEmpty) {
-                    cleanupSuccess = clearGraph(sqlConn, graphUri, "Clearing ORIGINAL graph after failed content loading", true);
-                } else {
-                    cleanupSuccess = clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after failed content loading", true);
-                }
-
-                // Throw the reason why content loading failed.
-                String msg = "Failed content loading ";
-                if (backupCreated && !restoredFromBackupSuccess) {
-                    msg = msg + "(and the subsequent restore from backup) ";
-                }
-                if (!cleanupSuccess) {
-                    if (wasOrigEmpty) {
-                        msg = msg + "(and the subsequent cleanup of original graph) ";
-                    } else {
-                        msg = msg + "(and the subsequent cleanup of temporary graph) ";
-                    }
-                }
-                throw new DAOException(msg + "of " + graphUri, e);
-            }
-
-            if (!wasOrigEmpty) {
-                // Content successfully loaded, clear the backup and temp graphs created two steps ago.
-                clearGraph(sqlConn, tempGraphUri, "Clearing TEMP graph after successful content loading", true);
-                if (backupCreated) {
-                    clearGraph(sqlConn, backupGraphUri, "Clearing BACKUP graph after successful content loading", true);
-                }
-            }
-        } finally {
-            // Ensure connections will be closed regardless of success or exceptions.
-            SQLUtil.close(sqlConn);
-            SesameUtil.close(repoConn);
+        for (File file : files) {
+            result = result + file.length();
         }
 
-        // Return the number of triples loaded into the graph.
-        return triplesLoaded;
+        return result;
     }
 
     /**
@@ -2103,10 +1946,10 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         boolean graphCleared = false;
         String logMessage = BaseHarvest.loggerMsg(message, graphUri);
-        String graphEmptyCkeckerQuery = String.format("sparql select 1 from <%s> where {?s ?p ?o} limit 1", graphUri);
+        String graphEmptyCheckerQuery = String.format("sparql select 1 from <%s> where {?s ?p ?o} limit 1", graphUri);
 
         try {
-            Object rslt = SQLUtil.executeSingleReturnValueQuery(graphEmptyCkeckerQuery, sqlConn);
+            Object rslt = SQLUtil.executeSingleReturnValueQuery(graphEmptyCheckerQuery, sqlConn);
             boolean isGraphEmpty = rslt == null || !rslt.toString().equals("1");
             if (isGraphEmpty) {
                 graphCleared = true;
