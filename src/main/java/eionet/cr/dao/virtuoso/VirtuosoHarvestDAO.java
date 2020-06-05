@@ -65,7 +65,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
     @Override
     public List<HarvestDTO> getHarvestsBySourceId(Integer harvestSourceId) throws DAOException {
 
-        int maxDistinctHarvests = 10;
+        int maxDistinctHarvests = 20;
 
         String getHarvestsBySourceIdSQL =
                 "select distinct top " + HarvestMessageType.values().length * maxDistinctHarvests + " H.HARVEST_ID as HARVEST_ID,"
@@ -75,7 +75,7 @@ public class VirtuosoHarvestDAO extends VirtuosoBaseDAO implements HarvestDAO {
                         + " H.HTTP_CODE as HTTP_CODE,"
                         + " H.LIT_STATEMENTS as LIT_STATEMENTS, M.TYPE as MESSAGE_TYPE"
                         + " from HARVEST AS H left join HARVEST_MESSAGE AS M on H.HARVEST_ID=M.HARVEST_ID"
-                        + " where H.HARVEST_SOURCE_ID=? order by H.HARVEST_ID desc";
+                        + " where H.HARVEST_SOURCE_ID=? order by H.STARTED desc";
 
         List<Object> values = new ArrayList<Object>();
         values.add(harvestSourceId);
