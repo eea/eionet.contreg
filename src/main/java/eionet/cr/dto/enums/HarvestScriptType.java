@@ -11,7 +11,7 @@ public enum HarvestScriptType {
     POST_HARVEST("Post Harvest script", "Post-harvest"),
 
     /**
-     * Push script, pushing content top an external service.
+     * Push script, pushing content to an external service.
      */
     PUSH("Push script", "Push");
 
@@ -57,7 +57,7 @@ public enum HarvestScriptType {
     public String getShortLabel() {
         return StringUtils.isBlank(shortLabel) ? name() : shortLabel;
     }
-};
+}
 
 
 

@@ -411,7 +411,8 @@ public abstract class BaseHarvest implements Harvest {
             }
         }
 
-        String dbgLabel = type.getShortLabel() + (phase != null ? " " + phase.getShortLabel() : "");
+        String dbgLabel = HarvestScriptType.POST_HARVEST.equals(type) && phase != null ?
+        phase.getShortLabel() : type.getShortLabel() + (phase != null ? " " + phase.getShortLabel() : "");
         LOGGER.debug(loggerMsg("Running \"" + dbgLabel  + "\" scripts..."));
 
         RepositoryConnection conn = null;
@@ -443,7 +444,7 @@ public abstract class BaseHarvest implements Harvest {
             }
 
             if (totalScriptsFound == 0) {
-                LOGGER.debug(loggerMsg("No active \"" + dbgLabel  + "\" scripts were found relevant for this source"));
+                LOGGER.debug(loggerMsg("No active \"" + dbgLabel  + "\" scripts were found for this source"));
             }
 
             // commit changes
@@ -491,6 +492,9 @@ public abstract class BaseHarvest implements Harvest {
 
         try {
             LOGGER.debug(MessageFormat.format("Executing {0} \"{1}\" script titled \"{2}\"", scriptType, phaseShortLabel, title));
+
+            //extralogging to be removed
+            LOGGER.debug(MessageFormat.format("Executing parsedQuery: {0}", parsedQuery));
 
             //post-harvest
             if (scriptDto.getType().name().equals(HarvestScriptType.POST_HARVEST.name())) {
@@ -1295,7 +1299,7 @@ public abstract class BaseHarvest implements Harvest {
         // Run harvest scripts meant to be run before clearing the graph before loading new content.
         runHarvestScripts(Phase.PRE_PURGE, HarvestScriptType.POST_HARVEST);
 
-        int tripleCount = dao.loadContentFast(filesAndLoaders, url);
+        int tripleCount = dao.loadContent(filesAndLoaders, url);
         return tripleCount;
     }
 

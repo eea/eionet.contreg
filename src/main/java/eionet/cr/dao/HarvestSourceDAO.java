@@ -23,7 +23,6 @@ package eionet.cr.dao;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
-import eionet.cr.dto.SubjectDTO;
 import eionet.cr.dto.UrlAuthenticationDTO;
 import eionet.cr.harvest.load.ContentLoader;
 import eionet.cr.harvest.statistics.dto.HarvestedUrlCountDTO;
@@ -35,7 +34,6 @@ import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -281,22 +279,10 @@ public interface HarvestSourceDAO extends DAO {
     boolean removeSourceFromInferenceRule(String url) throws DAOException;
 
     /**
-     * Loads the given file into the triple store (i.e. repository). File format must be supported by the triple store.
+     * Loads the given input stream into the triple store (i.e. repository).
+     * The stream must be formatted by a format supported by the triple store.
      *
-     * @param file
-     * @param rdfFormat
-     * @param graphUrl
-     * @param clearPreviousGraphContent
-     * @return
-     * @throws IOException
-     * @throws OpenRDFException
-     */
-    int loadIntoRepository(File file, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent) throws IOException,
-    OpenRDFException;
-
-    /**
-     * Loads the given input stream into the triple store (i.e. repository). The stream must be formatted by a format supported by
-     * the triple store.
+     * Usage of this method is deprecated, as it takes a somewhat naive approach that only works with smaller graphs.
      *
      * @param inputStream
      * @param rdfFormat
@@ -305,22 +291,14 @@ public interface HarvestSourceDAO extends DAO {
      * @return
      * @throws IOException
      * @throws OpenRDFException
+     *
+     * {@link Deprecated}
      */
-    int loadIntoRepository(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
+    int loadContentNaive(InputStream inputStream, RDFFormat rdfFormat, String graphUrl, boolean clearPreviousGraphContent)
             throws IOException, OpenRDFException;
 
     /**
-     *
-     * @param file
-     * @param contentLoader
-     * @param graphUri
-     * @return
-     * @throws DAOException
-     */
-    int loadContent(File file, ContentLoader contentLoader, String graphUri) throws DAOException;
-
-    /**
-     * Loads the given files with given loaders into the given target graph. Files and corresponding loaders given as map.
+     * Load the content given as a map of files and corresponding loaders, into the given target graph.
      *
      * @param filesAndLoaders
      *            The given files with given loaders.
@@ -331,34 +309,6 @@ public interface HarvestSourceDAO extends DAO {
      *             All exceptions are wrapped into this one.
      */
     int loadContent(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
-
-    /**
-     * A prototype of the files loader method that is hopefully significantly faster than {@link #loadContent(Map, String)}, because
-     * it uses DB.DBA.RDF_LOAD_RDFXML(file_open(f), graph, graph) and DB.DBA.TTLP(file_open(f), graph, graph) functions.
-     *
-     * @param filesAndLoaders
-     *            The given files with given loaders.
-     * @param graphUri
-     *            The target graph URI.
-     * @return Total number of loaded triples.
-     * @throws DAOException
-     *             All exceptions are wrapped into this one.
-     */
-    int loadContentFast(Map<File, ContentLoader> filesAndLoaders, String graphUri) throws DAOException;
-
-    /**
-     * Adds the meta information the harvester has collected about the source. The meta data is considered part of the harvester and
-     * not the source. Therefore the meta data is stored in the harvester's named graph (or context).
-     *
-     * @param sourceMetadata
-     * @throws DAOException
-     *             if relational database is unavailable.
-     * @throws RepositoryException
-     *             if data repository is unavailable.
-     * @throws RDFParseException
-     * @throws IOException
-     */
-    void addSourceMetadata(SubjectDTO sourceMetadata) throws DAOException, RDFParseException, RepositoryException, IOException;
 
     /**
      * Returns metadata from /harvester context.
