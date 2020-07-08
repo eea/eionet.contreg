@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import eionet.cr.util.QueryLoggerUtil;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
@@ -88,6 +89,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointActionBean.class);
+
+    private static final Logger SERVICE_LOGGER = LoggerFactory.getLogger(QueryLoggerUtil.class);
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
@@ -227,6 +230,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
+
+        SERVICE_LOGGER.debug("SERVICE LOGGER: " + query);
 
         // If "fillfrom" is specified then fill the bean from bookmarked query and send to form page without executing the query.
         // If "queryfrom" is specified then fill the bean from bookmarked query and execute the query.

@@ -1,10 +1,18 @@
 <Configuration>
+    <Properties>
+        <Property name="filename">target/services_query.log</Property>
+    </Properties>
     <Appenders>
         <Console name="console">
             <PatternLayout>
                 <Pattern>%style{[}{blue}%style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright,green}%style{]}{blue} - %highlight{%5p}{STYLE=LogBack} %style{---}{bright,magenta} %style{%-70.70logger}{bright,cyan} : %m - (%c{0}.java:%line)%n</Pattern>
             </PatternLayout>
         </Console>
+        <QueryAppender type="File" name="File" fileName="${filename}">
+            <PatternLayout>
+                <Pattern>%m</Pattern>
+            </PatternLayout>
+        </QueryAppender>
         <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
         <Sentry name="Sentry" />
     </Appenders>
