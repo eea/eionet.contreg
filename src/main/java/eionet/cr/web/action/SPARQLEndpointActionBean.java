@@ -1,54 +1,9 @@
 package eionet.cr.web.action;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import eionet.cr.util.QueryAppender;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.log4j.LogManager;
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.n3.N3WriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.SourceDeletionsDAO;
+import eionet.cr.dao.*;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -62,16 +17,35 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
-import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
+import eionet.cr.web.sparqlClient.helpers.*;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.LogManager;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.*;
+import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.n3.N3WriterFactory;
+import org.openrdf.rio.ntriples.NTriplesWriterFactory;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.turtle.TurtleWriterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.*;
 
 /**
  *
