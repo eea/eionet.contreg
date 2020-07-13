@@ -1,6 +1,7 @@
 <Configuration>
     <Properties>
-        <Property name="filename">target/services_query.log</Property>
+        <Property name="baseDir">target</Property>
+        <Property name="filename">services_query.log</Property>
     </Properties>
     <Appenders>
         <Console name="console">
@@ -8,16 +9,31 @@
                 <Pattern>%style{[}{blue}%style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright,green}%style{]}{blue} - %highlight{%5p}{STYLE=LogBack} %style{---}{bright,magenta} %style{%-70.70logger}{bright,cyan} : %m - (%c{0}.java:%line)%n</Pattern>
             </PatternLayout>
         </Console>
-        <QueryAppender type="File" name="File" fileName="${filename}">
+<!--        <RollingFile name="RollingFile" fileName="${baseDir}/${filename}" filePattern="${baseDir}/$${date:yyyy-MM}/contreg-%d{yyyy-MM-dd}.log.gz">-->
+        <RollingFile name="RollingFile" fileName="/home/claudia/work/services_query.log" filePattern="/home/claudia/work/service_query-%d{yyyy-MM-dd}.log.gz">
             <PatternLayout>
-                <Pattern>%m</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %m%n</Pattern>
             </PatternLayout>
-        </QueryAppender>
+<!--            <CronTriggeringPolicy schedule="0 0 0 * * ?"/>-->
+<!--            <DefaultRolloverStrategy>-->
+<!--                <Delete basePath="${baseDir}" maxDepth="2">-->
+<!--                    <IfFileName glob="*/contreg-*.log.gz" />-->
+<!--                    <IfLastModified age="60d" />-->
+<!--                </Delete>-->
+<!--            </DefaultRolloverStrategy>-->
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5" />
+        </RollingFile>
         <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
         <Sentry name="Sentry" />
     </Appenders>
     <Loggers>
         <logger name="eionet" level="debug"/>
+        <Logger name="RollingFileLogger">
+            <AppenderRef ref="RollingFile" />
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="console"/>
             <AppenderRef ref="Sentry" level="WARN" />
