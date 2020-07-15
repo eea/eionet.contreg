@@ -1,8 +1,4 @@
 <Configuration>
-    <Properties>
-        <Property name="baseDir">target</Property>
-        <Property name="filename">services_query.log</Property>
-    </Properties>
     <Appenders>
         <Console name="console">
             <PatternLayout>
@@ -18,7 +14,7 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
             <DefaultRolloverStrategy max="1">
-                <Delete basePath="${baseDir}" maxDepth="2">
+                <Delete basePath="${env:QUERY_LOG_DIR_PATH}" maxDepth="1">
                     <IfFileName glob="${env:QUERY_LOG_DIR_PATH}/${env:INSTANCE_NAME}-*.log.gz" />
                     <IfLastModified age="30d" />
                 </Delete>
@@ -29,6 +25,7 @@
     </Appenders>
     <Loggers>
         <logger name="eionet" level="debug"/>
+        <!-- QUERY_LOG_LEVEL environment variable to set the logger level - off/info-->
         <Logger name="RollingFileLogger" level="${env:QUERY_LOG_LEVEL}">
             <AppenderRef ref="RollingFile" />
         </Logger>
