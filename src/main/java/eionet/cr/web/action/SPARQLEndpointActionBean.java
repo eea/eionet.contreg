@@ -202,9 +202,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
-
-        SERVICE_LOGGER.info("SERVICE LOGGER: request event on sparql");
-
         // If "fillfrom" is specified then fill the bean from bookmarked query and send to form page without executing the query.
         // If "queryfrom" is specified then fill the bean from bookmarked query and execute the query.
         // In all other cases just execute the query.
@@ -552,12 +549,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // Set the default-graph-uri and named-graph-uri (see SPARQL protocol specifications).
         setDefaultAndNamedGraphs();
 
-        //Log debug details on query execution
-        SERVICE_LOGGER.info("SERVICE LOGGER: " + query);
-
-//        Map<String, String> map = this.getRequestHeadersInMap(getContext().getRequest());
-//        map.forEach((key, value) -> System.out.println(key + ":" + value));
-        System.out.println(getClientIpAddress(getContext().getRequest()));
+        // Get client IP for query logger
+        String clientIp = getClientIpAddress(getContext().getRequest());
         
         // If user has requested use of same-as "yes", then ensure that the relevant command is present in the query.
         String sameasyesCommand = SPARQLQueryUtil.getCrOwlSameAsDefinitionStr();
@@ -611,12 +604,28 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
             }
         } else if (STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.containsKey(mimeType)) {
-            SERVICE_LOGGER.info("Prepare streaming query execution: " + StringEscapeUtils.escapeJava(query));
+            long startTime = System.currentTimeMillis();
+            int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
+
             resolution = executeStreamingQuery(mimeType);
+
+            long endTime = System.currentTimeMillis();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp);
         } else {
-            SERVICE_LOGGER.info("Prepare query execution: " + StringEscapeUtils.escapeJava(query));
+            long startTime = System.currentTimeMillis();
+            int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
+
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
+
+            long endTime = System.currentTimeMillis();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -786,8 +795,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             Query queryObject = conn.prepareQuery(QueryLanguage.SPARQL, query);
             SesameUtil.setDatasetParameters(queryObject, conn, defaultGraphUris, namedGraphUris);
 
-            String clientIp = getClientIpAddress(getContext().getRequest());
-
             TupleQueryResult queryResult = null;
 
             try {
@@ -837,16 +844,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     // Evaluate CONSTRUCT query.
                     if (outputFormat.equals(FORMAT_HTML)) {
                         long startTime = System.currentTimeMillis();
-                        int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
-
-                        SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
 
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
                         TupleQueryResult bindings = resultsTable.evaluate();
-                        long endTime = System.currentTimeMillis();
-                        executionTime =  endTime - startTime;
-
-                        SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|NULL|" + clientIp);
+                        executionTime =  System.currentTimeMillis() - startTime;
 
                         if (bindings != null) {
                             result = new QueryResult(bindings, false, limitResultCount);
@@ -905,15 +906,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             || outputFormat.equals(FORMAT_HTML_PLUS))) {
                         response.setContentType("text/html");
                         long startTime = System.currentTimeMillis();
-                        int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
-
-                        SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
 
                         queryResult = ((TupleQuery) queryObject).evaluate();
-                        long endTime = System.currentTimeMillis();
-                        executionTime =  endTime - startTime;
-
-                        SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|NULL|" + clientIp);
+                        executionTime =  System.currentTimeMillis() - startTime;
 
                         if (queryResult != null) {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
