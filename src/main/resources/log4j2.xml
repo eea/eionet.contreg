@@ -14,9 +14,12 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
             <DefaultRolloverStrategy max="1">
-                <Delete basePath="${env:QUERY_LOG_DIR_PATH}" maxDepth="1">
+                <!--    testMode - boolean - If true, files are not deleted but instead a message is printed to the status -->
+                <!--    logger at INFO level. Use this to do a dry run to test if the configuration works as expected. Default is false.-->
+                <Delete basePath="${env:QUERY_LOG_DIR_PATH}" maxDepth="1" testMode="${env:QUERY_LOG_RETAIN_ALL}">
                     <IfFileName glob="${env:QUERY_LOG_DIR_PATH}/${env:INSTANCE_NAME}-*.log.gz" />
-                    <IfLastModified age="30d" />
+                    <!-- <IfLastModified age="30d" /> -->
+                    <IfLastModified age="${env:QUERY_LOG_RETENTION_DAYS}" />
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
