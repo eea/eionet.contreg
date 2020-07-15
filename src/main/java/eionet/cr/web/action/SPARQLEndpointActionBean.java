@@ -551,6 +551,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
         // Get client IP for query logger
         String clientIp = getClientIpAddress(getContext().getRequest());
+        String requestMethod = getContext().getRequest().getMethod();
         
         // If user has requested use of same-as "yes", then ensure that the relevant command is present in the query.
         String sameasyesCommand = SPARQLQueryUtil.getCrOwlSameAsDefinitionStr();
@@ -607,25 +608,25 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             long startTime = System.currentTimeMillis();
             int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
 
             resolution = executeStreamingQuery(mimeType);
 
             long endTime = System.currentTimeMillis();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp);
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
         } else {
             long startTime = System.currentTimeMillis();
             int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp);
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
 
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
 
             long endTime = System.currentTimeMillis();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp);
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
