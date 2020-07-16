@@ -40,7 +40,7 @@ pipeline {
                 sh '''sed -i "s/tests.virtuoso.port=.*/tests.virtuoso.port=$availableport2/" tests.properties'''
                 sh '''sed -i "s/tests.httpd.port=.*/tests.httpd.port=$availableport3/" tests.properties'''
                 //sh '''sed -i "s/virtuoso:1112/virtuoso-$availableport:$availableport2/" default.properties'''
-                sh '''sed -i "s/1112/$availableport2/" src/test/resources/liquibase.properties '''
+                //sh '''sed -i "s/1112/$availableport2/" src/test/resources/liquibase.properties '''
 
                 withSonarQubeEnv('Sonarqube') {
                     sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
