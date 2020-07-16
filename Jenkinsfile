@@ -29,6 +29,9 @@ pipeline {
                 checkout scm
                 sh './prepare-tmp.sh'
                 sh '''sed -i "s/8891:8890/$availableport:8890/" pom.xml'''
+                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/virtuoso.ini'''
+                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/Dockerfile'''
+
                 withSonarQubeEnv('Sonarqube') {
                     sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
                    if (env.CHANGE_ID == '') {
