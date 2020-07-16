@@ -1,9 +1,13 @@
 pipeline {
-  agent any
+  agent {
+            node { label "docker-1.13" }
+  }
 
   environment {
     GIT_NAME = "eionet.contreg"
     SONARQUBE_TAGS = "cr.eionet.europa.eu"
+    registry = "eeacms/contreg"
+    availableport = sh(script: 'echo $(python3 -c \'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1], end = ""); s.close()\');', returnStdout: true).trim();
   }
 
   tools {
@@ -11,28 +15,48 @@ pipeline {
     jdk 'Java8'
   }
 
+
   stages {
     stage ('Build, code analysis and SonarQube report') {
       steps {
-        node(label: 'docker-1.13') {
           script {
-              try {
+                 if (env.BRANCH_NAME == 'master') {
+                   tagName = 'latest'
+                 } else {
+                   tagName = "$BRANCH_NAME"
+                 }
                 sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
+                sh '''sed -i "s/8891:8890/$availableport:8890/" pom.xml'''
+                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/virtuoso.ini'''
+                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/Dockerfile'''
+                sh '''sed -i "s/virtuoso-cr-jenkins/virtuoso-cr-jenkins-$availableport/" pom.xml'''
+                sh '''sed -i 's#<name>virtuoso</name>#<name>virtuoso-$availableport</name>#' pom.xml'''
+                sh '''sed -i 's#<link>virtuoso</link>#<link>virtuoso-$availableport:virtuoso</link>#' pom.xml'''
+
+
                 withSonarQubeEnv('Sonarqube') {
                     sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
+                   if (env.CHANGE_ID == '') {
+                        try {
+                          dockerImage = docker.build("$registry:$tagName", "--no-cache .")
+                          docker.withRegistry( '', 'eeajenkins' ) {
+                          dockerImage.push()
+                           }
+                        } finally {
+                           sh "docker rmi $registry:$tagName"
+                        }
+                    }
+
                     sh '''try=2; while [ \$try -gt 0 ]; do curl -s -XPOST -u "${SONAR_AUTH_TOKEN}:" "${SONAR_HOST_URL}api/project_tags/set?project=${GIT_NAME}-${BRANCH_NAME}&tags=${SONARQUBE_TAGS},${BRANCH_NAME}" > set_tags_result; if [ \$(grep -ic error set_tags_result ) -eq 0 ]; then try=0; else cat set_tags_result; echo "... Will retry"; sleep 60; try=\$(( \$try - 1 )); fi; done'''
                 }
-              } catch (err) {
-                throw err
-              } finally {
-                sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
-              }
-          }
         }
       }
       post {
+        always {
+            sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
+        }
         success {
           archive 'target/*.war'
         }
