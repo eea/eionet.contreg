@@ -7,6 +7,7 @@ pipeline {
     GIT_NAME = "eionet.contreg"
     SONARQUBE_TAGS = "cr.eionet.europa.eu"
     registry = "eeacms/contreg"
+    availableport = sh(script: 'echo $(python3 -c \'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1], end = ""); s.close()\');', returnStdout: true).trim();
   }
 
   tools {
@@ -27,6 +28,7 @@ pipeline {
                 sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
                 checkout scm
                 sh './prepare-tmp.sh'
+                sh '''sed -i "s/8891:8890/$availableport:8890/" pom.xml'''
                 withSonarQubeEnv('Sonarqube') {
                     sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
                    if (env.CHANGE_ID == '') {
