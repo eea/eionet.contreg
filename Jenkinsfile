@@ -50,6 +50,8 @@ pipeline {
       }
       post {
         always {
+            sh 'ls -ltr *'
+            sh 'ls -ltr target/*'
             junit 'target/failsafe-reports/failsafe-summary.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
             sh 'ls -ltr target/site/cobertura/*'
