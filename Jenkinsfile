@@ -1,6 +1,6 @@
 pipeline {
   agent {
-            node { label "docker-1.13" }
+            node { label "docker-host" }
   }
 
   environment {
