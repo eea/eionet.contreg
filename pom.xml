@@ -20,10 +20,6 @@
     <version>1.0-SNAPSHOT</version>
     <name>cr3</name>
     <url>http://maven.apache.org</url>
-
-    <module name="MissingJavadocMethodCheck">
-      <property name="allowMissingPropertyJavadoc" value="true"/>
-    </module>  
          
     <!-- configuration of Maven repositories to be used -->
     <repositories>
