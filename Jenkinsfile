@@ -50,8 +50,16 @@ pipeline {
       }
       post {
         always {
-            sh 'ls -ltr *'
-            sh 'ls -ltr target/*'
+            
+        publishHTML target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'target/site',
+            reportFiles: 'surefire-report.html',
+            reportName: 'Test Report'
+          ]
+
             junit 'target/failsafe-reports/*.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
             sh 'ls -ltr target/site/cobertura/*'
