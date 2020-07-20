@@ -1,6 +1,6 @@
 pipeline {
   agent {
-            node { label "docker-1.13" }
+            node { label "docker-host" }
   }
 
   environment {
@@ -8,6 +8,9 @@ pipeline {
     SONARQUBE_TAGS = "cr.eionet.europa.eu"
     registry = "eeacms/contreg"
     availableport = sh(script: 'echo $(python3 -c \'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1], end = ""); s.close()\');', returnStdout: true).trim();
+    availableport2 = sh(script: 'echo $(python3 -c \'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1], end = ""); s.close()\');', returnStdout: true).trim();
+    availableport3 = sh(script: 'echo $(python3 -c \'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1], end = ""); s.close()\');', returnStdout: true).trim();
+
   }
 
   tools {
@@ -25,20 +28,13 @@ pipeline {
                  } else {
                    tagName = "$BRANCH_NAME"
                  }
-                sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
+                
                 checkout scm
                 sh './prepare-tmp.sh'
-                sh '''sed -i "s/8891:8890/$availableport:8890/" pom.xml'''
-                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/virtuoso.ini'''
-                sh '''sed -i "s/8891/$availableport/" docker/virtuoso-test/Dockerfile'''
-                sh '''sed -i "s/virtuoso-cr-jenkins/virtuoso-cr-jenkins-$availableport/" pom.xml'''
-                sh '''sed -i 's#<name>virtuoso</name>#<name>virtuoso-$availableport</name>#' pom.xml'''
-                sh '''sed -i 's#<link>virtuoso</link>#<link>virtuoso-$availableport:virtuoso</link>#' pom.xml'''
-
 
                 withSonarQubeEnv('Sonarqube') {
                     sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
-                   if (env.CHANGE_ID == '') {
+                    if (env.CHANGE_ID == '') {
                         try {
                           dockerImage = docker.build("$registry:$tagName", "--no-cache .")
                           docker.withRegistry( '', 'eeajenkins' ) {
@@ -55,7 +51,11 @@ pipeline {
       }
       post {
         always {
-            sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
+            junit target/failsafe-reports/failsafe-summary.xml
+            cobertura target/site/cobertura/coverage.xml
+            sh 'ls -ltr target/site/cobertura/*'
+            sh 'rm -rf ./tmp_cr'
+            cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
         }
         success {
           archive 'target/*.war'
