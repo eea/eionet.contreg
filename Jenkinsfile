@@ -52,7 +52,7 @@ pipeline {
         always {
             sh 'ls -ltr *'
             sh 'ls -ltr target/*'
-            junit 'target/site/surefire-report.html'
+            junit 'target/failsafe-reports/*.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
             sh 'ls -ltr target/site/cobertura/*'
             sh 'rm -rf ./tmp_cr'
