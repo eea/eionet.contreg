@@ -51,8 +51,9 @@ pipeline {
       }
       post {
         always {
-            sh 'ls -ltr ./tmp_cr/*'
-            sh 'ls -ltr target/*'
+            junit target/failsafe-reports/failsafe-summary.xml
+            cobertura target/site/cobertura/coverage.xml
+            sh 'ls -ltr target/site/cobertura/*'
             sh 'rm -rf ./tmp_cr'
             cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
         }
