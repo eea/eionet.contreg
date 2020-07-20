@@ -32,7 +32,7 @@ pipeline {
                 sh './prepare-tmp.sh'
 
                 withSonarQubeEnv('Sonarqube') {
-                    sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
+                    sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle surefire-report:report sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
                     if (env.CHANGE_ID == '') {
                         try {
                           dockerImage = docker.build("$registry:$tagName", "--no-cache .")
