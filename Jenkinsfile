@@ -28,7 +28,7 @@ pipeline {
                  } else {
                    tagName = "$BRANCH_NAME"
                  }
-                sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
+                
                 checkout scm
                 sh './prepare-tmp.sh'
 
@@ -51,7 +51,8 @@ pipeline {
       }
       post {
         always {
-            sh 'rm -rf /var/jenkins_home/worker/tmp_cr'
+            sh 'rm -rf ./tmp_cr'
+            cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
         }
         success {
           archive 'target/*.war'
