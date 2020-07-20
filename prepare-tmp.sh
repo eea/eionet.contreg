@@ -25,6 +25,7 @@ availableport3=${availableport3:-8181}
 sed -i "s/8891:8890/$availableport:8890/" pom.xml
 sed -i "s/virtuoso-cr-jenkins/virtuoso-cr-jenkins-$availableport/" pom.xml
 sed -i "s/httpd-cr-jenkins/httpd-cr-jenkins-$availableport/" pom.xml
+sed -i "s#<valid.images>virtuoso, httpd</valid.images>#<valid.images>virtuoso-$availableport, httpd-$availableport</valid.images>#" pom.xml
 sed -i "s#<name>virtuoso</name>#<name>virtuoso-$availableport</name>#" pom.xml
 sed -i "s#<name>httpd</name>#<name>httpd-$availableport</name>#" pom.xml
 sed -i "s#<link>virtuoso</link>#<link>virtuoso-$availableport:virtuoso</link>#" pom.xml
