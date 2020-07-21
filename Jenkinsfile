@@ -51,16 +51,6 @@ pipeline {
       }
       post {
         always {
-            
-        publishHTML target: [
-            allowMissing: false,
-            alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: 'target/site',
-            reportFiles: 'surefire-report.html',
-            reportName: 'Test Report'
-          ]
-
             junit 'target/failsafe-reports/*.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
             cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
