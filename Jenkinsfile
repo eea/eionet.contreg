@@ -54,7 +54,7 @@ pipeline {
       }
     }
 
-    stage ('Docker build') {
+    stage ('Docker build and push') {
       when {
           environment name: 'CHANGE_ID', value: ''
       }
