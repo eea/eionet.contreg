@@ -32,8 +32,9 @@ pipeline {
                 sh './prepare-tmp.sh'
 
                 withSonarQubeEnv('Sonarqube') {
-                    sh 'mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle surefire-report:report sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'
-                    if (env.CHANGE_ID == '') {
+                    sh '''mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle surefire-report:report sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'''
+                    
+                    if (env.CHANGE_ID) {
                         try {
                           dockerImage = docker.build("$registry:$tagName", "--no-cache .")
                           docker.withRegistry( '', 'eeajenkins' ) {
@@ -62,8 +63,6 @@ pipeline {
 
             junit 'target/failsafe-reports/*.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
-            sh 'ls -ltr target/site/cobertura/*'
-            sh 'rm -rf ./tmp_cr'
             cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
         }
         success {
