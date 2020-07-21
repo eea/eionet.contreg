@@ -100,8 +100,8 @@ pipeline {
           } else if (status == 'FAILURE') {
             color = '#FF0000'
           }
-
-          emailext (subject: '$DEFAULT_SUBJECT', to: '$DEFAULT_RECIPIENTS', body: details)
+          
+          emailext (subject: '$DEFAULT_SUBJECT', to: '$DEFAULT_RECIPIENTS', body: details, recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'CulpritsRecipientProvider']])
         }
       }
     }
