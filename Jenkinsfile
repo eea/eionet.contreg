@@ -19,49 +19,8 @@ pipeline {
 
 
   stages {
-    stage ('Build, code analysis and SonarQube report') {
-      steps {
-          script {
-                 if (env.BRANCH_NAME == 'master') {
-                   tagName = 'latest'
-                 } else {
-                   tagName = "$BRANCH_NAME"
-                 }
-                
-                checkout scm
-                sh './prepare-tmp.sh'
 
-                withSonarQubeEnv('Sonarqube') {
-                    sh '''mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle surefire-report:report sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'''
-                    
-                    if (env.CHANGE_ID == null) {
-                        try {
-                          dockerImage = docker.build("$registry:$tagName", "--no-cache .")
-                          docker.withRegistry( '', 'eeajenkins' ) {
-                          dockerImage.push()
-                           }
-                        } finally {
-                           sh "docker rmi $registry:$tagName"
-                        }
-                    }
-
-                    sh '''try=2; while [ \$try -gt 0 ]; do curl -s -XPOST -u "${SONAR_AUTH_TOKEN}:" "${SONAR_HOST_URL}api/project_tags/set?project=${GIT_NAME}-${BRANCH_NAME}&tags=${SONARQUBE_TAGS},${BRANCH_NAME}" > set_tags_result; if [ \$(grep -ic error set_tags_result ) -eq 0 ]; then try=0; else cat set_tags_result; echo "... Will retry"; sleep 60; try=\$(( \$try - 1 )); fi; done'''
-                }
-        }
-      }
-      post {
-        always {
-            junit 'target/failsafe-reports/*.xml'
-            cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
-            cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
-        }
-        success {
-          archive 'target/*.war'
-        }
-      }
-    }
-
-    stage('Pull Request') {
+    stage('Check pull Request') {
       when {
         not {
           environment name: 'CHANGE_ID', value: ''
@@ -69,18 +28,59 @@ pipeline {
         environment name: 'CHANGE_TARGET', value: 'master'
       }
       steps {
-        node(label: 'swarm') {
-          script {
             if ( env.CHANGE_BRANCH != "develop" &&  !( env.CHANGE_BRANCH.startsWith("hotfix")) ) {
                 error "Pipeline aborted due to PR not made from develop or hotfix branch"
             }
-          }
+      }
+    } 
+    
+    stage ('Test, build and Sonarqube') {
+      steps {
+                sh './prepare-tmp.sh'
+                withSonarQubeEnv('Sonarqube') {
+                    sh '''mvn clean -B -V -P docker verify cobertura:cobertura-integration-test pmd:pmd pmd:cpd findbugs:findbugs checkstyle:checkstyle surefire-report:report sonar:sonar -Dsonar.sources=src/main/java/ -Dsonar.junit.reportPaths=target/failsafe-reports -Dsonar.cobertura.reportPath=target/site/cobertura/coverage.xml -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.test.binaries=target/test-classes -Dsonar.projectKey=${GIT_NAME}-${GIT_BRANCH} -Dsonar.projectName=${GIT_NAME}-${GIT_BRANCH}'''
+                    sh '''try=2; while [ \$try -gt 0 ]; do curl -s -XPOST -u "${SONAR_AUTH_TOKEN}:" "${SONAR_HOST_URL}api/project_tags/set?project=${GIT_NAME}-${BRANCH_NAME}&tags=${SONARQUBE_TAGS},${BRANCH_NAME}" > set_tags_result; if [ \$(grep -ic error set_tags_result ) -eq 0 ]; then try=0; else cat set_tags_result; echo "... Will retry"; sleep 60; try=\$(( \$try - 1 )); fi; done'''
+                }
+      }
+      post {
+        always {
+            junit 'target/failsafe-reports/*.xml'
+            cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
+        }
+        success {
+          archive 'target/*.war'
         }
       }
     }
+
+    stage ('Docker build') {
+      when {
+          environment name: 'CHANGE_ID', value: ''
+      }
+      steps {
+                 if (env.BRANCH_NAME == 'master') {
+                         tagName = 'latest'
+                 } else {
+                         tagName = "$BRANCH_NAME"
+                 }
+                 try {
+                          dockerImage = docker.build("$registry:$tagName", "--no-cache .")
+                          docker.withRegistry( '', 'eeajenkins' ) {
+                             dockerImage.push()
+                          }
+                      } 
+                 finally {
+                           sh "docker rmi $registry:$tagName"
+                      }
+            }
+        }
+    
   }
 
   post {
+      always {
+        cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
+      }
       changed {
         script {
           def url = "${env.BUILD_URL}/display/redirect"
