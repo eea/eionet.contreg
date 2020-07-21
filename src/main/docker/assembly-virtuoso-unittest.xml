@@ -1,0 +1,18 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <files>
+    <file>
+      <source>sql/virtuoso/unittest/1_create_testuser.sql</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>1_create_testuser.sql</destName>
+    </file>
+    <file>
+      <source>src/main/docker/virtuoso.ini</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>virtuoso.ini</destName>
+    </file>
+  </files>
+
+</assembly>
