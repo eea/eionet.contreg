@@ -83,8 +83,6 @@ pipeline {
   post {
       always {
         cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
-      }
-      changed {
         script {
           def url = "${env.BUILD_URL}/display/redirect"
           def status = currentBuild.currentResult
