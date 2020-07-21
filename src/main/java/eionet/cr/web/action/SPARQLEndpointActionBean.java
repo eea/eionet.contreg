@@ -1,55 +1,9 @@
 package eionet.cr.web.action;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.ValidationMethod;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.openrdf.OpenRDFException;
-import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.n3.N3WriterFactory;
-import org.openrdf.rio.ntriples.NTriplesWriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriter;
-import org.openrdf.rio.turtle.TurtleWriterFactory;
-
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;
 import eionet.cr.config.GeneralConfig;
-import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
-import eionet.cr.dao.FolderDAO;
-import eionet.cr.dao.HarvestSourceDAO;
-import eionet.cr.dao.HelperDAO;
-import eionet.cr.dao.SourceDeletionsDAO;
+import eionet.cr.dao.*;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
@@ -63,16 +17,35 @@ import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
-import eionet.cr.web.sparqlClient.helpers.CRJsonWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlSchemaWriter;
-import eionet.cr.web.sparqlClient.helpers.CRXmlWriter;
 import eionet.cr.web.sparqlClient.helpers.QueryResult;
-import eionet.cr.web.sparqlClient.helpers.QueryResultValidator;
+import eionet.cr.web.sparqlClient.helpers.*;
 import eionet.cr.web.util.CRSPARQLCSVWriter;
 import eionet.cr.web.util.CRSPARQLTSVWriter;
 import eionet.cr.web.util.ServletOutputLazyStream;
+import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.validation.ValidationMethod;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.LogManager;
+import org.openrdf.OpenRDFException;
+import org.openrdf.model.vocabulary.XMLSchema;
+import org.openrdf.query.*;
+import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.rio.RDFWriter;
+import org.openrdf.rio.n3.N3WriterFactory;
+import org.openrdf.rio.ntriples.NTriplesWriterFactory;
+import org.openrdf.rio.rdfxml.RDFXMLWriter;
+import org.openrdf.rio.turtle.TurtleWriterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.*;
 
 /**
  *
@@ -88,6 +61,8 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     /** */
     private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointActionBean.class);
+
+    private static final org.apache.log4j.Logger SERVICE_LOGGER = LogManager.getLogger("RollingFileLogger");
 
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
@@ -227,7 +202,6 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution noEvent() throws OpenRDFException, DAOException {
-
         // If "fillfrom" is specified then fill the bean from bookmarked query and send to form page without executing the query.
         // If "queryfrom" is specified then fill the bean from bookmarked query and execute the query.
         // In all other cases just execute the query.
@@ -575,6 +549,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         // Set the default-graph-uri and named-graph-uri (see SPARQL protocol specifications).
         setDefaultAndNamedGraphs();
 
+        // Get client IP for query logger
+        String clientIp = getClientIpAddress(getContext().getRequest());
+        String requestMethod = getContext().getRequest().getMethod();
+        
         // If user has requested use of same-as "yes", then ensure that the relevant command is present in the query.
         String sameasyesCommand = SPARQLQueryUtil.getCrOwlSameAsDefinitionStr();
         if (useOwlSameAs) {
@@ -627,10 +605,28 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                 resolution = new RedirectResolution(FactsheetActionBean.class).addParameter("uri", dataset);
             }
         } else if (STREAMING_MIME_TYPES_TO_INTERNAL_FORMATS.containsKey(mimeType)) {
+            long startTime = System.currentTimeMillis();
+            int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
+
             resolution = executeStreamingQuery(mimeType);
+
+            long endTime = System.currentTimeMillis();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
         } else {
+            long startTime = System.currentTimeMillis();
+            int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
+
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
+
+            long endTime = System.currentTimeMillis();
+
+            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
@@ -639,6 +635,41 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
         }
 
         return resolution;
+    }
+
+    /**
+     * Gets the client ip from request.
+     * @param request
+     * @return client IP as a String
+     */
+    private static String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+
+        if (xForwardedForHeader == null) {
+            return request.getRemoteAddr();
+        } else {
+            // The general format of the field is: X-Forwarded-For: client, proxy1, proxy2 ...
+            return new StringTokenizer(xForwardedForHeader, ",").nextToken().trim();
+        }
+    }
+
+    /**
+     * Debugging method to double check the value of client ip from request.
+     * @param request
+     * @return A Key , Value map with details from request Header
+     */
+    private Map<String, String> getRequestHeadersInMap(HttpServletRequest request) {
+
+        Map<String, String> result = new HashMap<>();
+
+        Enumeration headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = request.getHeader(key);
+            result.put(key, value);
+        }
+
+        return result;
     }
 
     /**
@@ -656,11 +687,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return true, if user can add/delete shared SPARQL bookmars.
      */
     public boolean isSharedBookmarkPrivilege() {
-        if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/sparqlbookmarks", "u")) {
-            return true;
-        }
-
-        return false;
+        return getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/sparqlbookmarks", "u");
     }
 
     /**
@@ -669,10 +696,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return true, if user is in admin group.
      */
     public boolean isAdminPrivilege() {
-        if (getUser() != null && getUser().isAdministrator()) {
-            return true;
-        }
-        return false;
+        return getUser() != null && getUser().isAdministrator();
     }
 
     /**
@@ -683,11 +707,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return true, if user can add resources to the project.
      */
     public boolean hasProjectPrivilege(String projectName) {
-        if (getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/project/" + projectName, "i")) {
-            return true;
-        }
-
-        return false;
+        return getUser() != null && CRUser.hasPermission(getContext().getRequest().getSession(), "/project/" + projectName, "i");
     }
 
     /**
@@ -825,9 +845,11 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                     // Evaluate CONSTRUCT query.
                     if (outputFormat.equals(FORMAT_HTML)) {
                         long startTime = System.currentTimeMillis();
+
                         TupleQuery resultsTable = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
                         TupleQueryResult bindings = resultsTable.evaluate();
-                        executionTime = System.currentTimeMillis() - startTime;
+                        executionTime =  System.currentTimeMillis() - startTime;
+
                         if (bindings != null) {
                             result = new QueryResult(bindings, false, limitResultCount);
                         }
@@ -885,8 +907,10 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
                             || outputFormat.equals(FORMAT_HTML_PLUS))) {
                         response.setContentType("text/html");
                         long startTime = System.currentTimeMillis();
+
                         queryResult = ((TupleQuery) queryObject).evaluate();
-                        executionTime = System.currentTimeMillis() - startTime;
+                        executionTime =  System.currentTimeMillis() - startTime;
+
                         if (queryResult != null) {
                             result = new QueryResult(queryResult, outputFormat.equals(FORMAT_HTML_PLUS), limitResultCount);
                         }
