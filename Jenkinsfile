@@ -13,6 +13,10 @@ pipeline {
 
   }
 
+  tools {
+        maven 'maven3'
+  }
+  
   stages {
 
     stage('Check pull Request') {
@@ -32,10 +36,10 @@ pipeline {
       }
     } 
     
-    stage ('Test, build and Sonarqube') {
-      tools {
-        maven 'maven3'
-      }
+    stage ('Unit Tests and Sonarqube') {
+      when {
+        not { buildingTag() }
+      }     
       steps {
                 sh './prepare-tmp.sh'
                 withSonarQubeEnv('Sonarqube') {
@@ -48,35 +52,50 @@ pipeline {
             junit 'target/failsafe-reports/*.xml'
             cobertura coberturaReportFile: 'target/site/cobertura/coverage.xml'
         }
+      }
+    }
+
+    stage ('Build war') {
+      when {
+          environment name: 'CHANGE_ID', value: ''
+      }
+      steps {
+        script {
+                sh '''mvn -P docker clean package -Dmaven.test.skip=true'''
+            }
+       }
+       post {
         success {
           archive 'target/*.war'
         }
       }
     }
-
+    
     stage ('Docker build and push') {
       when {
           environment name: 'CHANGE_ID', value: ''
       }
       steps {
         script{
+                 
                  if (env.BRANCH_NAME == 'master') {
                          tagName = 'latest'
                  } else {
                          tagName = "$BRANCH_NAME"
                  }
-                 try {
-                          dockerImage = docker.build("$registry:$tagName", "--no-cache .")
-                          docker.withRegistry( '', 'eeajenkins' ) {
-                             dockerImage.push()
-                          }
-                      } 
-                 finally {
-                           sh "docker rmi $registry:$tagName"
-                      }
+                 dockerImage = docker.build("$registry:$tagName", "--no-cache .")
+                 docker.withRegistry( '', 'eeajenkins' ) {
+                          dockerImage.push()
+                 }
             }
-          }
+      }
+      post {
+        always {
+                           sh "docker rmi $registry:$tagName | docker images $registry:$tagName"
         }
+        
+        }
+        
     
   }
 
