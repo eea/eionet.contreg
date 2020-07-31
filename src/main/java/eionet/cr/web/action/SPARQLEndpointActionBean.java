@@ -536,7 +536,7 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
      * @return
      */
     private Resolution executeSparqlQuery(boolean limitResultCount) {
-//        LOGGER.info("CLASIC LOGGER - TEST LOGGER IN executeSparqlQuery");
+        LOGGER.info("CLASIC LOGGER - TEST LOGGER IN executeSparqlQuery");
         SERVICE_LOGGER.info("SERVICE QUERY LOGGER - TEST LOGGER IN executeSparqlQuery");
 
         // If query is blank then send HTTP 400 if not a browser, otherwise take the browser to the SPARQL endpoint form page.
