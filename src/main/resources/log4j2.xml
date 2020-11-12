@@ -1,10 +1,23 @@
 <Configuration>
     <Appenders>
-        <Console name="console">
+        <Console name="console-log">
             <PatternLayout>
                 <Pattern>%style{[}{blue}%style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright,green}%style{]}{blue} - %highlight{%5p}{STYLE=LogBack} %style{---}{bright,magenta} %style{%-70.70logger}{bright,cyan} : %m - (%c{0}.java:%line)%n</Pattern>
             </PatternLayout>
         </Console>
+
+        <Console name="console">
+            <PatternLayout pattern="[%-5p] - %c - %m%n"/>
+        </Console>
+
+        <RollingFile name="file" fileName="DataDict.log">
+            <PatternLayout pattern="[%-5p] %d{dd.MM.yy HH:mm:ss} - %c - %m%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5000KB" />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
         <RollingFile name="RollingFile" fileName="${env:QUERY_LOG_DIR_PATH}/${env:QUERY_LOG_FILENAME_PATH}" filePattern="${env:QUERY_LOG_DIR_PATH}/${env:INSTANCE_NAME}-%d{yyyy-MM-dd}.log.gz">
 <!--        <RollingFile name="RollingFile" fileName="/home/claudia/work/services_query.log" filePattern="/home/claudia/work/service_query-%d{yyyy-MM-dd}.log.gz">-->
             <PatternLayout>
@@ -23,18 +36,35 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
+
         <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
         <Sentry name="Sentry" />
+
+        <Syslog name="syslog" host="logcentral.eea.europa.eu:1514" facility="USER">
+            <PatternLayout pattern="cr.eionet.europa.eu %d{yyyy-MM-dd'T'HH:mm:ssX} %c{2} %m%n"/>
+        </Syslog>
     </Appenders>
     <Loggers>
-        <logger name="eionet" level="debug"/>
+        <Logger name="eionet" level="DEBUG"/>
+        <Logger name="eionet.cr" level="INFO"/>
+        <Logger name="eionet.cr.web.action.PingActionBean" level="DEBUG"/>
+        <Logger name="org.apache" level="INFO"/>
+        <Logger name="org.springframework" level="WARN"/>
+        <Logger name="org.displaytag" level="WARN"/>
+        <Logger name="net.sourceforge.stripes" level="WARN"/>
+
         <!-- QUERY_LOG_LEVEL environment variable to set the logger level - off/info-->
         <Logger name="RollingFileLogger" level="${env:QUERY_LOG_LEVEL}">
             <AppenderRef ref="RollingFile" />
         </Logger>
         <Root level="INFO">
-            <AppenderRef ref="console"/>
+            <AppenderRef ref="console-log"/>
+            <AppenderRef ref="console" level="DEBUG"/>
             <AppenderRef ref="Sentry" level="WARN" />
+            <AppenderRef ref="syslog" level="DEBUG" />
         </Root>
     </Loggers>
 </Configuration>
+
+
+
