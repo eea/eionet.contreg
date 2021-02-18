@@ -64,6 +64,9 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
 
     private static final org.apache.log4j.Logger SERVICE_LOGGER = LogManager.getLogger("RollingFileLogger");
 
+    /** Delimiter used by SERVICE_LOGGER*/
+    public static final String DELIMITER = GeneralConfig.getRequiredProperty(GeneralConfig.SERVICE_LOGGER_DELIMITER);
+
     /** */
     private static final int DEFAULT_NUMBER_OF_HITS = 20;
 
@@ -608,25 +611,25 @@ public class SPARQLEndpointActionBean extends AbstractActionBean {
             long startTime = System.currentTimeMillis();
             int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
+            SERVICE_LOGGER.info(queryId + DELIMITER + StringEscapeUtils.escapeJava(query) + DELIMITER + startTime + DELIMITER + "NULL" + DELIMITER + "NULL" + DELIMITER + clientIp + DELIMITER + requestMethod);
 
             resolution = executeStreamingQuery(mimeType);
 
             long endTime = System.currentTimeMillis();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
+            SERVICE_LOGGER.info(queryId + DELIMITER + StringEscapeUtils.escapeJava(query) + DELIMITER + startTime + DELIMITER + endTime + DELIMITER + errorCode + DELIMITER + clientIp + DELIMITER + requestMethod);
         } else {
             long startTime = System.currentTimeMillis();
             int queryId = (StringEscapeUtils.escapeJava(query) + startTime).hashCode();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|NULL|NULL|" + clientIp + "|" + requestMethod);
+            SERVICE_LOGGER.info(queryId + DELIMITER + StringEscapeUtils.escapeJava(query) + DELIMITER + startTime + DELIMITER + "NULL" + DELIMITER + "NULL" + DELIMITER + clientIp + DELIMITER + requestMethod);
 
             executeQuery(mimeType.equals("text/html+") ? FORMAT_HTML_PLUS : FORMAT_HTML, null, getContext().getResponse(),
                     limitResultCount);
 
             long endTime = System.currentTimeMillis();
 
-            SERVICE_LOGGER.info(queryId + "|" + StringEscapeUtils.escapeJava(query) + "|" + startTime + "|" + endTime + "|"+ errorCode +"|" + clientIp + "|" + requestMethod);
+            SERVICE_LOGGER.info(queryId + DELIMITER + StringEscapeUtils.escapeJava(query) + DELIMITER + startTime + DELIMITER + endTime + DELIMITER+ errorCode + DELIMITER + clientIp + DELIMITER + requestMethod);
         }
 
         // In case an error has been raised and the client is not a browser, then set the resolution to HTTP error
