@@ -10,3 +10,4 @@
 /.idea
 *.class
 /dockerhub-local.sh
+src/test/resources/maven

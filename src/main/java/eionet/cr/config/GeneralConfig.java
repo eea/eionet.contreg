@@ -193,6 +193,9 @@ public final class GeneralConfig {
     /** Servlet response buffer size to be used for requests that go via Stripes. The unit is number of bytes. */
     public static final int SERVLET_RESPONSE_BUFFER_SIZE = NumberUtils.toInt(getProperty("servletResponseBufferSize"), 32768);
 
+    /** Delimiter used by service query logger (SPARQL). */
+    public static final String SERVICE_LOGGER_DELIMITER = "service.logger.delimiter";
+
     /** */
     private static Properties properties;
     private static ConfigurationPropertyResolver propertyResolver;

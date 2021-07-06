@@ -20,7 +20,7 @@
     <version>1.0-SNAPSHOT</version>
     <name>cr3</name>
     <url>http://maven.apache.org</url>
-
+         
     <!-- configuration of Maven repositories to be used -->
     <repositories>
         <repository>
@@ -264,20 +264,28 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.26.0</version>
+                <version>0.26.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
                     <images>
 
                         <image>
-                            <alias>virtuoso</alias>
-                            <name>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</name>
+                            <alias>virtuoso-cr-jenkins</alias>
+                            <name>virtuoso</name>
+
+                            <build>
+                                <from>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</from>
+                                <assembly>
+                                    <descriptor>assembly-virtuoso-unittest.xml</descriptor>
+                                </assembly>
+                            </build>
+
                             <run>
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
                                     <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
-                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, ${apphome.unix}/tmp</VIRT_Parameters_DirsAllowed>
+                                    <VIRT_Parameters_DirsAllowed>., ../vad, /usr/share/proj, /var/tmp, /tmp, ${config.app.home}/tmp</VIRT_Parameters_DirsAllowed>
                                 </env>
                                 <ports>
                                     <port>8891:8890</port>
@@ -285,32 +293,46 @@
                                 </ports>
                                 <wait>
                                     <log>Server online at</log>
-                                    <time>20000</time>
+                                    <time>60000</time>
                                     <exec>
-                                        <postStart>isql localhost:1111 dba dba ${apphome.unix}/dbinit/1_create_testuser.sql</postStart>
+                                        <postStart>isql localhost:1111 dba dba /maven/1_create_testuser.sql</postStart>
                                     </exec>
                                 </wait>
                                 <volumes>
                                     <bind>
-                                        <volume>${apphome.windows}/tmp:${apphome.unix}/tmp</volume>
-                                        <volume>${basedir}/sql/virtuoso/unittest:${apphome.unix}/dbinit</volume>
+                                        <volume>${config.docker.sharedVolume}/tmp:${config.app.home}/tmp</volume>
                                     </bind>
                                 </volumes>
                             </run>
                         </image>
 
                         <image>
-                            <alias>httpd</alias>
-                            <name>httpd:2.4</name>
+                            <alias>httpd-cr-jenkins</alias>
+                            <name>httpd</name>
+
+                            <build>
+                                <from>httpd:2.4</from>
+                                <assembly>
+                                    <descriptor>assembly-httpd-unittest.xml</descriptor>
+                                </assembly>
+                            </build>
+
                             <run>
+                                <links>
+                                    <link>virtuoso</link>
+                                </links>
                                 <ports>
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
-                                <volumes>
-                                    <bind>
-                                        <volume>./src/test/resources:/usr/local/apache2/htdocs</volume>
-                                    </bind>
-                                </volumes>
+                                <wait>
+                                    <!-- Check for this URL to return a 200 return code .... -->
+                                    <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
+                                    <!-- ... but at max 2 minutes -->
+                                    <time>120000</time>
+                                    <exec>
+                                        <postStart>/maven/move-test-files.sh</postStart>
+                                    </exec>
+                                </wait>
                             </run>
                         </image>
 
@@ -326,6 +348,7 @@
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                            <goal>build</goal>
                             <goal>start</goal>
                         </goals>
                     </execution>
@@ -403,12 +426,22 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
+            <version>1.19</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
             <version>1.5.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -426,11 +459,23 @@
             <artifactId>jsp-api</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>cas</groupId>
             <artifactId>casclient</artifactId>
             <version>2.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
@@ -445,6 +490,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -473,6 +522,16 @@
             <groupId>eionet</groupId>
             <artifactId>documentation.core</artifactId>
             <version>2.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
@@ -483,6 +542,16 @@
             <groupId>eionet</groupId>
             <artifactId>acl</artifactId>
             <version>4.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>eionet</groupId>
@@ -524,6 +593,16 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.5-FINAL</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.simpleframework</groupId>
@@ -715,6 +794,12 @@
             <groupId>eionet</groupId>
             <artifactId>eea-template</artifactId>
             <version>3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>rome</groupId>
@@ -749,6 +834,16 @@
             <groupId>org.apache.ant</groupId>
             <artifactId>ant-apache-log4j</artifactId>
             <version>1.9.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Liquibase -->
@@ -765,6 +860,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.6.0.1398</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -839,7 +940,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
+                <version>3.1.1</version>
                 <configuration>
                     <configLocation>${checkstyle.config.location}</configLocation>
                 </configuration>
