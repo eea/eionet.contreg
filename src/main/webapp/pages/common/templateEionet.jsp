@@ -52,6 +52,7 @@
                         <a id="printlink" title="Print this page" href="javascript:this.print();"><span>Print</span></a>
                         <a id="fullscreenlink" href="javascript:toggleFullScreenMode()" title="Switch to/from full screen mode"><span>Switch to/from full screen mode</span></a>
                         <a id="acronymlink" href="about.action" title="About ${initParam.appDispName}"><span>About</span></a>
+                        <a id="eionetlink" title="Go to Eionet portal" href="https://www.eionet.europa.eu/"><span>Eionet portal</span></a>
                     </div>
                 </div> <!-- toolribbon -->
 
@@ -61,10 +62,6 @@
                     <div id="sitetitle">${initParam.appDispName}</div>
                     <div id="sitetagline">This service is part of Reportnet</div>
                 </div> <!-- pagehead -->
-
-                <div id="menuribbon">
-                    <%@ include file="/pages/common/dropdownmenus.txt" %>
-                </div>
 
                 <div class="breadcrumbtrail">
                     <div class="breadcrumbhead">You are here:</div>

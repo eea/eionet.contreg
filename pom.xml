@@ -183,9 +183,6 @@
                             <directory>${basedir}/src/main/webapp/pages/common</directory>
                             <filtering>true</filtering>
                             <targetPath>pages/common</targetPath>
-                            <includes>
-                                <include>dropdownmenus.txt</include>
-                            </includes>
                         </resource>
                     </webResources>
                 </configuration>
