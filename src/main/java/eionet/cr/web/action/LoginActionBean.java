@@ -28,6 +28,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;
+import eionet.cr.util.UserUtil;
 import eionet.cr.web.interceptor.annotation.DontSaveLastActionEvent;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -94,6 +95,7 @@ public class LoginActionBean extends AbstractActionBean {
             AuthMechanism.sessionLogin(username, password);
             CRUser user = new CRUser(username);
             getContext().setSessionAttribute(USER_SESSION_ATTR, user);
+            UserUtil.setUserGroupResults(user);
             return afterLogin();
 
         } catch (Exception e) {
@@ -142,6 +144,8 @@ public class LoginActionBean extends AbstractActionBean {
      */
     @HandlesEvent(LOGOUT_EVENT)
     public Resolution logout() {
+        CRUser crUser = (CRUser) getSession().getAttribute(USER_SESSION_ATTR);
+        crUser.setGroupResults(null);
         getContext().setSessionAttribute(USER_SESSION_ATTR, null);
         getSession().invalidate();
         if (GeneralConfig.isUseCentralAuthenticationService()) {

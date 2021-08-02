@@ -78,6 +78,9 @@ public class CRUser {
     /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
     private List<String> reservedFolderAndFileUris;
 
+    /** List of username and ldap roles (if exist) */
+    protected ArrayList<String> groupResults = null;
+
     /**
      * Creates CRUser.
      *
@@ -123,6 +126,13 @@ public class CRUser {
      * @return
      */
     public boolean hasPermission(String aclPath, String permission) {
+        if (getGroupResults()!=null) {
+            for (String result : getGroupResults()) {
+                if (CRUser.hasPermission(result, aclPath, permission)) {
+                    return true;
+                }
+            }
+        }
         return CRUser.hasPermission(userName, aclPath, permission);
     }
 
@@ -551,5 +561,13 @@ public class CRUser {
     public static boolean isHuman(String userName) {
 
         return StringUtils.isBlank(userName) ? false : new CRUser(userName).isHuman();
+    }
+
+    public ArrayList<String> getGroupResults() {
+        return groupResults;
+    }
+
+    public void setGroupResults(ArrayList<String> groupResults) {
+        this.groupResults = groupResults;
     }
 }
