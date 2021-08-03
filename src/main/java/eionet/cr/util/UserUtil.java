@@ -1,9 +1,9 @@
 package eionet.cr.util;
 
 import eionet.cr.acl.services.AclOperationsService;
-import eionet.cr.acl.errors.AclLibraryAccessControllerModifiedException;
-import eionet.cr.acl.errors.AclPropertiesInitializationException;
-import eionet.cr.ldap.errors.LdapDaoException;
+import eionet.cr.errors.AclLibraryAccessControllerModifiedException;
+import eionet.cr.errors.AclPropertiesInitializationException;
+import eionet.cr.errors.LdapDaoException;
 import eionet.cr.ldap.model.LdapRole;
 import eionet.cr.ldap.services.LdapService;
 import eionet.cr.spring.SpringApplicationContext;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.WebConnection;
 import java.util.*;
 
 @Component

@@ -1,4 +1,4 @@
-package eionet.cr.acl.errors;
+package eionet.cr.errors;
 
 public class AclAccessControllerInitializationException extends Exception {
 

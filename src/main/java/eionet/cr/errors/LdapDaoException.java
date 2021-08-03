@@ -1,4 +1,4 @@
-package eionet.cr.ldap.errors;
+package eionet.cr.errors;
 
 public class LdapDaoException extends Exception {
 

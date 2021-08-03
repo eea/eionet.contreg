@@ -1,7 +1,7 @@
 package eionet.cr.ldap.services.impl;
 
 import eionet.cr.ldap.dao.LdapRoleDao;
-import eionet.cr.ldap.errors.LdapDaoException;
+import eionet.cr.errors.LdapDaoException;
 import eionet.cr.ldap.model.LdapRole;
 import eionet.cr.ldap.services.LdapService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,17 @@ public class LdapServiceImpl implements LdapService {
     @Override
     public List<LdapRole> getUserLdapRoles(String user) throws LdapDaoException {
         ldapRoles = ldapRoleDao.findUserRoles(user);
+        return ldapRoles;
+    }
+
+    @Override
+    public List<String> getRoleUsers(String roleName) throws LdapDaoException {
+        return ldapRoleDao.findRoleUsers(roleName);
+    }
+
+    @Override
+    public List<LdapRole> getAllLdapRoles() throws LdapDaoException {
+        ldapRoles = ldapRoleDao.findAllRoles();
         return ldapRoles;
     }
 }

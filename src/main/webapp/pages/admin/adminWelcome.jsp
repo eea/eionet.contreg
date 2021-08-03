@@ -19,7 +19,7 @@
                 <li><stripes:link href="/admin/endpointQueries.action">SPARQL endpoint harvest queries</stripes:link></li>
                 <li><stripes:link href="/admin/sourceDeletions.action">Monitor source deletions</stripes:link></li>
                 <li><stripes:link href="/admin/stagingDbs.action">Staging databases</stripes:link>&nbsp;<span style="color:#FF0000">(work in progress!)</span></li>
-                <li><stripes:link href="/v2/admintools/list">Admin tools</stripes:link></li>
+                <li><a href="/v2/admintools/list">Admin tools</a></li>
             </ul>
         </c:when>
         <c:otherwise>
