@@ -126,14 +126,7 @@ public class CRUser {
      * @return
      */
     public boolean hasPermission(String aclPath, String permission) {
-        if (getGroupResults()!=null) {
-            for (String result : getGroupResults()) {
-                if (CRUser.hasPermission(result, aclPath, permission)) {
-                    return true;
-                }
-            }
-        }
-        return CRUser.hasPermission(userName, aclPath, permission);
+       return groupHasPerm(getGroupResults(), userName, aclPath, permission);
     }
 
     /**
@@ -163,9 +156,23 @@ public class CRUser {
 
         // get user name from user object, or set to null if user object null
         String userName = crUser == null ? null : crUser.getUserName();
+        if (userName!=null) {
+            return groupHasPerm(crUser.getGroupResults(), userName, aclPath, permission);
+        }
+        return groupHasPerm(null, userName, aclPath, permission);
+    }
 
-        // check if user with this name has this permission in this ACL
-        return CRUser.hasPermission(userName, aclPath, permission);
+    public static boolean groupHasPerm(ArrayList<String> groupResults, String userName, String aclPath, String permission) {
+        if (groupResults!=null) {
+            for (String result : groupResults) {
+                if (CRUser.hasPermission(result, aclPath, permission)) {
+                    return true;
+                }
+            }
+        } else {
+            return CRUser.hasPermission(userName, aclPath, permission);
+        }
+        return false;
     }
 
     /**
