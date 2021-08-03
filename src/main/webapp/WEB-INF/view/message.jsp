@@ -19,13 +19,11 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="error-template">
-                        <h1 style="color:red">${msgOne}</h1>
-                        <div>Sorry, an error has occured!</div>
-                    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="error-template">
+                    <h1 style="color:red">${msgOne}</h1>
+                    <div>Sorry, an error has occured!</div>
                 </div>
             </div>
         </div>
