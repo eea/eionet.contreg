@@ -56,15 +56,15 @@ Install a Git client of your choice, and clone CR source code into a directory
 that is denoted by CR_SOURCE_HOME in the below instructions.
 
 Before you can build CR source code, you need to set your environment specific properties.
-For that, make a copy of unittest.properties in CR_SOURCE_HOME, and rename it to local.properties.
+For that, make a copy of default.properties in CR_SOURCE_HOME, and rename it to local.properties.
 Go through the resulting file and change properties that are specific to your environment or wishes.
 Each property's exact meaning and effect is commented in the file.
 
 Now you are ready to build your CR code. It is built with Maven.
 The following command assumes that Maven's executable (mvn) is on the command path,
-and that it is run while being in CR_SOURCE_HOME directory:
+and that it is run while being in CR_SOURCE_HOME directory. The property `config.app.home` may need to be configured while running build command.
 
-    shell> mvn clean install
+    shell> mvn -Dmaven.test.skip=true -Denv=local -Dconfig.app.home=/some/other/dir clean install
 
 ### 3.1 Unit tests
 
@@ -117,9 +117,10 @@ Finally, the tests runner will run all tests, and it will eventually tear down t
 **NB!** The tests runner will attempt to create a directory defined by the `config.app.home` property in `tests.properties`.
 This is the directory where integration tests will create some temporaey files they need to use.
 If for some reason it fails to create that directory or you want to use a different location, then you can override
-this property by using `-Dconfig.app.home` option on command line, like this:
+this property by using `-Dconfig.app.home` option on command line, like below. The property `config.docker.sharedVolume`
+may also need to be configured while running the tests.
 
-    shell> mvn -Dconfig.app.home=/some/other/dir clean verify
+    shell> mvn -Dconfig.app.home=/some/other/dir -Dconfig.docker.sharedVolume=/some/other/dir clean verify
 
 **NB!** Other properties noteworthy from the integration tests point of view in `tests.properties` are
 

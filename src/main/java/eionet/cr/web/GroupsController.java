@@ -59,19 +59,6 @@ public class GroupsController extends AbstractActionBean {
         return "groupsAndUsers";
     }
 
-    @RequestMapping(value = "/ldapOptions")
-    @ResponseBody
-    public List<String> getLdapList(@RequestParam(value="term", required = false, defaultValue="") String term) throws LdapDaoException {
-        List<String> ldapRoleNames = getAllLdapRoles();
-        List<String> results = new ArrayList<>();
-        for (String roleName : ldapRoleNames) {
-            if (roleName.startsWith(term)) {
-                results.add(roleName);
-            }
-        }
-        return results;
-    }
-
     protected synchronized List<String> getAllLdapRoles() throws LdapDaoException {
         List<String> ldapRoleNames = new ArrayList<>();
         List<LdapRole> ldapRoles = ldapService.getAllLdapRoles();

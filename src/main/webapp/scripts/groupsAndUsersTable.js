@@ -2,7 +2,7 @@ function format ( row, tr ) {
     var d = row.data();
     //ajax call to get data by ldapGroup
     var ldapGroup = d[0];
-    $.ajax({
+    jQuery.ajax({
         type: "POST",
         url: 'roleUsers/' + ldapGroup,
         contentType : 'application/json; charset=utf-8',
@@ -26,15 +26,15 @@ function format ( row, tr ) {
     });
 }
 
-$(document).ready( function () {
-    var table = $('#groupsAndUsers').DataTable({
+jQuery(document).ready( function ($) {
+    var table = jQuery('#groupsAndUsers').DataTable({
         "order": [[1, "asc"]]
     });
 
-    $('.dataTables_length').addClass('bs-select');
+    jQuery('.dataTables_length').addClass('bs-select');
 
-    $('#groupsAndUsers tbody').on('click', 'td span.details-control', function () {
-        var tr = $(this).closest('tr');
+    jQuery('#groupsAndUsers tbody').on('click', 'td span.details-control', function ($) {
+        var tr = jQuery(this).closest('tr');
         var row = table.row( tr );
 
         if ( row.child.isShown() ) {
