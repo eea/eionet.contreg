@@ -43,10 +43,9 @@ public class UserUtil {
     public static Hashtable<String, Vector<String>> fetchGroupsAndUsers(boolean init) throws AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException {
         Hashtable<String, Vector<String>> results;
         if (init) {
-            results = getAclOperationsService().getRefreshedGroupsAndUsersHashTable(true);
+            return getAclOperationsService().getRefreshedGroupsAndUsersHashTable(true);
         }
-        results = getAclOperationsService().getRefreshedGroupsAndUsersHashTable(false);
-        return results;
+        return getAclOperationsService().getRefreshedGroupsAndUsersHashTable(false);
     }
 
     public static AclOperationsService getAclOperationsService() {
@@ -68,7 +67,7 @@ public class UserUtil {
     public static void setUserGroupResults(CRUser user) {
         try {
             UserUtil userUtil = new UserUtil();
-            ArrayList<String> results = userUtil.getUserOrGroup(user.getUserName(), false);
+            ArrayList<String> results = userUtil.getUserOrGroup(user.getUserName(), true);
             user.setGroupResults(results);
         } catch (AclLibraryAccessControllerModifiedException | AclPropertiesInitializationException | LdapDaoException e) {
             LOGGER.error(e.getMessage(), e);
