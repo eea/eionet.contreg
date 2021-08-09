@@ -76,16 +76,30 @@ public class UserUtil {
     }
 
     /**
-     * checks if user has admin rights
-     * @param user
+     * checks if user has specific permission to aclPath
+     * @param session
+     * @param aclPath
+     * @param perm
      * @return
      */
-    public static boolean hasAuthPermission(CRUser user) {
-        return user.isAdministrator();
+    public static Boolean hasPermission(HttpSession session, String aclPath, String perm) {
+        CRUser user = session == null ? null : (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
+        if (user!=null) {
+            if (user.getGroupResults() != null) {
+                for (String result : user.getGroupResults()) {
+                    if (CRUser.hasPermission(result, aclPath, perm)) {
+                        return true;
+                    }
+                }
+            } else {
+                return CRUser.hasPermission(user.getUserName(),aclPath,perm);
+            }
+        }
+        return false;
     }
 
     /**
-     * checks if user is authenticated
+     * checks if user is logged in
      * @param request
      * @return
      */

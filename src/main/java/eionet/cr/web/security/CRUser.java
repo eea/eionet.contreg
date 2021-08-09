@@ -78,7 +78,6 @@ public class CRUser {
     /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
     private List<String> reservedFolderAndFileUris;
 
-    /** List of username and ldap roles (if exist) */
     protected ArrayList<String> groupResults = null;
 
     /**
@@ -126,7 +125,16 @@ public class CRUser {
      * @return
      */
     public boolean hasPermission(String aclPath, String permission) {
-       return groupHasPerm(getGroupResults(), userName, aclPath, permission);
+        if (groupResults != null) {
+            for (String result : groupResults) {
+                if (CRUser.hasPermission(result, aclPath, permission)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return CRUser.hasPermission(userName, aclPath, permission);
+        }
     }
 
     /**
@@ -156,23 +164,9 @@ public class CRUser {
 
         // get user name from user object, or set to null if user object null
         String userName = crUser == null ? null : crUser.getUserName();
-        if (userName!=null) {
-            return groupHasPerm(crUser.getGroupResults(), userName, aclPath, permission);
-        }
-        return groupHasPerm(null, userName, aclPath, permission);
-    }
 
-    public static boolean groupHasPerm(ArrayList<String> groupResults, String userName, String aclPath, String permission) {
-        if (groupResults!=null) {
-            for (String result : groupResults) {
-                if (CRUser.hasPermission(result, aclPath, permission)) {
-                    return true;
-                }
-            }
-        } else {
-            return CRUser.hasPermission(userName, aclPath, permission);
-        }
-        return false;
+        // check if user with this name has this permission in this ACL
+        return CRUser.hasPermission(userName, aclPath, permission);
     }
 
     /**
