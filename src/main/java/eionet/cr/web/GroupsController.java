@@ -40,7 +40,7 @@ public class GroupsController extends AbstractActionBean {
             model.addAttribute("msgOne", PageErrorConstants.NOT_AUTHENTICATED + " Admin tools");
             return "message";
         }
-        if (!UserUtil.hasPermission(request.getSession(), "/admintools", "v")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "v")) {
             model.addAttribute("msgOne", PageErrorConstants.FORBIDDEN_ACCESS + " Admin tools");
             return "message";
         }
@@ -69,7 +69,7 @@ public class GroupsController extends AbstractActionBean {
     @PostMapping("/addUser")
     public String addUser(@ModelAttribute("groupDetails") GroupDetails groupDetails, Model model, HttpServletRequest request)
             throws UserExistsException, XmlMalformedException, LdapDaoException, AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException {
-        if (!UserUtil.hasPermission(request.getSession(), "/admintools", "u")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "u")) {
             model.addAttribute("msgOne", PageErrorConstants.PERMISSION_REQUIRED);
             return "message";
         }
@@ -90,7 +90,7 @@ public class GroupsController extends AbstractActionBean {
     @GetMapping("/removeUser")
     public String removeUser(@RequestParam("crGroupName") String groupName, @RequestParam("memberName") String userName, Model model, HttpServletRequest request)
             throws XmlMalformedException, AclPropertiesInitializationException, LdapDaoException, AclLibraryAccessControllerModifiedException {
-        if (!UserUtil.hasPermission(request.getSession(), "/admintools", "d")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "d")) {
             model.addAttribute("msgOne", PageErrorConstants.PERMISSION_REQUIRED);
             return "message";
         }

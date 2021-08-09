@@ -76,6 +76,21 @@ public class UserUtil {
     }
 
     /**
+     * checks if user is authenticated and has specific permission to aclPath
+     * @param request
+     * @param aclPath
+     * @param perm
+     * @return
+     */
+    public static boolean hasAuthPermission(HttpServletRequest request, String aclPath, String perm) {
+        CRUser user = getUser(request);
+        if (user!=null) {
+            return user.hasPermission(aclPath, perm);
+        }
+        return false;
+    }
+
+    /**
      * checks if user has specific permission to aclPath
      * @param session
      * @param aclPath
