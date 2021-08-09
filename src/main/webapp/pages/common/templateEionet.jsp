@@ -18,7 +18,7 @@
             <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen" title="Eionet 2007 style"/>
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
-            <link rel="shortcut icon" href="<c:url value="/favicon.ico"/>" type="image/x-icon" />
+            <link rel="shortcut icon" href="<c:url value="../../favicon.ico"/>" type="image/x-icon" />
 
             <link type="text/css" href="<c:url value="/css/smoothness/jquery-ui-1.8.16.custom.css" />" rel="stylesheet" />
             <script type="text/javascript" src="<c:url value="/scripts/jquery-1.6.2.min.js" />"></script>
