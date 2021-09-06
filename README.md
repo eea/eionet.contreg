@@ -21,8 +21,8 @@ The necessary versions are as follows:
 * Maven 3.3.9
 * Tomcat 8.5.20
 
-
-## 2. Download and install Virtuoso
+## There are 2 ways of configuring virtuoso database
+### 2a. Download and install Virtuoso
 
 CR uses OpenLink Virtuoso as its backend for relational database and triple
 store. Download Open-Source Edition of Virtuoso from here
@@ -47,6 +47,10 @@ something other than the default!
 CR will ask virtuoso to load files from the temporary directory. You must ensure
 the the values for harvester.tempFileDir and filestore.path in local.properties are
 listed for DirsAllowed in virtuoso.ini.
+
+### 2b. Run virtuoso instance using docker
+
+* docker run --name cr --interactive --tty --env DBA_PASSWORD=dba --publish 1111:1111 --publish  8890:8890 openlink/virtuoso-opensource-7:latest
 
 ## 3. Download, configure and build CR source code
 
@@ -87,13 +91,22 @@ and the following commands should be executed while being in that directory.
 The commands also assume that ISQL executable is on the command path
 (it is located in VIRTUOSO_HOME/bin directory).
 
+
 Create necessary Virtuoso users for CR:
 
     shell> isql localhost:1111 -U dba -P password < 1_create_users.sql
+    
+Alternatively if virtuoso run using docker:
+    
+    shell> docker exec -i cr isql 1111 -U dba -P dba < project_directory/eionet.contreg/sql/virtuoso/install/1_create_users.sql
 
 Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
+    
+Alternatively if virtuoso run using docker:
+
+    shell> docker exec -i cr isql 1111 -U dba -P dba < project_directory/eionet.contreg/sql/virtuoso/install/2_setup_full_text_indexing.sql
 
 ## 5. Integration tests
 
@@ -212,3 +225,7 @@ Recommended properties to override:
      and run the query manually to virtuoso server.
      In this case  where this error occurs, we were passing null value to an integer not null column.
 
+## 11. Enable EEA template for SDS
+* Set property config.useEeaTemplate=true
+* For local deployment in the directory that is declared in property config.app.home, create folder eeaTemplate and inside that folder copy the following files:
+  footer.html, header.html, required_head.html
