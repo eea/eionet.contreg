@@ -6,12 +6,9 @@
 <stripes:layout-render name="/pages/common/template.jsp" pageTitle="Admin tools">
 
     <stripes:layout-component name="head">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script>jQuery.noConflict();</script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
         <script type="text/javascript" src="<c:url value="/scripts/groupsAndUsersTable.js"/>"></script>
@@ -32,7 +29,7 @@
     </stripes:layout-component>
 
     <stripes:layout-component name="contents">
-        <table id="groupsAndUsers" class="table border">
+        <table id="groupsAndUsers" style="display:table" class="row-border hover">
             <thead>
             <tr>
                 <th>User/Ldap group</th>
@@ -71,7 +68,7 @@
         </table>
         <button id="myBtn" class="btn btn-info" style="margin-bottom:5px">Add User</button>
         </br></br>
-        <form:form id="myForm" style="display:none" action="${pageContext.request.contextPath}/v2/admintools/addUser"
+        <form:form id="myForm" style="display:none;margin-bottom:15px" action="${pageContext.request.contextPath}/v2/admintools/addUser"
                    modelAttribute="groupDetails" method="post">
             <form:select path="groupNameOptionOne" items="${crGroups}"/>
             <form:input path="userName" placeholder="Enter user name"/>
@@ -79,9 +76,8 @@
         </form:form>
         <button id="mySecondBtn" class="btn btn-info" style="margin-bottom:5px">Add LDAP Group</button>
         </br></br>
-        <form:form id="mySecondForm" style="display:none"
-                   action="${pageContext.request.contextPath}/v2/admintools/addUser" modelAttribute="groupDetails"
-                   method="post">
+        <form:form id="mySecondForm" style="display:none" action="${pageContext.request.contextPath}/v2/admintools/addUser"
+                   modelAttribute="groupDetails" method="post">
             <form:select path="groupNameOptionTwo" items="${crGroups}"/>
             <form:input id="ch" path="ldapGroupName" placeholder="Enter LDAP group name"/>
             <input type="submit" class="btn btn-info" name="submit" value="Submit"/>
