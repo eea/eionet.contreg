@@ -107,7 +107,7 @@ public class HomespaceUrlFilter implements Filter {
         String pathInfo = httpRequest.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
 
-            int i = pathInfo.indexOf('/', 1);
+            int i = pathInfo.indexOf('/');
             if (i != -1 && pathInfo.length() > (i + 1)) {
 
                 try {
