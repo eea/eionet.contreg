@@ -50,12 +50,14 @@ public class GroupsControllerTest {
     private MockHttpSession session;
     private List<LdapRole> ldapRoles;
     private LdapRole ldapRole;
+    private LdapRole crLdapRole;
     private Hashtable<String, Vector<String>> groupsAndUsers;
     private ArrayList<String> roles;
     private GroupDetails groupDetails;
     private static final String ACL_GROUP = "cr_admin";
     private static final String TEST_USER = "testUser";
     private static final String TEST_ROLE = "testRole";
+    private static final String LDAP_CR_ADMIN = "ldap-cr-admin";
 
     @Before
     public void setUp() throws LdapDaoException, AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException {
@@ -70,6 +72,7 @@ public class GroupsControllerTest {
         when(ldapService.getUserLdapRoles(anyString())).thenReturn(ldapRoles);
         when(ldapService.getAllLdapRoles()).thenReturn(ldapRoles);
         when(user.hasPermission(anyString(), anyString())).thenReturn(true);
+        when(user.isCrAdmin()).thenReturn(true);
         Mockito.doNothing().when(groupsController).refreshUserGroupResults(any(HttpServletRequest.class));
         mockMvc = MockMvcBuilders.standaloneSetup(groupsController).build();
     }
@@ -82,6 +85,7 @@ public class GroupsControllerTest {
     private void setRoleNames() {
         roles = new ArrayList<>();
         roles.add(TEST_ROLE);
+        roles.add(LDAP_CR_ADMIN);
     }
 
     void setGroupsAndUsers() {
@@ -99,8 +103,11 @@ public class GroupsControllerTest {
     void setLdapRoles() {
         ldapRoles = new ArrayList<>();
         ldapRole = new LdapRole();
+        crLdapRole = new LdapRole();
         ldapRole.setName(TEST_ROLE);
+        crLdapRole.setName(LDAP_CR_ADMIN);
         ldapRoles.add(ldapRole);
+        ldapRoles.add(crLdapRole);
     }
 
     @Test
