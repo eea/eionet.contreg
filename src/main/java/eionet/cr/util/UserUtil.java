@@ -1,6 +1,7 @@
 package eionet.cr.util;
 
 import eionet.cr.acl.services.AclOperationsService;
+import eionet.cr.config.GeneralConfig;
 import eionet.cr.errors.AclLibraryAccessControllerModifiedException;
 import eionet.cr.errors.AclPropertiesInitializationException;
 import eionet.cr.errors.LdapDaoException;
@@ -24,19 +25,26 @@ public class UserUtil {
     /** logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UserUtil.class);
 
-    public ArrayList<String> getUserOrGroup(String userName, boolean init) throws AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException, LdapDaoException {
+    private static String cr_admin_group = "config.admin-group";
+
+    public ArrayList<String> getUserOrGroup(CRUser crUser, boolean init) throws AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException, LdapDaoException {
         ArrayList<String> userGroupResults = new ArrayList<>();
         Hashtable<String, Vector<String>> results = fetchGroupsAndUsers(init);
         setCrGroupsAndUsers(results);
         Set<String> ddGroups = getCrGroupsAndUsers().keySet();
         for (String ddGroup : ddGroups) {
             Vector<String> ddGroupUsers = getCrGroupsAndUsers().get(ddGroup);
-            if (ddGroupUsers.contains(userName)) {
-                userGroupResults.add(userName);
+            if (ddGroupUsers.contains(crUser.getUserName())) {
+                userGroupResults.add(crUser.getUserName());
             }
         }
-        List<LdapRole> rolesList = this.getLdapService().getUserLdapRoles(userName);
-        rolesList.forEach(role -> userGroupResults.add(role.getName()));
+        List<LdapRole> rolesList = this.getLdapService().getUserLdapRoles(crUser.getUserName());
+        for (LdapRole ldapRole : rolesList) {
+            if (ldapRole.getName().equals("cn="+GeneralConfig.getProperty(cr_admin_group))) {
+                crUser.setCrAdmin(true);
+            }
+            userGroupResults.add(ldapRole.getName());
+        }
         return userGroupResults;
     }
 
@@ -67,7 +75,7 @@ public class UserUtil {
     public static void setUserGroupResults(CRUser user) {
         try {
             UserUtil userUtil = new UserUtil();
-            ArrayList<String> results = userUtil.getUserOrGroup(user.getUserName(), true);
+            ArrayList<String> results = userUtil.getUserOrGroup(user, true);
             user.setGroupResults(results);
         } catch (AclLibraryAccessControllerModifiedException | AclPropertiesInitializationException | LdapDaoException e) {
             LOGGER.error(e.getMessage(), e);
@@ -130,5 +138,15 @@ public class UserUtil {
     public static CRUser getUser(HttpServletRequest request) {
         HttpSession session = request.getSession();
         return session == null ? null : (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
+    }
+
+    /**
+     * checks if user has cr admin permission
+     * @param request
+     * @return
+     */
+    public static boolean hasCrPermission(HttpServletRequest request) {
+        CRUser user = getUser(request);
+        return user.isCrAdmin();
     }
 }

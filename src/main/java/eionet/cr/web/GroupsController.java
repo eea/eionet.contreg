@@ -40,7 +40,7 @@ public class GroupsController extends AbstractActionBean {
             model.addAttribute("msgOne", PageErrorConstants.NOT_AUTHENTICATED + " Admin tools");
             return "message";
         }
-        if (!UserUtil.hasAuthPermission(request, "/admintools", "v")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "v") || !UserUtil.hasCrPermission(request)) {
             model.addAttribute("msgOne", PageErrorConstants.FORBIDDEN_ACCESS + " Admin tools");
             return "message";
         }
@@ -69,7 +69,7 @@ public class GroupsController extends AbstractActionBean {
     @PostMapping("/addUser")
     public String addUser(@ModelAttribute("groupDetails") GroupDetails groupDetails, Model model, HttpServletRequest request)
             throws UserExistsException, XmlMalformedException, LdapDaoException, AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException {
-        if (!UserUtil.hasAuthPermission(request, "/admintools", "u")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "u") || !UserUtil.hasCrPermission(request)) {
             model.addAttribute("msgOne", PageErrorConstants.PERMISSION_REQUIRED);
             return "message";
         }
@@ -90,7 +90,7 @@ public class GroupsController extends AbstractActionBean {
     @GetMapping("/removeUser")
     public String removeUser(@RequestParam("crGroupName") String groupName, @RequestParam("memberName") String userName, Model model, HttpServletRequest request)
             throws XmlMalformedException, AclPropertiesInitializationException, LdapDaoException, AclLibraryAccessControllerModifiedException {
-        if (!UserUtil.hasAuthPermission(request, "/admintools", "d")) {
+        if (!UserUtil.hasAuthPermission(request, "/admintools", "d") || !UserUtil.hasCrPermission(request)) {
             model.addAttribute("msgOne", PageErrorConstants.PERMISSION_REQUIRED);
             return "message";
         }
@@ -104,7 +104,7 @@ public class GroupsController extends AbstractActionBean {
         CRUser user = session == null ? null : (CRUser) session.getAttribute(WebConstants.USER_SESSION_ATTR);
         if (user!=null) {
             UserUtil userUtil = new UserUtil();
-            ArrayList<String> results = userUtil.getUserOrGroup(user.getUserName(), true);
+            ArrayList<String> results = userUtil.getUserOrGroup(user, true);
             user.setGroupResults(results);
             session.setAttribute(WebConstants.USER_SESSION_ATTR, user);
         }

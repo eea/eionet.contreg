@@ -80,6 +80,8 @@ public class CRUser {
 
     protected ArrayList<String> groupResults = null;
 
+    private boolean isCrAdmin;
+
     /**
      * Creates CRUser.
      *
@@ -570,5 +572,13 @@ public class CRUser {
 
     public void setGroupResults(ArrayList<String> groupResults) {
         this.groupResults = groupResults;
+    }
+
+    public boolean isCrAdmin() {
+        return isCrAdmin;
+    }
+
+    public void setCrAdmin(boolean crAdmin) {
+        isCrAdmin = crAdmin;
     }
 }

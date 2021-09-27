@@ -32,7 +32,7 @@
         <table id="groupsAndUsers" style="display:table" class="row-border hover">
             <thead>
             <tr>
-                <th>User/Ldap group</th>
+                <th>User/Ldap role</th>
                 <th>CR Group</th>
                 <th>Action</th>
             </tr>

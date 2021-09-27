@@ -17,12 +17,16 @@ import eionet.cr.web.action.AbstractActionBean;
 public class AdminWelcomeActionBean extends AbstractActionBean {
 
     private boolean adminLoggedIn = false;
+    private boolean crAdmin = false;
 
     @DefaultHandler
     public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator()) {
                 adminLoggedIn = true;
+                if (getUser().isCrAdmin()) {
+                    crAdmin = true;
+                }
             } else {
                 adminLoggedIn = false;
             }
@@ -34,6 +38,10 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
 
     public boolean isAdminLoggedIn() {
         return adminLoggedIn;
+    }
+
+    public boolean isCrAdmin() {
+        return crAdmin;
     }
 
 }
