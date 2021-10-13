@@ -8,7 +8,7 @@
     <stripes:layout-component name="contents">
 
     <c:choose>
-        <c:when test="${actionBean.adminLoggedIn}">
+        <c:when test="${actionBean.adminLoggedIn or actionBean.crAdmin or actionBean.sdsAdmin}">
             <h1>Administration pages</h1>
             <ul>
                 <li><stripes:link href="/admin/harvestedurl">Harvested URLs</stripes:link></li>
@@ -19,10 +19,16 @@
                 <li><stripes:link href="/admin/endpointQueries.action">SPARQL endpoint harvest queries</stripes:link></li>
                 <li><stripes:link href="/admin/sourceDeletions.action">Monitor source deletions</stripes:link></li>
                 <li><stripes:link href="/admin/stagingDbs.action">Staging databases</stripes:link>&nbsp;<span style="color:#FF0000">(work in progress!)</span></li>
-                <c:if test="${actionBean.crAdmin and !actionBean.eeaTemplate}">
+                <c:if test="${!actionBean.eeaTemplate}">
                     <li><a href="/v2/admintools/list">Admin tools</a></li>
                 </c:if>
             </ul>
+
+            <div style="padding: 11em 0em;position: absolute;color: black">
+                Current LDAP admin role used: ${actionBean.userLdapRole}. Members of this LDAP role can access the
+                Admin
+                options in this application.
+            </div>
         </c:when>
         <c:otherwise>
             <div class="error-msg">Access not allowed!</div>

@@ -10,6 +10,7 @@ import eionet.cr.ldap.services.LdapService;
 import eionet.cr.spring.SpringApplicationContext;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class UserUtil {
     /** logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UserUtil.class);
 
-    private static String cr_admin_group = "config.admin-group";
+    private static String admin_group = "config.admin-group";
 
     public ArrayList<String> getUserOrGroup(CRUser crUser, boolean init) throws AclLibraryAccessControllerModifiedException, AclPropertiesInitializationException, LdapDaoException {
         ArrayList<String> userGroupResults = new ArrayList<>();
@@ -40,8 +41,9 @@ public class UserUtil {
         }
         List<LdapRole> rolesList = this.getLdapService().getUserLdapRoles(crUser.getUserName());
         for (LdapRole ldapRole : rolesList) {
-            if (ldapRole.getName().equals("cn="+GeneralConfig.getProperty(cr_admin_group))) {
-                crUser.setCrAdmin(true);
+            if (ldapRole.getName().equals("cn="+GeneralConfig.getProperty(admin_group))) {
+                if (GeneralConfig.getProperty(admin_group).contains("cr") && !isEeaTemplate()) crUser.setCrAdmin(true);
+                else if (GeneralConfig.getProperty(admin_group).contains("sds") && isEeaTemplate()) crUser.setSdsAdmin(true);
             }
             userGroupResults.add(ldapRole.getName());
         }
@@ -145,8 +147,21 @@ public class UserUtil {
      * @param request
      * @return
      */
-    public static boolean hasCrPermission(HttpServletRequest request) {
+    public static boolean isCrOrSdsAdmin(HttpServletRequest request) {
         CRUser user = getUser(request);
-        return user.isCrAdmin();
+        return user.isCrAdmin() || user.isSdsAdmin();
+    }
+
+    /**
+     * if true, template for sds is enabled
+     * @return
+     */
+    public static boolean isEeaTemplate() {
+        boolean ret = false;
+        String use = GeneralConfig.getProperty("useEeaTemplate");
+        if (!StringUtils.isBlank(use)) {
+            ret = Boolean.valueOf(use).booleanValue();
+        }
+        return ret;
     }
 }

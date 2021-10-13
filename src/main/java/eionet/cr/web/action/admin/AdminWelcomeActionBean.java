@@ -17,15 +17,21 @@ import eionet.cr.web.action.AbstractActionBean;
 public class AdminWelcomeActionBean extends AbstractActionBean {
 
     private boolean adminLoggedIn = false;
+    private String userLdapRole = "";
     private boolean crAdmin = false;
+    private boolean sdsAdmin = false;
 
     @DefaultHandler
     public Resolution view() throws DAOException {
         if (getUser() != null) {
-            if (getUser().isAdministrator()) {
+            if (getUser().isAdministrator() || getUser().isCrAdmin() || getUser().isSdsAdmin()) {
                 adminLoggedIn = true;
                 if (getUser().isCrAdmin()) {
                     crAdmin = true;
+                    userLdapRole = "extranet-cr-admin";
+                } else if (getUser().isSdsAdmin()) {
+                    userLdapRole = "extranet-sds-admin";
+                    sdsAdmin = true;
                 }
             } else {
                 adminLoggedIn = false;
@@ -40,8 +46,15 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
         return adminLoggedIn;
     }
 
+    public String getUserLdapRole() {
+        return userLdapRole;
+    }
+
     public boolean isCrAdmin() {
         return crAdmin;
     }
 
+    public boolean isSdsAdmin() {
+        return sdsAdmin;
+    }
 }

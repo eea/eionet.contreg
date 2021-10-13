@@ -82,6 +82,8 @@ public class CRUser {
 
     private boolean isCrAdmin;
 
+    private boolean isSdsAdmin;
+
     /**
      * Creates CRUser.
      *
@@ -580,5 +582,13 @@ public class CRUser {
 
     public void setCrAdmin(boolean crAdmin) {
         isCrAdmin = crAdmin;
+    }
+
+    public boolean isSdsAdmin() {
+        return isSdsAdmin;
+    }
+
+    public void setSdsAdmin(boolean sdsAdmin) {
+        isSdsAdmin = sdsAdmin;
     }
 }
