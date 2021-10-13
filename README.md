@@ -229,3 +229,6 @@ Recommended properties to override:
 * Set property config.useEeaTemplate=true
 * For local deployment in the directory that is declared in property config.app.home, create folder eeaTemplate and inside that folder copy the following files:
   footer.html, header.html, required_head.html
+
+## 12. Admin actions page
+A user can view admin actions page either if he belongs to acl admin group or if he is a crAdmin in cr template or sdsAdmin in sds template.
