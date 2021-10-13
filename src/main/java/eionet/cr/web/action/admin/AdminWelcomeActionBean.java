@@ -1,11 +1,12 @@
 package eionet.cr.web.action.admin;
 
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.dao.DAOException;
+import eionet.cr.web.action.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
-import eionet.cr.dao.DAOException;
-import eionet.cr.web.action.AbstractActionBean;
 
 /**
  *
@@ -18,20 +19,14 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
 
     private boolean adminLoggedIn = false;
     private String userLdapRole = "";
-    private boolean crAdmin = false;
-    private boolean sdsAdmin = false;
 
     @DefaultHandler
     public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator() || getUser().isCrAdmin() || getUser().isSdsAdmin()) {
                 adminLoggedIn = true;
-                if (getUser().isCrAdmin()) {
-                    crAdmin = true;
-                    userLdapRole = "extranet-cr-admin";
-                } else if (getUser().isSdsAdmin()) {
-                    userLdapRole = "extranet-sds-admin";
-                    sdsAdmin = true;
+                if (getUser().isCrAdmin() || getUser().isSdsAdmin()) {
+                    userLdapRole = GeneralConfig.getProperty( "config.admin-group");
                 }
             } else {
                 adminLoggedIn = false;
@@ -48,13 +43,5 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
 
     public String getUserLdapRole() {
         return userLdapRole;
-    }
-
-    public boolean isCrAdmin() {
-        return crAdmin;
-    }
-
-    public boolean isSdsAdmin() {
-        return sdsAdmin;
     }
 }
