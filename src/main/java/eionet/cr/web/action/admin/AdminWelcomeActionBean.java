@@ -18,16 +18,14 @@ import net.sourceforge.stripes.action.UrlBinding;
 public class AdminWelcomeActionBean extends AbstractActionBean {
 
     private boolean adminLoggedIn = false;
-    private String userLdapRole = "";
+    private String ldapRoleUsed = "";
 
     @DefaultHandler
     public Resolution view() throws DAOException {
         if (getUser() != null) {
             if (getUser().isAdministrator() || getUser().isCrAdmin() || getUser().isSdsAdmin()) {
                 adminLoggedIn = true;
-                if (getUser().isCrAdmin() || getUser().isSdsAdmin()) {
-                    userLdapRole = GeneralConfig.getProperty( "config.admin-group");
-                }
+                ldapRoleUsed = GeneralConfig.getProperty( "config.admin-group");
             } else {
                 adminLoggedIn = false;
             }
@@ -41,7 +39,7 @@ public class AdminWelcomeActionBean extends AbstractActionBean {
         return adminLoggedIn;
     }
 
-    public String getUserLdapRole() {
-        return userLdapRole;
+    public String getLdapRoleUsed() {
+        return ldapRoleUsed;
     }
 }

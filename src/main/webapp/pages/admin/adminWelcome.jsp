@@ -27,11 +27,9 @@
                     </c:if>
                 </ul>
 
-                <c:if test="${not empty actionBean.userLdapRole}">
-                    <div style="padding: 11em 0em;position: absolute;color: black">
-                        Current LDAP admin role used: ${actionBean.userLdapRole}. Members of this LDAP role can access the Admin options in this application.
-                    </div>
-                </c:if>
+                <div style="padding: 11em 0em;position: absolute;color: black">
+                    Current LDAP admin role used: ${actionBean.ldapRoleUsed}. Members of this LDAP role can access the Admin options in this application.
+                </div>
             </c:when>
             <c:otherwise>
                 <div class="error-msg">Access not allowed!</div>
