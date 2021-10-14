@@ -131,6 +131,7 @@ public class GroupsControllerTest {
     @Test
     public void testGetGroupsAndUsersNoPermission() throws Exception {
         when(user.hasPermission(anyString(), anyString())).thenReturn(false);
+        when(user.isCrAdmin()).thenReturn(false);
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admintools/list")
                 .session(session);
         mockMvc.perform(builder)
@@ -156,6 +157,7 @@ public class GroupsControllerTest {
     @Test
     public void testAddUserNoPermission() throws Exception {
         when(user.hasPermission(anyString(), anyString())).thenReturn(false);
+        when(user.isCrAdmin()).thenReturn(false);
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/admintools/addUser")
                 .session(session).flashAttr("groupDetails", groupDetails);
         mockMvc.perform(builder)
@@ -182,6 +184,7 @@ public class GroupsControllerTest {
     @Test
     public void testRemoveUserNoPermission() throws Exception {
         when(user.hasPermission(anyString(), anyString())).thenReturn(false);
+        when(user.isCrAdmin()).thenReturn(false);
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/admintools/removeUser")
                 .session(session).param("crGroupName", ACL_GROUP).param("memberName", "test");
         mockMvc.perform(builder)
