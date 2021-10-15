@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
+import eionet.cr.util.*;
 import net.sourceforge.stripes.action.UrlBinding;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -42,10 +43,6 @@ import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
-import eionet.cr.util.Hashes;
-import eionet.cr.util.QueryString;
-import eionet.cr.util.SortOrder;
-import eionet.cr.util.Util;
 import eionet.cr.web.action.AbstractActionBean;
 import eionet.cr.web.action.factsheet.FactsheetActionBean;
 import eionet.cr.web.security.CRUser;
@@ -127,7 +124,7 @@ public final class JstlFunctions {
      * @return
      */
     public static boolean userHasPermission(HttpSession session, java.lang.String aclPath, java.lang.String permission) {
-        return CRUser.hasPermission(session, aclPath, permission);
+        return UserUtil.hasPermission(session, aclPath, permission);
     }
 
     /**

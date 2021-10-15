@@ -1,7 +1,9 @@
+<%@ page import="eionet.cr.config.GeneralConfig" %>
 <%@ include file="/pages/common/taglibs.jsp"%>
+
 <stripes:layout-definition>
 	<c:choose>
-		<c:when test="${actionBean.eeaTemplate}">
+		<c:when test="${actionBean.eeaTemplate or GeneralConfig.getProperty('useEeaTemplate')}">
     		<stripes:layout-render name="/pages/common/templateEea.jsp" pageTitle="${pageTitle}"/>
 	    </c:when>
     	<c:otherwise>

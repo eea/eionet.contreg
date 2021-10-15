@@ -200,6 +200,20 @@ public final class GeneralConfig {
     private static Properties properties;
     private static ConfigurationPropertyResolver propertyResolver;
 
+    public static String LDAP_URL = "ldap.url";
+
+    public static String LDAP_PRINCIPAL = "ldap.principal";
+
+    public static String LDAP_PASSWORD = "ldap.password";
+
+    public static String LDAP_CONTEXT = "ldap.context";
+
+    public static String LDAP_ROLE_DIR = "ldap.role.dir";
+
+    public static String LDAP_USER_DIR = "ldap.user.dir";
+
+    public static String LDAP_ROLE_NAME = "ldap.attr.rolename";
+
 
     /**
      * Hide utility class constructor.

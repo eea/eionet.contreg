@@ -78,6 +78,12 @@ public class CRUser {
     /** List of the user's folder-or-file URIs that should be reserved, i.e. not to be created or deleted by user himself! */
     private List<String> reservedFolderAndFileUris;
 
+    protected ArrayList<String> groupResults = null;
+
+    private boolean isCrAdmin;
+
+    private boolean isSdsAdmin;
+
     /**
      * Creates CRUser.
      *
@@ -123,7 +129,16 @@ public class CRUser {
      * @return
      */
     public boolean hasPermission(String aclPath, String permission) {
-        return CRUser.hasPermission(userName, aclPath, permission);
+        if (groupResults != null) {
+            for (String result : groupResults) {
+                if (CRUser.hasPermission(result, aclPath, permission)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return CRUser.hasPermission(userName, aclPath, permission);
+        }
     }
 
     /**
@@ -551,5 +566,29 @@ public class CRUser {
     public static boolean isHuman(String userName) {
 
         return StringUtils.isBlank(userName) ? false : new CRUser(userName).isHuman();
+    }
+
+    public ArrayList<String> getGroupResults() {
+        return groupResults;
+    }
+
+    public void setGroupResults(ArrayList<String> groupResults) {
+        this.groupResults = groupResults;
+    }
+
+    public boolean isCrAdmin() {
+        return isCrAdmin;
+    }
+
+    public void setCrAdmin(boolean crAdmin) {
+        isCrAdmin = crAdmin;
+    }
+
+    public boolean isSdsAdmin() {
+        return isSdsAdmin;
+    }
+
+    public void setSdsAdmin(boolean sdsAdmin) {
+        isSdsAdmin = sdsAdmin;
     }
 }

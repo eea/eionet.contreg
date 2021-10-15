@@ -21,8 +21,8 @@ The necessary versions are as follows:
 * Maven 3.3.9
 * Tomcat 8.5.20
 
-
-## 2. Download and install Virtuoso
+## There are 2 ways of configuring virtuoso database
+### 2a. Download and install Virtuoso
 
 CR uses OpenLink Virtuoso as its backend for relational database and triple
 store. Download Open-Source Edition of Virtuoso from here
@@ -48,6 +48,10 @@ CR will ask virtuoso to load files from the temporary directory. You must ensure
 the the values for harvester.tempFileDir and filestore.path in local.properties are
 listed for DirsAllowed in virtuoso.ini.
 
+### 2b. Run virtuoso instance using docker
+
+* docker run --name cr --interactive --tty --env DBA_PASSWORD=dba --publish 1111:1111 --publish  8890:8890 openlink/virtuoso-opensource-7:latest
+
 ## 3. Download, configure and build CR source code
 
 The CR source code is kept in GitHub repository at https://github.com/eea/eionet.contreg
@@ -56,15 +60,15 @@ Install a Git client of your choice, and clone CR source code into a directory
 that is denoted by CR_SOURCE_HOME in the below instructions.
 
 Before you can build CR source code, you need to set your environment specific properties.
-For that, make a copy of unittest.properties in CR_SOURCE_HOME, and rename it to local.properties.
+For that, make a copy of default.properties in CR_SOURCE_HOME, and rename it to local.properties.
 Go through the resulting file and change properties that are specific to your environment or wishes.
 Each property's exact meaning and effect is commented in the file.
 
 Now you are ready to build your CR code. It is built with Maven.
 The following command assumes that Maven's executable (mvn) is on the command path,
-and that it is run while being in CR_SOURCE_HOME directory:
+and that it is run while being in CR_SOURCE_HOME directory. The property `config.app.home` may need to be configured while running build command.
 
-    shell> mvn clean install
+    shell> mvn -Dmaven.test.skip=true -Denv=local -Dconfig.app.home=/some/other/dir clean install
 
 ### 3.1 Unit tests
 
@@ -87,13 +91,22 @@ and the following commands should be executed while being in that directory.
 The commands also assume that ISQL executable is on the command path
 (it is located in VIRTUOSO_HOME/bin directory).
 
+
 Create necessary Virtuoso users for CR:
 
     shell> isql localhost:1111 -U dba -P password < 1_create_users.sql
+    
+Alternatively if virtuoso run using docker:
+    
+    shell> docker exec -i cr isql 1111 -U dba -P dba < project_directory/eionet.contreg/sql/virtuoso/install/1_create_users.sql
 
 Set up the triple store's full text indexing
 
     shell> isql localhost:1111 -U dba -P password < 2_setup_full_text_indexing.sql
+    
+Alternatively if virtuoso run using docker:
+
+    shell> docker exec -i cr isql 1111 -U dba -P dba < project_directory/eionet.contreg/sql/virtuoso/install/2_setup_full_text_indexing.sql
 
 ## 5. Integration tests
 
@@ -117,9 +130,10 @@ Finally, the tests runner will run all tests, and it will eventually tear down t
 **NB!** The tests runner will attempt to create a directory defined by the `config.app.home` property in `tests.properties`.
 This is the directory where integration tests will create some temporaey files they need to use.
 If for some reason it fails to create that directory or you want to use a different location, then you can override
-this property by using `-Dconfig.app.home` option on command line, like this:
+this property by using `-Dconfig.app.home` option on command line, like below. The property `config.docker.sharedVolume`
+may also need to be configured while running the tests.
 
-    shell> mvn -Dconfig.app.home=/some/other/dir clean verify
+    shell> mvn -Dconfig.app.home=/some/other/dir -Dconfig.docker.sharedVolume=/some/other/dir clean verify
 
 **NB!** Other properties noteworthy from the integration tests point of view in `tests.properties` are
 
@@ -211,3 +225,10 @@ Recommended properties to override:
      and run the query manually to virtuoso server.
      In this case  where this error occurs, we were passing null value to an integer not null column.
 
+## 11. Enable EEA template for SDS
+* Set property config.useEeaTemplate=true
+* For local deployment in the directory that is declared in property config.app.home, create folder eeaTemplate and inside that folder copy the following files:
+  footer.html, header.html, required_head.html
+
+## 12. Admin actions page
+A user can view admin actions page either if he belongs to acl admin group or if he is a crAdmin in cr template or sdsAdmin in sds template.

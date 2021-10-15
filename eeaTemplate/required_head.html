@@ -41,10 +41,830 @@
     <script type="text/javascript" src="http://www.eea.europa.eu/portal_javascripts/EEADesign2006/ploneScripts1440515351121511936.js"></script>
     <script type="text/javascript" src="http://www.eea.europa.eu/portal_javascripts/EEADesign2006/ploneScripts1440515351121850014.js"></script>
 
-                
+        <script type="text/javascript" src="https://www.eea.europa.eu/templates/v2/js/ploneScripts1556216698156459093.js"></script>
+        <script type="text/javascript" src="https://www.eea.europa.eu/templates/v2/js/ploneScripts1556216698151504993.js"></script>
             
-        
         <script type="text/javascript"> context_url='http://www.eea.europa.eu';</script>
-    
 
+        <style type="text/css">
+            /* - critical.css - */
+            /* https://www.eea.europa.eu/portal_css/critical.css?original=1 */
+            /* */
+            /* */
+            /* */
+            /* */
+            @font-face {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 400;
+                font-display: swap;
+                src: local('Open Sans Regular'), local('OpenSans-Regular'), url("https://www.eea.europa.eu/templates/v2/fonts/GoogleFonts-OpenSans-Regular1-v15.woff2") format('woff2');
+                unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+            }
+            /* */
+            @font-face {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 400;
+                font-display: swap;
+                src: local('Open Sans Regular'), local('OpenSans-Regular'), url("https://www.eea.europa.eu/templates/v2/fonts/GoogleFonts-OpenSans-Regular2-v15.woff2") format('woff2');
+                unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+            /* */
+            @font-face {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 700;
+                font-display: swap;
+                src: local('Open Sans Bold'), local('OpenSans-Bold'), url("https://www.eea.europa.eu/templates/v2/fonts/GoogleFonts-OpenSans-Bold1-v15.woff2") format('woff2');
+                unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+            }
+            /* */
+            @font-face {
+                font-family: 'Open Sans';
+                font-style: normal;
+                font-weight: 700;
+                font-display: swap;
+                src: local('Open Sans Bold'), local('OpenSans-Bold'), url("https://www.eea.europa.eu/templates/v2/fonts/GoogleFonts-OpenSans-Bold2-v15.woff2") format('woff2');
+                unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+            @media screen {
+                * {margin: 0; padding: 0;}
+            }
+            * {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            :link,:visited { text-decoration:none }
+            ul,ol { list-style:none; }
+            h1,h2,h3,h4,h5,h6,pre,code { font-size:1em; }
+            a img,:link img,:visited img { border:none }
+            a { outline: none; }
+            table { border-spacing: 0; }
+            img { vertical-align: text-bottom; }
+            iframe {
+                border: 0 none;
+            }
+            input, button, select, textarea {
+                font-family: inherit;
+                font-size: inherit;
+                line-height: inherit;
+            }
+            label {
+                font-weight: bold;
+            }
+            legend {
+                display: block;
+                margin-bottom: 17px;
+                color: #333333;
+            }
+            .clearfix::after, .container::after, .container-fluid::after, .row::after, .form-horizontal .form-group::after, .nav::after, .navbar::after, .navbar-header::after, .navbar-collapse::after {
+                clear: both;
+            }
+            .clearfix::before, .clearfix::after, .container::before, .container::after, .container-fluid::before, .container-fluid::after, .row::before, .row::after, .form-horizontal .form-group::before, .form-horizontal .form-group::after, .nav::before, .nav::after, .navbar::before, .navbar::after, .navbar-header::before, .navbar-header::after, .navbar-collapse::before, .navbar-collapse::after {
+                content: " ";
+                display: table;
+            }
+            .visualClear {
+                display: block;
+                clear: both;
+            }
+            .hiddenStructure {
+                display: block !important;
+                background: transparent none;
+                border: none;
+                height: 1px;
+                overflow: hidden;
+                padding: 0;
+                margin: -1px 0 0 -1px;
+                width: 1px;
+            }
+            .eea-slide-tooltips, #portal-logo-link-header, .navbar-toggle, .hiddenElem, .site-description, #print-warning, #portal-globalnav #portaltab-more, #portal-globalnav #portaltab-eeahome, #portal-searchbox .gsc-branding  {
+                display: none;
+            }
+            .hidden {
+                display: none !important;
+            }
+            html{font-size:16px !important;}body{font:75% 'Open Sans',Verdana,Helvetica,Arial,sans-serif;color:#333;margin:0;padding:0;background-color:#e8f0fb !important;}#cross-site-top{background-color:#069;margin:0;padding:0;}#globalnav-holder{background-color:#069;width:100%;display:block;overflow:hidden;order: 2;}#portal-header,#visual-portal-wrapper{max-width:1024px}#visual-portal-wrapper{margin:0 auto;padding:0;clear:both;overflow:visible}#portal-column-content{padding:0 1.5em 1.5em;min-width: 635px;}#footer-wrapper{background-color:#069;margin:2em 0;padding:2em 1em;clear:both;border-top:8px solid #FFF}
+            .pull-right {
+                float: right !important;
+            }
+            .container {
+                margin: 0 auto;
+                padding: 0 15px;
+            }
+            .col-md-5, .col-md-6, .col-sm-6 {
+                float: left;
+                position: relative;
+                padding: 0 15px;
+            }
+            @media (min-width: 768px) {
+                .col-sm-6 {
+                    width: 50%;
+                }
+            }
+            @media (min-width: 992px) {
+                .col-md-5 {
+                    width: 41.66666667%;
+                }
+            }
+            a { color: #346f83;
+                cursor: pointer}
+            a:hover {
+                color: #8e004d;
+            }
+            a:visited {
+                color: #8e004d;
+            }
+            h1, h2, h3, h4, h5, h6 {
+                color: #006699;
+                font-weight: bold;
+                font-family: 'Open Sans', Verdana, Helvetica, Arial, sans-serif;
+                line-height: 1.5;
+            }
+            p {
+                font-family: 'Open Sans', Verdana, Helvetica, Arial, sans-serif;
+                margin: 0 0 0.75em 0;
+                line-height: 1.5em;
+            }
+            ul {
+                margin: 0 0 0 1.5em;
+            }
+            .navTree {
+                list-style: none none;
+            }
+            select {
+                border: 1px solid #cccccc;
+                color: #333333;
+                vertical-align: top;
+                background: white;
+            }
+            .pull-left {
+                float: left !important;
+            }
+            .list-items > li {
+                display: list-item;
+            }
+            .contentViews li {
+                display: inline;
+            }
+            .list-inline li {
+                display: inline;
+            }
+            .list-inline li::before {
+                content: " ";
+            }
+            @media screen {
+                .position-0 {
+                    margin-left: -100%;
+                }
+                .width-full {
+                    width: 100%;
+                }
+                .row {
+                    float: left;
+                    width: 100%;
+                    display: block;
+                    position: relative;
+                }
+                .cell {
+                    position: relative;
+                    float: left;
+                    left: 100%;
+                }
+                .width-3\3A 4 {
+                width: 58.5%;
+            }
+            }
+            #portal-column-two {
+                min-width: 350px;
+            }
+            #portal-column-two .portlet {
+                margin: 0 0 1em 0;
+            }
+            .position-3\3a 4 {
+                margin-left: -35.5%;
+            }
+            .width-1\3A 4 {
+                width: 35.5%;
+            }
+            .panel {
+                display: none;
+                z-index: 600;
+                background: transparent;
+                border: 0;
+            }
+            #portal-personaltools-wrapper {
+                min-height: 10px;
+                font-size: 110%;
+                order: 2;
+            }
+            #portal-personaltools {
+                background-color: #009966;
+                color: #fff;
+                line-height: 1.6em;
+                padding: 0.3em 0.5em 0.5em;
+                margin: 0;
+                z-index: 3;
+                position: relative;
+                font-size: 80%;
+            }
+            .deactivated .actionMenuContent {
+                display: none;
+            }
+            #portal-externalsites, #portal-siteactions {
+                margin: 4px 0 4px 0;
+                padding: 0 10px 0 0;
+            }
+            #portal-externalsites {
+                margin-left: 0.5em;
+            }
+            #cross-site-top {
+                display: flex;
+                flex-grow: 1;
+                min-width: 80%;
+            }
+            #cross-site-top .eea-siteaction {
+                display: inline;
+                padding: 0 5px;
+                margin-right: 0.5em;
+            }
+            #cross-site-top .eea-siteaction {
+                font-size: 11px;
+            }
+            .eea-siteaction > a,
+            .eea-siteaction > a:hover,
+            .eea-siteaction .eea-icon
+            {
+                color: #FFF;
+                cursor: pointer;
+            }
+            #portal-siteactions {
+                margin-left: auto;
+            }
+            #portal-siteactions, #portal-externalsites {
+                display: block;
+            }
+            .navbar-collapse {
+                overflow-x: visible;
+                overflow-y: auto;
+                width: 100%;
+                max-height: 325px;
+            }
+            .navbar-toggle {
+                position: relative;
+                float: right;
+                margin-right: 15px;
+                padding: 9px 10px;
+                margin-top: 1em;
+                margin-bottom: 8px;
+                background: transparent none;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            #header-holder {
+                width: 100%;
+                clear: both;
+                display: block;
+                position: relative;
+            }
+            #header-holder .navbar {
+                box-shadow: 0 1px 10px #005078;
+                background-color: #FFF;
+                border: 0;
+                margin-bottom: 17px;
+            }
+            #eea-above-columns {
+                margin-top: -17px;
+            }
+            @media screen and (max-width: 767px) {
+                #portal-logo-link-header, .navbar-toggle {
+                    display: block;
+                }
+                .collapse {
+                    display: none;
+                }
+                .sr-only {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    margin: -1px;
+                    padding: 0;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    border: 0;
+                }
+                .navbar-toggle .icon-bar {
+                    display: block;
+                    width: 22px;
+                    height: 2px;
+                    border-radius: 1px;
+                    background: #888;
+                }
+                .navbar-fixed-top{
+                    position: fixed;
+                    right: 0;
+                    left: 0;
+                    top: 0;
+                    z-index: 1030;
+                    min-height: 50px;
+                }
+                .navbar-collapse {
+                    background-color: #006699;
+                    padding: 0 15px;
+                }
+                .navbar-toggle .icon-bar + .icon-bar {
+                    margin-top: 4px;
+                }
+                .collapse.in {
+                    display: block;
+                }
+            }
+            @media screen and (min-width: 768px) {
+                #header-holder .container-fluid {
+                    padding: 0;
+                }
+                .navbar-collapse {
+                    display: block !important;
+                    height: auto !important;
+                    overflow: visible !important;
+                }
+                #portal-searchbox .gsc-search-button {
+                    cursor: pointer;
+                    height: 32px;
+                    margin: 0;
+                    width: 70px;
+                    border-radius: 0;
+                    font: bold 12px 'Open Sans';
+                }
+            }
+            #portal-top {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            #portal-header {
+                display: flex;
+                justify-content: space-between;
+                clear: both;
+                position: relative;
+                margin: 0 auto;
+                overflow: inherit;
+                height: 90px;
+                z-index: initial;
+                order: 2;
+                width: 100%;
+            }
+            .portal-logo {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                position: relative;
+                order: 1;
+            }
+            .portal-logo a {
+                display: block;
+                text-decoration: none;
+                overflow: hidden;
+                border: 0;
+                margin: 0;
+                padding: 0;
+                cursor: pointer;
+            }
+            #printLogo {
+                padding: 0.9em 0 0 0.5em;
+                display: block;
+                width: auto;
+                height: 71px;
+            }
+            #portal-header .hiddenStructure {
+                order: 3;
+            }
+            #portal-searchbox {
+                margin: 20px 0 0 0;
+                font-size: 1.2em;
+                width: 350px;
+                text-align: left;
+                order: 3;
+            }
+            #portal-searchbox .gsc-control-cse {
+                background-color: transparent;
+                padding: 1px 0 0 0;
+                border: 0;
+            }
+            #portal-searchbox .gsc-clear-button {
+                display: none;
+            }
+            #portal-searchbox form {
+                padding: 0;
+                white-space: nowrap;
+                margin-bottom: 0;
+            }
+            #portal-searchbox input.gsc-input-query {
+                border: none;
+                background: #fff;
+                padding: 3px 6px;
+                height: 30px !important;
+                width: 100%;
+                vertical-align: top;
+                font: italic 16px 'Open Sans', Verdana, Helvetica, Arial, sans-serif;
+            }
+            .gsc-search-box td {
+                padding: 0;
+            }
+            #portal-searchbox .gsib_b {
+                display: none;
+            }
+            #portal-searchbox .gsc-input-box {
+                height: 100%;
+                position: relative;
+            }
+            #portal-searchbox .gsc-tabsArea > div {
+                overflow: visible;
+            }
+            #portal-searchbox .gsc-cursor-current-page {
+                padding: 5px;
+            }
+            #portal-searchbox .autocomplete-items {
+                position: absolute;
+                border: 1px solid #d4d4d4;
+                border-bottom: none;
+                border-top: none;
+                z-index: 9999;
+                top: 100%;
+                left: 0;
+                right: 0;
+            }
+            #portal-searchbox .autocomplete-item {
+                padding: 10px;
+                cursor: pointer;
+                background-color: #fff;
+                border-bottom: 1px solid #d4d4d4;
+                overflow: hidden;
+            }
+            #portal-searchbox .autocomplete-active {
+                background-color: #e9e9e9 !important;
+            }
+            .plone-breadcrumb {
+                background-color: #e6e4e4;
+                font-size: 100%;
+                box-shadow: 0 2px 10px #ccc;
+                margin-bottom: 1.5em;
+            }
+            .plone-breadcrumb .container {
+                max-width: 1024px;
+                width: 100%;
+                margin: auto;
+                padding: 0;
+            }
+            .plone-breadcrumb  li {
+                font-weight: 400;
+                display: inline-block;
+                line-height: 0;
+                position: relative;
+                padding: 0 25px 0 0;
+            }
+            .plone-breadcrumb ol {
+                display: inline-block;
+                padding: 8px 5px;
+                list-style: none;
+                margin: 0;
+            }
+            .mini-header #globalnav-holder {
+                overflow: visible;
+            }
+            #portal-globalnav {
+                clear: both;
+                display: flex;
+                font-size: 105%;
+                height: 50px;
+                list-style: none;
+                margin: 0 auto;
+                max-width: 1024px;
+                padding: 0;
+                position: relative;
+            }
+            #portal-globalnav > li, #secondary-portaltabs > li {
+                margin-bottom: 0;
+                height: 50px;
+                display: flex;
+            }
+            #portal-globalnav > li > a, #secondary-portaltabs > li > a {
+                display: flex;
+                align-items: center;
+            }
+            #portal-globalnav > li > a {
+                font-weight: bold;
+                color: white;
+                padding: 1em 0.8em;
+            }
+            #portaltab-media {
+                margin: 0 0 0 auto;
+            }
+            #portaltab-europe {
+                width: 212px;
+                font-size: 75%;
+                vertical-align: top;
+                padding-right: 92px;
+                background: url("https://www.eea.europa.eu/templates/v2/img/eu-flag.png") no-repeat 122px -3px;
+            }
+            #portaltab-europe a {
+                font-weight: normal !important;
+            }
+            li#secondary-portaltabs-container {
+                display: none;
+            }
+            .portalMessage {
+                background-color: #f3f3f3;
+                padding: 1em;
+                clear:both;
+            }
+            #megatopics-area {
+                font-size: 0.9em;
+                margin-bottom: 1.5em;
+                display: flex;
+                flex-wrap: wrap;
+                -ms-flex-wrap: nowrap;
+                justify-content: space-between;
+                width: 100%;
+            }
+            #megatopics-area .portlet, #megatopics-area dd {
+                margin: 0;
+                padding: 0;
+                min-height: 255px;
+            }
+            .portlet-megatopic {
+                display: flex;
+                white-space: nowrap;
+                flex: 1;
+            }
+            .portlet, .portletWrapper .featured {
+                background: #ffffff;
+            }
+            .portlet-megatopic ul {
+                height: auto;
+                margin: 1.5em;
+                padding: 0;
+            }
+            #portal-columns {
+                padding-top: 1em;
+            }
+            /* */
+            #region-content {
+                padding: 1.5em;
+                background-color: #ffffff;
+            }
+            @media screen and (min-width: 1024px) {
+                #region-content {
+                    margin: 0 -1.5em;
+                }
+            }
+            .template-datamaps_view #region-content,
+            .template-dc_view #region-content,
+            .frontpage .width-full,
+            .frontpage #region-content {
+                background-color: transparent;
+                padding: 0;
+            }
+            .content-core p,
+            .content-core li {
+                font-size: 115%;
+            }
+            .content-core li, .portlet li, .portletStaticText li {
+                margin-bottom: 0.25em;
+                line-height: 1.5em;
+                display: list-item;
+            }
+            .documentContent li a {
+                display: inline;
+            }
+            .content-core ul {
+                margin-left: 1.5em;
+            }
+            .content-core dt {
+                font-weight: bold;
+                margin-bottom: 0;
+            }
+            .portletHeader, .portlet .portletHeader {
+                font-weight: normal;
+                margin-bottom: 1em;
+            }
+            #content .featured p:last-child {
+                margin-bottom: 0;
+            }
+            /* */
+            #main-content {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+            .column-area, .right-column-area {
+                width: 58.5%;
+                flex-basis: 58.5%;
+                margin: 0 0;
+                padding: 0;
+            }
+            .right-column-area {
+                width: 39%;
+                flex-basis: 37.5%;
+                order: 1;
+            }
+            .frontpage #highlights-area {
+                padding: 0;
+                overflow: hidden;
+            }
+            #highlights-area {
+                background-color: #ffffff;
+                padding: 1.5em;
+            }
+            .featured {
+                background: #ffffff;
+            }
+            .featured, .portlet {
+                margin-bottom: 1em;
+                padding: 1.5em;
+            }
+            .figure-left {
+                float: left;
+            }
+            #article-language {
+                margin-top: -40px;
+                position: absolute;
+                right: 1.5em;
+                display: block;
+            }
+            .documentExportActions {
+                float: right;
+                margin: 0 0 1em 1em;
+            }
+            .eea-tabs-panels {
+                background-color: #ffffff;
+                padding: 1.5em;
+                clear: both;
+            }
+            .eea-tabs-panel {
+                display: none;
+            }
+            .eea-tabs-panel:first-of-type {
+                display: block;
+            }
+            #news-header {
+                height: 35px;
+                clear: both;
+                display: block;
+                margin: 14px 0 5px 0;
+            }
+            #news-header h2 {
+                border: none;
+                font-size: 160%;
+                font-weight: normal;
+                margin: 6px;
+                padding: 0;
+            }
+            #articles-area h2 {
+                padding-top: 0;
+                line-height: 1em;
+                border-bottom: 0;
+                font-weight: normal;
+            }
+            #semantic-data-service {
+                margin-top: 0;
+            }
+            #topic-selector {
+                position: absolute;
+                margin-top: 2.8em;
+                left: 0;
+                margin-left: 8em;
+            }
+            .filter-topic {
+                float: left;
+                text-align: left;
+                width: 81%;
+                padding-top: 6px;
+                margin-top: 0;
+            }
+            .gallery-layout-selection {
+                float: right;
+                position: relative;
+                top: 5px;
+                list-style: none;
+                margin-bottom: 10px;
+                display: inline;
+            }
+            #visual-portal-wrapper .eea-tabs {
+                padding: 0 10px 0 0;
+                margin: 0;
+                font-size: 12px;
+                list-style: none none;
+                background-color: #006699;
+                border: 1px solid #ececec;
+                border-bottom: 0;
+            }
+            .eea-tabs::before, .eea-tabs::after {
+                display: table;
+                content: " ";
+                clear: both;
+            }
+            #whatsnew-gallery .eea-tabs > li {
+                float: left;
+            }
+            #visual-portal-wrapper .eea-tabs.two-rows > li > a {
+                line-height: 2.5;
+            }
+            .eea-tabs > li {
+                margin: 0;
+                padding: 0;
+                display: inline-block;
+            }
+            .eea-tabs > li > a {
+                max-width: 195px;
+                position: relative;
+                display: block;
+                color: #fff;
+                text-shadow: 1px 1px 1px #000000;
+                padding: 8px;
+            }
+            .eea-tabs.two-rows > li > a {
+                line-height: 1.35;
+            }
+            .tileImage {
+                float: left;
+                margin: 1em 1em 1em 0;
+            }
+            .archives {
+                float: right;
+                margin: 1.5em 25px 15px 15px;
+                position: relative;
+                top: 8px;
+                line-height: 1em;
+            }
+            #eea-mobile-shortcut.shortcut-default, #enquiry-service-shortcut.shortcut-default {
+                padding: 25px 21px;
+            }
+            .shortcut-default {
+                text-align: left;
+                padding: 1.5em;
+                background: #ffffff;
+                margin-bottom: 1em;
+            }
+            #portal-colophon {
+                margin: 0;
+                padding: 0.5em 1em 1em 1em;
+                text-align: center;
+                clear: both;
+            }
+            .colophonWrapper {
+                text-align: left;
+                margin: 0 auto;
+                display: flex;
+            }
+            .colophon-left {
+                width: 215px;
+            }
+            .colophon-middle {
+                text-align: center;
+                flex: 1;
+            }
+            .colophon-right {
+                width: 215px;
+            }
+            .colophon-right span {
+                float: left;
+                width: 155px;
+            }
+            .colophon-right img {
+                float: right;
+                width: 50px;
+            }
+            /* */
+            /* */
+
+        </style>
+
+
+
+
+
+
+
+
+
+        <link rel="stylesheet" onload="this.onload=null;this.rel=&#39;stylesheet&#39;" href="https://www.eea.europa.eu/templates/v2/css/ploneStyles1556216956679276943.css" as="style">
+        <noscript><link rel="stylesheet" href="https://www.eea.europa.eu/templates/v2/css/ploneStyles1556216956679276943.css" /></noscript>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="stylesheet" onload="this.onload=null;this.rel=&#39;stylesheet&#39;" href="https://www.eea.europa.eu/templates/v2/css/ploneStyles1556216956682688951.css" as="style">
+        <noscript><link rel="stylesheet" href="https://www.eea.europa.eu/templates/v2/css/ploneStyles1556216956682688951.css" /></noscript>
 

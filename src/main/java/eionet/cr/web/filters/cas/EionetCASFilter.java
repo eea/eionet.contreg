@@ -20,27 +20,20 @@
  */
 package eionet.cr.web.filters.cas;
 
-import static eionet.cr.web.util.WebConstants.AFTER_LOGIN_EVENT;
-import static eionet.cr.web.util.WebConstants.LOGIN_ACTION;
-import static eionet.cr.web.util.WebConstants.USER_SESSION_ATTR;
+import edu.yale.its.tp.cas.client.filter.CASFilter;
+import eionet.cr.config.GeneralConfig;
+import eionet.cr.util.UserUtil;
+import eionet.cr.web.security.CRUser;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import edu.yale.its.tp.cas.client.filter.CASFilter;
-import eionet.cr.config.GeneralConfig;
-import eionet.cr.web.security.CRUser;
-import eionet.cr.web.util.CrCasFilterConfig;
+import static eionet.cr.web.util.WebConstants.*;
 
 /**
  *
@@ -90,7 +83,9 @@ public class EionetCASFilter extends CASFilter {
             if (session != null) {
 
                 String userName = ((String) session.getAttribute(CAS_FILTER_USER)).toLowerCase();
-                session.setAttribute(USER_SESSION_ATTR, new CRUser(userName));
+                CRUser crUser = new CRUser(userName);
+                session.setAttribute(USER_SESSION_ATTR, crUser);
+                UserUtil.setUserGroupResults(crUser);
 
                 String requestURI = httpRequest.getRequestURI();
                 if (requestURI.endsWith("/login")) {
