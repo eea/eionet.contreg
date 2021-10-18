@@ -59,7 +59,7 @@ pipeline {
       }
       steps {
         script {
-                sh '''mvn -P docker clean package -Dmaven.test.skip=true'''
+                sh '''mvn clean -B -V verify -Dmaven.test.skip=true'''
             }
        }
        post {
