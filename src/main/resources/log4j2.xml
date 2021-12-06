@@ -9,6 +9,40 @@
         <Console name="console">
             <PatternLayout pattern="[%-5p] - %c - %m%n"/>
         </Console>
+
+        <RollingFile name="file" fileName="DataDict.log" filePattern="DataDict-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout pattern="[%-5p] %d{dd.MM.yy HH:mm:ss} - %c - %m%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5000KB" />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <RollingFile name="RollingFile" fileName="${env:QUERY_LOG_DIR_PATH}/${env:QUERY_LOG_FILENAME_PATH}" filePattern="${env:QUERY_LOG_DIR_PATH}/${env:INSTANCE_NAME}-%d{yyyy-MM-dd}.log.gz">
+            <!--        <RollingFile name="RollingFile" fileName="/home/claudia/work/services_query.log" filePattern="/home/claudia/work/service_query-%d{yyyy-MM-dd}.log.gz">-->
+            <PatternLayout>
+                <Pattern>%m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="1">
+                <!--    testMode - boolean - If true, files are not deleted but instead a message is printed to the status -->
+                <!--    logger at INFO level. Use this to do a dry run to test if the configuration works as expected. Default is false.-->
+                <Delete basePath="${env:QUERY_LOG_DIR_PATH}" maxDepth="1" testMode="${env:QUERY_LOG_RETAIN_ALL}">
+                    <IfFileName glob="${env:QUERY_LOG_DIR_PATH}/${env:INSTANCE_NAME}-*.log.gz" />
+                    <!-- <IfLastModified age="30d" /> -->
+                    <IfLastModified age="${env:QUERY_LOG_RETENTION_DAYS}" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
+        <Sentry name="Sentry" />
+
+        <Syslog name="syslog" host="logcentral.eea.europa.eu" port="1514" facility="USER">
+            <PatternLayout pattern="cr.eionet.europa.eu %d{yyyy-MM-dd'T'HH:mm:ssX} %c{2} %m%n"/>
+        </Syslog>
     </Appenders>
     <Loggers>
         <Logger name="eionet" level="DEBUG"/>
@@ -19,12 +53,20 @@
         <Logger name="org.displaytag" level="WARN"/>
         <Logger name="net.sourceforge.stripes" level="WARN"/>
 
+        <!-- QUERY_LOG_LEVEL environment variable to set the logger level - off/info-->
+        <Logger name="RollingFileLogger" level="${env:QUERY_LOG_LEVEL}">
+            <AppenderRef ref="RollingFile" />
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="console-log"/>
             <AppenderRef ref="console" level="DEBUG"/>
+            <AppenderRef ref="file" />
+            <AppenderRef ref="Sentry" level="WARN" />
+            <AppenderRef ref="syslog" level="DEBUG" />
         </Root>
     </Loggers>
 </Configuration>
+
 
 
 
