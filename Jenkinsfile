@@ -15,21 +15,6 @@ pipeline {
   
   stages {
 
-    stage('Project Build') {
-      tools {
-          maven 'maven3'
-          jdk 'Java8'
-      }
-      steps {
-          sh 'mvn clean -B -V verify  -Dmaven.test.skip=true'
-      }
-      post {
-          success {
-          archiveArtifacts artifacts: 'target/*.war', fingerprint: true
-                    }
-      }
-    }
-
     stage ('Unit Tests') {
       when {
         not { buildingTag() }
