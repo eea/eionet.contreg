@@ -70,6 +70,10 @@ pipeline {
       when {
           environment name: 'CHANGE_ID', value: ''
       }
+      tools {
+         maven 'maven3'
+         jdk 'Java8'
+      }
       steps {
         script {
                 sh '''mvn clean -B -V verify -Dmaven.test.skip=true'''
