@@ -70,9 +70,13 @@ and that it is run while being in CR_SOURCE_HOME directory. The property `config
 
     shell> mvn -Dmaven.test.skip=true -Denv=local -Dconfig.app.home=/some/other/dir clean install
 
-### 3.1 Unit tests
+### 3.1 Unit/Integration tests
 
 When you ran the above command you probably noticed that it ran the unit tests. In case you don't want to, you can add `-Dmaven.test.skip=true` argument.
+
+### 3.1.1 Failing Tests and prerequisites
+During execution of integration tests, the test suite will attempt to write to this directory in the user's system: /var/jenkins_home
+Its important that this directory allows writing/modifications. To alter this , run command $ chmod -R 777 var/jenkins_home
 
 ## 4. Import CR database creation scripts
 
