@@ -425,7 +425,8 @@ public class FactsheetActionBean extends AbstractActionBean {
      *            the resourceUri to set
      */
     public void setUri(final String resourceUri) {
-        this.uri = resourceUri;
+
+        this.uri = StringEscapeUtils.escapeHtml(resourceUri);;
     }
 
     /**

@@ -943,6 +943,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.samaxes.stripes</groupId>
+            <artifactId>stripesafe</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
         <!-- PropertyPlaceholderConfigurer -->
         <dependency>
             <groupId>eionet</groupId>
