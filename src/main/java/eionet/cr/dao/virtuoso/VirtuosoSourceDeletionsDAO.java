@@ -196,6 +196,9 @@ public class VirtuosoSourceDeletionsDAO extends VirtuosoBaseDAO implements Sourc
                 if (CollectionUtils.isNotEmpty(bindingNames)) {
                     while (tupleQueryResult.hasNext()) {
                         BindingSet bindingSet = tupleQueryResult.next();
+                        if (CollectionUtils.isNotEmpty(bindingSet)) {
+                            continue;
+                        }
                         Value firstColumnValue = bindingSet.iterator().next().getValue();
                         if (firstColumnValue instanceof URI) {
 
