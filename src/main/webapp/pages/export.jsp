@@ -39,7 +39,7 @@
     <stripes:layout-component name="contents">
 
         <h1>Export triples</h1>
-        <p>Source URL: ${actionBean.harvestSource.url}</p>
+        <p>Source URL: <c:out value="${actionBean.harvestSource.url}" /></p>
 
         <crfn:form action="/source.action" method="get" id="exportForm">
 
