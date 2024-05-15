@@ -252,7 +252,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.26.1</version>
+                <version>0.44.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
@@ -313,8 +313,11 @@
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
                                 <wait>
+                                    <log>Http server online</log>
                                     <!-- Check for this URL to return a 200 return code .... -->
-                                    <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
+                                    <http>
+                                        <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
+                                    </http>
                                     <!-- ... but at max 2 minutes -->
                                     <time>120000</time>
                                     <exec>
