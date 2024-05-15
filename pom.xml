@@ -313,7 +313,6 @@
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
                                 <wait>
-                                    <log>Http server online</log>
                                     <!-- Check for this URL to return a 200 return code .... -->
                                     <http>
                                         <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
