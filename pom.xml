@@ -313,6 +313,12 @@
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
                                 <wait>
+                                    <!-- Check for this URL to return a 200 return code .... -->
+                                    <http>
+                                        <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
+                                    </http>
+                                    <!-- ... but at max 2 minutes -->
+                                    <time>120000</time>
                                     <exec>
                                         <postStart>/maven/move-test-files.sh</postStart>
                                     </exec>
