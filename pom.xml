@@ -23,21 +23,10 @@
          
     <!-- configuration of Maven repositories to be used -->
     <repositories>
-        <repository>
-            <id>archiva.internal</id>
-            <name>Internal Release Repository</name>
-            <url>https://archiva.eionet.europa.eu/repository/internal/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>archiva.snapshots</id>
-            <name>Internal Snapshot Repository</name>
-            <url>https://archiva.eionet.europa.eu/repository/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+       <repository>
+            <id>github</id>
+            <name>Internal Maven Repository</name>
+            <url>https://maven.pkg.github.com/eea/maven-repo</url>
         </repository>
         <!--For unpublished Virtuoso 4.2.fix -->
         <repository>
@@ -50,19 +39,6 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>archiva.internal</id>
-            <name>Internal Release Repository</name>
-            <url>https://archiva.eionet.europa.eu/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>archiva.snapshots</id>
-            <name>Internal Snapshot Repository</name>
-            <url>https://archiva.eionet.europa.eu/repository/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <profiles>
       <profile>
