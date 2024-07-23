@@ -275,7 +275,7 @@
                             <name>httpd</name>
 
                             <build>
-                                <from>httpd:2.4.51</from>
+                                <from>httpd:2.4.56</from>
                                 <assembly>
                                     <descriptor>assembly-httpd-unittest.xml</descriptor>
                                 </assembly>
