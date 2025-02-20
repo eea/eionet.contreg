@@ -14,7 +14,7 @@
         <!-- TODO Replace with RDF4j and modernize -->
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
-        <spring.version>4.3.24.RELEASE</spring.version>
+        <spring.version>6.0.0</spring.version>
     </properties>
 
     <version>1.0-SNAPSHOT</version>
