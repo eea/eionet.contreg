@@ -132,8 +132,7 @@ public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
                 }
                 matchCount = resultPair.getLeft() == null ? 0 : resultPair.getLeft().intValue();
             }
-
-            if (matchCount == 0) {
+            if (matchCount == 0 && !StringUtils.isEmpty(this.searchString)) {
                 HarvestSourceDTO sourceDTO = harvestSourceDAO.getHarvestSourceByUrl(this.searchString);
                 if (sourceDTO != null) {
                     matchCount = 1;
