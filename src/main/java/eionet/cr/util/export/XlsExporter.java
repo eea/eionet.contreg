@@ -68,7 +68,7 @@ public class XlsExporter extends Exporter implements SubjectExportEvent {
         // some pretty print with headers
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
-        headerFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        headerFont.setBold(true);
         headerStyle.setFont(headerFont);
 
         // output headers
