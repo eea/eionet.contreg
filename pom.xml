@@ -669,12 +669,12 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
+            <version>4.5.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.3</version>
+            <version>4.5.14</version>
         </dependency>
 
         <!-- start org.openrdf.sesame dependencies -->
@@ -819,11 +819,10 @@
         </dependency>
 
         <!-- Ant -->
-
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.9.3</version>
+            <version>1.10.15</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -854,7 +853,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -872,13 +871,13 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.19.v20190610</version>
+            <version>9.4.57.v20241219</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>9.4.19.v20190610</version>
+            <version>9.4.57.v20241219</version>
             <scope>test</scope>
         </dependency>
 
