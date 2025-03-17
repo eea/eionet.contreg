@@ -2,6 +2,7 @@ package eionet.cr.web.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -57,11 +58,8 @@ public abstract class OrderedProperties extends LinkedHashMap<String, String> {
      * @param testIfvalueIsUri the test ifvalue is uri
      */
     private void load(String propertiesFile, Logger logger, boolean testIfvalueIsUri) {
-
-        InputStream inputStream = null;
-        try {
-            inputStream = GeneralConfig.class.getClassLoader().getResourceAsStream(propertiesFile);
-            List<String> lines = IOUtils.readLines(inputStream);
+        try (InputStream inputStream = GeneralConfig.class.getClassLoader().getResourceAsStream(propertiesFile)) {
+            List<String> lines = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
             for (String line : lines) {
                 String trimmedLine = line.trim();
                 if (StringUtils.isNotBlank(trimmedLine) && trimmedLine.charAt(0) != '#') {
@@ -85,8 +83,6 @@ public abstract class OrderedProperties extends LinkedHashMap<String, String> {
             }
         } catch (IOException e) {
             throw new CRRuntimeException("Failed to load " + propertiesFile, e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 
