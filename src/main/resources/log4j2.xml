@@ -45,9 +45,9 @@
         <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
         <Sentry name="Sentry" />
 
-        <Syslog name="syslog" host="logcentral.eea.europa.eu" port="1514" facility="USER">
-            <PatternLayout pattern="cr.eionet.europa.eu %d{yyyy-MM-dd'T'HH:mm:ssX} %c{2} %m%n"/>
-        </Syslog>
+        <Gelf name="gelf" host="logcentral.eea.europa.eu" port="12201"
+              extractStackTrace="true" filterStackTrace="true"
+              originHost="${sys:config.edu.yale.its.tp.cas.client.filter.serverName}" />
     </Appenders>
     <Loggers>
         <Logger name="eionet" level="DEBUG"/>
@@ -66,7 +66,7 @@
             <AppenderRef ref="console" />
             <AppenderRef ref="file" level="INFO" />
             <AppenderRef ref="Sentry" level="WARN" />
-            <AppenderRef ref="syslog" level="DEBUG" />
+            <AppenderRef ref="gelf" level="INFO" />
         </Root>
     </Loggers>
 </Configuration>
