@@ -393,7 +393,7 @@ public class PullHarvest extends BaseHarvest {
                 finishWithError(httpResponseCode, responseMessage, null);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
             LOGGER.debug(loggerMsg("Exception occurred (will be further logged by caller below): " + e.toString()));
 
             // check what caused the DAOException - fatal flag is set to true
