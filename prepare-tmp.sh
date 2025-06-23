@@ -17,7 +17,7 @@ echo "Resolved WORKERDIR: $WORKERDIR"
 
 sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
 grep '^config.docker.sharedVolume=' tests.properties
-sed -i "s#config.app.home=.*#config.app.home=$(pwd)/tmp_cr#"  tests.properties
+#sed -i "s#config.app.home=.*#config.app.home=$(pwd)/tmp_cr#"  tests.properties
 grep '^config.app.home=' tests.properties
 
 availableport=${availableport:-8891}
