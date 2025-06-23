@@ -4,14 +4,14 @@ echo "Start getting data"
 
 docker_id=$(cat /proc/self/cgroup | grep :memory: | sed  's#.*/\([0-9a-fA-F]*\)$#\1#' )
 
-if [ -n $docker_id ] && [ $(echo $docker_id | grep -c memory ) -eq 0 ]; then
-        WORKERDIR=$(docker inspect $docker_id | grep :/var/jenkins_home/worker | awk -F'["|:]' '{print $2}')
-	WORKERDIR=$(pwd | sed -e "s#/var/jenkins_home/worker#$WORKERDIR#")
+if [ -n "$docker_id" ] && [ $(echo "$docker_id" | grep -c memory ) -eq 0 ]; then
+  WORKERDIR=$(docker inspect "$docker_id" | grep :/var/jenkins_home/worker | awk -F'["|:]' '{print $2}')
+  WORKERDIR=$(pwd | sed -e "s#/var/jenkins_home/worker#$WORKERDIR#")
 else
-	WORKERDIR=$(pwd)
+  WORKERDIR=$(pwd)
 fi
 
-echo "Identify path for WORKERDIR"
+echo "Resolved WORKERDIR: $WORKERDIR"
 
 #mkdir /var/jenkins_home/worker/tmp_cr
 
