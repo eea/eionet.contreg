@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -e
+if [ "${1:-}" = "stop" ]; then
+  exit 0
+fi
+
 echo "Start getting data"
 
 docker_id=$(cat /proc/self/cgroup | grep :memory: | sed  's#.*/\([0-9a-fA-F]*\)$#\1#' )
@@ -17,10 +21,24 @@ echo "Resolved WORKERDIR: $WORKERDIR"
 
 #mkdir /var/jenkins_home/worker/tmp_cr
 
-sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$WORKERDIR/tmp_cr+g" tests.properties
+HOST_TMP="$WORKERDIR/tmp_cr"
+
+mkdir -p "$HOST_TMP/tmp"
+
+sed -i "s+^config.docker.sharedVolume=.*+config.docker.sharedVolume=$HOST_TMP+g" tests.properties
 grep '^config.docker.sharedVolume=' tests.properties
-sed -i "s#config.app.home=.*#config.app.home=$(pwd)/tmp_cr#"  tests.properties
+sed -i "s#config.app.home=.*#config.app.home=$HOST_TMP#"  tests.properties
 grep '^config.app.home=' tests.properties
+
+if command -v docker >/dev/null 2>&1; then
+  sed -i "s#config.docker.copy.enabled=.*#config.docker.copy.enabled=true#" tests.properties
+else
+  sed -i "s#config.docker.copy.enabled=.*#config.docker.copy.enabled=false#" tests.properties
+fi
+
+sed -i "s#config.docker.container.path=.*#config.docker.container.path=/tmp/tmp_cr#" tests.properties
+sed -i "s#config.docker.container.match=.*#config.docker.container.match=virtuoso#" tests.properties
+
 
 availableport=${availableport:-8891}
 availableport2=${availableport2:-1112}

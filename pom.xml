@@ -103,6 +103,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <excludes>
                         <exclude>**/*.java</exclude>
@@ -114,6 +126,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.20</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <reportFormat>xml</reportFormat>
                     <systemPropertyVariables>
@@ -240,12 +264,16 @@
 
                             <build>
                                 <from>openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c</from>
+                                <createImageOptions>
+                                    <platform>linux/amd64</platform>
+                                </createImageOptions>
                                 <assembly>
                                     <descriptor>assembly-virtuoso-unittest.xml</descriptor>
                                 </assembly>
                             </build>
 
                             <run>
+                                <platform>linux/amd64</platform>
                                 <env>
                                     <DBA_PASSWORD>dba</DBA_PASSWORD>
                                     <VIRT_Parameters_TimezonelessDatetimes>0</VIRT_Parameters_TimezonelessDatetimes>
@@ -276,19 +304,23 @@
 
                             <build>
                                 <from>httpd:2.4.56</from>
+                                <createImageOptions>
+                                    <platform>linux/amd64</platform>
+                                </createImageOptions>
                                 <assembly>
                                     <descriptor>assembly-httpd-unittest.xml</descriptor>
                                 </assembly>
                             </build>
 
                             <run>
+                                <platform>linux/amd64</platform>
                                 <links>
                                     <link>virtuoso</link>
                                 </links>
                                 <ports>
                                     <port>${tests.httpd.port}:80</port>
                                 </ports>
-                                <wait>
+                            <wait>
                                     <!-- Check for this URL to return a 200 return code .... -->
                                     <http>
                                         <url>http://${tests.httpd.host}:${tests.httpd.port}/</url>
@@ -299,6 +331,11 @@
                                         <postStart>/maven/move-test-files.sh</postStart>
                                     </exec>
                                 </wait>
+                                <volumes>
+                                    <bind>
+                                        <volume>${config.docker.sharedVolume}/tmp:${config.app.home}/tmp</volume>
+                                    </bind>
+                                </volumes>
                             </run>
                         </image>
 
@@ -388,6 +425,21 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>

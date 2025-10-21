@@ -1994,6 +1994,8 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
             filePath = filePath.substring(2).replace('\\', '/');
         }
 
+        String containerFilePath = DockerFileSync.ensureFileAccessible(filePath);
+
         long fileSize = file.length();
         int fileSizeThreshold = GeneralConfig.getIntProperty(
                 GeneralConfig.TRANSACTIONAL_LOADING_FILE_SIZE_THRESHOLD_BYTES, 500000000);
@@ -2001,23 +2003,35 @@ public class VirtuosoHarvestSourceDAO extends VirtuosoBaseDAO implements Harvest
 
         int noOfThreads = GeneralConfig.getIntProperty(GeneralConfig.RDF_LOADER_THREADS, 1);
         String sql = String.format("DB.DBA.RDF_LOAD_RDFXML_MT(file_open('%s'), '%s', '%s', %d, %d, %d)",
-                filePath, baseUri, contextUri, logMode, noOfThreads, logMode);
+                containerFilePath, baseUri, contextUri, logMode, noOfThreads, logMode);
 
         if (!rdfFormat.equals(RDFFormat.RDFXML)) {
 
             if (rdfFormat.equals(RDFFormat.TRIG)) {
                 // For TriG format we must raise the flag 256 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 256)";
+                sql = "DB.DBA.TTLP(file_open('" + containerFilePath + "'), '" +baseUri+ "', '"+contextUri+"', 256)";
             } else if (rdfFormat.equals(RDFFormat.NQUADS)) {
                 // For N-Quads format we must raise the flag 512 (see http://docs.openlinksw.com/virtuoso/fn_ttlp.html).
-                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 512)";
+                sql = "DB.DBA.TTLP(file_open('" + containerFilePath + "'), '" +baseUri+ "', '"+contextUri+"', 512)";
             } else {
                 // No flags for other cases.
-                sql = "DB.DBA.TTLP(file_open('" + filePath + "'), '" +baseUri+ "', '"+contextUri+"', 0)";
+                sql = "DB.DBA.TTLP(file_open('" + containerFilePath + "'), '" +baseUri+ "', '"+contextUri+"', 0)";
             }
         }
 
         LOGGER.debug(BaseHarvest.loggerMsg("Executing file loading command: " + sql, ""));
+        if (!containerFilePath.equals(filePath)) {
+            LOGGER.debug(BaseHarvest.loggerMsg(String.format("Docker sync mapped host file %s to container path %s", filePath, containerFilePath), ""));
+        }
+
+        // Debug: Check if file exists before attempting to load
+        java.io.File fileToLoad = new java.io.File(filePath);
+        try {
+            LOGGER.debug(BaseHarvest.loggerMsg(String.format("File check from Java: path=%s, exists=%s, canRead=%s, size=%d",
+                filePath, fileToLoad.exists(), fileToLoad.canRead(), fileToLoad.exists() ? fileToLoad.length() : -1), ""));
+        } catch (Exception e) {
+            LOGGER.warn(BaseHarvest.loggerMsg("File check failed: " + e.getMessage(), ""));
+        }
 
         Statement s = null;
         try {

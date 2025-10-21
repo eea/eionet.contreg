@@ -66,6 +66,7 @@ public abstract class CRDatabaseTestCase extends DatabaseTestCase {
     @Override
     protected void setUp() throws Exception {
 
+        TestWebServer.ensureRunning();
         super.setUp();
         setUpTripleStore();
         repoConn = SesameUtil.getRepositoryConnection();
