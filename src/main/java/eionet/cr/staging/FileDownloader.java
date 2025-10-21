@@ -31,7 +31,7 @@ import java.net.URLConnection;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 import eionet.cr.common.CRRuntimeException;

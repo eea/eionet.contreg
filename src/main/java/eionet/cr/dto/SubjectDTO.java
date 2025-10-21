@@ -26,7 +26,7 @@ import eionet.cr.util.Hashes;
 import eionet.cr.util.URIUtil;
 import eionet.cr.util.URLUtil;
 import eionet.cr.web.security.CRUser;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;

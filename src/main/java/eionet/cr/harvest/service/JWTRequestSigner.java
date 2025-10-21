@@ -7,7 +7,7 @@ import com.auth0.jwt.JWTVerifyException;
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import eionet.cr.harvest.HarvestException;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;

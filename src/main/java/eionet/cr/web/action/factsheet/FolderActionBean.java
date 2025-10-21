@@ -43,7 +43,7 @@ import eionet.cr.web.util.tabs.FactsheetTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -37,7 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;

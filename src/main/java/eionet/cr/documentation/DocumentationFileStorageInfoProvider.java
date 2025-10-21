@@ -3,7 +3,7 @@ package eionet.cr.documentation;
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
 import eionet.doc.io.FileStorageInfoProvider;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 

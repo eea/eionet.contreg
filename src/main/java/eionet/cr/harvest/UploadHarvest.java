@@ -26,7 +26,7 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.harvest.util.HarvestMessageType;
 import eionet.cr.util.Util;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;

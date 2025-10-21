@@ -25,7 +25,7 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.sql.SQLUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;
 import org.openrdf.query.Binding;

@@ -20,7 +20,7 @@
  */
 package eionet.cr.harvest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.OpenRDFException;
 
 import java.io.ByteArrayInputStream;

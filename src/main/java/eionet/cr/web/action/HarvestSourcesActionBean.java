@@ -34,8 +34,8 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.CustomPaginatedList;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class HarvestSourcesActionBean extends DisplaytagSearchActionBean {
             String filterString = null;
             if (!StringUtils.isEmpty(this.searchString)) {
                 this.searchString = URLUtil.escapeIRI(this.searchString);
-                filterString = "%" + StringEscapeUtils.escapeSql(this.searchString) + "%";
+                filterString = "%" + this.searchString + "%";
             }
 
             Pair<Integer, List<HarvestSourceDTO>> resultPair = null;

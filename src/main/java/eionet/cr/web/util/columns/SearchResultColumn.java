@@ -24,8 +24,8 @@ import java.text.SimpleDateFormat;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.dao.virtuoso.VirtuosoBaseDAO;
 import eionet.cr.util.Util;

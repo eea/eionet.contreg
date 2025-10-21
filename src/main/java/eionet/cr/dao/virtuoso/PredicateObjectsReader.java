@@ -24,7 +24,7 @@ package eionet.cr.dao.virtuoso;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;

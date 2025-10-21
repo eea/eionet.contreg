@@ -23,7 +23,7 @@ package eionet.cr.test.helpers;
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
 import eionet.cr.util.sesame.SesameUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.CompositeDataSet;

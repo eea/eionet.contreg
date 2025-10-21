@@ -29,7 +29,7 @@ import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Util;
 import eionet.cr.web.util.WebConstants;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

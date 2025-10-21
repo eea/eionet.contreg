@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;

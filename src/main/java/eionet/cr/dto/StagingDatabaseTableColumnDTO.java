@@ -21,7 +21,7 @@
 
 package eionet.cr.dto;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * A DTO describing briefly a column in a table in a staging database.

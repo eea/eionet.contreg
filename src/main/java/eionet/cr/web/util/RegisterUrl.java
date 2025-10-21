@@ -1,6 +1,6 @@
 package eionet.cr.web.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.config.GeneralConfig;
 import eionet.cr.dao.DAOException;

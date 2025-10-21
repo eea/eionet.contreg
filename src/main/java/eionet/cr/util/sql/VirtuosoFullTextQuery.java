@@ -24,7 +24,7 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.dao.util.SearchExpression;
 

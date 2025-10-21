@@ -37,7 +37,7 @@ import eionet.cr.dto.enums.HarvestScriptType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;

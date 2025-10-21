@@ -27,7 +27,7 @@ import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.web.security.CRUser;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

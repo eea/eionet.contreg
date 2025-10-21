@@ -20,7 +20,7 @@
  * Jaanus Heinlaid, Tieto Eesti*/
 package eionet.cr.harvest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 import eionet.cr.common.CRRuntimeException;

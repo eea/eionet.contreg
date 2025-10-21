@@ -40,8 +40,8 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import eionet.cr.staging.AvailableFile;
 import eionet.cr.staging.FileDownloader;

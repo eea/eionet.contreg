@@ -25,7 +25,7 @@ import eionet.cr.util.Pair;
 import eionet.cr.web.util.job.DeliverySearchPicklistCacheUpdater;
 import eionet.cr.web.util.job.TagCloudCacheUpdater;
 import eionet.cr.web.util.job.TypeCacheUpdater;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;

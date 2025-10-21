@@ -21,7 +21,7 @@
 
 package eionet.cr.staging.exp;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 

@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.displaytag.properties.SortOrderEnum;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Value;

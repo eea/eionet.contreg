@@ -1,6 +1,6 @@
 package eionet.cr.util.xml;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility POJO for metadata about an XML file's conversion schema or DTD.

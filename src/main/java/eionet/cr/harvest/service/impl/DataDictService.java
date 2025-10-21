@@ -6,7 +6,7 @@ import eionet.cr.harvest.service.ExternalService;
 import eionet.cr.harvest.service.JWTRequestSigner;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

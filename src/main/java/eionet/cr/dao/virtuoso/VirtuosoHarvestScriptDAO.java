@@ -40,8 +40,8 @@ import eionet.cr.util.sql.PairReader;
 import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.action.admin.harvestscripts.HarvestScriptParser;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openrdf.repository.RepositoryConnection;
 
 import java.sql.Connection;

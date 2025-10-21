@@ -24,7 +24,7 @@ import eionet.cr.util.sql.SQLUtil;
 import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.WebConstants;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.*;
 import org.openrdf.model.vocabulary.XMLSchema;

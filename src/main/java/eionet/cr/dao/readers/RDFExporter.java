@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import org.openrdf.query.BindingSet;
 

@@ -42,7 +42,7 @@ import eionet.cr.util.pagination.PagingRequest;
 import eionet.cr.web.util.ApplicationCache;
 import eionet.cr.web.util.columns.SearchResultColumn;
 import eionet.cr.web.util.columns.SubjectPredicateColumn;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  *
@@ -192,7 +192,7 @@ public class TagSearchActionBean extends AbstractSearchActionBean<SubjectDTO> {
 
     public void setSearchTag(String searchTag) {
 
-        this.searchTag = StringEscapeUtils.escapeHtml(searchTag);
+        this.searchTag = StringEscapeUtils.escapeHtml4(searchTag);
     }
 
     public List<String> getSelectedTags() {

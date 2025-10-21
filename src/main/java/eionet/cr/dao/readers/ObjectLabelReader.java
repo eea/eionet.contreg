@@ -2,7 +2,7 @@ package eionet.cr.dao.readers;
 
 import java.util.Collections;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 

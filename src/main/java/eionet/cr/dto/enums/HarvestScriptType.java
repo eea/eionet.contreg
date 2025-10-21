@@ -1,6 +1,6 @@
 package eionet.cr.dto.enums;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /** Enum for possible harvest script types. */
 public enum HarvestScriptType {

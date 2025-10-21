@@ -36,8 +36,8 @@ import javax.servlet.jsp.PageContext;
 import eionet.cr.util.*;
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
@@ -545,8 +545,7 @@ public final class JstlFunctions {
      * @return
      */
     public static String escapeHtml(String s) {
-
-        return StringEscapeUtils.escapeHtml(s);
+        return StringEscapeUtils.escapeHtml4(s);
     }
 
     /**

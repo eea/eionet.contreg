@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.rio.RDFFormat;

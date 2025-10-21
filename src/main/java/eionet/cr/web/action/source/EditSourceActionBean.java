@@ -35,7 +35,7 @@ import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.validation.SimpleError;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;

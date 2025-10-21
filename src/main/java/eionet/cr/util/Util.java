@@ -52,9 +52,9 @@ import net.sourceforge.stripes.action.UrlBinding;
 import nl.bitwalker.useragentutils.Browser;
 import nl.bitwalker.useragentutils.BrowserType;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.CronExpression;
 
 import eionet.cr.common.CRRuntimeException;
@@ -694,7 +694,7 @@ public final class Util {
     public static String escapeHtml(String s) {
 
         if (!StringUtils.isBlank(s)) {
-            s = StringEscapeUtils.escapeHtml(s);
+            s = StringEscapeUtils.escapeHtml4(s);
             s = s.replaceAll("\n", "<br/>");
         }
         return s;

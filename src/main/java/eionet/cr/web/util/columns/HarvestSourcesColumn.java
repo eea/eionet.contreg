@@ -24,7 +24,7 @@ import java.util.Date;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.Util;
@@ -63,7 +63,7 @@ public class HarvestSourcesColumn extends SearchResultColumn {
                         new StringBuffer(i >= 0 ? factsheetUrlBinding.substring(i + 1) : factsheetUrlBinding).append(
                                 "?view=&amp;harvestSource.url=").append(Util.urlEncode(hrefName));
 
-                return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml(hrefName))
+                return new StringBuffer("<a href=\"").append(href).append("\">").append(StringEscapeUtils.escapeHtml4(hrefName))
                         .append("</a>").toString();
             }
         }

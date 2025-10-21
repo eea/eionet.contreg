@@ -44,7 +44,7 @@ import eionet.cr.web.util.RDFGenerator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.ValidationMethod;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 
 import javax.servlet.http.HttpServletResponse;

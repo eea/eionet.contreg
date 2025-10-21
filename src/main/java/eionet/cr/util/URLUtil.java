@@ -22,7 +22,7 @@ package eionet.cr.util;
 
 import eionet.cr.common.CRRuntimeException;
 import eionet.cr.config.GeneralConfig;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;

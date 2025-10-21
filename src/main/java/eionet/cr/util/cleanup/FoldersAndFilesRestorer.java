@@ -11,7 +11,7 @@ import eionet.cr.filestore.FileStore;
 import eionet.cr.util.FolderUtil;
 import eionet.cr.util.Pair;
 import eionet.cr.web.security.CRUser;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

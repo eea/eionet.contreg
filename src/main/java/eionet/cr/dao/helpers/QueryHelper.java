@@ -21,7 +21,7 @@
 
 package eionet.cr.dao.helpers;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.util.Bindings;
 import eionet.cr.util.URIUtil;

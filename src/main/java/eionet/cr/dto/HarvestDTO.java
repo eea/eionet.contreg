@@ -22,7 +22,7 @@ package eionet.cr.dto;
 
 import eionet.cr.harvest.BaseHarvest;
 import eionet.cr.web.util.WebConstants;
-import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.util.Date;
 

@@ -40,7 +40,7 @@ import eionet.cr.web.security.CRUser;
 import eionet.cr.web.util.tabs.SourceTabMenuHelper;
 import eionet.cr.web.util.tabs.TabElement;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,7 +5,7 @@ import eionet.cr.ApplicationTestContext;
 import net.sourceforge.stripes.mock.MockHttpServletResponse;
 import net.sourceforge.stripes.mock.MockRoundtrip;
 import net.sourceforge.stripes.mock.MockServletContext;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import eionet.acl.AccessController;
 import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.FolderDAO;

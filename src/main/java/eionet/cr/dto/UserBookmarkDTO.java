@@ -1,7 +1,7 @@
 package eionet.cr.dto;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -49,7 +49,7 @@ public class UserBookmarkDTO {
      * @return
      */
     public String getBookmarkUrlHtmlFormatted() {
-        return StringEscapeUtils.escapeHtml(bookmarkUrl);
+        return StringEscapeUtils.escapeHtml4(bookmarkUrl);
     }
 
     public String getBookmarkLabel() {

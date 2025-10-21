@@ -22,7 +22,7 @@ package eionet.cr.util.sesame;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.common.Namespace;
 import eionet.cr.util.Bindings;

@@ -3,7 +3,7 @@ package eionet.cr.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  *
@@ -79,7 +79,7 @@ public class ReviewDTO implements Serializable {
      * @return
      */
     public String getObjectUrlHTML() {
-        return StringEscapeUtils.escapeHtml(objectUrl);
+        return StringEscapeUtils.escapeHtml4(objectUrl);
     }
 
     /**
@@ -107,7 +107,7 @@ public class ReviewDTO implements Serializable {
      * @return
      */
     public String getReviewSubjectHtmlFormatted() {
-        return StringEscapeUtils.escapeHtml(reviewSubjectUri);
+        return StringEscapeUtils.escapeHtml4(reviewSubjectUri);
     }
 
     /**

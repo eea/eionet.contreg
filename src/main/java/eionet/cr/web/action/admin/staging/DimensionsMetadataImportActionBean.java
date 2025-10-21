@@ -28,7 +28,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.staging.exp.DimensionMetadataImporter;
 import eionet.cr.staging.exp.DimensionMetadataImporter.Dimension;

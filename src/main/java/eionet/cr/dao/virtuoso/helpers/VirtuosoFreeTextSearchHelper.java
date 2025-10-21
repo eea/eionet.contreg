@@ -2,7 +2,7 @@ package eionet.cr.dao.virtuoso.helpers;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.common.Predicates;
 import eionet.cr.common.Subjects;

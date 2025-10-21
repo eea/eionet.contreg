@@ -27,7 +27,7 @@ import eionet.cr.dto.HarvestScriptDTO.TargetType;
 import eionet.cr.dto.enums.HarvestScriptType;
 import eionet.cr.util.YesNoBoolean;
 import eionet.cr.util.sql.SQLResultSetBaseReader;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

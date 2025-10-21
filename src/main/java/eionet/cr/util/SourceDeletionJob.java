@@ -9,7 +9,7 @@ import java.util.HashSet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;

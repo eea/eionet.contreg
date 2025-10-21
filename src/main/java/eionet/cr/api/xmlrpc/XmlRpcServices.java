@@ -33,7 +33,7 @@ import eionet.cr.harvest.scheduled.UrgentHarvestQueue;
 import eionet.cr.util.URLUtil;
 import eionet.cr.util.Util;
 import eionet.cr.util.pagination.PagingRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

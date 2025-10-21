@@ -32,7 +32,7 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.validation.ValidationMethod;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 import eionet.cr.dao.DAOException;

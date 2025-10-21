@@ -22,8 +22,8 @@ package eionet.cr.web.util;
 
 import net.sourceforge.stripes.action.UrlBinding;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.displaytag.decorator.TableDecorator;
 
 import eionet.cr.dto.DeliveryDTO;

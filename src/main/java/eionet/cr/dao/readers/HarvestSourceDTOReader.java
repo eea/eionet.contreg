@@ -23,7 +23,7 @@ package eionet.cr.dao.readers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.util.YesNoBoolean;

@@ -26,7 +26,7 @@ import eionet.cr.util.Bindings;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.web.util.WebConstants;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;

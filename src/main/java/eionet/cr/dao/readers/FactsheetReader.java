@@ -22,7 +22,7 @@
 package eionet.cr.dao.readers;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;

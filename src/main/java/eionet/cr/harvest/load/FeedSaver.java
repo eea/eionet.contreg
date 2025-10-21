@@ -32,7 +32,7 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Literal;

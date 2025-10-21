@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 import eionet.cr.common.CRRuntimeException;

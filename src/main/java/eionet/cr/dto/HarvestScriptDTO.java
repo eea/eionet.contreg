@@ -22,7 +22,7 @@
 package eionet.cr.dto;
 
 import eionet.cr.dto.enums.HarvestScriptType;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 

@@ -23,7 +23,7 @@ package eionet.cr.dto;
 
 import java.util.Date;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import eionet.cr.staging.imp.ImportStatus;
 

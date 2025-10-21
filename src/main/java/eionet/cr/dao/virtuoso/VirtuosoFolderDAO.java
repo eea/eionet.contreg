@@ -40,7 +40,7 @@ import eionet.cr.util.sql.SingleObjectReader;
 import eionet.cr.web.security.CRUser;
 import net.sourceforge.stripes.action.FileBean;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.ContextStatementImpl;
