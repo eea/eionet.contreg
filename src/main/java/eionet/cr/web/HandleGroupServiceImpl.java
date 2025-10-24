@@ -107,6 +107,7 @@ public class HandleGroupServiceImpl implements HandleGroupService {
 
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
                 .newInstance();
+        documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         return documentBuilder.parse(file);
     }
