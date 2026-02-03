@@ -66,7 +66,6 @@ public class RegisterURLActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution unspecified() {
-
         return new ForwardResolution("/pages/registerUrl.jsp");
     }
 
@@ -77,12 +76,10 @@ public class RegisterURLActionBean extends AbstractActionBean {
      * @throws HarvestException
      */
     public Resolution save() throws DAOException, HarvestException {
-
         // register URL
         url = URLUtil.escapeIRI(url);
 
         if (RegisterUrl.isSubjectRegistered(url)) {
-
             showFactsheetLink = true;
 
             // User wants to bookmark the subject and the bookmark is not registered yet.
@@ -110,12 +107,14 @@ public class RegisterURLActionBean extends AbstractActionBean {
      */
     @ValidationMethod(on = "save")
     public void validateSave() {
-
         if (StringUtils.isBlank(url) || !URLUtil.isURL(url)) {
             addGlobalValidationError(new SimpleError("Not a valid URL!"));
         }
         if (getUser() == null) {
             addGlobalValidationError(new SimpleError("You are not logged in!"));
+        }
+        if (hasValidationErrors()) {
+            getContext().setSourcePageResolution(unspecified());
         }
     }
 
