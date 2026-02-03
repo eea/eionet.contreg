@@ -275,11 +275,8 @@ public final class FolderUtil {
      * @return acl name
      */
     public static String extractAclPath(String uri) {
-
         String appHome = GeneralConfig.getRequiredProperty(GeneralConfig.APPLICATION_HOME_URL);
-        System.out.println("appHome: " + appHome + " uri: " + uri);
         String result = StringUtils.substringAfter(uri, appHome);
-        System.out.println("res:" + result);
         try {
             result = URLDecoder.decode(result, "UTF-8");
         } catch (UnsupportedEncodingException e) {
