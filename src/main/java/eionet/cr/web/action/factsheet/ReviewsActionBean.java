@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import eionet.cr.web.action.home.HomesActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -53,7 +54,6 @@ public class ReviewsActionBean extends AbstractActionBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReviewsActionBean.class);
 
-
     /**
      * URI by which the factsheet has been requested.
      */
@@ -76,19 +76,21 @@ public class ReviewsActionBean extends AbstractActionBean {
     /**
      * @return
      * @throws DAOException
-     * @throws SignOnException
      */
     @DefaultHandler
-    public Resolution view() throws DAOException, SignOnException {
-        LOGGER.info("THIS IS A TEST MESSAGE");
+    public Resolution view() throws DAOException {
+        if (StringUtils.isBlank(uri)) {
+            if (isUserLoggedIn()) {
+                uri = getUser().getReviewsUri();
+            } else {
+                return new ForwardResolution(HomesActionBean.class);
+            }
+        }
+
         String aclPath = FolderUtil.extractAclPath(uri);
         if (!CRUser.hasPermission(aclPath, getUser(), CRUser.VIEW_PERMISSION, true)) {
             addSystemMessage("Not authorized to view reviews.");
             return new ForwardResolution(FolderActionBean.class).addParameter("uri", FolderUtil.extractParentFolderUri(uri));
-        }
-
-        if (StringUtils.isBlank(uri) && isUserLoggedIn()) {
-            uri = getUser().getReviewsUri();
         }
 
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
@@ -104,7 +106,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         return new ForwardResolution("/pages/factsheet/reviews.jsp");
     }
 
-    private void initReview() throws DAOException {
+    private void initReview() {
         try {
             review = DAOFactory.get().getDao(ReviewsDAO.class).getReview(new CRUser(getAttemptedUserName()), reviewId);
             if (review.getReviewID() == 0) {
@@ -201,10 +203,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         return new RedirectResolution(this.getClass()).addParameter("uri", uri).addParameter("reviewId", reviewId);
     }
 
-    /**
-     * @throws DAOException
-     */
-    public Resolution deleteReviews() throws DAOException {
+    public Resolution deleteReviews() {
         if (isUsersReview()) {
             if (reviewIds != null && !reviewIds.isEmpty()) {
                 try {
@@ -235,10 +234,7 @@ public class ReviewsActionBean extends AbstractActionBean {
         return new RedirectResolution(this.getClass());
     }
 
-    /**
-     * @throws DAOException
-     */
-    public Resolution deleteSingleReview() throws DAOException {
+    public Resolution deleteSingleReview() {
         if (isUsersReview()) {
             if (reviewId != 0) {
                 try {
@@ -271,7 +267,6 @@ public class ReviewsActionBean extends AbstractActionBean {
     /**
      */
     public Resolution upload() {
-
         if (isUsersReview()) {
             LOGGER.debug("Storing uploaded review attachment, file bean = " + attachment);
 
