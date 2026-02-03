@@ -135,7 +135,6 @@ public class FactsheetActionBean extends AbstractActionBean {
 
     /** */
     private Map<String, Integer> predicatePageNumbers;
-    private Map<String, Integer> predicatePageCounts;
 
     /** */
     private List<TabElement> tabs;
@@ -162,7 +161,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @DefaultHandler
     public Resolution view() throws DAOException {
-
         if (isNoCriteria()) {
             addCautionMessage("No request criteria specified!");
         } else {
@@ -179,7 +177,6 @@ public class FactsheetActionBean extends AbstractActionBean {
             uriIsFolder = tabsHelper.isUriFolder();
             harvestSourceDTO = tabsHelper.getHarvestSourceDTO();
         }
-
         return new ForwardResolution("/pages/factsheet/factsheet.jsp");
     }
 
@@ -193,7 +190,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails
      */
     public Resolution harvest() throws HarvestException, DAOException {
-
         HelperDAO helperDAO = DAOFactory.get().getDao(HelperDAO.class);
         SubjectDTO subjectDTO = helperDAO.getSubject(uri);
 
@@ -211,7 +207,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                 addWarningMessage("Failed to harvest table file: " + e.getMessage());
             }
         } else {
-
             // Block for harvesting other, i.e. non-table-file sources.
             Pair<Boolean, String> message = harvestNow();
             if (message.getLeft()) {
@@ -220,7 +215,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                 addSystemMessage(message.getRight());
             }
         }
-
         return new RedirectResolution(this.getClass(), "view").addParameter("uri", uri);
     }
 
@@ -234,13 +228,10 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails
      */
     private Pair<Boolean, String> harvestNow() throws HarvestException, DAOException {
-
         String message = null;
         if (isUserLoggedIn()) {
             if (!StringUtils.isBlank(uri) && URLUtil.isURL(uri)) {
-
                 // Add this URL into HARVEST_SOURCE table.
-
                 HarvestSourceDAO dao = factory.getDao(HarvestSourceDAO.class);
                 HarvestSourceDTO dto = new HarvestSourceDTO();
                 dto.setUrl(StringUtils.substringBefore(uri, "#"));
@@ -251,11 +242,9 @@ public class FactsheetActionBean extends AbstractActionBean {
                 dao.addSourceIgnoreDuplicate(dto);
 
                 // Issue an instant harvest of this URL.
-
                 OnDemandHarvester.Resolution resolution = OnDemandHarvester.harvest(dto.getUrl(), getUserName());
 
                 // Give feedback to the user.
-
                 if (resolution.equals(OnDemandHarvester.Resolution.ALREADY_HARVESTING)) {
                     message = "The resource is currently being harvested by another user or background harvester!";
                 } else if (resolution.equals(OnDemandHarvester.Resolution.UNCOMPLETE)) {
@@ -270,9 +259,9 @@ public class FactsheetActionBean extends AbstractActionBean {
                     message = "No feedback given from harvest!";
                 }
             }
-            return new Pair<Boolean, String>(false, message);
+            return new Pair<>(false, message);
         } else {
-            return new Pair<Boolean, String>(true, getBundle().getString("not.logged.in"));
+            return new Pair<>(true, getBundle().getString("not.logged.in"));
         }
     }
 
@@ -283,7 +272,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails if query fails
      */
     public Resolution edit() throws DAOException {
-
         return view();
     }
 
@@ -326,6 +314,10 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails if query fails
      */
     public Resolution save() throws DAOException {
+        if (StringUtils.isBlank(propertyValue)) {
+            addGlobalValidationError(new SimpleError("Property value must not be blank"));
+            return edit();
+        }
 
         SubjectDTO subjectDTO = new SubjectDTO(uri, anonymous);
 
@@ -366,10 +358,8 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails
      */
     public Resolution delete() throws DAOException {
-
         if (rowId != null && !rowId.isEmpty()) {
-
-            ArrayList<TripleDTO> triples = new ArrayList<TripleDTO>();
+            ArrayList<TripleDTO> triples = new ArrayList<>();
 
             for (String row : rowId) {
                 int i = row.indexOf("_");
@@ -396,7 +386,6 @@ public class FactsheetActionBean extends AbstractActionBean {
             helperDao.deleteTriples(triples);
             helperDao.updateUserHistory(getUser(), uri);
         }
-
         return new RedirectResolution(this.getClass(), "edit").addParameter("uri", uri);
     }
 
@@ -405,11 +394,8 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @ValidationMethod(on = {"save", "delete", "edit", "harvest"})
     public void validateUserKnown() {
-
         if (getUser() == null) {
             addWarningMessage("Operation not allowed for anonymous users");
-        } else if (getContext().getEventName().equals("save") && StringUtils.isBlank(propertyValue)) {
-            addGlobalValidationError(new SimpleError("Property value must not be blank"));
         }
     }
 
@@ -425,7 +411,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      *            the resourceUri to set
      */
     public void setUri(final String resourceUri) {
-
         this.uri = StringEscapeUtils.escapeHtml4(resourceUri);;
     }
 
@@ -443,17 +428,13 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @SuppressWarnings("unchecked")
     public Collection<UriLabelPair> getAddibleProperties() throws DAOException {
-
         // get the addible properties from session
-
         HttpSession session = getContext().getRequest().getSession();
         ArrayList<UriLabelPair> result = (ArrayList<UriLabelPair>) session.getAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR);
 
         // if not in session, create them and add to session
         if (result == null || result.isEmpty()) {
-
             // get addible properties from database
-
             HelperDAO helperDAO = factory.getDao(HelperDAO.class);
             HashMap<String, String> props = helperDAO.getAddibleProperties(uri);
 
@@ -466,20 +447,16 @@ public class FactsheetActionBean extends AbstractActionBean {
             props.put(Predicates.ROD_PRODUCT_OF, "productOf");
 
             // create the result object from the found and hard-coded properties, sort it
-
             result = new ArrayList<UriLabelPair>();
             if (props != null && !props.isEmpty()) {
-
                 for (String propUri : props.keySet()) {
                     result.add(UriLabelPair.create(propUri, props.get(propUri)));
                 }
                 Collections.sort(result);
             }
-
             // put into session
             session.setAttribute(ADDIBLE_PROPERTIES_SESSION_ATTR, result);
         }
-
         return result;
     }
 
@@ -542,7 +519,7 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return String
      */
     public String getUrl() {
-        return uri != null && URLUtil.isURL(uri) ? uri : null;
+        return URLUtil.isURL(uri) ? uri : null;
     }
 
     /**
@@ -561,15 +538,12 @@ public class FactsheetActionBean extends AbstractActionBean {
      *             if query fails if query fails
      */
     public boolean getSubjectIsUserBookmark() throws DAOException {
-
         if (!isUserLoggedIn()) {
             return false;
         }
-
         if (subjectIsUserBookmark == null) {
             subjectIsUserBookmark = Boolean.valueOf(factory.getDao(HelperDAO.class).isSubjectUserBookmark(getUser(), uri));
         }
-
         return subjectIsUserBookmark.booleanValue();
     }
 
@@ -578,7 +552,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public boolean isSubjectDownloadable() throws DAOException {
-
         if (subjectDownloadable == null) {
             subjectDownloadable = Boolean.valueOf(DAOFactory.get().getDao(SpoBinaryDAO.class).exists(uri));
         }
@@ -591,7 +564,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @throws DAOException
      */
     public boolean isCurrentlyHarvested() throws DAOException {
-
         return uri == null ? false : (CurrentHarvests.contains(uri) || UrgentHarvestQueue.isInQueue(uri) || CurrentLoadedDatasets
                 .contains(uri));
     }
@@ -601,13 +573,10 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return boolean
      */
     public boolean isCompiledDataset() {
-
         boolean ret = false;
-
         if (subject.getObject(Predicates.RDF_TYPE) != null) {
             ret = Subjects.CR_COMPILED_DATASET.equals(subject.getObject(Predicates.RDF_TYPE).getValue());
         }
-
         return ret;
     }
 
@@ -650,23 +619,17 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @SuppressWarnings("unchecked")
     public Map<String, Integer> getPredicatePageNumbers() {
-
         if (predicatePageNumbers == null) {
-
             predicatePageNumbers = new HashMap<String, Integer>();
             HttpServletRequest request = getContext().getRequest();
             Map<String, String[]> paramsMap = request.getParameterMap();
 
             if (paramsMap != null && !paramsMap.isEmpty()) {
-
                 for (Map.Entry<String, String[]> entry : paramsMap.entrySet()) {
-
                     String paramName = entry.getKey();
                     if (isPredicatePageParam(paramName)) {
-
                         int pageNumber = NumberUtils.toInt(paramName.substring(PAGE_PARAM_PREFIX.length()));
                         if (pageNumber > 0) {
-
                             String[] predicateUris = entry.getValue();
                             if (predicateUris != null) {
                                 for (String predUri : predicateUris) {
@@ -678,7 +641,6 @@ public class FactsheetActionBean extends AbstractActionBean {
                 }
             }
         }
-
         return predicatePageNumbers;
     }
 
@@ -688,7 +650,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return
      */
     public boolean isPredicatePageParam(String paramName) {
-
         if (paramName.startsWith(PAGE_PARAM_PREFIX) && paramName.length() > PAGE_PARAM_PREFIX.length()) {
             return StringUtils.isNumeric(paramName.substring(PAGE_PARAM_PREFIX.length()));
         } else {
@@ -701,7 +662,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return
      */
     public int getPredicatePageSize() {
-
         return PredicateObjectsReader.PREDICATE_PAGE_SIZE;
     }
 
@@ -718,13 +678,10 @@ public class FactsheetActionBean extends AbstractActionBean {
      * @return
      */
     public boolean getSubjectIsType() {
-
         if (subjectIsType == null) {
-
             List<String> typeUris = ApplicationCache.getTypeUris();
             subjectIsType = Boolean.valueOf(typeUris.contains(this.uri));
         }
-
         return subjectIsType;
     }
 
@@ -734,7 +691,6 @@ public class FactsheetActionBean extends AbstractActionBean {
      */
     @HandlesEvent("openPredObjValue")
     public Resolution openPredObjValue() {
-
         LOGGER.trace("Retrieving object value for MD5 " + objectMD5 + " of predicate " + predicateUri);
         String value = DAOFactory.get().getDao(HelperDAO.class).getLiteralObjectValue(uri, predicateUri, objectMD5, graphUri);
         if (StringUtils.isBlank(value)) {
