@@ -42,9 +42,6 @@
             </DefaultRolloverStrategy>
         </RollingFile>
 
-        <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
-        <Sentry name="Sentry" />
-
         <Gelf name="gelf" host="logcentral.eea.europa.eu" port="12201"
               extractStackTrace="true" filterStackTrace="true"
               originHost="${sys:config.edu.yale.its.tp.cas.client.filter.serverName}" />
@@ -65,7 +62,6 @@
         <Root level="INFO">
             <AppenderRef ref="console" />
             <AppenderRef ref="file" level="INFO" />
-            <AppenderRef ref="Sentry" level="WARN" />
             <AppenderRef ref="gelf" level="INFO" />
         </Root>
     </Loggers>
