@@ -13,9 +13,9 @@
 
             <title>${initParam.appDispName} - ${pageTitle}</title>
 
-            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/print.css" media="print" />
-            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/handheld.css" media="handheld" />
-            <link rel="stylesheet" type="text/css" href="https://www.eionet.europa.eu/styles/eionet2007/screen.css" media="screen" title="Eionet 2007 style" />
+            <link rel="stylesheet" type="text/css" href="<c:url value="/css/print.css"/>" media="print" />
+            <link rel="stylesheet" type="text/css" href="<c:url value="/css/handheld.css"/>" media="handheld" />
+            <link rel="stylesheet" type="text/css" href="<c:url value="/css/screen.css"/>" media="screen" title="Eionet 2007 style" />
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/eionet2007.css"/>" media="screen" title="Eionet 2007 style"/>
             <link rel="stylesheet" type="text/css" href="<c:url value="/css/application.css"/>" media="screen"/>
             <link rel="shortcut icon" href="<c:url value="../../favicon.ico"/>" type="image/x-icon" />
@@ -57,7 +57,7 @@
                 </div> <!-- toolribbon -->
 
                 <div id="pagehead">
-                    <a href="/"><img src="../../images/eea-print-logo.gif" alt="Logo" id="logo" /></a>
+                    <a href="/"><img src="<c:url value="/images/eea-print-logo.gif" />" alt="Logo" id="logo" /></a>
                     <div id="networktitle">Eionet</div>
                     <div id="sitetitle">${initParam.appDispName}</div>
                     <div id="sitetagline">This service is part of Reportnet</div>
