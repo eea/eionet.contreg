@@ -17,7 +17,7 @@
                 <c:choose>
                     <c:when test="${not empty param.edit}">
                         <h1>Edit review #${actionBean.reviewId}</h1>
-                            <stripes:form action="/reviews.action" method="post">
+                            <crfn:form action="/reviews.action" method="post">
                             <table>
                                 <col style="width:30em"/>
                                 <col style="width:200em"/>
@@ -39,15 +39,14 @@
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <input type="hidden" name="edit" value="Edit"/>
                                     	<stripes:hidden name="reviewId" value="${actionBean.reviewId}"/>
                                     	<stripes:hidden name="uri" value="${actionBean.uri}"/>
-                                        <stripes:submit name="save" value="Save review"/>
                                         <stripes:submit name="cancel" value="Cancel"/>
+                                        <stripes:submit name="save" value="Save review"/>
                                     </td>
                                 </tr>
                             </table>
-                        </stripes:form>
+                        </crfn:form>
                     </c:when>
                     <c:when test="${not empty param.editAttachments}">
                         <c:if test="${actionBean.usersReview}">
@@ -213,7 +212,7 @@
             <c:choose>
                 <c:when test="${not empty param.addReview}">
                     <h1>Adding new review</h1>
-                        <stripes:form action="/reviews.action" method="post">
+                        <crfn:form action="/reviews.action" method="post">
                         <table>
                             <col style="width:10em"/>
                             <col style="width:100%"/>
@@ -231,17 +230,12 @@
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <input type="hidden" name="addReview" value="Add"/>
                                 	<stripes:hidden name="uri" value="${actionBean.user.reviewsUri}"/>
                                     <stripes:submit name="add" value="Add review"/>
-                                    <stripes:link beanclass="eionet.cr.web.action.factsheet.ReviewsActionBean" event="view">
-                                        <stripes:param name="uri" value="${actionBean.uri}"/>
-                                        Cancel
-                                    </stripes:link>
                                 </td>
                             </tr>
                         </table>
-                    </stripes:form>
+                    </crfn:form>
                 </c:when>
                 <c:otherwise>
 	                <c:if test="${actionBean.usersReview}">
