@@ -250,7 +250,7 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.46.0</version>
+                <version>0.48.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <filter>${valid.images}</filter>
@@ -326,7 +326,7 @@
                                     <!-- ... but at max 2 minutes -->
                                     <time>120000</time>
                                     <exec>
-                                        <postStart>/maven/move-test-files.sh</postStart>
+                                        <postStart>/bin/sh /maven/move-test-files.sh</postStart>
                                     </exec>
                                 </wait>
                                 <volumes>
