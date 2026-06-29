@@ -10,7 +10,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <env>default</env>
-        <javaVersion>1.8</javaVersion>
+        <javaVersion>11</javaVersion>
         <!-- TODO Replace with RDF4j and modernize -->
         <sesame.openrdf.version>2.6.10</sesame.openrdf.version>
         <checkstyle.config.location>${basedir}/docs/checkstyle.xml</checkstyle.config.location>
@@ -86,14 +86,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.15.0</version>
                 <inherited>true</inherited>
                 <configuration>
                     <verbose>false</verbose>
                     <fork>false</fork>
-                    <compilerVersion>${javaVersion}</compilerVersion>
-                    <source>${javaVersion}</source>
-                    <target>${javaVersion}</target>
+                    <release>${javaVersion}</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -165,7 +163,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.5.1</version>
                 <configuration>
                     <filters>
                         <filter>${basedir}/${env}.properties</filter>
@@ -412,6 +410,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>1.3.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
             <version>2.5.2</version>
@@ -551,11 +555,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.12.2</version>
-        </dependency>
-        <dependency>
             <groupId>displaytag</groupId>
             <artifactId>displaytag</artifactId>
             <version>1.2</version>
@@ -594,7 +593,7 @@
         <dependency>
             <groupId>eionet</groupId>
             <artifactId>acl</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -986,10 +985,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.28.0</version>
                 <configuration>
                     <linkXRef>false</linkXRef>
-                    <sourceEncoding>utf-8</sourceEncoding>
                     <minimumTokens>300</minimumTokens>
                     <targetJdk>${javaVersion}</targetJdk>
                 </configuration>
