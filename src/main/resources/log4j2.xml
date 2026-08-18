@@ -41,10 +41,6 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-
-        <Gelf name="gelf" host="logcentral.eea.europa.eu" port="12201"
-              extractStackTrace="true" filterStackTrace="true"
-              originHost="${sys:config.edu.yale.its.tp.cas.client.filter.serverName}" />
     </Appenders>
     <Loggers>
         <Logger name="eionet" level="DEBUG"/>
@@ -62,7 +58,6 @@
         <Root level="INFO">
             <AppenderRef ref="console" />
             <AppenderRef ref="file" level="INFO" />
-            <AppenderRef ref="gelf" level="INFO" />
         </Root>
     </Loggers>
 </Configuration>

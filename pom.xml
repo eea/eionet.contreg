@@ -703,12 +703,6 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>2.0.17</version>
         </dependency>
-        <!--GELF-->
-        <dependency>
-            <groupId>biz.paluch.logging</groupId>
-            <artifactId>logstash-gelf</artifactId>
-            <version>1.15.1</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
