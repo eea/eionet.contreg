@@ -186,7 +186,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Run Ant for various preparation tasks, declared in build.xml -->
+            <!-- Run Ant for various preparation targets, declared in build.xml -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -199,7 +199,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <copy todir="${project.build.directory}/classes/acl">
                                     <fileset dir="${basedir}/acl" />
                                 </copy>
@@ -221,7 +221,7 @@
                                 </pathconvert>
                                 <echo>apphome.unix = ${apphome.unix}</echo>
                                 <echo>apphome.windows = ${apphome.windows}</echo>
-                            </tasks>
+                            </target>
                             <exportAntProperties>true</exportAntProperties>
                         </configuration>
                     </execution>
@@ -232,7 +232,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <copy file="${basedir}/tests.properties"
                                       toFile="${project.build.directory}/test-classes/env.properties" />
                                 <copy todir="${project.build.directory}/test-classes/sql">
@@ -241,7 +241,7 @@
                                 <copy todir="${project.build.directory}/test-classes/acl">
                                     <fileset dir="acl" />
                                 </copy>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
