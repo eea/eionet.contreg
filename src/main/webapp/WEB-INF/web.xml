@@ -13,10 +13,10 @@
             classpath:spring-context.xml
         </param-value>
     </context-param>
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- filters -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <filter>
         <filter-name>HomespaceUrlFilter</filter-name>
         <filter-class>eionet.cr.web.filters.HomespaceUrlFilter</filter-class>
@@ -136,7 +136,6 @@
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- servlets -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <servlet>
         <servlet-name>SpringMVCServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -213,6 +212,7 @@
         <url-pattern>/ping</url-pattern>
     </servlet-mapping>
 
+    <!--
     <servlet>
         <servlet-name>rpcrouter</servlet-name>
         <servlet-class>eionet.rpcserver.servlets.XmlRpcRouter</servlet-class>
@@ -222,6 +222,7 @@
         <servlet-name>rpcrouter</servlet-name>
         <url-pattern>/rpcrouter</url-pattern>
     </servlet-mapping>
+    -->
 
     <!-- AMP feed servlet -->
     <servlet>
@@ -244,7 +245,6 @@
         <url-pattern>/refreshtemplate</url-pattern>
     </servlet-mapping>
 
-
     <!-- XmlConvServlet -->
     <servlet>
         <servlet-name>XmlConvServlet</servlet-name>
@@ -257,7 +257,6 @@
     </servlet-mapping>
 
     <!-- File download servlet -->
-
     <servlet>
         <servlet-name>DownloadServlet</servlet-name>
         <servlet-class>eionet.cr.web.action.DownloadServlet</servlet-class>
@@ -268,7 +267,6 @@
     </servlet-mapping>
 
     <!-- Tabular data servlet -->
-
     <servlet>
         <servlet-name>TabularDataServlet</servlet-name>
         <servlet-class>eionet.cr.web.action.TabularDataServlet</servlet-class>
@@ -284,7 +282,6 @@
     </session-config>
 
     <!-- welcome file list -->
-
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
