@@ -28,7 +28,6 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Hashes;
 import eionet.cr.util.Pair;
 import eionet.cr.util.TestUtils;
-import org.eclipse.jetty.server.Server;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,9 +44,6 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTestContext.class })
 public class ExtractNewHarvestSourcesIT extends CRDatabaseTestCase {
-
-    /** Jetty mock server for serving test resources via HTTP. */
-    private static Server resourcesMockServer;
 
     /*
      * (non-Javadoc)

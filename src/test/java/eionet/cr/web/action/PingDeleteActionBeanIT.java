@@ -133,8 +133,6 @@ public class PingDeleteActionBeanIT extends CRDatabaseTestCase {
      */
     @Test
     public void testDeleteHarvestPingDeleteSequence() throws Exception {
-
-        // Create the source to be tested. The URL is served by Jetty below.
         String url = TestUtils.getFileUrl("simple-rdf.xml");
         HarvestSourceDTO source = new HarvestSourceDTO();
         source.setUrl(url);

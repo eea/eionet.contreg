@@ -907,18 +907,6 @@
             <version>2.5.3</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.4.57.v20241219</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>9.4.57.v20241219</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- Spring framework dependencies -->
         <dependency>
