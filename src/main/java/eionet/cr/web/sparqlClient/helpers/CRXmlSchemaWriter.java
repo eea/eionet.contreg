@@ -14,6 +14,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.resultio.QueryResultFormat;
+import org.openrdf.query.resultio.QueryResultWriterBase;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
@@ -27,7 +29,7 @@ import eionet.cr.util.export.XmlUtil;
  *
  * @author Juhan Voolaid
  */
-public class CRXmlSchemaWriter implements TupleQueryResultWriter {
+public class CRXmlSchemaWriter extends QueryResultWriterBase implements TupleQueryResultWriter {
 
     protected static final String SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
     protected static final String SCHEMA_NS_PREFIX = "xsd";
@@ -59,6 +61,39 @@ public class CRXmlSchemaWriter implements TupleQueryResultWriter {
 
     public final TupleQueryResultFormat getTupleQueryResultFormat() {
         return TupleQueryResultFormat.SPARQL;
+    }
+
+    @Override
+    public QueryResultFormat getQueryResultFormat() {
+        return getTupleQueryResultFormat();
+    }
+
+    @Override
+    public void handleBoolean(boolean value) {
+    }
+
+    @Override
+    public void handleLinks(List<String> linkUrls) {
+    }
+
+    @Override
+    public void handleNamespace(String prefix, String uri) {
+    }
+
+    @Override
+    public void startDocument() {
+    }
+
+    @Override
+    public void handleStylesheet(String stylesheetUrl) {
+    }
+
+    @Override
+    public void startHeader() {
+    }
+
+    @Override
+    public void endHeader() {
     }
 
     public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {

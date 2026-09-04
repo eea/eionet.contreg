@@ -27,6 +27,8 @@ import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.resultio.QueryResultFormat;
+import org.openrdf.query.resultio.QueryResultWriterBase;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
@@ -34,20 +36,12 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
  * A {@link TupleQueryResultWriter} that writes tuple query results in the <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL
  * Query Results XML Format</a>.
  */
-public class CRXmlWriter implements TupleQueryResultWriter {
-
-    /*-----------*
-     * Variables *
-     *-----------*/
+public class CRXmlWriter extends QueryResultWriterBase implements TupleQueryResultWriter {
 
     /**
      * XMLWriter to write XML to.
      */
-    private XMLWriter xmlWriter;
-
-    /*--------------*
-     * Constructors *
-     *--------------*/
+    private final XMLWriter xmlWriter;
 
     public CRXmlWriter(OutputStream out) {
         this(new XMLWriter(out));
@@ -58,14 +52,6 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         this.xmlWriter.setPrettyPrint(true);
     }
 
-    /*---------*
-     * Methods *
-     *---------*/
-
-    /*
-     * (non-Javadoc)
-     * @see org.openrdf.query.resultio.TupleQueryResultWriter#getTupleQueryResultFormat()
-     */
     @Override
     public final TupleQueryResultFormat getTupleQueryResultFormat() {
         return TupleQueryResultFormat.SPARQL;
@@ -80,10 +66,39 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         xmlWriter.setPrettyPrint(prettyPrint);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.openrdf.query.TupleQueryResultHandler#startQueryResult(java.util.List)
-     */
+    @Override
+    public QueryResultFormat getQueryResultFormat() {
+        return getTupleQueryResultFormat();
+    }
+
+    @Override
+    public void handleBoolean(boolean value) {
+    }
+
+    @Override
+    public void handleLinks(List<String> linkUrls) {
+    }
+
+    @Override
+    public void handleNamespace(String prefix, String uri) {
+    }
+
+    @Override
+    public void startDocument() {
+    }
+
+    @Override
+    public void handleStylesheet(String stylesheetUrl) {
+    }
+
+    @Override
+    public void startHeader() {
+    }
+
+    @Override
+    public void endHeader() {
+    }
+
     @Override
     public void startQueryResult(List<String> bindingNames) throws TupleQueryResultHandlerException {
         try {
@@ -107,10 +122,6 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.openrdf.query.TupleQueryResultHandler#endQueryResult()
-     */
     @Override
     public void endQueryResult() throws TupleQueryResultHandlerException {
         try {
@@ -123,10 +134,6 @@ public class CRXmlWriter implements TupleQueryResultWriter {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.openrdf.query.TupleQueryResultHandler#handleSolution(org.openrdf.query.BindingSet)
-     */
     @Override
     public void handleSolution(BindingSet bindingSet) throws TupleQueryResultHandlerException {
         try {
@@ -166,7 +173,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
 
     /**
      * Utility method for writing the given {@link URI}.
-     * @param value The given {@link URI}.
+     * @param uri The given {@link URI}.
      * @throws IOException
      */
     private void writeURI(URI uri) throws IOException {
@@ -184,7 +191,7 @@ public class CRXmlWriter implements TupleQueryResultWriter {
 
     /**
      * Utility method for writing the given {@link Literal}.
-     * @param bNode The given {@link Literal}.
+     * @param literal The given {@link Literal}.
      * @throws IOException
      */
     private void writeLiteral(Literal literal) throws IOException {

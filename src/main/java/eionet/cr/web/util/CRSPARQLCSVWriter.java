@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.openrdf.model.BNode;
@@ -17,6 +17,8 @@ import org.openrdf.model.datatypes.XMLDatatypeUtil;
 import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.resultio.QueryResultFormat;
+import org.openrdf.query.resultio.QueryResultWriterBase;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
@@ -25,15 +27,15 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
  *
  * @author kaido
  */
-public class CRSPARQLCSVWriter implements TupleQueryResultWriter {
+public class CRSPARQLCSVWriter extends QueryResultWriterBase implements TupleQueryResultWriter {
 
     /** internal writer object. */
-    private Writer writer;
+    private final Writer writer;
 
     /**
      * internal data separator variable.
      */
-    private char separator;
+    private final char separator;
 
     /** */
     private List<String> bindingNames;
@@ -44,9 +46,42 @@ public class CRSPARQLCSVWriter implements TupleQueryResultWriter {
      * @param separator data separator for the CSV file
      */
     public CRSPARQLCSVWriter(OutputStream out, char separator) {
-        Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));
+        Writer w = new OutputStreamWriter(out, StandardCharsets.UTF_8);
         writer = new BufferedWriter(w, 1024);
         this.separator = separator;
+    }
+
+    @Override
+    public QueryResultFormat getQueryResultFormat() {
+        return getTupleQueryResultFormat();
+    }
+
+    @Override
+    public void handleBoolean(boolean value) {
+    }
+
+    @Override
+    public void handleLinks(List<String> linkUrls) {
+    }
+
+    @Override
+    public void handleNamespace(String prefix, String uri) {
+    }
+
+    @Override
+    public void startDocument() {
+    }
+
+    @Override
+    public void handleStylesheet(String stylesheetUrl) {
+    }
+
+    @Override
+    public void startHeader() {
+    }
+
+    @Override
+    public void endHeader() {
     }
 
     @Override
@@ -159,8 +194,6 @@ public class CRSPARQLCSVWriter implements TupleQueryResultWriter {
     private void writeLiteral(Literal literal) throws IOException {
         String label = literal.getLabel();
         URI datatype = literal.getDatatype();
-        String language = literal.getLanguage();
-
         boolean quoted = false;
 
         if (datatype != null

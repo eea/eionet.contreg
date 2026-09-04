@@ -21,7 +21,7 @@ pipeline {
       }
       tools {
          maven 'maven3'
-         jdk 'Java8'
+         jdk 'Java11'
       }
       steps {
             sh './prepare-tmp.sh'

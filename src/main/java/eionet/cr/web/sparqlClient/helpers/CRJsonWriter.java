@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +19,8 @@ import org.openrdf.model.Value;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.resultio.QueryResultFormat;
+import org.openrdf.query.resultio.QueryResultWriterBase;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
@@ -28,31 +30,53 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
  * @author altnyris
  *
  */
-public class CRJsonWriter implements TupleQueryResultWriter {
-    /*-----------*
-     * Variables *
-     *-----------*/
+public class CRJsonWriter extends QueryResultWriterBase implements TupleQueryResultWriter {
 
-    private IndentingWriter writer;
-
+    private final IndentingWriter writer;
     private boolean firstTupleWritten;
 
-    /*--------------*
-     * Constructors *
-     *--------------*/
-
     public CRJsonWriter(OutputStream out) {
-        Writer w = new OutputStreamWriter(out, Charset.forName("UTF-8"));
+        Writer w = new OutputStreamWriter(out, StandardCharsets.UTF_8);
         w = new BufferedWriter(w, 1024);
         writer = new IndentingWriter(w);
     }
 
-    /*---------*
-     * Methods *
-     *---------*/
-
+    @Override
     public final TupleQueryResultFormat getTupleQueryResultFormat() {
         return TupleQueryResultFormat.JSON;
+    }
+
+    @Override
+    public QueryResultFormat getQueryResultFormat() {
+        return getTupleQueryResultFormat();
+    }
+
+    @Override
+    public void handleBoolean(boolean value) {
+    }
+
+    @Override
+    public void handleLinks(List<String> linkUrls) {
+    }
+
+    @Override
+    public void handleNamespace(String prefix, String uri) {
+    }
+
+    @Override
+    public void startDocument() {
+    }
+
+    @Override
+    public void handleStylesheet(String stylesheetUrl) {
+    }
+
+    @Override
+    public void startHeader() {
+    }
+
+    @Override
+    public void endHeader() {
     }
 
     public void startQueryResult(List<String> columnHeaders) throws TupleQueryResultHandlerException {

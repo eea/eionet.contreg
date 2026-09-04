@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.openrdf.model.BNode;
@@ -16,7 +17,10 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryResultHandlerException;
 import org.openrdf.query.TupleQueryResultHandlerException;
+import org.openrdf.query.resultio.QueryResultFormat;
+import org.openrdf.query.resultio.QueryResultWriterBase;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 
@@ -25,9 +29,10 @@ import org.openrdf.query.resultio.TupleQueryResultWriter;
  *
  * @author kaido
  */
-public class CRSPARQLTSVWriter implements TupleQueryResultWriter {
+public class CRSPARQLTSVWriter extends QueryResultWriterBase implements TupleQueryResultWriter {
+
     /** internal writer. */
-    private Writer writer;
+    private final Writer writer;
 
     /** local binding names. */
     private List<String> bindingNames;
@@ -39,8 +44,41 @@ public class CRSPARQLTSVWriter implements TupleQueryResultWriter {
      *            outputStream
      */
     public CRSPARQLTSVWriter(OutputStream out) {
-        Writer w = new OutputStreamWriter(out, Charset.forName("UTF-16LE"));
+        Writer w = new OutputStreamWriter(out, StandardCharsets.UTF_16LE);
         writer = new BufferedWriter(w, 1024);
+    }
+
+    @Override
+    public QueryResultFormat getQueryResultFormat() {
+        return getTupleQueryResultFormat();
+    }
+
+    @Override
+    public void handleBoolean(boolean value) {
+    }
+
+    @Override
+    public void handleLinks(List<String> linkUrls) {
+    }
+
+    @Override
+    public void handleNamespace(String prefix, String uri) {
+    }
+
+    @Override
+    public void startDocument() {
+    }
+
+    @Override
+    public void handleStylesheet(String stylesheetUrl) {
+    }
+
+    @Override
+    public void startHeader() {
+    }
+
+    @Override
+    public void endHeader() {
     }
 
     @Override
@@ -93,7 +131,7 @@ public class CRSPARQLTSVWriter implements TupleQueryResultWriter {
 
     @Override
     public TupleQueryResultFormat getTupleQueryResultFormat() {
-        return new TupleQueryResultFormat("SPARQL/TSV", "text/tab-separated-values", Charset.forName("UTF-16LE"), "tsv");
+        return new TupleQueryResultFormat("SPARQL/TSV", "text/tab-separated-values", StandardCharsets.UTF_16LE, "tsv");
     }
 
     /**
