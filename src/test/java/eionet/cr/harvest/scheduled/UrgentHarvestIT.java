@@ -34,7 +34,6 @@ import eionet.cr.dao.UrgentHarvestQueueDAO;
 import eionet.cr.dto.UrgentHarvestQueueItemDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.web.security.CRUser;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

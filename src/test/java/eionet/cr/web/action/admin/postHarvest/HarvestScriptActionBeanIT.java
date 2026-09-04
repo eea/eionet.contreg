@@ -22,7 +22,6 @@ import eionet.cr.web.action.admin.harvestscripts.HarvestScriptActionBean;
 import java.sql.Connection;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

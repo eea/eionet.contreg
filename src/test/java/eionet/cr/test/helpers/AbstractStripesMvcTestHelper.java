@@ -28,9 +28,6 @@ import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.StripesFilter;
 import net.sourceforge.stripes.mock.MockServletContext;
 import eionet.cr.web.action.AbstractActionBean;
-import org.springframework.web.context.ContextLoaderListener;
-
-import javax.servlet.ServletContextEvent;
 
 /**
  * Helper class for testing Stripes action beans.

@@ -23,7 +23,6 @@ import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
-import org.junit.Ignore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

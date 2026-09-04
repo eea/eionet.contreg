@@ -13,7 +13,6 @@ import eionet.cr.dao.DAOException;
 import eionet.cr.dao.readers.SubjectExportReader;
 import eionet.cr.util.Bindings;
 import eionet.cr.util.export.XmlExporter;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import eionet.cr.util.sesame.SPARQLResultSetReader;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

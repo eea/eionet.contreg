@@ -48,7 +48,6 @@ import eionet.cr.config.GeneralConfig;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
-import org.junit.Ignore;
 
 /**
  * Test Virtuoso Jdbc driver.

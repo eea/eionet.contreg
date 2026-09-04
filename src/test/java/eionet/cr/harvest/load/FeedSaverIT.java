@@ -28,7 +28,6 @@ import eionet.cr.util.URLUtil;
 import eionet.cr.util.sesame.SesameConnectionProvider;
 import eionet.cr.util.sesame.SesameUtil;
 import eionet.cr.util.sql.SQLUtil;
-import org.junit.Ignore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

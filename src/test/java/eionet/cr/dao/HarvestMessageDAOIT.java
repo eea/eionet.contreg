@@ -29,16 +29,10 @@ import org.junit.Test;
 import eionet.cr.dto.HarvestMessageDTO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
 /**
  * JUnit test tests HarvestMessageDAO functionality.

@@ -33,7 +33,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import eionet.cr.web.util.ApplicationCache;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

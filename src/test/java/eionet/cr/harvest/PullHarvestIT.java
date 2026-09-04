@@ -43,8 +43,6 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.dto.ObjectDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.JettyUtil;
-import org.junit.Ignore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

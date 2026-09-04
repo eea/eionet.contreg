@@ -24,10 +24,8 @@ import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestSourceDAO;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
-import eionet.cr.test.helpers.JettyUtil;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.sesame.SesameUtil;
-import org.junit.Ignore;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

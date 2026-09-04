@@ -32,7 +32,6 @@ import eionet.cr.dto.TripleDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.test.helpers.RdfLoader;
 import eionet.cr.util.pagination.PagingRequest;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

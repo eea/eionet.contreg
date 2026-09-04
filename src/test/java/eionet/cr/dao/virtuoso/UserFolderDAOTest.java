@@ -9,7 +9,6 @@ import eionet.cr.dao.virtuoso.helpers.VirtuosoUserFolderSearchHelper;
 import eionet.cr.util.SortOrder;
 import eionet.cr.util.SortingRequest;
 import eionet.cr.util.pagination.PagingRequest;
-import eionet.cr.util.sesame.SPARQLQueryUtil;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

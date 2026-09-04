@@ -25,20 +25,17 @@ import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import org.junit.Ignore;
 
 /**
  * JUnit test tests HarvestSourceDAO functionality.

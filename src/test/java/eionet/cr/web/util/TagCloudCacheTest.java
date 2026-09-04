@@ -26,7 +26,6 @@ import java.util.List;
 import eionet.cr.ApplicationTestContext;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import eionet.cr.dto.TagDTO;
 import org.junit.runner.RunWith;

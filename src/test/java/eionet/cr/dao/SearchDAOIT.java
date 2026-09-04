@@ -38,7 +38,6 @@ import eionet.cr.dto.SearchResultDTO;
 import eionet.cr.dto.SubjectDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.pagination.PagingRequest;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

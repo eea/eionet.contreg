@@ -14,12 +14,9 @@ import eionet.cr.dto.HarvestSourceDTO;
 import eionet.cr.test.helpers.CRDatabaseTestCase;
 import eionet.cr.util.Pair;
 import eionet.cr.util.pagination.PagingRequest;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;

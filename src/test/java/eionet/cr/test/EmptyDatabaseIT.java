@@ -27,7 +27,6 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 
 import eionet.cr.test.helpers.dbunit.DbUnitDatabaseConnection;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

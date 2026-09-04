@@ -20,10 +20,8 @@
  */
 package eionet.cr.dao.virtuoso;
 
-//import com.ibm.icu.util.Calendar;
 import eionet.cr.ApplicationTestContext;
 import eionet.cr.dao.DAOException;
-import eionet.cr.dao.DAOFactory;
 import eionet.cr.dao.HarvestScriptDAO;
 import eionet.cr.dto.HarvestScriptDTO;
 import eionet.cr.dto.HarvestScriptDTO.TargetType;
