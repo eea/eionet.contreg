@@ -32,7 +32,7 @@ Transition periods for implementation of the Directive were agreed with Estonia 
     <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-05-04</nextUpdate>
     <verified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-11</verified>
     <verifiedBy>HPE</verifiedBy>
-    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03T13:15:33.0</lastHarvested>
     <requester rdf:resource="clients/2"/>
     <dcterms:abstract>EC Water Reporting Obligation
 
@@ -94,7 +94,7 @@ Guidance document available at: http://ec.europa.eu/environment/air/quality/legi
     <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-03-30</nextUpdate>
     <verified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2008-07-30</verified>
     <verifiedBy>EEA</verifiedBy>
-    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03T13:15:33.0</lastHarvested>
     <requester rdf:resource="clients/2"/>
     <dcterms:abstract>Article 5 - Transmission of information and reporting:  
 1. With regard to the zones and agglomerations where any of the target values laid down in Annex I is exceeded, Member States shall forward the following information to the Commission:
@@ -161,7 +161,7 @@ The information shall be transmitted for each calendar year, by no later than 30
     <lastUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-09-16</lastUpdate>
     <isTerminated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isTerminated>
     <nextUpdate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-02-01</nextUpdate>
-    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03 13:15:33.0</lastHarvested>
+    <lastHarvested rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-11-03T13:15:33.0</lastHarvested>
     <requester rdf:resource="clients/2"/>
     <dcterms:abstract>Action plans related data as listed in annex VI for major roads, railways, airports and agglomerations concerned by 1st implementation step + Any criteria used in drawing up action plans
 &#8226; Per agglomeration &#8805; 250,000 inhab.
